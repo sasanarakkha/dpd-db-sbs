@@ -16,13 +16,15 @@ def zip_goldendict(rupth: RuPaths):
 
     if (
         rupth.dpd_goldendict_dir.exists()
-        and rupth.grammar_dict_goldendict_dir.exists()
+        and rupth.dpd_grammar_goldendict_dir.exists()
         and rupth.deconstructor_goldendict_dir.exists()
+        and rupth.dpd_variants_goldendict_dir.exists()
     ):
         input_dirs = [
             (rupth.dpd_goldendict_dir, "ru-dpd"),
-            (rupth.grammar_dict_goldendict_dir, "ru-dpd-grammar"),
+            (rupth.dpd_grammar_goldendict_dir, "ru-dpd-grammar"),
             (rupth.deconstructor_goldendict_dir, "ru-dpd-deconstructor"),
+            (rupth.dpd_variants_goldendict_dir, "dpd-variants"),
         ]
 
         output_zip_file = rupth.dpd_goldendict_zip_path
@@ -52,12 +54,14 @@ def zip_mdict(rupth: RuPaths):
     pr.green_title("zipping mdict")
 
     mdict_files = [
-        rupth.mdict_mdx_path,
-        rupth.mdict_mdd_path,
-        rupth.deconstructor_mdx_path,
-        rupth.deconstructor_mdd_path,
-        rupth.grammar_dict_mdx_path,
-        rupth.grammar_dict_mdd_path,
+        rupth.dpd_mdx_path,
+        rupth.dpd_mdd_path,
+        rupth.dpd_deconstructor_mdx_path,
+        rupth.dpd_deconstructor_mdd_path,
+        rupth.dpd_grammar_mdx_path,
+        rupth.dpd_grammar_mdd_path,
+        rupth.dpd_variants_mdx_path,
+        rupth.dpd_variants_mdd_path,
     ]
 
     for file in mdict_files:

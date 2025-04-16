@@ -135,6 +135,61 @@ def update_notes():
         # db_session.commit()
 
 
+def update_sbs_source_3(
+    new_source_3: str = "",
+    new_sutta_3: str = "",
+    new_example_3: str = ""
+) -> None:
+    """
+    Filters DpdHeadword entries where SBS.sbs_source_3 is not empty,
+    replaces sbs_source_3, sbs_sutta_3, and sbs_example_3 with empty strings,
+    and saves changes to the database.
+    """
+    console.print("[bold blue]Updating SBS source 3 entries...")
+
+    # Query words with non-empty sbs_source_3, loading the related SBS object
+    words_to_update = db_session.query(DpdHeadword).options(
+        joinedload(DpdHeadword.sbs)
+    ).join(SBS, DpdHeadword.id == SBS.id).filter(
+        and_(
+            SBS.sbs_source_3.isnot(None),
+            SBS.sbs_source_3 != ''
+        )
+    ).all()
+
+    count_updated = 0
+    for word in words_to_update:
+        if word.sbs: # Ensure SBS object exists
+            old_source_3 = word.sbs.sbs_source_3
+            old_sutta_3 = word.sbs.sbs_sutta_3
+            old_example_3 = word.sbs.sbs_example_3
+
+            # Update the values
+            word.sbs.sbs_source_3 = new_source_3
+            word.sbs.sbs_sutta_3 = new_sutta_3
+            word.sbs.sbs_example_3 = new_example_3
+
+            console.print(f"[cyan]Updating word ID:[/cyan] {word.id}")
+            console.print(f"  [yellow]Old source_3:[/yellow] {old_source_3}")
+            console.print(f"  [green]New source_3:[/green] {new_source_3}")
+            console.print(f"  [yellow]Old sutta_3:[/yellow] {old_sutta_3}")
+            console.print(f"  [green]New sutta_3:[/green] {new_sutta_3}")
+            console.print(f"  [yellow]Old example_3:[/yellow] {old_example_3}")
+            console.print(f"  [green]New example_3:[/green] {new_example_3}")
+            print()
+            count_updated += 1
+        else:
+            console.print(f"[yellow]Warning:[/yellow] Word ID {word.id} matched filter but has no SBS object.")
+
+
+    if count_updated > 0:
+        console.print(f"[bold green]Committing {count_updated} changes...")
+        # db_session.commit() # Uncomment to save changes
+        console.print("[bold green]Changes committed.")
+    else:
+        console.print("[yellow]No entries found matching the criteria. No changes made.")
+
+
 def update_column_for_some_criteria(source_value):
     # Query the database to find the rows that match the conditions
     rows_to_update_sbs = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.sbs)).outerjoin(SBS).filter(
@@ -236,4 +291,10 @@ value_to_update = "(грам) "
 
 # update_notes()
 
-update_column_for_some_criteria("VIN1.4.1.4")
+# update_sbs_source_3()
+
+update_column_for_some_criteria("VIN1.4.1.6")
+
+
+
+
