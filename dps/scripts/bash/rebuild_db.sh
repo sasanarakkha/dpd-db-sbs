@@ -5,14 +5,13 @@
 set -e
 test -e dpd.db || touch dpd.db
 
-git fetch
+# git fetch
 
-git checkout origin/main -- db/backup_tsv/dpd_headwords.tsv
+git checkout sbs-ru
 
-git checkout origin/main -- db/backup_tsv/dpd_roots.tsv
+# git checkout origin/main -- db/backup_tsv/dpd_headwords.tsv
 
-
-
+# git checkout origin/main -- db/backup_tsv/dpd_roots.tsv
 
 while true; do
     echo -ne "\033[1;36m Backup Ru and SBS tables and copy them to db/backup_tsv?\033[0m"

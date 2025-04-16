@@ -7,7 +7,7 @@
 
     <title>Электронный Словарь Пали</title>
 
-    <link href="dpd_ru.css" rel="stylesheet">
+    <link href="dpd-css-and-fonts.css" rel="stylesheet">
 
     <link href="ru_family_compound_json.js" class="load_js_ru" rel="preload" as="script">
     <link href="ru_family_compound_template.js" class="load_js_ru" rel="preload" as="script">
@@ -54,14 +54,14 @@
             
             % if i.needs_frequency_button:
             "FreqHeading": "${i.freq_data_unpack["FreqHeading"]}",
-            "CstFreq": ${i.freq_data_unpack["CstFreq"]},
-            "CstGrad": ${i.freq_data_unpack["CstGrad"]},
-            "BjtFreq": ${i.freq_data_unpack["BjtFreq"]},
-            "BjtGrad": ${i.freq_data_unpack["BjtGrad"]},
-            "SyaFreq": ${i.freq_data_unpack["SyaFreq"]},
-            "SyaGrad": ${i.freq_data_unpack["SyaGrad"]},
-            "ScFreq": ${i.freq_data_unpack["ScFreq"]},
-            "ScGrad": ${i.freq_data_unpack["ScGrad"]}
+            "CstFreq": ${ i.freq_data_unpack["CstFreq"] },
+            "CstGrad": ${ i.freq_data_unpack["CstGrad"] },
+            "BjtFreq": ${ i.freq_data_unpack["BjtFreq"] },
+            "BjtGrad": ${ i.freq_data_unpack["BjtGrad"] },
+            "SyaFreq": ${ i.freq_data_unpack["SyaFreq"] },
+            "SyaGrad": ${ i.freq_data_unpack["SyaGrad"] },
+            "ScFreq": ${ i.freq_data_unpack["ScFreq"] },
+            "ScGrad": ${ i.freq_data_unpack["ScGrad"] }
             % endif
         };
     </script>
