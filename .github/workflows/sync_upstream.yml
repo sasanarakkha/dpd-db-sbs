@@ -31,6 +31,6 @@ jobs:
 
       - name: Push Upstream Main to Origin Main
         run: |
-          git push --force-with-lease=refs/heads/main \
+          git push --force \
             https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git \
             upstream/main:refs/heads/main
