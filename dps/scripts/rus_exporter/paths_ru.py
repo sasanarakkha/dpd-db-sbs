@@ -13,7 +13,7 @@ class RuPaths:
 
         # /tsvs/
         self.sets_ru_path = (
-            base_dir / "exporter/goldendict/ru_components/tsvs/sets_ru.tsv"
+            base_dir / "dps/rus/sets_ru.tsv"
         )
 
         # exporter/kindle/
