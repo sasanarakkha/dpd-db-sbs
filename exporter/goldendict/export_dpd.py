@@ -622,7 +622,7 @@ def render_button_box_templ(
             )
         elif lang == "ru":
             grammar_button = button_html.format(
-                target=f"grammar_ru_{i.lemma_1_}", name="грамматика"
+                target=f"ru_grammar_{i.lemma_1_}", name="грамматика"
             )
     else:
         grammar_button = ""
@@ -635,7 +635,7 @@ def render_button_box_templ(
             )
         elif lang == "ru":
             example_button = button_html.format(
-                target=f"example_ru_{i.lemma_1_}", name="пример"
+                target=f"ru_example_{i.lemma_1_}", name="пример"
             )
     else:
         example_button = ""
@@ -648,7 +648,7 @@ def render_button_box_templ(
             )
         elif lang == "ru":
             examples_button = button_html.format(
-                target=f"examples_ru_{i.lemma_1_}", name="примеры"
+                target=f"ru_examples_{i.lemma_1_}", name="примеры"
             )
     else:
         examples_button = ""
@@ -660,7 +660,7 @@ def render_button_box_templ(
         and sbs.needs_sbs_example_button
     ):
         sbs_example_button = button_html.format(
-            target=f"sbs_example_{i.lemma_1_}", name="SBS"
+            target=f"ru_sbs_example_{i.lemma_1_}", name="SBS"
         )
     else:
         sbs_example_button = ""
@@ -673,7 +673,7 @@ def render_button_box_templ(
             )
         elif lang == "ru":
             conjugation_button = button_html.format(
-                target=f"conjugation_ru_{i.lemma_1_}", name="спряжения"
+                target=f"ru_conjugation_{i.lemma_1_}", name="спряжения"
             )
     else:
         conjugation_button = ""
@@ -686,7 +686,7 @@ def render_button_box_templ(
             )
         elif lang == "ru":
             declension_button = button_html.format(
-                target=f"declension_ru_{i.lemma_1_}", name="склонения"
+                target=f"ru_declension_{i.lemma_1_}", name="склонения"
             )
     else:
         declension_button = ""
@@ -699,7 +699,7 @@ def render_button_box_templ(
             )
         elif lang == "ru":
             root_family_button = button_html.format(
-                target=f"family_root_ru_{i.lemma_1_}", name="семья корня"
+                target=f"ru_family_root_{i.lemma_1_}", name="семья корня"
             )
     else:
         root_family_button = ""
@@ -712,7 +712,7 @@ def render_button_box_templ(
             )
         elif lang == "ru":
             word_family_button = button_html.format(
-                target=f"family_word_ru_{i.lemma_1_}", name="семья слова"
+                target=f"ru_family_word_{i.lemma_1_}", name="семья слова"
             )
     else:
         word_family_button = ""
@@ -725,7 +725,7 @@ def render_button_box_templ(
             )
         elif lang == "ru":
             compound_family_button = button_html.format(
-                target=f"family_compound_ru_{i.lemma_1_}", name="семья составного"
+                target=f"ru_family_compound_{i.lemma_1_}", name="семья составного"
             )
 
     elif i.needs_compound_families_button:
@@ -735,7 +735,7 @@ def render_button_box_templ(
             )
         elif lang == "ru":
             compound_family_button = button_html.format(
-                target=f"family_compound_ru_{i.lemma_1_}", name="семья составных"
+                target=f"ru_family_compound_{i.lemma_1_}", name="семья составных"
             )
     else:
         compound_family_button = ""
@@ -748,7 +748,7 @@ def render_button_box_templ(
             )
         elif lang == "ru":
             idioms_button = button_html.format(
-                target=f"family_idiom_ru_{i.lemma_1_}", name="идиомы"
+                target=f"ru_family_idiom_{i.lemma_1_}", name="идиомы"
             )
     else:
         idioms_button = ""
@@ -761,7 +761,7 @@ def render_button_box_templ(
             )
         elif lang == "ru":
             set_family_button = button_html.format(
-                target=f"family_set_ru_{i.lemma_1_}", name="группа"
+                target=f"ru_family_set_{i.lemma_1_}", name="группа"
             )
 
     elif i.needs_sets_button:
@@ -771,7 +771,7 @@ def render_button_box_templ(
             )
         elif lang == "ru":
             set_family_button = button_html.format(
-                target=f"family_set_ru_{i.lemma_1_}", name="группы"
+                target=f"ru_family_set_{i.lemma_1_}", name="группы"
             )
     else:
         set_family_button = ""
@@ -784,7 +784,7 @@ def render_button_box_templ(
             )
         elif lang == "ru":
             frequency_button = button_html.format(
-                target=f"frequency_ru_{i.lemma_1_}", name="частота"
+                target=f"ru_frequency_{i.lemma_1_}", name="частота"
             )
     else:
         frequency_button = ""
@@ -796,7 +796,7 @@ def render_button_box_templ(
         )
     elif lang == "ru":
         feedback_button = button_html.format(
-            target=f"feedback_ru_{i.lemma_1_}", name="о словаре"
+            target=f"ru_feedback_{i.lemma_1_}", name="о словаре"
         )
 
     return str(

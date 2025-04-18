@@ -17,13 +17,13 @@ def zip_goldendict(rupth: RuPaths):
     if (
         rupth.dpd_goldendict_dir.exists()
         and rupth.dpd_grammar_goldendict_dir.exists()
-        and rupth.deconstructor_goldendict_dir.exists()
+        and rupth.dpd_deconstructor_goldendict_dir.exists()
         and rupth.dpd_variants_goldendict_dir.exists()
     ):
         input_dirs = [
             (rupth.dpd_goldendict_dir, "ru-dpd"),
             (rupth.dpd_grammar_goldendict_dir, "ru-dpd-grammar"),
-            (rupth.deconstructor_goldendict_dir, "ru-dpd-deconstructor"),
+            (rupth.dpd_deconstructor_goldendict_dir, "ru-dpd-deconstructor"),
             (rupth.dpd_variants_goldendict_dir, "dpd-variants"),
         ]
 
