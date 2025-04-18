@@ -4,6 +4,8 @@
 
 set -e
 
+git checkout sbs-ru
+
 python -c "from tools.configger import config_update; config_update('exporter', 'language', 'en')"
 python -c "from tools.configger import print_config_settings; print_config_settings(['dictionary', 'goldendict', 'exporter'])"
 

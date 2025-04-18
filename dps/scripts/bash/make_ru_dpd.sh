@@ -4,6 +4,8 @@
 
 set -e
 
+git checkout sbs-ru
+
 python -c "from tools.configger import config_update; config_update('exporter', 'language', 'ru')"
 python -c "from tools.configger import config_update; config_update('dictionary', 'link_url', 'https://find.dhamma.gift/bw/')"
 
