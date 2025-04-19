@@ -1,12 +1,12 @@
-name: Build mkdocs site and copy to organization repo
+name: Russian Build mkdocs site and copy to repo
 
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["main"]
+    branches: ["sbs-ru"]
     paths:
-      - 'docs/**'
-      - 'mkdocs.yaml'
+      - 'docs_rus/**'
+      - 'mkrusdocs.yaml'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -53,18 +53,18 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.DPD_DEPLOY_KEY }}
 
-      - name: Push to digitalpalidictionary.github.io
+      - name: Push to Devamitta/dpd.rus.git
         run: |
           # Setup git identity
           git config --global user.name "DPD Bot"
           git config --global user.email "dpdbot@example.com"
-          
+
           # Clone and sync site files
-          git clone git@github.com:digitalpalidictionary/digitalpalidictionary.github.io.git dest_repo
+          git clone git@github.com:Devamitta/dpd.rus.git dest_repo
           cd dest_repo
-          rsync -a --delete --exclude='.git' --exclude='.github' "$GITHUB_WORKSPACE/docs_site/" .
+          rsync -a --delete --exclude='.git' --exclude='.github' "$GITHUB_WORKSPACE/docs_rus_site/" .
           
           # Commit and push if changes exist
           git add -A
           git diff --quiet && git diff --cached --quiet || \
-            (git commit -m "Update site: $(date +'%Y-%m-%d %H:%M:%S')" && git push origin main)
+            (git commit -m "Update site: $(date +'%Y-%m-%d %H:%M:%S')" && git push origin HEAD:ru)
