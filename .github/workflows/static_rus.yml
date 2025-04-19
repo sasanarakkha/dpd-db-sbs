@@ -3,7 +3,7 @@ name: Build mkdocs site and copy to repo
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["main"]
+    branches: ["sbs-ru"]
     paths:
       - 'docs_rus/**'
       - 'mkdocs.yaml'
