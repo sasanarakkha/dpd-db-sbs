@@ -112,6 +112,13 @@ extra_css:
   - stylesheets/extra.css
 
 extra:
+  alternate:
+    - name: English
+      link: https://digitalpalidictionary.github.io/
+      lang: en
+    - name: Русский
+      link: https://devamitta.github.io/dpd.rus/
+      lang: ru
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/sasanarakkha/dpd-db-sbs
