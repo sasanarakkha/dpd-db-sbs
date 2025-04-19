@@ -1,4 +1,4 @@
-# What Users Say About DPD
+# Что говорят пользователь DPD
 
 
 As the year is coming to an end I just wanted to write and thank you for all your work on DPD. It is now my No. 1 go-to dictionary, and I benefit from your work every day. At present I am translating the previously untranslated word-commentaries on the Jātaka verses. Wishing you all the very best for the coming year, and further progress in your work! Mettā
@@ -52,7 +52,7 @@ This is the best EVER, all features are FAB.
 ---
 
 
-Let us know about [you think about DPD](mailto:digitalpalidictionary@gmail.com?subject=What%20I%20think%20about%20DPD).
+Дайте пожалуйста знать, что [Вы думаете о DPD](mailto:devamitta@sasanarakkha.org).
  
 
 

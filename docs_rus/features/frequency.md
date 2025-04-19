@@ -2,7 +2,7 @@
 
 Нажатие кнопки **частота** даст вам мгновенный обзор того, где и как часто слово может встречаться в тексте [Chaṭṭha Saṅgāyana](https://www.tipitaka.org/).
 
-![image](pics/frequency/frequency-overview.png)
+![image](../pics/frequency/frequency-overview.png)
 
 Эти карты частоты слов могут предоставить мгновенный доступ к картинке использования слов в различных слоях текстов и стать отправной точкой для дальнейшего изучения того, как слова на пали и связанные с ними концепции развивались со временем.
 
@@ -30,7 +30,7 @@
 
 ## Vinaya Ṭīkā
 
-![image](pics/frequency/vinaya-ṭīkā.png)
+![image](../pics/frequency/vinaya-ṭīkā.png)
 
 Некоторые из подкомментариев Винаи (Vinaya Ṭīkā) содержат перекрывающийся материал, который нельзя сразу отнести к определенной книге Винаи, поэтому все Vinaya Ṭīkā перечислены в разделе Vinaya Pārājika.
 
@@ -40,7 +40,7 @@
 
 ## Кхуддака Никая
 
-![image](pics/frequency/khuddaka.png)
+![image](../pics/frequency/khuddaka.png)
 
 Кхуддака Никая содержит много материала, который отличается не только по языковому стилю, но и по смысловому содержанию. Он был разделен на три соответствующих раздела для удобства ссылок:
 
@@ -78,17 +78,17 @@ aggapāḷi, Nettippakaraṇapāḷi, Milindapañhapāḷi, Peṭakopadesapāḷ
 
 Раздел Aññā содержит огромный объем материала с комментариев и до современности.
 
-![image](pics/frequency/aññā.png)
+![image](../pics/frequency/aññā.png)
 
 ### Aññā Abhidhamma
 
-![image](pics/frequency/a%C3%B1%C3%B1%C4%81-abhidhamma.png)
+![image](../pics/frequency/a%C3%B1%C3%B1%C4%81-abhidhamma.png)
 
 Все книги, которые не связаны непосредственно с 7 книгами Абхидхамма Питаки, включены в Aññā Abhidhamma. Этот раздел включает в себя резюме и обзоры:  Abhidhammāvatāro-nāmarūpaparicchedo, широко известные Abhidhammatthasaṅgaho, Abhidhammāvatāra-purāṇaṭīkā, и Abhidhammamātikāpāḷi.
 
 ### Aññā Visuddhimagga
 
-![image](pics/frequency/aññā-visuddhimagga.png)
+![image](../pics/frequency/aññā-visuddhimagga.png)
 
 Висуддхимагга включена в раздел Aññā под *aṭṭhakathā*, а его комментарий под *ṭīkā*.
 

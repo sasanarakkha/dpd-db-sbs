@@ -10,12 +10,12 @@
 
 Перейдите в Меню > Редактировать > Словари (Клавиша **F3**).
 
-![open dictionaries](pics/dpdict.net/dpdict_api_gd_open_dictionaries.png)
+![open dictionaries](../pics/dpdict.net/dpdict_api_gd_open_dictionaries.png)
 
 
 (1) В **Источниках** перейдите на вкладку **Веб-сайты**
 
-![add website](pics/dpdict.net/dpdict_api_gd_add_website.png)
+![add website](../pics/dpdict.net/dpdict_api_gd_add_website.png)
 
 
 (2) Нажмите **Добавить**
@@ -30,7 +30,7 @@ Address: https://dpdict.net/ru/gd?search=%GDWORD%
 
 (1) Перейдите на вкладку **Словари**
 
-![reorder dictionaries](pics/dpdict.net/dpdict_api_gd_reorder_dictionaries.png)
+![reorder dictionaries](../pics/dpdict.net/dpdict_api_gd_reorder_dictionaries.png)
 
 (2) Перетащите www.dpdict.net/ru в нужное вам место в списке
 

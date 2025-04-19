@@ -4,14 +4,14 @@
 
 Внутри словаря есть формы обратной связи, которые автоматически заполняют необходимые поля. Просто щелкните на них напрямую. Одна из них находится в разделе **грамматика**.
 
-![image](pics/feedback/grammar.png)
+![image](../pics/feedback/grammar.png)
 
 И еще одна в разделе **таблицы спряжения**, если вы заметили там что-то неправильное.
 
-![image](pics/feedback/inflection.png)
+![image](../pics/feedback/inflection.png)
 
 Также, в **сводке** для слов, которые были [переведены автоматически](https://digitalpalidictionary.github.io/rus/features.html#%D0%9F%D0%B5%D1%80%D0%B5%D0%B2%D0%BE%D0%B4-%D0%BD%D0%B5%D0%B9%D1%80%D0%BE%D0%BD%D0%BD%D1%8B%D0%BC%D0%B8-%D1%81%D0%B5%D1%82%D1%8F%D0%BC%D0%B8), имеется прямая ссылка, которая автоматически заполняет необходимые поля.
 
-![image](pics/feedback/ai_link.png)
+![image](../pics/feedback/ai_link.png)
 
 И во многих других разделах.

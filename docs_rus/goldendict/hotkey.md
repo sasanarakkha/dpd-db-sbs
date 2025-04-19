@@ -4,27 +4,27 @@
 
 Перейдите в Меню > Правка > Параметры (Клавиша F4) > Горячие клавиши.
 
-![preferences](pics/hotkey/preferences.png)
+![preferences](../pics/hotkey/preferences.png)
 
 Выберите предпочтительную горячую клавишу и нажмите ОК. По умолчанию Ctrl-C-C работает отлично, нет необходимости его менять.
 
-![hoteky](pics/hotkey/hoteky.png)
+![hoteky](../pics/hotkey/hoteky.png)
 
 Дважды щелкните, чтобы выделить любое слово на пали в любом программном обеспечении или PDF-документе и нажмите горячую клавишу. Откроется небольшое окно GoldenDict. DPD автоматически найдет любое измененное слово в словаре.
 
-![popupwindow](pics/hotkey/popupwindow.png)
+![popupwindow](../pics/hotkey/popupwindow.png)
 
 Если вы предпочитаете, вы можете каждый раз открывать слово в главном окне.
 - Перейдите в меню > Правка > Параметры (Клавиша F4) > **Всплывающее окно**
 - Выберите "Отправлять переводимое слово в главное окно"
 
-![send to main window](pics/hotkey/send%20to%20main%20window.png)
+![send to main window](../pics/hotkey/send%20to%20main%20window.png)
 
 Если вы пользователь [Digital Pāli Reader](https://www.digitalpalireader.online/), вы можете включить горячую клавишу _одним щелчком_ в настройках.
 - Откройте настройки DPR (Клавиша **%**).
 - Выберите "**Копировать слова в буфер обмена при щелчке**".
 
-![dpr clipboard preference](pics/hotkey/dpr%20clipboard%20preference.png)
+![dpr clipboard preference](../pics/hotkey/dpr%20clipboard%20preference.png)
 
 Конечно, вы также можете искать слова на пали по-старому...
 
@@ -32,6 +32,6 @@
 - Начните вводить слово в строку поиска и щелкните слово, которое вы ищете.
 - Не нужно использовать диакритические знаки при вводе в GoldenDict, он автоматически найдет то, что вы ищете.
 
-![search](pics/hotkey/search.png)
+![search](../pics/hotkey/search.png)
 
-Если вы используете Linux, также попробуйте [всплывающее окно](setup_scan_popup.html) - это позволяет открывать слово в словаре одним щелчком.
+Если вы используете Linux, также попробуйте [всплывающее окно](setup_scan_popup.md) - это позволяет открывать слово в словаре одним щелчком.

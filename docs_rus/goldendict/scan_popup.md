@@ -4,24 +4,24 @@
 
 В GoldenDict откройте меню Правка > Параметры (Клавиша F4).
 
-![edit preferences](pics/scan-popup/edit%20preferences.png)
+![edit preferences](../pics/scan-popup/edit%20preferences.png)
 
 Перейдите на вкладку "Всплывающее окно" и активируйте **Разрешить всплывающее окно**. С этими настройками каждое слово, по которому вы щелкаете, будет открываться в словаре.
 
-![scan popup tab](pics/scan-popup/scan%20popup%20tab.png)
+![scan popup tab](../pics/scan-popup/scan%20popup%20tab.png)
 
 Если эта настройка кажется вам слишком неудобной, попробуйте настройку на картинке ниже.
 
-![settings with scan flag](pics/scan-popup/settings%20with%20scan%20flag.png)
+![settings with scan flag](../pics/scan-popup/settings%20with%20scan%20flag.png)
 
 Теперь, когда вы щелкаете слово в тексте на пали, появляется небольшая иконка словаря. Щелкните по ней, чтобы открыть слово в словаре.
 
-![popup icon](pics/scan-popup/popup%20icon.png)
+![popup icon](../pics/scan-popup/popup%20icon.png)
 
 Настройки, которые разработчики данного Словаря находят удобными, показаны на картинке ниже. При нажатии **Ctrl + Win/Meta** выделенное слово окрывается в главном окне.
 
-![settings personal](pics/scan-popup/settings%20personal.png)
+![settings personal](../pics/scan-popup/settings%20personal.png)
 
 Пожалуйста, экспериментируйте, чтобы найти настройки, которые подходят вам.
 
-Затем посмотрите, как настроить некоторые [расширенные функции в GoldenDict](setup_advanced.html).
+Затем посмотрите, как настроить некоторые [расширенные функции в GoldenDict](setup_advanced.md).

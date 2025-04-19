@@ -26,7 +26,7 @@
 
 Если ваше слово не найдено, будут показаны наиболее близкие совпадения.
 
-![no results found](pics/dpdict.net/dpdict_no_results_found.png)
+![no results found](../pics/dpdict.net/dpdict_no_results_found.png)
 
 **Дважды кликните** на любое слово, чтобы отобразить соответствующую запись в словаре.
 

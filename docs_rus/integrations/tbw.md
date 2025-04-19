@@ -8,6 +8,6 @@
 - текстами на Пали справа
 - поиском в DPD просто наведением мыши на любое слово на Пали
 
-![tbw](pics/tbw/tbw.png)
+![tbw](../pics/tbw/tbw.png)
 
 Веб-сайт Слов Будды также доступен для загрузки и использования офлайн [отсюда](https://drive.google.com/drive/folders/1HawM4A_Ns37VGpHgH4YFpkkJpjtpNLEw).

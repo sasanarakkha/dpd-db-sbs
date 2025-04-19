@@ -16,7 +16,7 @@
 
 Рекомендуется создать легкодоступную папку GoldenDict, например, `/Documents/GoldenDict`.
 
-![create new folder](pics/linux-install/create%20new%20folder.png)
+![create new folder](../pics/linux-install/create%20new%20folder.png)
 
 Или в терминале:
 ```
@@ -28,11 +28,11 @@ mkdir /home/ваше_имя_пользователя/Documents/GoldenDict
 
 Щелкните правой кнопкой мыши по zip-файлу DPD в папке Загрузки и откройте его с помощью Архивного менеджера.
 
-![archive manager](pics/linux-install/archive%20manager.png)
+![archive manager](../pics/linux-install/archive%20manager.png)
 
 Нажмите Извлечь и выберите папку `/Documents/GoldenDict`.
 
-![extract](pics/linux-install/extract.png)
+![extract](../pics/linux-install/extract.png)
 
 Или в терминале:
 ```
@@ -52,7 +52,7 @@ sudo apt-get install goldendict
 
 Или непосредственно из Менеджера программ:
 
-![software manager](pics/linux-install/software%20manager.png)
+![software manager](../pics/linux-install/software%20manager.png)
 
 Убедитесь, что устанавливается версия 1.5, а не версия 1.0!
 
@@ -62,21 +62,21 @@ sudo apt-get install goldendict
 
 Перейдите в Меню > Редактировать > Словари (Клавиша **F3**).
 
-![dictionaries F3](pics/linux-install/dictionaries%20F3.png)
+![dictionaries F3](../pics/linux-install/dictionaries%20F3.png)
 
 Перейдите в Источники > Файлы.
 
 Нажмите Добавить и выберите папку `/Documents/GoldenDict`.
 
-![add](pics/linux-install/add.png)
+![add](../pics/linux-install/add.png)
 
 Установите флажок рекурсивного поиска √ (это гарантирует поиск в подпапках).
 
-![recursive](pics/linux-install/recursive.png)
+![recursive](../pics/linux-install/recursive.png)
 
 Нажмите OK и подождите несколько моментов, пока словари индексируются.
 
 Вы готовы!
 
-Далее узнайте, как [настроить горячую клавишу](setup_hotkey.html) или [настроить всплывающее окно](setup_scan_popup.html), чтобы вы могли щелкнуть по любому слову Пали в любом тексте и сразу открыть его в словаре.
+Далее узнайте, как [настроить горячую клавишу](setup_hotkey.md) или [настроить всплывающее окно](setup_scan_popup.md), чтобы вы могли щелкнуть по любому слову Пали в любом тексте и сразу открыть его в словаре.
 
