@@ -273,16 +273,16 @@ class RuPaths:
         # resources/fdg_dpd
         self.fdg_dpd_ebts_js_ru_path = base_dir / "resources/fdg_dpd/assets/standalone-dpd/ru/dpd_ebts.js"
 
-        # dps/ru_docs
-        self.mk_ru_docs_yaml = base_dir / "mkrudocs.yaml"
-        # self.ru_docs_css_path = base_dir / "dps/ru_docs/stylesheets/extra.css"
-        # self.ru_docs_css_variables_path = base_dir / "dps/ru_docs/stylesheets/dpd-variables.css"
-        self.ru_docs_dir = base_dir / "dps/ru_docs/"
-        self.ru_docs_bibliography_md_path = base_dir / "dps/ru_docs/bibliography.md"
-        self.ru_docs_abbreviations_md_path = base_dir / "dps/ru_docs/abbreviations.md"
-        self.ru_docs_changelog_md_path = base_dir / "dps/ru_docs/changelog.md"
-        self.ru_docs_thanks_md_path = base_dir / "dps/ru_docs/thanks.md"
-
+        # ru_docs
+        self.mk_docs_yaml = base_dir / "mkdocs.yaml"
+        self.docs_css_path = base_dir / "docs_rus/stylesheets/extra.css"
+        self.docs_css_variables_path = base_dir / "docs_rus/stylesheets/dpd-variables.css"
+        self.docs_dir = base_dir / "docs_rus/"
+        self.docs_bibliography_md_path = base_dir / "docs_rus/bibliography.md"
+        self.docs_abbreviations_md_path = base_dir / "docs_rus/abbreviations.md"
+        self.docs_changelog_md_path = base_dir / "docs_rus/changelog.md"
+        self.docs_thanks_md_path = base_dir / "docs_rus/thanks.md"
+        
         if create_dirs:
             self.create_dirs()
 
