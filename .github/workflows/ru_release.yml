@@ -1,4 +1,4 @@
-name: Draft Russian Release
+name: Russian Draft Release
 
 on: 
  workflow_dispatch:
