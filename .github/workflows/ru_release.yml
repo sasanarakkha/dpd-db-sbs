@@ -16,8 +16,8 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
-        repository: 'digitalpalidictionary/dpd-db'
-        ref: 'main'
+        repository: 'sasanarakkha/dpd-db-sbs'
+        ref: 'sbs-ru'
         submodules: 'recursive'
         # Fetch depth 0 to allow committing back to the submodule
         fetch-depth: 0
