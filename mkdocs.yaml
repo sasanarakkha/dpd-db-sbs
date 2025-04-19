@@ -1,19 +1,19 @@
-site_name: Digital Pāḷi Dictionary Docs
-docs_dir: "docs"
-repo_url: https://github.com/digitalpalidictionary/dpd-db
+site_name: Цифровой Пали Словарь Документация
+docs_dir: "docs_rus"
+repo_url: https://github.com/sasanarakkha/dpd-db-sbs
 site_dir: "docs_site"
 
 nav:
-  - Home: index.md
-  - Features:
+  - Главная: index.md
+  - Особенности:
     - "features/index.md"
-    - Features: "features/features.md"
-    - Roots Dict: "features/rootdict.md"
-    - Word Frequency: "features/frequency.md"
-    - Deconstructor: "features/deconstructor.md"
-    - Grammar Dictionary: "features/grammardict.md"
-    - Variant Readings: "features/variants.md"
-  - Installation Guide:
+    - Особенности: "features/features.md"
+    - Словарь корней: "features/rootdict.md"
+    - Частота слов: "features/frequency.md"
+    - Деконструктор: "features/deconstructor.md"
+    - Словарь грамматики: "features/grammardict.md"
+    - Варианты текста: "features/variants.md"
+  - Установка:
     - "install/index.md"
     - Windows: "install/win.md"
     - Android: "install/android_dicttango.md"
@@ -23,21 +23,21 @@ nav:
     - Kindle: "install/kindle.md"
     - Kobo: "install/kobo.md"
     - ChromeBook: "install/chromebook.md"
-    - Update: "install/update.md"
-  - GoldenDict Features:
+    - Обновление: "install/update.md"
+  - GoldenDict Особенности:
     - "goldendict/index.md"
-    - Setup the Hotkey: "goldendict/hotkey.md"
-    - Setup the Scan Popup: "goldendict/scan_popup.md"
-    - Setup Advanced Features: "goldendict/advanced.md"
+    - Настройка горячей клавиши: "goldendict/hotkey.md"
+    - Настройка всплывающего окна: "goldendict/scan_popup.md"
+    - Настройка расширенных функций: "goldendict/advanced.md"
   - Webapp:
     - "webapp/index.md"
-    - Search: "webapp/search.md"
-    - Summary: "webapp/summary.md"
-    - Dictionary display: "webapp/dictionary_display.md"
-    - Settings: "webapp/settings.md"
-    - CST Bold Definitions: "webapp/cst_bold_def.md"
-    - API in GoldenDict: "webapp/api_goldendict.md"
-    - API in DictTango: "webapp/api_dicttango.md"
+    - Поиск: "webapp/search.md"
+    - Сводка: "webapp/summary.md"
+    - Отображение словаря: "webapp/dictionary_display.md"
+    - Настройки: "webapp/settings.md"
+    - Выделенные определения CST: "webapp/cst_bold_def.md"
+    - API в GoldenDict: "webapp/api_goldendict.md"
+    - API в DictTango: "webapp/api_dicttango.md"
   - Software Integrations:
     - integrations/index.md
     - Dhamma.gift website: "integrations/dhamma_gift.md"
@@ -55,22 +55,22 @@ nav:
     - "contributing/index.md"
     - Pāḷi: "contributing/pali.md"
     - Code: "contributing/code.md"
-  - What Users Say: users_say.md
-  - Abbreviations: "abbreviations.md"
-  - Bibliography: "bibliography.md"
-  - Thanks: "thanks.md"
-  - Contact: "contact.md"
-  - License: "license.md"  
-  - Changelog: "changelog.md"
-  - Pāḷi Notes: "pali_notes/index.md"
-  - Developer Docs:
+  - Совмещенный словарь: "dpd_rus.md"
+  - Отзывы Пользователей: users_say.md
+  - Сокращения: "abbreviations.md"
+  - Литература: "bibliography.md"
+  - Благодарности: "thanks.md"
+  - Контакты: "contact.md"
+  - Лицензия: "license.md"  
+  - Язык Пали: "pali_notes/index.md"
+  - Документация для разработчиков:
     - "technical/index.md"
-    - Build the DB from Scratch: "technical/build_db.md"
-    - Use the DB in a Project: "technical/use_db.md"
-    - Project Folder Structure: "technical/project_folder_structure.md" 
-    - DpdHeadwords Table: "technical/dpd_headwords_table.md"
-    - Tipiṭaka Source Files: "technical/tipitaka_source_files.md"
-    # - Style Guide for DPD Entries: "technical/style_guide_for_dpd_entries.md"
+    - Построить БД с нуля: "technical/build_db.md"
+    - Использовать БД в проекте: "technical/use_db.md"
+    - Структура папок проекта: "technical/project_folder_structure.md" 
+    - Таблица DpdHeadwords: "technical/dpd_headwords_table.md"
+    - Файлы источников Типитаки: "technical/tipitaka_source_files.md"
+    # - Стиль для записей DPD: "technical/style_guide_for_dpd_entries.md"
 
 theme:
   name: material
@@ -114,7 +114,7 @@ extra_css:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/digitalpalidictionary/dpd-db
+      link: https://github.com/sasanarakkha/dpd-db-sbs
 
 markdown_extensions:
   # allows adding {target="_blank"} after links
