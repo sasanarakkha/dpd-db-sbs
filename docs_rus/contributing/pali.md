@@ -6,8 +6,8 @@
 2. Нажмите на эту ссылку, чтобы исправить любые [__ошибки__](https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.1433863141=dpd-db){target="_blank"}, которые вы заметите.
 3. Нажмите на эту ссылку, чтобы добавить [__недостающие детали__](https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.1433863141=dpd-db){target="_blank"} к словарным статьям.
 
-Для этого проекта используются Google Forms. Самый быстрый способ получить доступ к формам — открыть кнопку __feedback__.
+Для этого проекта используются Google Forms. Самый быстрый способ получить доступ к формам — открыть кнопку __о словаре__.
 
 ![добавить и исправить](../pics/contributing/add_correct.png)
 
-Если вы хотите заняться чем-то более значительным, пожалуйста, [свяжитесь с нами по электронной почте](mailto:digitalpalidictionary@gmail.com), и мы обсудим возможные варианты более глубокого участия.
+Если вы хотите заняться чем-то более значительным, пожалуйста, [свяжитесь с нами по электронной почте](mailto:devamitta@sasanarakkha.org), и мы обсудим возможные варианты взаимодействия.

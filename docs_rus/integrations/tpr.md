@@ -8,15 +8,15 @@ TPR доступен для всех операционных систем и у
 
 Чтобы открыть слово в словаре, просто щелкните по нему, и откроется словарь. TPR использует ту же систему для распознавания измененных форм и сандхи, что и DPD, поэтому будут отображены только правильные возможности.
 
-![click_word](pics/tpr/tpr_click_word.png)
+![click_word](../pics/tpr/tpr_click_word.png)
 
 Чтобы увидеть подробную грамматическую информацию, щелкните по маленькой стрелке на записи в словаре, и появится больше информации.
 
-![grammar_info](pics/tpr/tpr_open_grammar.png)
+![grammar_info](../pics/tpr/tpr_open_grammar.png)
 
 Грамматический словарь DPD также включен для отображения возможных склонений и спряжений слова.
 
-![dpd_grammar](pics/tpr/tpr_grammar_info.png)
+![dpd_grammar](../pics/tpr/tpr_grammar_info.png)
 
 ## Получите последнюю версию DPD
 
@@ -28,19 +28,19 @@ Tipitaka Pali Reader позволяет вам загрузить различн
 
 2. Нажмите **Расширения**.
 
-![extension](pics/tpr/tpr_open_extensions.png)
+![extension](../pics/tpr/tpr_open_extensions.png)
 
 3. Выберите **DPD**. Это шестой элемент в списке.
 
-![select_dpd](pics/tpr/tpr_select_dpd.png)
+![select_dpd](../pics/tpr/tpr_select_dpd.png)
 
 4. Файл загрузится, а затем установится сам.
 
-![downloading](pics/tpr/tpr_downloading.png)
+![downloading](../pics/tpr/tpr_downloading.png)
 
 5. **ПОЖАЛУЙСТА, ОБРАТИТЕ ВНИМАНИЕ!** Подождите, пока вы снова не увидите меню Дополнений, это означает, что DPD установлен правильно.
 
-![extensions](pics/tpr/tpr_extensions.png)
+![extensions](../pics/tpr/tpr_extensions.png)
 
 Пока вы здесь, можете скачать что-то еще, что может быть вам полезно!
 
@@ -48,4 +48,4 @@ Tipitaka Pali Reader позволяет вам загрузить различн
 
 Я лично использую TPR для чтения палийских текстов, поэтому иногда нам нужна более актуальная версия DPD, чем ежемесячный релиз в день Упосатха. Чтобы получить самую последнюю / передовую / не проверенную / без каких-либо гарантий / бета-версию, прокрутите вниз до конца списка Дополнений, нажмите на **DPD Beta** и установите точно так же, как описано выше.
 
-![beta_version](pics/tpr/tpr_dpd_beta.png)
+![beta_version](../pics/tpr/tpr_dpd_beta.png)

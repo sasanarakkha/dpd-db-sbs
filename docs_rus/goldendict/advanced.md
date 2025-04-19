@@ -4,7 +4,7 @@
 
 Клик на любом слове откроет его в той же вкладке. **Ctrl + клик** на любом слове откроет его в новой вкладке, позволяя вам просматривать несколько слов одновременно.
 
-![image](pics/advanced-setup/tabs.png)
+![image](../pics/advanced-setup/tabs.png)
 
 ### Добавление других словарей
 
@@ -18,7 +18,7 @@
 
 Это откроет диалоговое окно, позволяющее быстро найти конкретное слово, которое вы ищете на странице.
 
-![groups2](pics/advanced-setup/find_in_page.png)
+![groups2](../pics/advanced-setup/find_in_page.png)
 
 ### Создание групп
 
@@ -26,11 +26,11 @@
 
 Перейдите в Меню > Правка > Словари (Клавиша F3) и перейдите на вкладку **Группы**. Создайте новую группу и перетащите словари в группу.
 
-![groups2](pics/advanced-setup/groups2.png)
+![groups2](../pics/advanced-setup/groups2.png)
 
 Теперь группа будет отображаться в выпадающем списке на главной странице.
 
-![dropdown](pics/advanced-setup/dropdown.png)
+![dropdown](../pics/advanced-setup/dropdown.png)
 
 Это помогает ограничить результаты поиска, что важно для полнотекстовых поисков.
 
@@ -40,11 +40,11 @@
 
 Сначала выберите группу, в которой хотите искать, иначе вы получите слишком много результатов.
 
-![dropdown](pics/advanced-setup/dropdown.png)
+![dropdown](../pics/advanced-setup/dropdown.png)
 
 Затем откройте Меню > Поиск > Полнотекстовый поиск (сочетание клавиш Ctrl+Shift+F).
 
-![full-text search](pics/advanced-setup/full-text%20search.png)
+![full-text search](../pics/advanced-setup/full-text%20search.png)
 
 Это откроет диалоговое окно.
 
@@ -54,7 +54,7 @@
 3. **Шаблоны** похож на простой текст с использованием масок, например, *
 4. **Регулярные выражения** позволяют выполнять очень точный поиск с использованием регулярных выражений.
 
-![mode](pics/advanced-setup/mode.png)
+![mode](../pics/advanced-setup/mode.png)
 
 Вы также можете вводить несколько слов, и они будут найдены, даже если они не находятся рядом друг с другом.
 
@@ -64,14 +64,14 @@
 - **Игнорировать порядок слов** делает именно это. Оставьте этот флажок установленным.
 - **Игнорировать диакритику** тоже говорит само за себя, например поиск sanna покажет saññā в числе других результатов.
 
-![other options](pics/advanced-setup/other%20options.png)
+![other options](../pics/advanced-setup/other%20options.png)
 
 ### Тёмный режим
 
 Вы можете установить тёмный режим для GoldenDict, следуя инструкциям [здесь](https://github.com/goldendict/goldendict/wiki/GoldenDict-Dark-Theme#how-to-install-goldendict-dark-theme). И после установки активируйте его в разделе **Меню > Параметры > Интерфейс > Дополнительный стиль**.
 
-![dark_mode_activation](pics/advanced-setup/dark_mode_activation.png)
+![dark_mode_activation](../pics/advanced-setup/dark_mode_activation.png)
 
 Пока вы этим занимаетесь, установите расширение [Dark Reader для Chrome](https://chrome.google.com/webstore/detail/dark-reader/eimadpbcbfnmbkopoojfekhnkhdbieeh?hl=en) для комфортного чтения Пали даже когда глаза устали. Также существует и для других веб-браузеров.
 
-![darkmode2](pics/advanced-setup/darkmode2.png)
+![darkmode2](../pics/advanced-setup/darkmode2.png)

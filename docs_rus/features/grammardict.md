@@ -4,11 +4,11 @@
 
 Он отображает все возможные **части речи** и **грамматическую информацию** для любого слова, найденного в текстах на пали, или в составах слов.
 
-![anupassinā](pics/grammar/anupassin%C4%81.png)
+![anupassinā](../pics/grammar/anupassin%C4%81.png)
 
 Если вы, как и мы, вероятно, не знаете наизусть таблицы спряжения возвратных глаголов. Нет проблем, Грамматический словарь знает все свои таблицы наизусть.
 
-![mantavho](pics/grammar/mantavho.png)
+![mantavho](../pics/grammar/mantavho.png)
 
 (Поможет ли это или помешает студентам палийского языка, пока неизвестно : )
 
@@ -16,6 +16,6 @@
 
 Скачайте последнюю версию Грамматического словаря DPD для GoldenDict или MDict с [этой страницы на GitHub](https://github.com/digitalpalidictionary/rus-release/releases) и поместите его в ту же папку, что и DPD.
 
-![grammar_folder](pics/grammar/dpd_grammar_folder.png)
+![grammar_folder](../pics/grammar/dpd_grammar_folder.png)
 
 

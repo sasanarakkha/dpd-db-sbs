@@ -29,7 +29,7 @@ nav:
     - Настройка горячей клавиши: "goldendict/hotkey.md"
     - Настройка всплывающего окна: "goldendict/scan_popup.md"
     - Настройка расширенных функций: "goldendict/advanced.md"
-  - Webapp:
+  - Онлайн Словарь:
     - "webapp/index.md"
     - Поиск: "webapp/search.md"
     - Сводка: "webapp/summary.md"
@@ -38,7 +38,7 @@ nav:
     - Выделенные определения CST: "webapp/cst_bold_def.md"
     - API в GoldenDict: "webapp/api_goldendict.md"
     - API в DictTango: "webapp/api_dicttango.md"
-  - Software Integrations:
+  - Программные Интеграции:
     - integrations/index.md
     - Dhamma.gift website: "integrations/dhamma_gift.md"
     - Simsapa Dhamma Reader: "integrations/simsapa.md"
@@ -46,15 +46,15 @@ nav:
     - The Buddha's Words: "integrations/tbw.md"
     - Tipitaka Pali Reader: "integrations/tpr.md"
     - Tipitakapali.org: "integrations/tipitakapali.md"
-  - Feedback:
+  - Обратная связь:
     - "feedback/index.md"
-    - Correct a Mistake: "feedback/correct_mistake.md"
-    - Add a Missing Word: "feedback/add_missing_word.md"
-    - Report a Bug: "feedback/bug_report.md"
-  - Contributing:
+    - Исправить ошибку: "feedback/correct_mistake.md"
+    - Добавить недостающее слово: "feedback/add_missing_word.md"
+    - Сообщить об ошибке: "feedback/bug_report.md"
+  - Участие:
     - "contributing/index.md"
-    - Pāḷi: "contributing/pali.md"
-    - Code: "contributing/code.md"
+    - Пали: "contributing/pali.md"
+    - Код: "contributing/code.md"
   - Совмещенный словарь: "dpd_rus.md"
   - Отзывы Пользователей: users_say.md
   - Сокращения: "abbreviations.md"

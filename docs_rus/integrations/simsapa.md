@@ -13,11 +13,11 @@ DPD интегрирован в [Simsapa Dhamma Reader](https://simsapa.github.i
 - Санскритские словари
 - И многое другое
 
-![simsapa sutta study](pics/simsapa/simsapa_sutta_study.png)
+![simsapa sutta study](../pics/simsapa/simsapa_sutta_study.png)
 
 *(щелкните правой кнопкой мыши и откройте в новой вкладке, чтобы увидеть изображения в полном размере)*
 
-![simsapa links](pics/simsapa/simsapa_links.png)
+![simsapa links](../pics/simsapa/simsapa_links.png)
 
 Каждый раз при выпуске новой версии DPD, Simsapa автоматически обновляется с последней информацией из базы данных DPD.
 

@@ -20,23 +20,23 @@
 
 Дважды щелкните файл `GoldenDict.dmg` в папке Загрузки.
 
-<!-- [download gd](pics/mac-install/download%20gd.png)-->
+<!-- [download gd](../pics/mac-install/download%20gd.png)-->
 
 Дважды щелкните установщик.
 
-![goldendict install](pics/mac-install/goldendict%20install.png)
+![goldendict install](../pics/mac-install/goldendict%20install.png)
 
 Вероятно, вы получите предупреждение безопасности. Нажмите "Открыть в любом случае".
 
-![warning](pics/mac-install/warning.png)
+![warning](../pics/mac-install/warning.png)
 
 Нажмите "Отмена" и откройте "Настройки безопасности и конфиденциальности". Нажмите на замочек в левом нижнем углу. Затем выберите "Открыть в любом случае", и GoldenDict откроется. Нажмите "Открыть в любом случае".
 
-![allow gd](pics/mac-install/allow%20gd.png)
+![allow gd](../pics/mac-install/allow%20gd.png)
 
 Нажмите "Открыть" на следующем предупреждении безопасности.
 
-![next security warning](pics/mac-install/next%20security%20warning.png)
+![next security warning](../pics/mac-install/next%20security%20warning.png)
 
 Установка завершена.
 
@@ -50,17 +50,17 @@
 
 Найдите файл .zip в папке Загрузки и распакуйте его.
 
-![unzip dpd](pics/mac-install/unzip%20dpd.png)
+![unzip dpd](../pics/mac-install/unzip%20dpd.png)
 
 ## Создание папки GoldenDict
 
 Рекомендуется создать легко доступную папку GoldenDict, например `/Documents/GoldenDict`.
 
-![documents folder](pics/mac-install/documents%20folder.png)
+![documents folder](../pics/mac-install/documents%20folder.png)
 
 Скопируйте распакованную папку DPD в `/Documents/GoldenDict`.
 
-![documents gd dpd](pics/mac-install/documents%20gd%20dpd.png)
+![documents gd dpd](../pics/mac-install/documents%20gd%20dpd.png)
 
 ---
 
@@ -70,26 +70,26 @@
 
 Перейдите в Меню > Правка > Словари (Горячая клавиша **F3**).
 
-![edit dictionaries](pics/mac-install/edit%20dictionaries.png)
+![edit dictionaries](../pics/mac-install/edit%20dictionaries.png)
 
 Перейдите в Источники > Файлы. Нажмите Добавить.
 
-![sources files](pics/mac-install/sources%20files.png)
+![sources files](../pics/mac-install/sources%20files.png)
 
 Выберите папку `/Documents/GoldenDict`.
 
-![select gd folder](pics/mac-install/select%20gd%20folder.png)
+![select gd folder](../pics/mac-install/select%20gd%20folder.png)
 
 Установите флажок "Рекурсивно" √ (это гарантирует поиск во вложенных папках).
 
-![recursive](pics/mac-install/recursive.png)
+![recursive](../pics/mac-install/recursive.png)
 
 Нажмите "Пересканировать сейчас" или OK и подождите несколько моментов, пока словари индексируются.
 
-![indexing](pics/mac-install/indexing.png)
+![indexing](../pics/mac-install/indexing.png)
 
 Всё готово!
 
 ---
 
-Можно почитать, как [настроить горячую клавишу](setup_hotkey.html), чтобы вы могли щелкнуть по любому измененному слову Пали в любом тексте и немедленно открыть его в словаре.
+Можно почитать, как [настроить горячую клавишу](setup_hotkey.md), чтобы вы могли щелкнуть по любому измененному слову Пали в любом тексте и немедленно открыть его в словаре.

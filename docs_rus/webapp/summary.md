@@ -2,12 +2,12 @@
 
 Краткое изложение результатов поиска отображается вверху.
 
-![summary](pics/dpdict.net/dpdict_summary.png)
+![summary](../pics/dpdict.net/dpdict_summary.png)
 
 Нажмите на **подсвеченное слово** или **стрелку**, чтобы перейти непосредственно к записи.
 
 Это краткое изложение результатов поиска можно отключить в настройках.
 
-![hide summary](pics/dpdict.net/dpdict_settings_summary_hide.png)
+![hide summary](../pics/dpdict.net/dpdict_settings_summary_hide.png)
 
 ДАЛЕЕ: [Настройки](dpdict_settings.md)
