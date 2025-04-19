@@ -67,4 +67,4 @@ jobs:
           # Commit and push if changes exist
           git add -A
           git diff --quiet && git diff --cached --quiet || \
-            (git commit -m "Update site: $(date +'%Y-%m-%d %H:%M:%S')" && git push origin main)
+            (git commit -m "Update site: $(date +'%Y-%m-%d %H:%M:%S')" && git push origin HEAD:ru)
