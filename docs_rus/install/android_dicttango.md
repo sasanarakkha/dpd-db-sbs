@@ -12,7 +12,7 @@ DictTango использует файлы MDict, и предлагает гор�
 
 ### Установка Вкратце
 
-1. Скачайте последнюю версию MDict DPD с [Github](https://github.com/digitalpalidictionary/rus-release/releases)
+1. Скачайте последнюю версию MDict DPD с [Github](https://github.com/sasanarakkha/dpd-db-sbs/releases/latest/)
 2. Скачайте и установите DictTango из [Google Play Store](https://play.google.com/store/apps/details?id=cn.jimex.dict&pcampaignid=web_shareS) или [APKPure](https://m.apkpure.com/dicttango/cn.jimex.dict)
 
 ### Подробные инструкции по установке
@@ -27,7 +27,7 @@ DictTango использует файлы MDict, и предлагает гор�
 
 ### Скачать DPD
 
-Скачайте последнюю версию **ru-dpd-mdict.zip** с [Github](https://github.com/digitalpalidictionary/rus-release/releases)
+Скачайте последнюю версию **ru-dpd-mdict.zip** с [Github](https://github.com/sasanarakkha/dpd-db-sbs/releases/latest/)
 
 ![github mdict](../pics/dicttango/github-mdict.png)
 

@@ -25,14 +25,14 @@
 
 Enable: checked\
 As Link: unchecked\
-Name: www.dpdict.net/ru\
-Address: https://dpdict.net/ru/gd?search=%GDWORD%
+Name: www.dict.dhamma.gift/ru\
+Address: https://dict.dhamma.gift/ru/gd?search=%GDWORD%
 
 (1) Перейдите на вкладку **Словари**
 
 ![reorder dictionaries](../pics/dpdict.net/dpdict_api_gd_reorder_dictionaries.png)
 
-(2) Перетащите www.dpdict.net/ru в нужное вам место в списке
+(2) Перетащите www.dict.dhamma.gift/ru в нужное вам место в списке
 
 Вот и всё, настройка завершена!
 

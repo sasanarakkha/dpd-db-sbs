@@ -476,7 +476,7 @@ if (data.CstFreq[0] != undefined) {
 }
 html += `
 <p>
-    Для подробного объяснения того, как рассчитывается этот график частоты слов, его точности и неточности, обратитесь, пожалуйста, к <a class="link" href="https://digitalpalidictionary.github.io/rus/frequency.html">этой веб-странице</a>.
+    Для подробного объяснения того, как рассчитывается этот график частоты слов, его точности и неточности, обратитесь, пожалуйста, к <a class="link" href="https://devamitta.github.io/dpd.rus/features/frequency/">этой веб-странице</a>.
 </p>
 <p class='footer'>
     Что-то не на месте? <a class="link" href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500=${lemmaLink}&entry.326955045=Частота&entry.1433863141=GoldenDict+${data.date}" target="_blank">Сообщите здесь.</a>

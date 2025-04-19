@@ -86,9 +86,9 @@ document.addEventListener("DOMContentLoaded", function () {
         <p class="message">Настройте <b>параметры</b> в соответствии с вашими предпочтениями.</p>
         <p class="message"><b>Обновите</b> страницу, если у вас возникли какие-либо проблемы.</p>
         <p class="message">
-            <a href="https://digitalpalidictionary.github.io/rus/dpdict.html" target="_blank">Нажмите здесь</a>,
+            <a href="https://https://devamitta.github.io/dpd.rus/webapp/" target="_blank">Нажмите здесь</a>,
             чтобы узнать больше о данном веб-сайте, или 
-            <a href="https://digitalpalidictionary.github.io/rus/" target="_blank">больше информации</a>
+            <a href="https://devamitta.github.io/dpd.rus/" target="_blank">больше информации</a>
             о DPD в целом.
         </p>
         <p class="message">Начните с <b>двойного щелчка</b> по любому слову в списке ниже:</p>

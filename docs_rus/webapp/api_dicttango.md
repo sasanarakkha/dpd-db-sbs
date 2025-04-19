@@ -18,8 +18,8 @@
 
 Добавьте следующую информацию в раздел **Изменить сведения о словаре**:
 
-Название словаря: www.dpdict.net/ru\
-URL-адрес словаря: https://www.dpdict.net/ru/gd?search=#KEYWORD#
+Название словаря: www.dict.dhamma.gift/ru\
+URL-адрес словаря: https://dict.dhamma.gift/ru/gd?search=#KEYWORD#
 
 ![Edit Dictionary Details](../pics/dpdict.net/dpdict_api_dicttango_dictionary_detail.jpg)
 

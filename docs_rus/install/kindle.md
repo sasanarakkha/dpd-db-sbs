@@ -4,7 +4,7 @@
 
 ## Установка
 
-1. Загрузите последнюю версию **ru-dpd-kindle.mobi** с [этой страницы на GitHub](https://github.com/digitalpalidictionary/rus-release/releases).
+1. Загрузите последнюю версию **ru-dpd-kindle.mobi** с [этой страницы на GitHub](https://github.com/sasanarakkha/dpd-db-sbs/releases/latest/).
 
 ![image](../pics/kindle/kindle_github.png)
 

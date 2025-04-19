@@ -9,7 +9,7 @@
 
 ## Обновление на Windows
 
-1. Скачайте последний zip-файл DPD с [Github](https://github.com/digitalpalidictionary/rus-release/releases).
+1. Скачайте последний zip-файл DPD с [Github](https://github.com/sasanarakkha/dpd-db-sbs/releases/latest/).
 2. Распакуйте папку DPD и скопируйте ее в папку GoldenDict. `\Documents\GoldenDict`
 3. Убедитесь, что все содержимое старой папки DPD заменено.
 4. ЛИБО полностью закройте GoldenDict и снова откройте его (убедитесь, что он не активен в системном трее) 
@@ -20,7 +20,7 @@
 
 ## Обновление на Mac
 
-1. Скачайте последний zip-файл DPD с [Github](https://github.com/digitalpalidictionary/rus-release/releases).
+1. Скачайте последний zip-файл DPD с [Github](https://github.com/sasanarakkha/dpd-db-sbs/releases/latest/).
 2. Распакуйте
 3. Скопируйте папку DPD в вашу папку `/Documents/GoldenDict`, полностью заменив старую.
 4. Выходите из GoldenDict и перезапустите его 

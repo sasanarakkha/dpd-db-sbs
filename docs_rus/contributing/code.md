@@ -3,17 +3,19 @@
 Ищем помощь в написании кода для различных аспектов проекта Цифровой Словарь Пали. Если у вас есть опыт и интерес, [свяжитесь с нами по электронной почте](mailto:devamitta@sasanarakkha.org).
 
 ## DPD Project Management
-Here's the [DPD Codebase](https://GitHub.com/orgs/digitalpalidictionary/projects/1/views/2){target="_blank"} Project Management on GitHub with all the open and in-progress issues. Just comment on any issue to find out more, or [please get in touch by email](mailto:digitalpalidictionary@gmail.com).
+Here's the [DPD Codebase](https://GitHub.com/orgs/digitalpalidictionary/projects/1/views/2){target="_blank"} Project Management on GitHub with all the open and in-progress issues. Just comment on any issue to find out more, or [please get in touch by email](mailto:devamitta@sasanarakkha.org).
+
+Here's the [DPD - SBS / Russian](https://github.com/orgs/sasanarakkha/projects/1/views/1){target="_blank"} Project Management on GitHub with all the open and in-progress issues. Just comment on any issue to find out more, or [please get in touch by email](mailto:devamitta@sasanarakkha.org).
 
 ## DPD Project repo
 
-Here's the [dpd-db](https://GitHub.com/digitalpalidictionary/dpd-db){target="_blank"}  GitHub repo, which contains the code for all aspects of the project.
+Here's the [dpd-db-sbs](https://github.com/sasanarakkha/dpd-db-sbs){target="_blank"}  GitHub repo, which contains the code for all aspects of the project.
 
 ## Technical Docs
 Here are the [technical docs](../technical/index.md), for building the database, or just working with the pre-built database
 
 ## GitHub Releases
-You can find the [latest releases](https://GitHub.com/digitalpalidictionary/dpd-db/releases){target="_blank"}  here on GitHub, which includes the latest version of the database. 
+You can find the [latest releases](https://github.com/sasanarakkha/dpd-db-sbs/releases){target="_blank"}  here on GitHub, which includes the latest version of the database. 
 
 ## Languages
 DPD uses a few languages.

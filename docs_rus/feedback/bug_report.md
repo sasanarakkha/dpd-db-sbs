@@ -1,11 +1,11 @@
-# Report a Bug
+# Сообщить об Ошибке
 
-If you find a bug in the code, or something is not behaving as expected, please make an [issue on GitHub](https://github.com/digitalpalidictionary/dpd-db/issues){target="_blank"}.
+Если вы обнаружили ошибку в коде или что-то работает не так, как ожидалось, пожалуйста, создайте [issue на GitHub](https://github.com/sasanarakkha/dpd-db-sbs/issues){target="_blank"}.
 
-Click the __New Issue__ button on the right-hand side and you will be guided through the rest of the process. 
+Нажмите кнопку __New Issue__ с правой стороны, и вы будете пошагово направлены через весь процесс.
 
-![make github issue](../pics/feedback/github_issue.png)
+![создание issue на GitHub](../pics/feedback/github_issue.png)
 
-Or else just click this link to make a [new bug report](https://github.com/digitalpalidictionary/dpd-db/issues/new/choose){target="_blank"} right now.
+Или просто нажмите на эту ссылку, чтобы сразу создать [новое сообщение об ошибке](https://github.com/sasanarakkha/dpd-db-sbs/issues/new/choose){target="_blank"}.
 
-Software developers will be able to handle it once it's on GitHub.
+После того как сообщение окажется на GitHub, разработчики смогут им заняться.

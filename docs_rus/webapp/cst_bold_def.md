@@ -69,9 +69,9 @@ That's all there is to it. Enjoy this powerful search tool!
 
 ## Issues
 
-If you have any problems or suggestions for improvement, please add it to the [DPD issues on GitHub](https://github.com/digitalpalidictionary/dpd-db/issues){target="_blank"}.
+If you have any problems or suggestions for improvement, please add it to the [DPD issues on GitHub](https://github.com/sasanarakkha/dpd-db-sbs/issues){target="_blank"}.
 
-The source code is [here](https://github.com/digitalpalidictionary/dpd-db/blob/6eaaa4c58059e5e03ecdf522635335b89a5e4b1d/exporter/webapp/main.py#L223){target="_blank"}.
+The source code is [here](https://github.com/sasanarakkha/dpd-db-sbs/blob/6eaaa4c58059e5e03ecdf522635335b89a5e4b1d/exporter/webapp/main.py#L223){target="_blank"}.
 
 ## Thanks
 

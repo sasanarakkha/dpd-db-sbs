@@ -1,53 +1,47 @@
 # Dhamma.gift
 
-## About Dhamma.gift
+## О Dhamma.gift
 
-[Dhamma.gift](https://dhamma.gift/){target="_blank"} aims to be a "Swiss Army Knife" for the Buddha Dhamma. It consolidates numerous resources—Pāḷī texts, translations, useful websites, Pāḷī learning materials, and a number of tools—into one website. 
+[Dhamma.gift](https://dhamma.gift/ru/){target="_blank"} стремится быть «швейцарским ножом» для Дхаммы Будды. Он объединяет множество ресурсов — тексты на пали, переводы, полезные сайты, материалы для изучения пали и ряд инструментов — в одном сайте.
 
-- **Sutta-Vinaya Search** with advanced filtering, sorting and grouping.
-- **Dhamma multi-tool** — "Collection of Links" in one toolbar.
-- **Reading Mode** with numerous options and DPD integration.
+- **Поиск по Сутта-Виная** с расширенной фильтрацией, сортировкой и группировкой.
+- **Многофункциональный инструмент Дхаммы** — «Сборник ссылок» в одной панели.
+- **Режим чтения** с множеством опций и интеграцией с DPD.
 
-Find out more about the key features [here](https://dhamma.gift/assets/common/keyFeatures.html){target="_blank"}.
+Узнайте больше о ключевых особенностях [здесь](https://dhamma.gift/assets/common/keyFeaturesRu.html){target="_blank"}.
 
-Dhamma.gift provides an amazing variety of DPD lookup options, including the ability to look up words in DictTango Android and Mdict IOS directly from the site.
+Dhamma.gift предоставляет удивительное разнообразие способов использовать DPD, включая возможность поиска слов прямо с сайта в приложениях DictTango для Android и Mdict для iOS.
 
-## Changing the dictionary mode
+## Смена режима словаря
 
-By default, the built-in lightweight dictionary will be turned on for search results and reader pages. To choose the dictionary style that suits your needs:
+По умолчанию для результатов поиска и страниц чтения включён встроенный лёгкий словарь. Чтобы выбрать стиль словаря, соответствующий вашим нуждам:
 
-(1) Open [Dhamma.gift Read](https://dhamma.gift/sn2.1){target="_blank"}.
+(1) Откройте [Dhamma.gift Read](https://dhamma.gift/ru/sn2.1){target="_blank"}.
 
-(2) Click the **gear icon** ⚙️ (Settings).
+(2) Нажмите **значок шестерёнки** ⚙️ (Настройки).
 
-![gear icon](../pics/dhamma_gift/gear_dark.png#only-dark)
+![gear icon](../pics/dhamma_gift/gear_dark.png#only-dark)  
 ![gear icon](../pics/dhamma_gift/gear_light.png#only-light)
 
-(3) Click the dropdown list **"Dictionary on click"** and select the desired option.
+(3) Нажмите выпадающий список **"Словарь по клику"** и выберите желаемый вариант
 
-![dictionary settings](../pics/dhamma_gift/settings_dark.png#only-dark)
+![dictionary settings](../pics/dhamma_gift/settings_dark.png#only-dark)  
 ![dictionary settings](../pics/dhamma_gift/settings_light.png#only-light)
 
+(4) Нажмите **"Применить"**, чтобы сохранить настройки.
 
-(4) Click **"Apply"** to save the settings.
+## Описание режимов словаря
 
-![apply](../pics/dhamma_gift/apply_dark.png#only-dark)
-![apply](../pics/dhamma_gift/apply_light.png#only-light)
+- **DPD Встроенный:** Лёгкая, но мощная встроенная версия DPD, предоставляющая основные сведения: значения слов, разбор составных слов и базовую грамматику.
+- **DPD Встроенный Англ:** Лёгкая англоязычная версия DPD.
+- **DPD Онлайн:** Полная версия словаря DPD с подробной грамматикой, информацией о корнях слов, примерами и другим, включая ввод текста для анализа, историю поиска и настройки.
+- **DPD Онлайн Англ:** Полная версия DPD со всеми переводами и пояснениями на английском языке.
+- **DPD Онлайн мини:** Компактная версия полной онлайн-версии DPD, предоставляющая основные сведения.
+- **DPD Онлайн мини Англ:** Компактная английская версия словаря DPD.
+- **Только Поиск:** Позволяет просто начать поиск по выделенному слову на сайте Dhamma.gift.
+- **DictTango Android:** Открывает приложение DictTango для Android, позволяя мгновенно искать слово в любом установленном словаре, включая DPD, без копирования и вставки.
+- **Mdict IOS:** То же самое, но для Mdict на iOS.
 
+Для получения дополнительной информации и доступа ко всем функциям посетите сайт [Dhamma.gift](https://dhamma.gift/ru/){target="_blank"}.
 
-
-## Description of Dictionary Modes
-
-- **DPD Built-in:** A lightweight yet powerful built-in version of DPD that provides essential details: word meanings, compound breakdowns, and basic grammar information.
-- **DPD Online:** The full version of DPD dictionary, offering extensive grammatical details, root information, examples, and more, along with text input for further investigation, word lookup history, and settings.
-- **DPD Online mini:** A compact version of the full DPD dictionary that provides essential details.
-- **DPD Built-in Rus:** A lightweight Russian version of DPD.
-- **DPD Online Rus:** The full DPD dictionary including Russian translations and explanations.
-- **DPD Online mini Rus:** A compact version of the Russian DPD dictionary.
-- **Search Only:** This option allows you to initiate a search for the clicked word on Dhamma.gift.
-- **DictTango Android:** Directly opens the DictTango Android app, enabling instant lookup in any installed dictionaries, including DPD, without copying and pasting or using the context menu.
-- **Mdict IOS:** Same as above, but for Mdict iOS. 
-
-For more information and access to all features, visit [Dhamma.gift](https://dhamma.gift/){target="_blank}.  
-
-The website is a work in progress, so please report any bugs or errors using the [Dhamma.gift contacts](https://dhamma.gift/#contacts){target="_blank}.
+Сайт находится в стадии активной разработки, поэтому, пожалуйста, сообщайте об ошибках и проблемах через [контактную форму Dhamma.gift](https://dhamma.gift/ru/#contacts){target="_blank"}.

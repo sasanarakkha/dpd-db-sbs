@@ -229,8 +229,8 @@ def prepare_gd_mdict_and_export(g: ProgData):
         dict_info = DictInfo(
             bookname="DPD Грамматика",
             author="Дост. Бодхираса",
-            description="<h3>DPD Грамматика</h3><p>Таблица всех грамматических возможностей, которыми может обладать определенное слово в склонении или спряжении. Для получения дополнительной информации посетите <a href='https://digitalpalidictionary.github.io/rus/grammardict.html' target='_blank'>веб-сайт DPD</a>.</p>",
-            website="https://digitalpalidictionary.github.io/rus/grammardict.html",
+            description="<h3>DPD Грамматика</h3><p>Таблица всех грамматических возможностей, которыми может обладать определенное слово в склонении или спряжении. Для получения дополнительной информации посетите <a href='https://devamitta.github.io/dpd.rus/features/grammardict/' target='_blank'>веб-сайт DPD</a>.</p>",
+            website="https://devamitta.github.io/dpd.rus/features/grammardict/",
             source_lang="pi",
             target_lang="ru",
         )

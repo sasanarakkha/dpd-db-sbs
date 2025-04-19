@@ -14,7 +14,7 @@
 
 ## Как установить
 
-Скачайте последнюю версию Грамматического словаря DPD для GoldenDict или MDict с [этой страницы на GitHub](https://github.com/digitalpalidictionary/rus-release/releases) и поместите его в ту же папку, что и DPD.
+Скачайте последнюю версию Грамматического словаря DPD для GoldenDict или MDict с [этой страницы на GitHub](https://github.com/sasanarakkha/dpd-db-sbs/releases/latest/) и поместите его в ту же папку, что и DPD.
 
 ![grammar_folder](../pics/grammar/dpd_grammar_folder.png)
 

@@ -2,7 +2,7 @@
 
 ## Вкратце
 
-1. Загрузите последнюю версию DPD для MDict (ru-dpd-mdict.mdx) [здесь](https://github.com/digitalpalidictionary/rus-release/releases).
+1. Загрузите последнюю версию DPD для MDict (ru-dpd-mdict.mdx) [здесь](https://github.com/sasanarakkha/dpd-db-sbs/releases/latest/).
 2. Установите MDict из [App Store](https://apps.apple.com/us/app/mdict-ad/id894362875).
 3. Переместите файл ru-dpd-mdict.mdx в папку MDict на вашем устройстве iOS.
 
@@ -10,7 +10,7 @@
 
 ## Загрузка DPD
 
-Прежде всего, загрузите последнюю версию Цифрового Словаря Пали для MDict с [Github](https://github.com/digitalpalidictionary/rus-release/releases).
+Прежде всего, загрузите последнюю версию Цифрового Словаря Пали для MDict с [Github](https://github.com/sasanarakkha/dpd-db-sbs/releases/latest/).
 
 ## Загрузка MDict
 

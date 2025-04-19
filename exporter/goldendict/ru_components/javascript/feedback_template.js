@@ -40,7 +40,7 @@ function makeFeedback(data) {
         <span>Ваша версия словаря от <b>${data.date}</b>. Пожалуйста, регулярно проверяйте наличие обновлений.</span>
     </p>
     <p>
-        <a class="link" href="https://digitalpalidictionary.github.io/rus/">Веб страница</a>.
+        <a class="link" href="https://devamitta.github.io/dpd.rus/">Веб страница</a>.
         <span>
             Можно найти свежую версию словаря; узнать больше о функциях, как установить и настроить.
         </span>

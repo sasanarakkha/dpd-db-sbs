@@ -4,7 +4,7 @@ There is a comprehensive database model and lots of pre-existing tools in the re
 
 Clone this repo.
 
-Download **dpd.db.tar.bz2** from [the dpd-db release page](https://github.com/digitalpalidictionary/dpd-db/releases){target="_blank"}, 
+Download **dpd.db.tar.bz2** from [the dpd-db release page](https://github.com/sasanarakkha/dpd-db-sbs/releases/latest/){target="_blank"}, 
 
 Unzip and place the db in the root of the project folder.
 
