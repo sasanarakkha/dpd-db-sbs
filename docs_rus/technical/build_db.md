@@ -4,7 +4,7 @@
 (1) Download the repo
 
 ```shell
-git clone --depth=1 https://github.com/digitalpalidictionary/dpd-db.git
+git clone --depth=1 https://github.com/sasanarakkha/dpd-db-sbs.git
 ```
 
 (2) Navigate into the directory

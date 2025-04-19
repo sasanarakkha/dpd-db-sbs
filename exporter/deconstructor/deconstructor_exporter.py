@@ -136,8 +136,8 @@ def prepare_and_export_to_gd_mdict(g: ProgData) -> None:
     if g.lang == "ru":
         dict_info.bookname = "DPD Деконструктор"
         dict_info.author = "Дост. Бодхираса"
-        dict_info.description = "<h3>DPD Деконструктор от Дост. Бодхирасы</h3><p>Автоматизированное разложение сложных слов и разделение сандхи для всех слов в текстах Типитаки <b>Chaṭṭha Saṅgāyana</b> и на <b>Sutta Central</b>.</p><p>Дополнительную информацию можно найти на странице <a href='https://digitalpalidictionary.github.io/rus/deconstructor.html'>Деконструктора</a> на сайте <a href='https://digitalpalidictionary.github.io/rus'>DPD</a>.</p>"
-        dict_info.website = "https://digitalpalidictionary.github.io/rus"
+        dict_info.description = "<h3>DPD Деконструктор от Дост. Бодхирасы</h3><p>Автоматизированное разложение сложных слов и разделение сандхи для всех слов в текстах Типитаки <b>Chaṭṭha Saṅgāyana</b> и на <b>Sutta Central</b>.</p><p>Дополнительную информацию можно найти на странице <a href='https://devamitta.github.io/dpd.rus/deconstructor.html'>Деконструктора</a> на сайте <a href='https://devamitta.github.io/dpd.rus/features/deconstructor/'>DPD</a>.</p>"
+        dict_info.website = "https://devamitta.github.io/dpd.rus/"
 
         dict_name = "ru-dpd-deconstructor"
 

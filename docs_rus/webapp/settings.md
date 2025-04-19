@@ -1,6 +1,6 @@
 ## Настройки
 
-[www.dpdict.net/ru](https://www.dpdict.net/ru) предлагает множество настроек для персонализации.
+[www.dict.dhamma.gift/ru](https://dict.dhamma.gift/ru) предлагает множество настроек для персонализации.
 
 ## Размер шрифта
 

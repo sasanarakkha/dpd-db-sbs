@@ -2,7 +2,7 @@
 
 ## Кратко
 
-1. Скачайте последнюю версию DPD [здесь](https://github.com/digitalpalidictionary/rus-release/releases).
+1. Скачайте последнюю версию DPD [здесь](https://github.com/sasanarakkha/dpd-db-sbs/releases/latest/).
 2. Установите версию 1.5 GoldenDict.
 3. В настройках направьте GoldenDict в папку DPD.
 
@@ -10,7 +10,7 @@
 
 ## Скачать DPD
 
-Прежде всего, скачайте последнюю версию Цифрового Словаря Пали с [Github](https://github.com/digitalpalidictionary/rus-release/releases).
+Прежде всего, скачайте последнюю версию Цифрового Словаря Пали с [Github](https://github.com/sasanarakkha/dpd-db-sbs/releases/latest/).
 
 ## Создайте папку GoldenDict
 

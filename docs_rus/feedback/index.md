@@ -1,3 +1,3 @@
-# Feedback
+# Обратная Связь
 
-DPD has an active    community of users who report mistakes, add missing information, and contribute new words the dictionary. 
+У DPD есть активное сообщество пользователей, которые сообщают об ошибках, добавляют недостающую информацию и вносят новые слова в словарь.

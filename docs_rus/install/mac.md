@@ -2,7 +2,7 @@
 
 ## Кратко
 
-1. Скачайте последнюю версию DPD [здесь](https://github.com/digitalpalidictionary/rus-release/releases).
+1. Скачайте последнюю версию DPD [здесь](https://github.com/sasanarakkha/dpd-db-sbs/releases/latest/).
 2. Установите версию GoldenDict NG для [Apple Silicon M1 и выше](https://github.com/xiaoyifang/goldendict-ng/releases/download/v24.05.05-LiXia.ecd1138c/GoldenDict-24.05.05-Qt6.7.0-arm64.dmg) или [Intel AMD64](https://github.com/xiaoyifang/goldendict-ng/releases/download/v24.05.05-LiXia.ecd1138c/GoldenDict-24.05.05-Qt6.7.0-x86_64.dmg).
 3. В настройках направьте GoldenDict в папку DPD.
 
@@ -44,7 +44,7 @@
 
 ## Скачать DPD
 
-Скачайте последнюю версию Цифрового Словаря Пали для GoldenDict с [Github](https://github.com/digitalpalidictionary/rus-release/releases) в вашу папку Загрузки.
+Скачайте последнюю версию Цифрового Словаря Пали для GoldenDict с [Github](https://github.com/sasanarakkha/dpd-db-sbs/releases/latest/) в вашу папку Загрузки.
 
 ## Распаковка
 

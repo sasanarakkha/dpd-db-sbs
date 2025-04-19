@@ -135,7 +135,7 @@ There are four main parts to the code:
 
 - **scripts/** Useful scripts for project maintenance.
 
-	see the [scripts readme](https://github.com/digitalpalidictionary/dpd-db/tree/main/scripts#readme){target="_blank"} for more info.
+	see the [scripts readme](https://github.com/sasanarakkha/dpd-db-sbs/tree/main/scripts#readme){target="_blank"} for more info.
 
 - **shared_data/** Data used across the project.
 

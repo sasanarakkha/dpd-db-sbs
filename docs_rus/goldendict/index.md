@@ -1,3 +1,3 @@
-# GoldenDict Features
+# Возможности GoldenDict
 
-GoldenDict has a number of advanced features that can really improve your experience of working with Pāḷi texts. 
+GoldenDict обладает рядом расширенных функций, которые могут значительно улучшить ваш опыт работы с текстами на пали.

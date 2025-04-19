@@ -1,6 +1,6 @@
 ## Отображение словаря
 
-[www.dpdict.net/ru](https://www.dpdict.net/ru) отображает все словари DPD, включая:
+[https://dict.dhamma.gift/ru](https://dict.dhamma.gift/ru) отображает все словари DPD, включая:
 
 ### 1. Основной DPD
 

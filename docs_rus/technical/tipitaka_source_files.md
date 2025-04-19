@@ -11,7 +11,7 @@ These are the digital sources DPD uses for Pāḷi texts.
 ### SYA: Syāmaraṭṭha_1927 Royal Thai Edition (Thailand)
 
 Do you know of a better source? These text files are in bad shape.
-[https://github.com/digitalpalidictionary/dpd-db/tree/main/resources/sy%C4%81mara%E1%B9%AD%E1%B9%ADha_1927](https://github.com/digitalpalidictionary/dpd-db/tree/main/resources/sy%C4%81mara%E1%B9%AD%E1%B9%ADha_1927){target="_blank"}
+[https://github.com/sasanarakkha/dpd-db-sbs/tree/main/resources/sy%C4%81mara%E1%B9%AD%E1%B9%ADha_1927](https://github.com/sasanarakkha/dpd-db-sbs/tree/main/resources/sy%C4%81mara%E1%B9%AD%E1%B9%ADha_1927){target="_blank"}
 
 
 ### MST: Mahāsaṅgīti Tipiṭaka (Sutta Central)

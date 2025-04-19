@@ -2,7 +2,7 @@
 
 DPD - это богатый возможностями словарь палийского языка на английском и русском, который работает <a href='https://dpdict.net' target='_blank'>онлайн</a> в GoldenDict, MDict, [DictTango](install/android_dicttango.md) и [Kindle](install/kindle.md), или в любом другом приложении, поддерживающем эти форматы.
 
-Скачайте последнюю версию с [этой страницы на GitHub](https://github.com/sasanarakkha/dpd-db-sbs/releases).
+Скачайте последнюю версию с [этой страницы на GitHub](https://github.com/sasanarakkha/dpd-db-sbs/releases/latest/).
 
 Также доступна совмещенная версия английского DPD с русским переводом. Более подробную информацию можно найти на [этой странице.](dpd_rus.md)
 
@@ -22,7 +22,7 @@ DPD - это богатый возможностями словарь палий
 
 Пока вы занимаетесь этим, вот еще несколько [словарей на пали и санскрите](other_dicts.md) для установки в GoldenDict или MDict. Среди них Критический Пали Словарь и Объединенный Словарь Симсапа, который содержит PTS, DPPN и NCPED и другие.
 
-Если вы заметили ошибку в DPD или заметили что-то отсутствующее, пожалуйста [сообщите об этом](https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.1433863141=digitalpalidictionary.github.io). Обычно на это уходит менее минуты.
+Если вы заметили ошибку в DPD или заметили что-то отсутствующее, пожалуйста [сообщите об этом](https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.1433863141=dpd_ru_web). Обычно на это уходит менее минуты.
 
 Если у вас есть какие-то яркие идеи, чтобы сделать этот словарь еще лучше, или вы хотели бы принять участие в проекте, пожалуйста, [свяжитесь с нами](contact.md).
 

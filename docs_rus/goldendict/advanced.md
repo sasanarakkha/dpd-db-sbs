@@ -10,7 +10,7 @@
 
 Чтобы добавить больше словарей в GoldenDict, просто загрузите любой словарь в формате, совместимом с GoldenDict (Stardict, Babylon, Lingoes и т. д.) и добавьте эту папку в папку GoldenDict `Documents/GoldenDict`.
 
-Существует [множество палийских словарей для GoldenDict или MDict](https://github.com/digitalpalidictionary/dpd-db/tree/main/exporter/other_dictionaries). Среди них Критический Пали Словарь и Объединенный Словарь Симсапа, который содержит PTS, DPPN и NCPED и другие. Скопируйте их в папку GoldenDict и пересканируйте словарь.
+Существует [множество палийских словарей для GoldenDict или MDict](other_dicts.md). Среди них Критический Пали Словарь и Объединенный Словарь Симсапа, который содержит PTS, DPPN и NCPED и другие. Скопируйте их в папку GoldenDict и пересканируйте словарь.
 
 ### Поиск на странице
 
