@@ -1,5 +1,7 @@
 import flet as ft
+from gui2.class_daily_log import DailyLog
 from gui2.class_database import DatabaseManager
+from tools.fast_api_utils import start_dpd_server
 
 
 class App:
@@ -17,9 +19,19 @@ class App:
         self.page.window.left = 0
         self.page.window.height = 1280
         self.page.window.width = 1380
-        self.page.title = "dpd-db gui"
         self.page.vertical_alignment = ft.MainAxisAlignment.START
         self.page.on_keyboard_event = self.on_keyboard
+
+        self.daily_log = DailyLog()
+
+        page.appbar = ft.AppBar(
+            title=ft.Text("dpd gui"),
+            bgcolor=ft.Colors.LIGHT_BLUE_900,
+            elevation=100,
+            title_spacing=20,
+            center_title=False,
+            actions=[ft.Text(self.daily_log.get_counts())],
+        )
 
         # initilize classes
         self.db = DatabaseManager()
@@ -76,6 +88,7 @@ class App:
 
 
 def main(page: ft.Page) -> None:
+    start_dpd_server()
     App(page)
 
 

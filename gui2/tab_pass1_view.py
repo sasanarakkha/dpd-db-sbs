@@ -199,8 +199,9 @@ class Pass1View(ft.Column, PopUpMixin):
             "family_root",
             "root_sign",
             "root_base",
-            "family_compound",
             "construction",
+            "family_compound",
+            "family_word",
             "stem",
             "pattern",
             "example_1",
@@ -237,3 +238,11 @@ class Pass1View(ft.Column, PopUpMixin):
             self.update_message(f"Sandhi added for {self.word_in_text.value}")
         else:
             self.update_message("Sandhi input cancelled.")
+
+    def update_appbar(self, message):
+        if (
+            self.page.appbar
+            and self.page.appbar.actions
+            and self.page.appbar.actions[0]
+        ):
+            self.page.appbar.actions[0].value = message
