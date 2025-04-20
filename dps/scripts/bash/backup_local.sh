@@ -8,7 +8,6 @@ EXCLUDE_FILE=$(mktemp)
 
 cat > "$EXCLUDE_FILE" <<EOF
 .git/
-.github/
 dpd.db
 .venv/
 .vscode/
