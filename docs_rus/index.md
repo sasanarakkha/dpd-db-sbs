@@ -1,6 +1,6 @@
 # Добро пожаловать в Цифровой Пали Словарь
 
-DPD - это богатый возможностями словарь палийского языка на английском и русском, который работает <a href='https://dpdict.net' target='_blank'>онлайн</a> в GoldenDict, MDict, [DictTango](install/android_dicttango.md) и [Kindle](install/kindle.md), или в любом другом приложении, поддерживающем эти форматы.
+DPD - это богатый возможностями словарь Палийского языка на английском и русском, который работает <a href='https://dict.dhamma.gift/ru' target='_blank'>онлайн</a> в GoldenDict, MDict, [DictTango](install/android_dicttango.md) и [Kindle](install/kindle.md), или в любом другом приложении, поддерживающем эти форматы.
 
 Скачайте последнюю версию с [этой страницы на GitHub](https://github.com/sasanarakkha/dpd-db-sbs/releases/latest/).
 
@@ -16,11 +16,11 @@ DPD - это богатый возможностями словарь палий
 
 Прежде всего, вам нужно установить и настроить GoldenDict, DictTango или MDict на вашем устройстве ([Win](install/win.md) / [Mac](install/mac.md) / [iOS](install/ios.md) / [Linux](install/linux.md) / [Android](install/android_dicttango.md)) или [обновить](install/update.md) раз в месяц, если вы уже установили их.
 
-Затем можно [настроить горячую клавишу](goldendict/hotkey.md), если вы используете Windows или Mac, или попробовать [всплывающее окно](goldendict/scan_popup.md), если вы используете Linux. Это позволит вам щелкнуть любое слово в любом тексте на пали, и автоматически открыть его в GoldenDict.
+Затем можно [настроить горячую клавишу](goldendict/hotkey.md), если вы используете Windows или Mac, или попробовать [всплывающее окно](goldendict/scan_popup.md), если вы используете Linux. Это позволит вам щелкнуть любое слово в любом тексте на Пали, и автоматически открыть его в GoldenDict.
 
 Есть некоторые [продвинутые функции для GoldenDict](goldendict/advanced.md), которые могут быть полезны для вас.
 
-Пока вы занимаетесь этим, вот еще несколько [словарей на пали и санскрите](other_dicts.md) для установки в GoldenDict или MDict. Среди них Критический Пали Словарь и Объединенный Словарь Симсапа, который содержит PTS, DPPN и NCPED и другие.
+Пока вы занимаетесь этим, вот еще несколько [словарей на Пали и санскрите](other_dicts.md) для установки в GoldenDict или MDict. Среди них Критический Пали Словарь и Объединенный Словарь Симсапа, который содержит PTS, DPPN и NCPED и другие.
 
 Если вы заметили ошибку в DPD или заметили что-то отсутствующее, пожалуйста [сообщите об этом](https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.1433863141=dpd_ru_web). Обычно на это уходит менее минуты.
 

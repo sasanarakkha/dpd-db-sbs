@@ -1,3 +1,3 @@
-# Pāḷi Notes
+# Язык Пали
 
-A collection of notes on the Pāḷi language.
+Сборник заметок по языку Пали.

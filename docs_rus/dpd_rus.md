@@ -6,7 +6,7 @@
 
 ## DPD+RUS содержит пять различных словарей
 
-### Словарь палийского языка на анлийский (синий)
+### Словарь Палийского языка на анлийский (синий)
 
 ![pali2english](pics/features/1pali2english.png)
 
@@ -14,7 +14,7 @@
 
 ![1rus_eng_grammar](pics/features/1rus_eng_grammar.png)
 
-### Словарь корней палийского языка (оранжевый)
+### Словарь корней Палийского языка (оранжевый)
 
 ![pali2english](pics/features/2rootsdict_en.png)
 
@@ -22,11 +22,11 @@
 
 ![2rus_eng_root_info](pics/features/2rus_eng_root_info.png)
 
-### Словарь английского на палийский язык (фиолетовый)
+### Словарь английского на Палийский язык (фиолетовый)
 
 ![english2pali](pics/features/3english2pali.png)
 
-### Словарь русского на палийский язык (фиолетовый)
+### Словарь русского на Палийский язык (фиолетовый)
 
 ![english2pali](pics/features/3rus2pali.png)
 

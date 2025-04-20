@@ -1,79 +1,78 @@
-## CST Bold Definitions Search
+## Поиск Выделенных определений CST
 
-In the Chaṭṭha Saṅgāyana Tipiṭaka, there are more than 300 000 words highlighted in **bold**, which are definitions of other Pāḷi words.
+В Chaṭṭha Saṅgāyana Tipiṭaka более **300 000** слов выделены **жирным шрифтом** — это определения других слов на Пали.
 
 > **sikkhā**ti tisso sikkhā – adhisīlasikkhā, adhicittasikkhā, adhipaññāsikkhā. tatra yāyaṃ adhisīlasikkhā, ayaṃ imasmiṃ atthe adhippetā sikkhāti.
 
-These bold definitions are found in *vinaya-piṭaka*, *khuddaka-nikāya*, *aṭṭhakathā*, *ṭīkā* and *aññā* sections of CST texts.
+Эти выделенные определения встречаются в *vinaya-piṭaka*, *khuddaka-nikāya*, *aṭṭhakathā*, *ṭīkā* и других разделах текстов CST.
 
-For millennia, these definitions within Pāḷi texts have been the dictionary of choice for Buddhist monastics. 
+На протяжении тысячелетий именно такие определения внутри самих текстов на Пали служили словарём для буддийских монахов.  
 
-DPD now provides a [web search engine](https://www.dpdict.net){target="_blank"} to easily access this amazing resource.
+Теперь DPD предоставляет [веб-поисковик](https://dict.dhamma.gift/ru){target="_blank"} для удобного доступа к этому удивительному ресурсу.
 
-## Basic Search
+## Базовый поиск
 
-Click on the CST Bold Definitions tab in the top left corner of the web page to open it. 
+Нажмите на вкладку **Выделенные определения CST** в левом верхнем углу веб-страницы, чтобы открыть её.
 
-![DPD bold definitions tab](../pics/dpdict.net/dpdict_bd_tab.png)
+![Вкладка определений DPD](../pics/dpdict.net/dpdict_bd_tab.png)
 
-There are two search boxes.
+Есть два поисковых поля.
 
-Use the first search box to find the bold definition you are looking for.
+В первое поле введите определение, которое вы хотите найти.
 
-![Search box 1](../pics/dpdict.net/dpdict_bd_searchbox1.png)
+![Поисковое поле 1](../pics/dpdict.net/dpdict_bd_searchbox1.png)
 
-> Hint: leave the last letter of the word off, as this is often included in sandhi with *iti*.
+> Совет: опускайте последнюю букву слова, так как она часто сливается с *iti* при сандхи.
 
-**Press enter** or **click search** to get some results.
+**Нажмите Ввод** или **кликните "поиск"**, чтобы получить результаты.
 
-The results will display below.
+Результаты отобразятся ниже.
 
-![Search results](../pics/dpdict.net/dpdict_bd_results.png)
+![Результаты поиска](../pics/dpdict.net/dpdict_bd_results.png)
 
-In the results, you can see the bold defined word, the definition, and surrounding sentences. The source text and chapter are highlighted in blue. 
+В результатах вы увидите определяемое слово (выделенное), само определение и окружающий контекст. Источник текста и раздел будут выделены синим.
 
-## Search Modes
+## Режимы поиска
 
-There are three different search modes. 
+Существует три различных режима поиска.
 
-![Search modes](../pics/dpdict.net/dpdict_bd_search_modes.png)
+![Режимы поиска](../pics/dpdict.net/dpdict_bd_search_modes.png)
 
-### 1. Starts with
-All results will **start with** the search term. It's useful when you know exactly what you are looking for.
+### 1. Начинается с
+Показывает результаты, **начинающиеся** с введённого слова. Полезно, если вы точно знаете, что ищете.
 
-### 2. Normal/rx
-This is the default search mode. All results will **contain** the search term. You can also use [**regular expressions**](https://regexone.com/){target="_blank"} for power searches.
+### 2. Обычный/rx  
+Это режим по умолчанию. Показывает результаты, **содержащие** поисковое слово. Также можно использовать [**регулярные выражения**](https://habr.com/ru/articles/545150/){target="_blank"} для продвинутого поиска.
 
-### 3. Fuzzy
-When activated, **fuzzy search** ignores all diacritics, aspiration, double consonants and variation of nasals. It is very useful if you don't know the exact spelling, but it will also give many more results. 
+### 3. Нечеткий  
+При включении **приблизительного поиска** игнорируются все диакритики, аспирация, удвоенные согласные и различия между носовыми звуками. Это полезно, если вы не знаете точного написания, но также даст гораздо больше результатов.
 
-> Fuzzy searching for *karaṃ* will also find *kārañ, kharaṅ, khāraṃ*, etc. 
+> Например, нечеткий-поиск по *karaṃ* также найдёт *kārañ, kharaṅ, khāraṃ* и т.д.
 
-## Search Within Results
+## Поиск внутри результатов
 
-Sometimes you will get too many results. 
+Иногда результаты оказываются слишком обширными.
 
-![Too many results](../pics/dpdict.net/dpdict_bd_too_many.png)
+![Слишком много результатов](../pics/dpdict.net/dpdict_bd_too_many.png)
 
-Then you can use the second search box to search within results. 
+Тогда можно воспользоваться вторым поисковым полем для уточнения результатов.
 
-![Search box 2](../pics/dpdict.net/dpdict_bd_searchbox2.png)
+![Поисковое поле 2](../pics/dpdict.net/dpdict_bd_searchbox2.png)
 
-This will drastically reduce the number of results.
+Это значительно сократит число найденных фрагментов.
 
-![alt text](../pics/dpdict.net/dpdict_bd_less_results.png)
+![Меньше результатов](../pics/dpdict.net/dpdict_bd_less_results.png)
 
-Notice that the word from the second search box is highlighted blue in the text.
+Обратите внимание, что слово из второго поиска подсвечено синим в тексте.
 
-That's all there is to it. Enjoy this powerful search tool!
+Вот и всё. Наслаждайтесь этим мощным инструментом поиска!
 
-## Issues
+## Проблемы
 
-If you have any problems or suggestions for improvement, please add it to the [DPD issues on GitHub](https://github.com/sasanarakkha/dpd-db-sbs/issues){target="_blank"}.
+Если вы обнаружили ошибку или у вас есть предложения по улучшению, добавьте их в [раздел Issues на GitHub](https://github.com/sasanarakkha/dpd-db-sbs/issues){target="_blank"}.
 
-The source code is [here](https://github.com/sasanarakkha/dpd-db-sbs/blob/6eaaa4c58059e5e03ecdf522635335b89a5e4b1d/exporter/webapp/main.py#L223){target="_blank"}.
+Исходный код можно найти [здесь](https://github.com/sasanarakkha/dpd-db-sbs/blob/6eaaa4c58059e5e03ecdf522635335b89a5e4b1d/exporter/webapp/main.py#L223){target="_blank"}.
 
-## Thanks
+## Благодарности
 
-Thanks to the **Vipassana Research Institute** for making these digital texts in XML format freely available for non-commercial use. They can be found here on [GitHub](https://github.com/VipassanaTech/tipitaka-xml){target="_blank"}.
-
+Благодарим **Vipassana Research Institute** за то, что они сделали эти цифровые тексты в формате XML свободно доступными для некоммерческого использования. Их можно найти на [GitHub](https://github.com/VipassanaTech/tipitaka-xml){target="_blank"}.

@@ -1,3 +1,3 @@
-# Software Integrations
+# Интеграции с программным обеспечением
 
-DPD is integrated into a number of popular Pāḷi software applications. Find the one that best suits your needs.
+Словарь интегрирован в ряд популярных приложений для работы с Пали. Найдите то, которое лучше всего подходит для ваших нужд.
