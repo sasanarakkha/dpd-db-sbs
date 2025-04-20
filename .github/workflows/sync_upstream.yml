@@ -8,7 +8,7 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    # Grant permissions to write to contents (push to main branch)
+    # Grant permissions to write to contents
     permissions:
       contents: write 
     steps:
@@ -24,13 +24,13 @@ jobs:
       - name: Add Upstream Remote
         run: git remote add upstream https://github.com/digitalpalidictionary/dpd-db.git
 
-      - name: Fetch Upstream and Origin Main
+      - name: Fetch Upstream and Origin as_upstream
         run: |
           git fetch --depth=1 upstream main
-          git fetch --depth=1 origin main
+          git fetch --depth=1 origin as_upstream
 
       - name: Push Upstream Main to Origin Main
         run: |
           git push --force \
             https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git \
-            upstream/main:refs/heads/main
+            upstream/main:refs/heads/as_upstream
