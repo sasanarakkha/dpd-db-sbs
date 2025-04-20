@@ -1,6 +1,6 @@
-## Веб-сайт Слов Будды
+## Веб-сайт "Слова Будды"
 
-Легкая версия английского DPD теперь интегрирована на [веб-сайте Слов Будды](https://thebuddhaswords.net/home/index.html).
+Легкая версия английского DPD теперь интегрирована на [веб-сайте "Слова Будды"](https://thebuddhaswords.net/home/index.html).
 
 Это способствует очень комфортному чтению на Пали, с:
 
@@ -10,4 +10,4 @@
 
 ![tbw](../pics/tbw/tbw.png)
 
-Веб-сайт Слов Будды также доступен для загрузки и использования офлайн [отсюда](https://drive.google.com/drive/folders/1HawM4A_Ns37VGpHgH4YFpkkJpjtpNLEw).
+Веб-сайт "Слова Будды" также доступен для загрузки и использования офлайн [отсюда](https://drive.google.com/drive/folders/1HawM4A_Ns37VGpHgH4YFpkkJpjtpNLEw).

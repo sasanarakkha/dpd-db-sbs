@@ -1,3 +1,4 @@
-# Developer Docs
+# Для разработчиков
 
-Here's some useful information for software developers using the [dpd-db-sbs](https://github.com/sasanarakkha/dpd-db-sbs){target="_blank"} repo and DPD database.
+Вот полезная информация для разработчиков программного обеспечения, использующих репозиторий [dpd-db-sbs](https://github.com/sasanarakkha/dpd-db-sbs){target="_blank"} и базу данных DPD.
+

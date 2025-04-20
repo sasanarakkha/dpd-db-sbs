@@ -1,66 +1,65 @@
+## Сборка базы данных с нуля
 
-## Building the DB from scratch
-
-(1) Download the repo
+(1) Скачайте репозиторий:
 
 ```shell
 git clone --depth=1 https://github.com/sasanarakkha/dpd-db-sbs.git
 ```
 
-(2) Navigate into the directory
+(2) Перейдите в директорию проекта:
 
 ```shell
-cd dpd-db
+cd dpd-db-sbs
 ```
 
-(3) Download the submodules from Github
+(3) Загрузите подмодули из GitHub:
 
 ```shell
 git submodule init && git submodule update
 ```
 
-(4) Install [nodejs](https://nodejs.org/en/download){target="_blank"} for your operating system
+(4) Установите [Node.js](https://nodejs.org/en/download){target="_blank"} для вашей операционной системы.
 
-(5) Install [go](https://go.dev/doc/install){target="_blank"} for your operating system
+(5) Установите [Go](https://go.dev/doc/install){target="_blank"} для вашей операционной системы.
 
-(6) Install [uv](https://astral.sh/uv/install){target="_blank"} for your operating system
+(6) Установите [uv](https://astral.sh/uv/install){target="_blank"} для вашей операционной системы:
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-(7) Install all the dependencies with uv
+(7) Установите все зависимости с помощью `uv`:
 
-```bash
+```shell
 uv sync
 ```
 
-(8) Having at least 20 GB of RAM can be helpful. If you have less, consider [increasing the swap memory.](https://www.reddit.com/r/linuxmint/comments/uhjyir/how_to_increase_swap_size/?rdt=34113){target="_blank"}.
+(8) Наличие как минимум 20 ГБ оперативной памяти будет полезно. Если у вас меньше, рассмотрите возможность [увеличения объёма swap-памяти.](https://www.reddit.com/r/linuxmint/comments/uhjyir/how_to_increase_swap_size/?rdt=34113){target="_blank"}
 
-(9) Run this once to initialize the project
+(9) Один раз выполните инициализацию проекта:
 
 ```shell
 uv run bash scripts/bash/initial_setup_run_once.sh
 ```
 
-(10) Build the database, this can take up to an hour the first time.
+(10) Постройте базу данных — это может занять до часа при первом запуске:
 
 ```shell
 uv run bash scripts/bash/initial_build_db.sh
 ```
 
-That should create an SQLite database `dpd.db` in the root folder which can be accessed with [DB Browser](https://sqlitebrowser.org/){target="_blank"}, [DBeaver](https://dbeaver.io/){target="_blank"}, through [SQLAlechmy](https://www.sqlalchemy.org/){target="_blank"} or your preferred method.
+В результате будет создан файл базы данных SQLite `dpd.db` в корневой папке проекта. Его можно открыть с помощью [DB Browser](https://sqlitebrowser.org/){target="_blank"}, [DBeaver](https://dbeaver.io/){target="_blank"}, через [SQLAlchemy](https://www.sqlalchemy.org/){target="_blank"} или другим удобным способом.
 
-For a quick tutorial on how to access any information in the db with SQLAlchemy, see [Using the db](use_db.md)
+Краткое руководство по работе с этой базой данных через SQLAlchemy см. в разделе [использование базы данных](use_db.md)
 
 ---
 
-## Additional configuration
+## Дополнительная настройка
 
-There are some additional dependencies in different parts of the project that may need to be installed depending on your use case.
+В проекте есть дополнительные модули, которые могут потребовать установки в зависимости от того, чем вы планируете пользоваться:
 
-1. The __GoldenDict__ exporter requires [dictzip](https://linux-packages.com/ubuntu-24-04/package/dictzip){target="_blank"}
+1. __Экспорт в GoldenDict__ требует установленной утилиты [dictzip](https://linux-packages.com/ubuntu-24-04/package/dictzip){target="_blank"}
 
-2. Running the __GUI__ requires [tkinter](https://www.pythonguis.com/installation/install-tkinter-linux/){target="_blank"}
+2. Для запуска __графического интерфейса__ требуется установленный [tkinter](https://www.pythonguis.com/installation/install-tkinter-linux/){target="_blank"}
 
-3. The __database tests__ may require [pyperclip dependencies](https://pyperclip.readthedocs.io/en/latest/index.html#not-implemented-error){target="_blank"}.
+3. Для запуска __тестов базы данных__ могут понадобиться зависимости для [pyperclip](https://pyperclip.readthedocs.io/en/latest/index.html#not-implemented-error){target="_blank"}

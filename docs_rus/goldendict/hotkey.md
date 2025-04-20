@@ -1,6 +1,6 @@
 ## Настройка горячей клавиши
 
-Независимо от того, используете ли вы [Sutta Central](https://suttacentral.net/), [Digital Pāli Reader](https://www.digitalpalireader.online/_dprhtml/index.html), [Tipitaka Pali Projector](https://www.microsoft.com/en-us/p/tipitaka-pali-projector/9pkwwvrdvnl4#activetab=pivot:overviewtab), [Tipitaka.app](https://tipitaka.app/), PDF-документы или любой другой источник текстов на пали, это позволяет вам щелкнуть по слову и немедленно открыть его в словаре.
+Независимо от того, используете ли вы [Sutta Central](https://suttacentral.net/), [Digital Pāli Reader](https://www.digitalpalireader.online/_dprhtml/index.html), [Tipitaka Pali Projector](https://www.microsoft.com/en-us/p/tipitaka-pali-projector/9pkwwvrdvnl4#activetab=pivot:overviewtab), [Tipitaka.app](https://tipitaka.app/), PDF-документы или любой другой источник текстов на Пали, это позволяет вам щелкнуть по слову и немедленно открыть его в словаре.
 
 Перейдите в Меню > Правка > Параметры (Клавиша F4) > Горячие клавиши.
 
@@ -10,7 +10,7 @@
 
 ![hoteky](../pics/hotkey/hoteky.png)
 
-Дважды щелкните, чтобы выделить любое слово на пали в любом программном обеспечении или PDF-документе и нажмите горячую клавишу. Откроется небольшое окно GoldenDict. DPD автоматически найдет любое измененное слово в словаре.
+Дважды щелкните, чтобы выделить любое слово на Пали в любом программном обеспечении или PDF-документе и нажмите горячую клавишу. Откроется небольшое окно GoldenDict. DPD автоматически найдет любое измененное слово в словаре.
 
 ![popupwindow](../pics/hotkey/popupwindow.png)
 
@@ -26,7 +26,7 @@
 
 ![dpr clipboard preference](../pics/hotkey/dpr%20clipboard%20preference.png)
 
-Конечно, вы также можете искать слова на пали по-старому...
+Конечно, вы также можете искать слова на Пали по-старому...
 
 - Перейдите в Меню > Вид и выберите Панель поиска (Сочетание клавиш **Ctrl-S**).
 - Начните вводить слово в строку поиска и щелкните слово, которое вы ищете.

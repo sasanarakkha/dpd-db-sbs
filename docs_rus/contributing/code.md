@@ -2,31 +2,35 @@
 
 Ищем помощь в написании кода для различных аспектов проекта Цифровой Словарь Пали. Если у вас есть опыт и интерес, [свяжитесь с нами по электронной почте](mailto:devamitta@sasanarakkha.org).
 
-## DPD Project Management
-Here's the [DPD Codebase](https://GitHub.com/orgs/digitalpalidictionary/projects/1/views/2){target="_blank"} Project Management on GitHub with all the open and in-progress issues. Just comment on any issue to find out more, or [please get in touch by email](mailto:devamitta@sasanarakkha.org).
+## Управление проектом
 
-Here's the [DPD - SBS / Russian](https://github.com/orgs/sasanarakkha/projects/1/views/1){target="_blank"} Project Management on GitHub with all the open and in-progress issues. Just comment on any issue to find out more, or [please get in touch by email](mailto:devamitta@sasanarakkha.org).
+Вот [управление проектом DPD Codebase](https://GitHub.com/orgs/digitalpalidictionary/projects/1/views/2){target="_blank"} и [управление проектом DPD - SBS / Russian](https://github.com/orgs/sasanarakkha/projects/1/views/1){target="_blank"} на GitHub со всеми открытыми и текущими задачами. Просто прокомментируйте любую задачу, чтобы узнать больше, или [свяжитесь с нами по электронной почте](mailto:devamitta@sasanarakkha.org).
 
-## DPD Project repo
+## Репозиторий проекта DPD
 
-Here's the [dpd-db-sbs](https://github.com/sasanarakkha/dpd-db-sbs){target="_blank"}  GitHub repo, which contains the code for all aspects of the project.
+Вот [репозиторий dpd-db-sbs](https://github.com/sasanarakkha/dpd-db-sbs){target="_blank"} на GitHub, содержащий код всех компонентов проекта.
 
-## Technical Docs
-Here are the [technical docs](../technical/index.md), for building the database, or just working with the pre-built database
+## Техническая документация
 
-## GitHub Releases
-You can find the [latest releases](https://github.com/sasanarakkha/dpd-db-sbs/releases){target="_blank"}  here on GitHub, which includes the latest version of the database. 
+Здесь находятся [технические документы](../technical/index.md) для сборки базы данных или работы с уже собранной базой.
 
-## Languages
-DPD uses a few languages.
+## Обновления на GitHub
 
-- __Python__: Most of the project backend is written in Python.   
+Последние [обновления](https://github.com/sasanarakkha/dpd-db-sbs/releases){target="_blank"} доступны здесь на GitHub, включая актуальную версию базы данных.
 
-- __HTML CSS JS__: Most of the frontend is written in HTML, CSS and vanilla JavaScript.  
+## Языки
 
-- __Go__: A few of the more time-consuming operations, like the Deconstructor and generating Frequency tables, are written in Go to take advantage of its speed and concurrency.
+DPD использует несколько языков программирования.
 
-- __Markdown__: This website and all the project docs are written in Markdown.  
+- __Python__: Основная часть серверной логики проекта написана на Python.  
 
-## App Development
-A long-term goal is to create a custom app for DPD and other Pāḷi Dictionaries. This would replicate the current lookup functionality of GoldenDict and further allow the integration of many requested features, which are not possible within the GoldenDict framework. 
+- __HTML CSS JS__: Основная часть интерфейса написана на HTML, CSS и чистом JavaScript.  
+
+- __Go__: Некоторые ресурсоёмкие операции, такие как деконструкция и генерация таблиц частотности, написаны на Go для использования его высокой скорости и многопоточности.
+
+- __Markdown__: Этот сайт и вся документация проекта написаны в формате Markdown.
+
+## Разработка приложения
+
+Долгосрочная цель — создать собственное приложение для DPD и других словарей Пали. Оно будет воспроизводить текущую функциональность поиска GoldenDict и дополнительно позволять интеграцию множества запрашиваемых функций, которые невозможно реализовать в рамках GoldenDict.
+

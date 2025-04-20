@@ -1,3 +1,4 @@
-# Installation Guide
+# Руководство по установке
 
-DPD runs inside dictionary software on your computer or device. Here's how to get set up. 
+Словарь работает внутри программного обеспечения-словаря на вашем компьютере или устройстве. Вот как настроить его.
+

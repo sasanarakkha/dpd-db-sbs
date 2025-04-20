@@ -26,11 +26,11 @@
 
 ![help](../pics/dpdict.net/dpdict_help.png)
 
-### 6. Словарь с английского на пали
+### 6. Словарь с английского на Пали
 
 ![epd](../pics/dpdict.net/dpdict_epd.png)
 
-### 7. Словарь с русского на пали
+### 7. Словарь с русского на Пали
 
 ![epd](../pics/dpdict.net/dpdict_rpd.png)
 

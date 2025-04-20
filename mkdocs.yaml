@@ -40,9 +40,9 @@ nav:
     - API в DictTango: "webapp/api_dicttango.md"
   - Программные Интеграции:
     - integrations/index.md
-    - Dhamma.gift website: "integrations/dhamma_gift.md"
+    - Dhamma.gift: "integrations/dhamma_gift.md"
     - Simsapa Dhamma Reader: "integrations/simsapa.md"
-    - Sutta Central Website: "integrations/sutta_central.md"
+    - Sutta Central: "integrations/sutta_central.md"
     - The Buddha's Words: "integrations/tbw.md"
     - Tipitaka Pali Reader: "integrations/tpr.md"
     - Tipitakapali.org: "integrations/tipitakapali.md"
@@ -64,7 +64,7 @@ nav:
   - Контакты: "contact.md"
   - Лицензия: "license.md"  
   - Язык Пали: "pali_notes/index.md"
-  - Документация для разработчиков:
+  - Для разработчиков:
     - "technical/index.md"
     - Построить БД с нуля: "technical/build_db.md"
     - Использовать БД в проекте: "technical/use_db.md"
