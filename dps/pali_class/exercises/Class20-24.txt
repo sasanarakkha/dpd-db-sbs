@@ -1,0 +1,401 @@
+Class 20 Exercises 
+
+1.	byāpādapadosaṃ pahāya abyāpannacitto viharati sabbapāṇabhūtahit’ānukampī MN 107
+Abandoning ill-will and hatred, he dwells with a mind without ill-will, compassionate for the welfare of all living beings.
+2.	% sukhassa ca pahānā dukkhassa ca pahānā, pubb’eva somanassadomanassānaṃ atthaṅ’gamā, adukkham’asukhaṃ upekkhāsatipārisuddhiṃ catutthaṃ jhānaṃ upasampajja viharati. DN 22.18
+With the abandoning of pleasure and pain, and with the passing away of joy and dejection already before, he dwells having entered into the fourth stage of meditation, which has no pleasure and no pain, (but) has purification of awareness due to equanimity.
+3.	ajja’t’agge te, āvuso, samaṇ'uddesa na c'eva so bhagavā satthā apadisitabbo VIN PAT PC 70
+From today onwards, friend novice, the Blessed One is not to be referred to as the teacher by you. 
+4.	yāvajīvam’pi ce bālo, paṇḍitaṃ payirupāsati,  
+na so dhammaṃ vijānāti, dabbī sūparasaṃ yathā. DHP 064
+[Even] if a fool associates closely with a wise person for the rest of his life, he will not (lit: does not) comprehend the doctrine, as a spoon [does not comprehend] the taste of the soup. 
+5.	yo pana bhikkhu jānaṃ yathādhammaṃ nihat’ādhikaraṇaṃ punakammāya ukkoṭeyya, pācittiyaṃ. VIN PAT PC 63
+If any monk should knowingly re-open for further action a legal issue which has been disposed of according to the rule, [this is an offence] involving confession.
+6.	tiṇadosāni khettāni, rāgadosā ayaṃ pajā, tasmā hi vītarāgesu, dinnaṃ hoti mahapphalaṃ. DHP 356
+Fields are ruined by weeds, this generation is ruined by desire; that is why an offering to [those who are] free from desires is indeed of great fruit.
+7.	taṃ kiṃ maññasi, gāmaṇi, idh'assa puriso pāṇ'ātipātī adinn'ādāyī kāmesumicchācārī musāvādī pisuṇavāco pharusavāco samphappalāpī abhijjhālu byāpannacitto micchādiṭṭhiko. SN 42.6 
+What do you think, headman, here could be a person who kills living being, takes what is not given, who engages in sexual misconduct, speaks falsely, divisively, harshly, and chatters frivolously, [one] who is covetous, has a malicious mind and holds a wrong view.
+8.	% dvīsu mahāpurisalakkhaṇesu kaṅkhati vicikicchati n'ādhimuccati na sampasīdati, kos'ohite ca vatthaguyhe, pahūtajivhatāya ca. MN 91 
+He has doubt, he is uncertain about two auspicious marks of a great man, he has not made up his mind [and] is unsettled regarding [them]: about the genitals being enclosed in a sheath and about the largeness of the tongue.
+9.	$ tena kho pana samayena satta ca jaṭilā satta ca nigaṇṭhā satta ca acelakā satta ca ekasāṭakā satta ca paribbājakā parūḷhakacchanakhalomā khārivividham'ādāya bhagavato avidūre atikkamanti. SN 3.11
+Now on that occasion, seven dread-locked ascetics, seven Jains, seven naked ascetics, seven one-robe ascetics, and seven wandering ascetics, with long armpit hair, nails and body hair, and carrying bundles of personal belongings on a pole, passed by near to the Blessed One. 
+
+Class 20 Tipiṭaka Examples
+
+Break up all the sandhis and compounds in the following sentences. Underneath the translation, demonstrate how each compound is formed and name the type of compound.
+
+1.	MN 107 gaṇakamoggallānasuttaṃ
+so pacchābhattaṃ piṇḍapātapaṭikkanto nisīdati pallaṅkaṃ ābhujitvā ujuṃ kāyaṃ paṇidhāya parimukhaṃ satiṃ upaṭṭhapetvā
+After the meal, after returning from alms-round, he sits down, having folded [his legs] into a cross-legged sitting position, positioning the body uprightly, having set up mindfulness as first priority.
+2.	DN 22.18 mahāsatipaṭṭhānasuttaṃ
+savitakkaṃ savicāraṃ vivekajaṃ pītisukhaṃ paṭhamaṃ jhānaṃ upasampajja viharati
+Having reached the first stage of meditation, which has thinking and discursive thought, and joy and happiness born from solitude, he dwells there.
+3.	MN 51 kandarakasuttaṃ
+kālavādī bhūtavādī atthavādī dhammavādī vinayavādī nidhānavatiṃ vācaṃ bhāsitā hoti kālena sāpadesaṃ pariyantavatiṃ atthasaṃhitaṃ
+He speaks at the right time, speaks the truth, speaks what is of benefit, speaks about the doctrine, speaks about the discipline, a speaker of words worth treasuring; at a suitable time, [he speaks] reasonable, within a limit and [what is] advantageous.
+4.	AN 7.61 pacalāyamānasuttaṃ
+viggāhikāya moggallāna kathāya sati kathābāhullaṃ pāṭikaṅkhaṃ, kathābāhulle sati uddhaccaṃ
+Moggallāna, when there is quarrelsome talk, an excess of speech is to be expected. When there is an abundance of talk, there is agitation.
+5.	SN 12.23 upanisasuttaṃ
+seyyathāpi, bhikkhave, uparipabbate thullaphusitake deve vassante taṃ udakaṃ yathāninnaṃ pavattamānaṃ pabbatakandarapadarasākhā paripūreti.
+Just as when the sky is raining big drops (of rain) on top of the mountain, that water, proceeding downwards, fills up the mountain cracks, crevices and creeks.
+6.	MN 40 cūḷāssapurasuttaṃ
+ehi tvaṃ, bhadramukha, saṅghāṭiko hohi, saṅghāṭikassa te sato saṅghāṭidhāraṇamattena abhijjhālussa abhijjhā pahīyissati. 
+Come, my dear! Be someone who wears a patchwork robe! When you are someone who wears a patchwork robe, when you are covetous, by the mere fact of wearing a patchwork robe, covetousness will be abandoned.
+7.	MN 40 cūḷāssapurasuttaṃ
+tassa sabbehi imehi pāpakehi akusalehi dhammehi visuddhamattānaṃ samanupassato, vimuttamattānaṃ samanupassato, pāmojjaṃ jāyati, pamuditassa pīti jāyati, pītimanassa kāyo passambhati, passaddhakāyo sukhaṃ vedeti, sukhino cittaṃ samādhiyati.
+When he sees himself pure and free from all these bad, unskilful mental states, happiness arises, for one who is happy delight arises, for one who has a joyful mind the body relaxes. One with a relaxed body experiences ease for who is at ease the mind becomes settled.
+8.	AN 10.176 cundasuttaṃ
+brāhmaṇā, bhante, pacchābhūmakā kamaṇḍalukā sevālamālikā aggiparicārikā udakorohakā soceyyāni paññapenti, tesāhaṃ soceyyāni rocemī’ti
+Venerable sir, the Brahmans from the Western lands who carry water pitchers, who wear moss garlands, who tend the sacred fire, who bathe ritually, they declare purification rites. I approve of their purification rites.
+9.	MN 12 mahāsīhanādasuttaṃ
+assosi kho āyasmā sāriputto sunakkhattassa licchaviputtassa vesāliyaṃ parisati evaṃ vācaṃ bhāsamānassa - natthi samaṇassa gotamassa uttarimanussadhammā alamariyañāṇadassanaviseso.
+Venerable Sariputta heard when Lucky Star, the young Licchavi, was talking in the Vesali assembly (saying), “The Ascetic Gotama has no super-powers, a distinction of knowledge and vision worthy of the Noble One’s.” 
+
+
+
+Class 21 Exercises 
+
+
+
+1.	yaṃ buddhaseṭṭho parivaṇṇayī suciṃ, samādhim’ānantarikañ’ñam’āhu. SNP 13
+The foremost Buddha extolled pure stillness of the mind, which they say with  immediate results.
+2.	khayaṃ virāgaṃ amataṃ paṇītaṃ, yad'ajjhagā sakyamunī samāhito. SNP 13
+The wearing away, the dispassion, the deathless, the sublime (or sublime deathless) which the concentrated Sakyan sage attained…
+3.	khaṇo vo mā upaccagā, khaṇ’ātītā hi socanti, nirayamhi samappitā. SNP 22
+Don’t let the opportunity pass by; they who have missed the chance are consigned to hell [and] sorrow over [it].
+4.	sabbe sattā sabbe pāṇā, sabbe bhūtā ca kevalā.  
+sabbe bhadrāni passantu, mā kiñci pāpam’āgamā. AN 4.67
+May all creatures, all living beings, all existing entities, all of them, may they all encounter good fortune and may not any evil come to (them).
+5.	yo attano sīlavatāni jantu, anānupuṭṭho'va paresa pāva, anariyadhammaṃ kusalā tam'āhu, yo ātumānaṃ sayam'eva pāva.
+SNP 41
+A person who, unasked, boasts to others about his virtues and practices, the skillful ones call him [one of] ignoble nature, who boasts about himself just on his own accord.
+6.	$ kayirā ce, kayirāth’enaṃ, daḷham’enaṃ parakkame.  
+sithilo hi paribbājo, bhiyyo ākirate rajaṃ. SN.2.8 (Dhp 313)
+If one should do (something), one should do (it) by oneself; one should undertake it vigorously.
+A wandering monk [who is] lax would certainly stir up for himself more dirt.
+(or)
+A wandering monk, because (he is) lax, would stir up for himself more dirt.
+7.	$ na dīgham’āyuṃ labhate dhanena, na c’āpi vittena jaraṃ vihanti.  appaṃ h’idaṃ jīvitam’āhu dhīrā, asassataṃ vippariṇāmadhammaṃ. TH 251
+Not by means of wealth does one get oneself a long life and not even by means of possessions does one banish old age. 
+The sages say this life is indeed short, not eternal, and having the nature of changing (i.e. is changeable in nature).
+8.	appevanām’imassa kevalassa dukkhakkhandhassa antakiriyā paññāyethā’ti MN 79
+“If only the destruction of this whole mass of suffering would be apparent. (lit. make itself known)”
+9.	"iṅgha tāva āyasmā kāyikaṃ sikkhassū"ti, iti’ssa bhavanti vattāro.	 AN 10.44
+“Please, Venerable, first you must train yourself bodily”; there are those who speak thus to him. 
+10.	$ yuñjant'āyasmanto sakaṃ, mā vo sakaṃ vinassā”ti. VIN PAT NP 10
+“Let the venerables regain for [what is their] own; do not [let] what is your own get lost.”
+11.	evaṃ abhikkantadassāviṃ, atthi pañhena āgamaṃ, 
+kathaṃ lokaṃ avekkhantaṃ, maccurājā na passati. SNP 70
+I myself, a seeker, have come to [the one] of such excellent vision, with a question. How is one viewing the world  [and] the king of death does not see [him]?
+
+Class 21 Tipiṭaka Examples
+
+
+1.	SN 1.31 
+sabbhireva samāsetha,
+sabbhi kubbetha santhavaṃ,
+sataṃ saddhammamaññāya,
+sattā gacchanti suggatin’ti.
+One should associate oneself just with the virtuous,
+with the virtuous, one should be intimate,
+having understood the true teaching of the virtuous,
+beings go (on) to a good destination.
+2.	UD 5.10
+ṭhitena kāyena ṭhitena cetasā,
+tiṭṭhaṃ nisinno uda vā sayāno,
+etaṃ satiṃ bhikkhu adhiṭṭhahāno,
+labhetha pubbāpariyaṃ visesaṃ,
+laddhāna pubbāpariyaṃ visesaṃ,
+adassanaṃ maccurājassa gacche'ti.
+With stationary body, with stationary mind, 
+standing or sitting or lying down,
+a monk focusing on this mindfulness,
+could get successive attainments,
+having obtained successive attainments,
+he could go out of the king of death’s sight.  
+3.	KHP 9
+na paro paraṃ nikubbetha,
+n’ātimaññetha katthaci naṃ kiñci,
+byārosanā paṭighasaññā,
+nāññamaññassa dukkhamiccheyya. 
+One should not cheat another, 
+nor despise anywhere anyone,
+out of anger and dislike, 
+one should not wish suffering for another.
+4.	AN 2.19 kusalaṃ, bhikkhave, bhāvetha. sakkā, bhikkhave, kusalaṃ bhāvetuṃ. no cedaṃ, bhikkhave, sakkā abhavissa kusalaṃ bhāvetuṃ, nāhaṃ evaṃ vadeyyaṃ, ‘kusalaṃ, bhikkhave, bhāvethā’ti.
+You all must develop skillful qualities (lit: the good), monks. It is possible to develop skillful qualities. If it would not be possible to develop skillful qualities, I myself would not say this, “Monks, develop skillful qualities.” 
+
+5.	AN 3.39 ahañceva kho pana jarādhammo samāno jaraṃ anatīto paraṃ jiṇṇaṃ disvā aṭṭīyeyyaṃ harāyeyyaṃ jiguccheyyaṃ na metaṃ assa patirūpan’ti.
+“And if I, being of a nature to get old, who is not exempt from old age, would see another old person and would become troubled, ashamed and disgusted, that would not be suitable for me”. 
+
+6.	SNP 46
+visenikatvā pana ye caranti,
+diṭṭhīhi diṭṭhiṃ avirujjhamānā,
+tesu tvaṃ kiṃ labhetho pasūra,
+yesīdha natthī paramuggahītaṃ. 
+They wander around without an army, not opposing a view with views. In them, what could you get yourself, Pasura, in whom there is nothing grasped as the highest.
+7.	UD 5.10 addasā kho bhagavā āyasmantaṃ cūḷapanthakaṃ avidūre nisinnaṃ pallaṅkaṃ ābhujitvā ujuṃ kāyaṃ paṇidhāya parimukhaṃ satiṃ upaṭṭhapetvā.
+The Blessed One saw Venerable Cūḷapanthaka seated nearby, having folded (his legs) into sitting posture, directing his body upright, having set up mindfulness to the fore.
+8.	ITI 87
+tayo vitakke kusale vitakkaye,
+tayo pana akusale nirākare,
+sa ve vitakkāni vicāritāni,
+sameti vuṭṭhīva rajaṃ samūhataṃ,
+sa ve vitakkūpasamena cetasā, 
+idheva so santipadaṃ samajjhagā'ti.
+One should think three skilful thoughts,
+and one should reject three unskilful ones.
+One stills thoughts and plans,
+like the rain (stills) raised dust.
+With a mind with thought calmed,
+right here one has obtained that state of peace.
+9.	SN 11.24 tena kho pana samayena dve bhikkhū sampayojesuṃ, tatreko bhikkhu accasarā, atha kho so bhikkhu tassa bhikkhuno santike accayaṃ accayato deseti, so bhikkhu nappaṭiggaṇhāti.
+And at that time two monks quarreled. There, one monk transgressed. Then that monk confessed his fault to that other monk, but that monk did not accept (his apology).
+ 
+
+ 
+Class 22 Exercises 
+
+
+1.	kiṃ'sū asissāmi kuvaṃ vā asissaṃ, 
+dukkhaṃ vata settha kv'ajja sessaṃ, 
+ete vitakke paridevaneyye, 
+vinayetha sekho aniketacārī. SNP 54 
+What will I eat? Where will I (myself) eat? Alas, you slept (lit: sleep) badly! Where do I (myself) sleep today? A trainee, one who is wandering without a home, should dispel these lamentable thoughts. 
+2.	asmī’ti, bhikkhave, maññitam'etaṁ, ‘ayam'aham'asmī’ti maññitam'etaṁ, ‘bhavissan’ti maññitam'etaṁ, ‘na bhavissan’ti maññitam'etaṁ SN 35.248
+“I am” is imagination; “this I am” is imagination; “I will be.” is imagination; “I will not be.” is imagination.
+3.	moneyyaṃ te upaññissaṃ, dukkaraṃ durabhisambhavaṃ,
+handa te naṃ pavakkhāmi, santhambhassu daḷho bhava. SNP 37
+I myself will explain sagehood to you, hard to achieve, hard to attain . Come, I will tell you [about] it: Stand yourself firm, you must be strong/steady.
+4.	ādittato'haṃ samathehi yutto, 
+paññāya dacchaṃ tad'idaṃ kadā me. TH 262
+I am as on fire, [although] engaged in serenity; when will I see with wisdom this state for myself?
+5.	$ atha kho tā devatāyo bhiyyosomattāya ujjhāyantiyo vehāsaṃ abbhuggañchuṃ. SN 1.35
+After that those deities, finding fault to an even greater measure, flew up into the sky.
+6.	aniccaṃ aniccato dakkhuṃ, dukkham’addakkhu dukkhato. 
+anattani ‘anattā’ti, asubhaṃ asubhat’addasuṃ. 
+sammādiṭṭhisamādānā, sabbaṃ dukkhaṃ upaccagun’ti AN 4.49 
+“They saw what is impermanent as impermanent. They saw suffering as suffering. They have seen what is non-self as ‘non-self’, they have perceived what is foul as foul. Taking upon themselves right view, they overcame all suffering.”
+7.	% app'eva nāma mayam'pi āyasmantānaṃ kiñcimattaṃ anupadajjeyyāmā'ti. evañ'ca so bhikkhu vatvā kiñcimattaṃ anupadajjeyya antamaso piṇḍapātamattam'pi, nissaggiyaṃ pācittiyaṃ. VIN PAT NP 27
+“Certainly, we too should give a little something to the venerables.” And if that monk, having said [this] should give a little something, even just a little bit of alms-food, [this is a case] involving confession and forfeiture.
+8.	hirīnisedho puriso, koci lokasmiṃ vijjati, yo nindaṃ apabodheti, asso bhadro kasām'iva DHP 143
+A person, restrained by conscience, exists somewhere in the world, who avoids blame like the fortunate horse the whip.
+(Figuratively):
+Is any person found in the world who, restrained by conscience, avoids blame like the fortunate horse (avoids) the whip? 
+9.	$ adāsi me akāsi me, ñātimittā sakhā ca me. 
+petānaṃ dakkhiṇaṃ dajjā, pubbe katam’anussaraṃ. KHP 7
+“He gave to me, he did for me, they [were] my family, friends, and companions”; one should give a donation to the departed, remembering what was done before (by them).
+10.	paccuppannañ’ca yaṃ dhammaṃ, tattha tattha vipassati. asaṃhiraṃ asaṅkuppaṃ, taṃ vidvā m'anubrūhaye. MN 131
+And he understands with insight right there any state which is presently arisen. (or)
+And he understands with insight in each and every case a state which is presently arisen. 
+One who is wise should cultivate that unmovable and steady [state].
+
+Class 22 Tipiṭaka Examples
+
+1.	TH 206 vijitasenattheragāthā
+satiyā taṃ nibandhissaṃ,
+payutto te damessāmi,
+vīriyadhuraniggahito,
+na yito dūraṃ gamissase cittā’ti. 
+“I will bind you with mindfulness,
+intent, I will tame you,
+harnessed to the yoke of effort,
+you won’t go far from here, mind”.
+2.	MN 56 upālisuttaṃ
+api cāhaṃ imāni bhagavato vicitrāni pañhapaṭibhānāni sotukāmo, evāhaṃ bhagavantaṃ paccanīkaṃ kātabbaṃ amaññissaṃ.
+But wishing to hear these varied intelligent answers of the Blessed One, I just thought I should oppose the Blessed One (lit. an opposition should be made)
+3.	SN 22.96 gomayapiṇḍasuttaṃ
+ettako cepi, bhikkhu, attabhāvapaṭilābho abhavissa nicco dhuvo sassato avipariṇāmadhammo, nayidaṃ brahmacariyavāso paññāyetha sammā dukkhakkhayāya.
+Monk, even if there were this much personal existence that is stable, permanent, eternal, with an unchanging nature, living this holy life for the complete destruction of suffering would not be evident.
+4.	MN 73 mahāvacchasuttaṃ
+sace hi, bho gotama, imaṃ dhammaṃ bhavaṃyeva gotamo ārādhako abhavissa, no ca kho bhikkhū ārādhakā abhavissaṃsu. evamidaṃ brahmacariyaṃ aparipūraṃ abhavissa tenaṅgena.
+Sir Gotama, if only you were successful in this holy life, but the monks would not be successful, this holy life would be incomplete in that regard.
+5.	MN 65 bhaddālisuttaṃ
+etha, tumhepi, bhikkhave, ekāsanabhojanaṃ bhuñjatha; ekāsanabhojanaṃ kho, bhikkhave, tumhepi bhuñjamānā appābādhatañca sañjānissatha appātaṅkatañca lahuṭṭhānañca balañca phāsuvihārañcā’ti.
+“Come monks! You all too should eat (your) meal in one sitting. Eating (your) meal in one sitting, you too will experience good health and well-being, physical lightness, strength and a comfortable existence”.
+6.	SN 35.194 paṭhamadārukkhandhopamasuttaṃ
+evameva kho, bhikkhave, sace tumhepi na orimaṃ tīraṃ upagacchatha, na pārimaṃ tīraṃ upagacchatha; na majjhe saṃsīdissatha, na thale ussīdissatha, na manussaggāho gahessati, na amanussaggāho gahessati, na āvaṭṭaggāho gahessati, na antopūtī bhavissatha; evaṃ tumhe, bhikkhave, nibbānaninnā bhavissatha nibbānapoṇā nibbānapabbhārā.
+Similarly, monks, if you don’t veer towards the near bank, nor veer towards the far bank, not sink down in the middle, nor wash up on dry land, nor be grabbed by humans, nor be grabbed by non-humans, nor be grabbed by a whirlpool, nor become rotten inside, like this you will be sloping to going out, (nibbāna) slanting to going out, inclining to going out. 
+
+7.	SN 22.59 anattalakkhaṇasuttaṃ
+saṅkhārā ca hidaṃ, bhikkhave, attā abhavissaṃsu, nayidaṃ saṅkhārā ābādhāya saṃvatteyyuṃ, labbhetha ca saṅkhāresu — ‘evaṃ me saṅkhārā hontu, evaṃ me saṅkhārā mā ahesun’ti.
+If thought processes were yourself, monks, then thought processes would/could not lead to affliction; this could be obtained from (lit. in) mental processes: “May my mental processes be like this, may my mental processes not be like this.”
+
+8.	UD 73 tatiyanibbānapaṭisaṃyuttasuttaṃ
+no cetaṃ bhikkhave abhavissa ajātaṃ abhūtaṃ akataṃ asaṅkhataṃ nayidha jātassa bhūtassa katassa saṅkhatassa nissaraṇaṃ paññāyetha.
+Monks, if there were not an unborn, unbecome, unmade and uncreated, there would be no evident escape from the born, the become, the made and the created.
+9.	AN 2.9 cariyasuttaṃ
+ime kho, bhikkhave, dve sukkā dhammā lokaṃ na pāleyyuṃ, nayidha paññāyetha mātāti vā mātucchāti vā mātulānīti vā ācariyabhariyāti vā garūnaṃ dārāti vā. sambhedaṃ loko agamissa, yathā ajeḷakā kukkuṭasūkarā soṇasiṅgālā.
+If these two wholesome principles did not protect the world, it would not be clear, (this is my) mother, (this is my) mother’s sister, (this is my) uncle’s wife, (these are) wives of teachers. The world would become confused like goats and sheep, chickens and pigs, dogs and jackals.
+10.	MN 39 mahāassapurasuttaṃ
+tassa nevassa puratthimāya disāya udakassa āyamukhaṃ ... devo ca na kālena kālaṃ sammādhāraṃ anuppaveccheyya. 
+…and it had no inflow (lit: there could not be an inflow) of water from the eastern direction… and not a rain cloud [that] would rains….
+ 
+
+
+
+
+ 
+Class 23 Exercises 
+
+
+1.	so navaṃ santh'āgāraṃ pavisati, saddhiṃ mahesiyā brāhmaṇena ca purohitena.
+AN 4.198
+He enters the new meeting hall together with the royal consort and the chief brahmin priest.
+2.	mā, āyasmā, evaṃ avaca. mā bhagavantaṃ abbhācikkhi, na hi sādhu  bhagavato abbhakkhānaṃ, na hi bhagavā evaṃ vadeyya.
+VIN PAT PC 68
+Venerable, do not say so. Do not misrepresent the Blessed One. Misrepresenting the Blessed One [is] not good. The Blessed One would not speak in this way.
+3.	% seyyathā’pi, bhikkhave, balavā puriso dubbalataraṃ purisaṃ sīse vā gale vā khandhe vā gahetvā abhiniggaṇheyya abhinippīḷeyya abhisantāpeyya
+MN 20
+Just as a powerful man, having seized a weaker man on the head or neck or shoulder, might firmly grab hold of [him] [and] completely crush [him] down, [and] torture [him]....
+4.	% passāmi loke sadhane manusse, laddhāna vittaṃ na dadanti mohā. 
+luddhā dhanaṃ sannicayaṃ karonti, bhiyyo’va kāme abhipatthayanti.
+TH 251
+I see wealthy persons in the world; having obtained wealth, they do not donate [it], because of delusion. [And] because of greed, they make a stockpile [of] wealth; they crave even more sensual pleasures
+5.	% savanampāhaṃ, bhikkhave, tesaṃ bhikkhūnaṃ  bahukāraṃ vadāmi; upasaṅkamanampāhaṃ … payirupāsanampāhaṃ … anussatimpāhaṃ … anupabbajjampāhaṃ SN 46.3
+Just hearing of those monks, just approaching [them], just attending closely to [them], just recollecting [them], just following [them] into the monastic life, is very helpful I say.
+6.	idha, gahapati, ariyasāvako vigatamalamaccherena cetasā agāraṃ ajjhāvasati muttacāgo payatapāṇi vossaggarato yācayogo dānasaṃvibhāgarato. ayaṃ vuccati, gahapati, cāgasampadā.
+AN 4.61
+Here, householder, the master of the house [who is] a noble disciple lives the household life with a mind free from the stain of stinginess, giving freely, open-handed, delighting in generosity, ready to give to beggars, and who delights in sharing gifts. This, householder, is called the attainment of generosity.
+7.	% seyyathā’pi rañño paccantime nagare anupariyāyapatho hoti ucco c’eva vitthato ca, evam’evaṃ kho, ariyasāvako ottappī hoti, ottappati kāyaduccaritena vacīduccaritena manoduccaritena 
+AN 7.67
+Just as the encircling path around the frontier fortress of the king is high and even broad [for protecting its inhabitants]; in the same way, indeed, a 
+noble disciple is afraid of doing wrong and feels conscience about bodily misconduct, verbal misconduct, and mental misconduct. 
+
+8.	khayaṃ virāgaṃ amataṃ paṇītaṃ, 
+yad'ajjhagā sakyamunī samāhito. 
+na tena dhammena sam’atthi kiñci
+SNP 13
+Wearing away, dispassion, the superior deathless state – whatever the Sakyan sage, concentrated, obtained; there is not anything equal to that doctrine.
+9.	$ aññam'aññ'ābhigijjhanti,
+kāmesu analaṅ'katā.
+SN 1.28
+They are jealous of each other; they are insatiable in regard to sensual pleasures.
+10.	% yān’īdha bhūtāni samāgatāni,  bhummāni vā yāni va antalikkhe. 
+sabb’eva bhūtā sumanā bhavantu,  atho'pi sakkacca suṇantu bhāsitaṃ.
+SNP 13
+Whichever living beings gathered here, earthly or in the sky: may all living beings be happy and then let them respectfully listen to what is said ([this] utterance).
+11.	(passati) dukkhaṃ dukkhasamuppādaṃ, dukkhassa ca atikkamaṃ, ariyañ’c’aṭṭh’aṅgikaṃ maggaṃ, dukkh’ūpasamagāminaṃ.
+DHP 191 
+[one sees the four noble truths with right understanding:] suffering, the origin of suffering, the overcoming of suffering, and the noble eightfold path leading to release from suffering.
+12.	santussako  ca subharo ca, appakicco ca sallahukavutti, 
+sant’indriyo ca nipako ca, appagabbho kulesu ananugiddho.
+SNP 8
+One who is satisfied and easy to support, with few obligations and whose livelihood is frugal; one whose (mental) faculties are calm and who is discerning, courteous among families and not greedy. 
+13.	araññe rukkhamūlesu, kandarāsu guhāsu ca.
+vivekam’anubrūhantā, vihaṃsu tap’parāyanā
+TH 257
+They lived in the forest, at the bases of trees, in grottoes and in caves, fostering seclusion, with that as [their] final goal.
+14.	dukkhaṃ, bhikkhave, kusīto viharati vokiṇṇo pāpakehi akusalehi dhammehi, mahantañ’ca sadatthaṃ parihāpeti.
+SN 12.22
+He [who is] lazy dwells in suffering, mingled with evil and unskillful things, and [one who] greatly neglects his own benefit. 
+15.	% na pallatthikāya antaraghare nisīdissāmī'ti sikkhā karaṇīyā.
+VIN PAT SK 26
+“I will not sit  with the knees clasped around in an inhabited area.” The training is to be done.
+16.	% nikkhipitvā garuṃ bhāraṃ, aññaṃ bhāraṃ anādiya. samūlaṃ taṇham’abbuyha, nicchāto parinibbuto”ti.
+SN 22.22 
+“Having placed down the onerous burden [and] not taking up another burden, pulling out craving with the root, he is desireless (without being hungry), entirely liberated.”
+
+Class 23 Tipiṭaka Examples
+
+
+
+1.	VIN 5.4.7 tiṇavatthārakaṃ
+yadi saṅghassa pattakallaṃ, saṅgho imaṃ adhikaraṇaṃ tiṇavatthārakena vūpasameyya, ṭhapetvā thullavajjaṃ, ṭhapetvā gihippaṭisaṃyuttan’ti.
+If it is a suitable time for the community, the community may settle this dispute by covering it with grass, apart from serious offences and those connected with lay people.
+2.	AN 6.46 mahācundasuttaṃ
+idh’āvuso, dhammayogā bhikkhū jhāyī bhikkhū apasādenti, ime pana jhāyino’mhā, jhāyino’mhā’ti jhāyanti pajjhāyanti nijjhāyanti avajjhāyanti.
+Here friends, the monks devoted to the teaching belittle the meditator monks (saying), “These (monks say) ‘We are meditators, we are meditators!” but they meditate, over-meditate, under-meditate, mis-meditate.”
+3.	SNP 53 attadaṇḍasuttaṃ, aṭṭhakavaggo 15 
+yodha kāme accatari,
+saṅgaṃ loke duraccayaṃ,
+na so socati nājjheti,
+chinnasoto abandhano.
+Whoever here has escaped sensual pleasures,
+an attachment to the world hard to overcome,
+he does not sorrow, he is not anxious,
+(he has) cut the stream, (he is) free.
+4.	SN 20.10 biḷārasuttaṃ
+atha kho so, bhikkhave, mudumūsi gocarāya pakkāmi. tam’enaṃ biḷāro gahetvā sahasā asaṅkhāditvā ajjhohari. tassa so mudumūsi antam’pi khādi, antaguṇam’pi khādi.
+Then, monks, that soft mouse set out for food. A cat grabbed it, and quickly swallowed it without chewing. That soft mouse ate the cat’s intestines and it’s mesentery.
+5.	DN 16.27 mahāparinibbānasuttaṃ
+sabbaphāliphullā kho, ānanda, yamakasālā akālapupphehi. te tathāgatassa sarīraṃ okiranti ajjhokiranti abhippakiranti tathāgatassa pūjāya.
+Ananda, this pair of Sal tress is in full blossom with out of season flowers. They rain down, scatter down, completely cover the body of the Tathagata, in worship of the Tathagata.
+6.	MN 107 gaṇakamoggallānasuttaṃ
+cakkhunā rūpaṃ disvā mā nimittaggāhino ahuvattha, mā anubyañjanaggāhino. yatvādhikaraṇamenaṃ cakkhundriyaṃ asaṃvutaṃ viharantaṃ abhijjhādomanassā pāpakā akusalā dhammā anvāssaveyyuṃ.
+Having seen a form with the eye, don’t grasp the image or the other features. 
+On account of which greed and grief, evil, unwholesome states, would flow upon him dwelling with an unrestrained faculty of sight.
+7.	SN 22.26 assādasuttaṃ
+yāvakīvañ’c’āhaṃ, bhikkhave, imesaṃ pañcannaṃ upādānakkhandhānaṃ evaṃ assādañ’ca assādato ādīnavañ’ca ādīnavato nissaraṇañ’ca nissaraṇato yathābhūtaṃ n’ābbhaññāsiṃ, neva tāv’āhaṃ, bhikkhave ... anuttaraṃ sammāsambodhiṃ abhisambuddho’ti paccaññāsiṃ
+Monks, as long as I did not know the satisfaction of these five aggregates which are grasped to as satisfaction, the danger as the danger, and the escape as the escape,... I did not claim full realisation of enlightenment, “(I have) realised enlightenment”. 
+
+8.	AN 5.23 upakkilesasuttaṃ
+so sace ākaṅkhati, anekavihitaṃ iddhividhaṃ paccanubhaveyyaṃ, eko’pi hutvā bahudhā assaṃ, bahudhā’pi hutvā eko assaṃ, āvibhāvaṃ tirobhāvaṃ
+If he wishes, “I could manifest various kinds of psychic power. Having been one I could become many, having been many I could become one. (I could) appear and disappear.”
+
+9.	MN 61 ambalaṭṭhika rāhulovādasuttaṃ
+sace tvaṃ, rāhula, paccavekkhamāno evaṃ jāneyyāsi, yaṃ kho ahaṃ idaṃ kāyena kammaṃ kattukāmo idaṃ me kāyakammaṃ attabyābādhāya’pi saṃvatteyya
+If you know this while reflecting, “Whichever action that I wish to do by body, that physical action could lead to harm to myself” ...
+ 
+ 
+Class 24 Exercises  
+
+
+
+1.	tañ'hi'ssa, bhikkhu, n'atthi yena jāyetha, ajāyamāno kiṃ jīyissati, ajīyamāno kiṃ mīyissati, amīyamāno kiṃ kuppissati, akuppamāno kissa pihessati? MN 140
+Monk, there is indeed for him (i.e. he has indeed) not that by which he himself could be born. Not being born, how will he age? Not getting old, how will he die? Not dying, how will he be agitated? Not being agitated, for what will he long?
+2.	% tassā puriso sotena vuyhamāno kāse ce'pi gaṇheyya, te palujjeyyuṃ. so tatonidānaṃ anayabyasanaṃ āpajjeyya. SN 22.93
+A person being carried along by its (the rivers) current, even if he grabbed hold of the grasses (growing along the bank), they would break off and because of that he would experience misfortune and disaster.
+3.	kumbh'ūpamaṃ kāyam'imaṃ viditvā,
+nagar'ūpamaṃ cittam'idaṃ ṭhapetvā.
+yodhetha māraṃ paññ'āvudhena, 
+jitañ'ca rakkhe anivesano siyā.  DHP 40
+Having perceived this body [is fragile] like a clay pot, having set up this mind like a fortress, you should fight against death with the weapon of wisdom; one should protect the conquest and be without attachment.
+4.	$ seyyathā'pi, bhikkhave, māyākāro vā māyākār'antevāsī vā catumahāpathe māyaṃ vidaṃseyya. SN 22.95
+Just as a magician or a magician’s apprentice would display an illusion at a crossroads (i.e. at the meeting of four great roads).
+5.	% tassa mukh'ādhāne kāraṇaṃ kāriyamānassa honti y'eva visūkāyitāni visevitāni vipphanditāni kānici kānici, yathā taṃ akāritapubbaṃ kāraṇaṃ kāriyamānassa. MN 65
+While  [the colt] is being made to do a task with the bit, there are just twistings, tricks, and vacillations in whichever way, [because] it is being made to do that task not previously done before.
+6.	usabhaṃ pavaraṃ vīraṃ, mahesiṃ vijitāvinaṃ,
+anejaṃ nhātakaṃ buddhaṃ, tam'ahaṃ brūmi brāhmaṇaṃ.
+DHP 422
+The great sage, the hero, the distinguished noble being who, unmoved, vanquished; the perfected one, the awakened one – him do I call a brahmin (holy man).
+7.	tīṇ'imāni, bhikkhave, indriyāni. katamāni tīṇi? anaññātaññassāmī't'indriyaṃ, aññ'indriyaṃ, aññātāv'indriyaṃ
+ITI 62
+Monks, [there are] these three mental faculties. Which three? The faculty (that senses) “I will know the unknown,” the faculty of final knowledge, the faculty of one who has understood.
+8.	%SN 35.245 kiṃsukopamasuttaṃ	
+seyyathāpi, bhikkhu, purisassa kiṃsuko adiṭṭhapubbo assa. so yen’aññataro puriso kiṃsukassa dassāvī ten’upasaṅkameyya.
+Suppose there were (lit: would be) a man who had never seen a parrot tree before (lit: by whom a parrot tree had not been seen before); he would approach a certain person who has seen a parrot tree….  
+9.	AN 6.103	ukkhittāsikasuttaṃ
+nibbāne ca santadassāvī bhavissāmi, anusayā ca me samugghātaṃ gacchissanti, kiccakārī ca bhavissāmi, satthā ca me pariciṇṇo bhavissati mettāvatāyā’ti.
+“I will be one who has seen peacefulness in extinguishment, my underlying tendencies will be(come) exterminated (there will be extermination of my underlying tendencies), I will be one who has done his duty, and my teacher will (have) be(en) served with goodwill.”
+10.	yo pana bhikkhu bhuttāvī pavārito anatirittaṃ khādanīyaṃ vā bhojanīyaṃ vā khādeyya vā bhuñjeyya vā, pācittiyaṃ.
+VIN PAT PC 35
+If any monk who has eaten (a meal), who has been invited (to take more and refused), should chew uncooked food or consume food to be savored, which is not left over, [this is a case] involving confession.
+
+ 
+Class 24 Tipiṭaka Examples
+
+
+1.	SN 4.19 api, samaṇa, balībadde addasā'ti?
+Perhaps, ascetic, he saw oxen?
+
+2.	MN 31 kiṃ nu kho mayaṃ āyasmato anuruddhassa evam’ārocimha, imāsañ’ca imāsañ’ca vihārasamāpattīnaṃ mayaṃ lābhino’ti
+“Did we ever inform the venerable Anuruddha, ‘We obtain such and such meditation attainments’?”
+3.	AN 10.61 ko c’āhāro ayonisomanasikārassa. assaddhiyan’ti’ssa vacanīyaṃ. assaddhiyam’p’āhaṃ, bhikkhave, sāhāraṃ vadāmi, no anāhāraṃ. ko c’āhāro assaddhiyassa. asaddhammassavanan’ti’ssa vacanīyaṃ
+And what is the fuel for improper attention? It should be said of this, “lack of belief.” And monks, lack of belief has a fuel, it is not fuel-less. What is the fuel for lack of belief? It should be said of this, “not listening to the true teaching.”
+4.	MN 18 ko nu kho imassa bhagavatā saṃkhittena uddesassa uddiṭṭhassa vitthārena  atthaṃ avibhattassa vitthārena atthaṃ  vibhajeyyā'ti
+Who could analyse the meaning in detail of this brief statement stated and unexplained by the Blessed One, [who could] analyse the meaning in detail?
+5.	SN 1.71 kiṃsu chetvā sukhaṃ seti, kiṃsu chetvā na socati, kissassu ekadhammassa, vadhaṃ rocesi gotamā’ti.
+Having severed what, he sleeps comfortably? Having severed what, he does not mourn? The slaughter of which one thing, O Gotama, do you consent to?
+6.	AN 3.91 yathā divā tathā rattiṃ, yathā rattiṃ tathā divā, abhibhuyya disā sabbā, appamāṇasamādhinā.
+As by day, so by night, as by night, so by day. Overcoming all directions with a boundless stable mind.
+7.	AN 3.101 yo, bhikkhave, evaṃ vadeyya, yathā yath’āyaṃ puriso kammaṃ karoti tathā tathā taṃ paṭisaṃvediyatī’ti, evaṃ santaṃ, bhikkhave, brahmacariyavāso na hoti, okāso na paññāyati sammā dukkhassa antakiriyāya.
+Whoever monks, would say thus, “In whatever way a person performs a deed, in exactly that way he experiences that (result). This being the case, monks, there is no living the holy life, no opportunity is evident for the complete ending of suffering.
+8.	AN 8.74 seyyathā’pi, bhikkhave, ādittacelo vā ādittasīso vā, tass’eva celassa vā sīsassa vā nibbāpanāya adhimattaṃ chandañ’ca vāyāmañ’ca ussāhañ’ca ussoḷhiñ’ca appaṭivāniñ’ca satiñ’ca sampajaññañ’ca kareyya.
+Imagine if, monks, someone’s clothes or head was on fire. He would (set) extreme intention and (make) effort and exertion and tireless determination and (have) mindfulness and clear attention for putting out that exact clothes or head. 
+
+9.	SN 46.53 atha kho te bhikkhū tesaṃ aññatitthiyānaṃ paribbājakānaṃ bhāsitaṃ n’eva abhinandiṃsu nappaṭikkosiṃsu, anabhinanditvā appaṭikkositvā uṭṭhāyāsanā pakkamiṃsu, bhagavato santike etassa bhāsitassa atthaṃ ājānissāmā'ti.
+Then those monks neither approved of nor rejected the statement of those wandering ascetics of another religion. Having neither approved of nor rejected, they got up from their seats and left. “We will learn the meaning of this statement in the presence of the Blessed One,” (they said).
+10.	MN 107 ehi tvaṃ bhikkhu bhojane mattaññū hohi. paṭisankhā yoniso āhāraṃ āhāreyyāsi n’eva davāya na madāya na maṇḍanāya na vibhūsanāya yāvadeva imassa kāyassa ṭhitiyā yāpanāya vihiṃs’ūparatiyā brahmacariy’ānuggahāya iti purāṇañ’ca vedanaṃ paṭihaṅkhāmi navañ’ca vedanaṃ na uppādessāmi yātrā ca no bhavissati anavajjatā ca phāsu vihāro cā’ti
+Come, monk! You must be (one) who knows the right measure in eating. Reflecting deeply: you should not eat food for fun, nor for intoxication, nor for embellishment, nor for beautification. Only for as much the continuance of this body and for nourishment of this body, and for avoiding harm to this body, and for supporting the spiritual life. Thus I will destroy the old feeling (of hunger) and not cause a new feeling (of fullness) to arise. And we will will have a support, blamelessness and comfortable existence."
