@@ -49,27 +49,5 @@
             </td>
         </tr>
         {% endif %}
-        {% if d.show_sbs_data %}
-            {% if d.ru_abbrev and d.ru_abbrev != d.headword %}
-            <tr>
-                <th>
-                    Сокращение
-                </th>
-                <td>
-                    {{d.ru_abbrev|safe}}
-                </td>
-            </tr>
-            {% endif %}
-            {% if d.ru_meaning: %}
-            <tr>
-                <th>
-                    Значение
-                </th>
-                <td>
-                    {{d.ru_meaning|safe}}
-                </td>
-            </tr>
-            {% endif %}
-        {% endif %}
     </table>
 </div>

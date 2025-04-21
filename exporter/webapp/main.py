@@ -54,6 +54,7 @@ with get_db() as db_session:
 # Set up templates
 templates = Jinja2Templates(directory="exporter/webapp/templates")
 templates_ru = Jinja2Templates(directory="exporter/webapp/ru_templates")
+templates_sbs = Jinja2Templates(directory="exporter/webapp/sbs_templates")
 
 # Update CSS
 css_manager = CSSManager()
@@ -97,7 +98,15 @@ def home_page_ru(request: Request, response_class=HTMLResponse):
     """Russian home page"""
 
     return templates_ru.TemplateResponse(
-        "home.html", {"request": request, "dpd_results": ""}
+        "home.html", {"request": request, "dpd_results": "", "bd_count": bd_count}
+    )
+
+@app.get("/sbs")
+def home_page_sbs(request: Request, response_class=HTMLResponse):
+    """SBS home page."""
+
+    return templates_sbs.TemplateResponse(
+        "home.html", {"request": request, "dpd_results": "", "bd_count": bd_count}
     )
 
 
@@ -148,6 +157,30 @@ def db_search_html_ru(request: Request, q: str):
     )
 
 
+@app.get("/sbs/search_html", response_class=HTMLResponse)
+def db_search_html_sbs(request: Request, q: str):
+    """Returns a JSON with SBS HTML."""
+
+    q_roman = auto_translit_to_roman(q)
+
+    dpd_html, summary_html = make_dpd_html(
+        q_roman,
+        pth,
+        templates_sbs,
+        roots_count_dict,
+        headwords_clean_set,
+        ascii_to_unicode_dict,
+    )
+    return templates.TemplateResponse(
+        "home.html",
+        {
+            "request": request,
+            "q": q,
+            "dpd_results": dpd_html,
+        },
+    )
+
+
 @app.get("/search_json", response_class=JSONResponse)
 def db_search_json(request: Request, q: str):
     """Main search route for website."""
@@ -179,6 +212,25 @@ def db_search_json_ru(request: Request, q: str):
         headwords_clean_set_ru,
         ascii_to_unicode_dict,
         "ru",
+    )
+    response_data = {"summary_html": summary_html, "dpd_html": dpd_html}
+    headers = {"Accept-Encoding": "gzip"}
+    return JSONResponse(content=response_data, headers=headers)
+
+
+@app.get("/sbs/search_json", response_class=JSONResponse)
+def db_search_json_sbs(request: Request, q: str):
+    """Main search route for SBS website."""
+
+    q_roman = auto_translit_to_roman(q)
+
+    dpd_html, summary_html = make_dpd_html(
+        q_roman,
+        pth,
+        templates_sbs,
+        roots_count_dict,
+        headwords_clean_set,
+        ascii_to_unicode_dict,
     )
     response_data = {"summary_html": summary_html, "dpd_html": dpd_html}
     headers = {"Accept-Encoding": "gzip"}
@@ -227,6 +279,34 @@ def db_search_gd_ru(request: Request, search: str):
         headwords_clean_set_ru,
         ascii_to_unicode_dict,
         "ru",
+    )
+    global dpd_css, dpd_js, home_simple_css
+
+    return templates.TemplateResponse(
+        "home_simple.html",
+        {
+            "request": request,
+            "search": search,
+            "dpd_results": dpd_html,
+            "summary": summary_html,
+            "dpd_css": dpd_css,
+            "dpd_js": dpd_js,
+            "home_simple_css": home_simple_css,
+        },
+    )
+
+
+@app.get("/sbs/gd", response_class=HTMLResponse)
+def db_search_gd_sbs(request: Request, search: str):
+    """Returns pure HTML for SBS GoldenDict and MDict."""
+
+    dpd_html, summary_html = make_dpd_html(
+        search,
+        pth,
+        templates_sbs,
+        roots_count_dict,
+        headwords_clean_set,
+        ascii_to_unicode_dict,
     )
     global dpd_css, dpd_js, home_simple_css
 
