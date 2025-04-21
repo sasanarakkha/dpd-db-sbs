@@ -1,0 +1,32 @@
+<div class="main">
+
+    <div class="bd-message">
+        {{ message|safe }}
+    </div>
+    <table class="bd-table" id="bd-search-results">
+        <tbody class="bd-tbody">
+            {% for r in results %}
+            <tr class="bd-row">
+                <th class="bd-th">
+                    {{ loop.index }}. <b>{{ r.bold|safe }}</b>{{ r.bold_end|safe }}
+                </th>
+                <td class="bd-td">
+                    ({{ r.ref_code }}) {{ r.commentary|safe }}
+                    <br>
+                    <span class='bd-info'>{{ r.nikaya}}, {{ r.book }}, {{ r.title }}, {{ r.subhead }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if too_many_results: %}
+    <div class="bd-message">
+        Отображаются только первые <b>100</b> результатов. <br><br>
+        Пожалуйста, уточните критерии поиска:<br>
+        1. Используйте более конкретный поисковый запрос в первом поле поиска.<br>
+        2. Ищите внутри результатов во втором поле поиска.<br>
+        3. Используйте `начинается с`, чтобы сузить поиск.<br>
+        4. Используйте регулярные выражения для более точного поиска.<br>        
+    </div>
+    {% endif %}
+</div>

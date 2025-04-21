@@ -71,9 +71,9 @@ document.addEventListener("DOMContentLoaded", function () {
         <p class="message">Adjust the <b>settings</b> to suit your preferences.</p>
         <p class="message"><b>Refresh</b> the page if you experience any problems.</p>
         <p class="message">
-            <a href="https://docs.dpdict.net/dpdict.html" target="_blank">Click here</a>
+            <a href="https://docs.dpdict.net/webapp/" target="_blank">Click here</a>
             for more details about this website or 
-            <a href="https://docs.dpdict.net/titlepage.html" target="_blank">more information</a>
+            <a href="https://docs.dpdict.net/" target="_blank">more information</a>
             about DPD in general.
         </p>
         <p class="message">Start by <b>double clicking</b> on any word in the list below:</p>
@@ -86,12 +86,27 @@ document.addEventListener("DOMContentLoaded", function () {
         <p class="message">Настройте <b>параметры</b> в соответствии с вашими предпочтениями.</p>
         <p class="message"><b>Обновите</b> страницу, если у вас возникли какие-либо проблемы.</p>
         <p class="message">
-            <a href="https://https://devamitta.github.io/dpd.rus/webapp/" target="_blank">Нажмите здесь</a>,
+            <a href="https://devamitta.github.io/dpd.rus/webapp/" target="_blank">Нажмите здесь</a>,
             чтобы узнать больше о данном веб-сайте, или 
             <a href="https://devamitta.github.io/dpd.rus/" target="_blank">больше информации</a>
             о DPD в целом.
         </p>
         <p class="message">Начните с <b>двойного щелчка</b> по любому слову в списке ниже:</p>
+        <p class="message">atthi kāmarāgapariyuṭṭhitena peace kar gacchatīti Root ✓</p>
+        `;
+    } else if (language === 'sbs') {
+        startMessage = `
+        <p class="message">Search for Pāḷi or English words above using <b>Unicode</b> or <b>Velthuis</b> characters.</p>
+        <p class="message"><b>Double click</b> on any word to search for it.</p>
+        <p class="message">Adjust the <b>settings</b> to suit your preferences.</p>
+        <p class="message"><b>Refresh</b> the page if you experience any problems.</p>
+        <p class="message">
+            <a href="https://sasanarakkha.github.io/study-tools/dict/sbs-pali-dictionary" target="_blank">Click here</a>
+            for more details about this website or 
+            <a href="https://docs.dpdict.net/" target="_blank">more information</a>
+            about DPD in general.
+        </p>
+        <p class="message">Start by <b>double clicking</b> on any word in the list below:</p>
         <p class="message">atthi kāmarāgapariyuṭṭhitena peace kar gacchatīti Root ✓</p>
         `;
     }
@@ -281,13 +296,16 @@ async function handleFormSubmit(event) {
             let searchUrl = '/search_json';
             if (language === 'ru') {
                 searchUrl = '/ru/search_json';
+            } else if (language === 'sbs') {
+                searchUrl = '/sbs/search_json';
             }
+            // Fetch data from the server
             const response = await fetch(`${searchUrl}?q=${encodeURIComponent(searchQuery)}`);
             const data = await response.json();
 
             //// add the summary_html
             if (data.summary_html.trim() != "") {
-                if (language === 'en') {
+                if (language === 'en' || language === 'sbs') {
                     summaryResults.innerHTML = "<h3>Summary</h3>";
                 } else {
                     summaryResults.innerHTML = "<h3>Сводка</h3>";

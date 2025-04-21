@@ -1,0 +1,32 @@
+<div class="main">
+
+    <div class="bd-message">
+        {{ message|safe }}
+    </div>
+    <table class="bd-table" id="bd-search-results">
+        <tbody class="bd-tbody">
+            {% for r in results %}
+            <tr class="bd-row">
+                <th class="bd-th">
+                    {{ loop.index }}. <b>{{ r.bold|safe }}</b>{{ r.bold_end|safe }}
+                </th>
+                <td class="bd-td">
+                    ({{ r.ref_code }}) {{ r.commentary|safe }}
+                    <br>
+                    <span class='bd-info'>{{ r.nikaya}}, {{ r.book }}, {{ r.title }}, {{ r.subhead }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if too_many_results: %}
+    <div class="bd-message">
+        Only displaying the first <b>100</b> results. <br><br>
+        Please refine your search criteria by:<br>
+        1. Using a more specific search term in the first search box.<br>
+        2. Searching withing results in the second search box.<br>
+        3. Using `starts with` to narrow the search.<br>
+        4. Using regular expressions to search more precisely.<br>
+    </div>
+    {% endif %}
+</div>
