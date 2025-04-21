@@ -2,23 +2,27 @@
 
 ## DPD содержит четыре различных словаря
 
-### Словарь Палийского языка на русский (зеленый)
+### Словарь Палийского языка на русский
 
-![pali2english](../pics/features/1pali2rus.png)
+![pali2english](../pics/features/1pali2rus_d.png#only-dark)
+![pali2english](../pics/features/1pali2rus_l.png#only-light)
 
-### Словарь корней Палийского языка (оранжевый)
+### Словарь корней Палийского языка
 
-![pali2english](../pics/features/2rootsdict.png)
+![pali2english](../pics/features/2rootsdict_d.png)
+![pali2english](../pics/features/2rootsdict_l.png)
 
 Для получения дополнительной информации [нажмите здесь](rootdict.md)
 
-### Словарь русского на Палийский язык (фиолетовый)
+### Словарь русского на Палийский язык
 
-![english2pali](../pics/features/3rus2pali.png)
+![english2pali](../pics/features/3rus2pali_d.png)
+![english2pali](../pics/features/3rus2pali_l.png)
 
-### Словарь сокращений и помощи (зеленый)
+### Словарь сокращений и помощи
 
-![helpdict](../pics/features/5helpabbreviations.png)
+![helpdict](../pics/features/5helpabbreviations_d.png)
+![helpdict](../pics/features/5helpabbreviations_l.png)
 
 ## Два дополнительных словаря
 
@@ -28,7 +32,8 @@
 
 Когда вы выбираете слово в тексте на Палийском языке и нажимаете сочетание клавиш, DPD автоматически определяет все главные слова, к которым принадлежит эта измененная форма. Например, клик по *takkarassa* автоматически откроет *takkara*.
 
-![inflected forms](../pics/features/inflected%20forms.png)
+![inflected forms](../pics/features/inflected%20forms_d.png)
+![inflected forms](../pics/features/inflected%20forms_l.png)
 
 ## 100% Распознавание словаря в этих книгах
 
@@ -47,7 +52,8 @@ DPD распознает все слова, как в **Chaṭṭha Saṅgāyana
 
 Вся важная информация на Палийском языке представлена в **одной компактной строке**, доступной на первый взгляд, а более подробная информация доступна при нажатии кнопок.
 
-![compact line](../pics/features/compact%20line.png)
+![compact line](../pics/features/compact%20line_d.png)
+![compact line](../pics/features/compact%20line_l.png)
 
 Основная информация включает часть речи, падеж, значение, буквальное значение и упрощенную конструкцию.
 
@@ -55,7 +61,8 @@ DPD распознает все слова, как в **Chaṭṭha Saṅgāyana
 
 Если слова с несколькими значениями происходят из разных источников, их нумерация будет отражать это.
 
-![renumbering](../pics/features/renumbering.png)
+![renumbering](../pics/features/renumbering_d.png)
+![renumbering](../pics/features/renumbering_l.png)
 
 В приведенном выше примере 1.1 и 1.2 оба связаны с санскритским *śara*, в то время как 2.1 происходит от корня √sar (издавать звук), санскритское *svara*.
 
@@ -63,7 +70,8 @@ DPD распознает все слова, как в **Chaṭṭha Saṅgāyana
 
 Поскольку DPD находится в процессе выполнения, полезно знать, насколько полны данные о слове. Это указывается символами (<span>✓◑✗</span>) после записи.
 
-![complete](../pics/features/complete_fin.png)
+![complete](../pics/features/complete_fin_d.png)
+![complete](../pics/features/complete_fin_l.png)
 
 <span>✔</span> галочка означает, что данные о слове в основном завершены с контекстуальным значением, грамматической информацией, примерами из сутт и другой соответствующей информацией.
 

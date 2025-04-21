@@ -6,39 +6,44 @@
 
 ## DPD+RUS содержит пять различных словарей
 
-### Словарь Палийского языка на анлийский (синий)
+### Словарь Палийского языка на анлийский
 
-![pali2english](pics/features/1pali2english.png)
+![gear icon](pics/features/1pali2english_d.png#only-dark)  
+![gear icon](pics/features/1pali2english_l.png#only-light)
 
 В разделе "grammar" добавлен русский перевод. Щелкните на "Русский", "Перевод ИИ" или "Заметки", чтобы перейти на страницу отзывов, где можно сообщить об ошибке или внести предложение в русскую часть DPD.
 
-![1rus_eng_grammar](pics/features/1rus_eng_grammar.png)
+![1rus_eng_grammar](pics/features/1rus_eng_grammar_d.png#only-dark)
+![1rus_eng_grammar](pics/features/1rus_eng_grammar_l.png#only-light)
 
-### Словарь корней Палийского языка (оранжевый)
+### Словарь корней Палийского языка
 
-![pali2english](pics/features/2rootsdict_en.png)
+![2rus_eng_root_info](pics/features/2rus_eng_root_info_d.png#only-dark)
+![2rus_eng_root_info](pics/features/2rus_eng_root_info_l.png#only-light)
 
-В разделе "root info" добавлен русский перевод смысла корней на Пали и Санскрите. Щелкните на "Русский", чтобы перейти на страницу отзывов, где можно сообщить об ошибке или внести предложение в русскую часть DPD.
+В разделе "root info" добавлен русский перевод смысла корня на Пали. Щелкните на "Русский", чтобы перейти на страницу отзывов, где можно сообщить об ошибке или внести предложение в русскую часть DPD.
 
-![2rus_eng_root_info](pics/features/2rus_eng_root_info.png)
+### Словарь английского на Палийский язык
 
-### Словарь английского на Палийский язык (фиолетовый)
+![english2pali](pics/features/3english2pali_d.png#only-dark)
+![english2pali](pics/features/3english2pali_l.png#only-light)
 
-![english2pali](pics/features/3english2pali.png)
+### Словарь русского на Палийский язык
 
-### Словарь русского на Палийский язык (фиолетовый)
+![english2pali](pics/features/3rus2pali_d.png#only-dark)
+![english2pali](pics/features/3rus2pali_l.png#only-light)
 
-![english2pali](pics/features/3rus2pali.png)
+### Словарь сокращений и помощи
 
-### Словарь сокращений и помощи (зеленый)
-
-![helpdict](pics/features/5helpabbreviations_en_rus.png)
+![helpdict](pics/features/5helpabbreviations_en_rus_d.png#only-dark)
+![helpdict](pics/features/5helpabbreviations_en_rus_l.png#only-light)
 
 ## Перевод нейронными сетями
 
-Важно отметить, что часть информации в словаре была частично переведена с использованием технологий искусственного интеллекта, нейронными сетями [GPT 4o](https://platform.openai.com/overview). Этот процесс позволяет нам расширять словарь и обновлять его с более высокой скоростью. Однако, такие переводы требуют дополнительной проверки для обеспечения точности и достоверности информации. Поэтому, записи, полученные с помощью искусственного интеллекта, помечены как **[пер. ИИ]**. Если вы обнаружите явно некорректный перевод ИИ, пожалуйста, сообщите нам через [Google форму.](https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?). 
+Важно отметить, что часть информации в словаре была частично переведена с использованием технологий искусственного интеллекта, нейронными сетями [GPT 4o](https://platform.openai.com/overview). Этот процесс позволяет нам расширять словарь и обновлять его с более высокой скоростью. Однако, такие переводы требуют дополнительной проверки для обеспечения точности и достоверности информации. Поэтому, записи, полученные с помощью искусственного интеллекта, помечены как **[пер. ИИ]**. Если вы обнаружите явно некорректный перевод ИИ, пожалуйста, сообщите нам через [Google форму.](https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?)
 
-![half_complete_en](pics/features/ai_translation_en.png)
+![half_complete_en](pics/features/ai_translation_en_d.png#only-dark)
+![half_complete_en](pics/features/ai_translation_en_l.png#only-light)
 
 Такие незавершенные переводы отмечены серым символом для обозначения степени завершенности данных (<span style='color:gray'>✓◑✗</span>). Подробнее о значениях этих символов можно [узнать в описании особенностей словаря.](features/features.md)
 
