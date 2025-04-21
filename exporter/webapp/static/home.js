@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <p class="message">Adjust the <b>settings</b> to suit your preferences.</p>
         <p class="message"><b>Refresh</b> the page if you experience any problems.</p>
         <p class="message">
-            <a href="https://docs.dpdict.net/webapp/" target="_blank">Click here</a>
+            <a href="https://sasanarakkha.github.io/study-tools/dict/sbs-pali-dictionary" target="_blank">Click here</a>
             for more details about this website or 
             <a href="https://docs.dpdict.net/" target="_blank">more information</a>
             about DPD in general.
@@ -92,21 +92,6 @@ document.addEventListener("DOMContentLoaded", function () {
             о DPD в целом.
         </p>
         <p class="message">Начните с <b>двойного щелчка</b> по любому слову в списке ниже:</p>
-        <p class="message">atthi kāmarāgapariyuṭṭhitena peace kar gacchatīti Root ✓</p>
-        `;
-    } else if (language === 'sbs') {
-        startMessage = `
-        <p class="message">Search for Pāḷi or English words above using <b>Unicode</b> or <b>Velthuis</b> characters.</p>
-        <p class="message"><b>Double click</b> on any word to search for it.</p>
-        <p class="message">Adjust the <b>settings</b> to suit your preferences.</p>
-        <p class="message"><b>Refresh</b> the page if you experience any problems.</p>
-        <p class="message">
-            <a href="https://sasanarakkha.github.io/study-tools/dict/sbs-pali-dictionary" target="_blank">Click here</a>
-            for more details about this website or 
-            <a href="https://docs.dpdict.net/" target="_blank">more information</a>
-            about DPD in general.
-        </p>
-        <p class="message">Start by <b>double clicking</b> on any word in the list below:</p>
         <p class="message">atthi kāmarāgapariyuṭṭhitena peace kar gacchatīti Root ✓</p>
         `;
     }
@@ -247,34 +232,35 @@ function decreaseFontSize() {
 
 
 function changeLanguage(lang) {
-    // Get current URL and path
-    const currentUrl = window.location.href;
-    const url = new URL(currentUrl);
-    let path = url.pathname;
+    const currentUrl = new URL(window.location.href);
+    const hostname = currentUrl.hostname;
+    const pathname = currentUrl.pathname;
+    const search = currentUrl.search;
+    const protocol = currentUrl.protocol; // e.g., 'https:'
+    const port = currentUrl.port;         // Get the port (e.g., '8080')
 
-    // Handle language switching
-    if (lang === 'en') {
-        // Remove any language prefix
-        path = path.replace(/^\/[a-z][a-z](\/|$)/, '/');
-    } else if (lang === 'ru') {
-        // If start with /bd remove it
-        if (path.startsWith('/bd')) {
-            path = path.replace(/^\/[a-z][a-z](\/|$)/, '/');
+    let newHostname = hostname;
+
+    if (lang === 'ru') {
+        // Add ru. prefix if not already present
+        if (!hostname.startsWith('ru.')) {
+            newHostname = `ru.${hostname}`;
         }
-        // Add ru prefix if not already present
-        else if (!path.startsWith('/ru')) {
-            path = `/ru${path}`;
+    } else if (lang === 'en') {
+        // Remove ru. prefix if present
+        if (hostname.startsWith('ru.')) {
+            newHostname = hostname.substring(3); // Remove 'ru.'
         }
     }
 
-    // Preserve query parameters
-    const search = url.search;
-
-    // Construct new URL
-    const newUrl = `${url.origin}${path}${search}`;
-
-    // Redirect
-    window.location.href = newUrl;
+    // Only redirect if the hostname actually changed
+    if (newHostname !== hostname) {
+        // Construct new URL, including the port if it exists
+        const portString = port ? `:${port}` : ''; // Add colon only if port exists
+        const newUrl = `${protocol}//${newHostname}${portString}${pathname}${search}`;
+        // Redirect
+        window.location.href = newUrl;
+    }
 }
 
 //// enter or click button to search 
@@ -294,9 +280,7 @@ async function handleFormSubmit(event) {
             addToHistory(searchQuery);
             // Adjust the search URL based on the current language
             let searchUrl = '/search_json';
-            if (language === 'ru') {
-                searchUrl = '/ru/search_json';
-            } else if (language === 'sbs') {
+            if (language === 'en') {
                 searchUrl = '/sbs/search_json';
             }
             // Fetch data from the server
@@ -305,7 +289,7 @@ async function handleFormSubmit(event) {
 
             //// add the summary_html
             if (data.summary_html.trim() != "") {
-                if (language === 'en' || language === 'sbs') {
+                if (language === 'en') {
                     summaryResults.innerHTML = "<h3>Summary</h3>";
                 } else {
                     summaryResults.innerHTML = "<h3>Сводка</h3>";
