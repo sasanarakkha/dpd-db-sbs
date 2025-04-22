@@ -4,13 +4,15 @@
 
 В настоящее время он содержит около 700 000 разобранных слов, охватывая все книги в **тексте Chaṭṭha Saṅgāyana**, *mūla*, *aṭṭhakathā*, *ṭīkā* и *aññā*, а также все Палийские тексты на **Sutta Central**. Это число будет уменьшаться по мере добавления новых сочетаний в DPD.
 
-![deconstructor_example](../pics/deconstructor/dinnantiādikāpīti.png)
+![deconstructor_example](../pics/deconstructor/dinnantiādikāpīti_d.png)
+![deconstructor_example](../pics/deconstructor/dinnantiādikāpīti_l.png)
 
 ## Как установить
 
 Скачайте последнюю версию деконструктора DPD для GoldenDict или MDict с [этой страницы на GitHub](https://github.com/sasanarakkha/dpd-db-sbs/releases/latest/) и поместите его в ту же папку, что и DPD.
 
-![deconstructor_folder](../pics/deconstructor/dpd_deconstructor_folder.png)
+![deconstructor_folder](../pics/deconstructor/dpd_deconstructor_folder_d.png)
+![deconstructor_folder](../pics/deconstructor/dpd_deconstructor_folder_l.png)
 
 ## Немного информации
 
@@ -32,4 +34,5 @@
 
 Например, если вы откроете *bahalamadhukatelanāgabalapicchillādīnaṃ* в DPD, он покажет разбиение, по которому можно перейти к соответствующим словам.
 
-![deconstructor](../pics/deconstructor/bahalamadhukatelanāgabalapicchillādīnaṃ.png)
+![deconstructor](../pics/deconstructor/bahalamadhukatelanāgabalapicchillādīnaṃ_d.png)
+![deconstructor](../pics/deconstructor/bahalamadhukatelanāgabalapicchillādīnaṃ_l.png)
