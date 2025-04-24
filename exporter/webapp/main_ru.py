@@ -290,9 +290,9 @@ def db_search_bd(
             )
 
     if results:
-        message = f"<b>{len(results)}</b> results found"
+        message = f"<b>{len(results)}</b> результатов найдено"
     else:
-        message = "<b>0</b> results found - broaden your search or try the fuzzy option"
+        message = "<b>0</b> результатов найдено - расширьте поиск или попробуйте опцию нечеткого поиска"
 
     # highlight search_2
     if q2:
@@ -339,7 +339,7 @@ def update_history(
 
 if __name__ == "__main__":
     uvicorn.run(
-        "main:app",
+        "main_ru:app",
         # host="0.0.0.0",
         host="127.1.1.1",
         port=8080,
@@ -348,10 +348,10 @@ if __name__ == "__main__":
     )
 
 # Run on local machine with reload on changes
-# uv run uvicorn exporter.webapp.main:app --host 127.1.1.1 --port 8080 --reload --reload-dir exporter/webapp
+# uv run uvicorn exporter.webapp.main_ru:app --host 127.1.1.1 --port 8080 --reload --reload-dir exporter/webapp
 
 # Run on local network with reload on changes
-# uv run uvicorn exporter.webapp.main:app --host 0.0.0.0 --port 8080 --reload --reload-dir exporter/webapp
+# uv run uvicorn exporter.webapp.main_ru:app --host 0.0.0.0 --port 8080 --reload --reload-dir exporter/webapp
 
 
 # TODO make help popup tooltips and a toggle to turn them off

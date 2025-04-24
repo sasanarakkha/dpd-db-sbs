@@ -108,7 +108,10 @@ def generate_html_from_lookup(g: ProgData):
     html_header = css_manager.update_style(html_header, "primary")
 
     html_header += "<body><div class='dpd'><table class='grammar_dict'>"
-    html_header += "<thead><tr><th id='col1'>pos ⇅</th><th id='col2'>⇅</th><th id='col3'>⇅</th><th id='col4'>⇅</th><th id='col5'></th><th id='col6'>word ⇅</th></tr></thead><tbody>"
+    if g.lang == "ru":
+        html_header += "<thead><tr><th id='col1'>чр ⇅</th><th id='col2'>⇅</th><th id='col3'>⇅</th><th id='col4'>⇅</th><th id='col5'></th><th id='col6'>слово ⇅</th></tr></thead><tbody>"
+    else:
+        html_header += "<thead><tr><th id='col1'>pos ⇅</th><th id='col2'>⇅</th><th id='col3'>⇅</th><th id='col4'>⇅</th><th id='col5'></th><th id='col6'>word ⇅</th></tr></thead><tbody>"
 
     # Process each lookup entry
     for counter, lookup_entry in enumerate(lookup_results):
