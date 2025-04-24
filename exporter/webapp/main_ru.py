@@ -130,8 +130,10 @@ def db_search_html_sbs(request: Request, q: str):
 def db_search_html_ru(request: Request, q: str):
     """Returns a JSON with Russian HTML."""
 
+    q_roman = auto_translit_to_roman(q)
+
     dpd_html, summary_html = make_dpd_html(
-        q,
+        q_roman,
         pth,
         templates_ru,
         roots_count_dict,
@@ -172,8 +174,10 @@ def db_search_json_sbs(request: Request, q: str):
 def db_search_json_ru(request: Request, q: str):
     """Main Russian search route for website."""
 
+    q_roman = auto_translit_to_roman(q)
+
     dpd_html, summary_html = make_dpd_html(
-        q,
+        q_roman,
         pth,
         templates_ru,
         roots_count_dict,
@@ -220,8 +224,10 @@ def db_search_gd_sbs(request: Request, search: str):
 def db_search_gd_ru(request: Request, search: str):
     """Returns pure HTML in Russian for GoldenDict and MDict."""
 
+    search_roman = auto_translit_to_roman(search)
+
     dpd_html, summary_html = make_dpd_html(
-        search,
+        search_roman,
         pth,
         templates_ru,
         roots_count_dict,
