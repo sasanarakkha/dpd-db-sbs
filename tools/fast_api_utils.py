@@ -4,14 +4,12 @@ import webbrowser
 
 
 def start_dpd_server():
-    "uvicorn exporter.webapp.main:app --host 127.1.1.1 --port 8080 --reload --reload-dir exporter/webapp"
+    "uvicorn exporter.webapp.main_ru:app --host 127.1.1.1 --port 8080 --reload --reload-dir exporter/webapp"
     command = [
         "uvicorn",
-        "exporter.webapp.main:app",
-        "--host",
-        "127.1.1.1",
-        "--port",
-        "8080",
+        "exporter.webapp.main_ru:app",
+        "--host", "127.1.1.1",
+        "--port", "8080",
         "--reload",
         "--reload-dir",
         "exporter/webapp",
@@ -19,8 +17,8 @@ def start_dpd_server():
     subprocess.Popen(command)
 
 
-def request_dpd_server(q: str | int):
-    base_url = "http://127.1.1.1:8080/"
+def request_dpd_server(q: str|int):
+    base_url = "http://127.1.1.1:8080/sbs/"
     search_params = {"q": q}
     url = f"{base_url}?{urllib.parse.urlencode(search_params)}"
     webbrowser.open(url)

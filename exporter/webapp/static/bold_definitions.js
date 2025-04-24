@@ -221,7 +221,7 @@ function hoverHelp(event) {
     else { // Default case
         if (bdLanguage === 'ru') {
             // Assuming the Russian docs link should also have /ru/
-            bdFooterText.innerHTML = 'Для получения подробной информации об этой функции, пожалуйста, <a href="https://digitalpalidictionary.github.io/ru/webapp/cst_bold_def/" target="_blank">прочтите документацию</a>. Используются тексты <a href="https://github.com/VipassanaTech/tipitaka-xml" target="_blank">Vipassana Research Institute</a>';
+            bdFooterText.innerHTML = 'Для получения подробной информации об этой функции, пожалуйста, <a href="https://devamitta.github.io/dpd.rus/webapp/cst_bold_def/" target="_blank">прочтите документацию</a>. Используются тексты <a href="https://github.com/VipassanaTech/tipitaka-xml" target="_blank">Vipassana Research Institute</a>';
         } else {
             bdFooterText.innerHTML = 'For detailed information on this feature, please <a href="https://digitalpalidictionary.github.io/webapp/cst_bold_def/" target="_blank">read the docs</a>. This uses <a href="https://github.com/VipassanaTech/tipitaka-xml" target="_blank">Vipassana Research Institute</a> texts';
         }
