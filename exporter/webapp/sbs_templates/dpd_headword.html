@@ -24,7 +24,11 @@
         {% if d.summary %}
         [{{d.summary}}]
         {% endif %}
+        {% if d.show_ru_data %}
+        {{d.rus_complete|safe}}
+        {% else %}
         {{d.complete|safe}}
+        {% endif %}
     </p>
 </div>
 
@@ -33,7 +37,7 @@
 
 
 <div class="button-box">
-    {% if d.i.needs_grammar_button %}
+    {% if d.i.needs_grammar_button or d.show_ru_data %}
     <a class="button" name="grammar-button" href="#" data-target="grammar_{{d.i.lemma_1_}}">
         grammar</a>
     {% endif %}
@@ -111,7 +115,7 @@
 <!-- grammar -->
 
 
-{% if d.i.needs_grammar_button %}
+{% if d.i.needs_grammar_button or d.show_ru_data %}
 <div id="grammar_{{d.i.lemma_1_}}" name="grammar-div" class="dpd content hidden">
     <table class="grammar">
         <tr>
@@ -130,6 +134,24 @@
                 /{{d.i.lemma_ipa}}/
             </td>
         </tr>
+
+        {% if d.show_ru_data and d.i.ru  %}
+        <tr>
+            <th>
+                Русский
+            </th>
+            <td>
+                {% if d.i.ru.ru_meaning %}
+                {{d.i.ru.ru_meaning}}
+                {% if d.i.ru.ru_meaning_lit %}
+                ; досл. {{d.i.ru.ru_meaning_lit}}
+                {% endif %}
+                {% else %}
+                <i>[пер. ИИ]</i> {{d.i.ru.ru_meaning_raw}}
+                {% endif %}
+            </td>
+        </tr>
+        {% endif %}
 
         {% if d.i.sbs and d.i.sbs.sbs_meaning %}
         <tr>
@@ -309,6 +331,30 @@
         </tr>
         {% endif %}
 
+        {% if d.show_ru_data %}
+
+            {% if d.i.ru and d.i.ru.ru_notes and d.i.needs_ru_notes %}
+            <tr>
+                <th>
+                    Заметки
+                </th>
+                <td>
+                    {{d.i.ru.ru_notes|safe}}
+                </td>
+            </tr>
+            {% endif %}
+
+            {% if d.i.ru.ru_cognate %}
+            <tr>
+                <th>
+                    Родствен.
+                </th>
+                <td>
+                    {{d.i.ru.ru_cognate}}
+                </td>
+            </tr>
+            {% endif %}
+        {% endif %}
         {% if d.i.cognate %}
         <tr>
             <th>
