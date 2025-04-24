@@ -44,10 +44,10 @@ class HeadwordData:
             self.make_link = True
         else:
             self.make_link = False
-        if config_test("dictionary", "show_sbs_data", "yes"):
-            self.show_sbs_data = True
+        if config_test("dictionary", "show_ru_data", "yes"):
+            self.show_ru_data = True
         else:
-            self.show_sbs_data = False
+            self.show_ru_data = False
 
     @staticmethod
     def convert_newlines(obj):
@@ -127,6 +127,10 @@ class AbbreviationsData:
         self.explanation = data["explanation"]
         self.ru_meaning = data.get("ru_meaning", "")
         self.ru_abbrev = data.get("ru_abbrev", "")
+        if config_test("dictionary", "show_ru_data", "yes"):
+            self.show_ru_data = True
+        else:
+            self.show_ru_data = False
 
 
 class EpdData:
