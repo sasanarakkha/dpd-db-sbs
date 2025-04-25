@@ -1,6 +1,6 @@
 # Добро пожаловать в Цифровой Пали Словарь
 
-DPD - это богатый возможностями словарь Палийского языка на английском и русском, который работает <a href='https://dict.dhamma.gift/ru' target='_blank'>онлайн</a> в GoldenDict, MDict, [DictTango](install/android_dicttango.md) и [Kindle](install/kindle.md), или в любом другом приложении, поддерживающем эти форматы.
+DPD - это богатый возможностями словарь Палийского языка на английском и русском, который работает <a href='https://ru.dpdict.net' target='_blank'>онлайн</a> в GoldenDict, MDict, [DictTango](install/android_dicttango.md) и [Kindle](install/kindle.md), или в любом другом приложении, поддерживающем эти форматы.
 
 Скачайте последнюю версию с [этой страницы на GitHub](https://github.com/sasanarakkha/dpd-db-sbs/releases/latest/).
 

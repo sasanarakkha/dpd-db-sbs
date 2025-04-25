@@ -65,7 +65,7 @@ def update_db_version(pth, version):
         email_address = DbInfo(key="email", value="devamitta@sasanarakkha.org")
         db_session.add(email_address)
 
-        website = DbInfo(key="website", value="https://dict.dhamma.gift/ru")
+        website = DbInfo(key="website", value="https://ru.dpdict.net")
         db_session.add(website)
 
         docs = DbInfo(key="docs", value="https://devamitta.github.io/dpd.rus/")
