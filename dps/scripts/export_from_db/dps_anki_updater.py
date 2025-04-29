@@ -375,8 +375,9 @@ def update_note_values(note, i):
         note["link"] = ""
 
     # sbs_audio
-    if dpspth.anki_media_dir:
-        audio_path = os.path.join(dpspth.anki_media_dir, f"{i.lemma_clean}.mp3")
+    anki_media_dir_path = config_read("anki", "media_dir")
+    if anki_media_dir_path:
+        audio_path = os.path.join(anki_media_dir_path, f"{i.lemma_clean}.mp3")
         if os.path.exists(audio_path):
             sbs_audio = f"[sound:{i.lemma_clean}.mp3]"
         else:
