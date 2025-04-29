@@ -2,8 +2,6 @@
 
 # making backup of db if it is first time today and open GUI
 
-exec > >(tee "/home/deva/logs/gui.log") 2>&1
-
 # Directory where backups are stored
 BACKUP_DIR="dps/backup/"
 
