@@ -1,9 +1,5 @@
 #!/bin/bash
 
-exec > >(tee "/home/deva/logs/auto_commit.log") 2>&1
-
-cd /home/deva/Documents/dpd-db/
-
 uv run python dps/scripts/export_from_db/backup_corrections_additions.py
 
 while true; do
