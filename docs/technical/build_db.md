@@ -29,21 +29,23 @@ git submodule init && git submodule update
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-(7) Install all the dependencies with uv
+(7) For Mac user may be nessesary install [Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html)
+
+(8) Install all the dependencies with uv
 
 ```bash
 uv sync
 ```
 
-(8) Having at least 20 GB of RAM can be helpful. If you have less, consider [increasing the swap memory.](https://www.reddit.com/r/linuxmint/comments/uhjyir/how_to_increase_swap_size/?rdt=34113){target="_blank"}.
+(9) Having at least 20 GB of RAM can be helpful. If you have less, consider [increasing the swap memory.](https://www.reddit.com/r/linuxmint/comments/uhjyir/how_to_increase_swap_size/?rdt=34113){target="_blank"}.
 
-(9) Run this once to initialize the project
+(10) Run this once to initialize the project
 
 ```shell
 uv run bash scripts/bash/initial_setup_run_once.sh
 ```
 
-(10) Build the database, this can take up to an hour the first time.
+(11) Build the database, this can take up to an hour the first time.
 
 ```shell
 uv run bash scripts/bash/initial_build_db.sh

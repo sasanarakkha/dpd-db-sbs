@@ -356,6 +356,9 @@ if __name__ == "__main__":
 # Run on local machine with reload on changes
 # uv run uvicorn exporter.webapp.main_ru:app --host 127.1.1.1 --port 8080 --reload --reload-dir exporter/webapp
 
+# Run on mac with reload on changes
+# uv run uvicorn exporter.webapp.main_ru:app --host 127.0.0.1 --port 8080 --reload --reload-dir exporter/webapp
+
 # Run on local network with reload on changes
 # uv run uvicorn exporter.webapp.main_ru:app --host 0.0.0.0 --port 8080 --reload --reload-dir exporter/webapp
 

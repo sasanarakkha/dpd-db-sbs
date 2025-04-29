@@ -186,3 +186,6 @@ exporter/tester/tester/
 scratchpad.py
 db/audio/mp3/
 gui2_profile.prof
+.DS_Store
+*.DS_Store
+uv.lock
