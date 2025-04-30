@@ -274,7 +274,7 @@ class RuPaths:
         self.fdg_dpd_ebts_js_ru_path = base_dir / "resources/fdg_dpd/assets/standalone-dpd/ru/dpd_ebts.js"
 
         # ru_docs
-        self.mk_docs_yaml = base_dir / "mkdocs.yaml"
+        self.mk_docs_yaml = base_dir / "mkdocs_ru.yaml"
         self.docs_css_path = base_dir / "docs_rus/stylesheets/extra.css"
         self.docs_css_variables_path = base_dir / "docs_rus/stylesheets/dpd-variables.css"
         self.docs_dir = base_dir / "docs_rus/"

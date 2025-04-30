@@ -1,0 +1,150 @@
+site_name: Цифровой Пали Словарь Документация
+docs_dir: "docs_rus"
+repo_url: https://github.com/sasanarakkha/dpd-db-sbs
+site_dir: "docs_site"
+
+nav:
+  - Главная: index.md
+  - Особенности:
+    - "features/index.md"
+    - Особенности: "features/features.md"
+    - Словарь корней: "features/rootdict.md"
+    - Частота слов: "features/frequency.md"
+    - Деконструктор: "features/deconstructor.md"
+    - Словарь грамматики: "features/grammardict.md"
+    - Варианты текста: "features/variants.md"
+  - Установка:
+    - "install/index.md"
+    - Windows: "install/win.md"
+    - Android: "install/android_dicttango.md"
+    - Mac: "install/mac.md"
+    - iOS: "install/ios.md"
+    - Linux: "install/linux.md"
+    - Kindle: "install/kindle.md"
+    - Kobo: "install/kobo.md"
+    - ChromeBook: "install/chromebook.md"
+    - Обновление: "install/update.md"
+  - GoldenDict Особенности:
+    - "goldendict/index.md"
+    - Настройка горячей клавиши: "goldendict/hotkey.md"
+    - Настройка всплывающего окна: "goldendict/scan_popup.md"
+    - Настройка расширенных функций: "goldendict/advanced.md"
+  - Онлайн Словарь:
+    - "webapp/index.md"
+    - Поиск: "webapp/search.md"
+    - Сводка: "webapp/summary.md"
+    - Отображение словаря: "webapp/dictionary_display.md"
+    - Настройки: "webapp/settings.md"
+    - Выделенные определения CST: "webapp/cst_bold_def.md"
+    - API в GoldenDict: "webapp/api_goldendict.md"
+    - API в DictTango: "webapp/api_dicttango.md"
+  - Программные Интеграции:
+    - integrations/index.md
+    - Dhamma.gift: "integrations/dhamma_gift.md"
+    - Simsapa Dhamma Reader: "integrations/simsapa.md"
+    - Sutta Central: "integrations/sutta_central.md"
+    - The Buddha's Words: "integrations/tbw.md"
+    - Tipitaka Pali Reader: "integrations/tpr.md"
+    - Tipitakapali.org: "integrations/tipitakapali.md"
+  - Обратная связь:
+    - "feedback/index.md"
+    - Исправить ошибку: "feedback/correct_mistake.md"
+    - Добавить недостающее слово: "feedback/add_missing_word.md"
+    - Сообщить об ошибке: "feedback/bug_report.md"
+  - Участие:
+    - "contributing/index.md"
+    - Пали: "contributing/pali.md"
+    - Код: "contributing/code.md"
+  - Совмещенный словарь: "dpd_rus.md"
+  - Другие словари: "other_dicts.md"
+  - Отзывы Пользователей: users_say.md
+  - Сокращения: "abbreviations.md"
+  - Литература: "bibliography.md"
+  - Благодарности: "thanks.md"
+  - Контакты: "contact.md"
+  - Лицензия: "license.md"  
+  - Язык Пали: "pali_notes/index.md"
+  - Для разработчиков:
+    - "technical/index.md"
+    - Построить БД с нуля: "technical/build_db.md"
+    - Использовать БД в проекте: "technical/use_db.md"
+    - Структура папок проекта: "technical/project_folder_structure.md" 
+    - Таблица DpdHeadwords: "technical/dpd_headwords_table.md"
+    - Файлы источников Типитаки: "technical/tipitaka_source_files.md"
+    # - Стиль для записей DPD: "technical/style_guide_for_dpd_entries.md"
+
+theme:
+  name: material
+  logo: assets/dpd-logo.svg
+  features:
+    - content.code.copy
+    - navigation.footer
+    - navigation.indexes
+    - navigation.instant
+    - navigation.path
+    # - navigation.expand
+    # - navigation.sections
+    # - navigation.tabs
+    # - navigation.tabs_sticky
+    # - toc.integrate
+
+  palette: 
+    # light mode
+    - scheme: default
+      primary: custom
+      accent: custom
+      toggle: 
+        icon: material/lightbulb
+        name: Switch to dark mode
+
+    # dark mode
+    - scheme: slate
+      primary: custom
+      accent: custom
+      toggle: 
+        icon: material/lightbulb-outline
+        name: Switch to light mode
+
+  font: 
+    text: Inter
+
+extra_css:
+  - stylesheets/dpd-variables.css
+  - stylesheets/extra.css
+
+extra:
+  alternate:
+    - name: English
+      link: https://digitalpalidictionary.github.io/
+      lang: en
+    - name: Русский
+      link: https://devamitta.github.io/dpd.rus/
+      lang: ru
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/sasanarakkha/dpd-db-sbs
+
+markdown_extensions:
+  # allows adding {target="_blank"} after links
+  - attr_list 
+
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+
+
+plugins:
+  - search
+  - blog:
+      blog_dir: pali_notes
+      blog_toc: true
+      post_date_format: full
+      post_excerpt: optional
+      post_excerpt_separator: <!-- read more -->
+      draft: false
+      draft_on_serve: true
+  - tags

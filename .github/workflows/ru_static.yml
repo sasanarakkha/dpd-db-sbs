@@ -6,7 +6,7 @@ on:
     branches: ["sbs-ru"]
     paths:
       - 'docs_rus/**'
-      - 'mkdocs.yaml'
+      - 'mkdocs_ru.yaml'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
