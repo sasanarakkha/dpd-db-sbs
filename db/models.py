@@ -33,7 +33,7 @@ from tools.pos import EXCLUDE_FROM_FREQ
 from tools.sinhala_tools import si_grammar, pos_si, pos_si_full, translit_ro_to_si
 from tools.clean_machine import clean_machine
 
-from dps.tools.sbs_table_functions import SBS_table_tools, paragraphs_are_similar
+from tools.sbs_table_functions import SBS_table_tools, paragraphs_are_similar
 
 
 class Base(DeclarativeBase):

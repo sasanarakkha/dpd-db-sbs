@@ -12,7 +12,7 @@ from tools.paths import ProjectPaths
 from tools.tsv_read_write import write_tsv_list
 from tools.meaning_construction import make_meaning_combo
 from sqlalchemy import and_, or_
-from dps.tools.ai_related import load_openai_config
+from tools.ai_related import load_openai_config
 
 from timeout_decorator import timeout, TimeoutError as TimeoutDecoratorError
 

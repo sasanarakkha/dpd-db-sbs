@@ -22,7 +22,7 @@ from tools.paths import ProjectPaths
 from tools.superscripter import superscripter_uni
 from tools.printer import printer as pr
 
-from dps.scripts.rus_exporter.tools_for_ru_exporter import (
+from tools.tools_for_ru_exporter import (
     make_short_ru_meaning,
     ru_replace_abbreviations,
 )

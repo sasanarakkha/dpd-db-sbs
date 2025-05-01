@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-cd "/Users/deva/Documents/dpd-db/"
-
-uv run bash dps/scripts/bash/gui.sh
-
-# xed '/Users/deva/logs/gui.log'

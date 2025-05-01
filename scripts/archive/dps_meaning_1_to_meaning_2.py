@@ -6,7 +6,7 @@ from rich import print
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword
 from tools.paths import ProjectPaths
-from dps.tools.paths_dps import DPSPaths
+from tools.paths_dps import DPSPaths
 
 
 def main():

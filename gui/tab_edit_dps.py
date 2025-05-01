@@ -2,7 +2,7 @@
 
 from gui.functions_db_dps import load_sbs_index
 from gui.completion_combo import CompletionCombo
-from dps.tools.sbs_table_functions import sbs_category_list
+from tools.sbs_table_functions import sbs_category_list
 
 def make_tab_edit_dps(dpspth, sg):
 

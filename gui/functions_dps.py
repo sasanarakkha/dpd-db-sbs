@@ -18,7 +18,7 @@ from tools.tsv_read_write import read_tsv_dict, write_tsv_dot_dict
 
 from tools.paths import ProjectPaths
 
-from dps.tools.ai_related import (
+from tools.ai_related import (
     load_translation_examples,
     replace_abbreviations,
     handle_ai_response,
@@ -28,7 +28,7 @@ from dps.tools.ai_related import (
     generate_messages_for_english_meaning
 )
 
-from dps.tools.spell_check import SpellCheck
+from tools.spell_check import SpellCheck
 
 
 # flags

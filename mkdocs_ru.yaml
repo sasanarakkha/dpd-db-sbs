@@ -55,6 +55,7 @@ nav:
     - "contributing/index.md"
     - Пали: "contributing/pali.md"
     - Код: "contributing/code.md"
+    - Помощь с переводом: "contributing/rus_collaboration.md"
   - Совмещенный словарь: "dpd_rus.md"
   - Другие словари: "other_dicts.md"
   - Отзывы Пользователей: users_say.md

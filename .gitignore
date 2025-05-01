@@ -25,9 +25,7 @@ db/sinhala/dpd sinhala 1.2.xlsx
 definitions/
 dpd.db-journal
 dpd/
-dps.ods
-dps/backup
-dps/csvs
+csvs
 exporter/goldendict/javascript/family_compound_json.js
 exporter/goldendict/javascript/family_idiom_json.js
 exporter/goldendict/javascript/family_root_json.js

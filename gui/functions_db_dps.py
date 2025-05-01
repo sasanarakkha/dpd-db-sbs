@@ -28,7 +28,7 @@ from gui.functions import stasher
 
 from gui.functions_daily_record import daily_record_update
 
-from dps.tools.sbs_table_functions import sbs_category_list
+from tools.sbs_table_functions import sbs_category_list
 
 
 def populate_dps_tab(dpspth, values, window, dpd_word, ru_word, sbs_word):

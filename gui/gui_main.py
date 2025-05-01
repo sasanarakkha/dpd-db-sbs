@@ -160,7 +160,7 @@ from tools.fast_api_utils import request_dpd_server
 from tools.fast_api_utils import request_bold_def_server
 from tools.missing_meanings import find_missing_meanings
 
-from dps.tools.paths_dps import DPSPaths
+from tools.paths_dps import DPSPaths
 
 
 def main():
