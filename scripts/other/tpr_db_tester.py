@@ -26,7 +26,7 @@ if not tpr_db_path.exists():
         print(f"Info: Found database at relative path: {tpr_db_path}")
 
 # Create output directory
-output_dir = Path("temp")
+output_dir = Path("shared_data")
 output_dir.mkdir(parents=True, exist_ok=True)
 errors_tsv_path = output_dir / "tpr_parsing_errors.tsv"
 
