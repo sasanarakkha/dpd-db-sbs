@@ -9,6 +9,7 @@ from db.models import DpdHeadword
 
 from tools.paths import ProjectPaths
 from tools.tsv_read_write import read_tsv_dot_dict
+from tools.printer import printer as pr
 
 pth = ProjectPaths()
 db_session = get_db_session(pth.dpd_db_path)
@@ -58,5 +59,11 @@ def apply_all_suggestions():
 
     print(f"Total number of applied corrections: {added_lines_count}")
 
+def main():
+    pr.tic()
+    apply_all_suggestions()
+    pr.toc()
 
-apply_all_suggestions()
+
+if __name__ == "__main__":
+    main()

@@ -31,6 +31,7 @@
 ### uv
 - Use astral uv to manage dependencies.
 - Install with "uv add" not "pip install" or "uv pip install" etc.
+- This repo use uv for running all scripts - use "uv run python ...", etc.
 
 ## Plan Mode
 - When starting to plan, show that you've understood the question by saying "Hmmm...". If not, ask more questions to clarify.

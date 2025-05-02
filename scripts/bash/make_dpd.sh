@@ -41,11 +41,6 @@ git checkout -- db/sanskrit/root_families_sanskrit.tsv
 
 git checkout -- shared_data/changed_templates
 
-git checkout -- exporter/goldendict/javascript/family_compound_json.js
-git checkout -- exporter/goldendict/javascript/family_idiom_json.js
-git checkout -- exporter/goldendict/javascript/family_root_json.js
-git checkout -- exporter/goldendict/javascript/family_set_json.js
-git checkout -- exporter/goldendict/javascript/family_word_json.js
 
 
 
