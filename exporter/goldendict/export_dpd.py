@@ -13,6 +13,7 @@ from multiprocessing import Process, Manager
 from typing import List, Set, TypedDict, Tuple, Union
 
 from sqlalchemy.orm.session import Session
+from sqlalchemy.orm import joinedload
 
 from exporter.goldendict.helpers import TODAY
 
@@ -104,9 +105,7 @@ class DpdHeadwordDbParts(TypedDict):
     family_set: List[FamilySet]
 
 
-class DpdHeadwordRenderData(TypedDict):
-    pth: Union[ProjectPaths, RuPaths]
-    word_templates: DpdHeadwordTemplates
+class DpdHeadwordRenderDataBase(TypedDict):
     sandhi_contractions: SandhiContractions
     cf_set: Set[str]
     idioms_set: Set[str]
@@ -115,6 +114,10 @@ class DpdHeadwordRenderData(TypedDict):
     show_ebt_count: bool
     show_sbs_data: bool
     show_ru_data: bool
+
+class DpdHeadwordRenderData(DpdHeadwordRenderDataBase):
+    pth: Union[ProjectPaths, RuPaths]
+    word_templates: DpdHeadwordTemplates
 
 
 def render_pali_word_dpd_html(
@@ -357,6 +360,39 @@ def render_pali_word_dpd_html(
     return (res, size_dict)
 
 
+def _parse_batch_top_level(
+    batch: List[DpdHeadwordDbParts],
+    paths: Union[ProjectPaths, RuPaths],
+    render_data: DpdHeadwordRenderData,
+    lang: str,
+    extended_synonyms: bool,
+    show_sbs_data: bool,
+    dpd_data_results_list: ListProxy,
+    rendered_sizes_results_list: ListProxy
+):
+    """Helper function for multiprocessing, now at top level."""
+    # Create templates locally in child process
+    word_templates = DpdHeadwordTemplates(paths, lang)
+    
+    # Reconstruct full render data with local templates
+    full_render_data: DpdHeadwordRenderData = {
+        **render_data,  # type: ignore
+        "pth": paths,
+        "word_templates": word_templates
+    }
+
+    res: List[Tuple[DictEntry, RenderedSizes]] = [
+        render_pali_word_dpd_html(
+            i, full_render_data, lang, extended_synonyms, show_sbs_data
+        )
+        for i in batch
+    ]
+
+    for i, j in res:
+        dpd_data_results_list.append(i)
+        rendered_sizes_results_list.append(j)
+
+
 def generate_dpd_html(
     db_session: Session,
     pth: ProjectPaths,
@@ -376,8 +412,6 @@ def generate_dpd_html(
         paths = pth
     elif lang == "ru":
         paths = rupth
-
-    word_templates = DpdHeadwordTemplates(paths, lang)
 
     if config_test("dictionary", "extended_synonyms", "yes"):
         extended_synonyms: bool = True
@@ -427,6 +461,8 @@ def generate_dpd_html(
     dpd_data_results_list: ListProxy = manager.list()
     rendered_sizes_results_list: ListProxy = manager.list()
     num_logical_cores = psutil.cpu_count()
+    if num_logical_cores is None:
+        num_logical_cores = 1  # Default to single core if count fails
     pr.green_title(f"running with {num_logical_cores} cores")
 
     while offset <= pali_words_count:
@@ -438,6 +474,11 @@ def generate_dpd_html(
             .outerjoin(FamilyWord, DpdHeadword.family_word == FamilyWord.word_family)
             .outerjoin(Russian, DpdHeadword.id == Russian.id)
             .outerjoin(SBS, DpdHeadword.id == SBS.id)
+            .options(
+                joinedload(DpdHeadword.rt),
+                joinedload(DpdHeadword.ru),
+                joinedload(DpdHeadword.sbs),
+            )
             .order_by(DpdHeadword.lemma_1)
         )
         if lang == "ru":
@@ -475,34 +516,32 @@ def generate_dpd_html(
 
         processes: List[Process] = []
 
-        render_data = DpdHeadwordRenderData(
-            pth=pth,
-            word_templates=word_templates,
-            sandhi_contractions=sandhi_contractions,
-            cf_set=cf_set,
-            idioms_set=idioms_set,
-            make_link=make_link,
-            show_id=show_id,
-            show_ebt_count=show_ebt_count,
-            show_sbs_data=show_sbs_data,
-            show_ru_data=show_ru_data,
-        )
-
-        def _parse_batch(batch: List[DpdHeadwordDbParts]):
-            res: List[Tuple[DictEntry, RenderedSizes]] = [
-                render_pali_word_dpd_html(
-                    i, render_data, lang, extended_synonyms, show_sbs_data
-                )
-                for i in batch
-            ]
-
-            for i, j in res:
-                dpd_data_results_list.append(i)
-                rendered_sizes_results_list.append(j)
+        # Create base render data without unpickleable fields
+        render_data: DpdHeadwordRenderDataBase = {
+            "sandhi_contractions": sandhi_contractions,
+            "cf_set": cf_set,
+            "idioms_set": idioms_set,
+            "make_link": make_link,
+            "show_id": show_id,
+            "show_ebt_count": show_ebt_count,
+            "show_sbs_data": show_sbs_data,
+            "show_ru_data": show_ru_data,
+        }
 
         for batch in batches:
-            p = Process(target=_parse_batch, args=(batch,))
-
+            p = Process(
+                target=_parse_batch_top_level,
+                args=(
+                    batch,
+                    paths,  # Pass paths separately
+                    render_data,
+                    lang,
+                    extended_synonyms,
+                    show_sbs_data,
+                    dpd_data_results_list,
+                    rendered_sizes_results_list
+                )
+            )
             p.start()
             processes.append(p)
 
@@ -660,7 +699,7 @@ def render_button_box_templ(
         and sbs.needs_sbs_example_button
     ):
         sbs_example_button = button_html.format(
-            target=f"ru_sbs_example_{i.lemma_1_}", name="SBS"
+            target=f"sbs_example_{i.lemma_1_}", name="SBS"
         )
     else:
         sbs_example_button = ""

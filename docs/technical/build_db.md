@@ -29,7 +29,7 @@ git submodule init && git submodule update
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-(7) For Mac user may be nessesary install [Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html)
+(7) For Mac user may be nessesary install [Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html){target="_blank"}
 
 (8) Install all the dependencies with uv
 
@@ -61,7 +61,7 @@ For a quick tutorial on how to access any information in the db with SQLAlchemy,
 
 There are some additional dependencies in different parts of the project that may need to be installed depending on your use case.
 
-1. The __GoldenDict__ exporter requires [dictzip](https://linux-packages.com/ubuntu-24-04/package/dictzip){target="_blank"}
+1. The __GoldenDict__ exporter requires [dictzip](https://linux-packages.com/ubuntu-24-04/package/dictzip){target="_blank"} or [dict](https://formulae.brew.sh/formula/dict#default){target="_blank"} for MacOS.
 
 2. Running the __GUI__ requires [tkinter](https://www.pythonguis.com/installation/install-tkinter-linux/){target="_blank"}
 

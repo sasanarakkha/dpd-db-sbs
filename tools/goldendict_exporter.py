@@ -314,12 +314,25 @@ def copy_dir(v: DictVariables) -> None:
     pr.white("copying to GoldenDict dir")
     goldendict_pth: Path | str = make_goldendict_path()
     if goldendict_pth:
+        if isinstance(goldendict_pth, str):
+            goldendict_pth = Path(goldendict_pth)
+
         if goldendict_pth.exists():
+            target_path = goldendict_pth.joinpath(v.gd_path.name)
             try:
-                Popen(["cp", "-r", v.gd_path, "-t", goldendict_pth])
+                if target_path.exists() and target_path.is_dir():
+                    shutil.rmtree(target_path)
+                elif target_path.exists():
+                    pr.no(f"error: Target path '{target_path}' exists but is not a directory.")
+                    return
+
+                shutil.copytree(v.gd_path, target_path)
                 pr.yes("ok")
-            except Exception:
+            except Exception as e:
                 pr.no("error")
+                pr.red(f"Error copying directory: {e}")
+        else:
+            pr.no(f"error: GoldenDict path does not exist: {goldendict_pth}")
     else:
         pr.yes("no")
 

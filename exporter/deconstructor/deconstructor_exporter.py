@@ -2,8 +2,6 @@
 
 """Export Deconstructor To GoldenDict and MDict formats."""
 
-import re
-from rich import print
 from mako.template import Template
 from minify_html import minify
 

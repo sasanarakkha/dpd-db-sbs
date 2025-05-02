@@ -28,6 +28,8 @@ git submodule init && git submodule update
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
+(7) Для Mac необходимо установить [Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html){target="_blank"}
+
 (7) Установите все зависимости с помощью `uv`:
 
 ```shell
@@ -60,6 +62,6 @@ uv run bash scripts/bash/initial_build_db.sh
 
 1. __Экспорт в GoldenDict__ требует установленной утилиты [dictzip](https://linux-packages.com/ubuntu-24-04/package/dictzip){target="_blank"}
 
-2. Для запуска __графического интерфейса__ требуется установленный [tkinter](https://www.pythonguis.com/installation/install-tkinter-linux/){target="_blank"}
+2. Для запуска __графического интерфейса__ требуется установленный [tkinter](https://www.pythonguis.com/installation/install-tkinter-linux/){target="_blank"}  или [dict](https://formulae.brew.sh/formula/dict#default){target="_blank"} для MacOS.
 
 3. Для запуска __тестов базы данных__ могут понадобиться зависимости для [pyperclip](https://pyperclip.readthedocs.io/en/latest/index.html#not-implemented-error){target="_blank"}
