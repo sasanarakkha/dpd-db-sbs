@@ -58,7 +58,7 @@ class DPSPaths:
         self.temp_csv_backup_dir = base_dir.joinpath(Path("temp/backup_csv/")) 
 
         # txt
-        self.ru_user_dict_path = base_dir.joinpath(Path("shared_data/rus/russian_words_user_dict.txt"))
+        self.ru_user_dict_path = base_dir.joinpath(Path("tools/russian_words_user_dict.txt"))
         self.text_to_add_path = base_dir.joinpath(Path("temp/text.txt"))
 
         # /gui/stash
