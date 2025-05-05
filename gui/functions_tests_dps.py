@@ -14,7 +14,7 @@ from typing import List, Tuple
 from rich import print
 
 from db.models import DpdHeadword
-from db_tests.helpers import InternalTestRow
+from db_tests.old_tests_DELETE import InternalTestRow
 
 from sqlalchemy.orm import joinedload
 
