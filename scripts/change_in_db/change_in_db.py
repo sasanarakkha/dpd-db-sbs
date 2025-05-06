@@ -274,7 +274,7 @@ def update_column_for_some_criteria(source_value):
     console.print(f"[bold bright_green]Total count of changed sbs: {count_changed_sbs}")
     console.print(f"[bold bright_green]Total count of added: {count_added}")
 
-    # db_session.commit()
+    db_session.commit()
 
 
 column_to_filter = DpdHeadword.meaning_1
@@ -293,7 +293,7 @@ value_to_update = "(грам) "
 
 # update_sbs_source_3()
 
-update_column_for_some_criteria("VIN1.4.2.4")
+update_column_for_some_criteria("VIN1.4.2.7")
 
 
 

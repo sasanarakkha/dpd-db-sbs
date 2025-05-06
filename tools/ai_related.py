@@ -76,7 +76,7 @@ def handle_ai_response(client, messages, model, provider: str):
             content = response.choices[0].message.content
         elif provider == "deepseek":
             prompt = [{"content": m["content"], "role": m["role"]} for m in messages]
-            response = client.chat(
+            response = client.request(
                 prompt=prompt,
                 model=model,
                 stream=False,
