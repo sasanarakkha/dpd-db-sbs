@@ -33,6 +33,8 @@ class DPSPaths:
         self.sbs_example_corrections = base_dir.joinpath(Path("temp/sbs_example_corrections.tsv"))
         self.ru_apply_path = base_dir.joinpath(Path("temp/ru_apply.csv"))
 
+        self.pat_links_path = base_dir.joinpath(Path("shared_data/sbs_csvs/pat_links.tsv"))
+
         self.ai_for_batch_api_dir = base_dir.joinpath(Path("temp/ai_for_batch_api/"))
         self.ai_from_batch_api_dir = base_dir.joinpath(Path("temp/ai_from_batch_api/"))
 

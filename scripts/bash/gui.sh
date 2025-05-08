@@ -1,4 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
+# This script is used to run the GUI for the dpd project.
 
 # making backup of db if it is first time today and open GUI
 

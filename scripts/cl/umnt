@@ -1,0 +1,37 @@
+#!/bin/bash
+
+MOUNT_BASE_DIR="$HOME/filesrv1" # Ensure this matches the mnt script
+share1_mount_point="$MOUNT_BASE_DIR/share1"
+share2_mount_point="$MOUNT_BASE_DIR/share2"
+
+safe_unmount() {
+    local volume="$1"
+    # Check if the directory exists and is a mount point
+    if mount | grep -q "$volume"; then
+        echo -e "\033[1;33mUnmounting $volume using diskutil...\033[0m"
+        # Try diskutil unmount first
+        if diskutil unmount "$volume"; then
+            echo -e "\033[1;32mSuccessfully unmounted $volume.\033[0m"
+        else
+            echo -e "\033[1;31mFailed to unmount $volume with diskutil unmount. It might be very busy.\033[0m"
+            echo -e "\033[1;31mYou could try 'diskutil unmount force \"$volume\"' manually if necessary, but be cautious.\033[0m"
+            # As a next step, we could try 'diskutil unmount force "$volume"' here,
+            # but it's good to be cautious with force unmounts in scripts.
+        fi
+    else
+        if [ -d "$volume" ]; then
+            echo -e "\033[1;34m$volume exists but is not currently mounted.\033[0m"
+        else
+            echo -e "\033[1;34m$volume mount point does not exist or is not mounted.\033[0m"
+        fi
+    fi
+}
+
+safe_unmount "$share1_mount_point"
+safe_unmount "$share2_mount_point"
+
+# Optional: Remove the base directory if it's empty and no longer needed
+# if [ -d "$MOUNT_BASE_DIR" ] && [ -z "$(ls -A "$MOUNT_BASE_DIR")" ]; then
+#     echo -e "\033[1;33mRemoving empty base directory $MOUNT_BASE_DIR...\033[0m"
+#     rmdir "$MOUNT_BASE_DIR" && echo -e "\033[1;32mRemoved $MOUNT_BASE_DIR.\033[0m" || echo -e "\033[1;31mCould not remove $MOUNT_BASE_DIR.\033[0m"
+# fi

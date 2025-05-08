@@ -1,8 +1,8 @@
 # Совмещенная версия DPD Английский + Русский
 
-[GoldenDict версия](https://github.com/sasanarakkha/dpd-db-sbs/releases/latest//latest/download/dpd+rus-goldendict.zip)
+[GoldenDict версия](https://github.com/sasanarakkha/dpd-db-sbs/releases/latest/download/dpd+rus-goldendict.zip)
 
-[MDict версия](https://github.com/sasanarakkha/dpd-db-sbs/releases/latest//latest/download/dpd+rus-mdict.zip)
+[MDict версия](https://github.com/sasanarakkha/dpd-db-sbs/releases/latest/download/dpd+rus-mdict.zip)
 
 ## DPD+RUS содержит пять различных словарей
 

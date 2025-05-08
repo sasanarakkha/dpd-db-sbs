@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-# generate dictionaries
+# This script builds dpd.db from scratch and export all dictionaries.
 
 set -e
 

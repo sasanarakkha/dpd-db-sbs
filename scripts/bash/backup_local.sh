@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# This script creates a backup of the dpd.db locally
+
 # --- Create a temporary exclude file ---
 EXCLUDE_FILE=$(mktemp) || { echo "Failed to create temp file"; exit 1; }
 

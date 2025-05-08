@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# This script is running update_decks.sh
+
+# Ask the user if they want to attempt to mount the fileserver
+while true; do
+    echo -ne "\033[1;34m Do you want to attempt to mount the fileserver? \033[0m"
+    read -n 1 -s mount_confirm
+    if [[ $mount_confirm == "q" ]]; then
+        echo -e "\n\033[1;31m Aborted by user.\033[0m"
+        exit 1
+    fi
+    case $mount_confirm in
+        [Yy]* )
+            mnt
+            break;;
+        * )
+            break;;
+    esac
+done
+
+cd "$HOME/Documents/dpd-db"
+
+uv run bash scripts/bash/update_decks.sh
+
+cd
+
+# Ask the user if they want to attempt to umount the fileserver
+while true; do
+    echo -ne "\033[1;34m Do you want to umount the fileserver? \033[0m"
+    read -n 1 -s mount_confirm
+    if [[ $mount_confirm == "q" ]]; then
+        echo -e "\n\033[1;31m Aborted by user.\033[0m"
+        exit 1
+    fi
+    case $mount_confirm in
+        [Yy]* )
+            umnt
+            break;;
+        * )
+            break;;
+    esac
+done

@@ -33,7 +33,7 @@ from sqlalchemy.orm import joinedload
 
 from tools.sbs_table_functions import SBS_table_tools
 
-current_date = datetime.date.today().strftime("%d-%m")
+current_date = datetime.date.today().strftime("%m-%d")
 
 console = Console()
 

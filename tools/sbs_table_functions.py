@@ -9,6 +9,8 @@ from difflib import SequenceMatcher
 
 from rich.console import Console
 
+from tools.configger import config_read
+
 console = Console()
 
 dpspth = DPSPaths()
@@ -68,8 +70,9 @@ class SBS_table_tools:
     
     def generate_sbs_audio(self, lemma_clean):
         """Generate the sbs_audio string based on the presence of an audio file."""
-        if dpspth.anki_media_dir:
-            audio_path = os.path.join(dpspth.anki_media_dir, f"{lemma_clean}.mp3")
+        anki_media_dir_path = config_read("anki", "media_dir")
+        if anki_media_dir_path:
+            audio_path = os.path.join(anki_media_dir_path, f"{lemma_clean}.mp3")
             if os.path.exists(audio_path):
                 return f"[sound:{lemma_clean}.mp3]"
         return ''

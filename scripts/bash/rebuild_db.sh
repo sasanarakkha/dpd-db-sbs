@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # build dpd.db from scratch or update existing one using backup_tsv with additions and corrections and making goldendict 
 
@@ -15,7 +15,11 @@ git checkout sbs-ru
 
 while true; do
     echo -ne "\033[1;36m Backup Ru and SBS tables and copy them to db/backup_tsv?\033[0m"
-    read yn
+    read -n 1 -s yn
+    if [[ $yn == "q" ]]; then
+        echo -e "\n\033[1;31m Aborted by user.\033[0m"
+        exit 1
+    fi
     case $yn in
         [Yy]* )
             scripts/export/backup_all_dps.py
@@ -31,7 +35,11 @@ done
 
 while true; do
     echo -ne "\033[1;36m Copy all from dps_backup to db/backup_tsv?\033[0m"
-    read yn
+    read -n 1 -s yn
+    if [[ $yn == "q" ]]; then
+        echo -e "\n\033[1;31m Aborted by user.\033[0m"
+        exit 1
+    fi
     case $yn in
         [Yy]* )
             FILENAMES=("dpd_headwords.tsv" "dpd_roots.tsv" "sbs.tsv" "russian.tsv" "ru_roots.tsv")
@@ -46,7 +54,11 @@ done
 
 while true; do
     echo -ne "\033[1;36m Rebuild db from db/backup_tsv?\033[0m"
-    read yn
+    read -n 1 -s yn
+    if [[ $yn == "q" ]]; then
+        echo -e "\n\033[1;31m Aborted by user.\033[0m"
+        exit 1
+    fi
     case $yn in
         [Yy]* )
             # build dpd.db from scratch using backup_tsv
@@ -58,7 +70,7 @@ while true; do
             python -c "from tools.configger import config_update; config_update('regenerate', 'db_rebuild', 'no')"
             scripts/other/add_combined_view.py
             scripts/change_in_db/apply_all_corrections.py
-            # exporter/goldendict/main.py
+            exporter/goldendict/main.py
             git checkout -- pyproject.toml
             git checkout -- db/backup_tsv/dpd_headwords.tsv
             git checkout -- db/sanskrit/root_families_sanskrit.tsv
@@ -72,7 +84,11 @@ done
 
 # while true; do
 #     echo -ne "\033[1;36m Make dpd?\033[0m"
-#     read yn
+#     read -n 1 -s yn
+#     if [[ $yn == "q" ]]; then
+#         echo -e "\n\033[1;31m Aborted by user.\033[0m"
+#         exit 1
+#     fi
 #     case $yn in
 #         [Yy]* )
 #             exporter/goldendict/main.py

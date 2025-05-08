@@ -1,4 +1,7 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
+# This script is used to check for new words in the database and compare them with the existing ones.
+# It will also prompt the user to apply changes and backup the database.q
 
 # --- Cross-platform spreadsheet viewer function ---
 open_spreadsheet() {

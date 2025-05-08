@@ -1,12 +1,18 @@
 #!/bin/bash
 
-cd ~/Code/dpd-db
+# This script is a wrapper for run_and_log.sh
+# It executes scripts/bash/rebuild_db.sh with logging and rotation.
 
-# Ensure the logs directory exists
-mkdir -p logs
+# Determine the directory of this script
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+PROJECT_ROOT="$HOME/Documents/dpd-db" # Or derive from SCRIPT_DIR if preferred
 
-# Generate a timestamp
-timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
+MASTER_SCRIPT="${PROJECT_ROOT}/scripts/bash/run_and_log.sh"
+LOG_BASE_NAME="rebuild_db"
+TARGET_SCRIPT_PATH="scripts/bash/rebuild_db.sh"
 
-# Run the command and save output with timestamped filename
-script -q -c "bash scripts/bash/initial_build_db.sh" | tee >(ansi2html > "logs/build_$timestamp.html")
+# The command to run, including 'uv run bash'
+COMMAND_TO_EXECUTE=(uv run bash "${TARGET_SCRIPT_PATH}")
+
+# Execute the master script
+bash "${MASTER_SCRIPT}" "${LOG_BASE_NAME}" "${COMMAND_TO_EXECUTE[@]}"

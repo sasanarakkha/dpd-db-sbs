@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Define mount points within the user's home directory
+MOUNT_BASE_DIR="$HOME/filesrv1" # Or any other path you prefer, e.g., ~/Mounts
+SHARE1_MOUNT_POINT="$MOUNT_BASE_DIR/share1"
+SHARE2_MOUNT_POINT="$MOUNT_BASE_DIR/share2"
+
+USER="devamitta"
+SERVER="filesrv1"
+
+# Fetch password from Keychain
+PASS=$(security find-generic-password -a "$USER" -s "$SERVER" -w 2>/dev/null)
+
+if [ -z "$PASS" ]; then
+    echo -e "\033[1;31mError: Could not retrieve password from Keychain for server '$SERVER' and user '$USER'.\033[0m"
+    echo -e "\033[1;31mPlease ensure you've added it with: security add-generic-password -a \"$USER\" -s \"$SERVER\" -w YOUR_PASSWORD\033[0m"
+    exit 1
+fi
+
+# Create the base directory and mount point directories if they don't exist
+mkdir -p "$SHARE1_MOUNT_POINT"
+mkdir -p "$SHARE2_MOUNT_POINT"
+
+# Check and mount SHARE1
+if mount | grep -q "$SHARE1_MOUNT_POINT"; then # Use -q for quiet grep
+    echo -e "\033[1;32m$SHARE1_MOUNT_POINT is already mounted.\033[0m"
+else
+    echo -e "\033[1;33mMounting to $SHARE1_MOUNT_POINT...\033[0m"
+    # For macOS, the share name in the smb path is usually just the share name, not the full path
+    if mount_smbfs "//$USER:$PASS@$SERVER/share1" "$SHARE1_MOUNT_POINT"; then
+        echo -e "\033[1;32mMounted to $SHARE1_MOUNT_POINT.\033[0m"
+    else
+        echo -e "\033[1;31mFailed to mount to $SHARE1_MOUNT_POINT.\033[0m"
+    fi
+fi
+
+# Check and mount SHARE2
+if mount | grep -q "$SHARE2_MOUNT_POINT"; then
+    echo -e "\033[1;32m$SHARE2_MOUNT_POINT is already mounted.\033[0m"
+else
+    echo -e "\033[1;33mMounting to $SHARE2_MOUNT_POINT...\033[0m"
+    if mount_smbfs "//$USER:$PASS@$SERVER/share2" "$SHARE2_MOUNT_POINT"; then
+        echo -e "\033[1;32mMounted to $SHARE2_MOUNT_POINT.\033[0m"
+    else
+        echo -e "\033[1;31mFailed to mount to $SHARE2_MOUNT_POINT.\033[0m"
+    fi
+fi

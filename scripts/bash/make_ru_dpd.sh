@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-# generate ru dpd
+# This script exports the RU DPD.
 
 set -e
 

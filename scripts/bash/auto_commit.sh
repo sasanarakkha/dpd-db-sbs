@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# This script is used to make a backup of the dpd.db and push it to GitHub.
+
 uv run python scripts/export/backup_corrections_additions.py
 
 while true; do

@@ -81,7 +81,7 @@ def update_from_text_file(word, text_content):
 
 def filter_and_update_from_file(pth: ProjectPaths):
     # Define the path to your text file
-    file_path = "/home/deva/Documents/dpd-db/temp/chattha-sangayana-patimokkhha.txt"
+    file_path = "$HOME/Documents/dpd-db/temp/chattha-sangayana-patimokkhha.txt"
 
     # Read the content of the file
     with open(file_path, 'r', encoding='utf-8') as f:

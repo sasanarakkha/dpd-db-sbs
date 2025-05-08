@@ -461,7 +461,7 @@ def ru_edit_spelling(dpspth):
 
 
 def tail_log():
-    subprocess.Popen(["gnome-terminal", "--", "tail", "-n", "+0", "-f", "/home/deva/logs/gui.log"])
+    subprocess.Popen(["gnome-terminal", "--", "tail", "-n", "+0", "-f", "$HOME/logs/gui.log"])
     
 
 # from_test_to_add_button
