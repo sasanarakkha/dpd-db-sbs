@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# This script is pushing the latest changes to a remote repository.
+
+# clean MacOS .DS_Store files
+find . -name .DS_Store -delete
+
 echo "------ push_latest_changes"
 
 # Get the current date

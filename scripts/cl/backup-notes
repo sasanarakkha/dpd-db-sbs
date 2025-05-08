@@ -1,13 +1,7 @@
 #!/bin/bash
 
-# This script is a wrapper for run_and_log.sh
-# It executes scripts/bash/backup_notes.sh with logging and rotation.
+# This script is backing up notes to a remote repository.
 
-# Determine the directory of this script
-PROJECT_ROOT="$HOME/Documents/dpd-db" # Or derive from SCRIPT_DIR if preferred
+cd "$HOME/Documents/notes"
 
-MASTER_SCRIPT="${PROJECT_ROOT}/scripts/bash/run_and_log.sh"
-LOG_BASE_NAME="backup_notes"
-
-# Execute the master script
-bash "${MASTER_SCRIPT}" "${LOG_BASE_NAME}" "git_push"
+git-push

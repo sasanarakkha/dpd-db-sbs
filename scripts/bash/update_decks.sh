@@ -28,23 +28,27 @@ done
 
 # cd "$HOME/Documents/dps/utilities"
 
-# while true; do
-#     echo -ne "\033[1;34m need to push vocab for classes? \033[0m"
-#     read -n 1 -s yn
-#     echo
-#     if [[ $yn == "q" ]]; then
-#         echo -e "\n\033[1;31m Aborted by user.\033[0m"
-#         exit 1
-#     fi
-#     case $yn in
-#         [Yy]* )
-#             echo -e "\033[1;33m pushing vocab for classes...\033[0m"
-#             bash generate_and_push_vocab.sh
-#             break;;
-#         * )
-#             break;;
-#     esac
-# done
+while true; do
+    echo -ne "\033[1;34m need to push vocab for classes? \033[0m"
+    read -n 1 -s yn
+    echo
+    if [[ $yn == "q" ]]; then
+        echo -e "\n\033[1;31m Aborted by user.\033[0m"
+        exit 1
+    fi
+    case $yn in
+        [Yy]* )
+            echo -e "\033[1;33m pushing vocab for classes...\033[0m"
+            uv run python scripts/export/save_classes_vocab_individual.py
+            uv run python scripts/export/save_classes_vocab_united.py
+            cp -X -rf "$HOME/Documents/sasanarakkha/study-tools/pali-class/vocab/vocab-for-classes.xlsx" "$HOME/filesrv1/share1/Sharing between users/13 For Pāli class/vocab-for-classes.xlsx"
+            cd "$HOME/Documents/sasanarakkha/study-tools"
+            git-push
+            break;;
+        * )
+            break;;
+    esac
+done
 
 # grammar.xlsx - https://docs.google.com/spreadsheets/d/1KV5LmebIQpNyNKl03Pmo_Ti-LNW3IYWB6uc7OfGRGPU/
 
@@ -90,46 +94,42 @@ while true; do
     esac
 done
 
-# # cd "$HOME/Documents/dps/utilities"
+while true; do
+    echo -e "\033[1;36m please save all class anki decks! \033[0m"
+    echo -ne "\033[1;34m need to move all classes? \033[0m"
+    read -n 1 -s yn
+    echo
+    if [[ $yn == "q" ]]; then
+        echo -e "\n\033[1;31m Aborted by user.\033[0m"
+        exit 1
+    fi
+    case $yn in
+        [Yy]* )
+            echo -e "\033[1;33m moving all classes...\033[0m"
+            uv run bash scripts/bash/move_class.sh
+            break;;
+        * )
+            break;;
+    esac
+done
 
-# while true; do
-#     echo -e "\033[1;36m please save all class anki decks! \033[0m"
-#     echo -ne "\033[1;34m need to move all classes? \033[0m"
-#     read -n 1 -s yn
-#     echo
-#     if [[ $yn == "q" ]]; then
-#         echo -e "\n\033[1;31m Aborted by user.\033[0m"
-#         exit 1
-#     fi
-#     case $yn in
-#         [Yy]* )
-#             echo -e "\033[1;33m moving all classes...\033[0m"
-#             bash move-class.sh
-#             break;;
-#         * )
-#             break;;
-#     esac
-# done
-
-# while true; do
-#     echo -ne "\033[1;34m need to create wordtree for all classes? \033[0m"
-#     read -n 1 -s yn
-#     echo
-#     if [[ $yn == "q" ]]; then
-#         echo -e "\n\033[1;31m Aborted by user.\033[0m"
-#         exit 1
-#     fi
-#     case $yn in
-#         [Yy]* )
-#             echo -e "\033[1;33m creating wordtree...\033[0m"
-#             bash wordtree.sh
-#             break;;
-#         * )
-#             break;;
-#     esac
-# done
-
-
+while true; do
+    echo -ne "\033[1;34m need to create wordtree for all classes? \033[0m"
+    read -n 1 -s yn
+    echo
+    if [[ $yn == "q" ]]; then
+        echo -e "\n\033[1;31m Aborted by user.\033[0m"
+        exit 1
+    fi
+    case $yn in
+        [Yy]* )
+            echo -e "\033[1;33m creating wordtree...\033[0m"
+            uv run bash scripts/bash/wordtree.sh
+            break;;
+        * )
+            break;;
+    esac
+done
 
 while true; do
     echo -e "\033[1;36m please save all other anki decks! \033[0m"

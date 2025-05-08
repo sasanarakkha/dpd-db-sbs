@@ -14,5 +14,5 @@ uv run python scripts/other/patimokkha_dict.py
 
 cd "$HOME/Documents/sasanarakkha/study-tools"
 
-git_push
+git-push
 

@@ -1,17 +1,18 @@
 #!/bin/bash
 
+# This script downloads class materials from Google Docs and saves them as PDFs.
+
 # Check for internet connection
 if ! ping -c 1 google.com &> /dev/null; then
     echo "\033[0;31mError: No internet connection. Please check your network settings."
     exit 1
 fi
 
-exec > >(tee "~/logs/download_class_materials.log") 2>&1
-
-echo "--- download_class_materials Script Started at $(date) ---"
-
-cd "~/offline_materials"
-
+mkdir -p "$HOME/offline_materials/per"
+mkdir -p "$HOME/offline_materials/bpc"
+mkdir -p "$HOME/offline_materials/ipc"
+mkdir -p "$HOME/offline_materials/apc"
+mkdir -p "$HOME/offline_materials/sa"
 
 per=(
     "[1 Dedication of Offerings](https://docs.google.com/document/d/1hBa7NGk8IaNqHDZlL-ZY-N86Fvh_qhQ8_N5veea-b04/)|"
@@ -145,7 +146,7 @@ sa=(
 
 )
 
-
+cd "$HOME/offline_materials"
 
 # Loop through the list of per and extract the title and URL
 for link in "${per[@]}"; do
@@ -154,8 +155,8 @@ for link in "${per[@]}"; do
     # Extract URL from within parentheses
     url=$(echo "$link" | sed -n 's/.*(\(https:[^)]*\)).*/\1/p' | sed 's/\/$//')
 
-    # Generate and execute the wget command with the formatted title
-    wget -O "per/$title.pdf" "$url/export?format=pdf"
+    # Generate and execute the curl command with the formatted title
+    curl -L "$url/export?format=pdf" -o "per/$title.pdf"
 
     # Check if the downloaded file exists
     if [ ! -f "per/$title.pdf" ]; then
@@ -171,8 +172,8 @@ for link in "${bpc[@]}"; do
     # Extract URL from within parentheses
     url=$(echo "$link" | sed -n 's/.*(\(https:[^)]*\)).*/\1/p' | sed 's/\/$//')
 
-    # Generate and execute the wget command with the formatted title
-    wget -O "bpc/$title.pdf" "$url/export?format=pdf"
+    # Generate and execute the curl command with the formatted title
+    curl -L "$url/export?format=pdf" -o "bpc/$title.pdf"
 
     # Check if the downloaded file exists
     if [ ! -f "bpc/$title.pdf" ]; then
@@ -188,8 +189,8 @@ for link in "${ipc[@]}"; do
     # Extract URL from within parentheses
     url=$(echo "$link" | sed -n 's/.*(\(https:[^)]*\)).*/\1/p' | sed 's/\/$//')
 
-    # Generate and execute the wget command with the formatted title
-    wget -O "ipc/$title.pdf" "$url/export?format=pdf"
+    # Generate and execute the curl command with the formatted title
+    curl -L "$url/export?format=pdf" -o "ipc/$title.pdf"
 
     # Check if the downloaded file exists
     if [ ! -f "ipc/$title.pdf" ]; then
@@ -205,8 +206,8 @@ for link in "${apc[@]}"; do
     # Extract URL from within parentheses
     url=$(echo "$link" | sed -n 's/.*(\(https:[^)]*\)).*/\1/p' | sed 's/\/$//')
 
-    # Generate and execute the wget command with the formatted title
-    wget -O "apc/$title.pdf" "$url/export?format=pdf"
+    # Generate and execute the curl command with the formatted title
+    curl -L "$url/export?format=pdf" -o "apc/$title.pdf"
 
     # Check if the downloaded file exists
     if [ ! -f "apc/$title.pdf" ]; then
@@ -222,8 +223,8 @@ for link in "${sa[@]}"; do
     # Extract URL from within parentheses
     url=$(echo "$link" | sed -n 's/.*(\(https:[^)]*\)).*/\1/p' | sed 's/\/$//')
 
-    # Generate and execute the wget command with the formatted title
-    wget -O "sa/$title.pdf" "$url/export?format=pdf"
+    # Generate and execute the curl command with the formatted title
+    curl -L "$url/export?format=pdf" -o "sa/$title.pdf"
 
     # Check if the downloaded file exists
     if [ ! -f "sa/$title.pdf" ]; then
@@ -232,23 +233,21 @@ for link in "${sa[@]}"; do
     fi
 done
 
-cd "~/offline_materials"
-
 # Check if the fileserver is mounted
-if [ -d "~/filesrv1/share1/Sharing between users" ]; then
+if [ -d "$HOME/filesrv1/share1/Sharing between users" ]; then
 
-    echo "Moving folders to the fileserver"
+    echo "Copying folders to the fileserver"
 
     # Copy folders on the server
-    cp -rf bpc/* "~/filesrv1/share1/Sharing between users/13 For Pāli class/offline materials/beginner/"
+    cp -X -rf bpc/* "$HOME/filesrv1/share1/Sharing between users/13 For Pāli class/offline materials/beginner/"
 
-    cp -rf ipc/* "~/filesrv1/share1/Sharing between users/13 For Pāli class/offline materials/intermediate/"
+    cp -X -rf ipc/* "$HOME/filesrv1/share1/Sharing between users/13 For Pāli class/offline materials/intermediate/"
 
-    cp -rf apc/* "~/filesrv1/share1/Sharing between users/13 For Pāli class/offline materials/advanced/"
+    cp -X -rf apc/* "$HOME/filesrv1/share1/Sharing between users/13 For Pāli class/offline materials/advanced/"
 
-    cp -rf sa/* "~/filesrv1/share1/Sharing between users/13 For Pāli class/offline materials/suttas alalysis/"
+    cp -X -rf sa/* "$HOME/filesrv1/share1/Sharing between users/13 For Pāli class/offline materials/suttas alalysis/"
 
-    cp -rf per/* "~/filesrv1/share1/Sharing between users/13 For Pāli class/offline materials/PER analysis/"
+    cp -X -rf per/* "$HOME/filesrv1/share1/Sharing between users/13 For Pāli class/offline materials/PER analysis/"
 
     echo "Copied folders to the fileserver"
 
@@ -257,16 +256,11 @@ else
 fi
 
 # Combine and clean materials to txt
-cd "~/.local/bin"
-bash make_comb_class.sh
-bash make_comb_suttas.sh
-
-echo "------ backup_filesrv Script Ended at $(date) ------"
+# cd "$HOME/.local/bin"
+# bash make_comb_class.sh
+# bash make_comb_suttas.sh
 
 # Check if any errors occurred during the script execution
 if [ $? -ne 0 ]; then
     echo "\033[0;31mError: Some PDFs were not available or an error occurred during the script execution.\033[0m"
 fi
-
-
-# export VISUAL=xed; crontab -e 
