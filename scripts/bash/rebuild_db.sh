@@ -16,6 +16,7 @@ git checkout sbs-ru
 while true; do
     echo -ne "\033[1;36m Backup Ru and SBS tables and copy them to db/backup_tsv?\033[0m"
     read -n 1 -s yn
+    echo
     if [[ $yn == "q" ]]; then
         echo -e "\n\033[1;31m Aborted by user.\033[0m"
         exit 1
@@ -36,6 +37,7 @@ done
 while true; do
     echo -ne "\033[1;36m Copy all from dps_backup to db/backup_tsv?\033[0m"
     read -n 1 -s yn
+    echo
     if [[ $yn == "q" ]]; then
         echo -e "\n\033[1;31m Aborted by user.\033[0m"
         exit 1
@@ -55,6 +57,7 @@ done
 while true; do
     echo -ne "\033[1;36m Rebuild db from db/backup_tsv?\033[0m"
     read -n 1 -s yn
+    echo
     if [[ $yn == "q" ]]; then
         echo -e "\n\033[1;31m Aborted by user.\033[0m"
         exit 1
@@ -85,6 +88,7 @@ done
 # while true; do
 #     echo -ne "\033[1;36m Make dpd?\033[0m"
 #     read -n 1 -s yn
+#     echo
 #     if [[ $yn == "q" ]]; then
 #         echo -e "\n\033[1;31m Aborted by user.\033[0m"
 #         exit 1

@@ -6,6 +6,7 @@
 while true; do
     echo -ne "\033[1;34m Do you want to attempt to mount the fileserver? \033[0m"
     read -n 1 -s mount_confirm
+    echo
     if [[ $mount_confirm == "q" ]]; then
         echo -e "\n\033[1;31m Aborted by user.\033[0m"
         exit 1
@@ -29,6 +30,7 @@ cd
 while true; do
     echo -ne "\033[1;34m Do you want to umount the fileserver? \033[0m"
     read -n 1 -s mount_confirm
+    echo
     if [[ $mount_confirm == "q" ]]; then
         echo -e "\n\033[1;31m Aborted by user.\033[0m"
         exit 1
