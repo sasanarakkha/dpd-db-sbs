@@ -1,4 +1,15 @@
 #!/bin/bash
 
-cd ~/Code/dpd-db
-uv run flet run gui2/main.py
+# This script is a wrapper for run_and_log.sh
+# It executes uv run flet gui2/main.py with logging and rotation.
+
+MASTER_SCRIPT="$HOME/Documents/dpd-db/scripts/bash/run_and_log.sh"
+LOG_BASE_NAME="backup_local"
+
+cd "$HOME/Documents/dpd-db/"
+
+# The command to run
+COMMAND_TO_EXECUTE=(uv run python gui2/main.py)
+
+# Execute the master script
+bash "${MASTER_SCRIPT}" "${LOG_BASE_NAME}" "${COMMAND_TO_EXECUTE[@]}"

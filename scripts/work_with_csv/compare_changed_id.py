@@ -31,8 +31,7 @@ mismatched_notes_rows = merged_notes[merged_notes['_merge'] != 'both']
 # Read the backup_ru file into a DataFrame
 backup_ru = pd.read_csv(pth.russian_path, sep='\t')
 
-backup_dps_ru_pth = os.path.join(dpspth.dps_backup_dir, 'russian.tsv')
-backup_dps_ru = pd.read_csv(backup_dps_ru_pth, sep='\t', low_memory=False)
+backup_dps_ru = pd.read_csv(dpspth.russian_path, sep='\t', low_memory=False)
 
 # Step 1: Combine the IDs from both DataFrames
 all_ids = pd.concat([backup_ru['id'], backup_dps_ru['id']])

@@ -55,9 +55,11 @@ class DPSPaths:
         self.dps_test_2_path = base_dir.joinpath(Path("temp/dps_test_2.tsv"))
 
         # dps bakup folder
-        self.dps_backup_dir = base_dir.joinpath(Path("db/backup_sbs_ru/")) 
-        self.for_compare_dir = base_dir.joinpath(Path("db/backup_sbs_ru/for_compare/")) 
+        self.for_compare_dir = base_dir.joinpath(Path("db/backup_tsv/for_compare/")) 
         self.temp_csv_backup_dir = base_dir.joinpath(Path("temp/backup_csv/")) 
+        self.ru_root_path = base_dir / "db/backup_tsv/ru_roots.tsv"
+        self.russian_path = base_dir / "db/backup_tsv/russian.tsv"
+        self.sbs_path = base_dir / "db/backup_tsv/sbs.tsv"
 
         # txt
         self.ru_user_dict_path = base_dir.joinpath(Path("tools/russian_words_user_dict.txt"))
@@ -81,7 +83,6 @@ class DPSPaths:
                 self.anki_csvs_dps_dir,
                 self.pali_class_dir,
                 self.pali_class_grammar_dir,
-                self.dps_backup_dir,
                 self.for_compare_dir,
                 self.temp_csv_backup_dir,
                 self.csvs_for_audio_dir,

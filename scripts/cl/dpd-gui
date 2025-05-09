@@ -1,4 +1,26 @@
 #!/bin/bash
 
-cd ~/Code/dpd-db
-uv run python3 gui/gui_main.py &
+# This script is used to run the GUI for the dpd project.
+
+cd "$HOME/Documents/dpd-db/"
+
+# making backup of db if it is first time today and open GUI
+
+# Directory where backups are stored
+BACKUP_DIR="db/backup_tsv/"
+
+# Get today's date
+TODAY=$(date "+%Y-%m-%d")
+
+# Check the modification date of a file (for example, dpd_headwords.tsv)
+FILE_DATE=$(stat -c %y "${BACKUP_DIR}dpd_headwords.tsv" | cut -d' ' -f1)
+
+# Check if backups for today exist in db/backup_tsv/
+if [[ "$FILE_DATE" == "$TODAY" ]]; then
+    echo "Backups for today already exist."
+else
+    uv run python scripts/backup/backup_all.py
+fi
+
+# Run the GUI script
+uv run python gui/gui_main.py

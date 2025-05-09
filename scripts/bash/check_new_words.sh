@@ -21,11 +21,11 @@ open_spreadsheet() {
 
 # --- Backup prompt ---
 while true; do
-    echo -ne "\033[1;36mBackup all DPS? (y/n): \033[0m"
+    echo -ne "\033[1;36mBackup all? (y/n): \033[0m"
     read yn
     case $yn in
         [Yy]* )
-            scripts/export/backup_all_dps.py
+            scripts/backup/backup_all.py
             break;;
         * )
             break;;
@@ -42,16 +42,16 @@ reset=$(tput sgr0)
 echo "${bold}${yellow}Filter the list of words${reset}"
 
 # --- Open files with cross-platform method ---
-open_spreadsheet "gui/major_change_meaning_history.tsv"
+open_spreadsheet "shared_data/major_change_meaning_history.tsv"
 scripts/work_with_csv/compare_changed_id.py
 
-open_spreadsheet "db/backup_sbs_ru/for_compare/added_another_meaning.tsv"
-open_spreadsheet "db/backup_sbs_ru/for_compare/changed_notes.tsv"
+open_spreadsheet "db/backup_tsv/for_compare/added_another_meaning.tsv"
+open_spreadsheet "db/backup_tsv/for_compare/changed_notes.tsv"
 
 # --- User confirmation ---
 read -p "${bold}${yellow}Did you apply all changes? (y/n): ${reset}" confirmation
 if [ "$confirmation" == "y" ]; then
-    cp -rf db/backup_tsv/dpd_headwords.tsv db/backup_sbs_ru/for_compare/dpd_headwords.tsv
+    cp -rf db/backup_tsv/dpd_headwords.tsv db/backup_tsv/for_compare/dpd_headwords.tsv
     echo "${bold}${green}The job is done${reset}"
 else
     echo "${bold}${red}No changes applied. Exiting.${reset}"

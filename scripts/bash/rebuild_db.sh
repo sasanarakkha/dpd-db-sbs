@@ -14,7 +14,7 @@ git checkout sbs-ru
 # git checkout origin/main -- db/backup_tsv/dpd_roots.tsv
 
 while true; do
-    echo -ne "\033[1;36m Backup Ru and SBS tables and copy them to db/backup_tsv?\033[0m"
+    echo -ne "\033[1;36m Backup Ru and SBS tables\033[0m"
     read -n 1 -s yn
     echo
     if [[ $yn == "q" ]]; then
@@ -23,31 +23,7 @@ while true; do
     fi
     case $yn in
         [Yy]* )
-            scripts/export/backup_all_dps.py
-            FILENAMES=("sbs.tsv" "russian.tsv" "ru_roots.tsv")
-            for file in "${FILENAMES[@]}"; do
-                cp -rf ./db/backup_sbs_ru/$file ./db/backup_tsv/$file
-            done
-            break;;
-        * )
-            break;;
-    esac
-done
-
-while true; do
-    echo -ne "\033[1;36m Copy all from dps_backup to db/backup_tsv?\033[0m"
-    read -n 1 -s yn
-    echo
-    if [[ $yn == "q" ]]; then
-        echo -e "\n\033[1;31m Aborted by user.\033[0m"
-        exit 1
-    fi
-    case $yn in
-        [Yy]* )
-            FILENAMES=("dpd_headwords.tsv" "dpd_roots.tsv" "sbs.tsv" "russian.tsv" "ru_roots.tsv")
-            for file in "${FILENAMES[@]}"; do
-                cp -rf ./db/backup_sbs_ru/$file ./db/backup_tsv/$file
-            done
+            scripts/backup/backup_all.py
             break;;
         * )
             break;;
