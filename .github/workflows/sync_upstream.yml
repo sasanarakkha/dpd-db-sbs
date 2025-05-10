@@ -10,7 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     # Grant permissions to write to contents
     permissions:
-      contents: write 
+      contents: write
+      actions: write
     steps:
 
       - name: Checkout repository
