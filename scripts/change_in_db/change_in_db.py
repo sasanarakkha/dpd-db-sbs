@@ -293,7 +293,7 @@ value_to_update = "(грам) "
 
 # update_sbs_source_3()
 
-update_column_for_some_criteria("VIN1.4.2.7")
+update_column_for_some_criteria("VIN1.4.2.10")
 
 
 
