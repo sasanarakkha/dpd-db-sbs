@@ -1,7 +1,0 @@
-#!/bin/bash
-
-# This script is backing up notes to a remote repository.
-
-cd "$HOME/Documents/notes"
-
-git-push
