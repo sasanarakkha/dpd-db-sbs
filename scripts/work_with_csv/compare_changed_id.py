@@ -44,7 +44,7 @@ unique_to_dps = backup_dps_ru[~backup_dps_ru['id'].isin(backup_ru['id'])]['id']
 unique_ids = pd.concat([unique_to_ru, unique_to_dps])
 
 # Step 4: Save this list of unique IDs into a TSV file
-unique_ids.to_csv(os.path.join(dpspth.for_compare_dir, 'ru_unique_ids.tsv'), sep='\t', index=False)
+unique_ids.to_csv(os.path.join(dpspth.for_compare_csv_dir, 'ru_unique_ids.tsv'), sep='\t', index=False)
 
 print(f"{len(unique_ids)} IDs that do not exist in both backup_ru and backup_dps_ru saved to unique_ids.tsv")
 
@@ -62,8 +62,8 @@ filtered_rows_notes = merged_notes_with_ru[merged_notes_with_ru['ru_notes'].notn
 
 
 # Save the mismatched rows to a TSV file
-output_path = os.path.join(dpspth.for_compare_dir, 'added_another_meaning.tsv')
-notes_output_path = os.path.join(dpspth.for_compare_dir, 'changed_notes.tsv')
+output_path = os.path.join(dpspth.for_compare_csv_dir, 'added_another_meaning.tsv')
+notes_output_path = os.path.join(dpspth.for_compare_csv_dir, 'changed_notes.tsv')
 # mismatched_rows[['id', 'lemma_1']].to_csv(output_path, sep='\t', index=False)
 # print(f"Mismatched rows saved to {output_path}")
 

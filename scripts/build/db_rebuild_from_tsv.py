@@ -4,6 +4,7 @@
 
 import csv
 import sys
+from tools.duplicates import has_duplicate_values_in_column
 
 from rich import print
 
@@ -36,10 +37,34 @@ def main():
 
     create_db_if_not_exists(pth.dpd_db_path)
 
-    for p in [pth.pali_root_path, pth.pali_word_path, pth.russian_path, pth.sbs_path]:
-        if not p.exists():
-            pr.red(f"TSV backup file does not exist: {p}")
+    # Define TSV files and their ID columns to check for duplicates
+    tsvs_to_check = [
+        {"path": pth.pali_word_path, "id_col": "id"},
+        {"path": pth.pali_root_path, "id_col": "root"}, 
+        {"path": pth.russian_path, "id_col": "id"},
+        {"path": pth.sbs_path, "id_col": "id"},
+        {"path": pth.ru_root_path, "id_col": "root"}
+    ]
+
+    # Check each TSV for duplicates before processing
+    for tsv_info in tsvs_to_check:
+        if not tsv_info["path"].exists():
+            pr.red(f"TSV backup file does not exist: {tsv_info['path']}")
             sys.exit(1)
+        
+        has_dupes, dupes_list, dupes_lines = has_duplicate_values_in_column(
+            tsv_path=tsv_info["path"],
+            column_name=tsv_info["id_col"]
+        )
+        if has_dupes:
+            pr.red(f"Duplicate values found in '{tsv_info['path']}' (column: '{tsv_info['id_col']}'):")
+            for val in dupes_list:
+                lines = ", ".join(map(str, dupes_lines[val]))
+                pr.red(f"  - Value: '{val}' found on lines: {lines}")
+            pr.red("Please fix the TSV file and try again.")
+            sys.exit(1)
+        else:
+            pr.yes
 
     db_session = get_db_session(pth.dpd_db_path)
 

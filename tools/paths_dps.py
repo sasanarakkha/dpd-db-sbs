@@ -12,13 +12,36 @@ class DPSPaths:
             # The current working directory of the shell.
             base_dir = Path(os.path.abspath("."))
 
-        # csvs
+        # anki csvs
         self.anki_csvs_dps_dir = base_dir.joinpath(Path("anki_csvs/"))
         self.pali_class_dir = base_dir.joinpath(Path("anki_csvs/pali_class/"))
         self.pali_class_grammar_dir = base_dir.joinpath(Path("anki_csvs/pali_class/grammar/"))
+
+        # shared_data
         self.sbs_index_path = base_dir.joinpath(Path("shared_data/sbs_csvs/sbs_index.csv"))
         self.class_index_path = base_dir.joinpath(Path("shared_data/sbs_csvs/class_index.csv"))
         self.sutta_index_path = base_dir.joinpath(Path("shared_data/sbs_csvs/sutta_index.csv"))
+        self.ru_user_dict_path = base_dir.joinpath(Path("shared_data/russian_words_user_dict.txt"))
+        self.vinaya_tsv_path = base_dir.joinpath(Path("shared_data/sbs_csvs/vinaya.tsv"))
+        self.translation_example_path = base_dir.joinpath(Path("shared_data/sbs_csvs/tranlslation_examples.csv"))
+        self.sbs_archive = base_dir.joinpath(Path("shared_data/sbs_csvs/sbs_archive.tsv"))
+        self.pat_links_path = base_dir.joinpath(Path("shared_data/sbs_csvs/pat_links.tsv"))
+        self.ru_total_root_path = base_dir.joinpath(Path("shared_data/rus/ru_total_roots.tsv"))
+        self.ru_total_comp_path = base_dir.joinpath(Path("shared_data/rus/ru_total_comps.tsv"))
+        self.pali_class_vocab_dir = base_dir.joinpath(Path("shared_data/pali_class/vocab/"))
+        self.discourses_vocab_dir = base_dir.joinpath(Path("shared_data/discourses/vocab/"))
+        self.dps_internal_tests_path = base_dir.joinpath(Path("shared_data/sbs_csvs/dps_internal_tests.tsv"))
+
+        # backup_tsv folder
+        self.for_compare_dir = base_dir.joinpath(Path("db/backup_tsv/for_compare/")) 
+        self.ru_root_path = base_dir / "db/backup_tsv/ru_roots.tsv"
+        self.russian_path = base_dir / "db/backup_tsv/russian.tsv"
+        self.sbs_path = base_dir / "db/backup_tsv/sbs.tsv"
+
+        # temp
+        
+        self.text_to_add_path = base_dir.joinpath(Path("temp/text.txt"))
+        self.temp_csv_backup_dir = base_dir.joinpath(Path("temp/backup_csv/")) 
         self.ai_ru_suggestion_history_path = base_dir.joinpath(Path("temp/ai_ru_suggestion_history.csv"))
         self.ai_ru_notes_suggestion_history_path = base_dir.joinpath(Path("temp/ai_ru_notes_suggestion_history.csv"))
         self.ai_en_suggestion_history_path = base_dir.joinpath(Path("temp/ai_en_suggestion_history.csv"))
@@ -27,43 +50,17 @@ class DPSPaths:
         self.id_temp_list_path = base_dir.joinpath(Path("temp/id_temp_list.csv"))
         self.csvs_for_audio_dir = base_dir.joinpath(Path("temp/csvs_for_audio/"))
         self.ai_translated_dir = base_dir.joinpath(Path("temp/ai_translated"))
-        self.vinaya_tsv_path = base_dir.joinpath(Path("shared_data/sbs_csvs/vinaya.tsv"))
-        self.translation_example_path = base_dir.joinpath(Path("shared_data/sbs_csvs/tranlslation_examples.csv"))
-        self.sbs_archive = base_dir.joinpath(Path("shared_data/sbs_csvs/sbs_archive.tsv"))
         self.sbs_example_corrections = base_dir.joinpath(Path("temp/sbs_example_corrections.tsv"))
         self.ru_apply_path = base_dir.joinpath(Path("temp/ru_apply.csv"))
-
-        self.pat_links_path = base_dir.joinpath(Path("shared_data/sbs_csvs/pat_links.tsv"))
-
         self.ai_for_batch_api_dir = base_dir.joinpath(Path("temp/ai_for_batch_api/"))
         self.ai_from_batch_api_dir = base_dir.joinpath(Path("temp/ai_from_batch_api/"))
-
-        self.ru_total_root_path = base_dir.joinpath(Path("shared_data/rus/ru_total_roots.tsv"))
-        self.ru_total_comp_path = base_dir.joinpath(Path("shared_data/rus/ru_total_comps.tsv"))
         self.total_words_path = base_dir.joinpath(Path("temp/total_words.tsv"))
         self.total_roots_path = base_dir.joinpath(Path("temp/total_roots.tsv"))
-
         self.sbs_class_vocab_dir = base_dir.joinpath(Path("temp/vocab/"))
-
-        self.pali_class_vocab_dir = base_dir.joinpath(Path("shared_data/pali_class/vocab/"))
-        self.discourses_vocab_dir = base_dir.joinpath(Path("shared_data/discourses/vocab/"))
-
-        # /tests
-        self.dps_internal_tests_path = base_dir.joinpath(Path("shared_data/sbs_csvs/dps_internal_tests.tsv"))
+        self.for_compare_csv_dir = base_dir.joinpath(Path("temp/for_compare/")) 
         self.dps_internal_tests_replaced_path = base_dir.joinpath(Path("temp/dps_internal_tests_replaced.tsv"))
         self.dps_test_1_path = base_dir.joinpath(Path("temp/dps_test_1.tsv"))
         self.dps_test_2_path = base_dir.joinpath(Path("temp/dps_test_2.tsv"))
-
-        # dps bakup folder
-        self.for_compare_dir = base_dir.joinpath(Path("db/backup_tsv/for_compare/")) 
-        self.temp_csv_backup_dir = base_dir.joinpath(Path("temp/backup_csv/")) 
-        self.ru_root_path = base_dir / "db/backup_tsv/ru_roots.tsv"
-        self.russian_path = base_dir / "db/backup_tsv/russian.tsv"
-        self.sbs_path = base_dir / "db/backup_tsv/sbs.tsv"
-
-        # txt
-        self.ru_user_dict_path = base_dir.joinpath(Path("tools/russian_words_user_dict.txt"))
-        self.text_to_add_path = base_dir.joinpath(Path("temp/text.txt"))
 
         # /gui/stash
         self.dps_stash_path = base_dir.joinpath(Path("gui/stash/dps_stash.json"))
@@ -84,6 +81,7 @@ class DPSPaths:
                 self.pali_class_dir,
                 self.pali_class_grammar_dir,
                 self.for_compare_dir,
+                self.for_compare_csv_dir,
                 self.temp_csv_backup_dir,
                 self.csvs_for_audio_dir,
                 self.ai_for_batch_api_dir,

@@ -45,8 +45,8 @@ echo "${bold}${yellow}Filter the list of words${reset}"
 open_spreadsheet "shared_data/major_change_meaning_history.tsv"
 scripts/work_with_csv/compare_changed_id.py
 
-open_spreadsheet "db/backup_tsv/for_compare/added_another_meaning.tsv"
-open_spreadsheet "db/backup_tsv/for_compare/changed_notes.tsv"
+open_spreadsheet "db/temp/for_compare/added_another_meaning.tsv"
+open_spreadsheet "db/temp/for_compare/changed_notes.tsv"
 
 # --- User confirmation ---
 read -p "${bold}${yellow}Did you apply all changes? (y/n): ${reset}" confirmation

@@ -4,15 +4,15 @@
 # It executes scripts/bash/rebuild_db.sh with logging and rotation.
 
 # Determine the directory of this script
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-PROJECT_ROOT="$HOME/Documents/dpd-db" # Or derive from SCRIPT_DIR if preferred
+PROJECT_ROOT="$HOME/Documents/dpd-db"
 
-MASTER_SCRIPT="${PROJECT_ROOT}/scripts/bash/run_and_log.sh"
+MASTER_SCRIPT="$HOME/.local/bin/run_and_log.sh"
+
 LOG_BASE_NAME="rebuild_db"
-TARGET_SCRIPT_PATH="scripts/bash/rebuild_db.sh"
+TARGET_SCRIPT_PATH="${PROJECT_ROOT}/scripts/bash/rebuild_db.sh"
 
 # The command to run, including 'uv run bash'
-COMMAND_TO_EXECUTE=(uv run bash "${TARGET_SCRIPT_PATH}")
+COMMAND_TO_EXECUTE=(bash -c "cd '${PROJECT_ROOT}' && uv run bash '${TARGET_SCRIPT_PATH}'")
 
 # Execute the master script
 bash "${MASTER_SCRIPT}" "${LOG_BASE_NAME}" "${COMMAND_TO_EXECUTE[@]}"
