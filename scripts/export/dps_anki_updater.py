@@ -83,9 +83,13 @@ def get_anki_collection() -> Collection | None:
             col = Collection(anki_db_path)
             pr.yes("ok")
             return col
-        except DBError:
+        except DBError as e:
+            import traceback
             pr.no("error")
-            pr.red("Anki is currently open, close and try again.")
+            pr.red(f"Anki DBError: {e}")
+            pr.red("Full traceback:")
+            traceback.print_exc()
+            pr.red("Anki is currently open, close and try again. (This might be a misinterpretation of the actual error)")
             return None
 
 
@@ -94,6 +98,8 @@ def backup_anki_db(col) -> None:
     pr.green("backup anki db")
     anki_backup_path = config_read("anki", "backup_path")
     if anki_backup_path:
+        # Ensure the backup directory exists
+        os.makedirs(anki_backup_path, exist_ok=True)
         is_backed_up = col.create_backup(
             backup_folder=anki_backup_path, force=False, wait_for_completion=False
         )
