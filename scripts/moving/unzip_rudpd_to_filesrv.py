@@ -10,7 +10,7 @@ import shutil
 today: date = date.today()
 
 # Print completion message in green color
-print("\033[1;33m from dpd-db/exporter/share/ \033[0m")
+print("\033[1;33m from downloads \033[0m")
 
 # Paths determined from the current working directory (project root)
 project_dir: Path = Path.cwd()

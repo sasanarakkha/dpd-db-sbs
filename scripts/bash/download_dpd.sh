@@ -38,15 +38,15 @@ DPD_RU_links=(
 # Loop through the list of links and download them
 for link in "${DPD_links[@]}"; do
     echo "Downloading $link..."
-    wget -q --show-progress "$link"
+    curl -q -# -L -O "$link"
 done
 for link in "${DPD_SBS_links[@]}"; do
     echo "Downloading $link..."
-    wget -q --show-progress "$link"
+    curl -q -# -L -O "$link"
 done
 for link in "${DPD_RU_links[@]}"; do
     echo "Downloading $link..."
-    wget -q --show-progress "$link"
+    curl -q -# -L -O "$link"
 done
 
 # print success message

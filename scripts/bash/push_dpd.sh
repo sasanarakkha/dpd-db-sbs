@@ -19,7 +19,7 @@ while true; do
     case $yn in
         [Yy]* )
             echo -e "\033[1;33m Downloading DPD...\033[0m"
-            uv bash run scripts/bash/download_dpd.sh
+            scripts/bash/download_dpd.sh
             break;;
         * )
             break;;
@@ -37,7 +37,7 @@ while true; do
     case $yn in
         [Yy]* )
             echo -e "\033[1;33m Unzipping and copying ru-dpd.\033[0m"
-            uv python run scripts/moving/unzip_rudpd_to_filesrv.py
+            scripts/moving/unzip_rudpd_to_filesrv.py
             break;;
         * )
             break;;
@@ -51,7 +51,7 @@ while true; do
     case $yn in
         [Yy]* )
             echo -e "\033[1;33m Unzipping and copying DPD...\033[0m"
-            uv python run scripts/moving/unzip_dpd_to_filesrv.py
+            scripts/moving/unzip_dpd_to_filesrv.py
             break;;
         * )
             break;;
@@ -69,7 +69,7 @@ while true; do
     case $yn in
         [Yy]* )
             echo -e "\033[1;33m Unzipping and copying DPD-SBS...\033[0m"
-            uv python run scripts/moving/unzip_dpd_sbs_to_filesrv.py
+            scripts/moving/unzip_dpd_sbs_to_filesrv.py
             break;;
         * )
             break;;
@@ -87,7 +87,7 @@ while true; do
     case $yn in
         [Yy]* )
             echo -e "\033[1;33m Unzipping to local goldendict...\033[0m"
-            uv python run scripts/moving/unzip_dpd_to_gd.py
+            scripts/moving/unzip_dpd_to_gd.py
             break;;
         * )
             break;;
@@ -105,7 +105,7 @@ while true; do
     case $yn in
         [Yy]* )
             echo -e "\033[1;33m Unzipping to local share...\033[0m"
-            uv python run scripts/moving/unzip_dpd_to_share.py
+            scripts/moving/unzip_dpd_to_share.py
             break;;
         * )
             break;;
