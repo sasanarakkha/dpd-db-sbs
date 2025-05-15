@@ -102,7 +102,7 @@ jobs:
       run: uv run python db/families/family_idiom.py
 
     - name: Families to JSON
-      run: uv run python scripts/build/families_to_json.py
+      run: uv run python scripts/build/families_to_json_ru.py
 
     - name: Extract Variants
       run: uv run python db/variants/main.py

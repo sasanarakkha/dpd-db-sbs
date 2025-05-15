@@ -8,7 +8,9 @@ from db.db_helpers import get_db_session
 from db.models import DpdHeadword
 from tools.paths import ProjectPaths
 
-find_char = " "
+from sqlalchemy.orm import joinedload
+
+find_char = ' '
 replace_char = " "
 column = "meaning_1"
 
@@ -16,12 +18,23 @@ column = "meaning_1"
 def main():
     pth = ProjectPaths()
     db_session = get_db_session(pth.dpd_db_path)
-    db = db_session.query(DpdHeadword).all()
-
+    db = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.sbs), joinedload(DpdHeadword.ru)).all()
+    
     counter = 0
     for i in db:
         # grab the text from the column
-        old_field = getattr(i, column)
+        if column.startswith("sbs_"):
+            if i.sbs:
+                old_field = getattr(i.sbs, column)
+            else:
+                old_field = ""
+        elif column.startswith("ru_"):
+            if i.ru:
+                old_field = getattr(i.ru, column)
+            else:
+                old_field = ""
+        else:
+            old_field = getattr(i, column)
 
         if find_char in old_field:
             new_field = old_field.replace(find_char, replace_char)
@@ -30,7 +43,12 @@ def main():
             print(f"[green]{old_field}")
             print(f"[light_green]{new_field}")
             print()
-            setattr(i, column, new_field)
+            if column.startswith("sbs_"):
+                setattr(i.sbs, column, new_field)
+            elif column.startswith("ru_"):
+                setattr(i.ru, column, new_field)
+            else:
+                setattr(i, column, new_field)
             counter += 1
 
     if counter > 0:

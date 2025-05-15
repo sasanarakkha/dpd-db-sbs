@@ -19,7 +19,7 @@ while true; do
             scripts/bash/generate_components.sh
             break;;
         * )
-            scripts/build/families_to_json.py
+            scripts/build/families_to_json_ru.py
             break;;
     esac
 done
