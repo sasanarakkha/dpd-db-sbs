@@ -7,11 +7,11 @@ from tools.tools_for_ru_exporter import (
 )
 from tools.configger import config_test
 from tools.date_and_time import year_month_day_dash
+from tools.degree_of_completion import degree_of_completion
+from tools.degree_of_completion_ru import rus_degree_of_completion
 from tools.meaning_construction import (
-    degree_of_completion,
     make_grammar_line,
     make_meaning_combo_html,
-    rus_degree_of_completion,
     summarize_construction,
 )
 

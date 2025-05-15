@@ -68,11 +68,14 @@ jobs:
     - name: Build the database
       run: uv run python scripts/build/db_rebuild_from_tsv.py
 
+    - name: Populating RU SBS tables
+      run: uv run python scripts/build/db_rebuild_from_tsv_ru_sbs.py
+
     - name: Run initial setup script
       run: uv run bash scripts/bash/initial_setup_run_once.sh
     
     - name: Create version
-      run: uv run python tools/version.py
+      run: uv run python tools/version_ru.py
 
     - name: Create Inflection Templates
       run: uv run python db/inflections/create_inflection_templates.py

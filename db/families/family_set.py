@@ -8,11 +8,9 @@ from db.db_helpers import get_db_session
 from db.models import DpdHeadword, FamilySet
 from tools.printer import printer as pr
 from tools.superscripter import superscripter_uni
-from tools.meaning_construction import (
-    degree_of_completion,
-    make_meaning_combo,
-    rus_degree_of_completion,
-)
+from tools.meaning_construction import make_meaning_combo
+from tools.degree_of_completion import degree_of_completion
+from tools.degree_of_completion_ru import rus_degree_of_completion
 from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
 from tools.configger import config_test

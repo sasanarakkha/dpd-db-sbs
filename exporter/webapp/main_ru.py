@@ -19,7 +19,7 @@ from exporter.webapp.preloads import (
 from exporter.webapp.toolkit import fuzzy_replace, make_dpd_html
 from tools.css_manager import CSSManager
 from tools.paths import ProjectPaths
-from tools.translit import auto_translit_to_roman
+from tools.translit_ru import auto_translit_to_roman
 
 app = FastAPI()
 app.add_middleware(GZipMiddleware, minimum_size=500)

@@ -12,21 +12,24 @@ from db.db_helpers import get_db_session
 from db.models import Russian, SBS, DpdRoot
 from tools.printer import printer as pr
 from tools.paths import ProjectPaths
+from tools.paths_dps import DPSPaths
+
 
 
 def backup_ru_sbs():
     pr.tic()
     print("[bright_yellow]backing russian and sbs tables to tsv")
     pth = ProjectPaths()
+    dpspth = DPSPaths()
     db_session = get_db_session(pth.dpd_db_path)
-    backup_russian(db_session, pth)
-    backup_sbs(db_session, pth)
-    backup_ru_roots(db_session, pth)
+    backup_russian(db_session, dpspth)
+    backup_sbs(db_session, dpspth)
+    backup_ru_roots(db_session, dpspth)
     db_session.close()
     pr.toc()
 
 
-def backup_russian(db_session: Session, pth: ProjectPaths, custom_path: str = ""):
+def backup_russian(db_session: Session, dpspth: DPSPaths, custom_path: str = ""):
     """Backup Russian table to TSV."""
     print("[green]Checking Russian table")
 
@@ -42,7 +45,7 @@ def backup_russian(db_session: Session, pth: ProjectPaths, custom_path: str = ""
     print("[green]Writing Russian table")
 
     # Use the custom path if provided, otherwise use the default path
-    russian_path = custom_path if custom_path else pth.russian_path
+    russian_path = custom_path if custom_path else dpspth.russian_path
 
     with open(russian_path, "w", newline="") as tsvfile:
         csvwriter = csv.writer(
@@ -56,7 +59,7 @@ def backup_russian(db_session: Session, pth: ProjectPaths, custom_path: str = ""
             csvwriter.writerow(row)
 
 
-def backup_sbs(db_session: Session, pth: ProjectPaths, custom_path: str = ""):
+def backup_sbs(db_session: Session, dpspth: DPSPaths, custom_path: str = ""):
     """Backup SBS tables to TSV."""
     print("[green]Checking SBS table")
 
@@ -72,7 +75,7 @@ def backup_sbs(db_session: Session, pth: ProjectPaths, custom_path: str = ""):
     print("[green]writing SBS table")
 
     # Use the custom path if provided, otherwise use the default path
-    sbs_path = custom_path if custom_path else pth.sbs_path
+    sbs_path = custom_path if custom_path else dpspth.sbs_path
 
     with open(sbs_path, "w", newline="") as tsvfile:
         csvwriter = csv.writer(
@@ -86,7 +89,7 @@ def backup_sbs(db_session: Session, pth: ProjectPaths, custom_path: str = ""):
             csvwriter.writerow(row)
 
 
-def backup_ru_roots(db_session: Session, pth: ProjectPaths, custom_path: str = ""):
+def backup_ru_roots(db_session: Session, dpspth: DPSPaths, custom_path: str = ""):
     """Backup Ru columns from the DpdRoot to TSV."""
     print("[green]Checking DpdRoot table")
 
@@ -109,7 +112,7 @@ def backup_ru_roots(db_session: Session, pth: ProjectPaths, custom_path: str = "
             print(f"[red]No root_ru_meaning: {record}")
 
     # Use the custom path if provided, otherwise use the default path
-    ru_root_path = custom_path if custom_path else pth.ru_root_path
+    ru_root_path = custom_path if custom_path else dpspth.ru_root_path
 
     with open(ru_root_path, "w", newline="") as tsvfile:
         used_columns = ["root", "root_ru_meaning", "sanskrit_root_ru_meaning"]

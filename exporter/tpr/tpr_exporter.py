@@ -19,6 +19,7 @@ from exporter.goldendict.export_dpd import render_dpd_definition_templ
 from tools.configger import config_test, config_read
 from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
+from tools.paths_ru import RuPaths
 from tools.printer import printer as pr
 from tools.headwords_clean_set import make_clean_headwords_set
 from tools.tsv_read_write import read_tsv
@@ -33,6 +34,7 @@ from tools.tools_for_ru_exporter import (
 class ProgData:
     def __init__(self) -> None:
         self.pth = ProjectPaths()
+        self.rupth = RuPaths()
         self.db_session: Session = get_db_session(self.pth.dpd_db_path)
         self.dpd_db = self.make_dpd_db()
 
@@ -551,7 +553,7 @@ def copy_zip_to_tpr_downloads(g: ProgData):
             download_list[27] = dpd_beta_info
 
         if version == "dpd_with_rus":
-            output_file = g.pth.tpr_with_rus_path
+            output_file = g.rupth.tpr_with_rus_path
             _zip_it_up(file_path, file_name, output_file)
             filesize = _file_size(output_file)
 

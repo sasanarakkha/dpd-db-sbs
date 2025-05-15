@@ -1,0 +1,46 @@
+#!/bin/bash
+
+PROJECT_DIR="$HOME/Documents/dpd-db"
+FOLDERS=(
+    db_tests
+    db_tests_gui
+    docs
+    go_modules
+    gui2
+    tools
+)
+FILES=(
+    pyproject.toml
+    README.md
+    # db/models.py
+)
+
+cd "$PROJECT_DIR" || exit 1
+
+# Update as_upstream branch
+git checkout as_upstream || exit 1
+git pull origin as_upstream || exit 1
+git fetch upstream || exit 1
+git reset --hard upstream/main || exit 1
+
+# Switch to sbs-ru and sync
+git checkout sbs-ru || exit 1
+
+echo "🔄 Syncing folders:"
+for FOLDER in "${FOLDERS[@]}"; do
+    echo "  - $FOLDER"
+    git checkout as_upstream -- "$FOLDER" || exit 1
+done
+
+echo "📄 Syncing files:"
+for FILE in "${FILES[@]}"; do
+    echo "  - $FILE"
+    git checkout as_upstream -- "$FILE" || exit 1
+done
+
+# Commit changes with date
+DATE=$(date +"%d-%m")
+git add "${FOLDERS[@]}" "${FILES[@]}" || exit 1
+git commit -m "sync: update from as_upstream ($DATE)" || exit 1
+
+echo "✅ Done!"

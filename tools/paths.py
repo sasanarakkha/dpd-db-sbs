@@ -18,9 +18,6 @@ class ProjectPaths:
         # backup_tsv
         self.pali_root_path = base_dir / "db/backup_tsv/dpd_roots.tsv"
         self.pali_word_path = base_dir / "db/backup_tsv/dpd_headwords.tsv"
-        self.ru_root_path = base_dir / "db/backup_tsv/ru_roots.tsv"
-        self.russian_path = base_dir / "db/backup_tsv/russian.tsv"
-        self.sbs_path = base_dir / "db/backup_tsv/sbs.tsv"
 
         # db/bold_definitions
         self.bold_definitions_json_path = (
@@ -213,9 +210,6 @@ class ProjectPaths:
         )
         self.root_header_templ_path = (
             base_dir / "exporter/goldendict/templates/root_header.html"
-        )
-        self.sbs_example_templ_path = (
-            base_dir / "exporter/goldendict/templates/sbs_example.html"
         )
         self.spelling_templ_path = (
             base_dir / "exporter/goldendict/templates/dpd_spelling_mistake.html"
@@ -487,9 +481,6 @@ class ProjectPaths:
         self.tpr_beta_path = (
             base_dir / "resources/tpr_downloads/release_zips/dpd_beta.zip"
         )
-        self.tpr_with_rus_path = (
-            base_dir / "resources/tpr_downloads/release_zips/dpd_with_rus.zip"
-        )
         self.tpr_download_list_path = (
             base_dir
             / "resources/tpr_downloads/download_source_files/download_list.json"
@@ -616,15 +607,19 @@ class ProjectPaths:
 
         # share/frequency
         self.cst_file_freq = base_dir / "shared_data/frequency/cst_file_freq.json"
+        self.cst_freq_json = base_dir / "shared_data/frequency/cst_freq.json"
         self.cst_wordlist = base_dir / "shared_data/frequency/cst_wordlist.json"
 
         self.bjt_file_freq = base_dir / "shared_data/frequency/bjt_file_freq.json"
+        self.bjt_freq_json = base_dir / "shared_data/frequency/bjt_freq.json"
         self.bjt_wordlist = base_dir / "shared_data/frequency/bjt_wordlist.json"
 
         self.sya_file_freq = base_dir / "shared_data/frequency/sya_file_freq.json"
+        self.sya_freq_json = base_dir / "shared_data/frequency/sya_freq.json"
         self.sya_wordlist = base_dir / "shared_data/frequency/sya_wordlist.json"
 
         self.sc_file_freq = base_dir / "shared_data/frequency/sc_file_freq.json"
+        self.sc_freq_json = base_dir / "shared_data/frequency/sc_freq.json"
         self.sc_wordlist = base_dir / "shared_data/frequency/sc_wordlist.json"
 
         # temp

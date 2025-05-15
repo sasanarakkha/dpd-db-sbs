@@ -255,6 +255,11 @@ class RuPaths:
             base_dir / "exporter/goldendict/ru_components/templates/help_help.html"
         )
 
+        # tpr
+        self.tpr_with_rus_path = (
+            base_dir / "resources/tpr_downloads/release_zips/dpd_with_rus.zip"
+        )
+
 
         # identity/
         self.dpd_css_path = base_dir / "identity/css/dpd.css"

@@ -37,19 +37,17 @@ from tools.exporter_functions import (
 )
 from tools.goldendict_exporter import DictEntry
 from tools.meaning_construction import make_meaning_combo_html, make_grammar_line
-from tools.meaning_construction import (
-    summarize_construction,
-    degree_of_completion,
-    rus_degree_of_completion,
-)
+from tools.degree_of_completion import degree_of_completion
+from tools.degree_of_completion_ru import rus_degree_of_completion
+from tools.meaning_construction import summarize_construction
 from tools.niggahitas import add_niggahitas
 from tools.paths import ProjectPaths
 from tools.pos import CONJUGATIONS, DECLENSIONS, INDECLINABLES
 from tools.printer import printer as pr
 from tools.sandhi_contraction import SandhiContractions
 from tools.superscripter import superscripter_uni
-from tools.utils import RenderedSizes, default_rendered_sizes, list_into_batches
-from tools.utils import sum_rendered_sizes, squash_whitespaces
+from tools.utils_sbs import RenderedSizes, default_rendered_sizes, list_into_batches
+from tools.utils_sbs import sum_rendered_sizes, squash_whitespaces
 
 from tools.paths_ru import RuPaths
 from tools.tools_for_ru_exporter import (

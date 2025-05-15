@@ -42,6 +42,7 @@ while true; do
         [Yy]* )
             # build dpd.db from scratch using backup_tsv
             scripts/build/db_rebuild_from_tsv.py
+            scripts/build/db_rebuild_from_tsv_ru_sbs.py
             db/bold_definitions/update_bold_definitions_db.py
             scripts/change_in_db/dps_add_additions_to_db.py
             scripts/bash/generate_components.sh

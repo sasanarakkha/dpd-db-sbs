@@ -4,7 +4,6 @@
 
 import csv
 import sys
-from tools.duplicates import has_duplicate_values_in_column
 
 from rich import print
 
@@ -12,7 +11,7 @@ from sqlalchemy.orm.session import Session
 
 from db.db_helpers import get_db_session
 from db.db_helpers import create_db_if_not_exists
-from db.models import DpdHeadword, DpdRoot, Russian, SBS
+from db.models import DpdHeadword, DpdRoot
 from tools.printer import printer as pr
 from tools.paths import ProjectPaths
 from tools.configger import config_update, config_test
@@ -37,42 +36,15 @@ def main():
 
     create_db_if_not_exists(pth.dpd_db_path)
 
-    # Define TSV files and their ID columns to check for duplicates
-    tsvs_to_check = [
-        {"path": pth.pali_word_path, "id_col": "id"},
-        {"path": pth.pali_root_path, "id_col": "root"}, 
-        {"path": pth.russian_path, "id_col": "id"},
-        {"path": pth.sbs_path, "id_col": "id"},
-        {"path": pth.ru_root_path, "id_col": "root"}
-    ]
-
-    # Check each TSV for duplicates before processing
-    for tsv_info in tsvs_to_check:
-        if not tsv_info["path"].exists():
-            pr.red(f"TSV backup file does not exist: {tsv_info['path']}")
+    for p in [pth.pali_root_path, pth.pali_word_path]:
+        if not p.exists():
+            pr.red(f"TSV backup file does not exist: {p}")
             sys.exit(1)
-        
-        has_dupes, dupes_list, dupes_lines = has_duplicate_values_in_column(
-            tsv_path=tsv_info["path"],
-            column_name=tsv_info["id_col"]
-        )
-        if has_dupes:
-            pr.red(f"Duplicate values found in '{tsv_info['path']}' (column: '{tsv_info['id_col']}'):")
-            for val in dupes_list:
-                lines = ", ".join(map(str, dupes_lines[val]))
-                pr.red(f"  - Value: '{val}' found on lines: {lines}")
-            pr.red("Please fix the TSV file and try again.")
-            sys.exit(1)
-        else:
-            pr.yes
 
     db_session = get_db_session(pth.dpd_db_path)
 
     make_pali_word_table_data(pth, db_session)
     make_pali_root_table_data(pth, db_session)
-    make_russian_table_data(pth, db_session)
-    make_sbs_table_data(pth, db_session)
-    make_ru_root_table_data(pth, db_session)
 
     pr.green("committing to db")
     db_session.commit()
@@ -87,8 +59,8 @@ def make_pali_word_table_data(pth: ProjectPaths, db_session: Session):
 
     pr.green("creating DpdHeadword table data")
     counter = 0
-    with open(pth.pali_word_path, "r", newline="") as tsvfile:
-        csvreader = csv.reader(tsvfile, delimiter="\t", quotechar='"')
+    with open(pth.pali_word_path, "r", newline="") as tsv_file:
+        csvreader = csv.reader(tsv_file, delimiter="\t", quotechar='"')
         columns = next(csvreader)
         for row in csvreader:
             data = {}
@@ -104,8 +76,8 @@ def make_pali_root_table_data(pth: ProjectPaths, db_session: Session):
     """Read TSV and return DpdRoot table data."""
     pr.green("creating DpdRoot table data")
     counter = 0
-    with open(pth.pali_root_path, "r", newline="") as tsvfile:
-        csvreader = csv.reader(tsvfile, delimiter="\t", quotechar='"')
+    with open(pth.pali_root_path, "r", newline="") as tsv_file:
+        csvreader = csv.reader(tsv_file, delimiter="\t", quotechar='"')
         columns = next(csvreader)
         for row in csvreader:
             data = {}
@@ -120,62 +92,6 @@ def make_pali_root_table_data(pth: ProjectPaths, db_session: Session):
                 ):
                     data[col_name] = value
             db_session.add(DpdRoot(**data))
-            counter += 1
-    pr.yes(counter)
-
-
-def make_russian_table_data(pth: ProjectPaths, db_session: Session):
-    """Read TSV and return Russian table data."""
-    pr.green("creating Russian table data")
-    counter = 0
-    with open(pth.russian_path, "r", newline="") as tsvfile:
-        csvreader = csv.reader(tsvfile, delimiter="\t", quotechar='"')
-        columns = next(csvreader)
-        for row in csvreader:
-            data = {}
-            for col_name, value in zip(columns, row):
-                data[col_name] = value
-            db_session.add(Russian(**data))
-            counter += 1
-    pr.yes(counter)
-
-
-def make_sbs_table_data(pth: ProjectPaths, db_session: Session):
-    """Read TSV and return SBS table data."""
-    pr.green("creating SBS table data")
-    counter = 0
-    with open(pth.sbs_path, "r", newline="") as tsvfile:
-        csvreader = csv.reader(tsvfile, delimiter="\t", quotechar='"')
-        columns = next(csvreader)
-        for row in csvreader:
-            data = {}
-            for col_name, value in zip(columns, row):
-                data[col_name] = value
-            db_session.add(SBS(**data))
-            counter += 1
-    pr.yes(counter)
-
-
-def make_ru_root_table_data(pth: ProjectPaths, db_session: Session):
-    """Read TSV and return ru columns from DpdRoot."""
-    pr.green("filling ru in DpdRoot table")
-    counter = 0
-    with open(pth.ru_root_path, "r", newline="") as tsvfile:
-        csvreader = csv.reader(tsvfile, delimiter="\t", quotechar='"')
-        columns = next(csvreader)
-        for row in csvreader:
-            data = {}
-            for col_name, value in zip(columns, row):
-                # Include 'root' in the data dictionary
-                data[col_name] = value
-            existing_record = (
-                db_session.query(DpdRoot).filter_by(root=data["root"]).first()
-            )
-            if existing_record:
-                for key, value in data.items():
-                    setattr(existing_record, key, value)
-            else:
-                db_session.add(DpdRoot(**data))
             counter += 1
     pr.yes(counter)
 

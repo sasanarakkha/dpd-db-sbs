@@ -20,7 +20,7 @@ from tools.configger import config_test
 from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
-from tools.uposatha_day import read_uposatha_count, uposatha_today, write_uposatha_count
+from tools.uposatha_day import UposathaManger
 
 
 class GlobalVars:
@@ -35,7 +35,8 @@ class GlobalVars:
             self.db_session.query(Lookup).filter(Lookup.deconstructor != "").all()
         )
 
-        self.last_id: str = read_uposatha_count()
+        uposatha_count = UposathaManger.read_uposatha_count()
+        self.last_id: str = str(uposatha_count) if uposatha_count is not None else "0"
 
         self.new_words_db: List[DpdHeadword] = (
             self.db_session.query(DpdHeadword)
@@ -77,7 +78,7 @@ def get_dpd_size(g: GlobalVars) -> None:
 
     for i in g.dpd_db:
         if i.meaning_1:
-            if i.example_1:
+            if i.source_1:
                 total_complete += 1
             else:
                 total_partially_complete += 1
@@ -150,7 +151,7 @@ def get_inflection_size(g: GlobalVars) -> None:
         total_inflections += len(inflections)
         all_inflection_set.update(inflections)
 
-    line4: str = f"{len(all_inflection_set):_} unique inflected forms recognised"
+    line4: str = f"{len(all_inflection_set):_} unique inflected forms recognized"
     line4 = line4.replace("_", " ")
 
     g.line_4_inflections = line4
@@ -249,10 +250,10 @@ This work is licensed under a <a rel="license" href="https://creativecommons.org
 - {g.line_4_inflections}
 - {g.line_5_cell_of_pali_data}
 - {g.line_6_cells_of_root_data}
-- Pass1 complete: VIN1-2, DN1-3, MN1-3, SN1-5, AN1-11, KN1-5, KN8-9
-- Pass1 in progress: VIN3
+- Pass1 complete: VIN1-3, DN1-3, MN1-3, SN1-5, AN1-11, KN1-5, KN8-9
+- Pass1 in progress: VIN4
 - Pass2 complete: DN1, DN2, MN1
-- Pass2 in progress: DN3 
+- Pass2 in progress: DN3
 - numerous additions and corrections based on user feedback
 
 """
@@ -327,9 +328,9 @@ def main() -> str | None:
     g.changelog = make_website_changelog(g)
     g.release_notes = make_release_notes(g)
 
-    if uposatha_today():
+    if UposathaManger.uposatha_today():
         last_id: int = g.dpd_db[-1].id
-        write_uposatha_count(last_id)
+        UposathaManger.write_uposatha_count(last_id)
         update_website_changelog(g)
 
     write_to_file(g)

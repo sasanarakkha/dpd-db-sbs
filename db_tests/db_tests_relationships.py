@@ -16,7 +16,7 @@ from db.models import FamilyCompound
 from tools.printer import printer as pr
 from tools.pali_alphabet import consonants
 from tools.paths import ProjectPaths
-from tools.sandhi_contraction import make_sandhi_contraction_dict
+from tools.sandhi_contraction import SandhiContractionFinder
 
 # generic tests that return tuples of results
 # that can be printed or displayed in gui
@@ -852,7 +852,8 @@ def sandhi_contraction_errors(db_session) -> tuple:
     """Test if there are errors in in sandhi apostropes.
     e.g. aham'pi / ahamp'i, n'eva / ne'va"""
 
-    sandhi_contractions = make_sandhi_contraction_dict(db_session)
+    sandhi_finder = SandhiContractionFinder()
+    sandhi_contractions = sandhi_finder.get_sandhi_contractions()
     results = ""
     exceptions = [
         "maññeti",
@@ -862,7 +863,7 @@ def sandhi_contraction_errors(db_session) -> tuple:
     counter = 0
 
     for key, values in sandhi_contractions.items():
-        contractions = values["contractions"]
+        contractions = values.contractions
 
         if len(contractions) > 1 and key not in exceptions:
             results += f"{counter}. {key}: \n"
@@ -870,7 +871,7 @@ def sandhi_contraction_errors(db_session) -> tuple:
             for contraction in contractions:
                 results += f"{contraction}\n"
 
-            ids = values["ids"]
+            ids = values.ids
             results += f"/^({'|'.join(ids)})$/\n"
             results += "\n"
             counter += 1
