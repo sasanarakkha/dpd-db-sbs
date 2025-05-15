@@ -7,12 +7,19 @@ FOLDERS=(
     docs
     go_modules
     gui2
+    scripts
     tools
 )
 FILES=(
+    .clinerules
+    .gitattributes
+    .gitignore
+    .gitmodules
+    go.mod
+    go.sum
+    mkdocs.yaml
     pyproject.toml
     README.md
-    # db/models.py
 )
 
 cd "$PROJECT_DIR" || exit 1
