@@ -25,8 +25,7 @@ from db.models import FamilyIdiom
 from db.models import FamilyRoot
 from db.models import FamilySet
 from db.models import FamilyWord
-from db.models import Russian
-from db.models import SBS
+
 
 from tools.configger import config_test
 from tools.css_manager import CSSManager
@@ -80,14 +79,12 @@ class DpdHeadwordTemplates:
         self.button_js = ""
 
 
-DpdHeadwordDbRowItems = Tuple[DpdHeadword, FamilyRoot, FamilyWord, SBS, Russian]
+DpdHeadwordDbRowItems = Tuple[DpdHeadword, FamilyRoot, FamilyWord]
 
 
 class DpdHeadwordDbParts(TypedDict):
     pali_word: DpdHeadword
     pali_root: DpdRoot
-    sbs: SBS
-    ru: Russian
     family_root: FamilyRoot
     family_word: FamilyWord
     family_compounds: List[FamilyCompound]
@@ -120,8 +117,6 @@ def render_pali_word_dpd_html(
 
     i: DpdHeadword = db_parts["pali_word"]
     rt: DpdRoot = db_parts["pali_root"]
-    sbs: SBS = db_parts["sbs"]
-    ru: Russian = db_parts["ru"]
     fr: FamilyRoot = db_parts["family_root"]
     fw: FamilyWord = db_parts["family_word"]
     fc: List[FamilyCompound] = db_parts["family_compounds"]
@@ -156,45 +151,45 @@ def render_pali_word_dpd_html(
         i.example_2 = i.example_2.replace("\n", "<br>")
     if i.notes:
         i.notes = i.notes.replace("\n", "<br>")
-    if show_ru_data and ru:
-        ru.ru_notes = ru.ru_notes.replace("\n, ", "<br>")
-    if show_sbs_data and sbs:
-        if sbs.sbs_sutta_1:
-            sbs.sbs_sutta_1 = sbs.sbs_sutta_1.replace("\n", "<br>")
-        if sbs.sbs_sutta_2:
-            sbs.sbs_sutta_2 = sbs.sbs_sutta_2.replace("\n", "<br>")
-        if sbs.sbs_sutta_3:
-            sbs.sbs_sutta_3 = sbs.sbs_sutta_3.replace("\n", "<br>")
-        if sbs.sbs_sutta_4:
-            sbs.sbs_sutta_4 = sbs.sbs_sutta_4.replace("\n", "<br>")
-        if sbs.sbs_example_1:
-            sbs.sbs_example_1 = sbs.sbs_example_1.replace("\n", "<br>")
-        if sbs.sbs_example_2:
-            sbs.sbs_example_2 = sbs.sbs_example_2.replace("\n", "<br>")
-        if sbs.sbs_example_3:
-            sbs.sbs_example_3 = sbs.sbs_example_3.replace("\n", "<br>")
-        if sbs.sbs_example_4:
-            sbs.sbs_example_4 = sbs.sbs_example_4.replace("\n", "<br>")
-        if sbs.dhp_example:
-            sbs.dhp_example = sbs.dhp_example.replace("\n", "<br>")
-        if sbs.dhp_source:
-            sbs.dhp_source = sbs.dhp_source.replace("\n", "<br>")
-        if sbs.pat_example:
-            sbs.pat_example = sbs.pat_example.replace("\n", "<br>")
-        if sbs.pat_source:
-            sbs.pat_source = sbs.pat_source.replace("\n", "<br>")
-        if sbs.vib_example:
-            sbs.vib_example = sbs.vib_example.replace("\n", "<br>")
-        if sbs.vib_source:
-            sbs.vib_source = sbs.vib_source.replace("\n", "<br>")
-        if sbs.class_example:
-            sbs.class_example = sbs.class_example.replace("\n", "<br>")
-        if sbs.class_source:
-            sbs.class_source = sbs.class_source.replace("\n", "<br>")
-        if sbs.discourses_example:
-            sbs.discourses_example = sbs.discourses_example.replace("\n", "<br>")
-        if sbs.discourses_source:
-            sbs.discourses_source = sbs.discourses_source.replace("\n", "<br>")
+    if show_ru_data and i.ru:
+        i.ru.ru_notes = i.ru.ru_notes.replace("\n, ", "<br>")
+    if show_sbs_data and i.sbs:
+        if i.sbs.sbs_sutta_1:
+            i.sbs.sbs_sutta_1 = i.sbs.sbs_sutta_1.replace("\n", "<br>")
+        if i.sbs.sbs_sutta_2:
+            i.sbs.sbs_sutta_2 = i.sbs.sbs_sutta_2.replace("\n", "<br>")
+        if i.sbs.sbs_sutta_3:
+            i.sbs.sbs_sutta_3 = i.sbs.sbs_sutta_3.replace("\n", "<br>")
+        if i.sbs.sbs_sutta_4:
+            i.sbs.sbs_sutta_4 = i.sbs.sbs_sutta_4.replace("\n", "<br>")
+        if i.sbs.sbs_example_1:
+            i.sbs.sbs_example_1 = i.sbs.sbs_example_1.replace("\n", "<br>")
+        if i.sbs.sbs_example_2:
+            i.sbs.sbs_example_2 = i.sbs.sbs_example_2.replace("\n", "<br>")
+        if i.sbs.sbs_example_3:
+            i.sbs.sbs_example_3 = i.sbs.sbs_example_3.replace("\n", "<br>")
+        if i.sbs.sbs_example_4:
+            i.sbs.sbs_example_4 = i.sbs.sbs_example_4.replace("\n", "<br>")
+        if i.sbs.dhp_example:
+            i.sbs.dhp_example = i.sbs.dhp_example.replace("\n", "<br>")
+        if i.sbs.dhp_source:
+            i.sbs.dhp_source = i.sbs.dhp_source.replace("\n", "<br>")
+        if i.sbs.pat_example:
+            i.sbs.pat_example = i.sbs.pat_example.replace("\n", "<br>")
+        if i.sbs.pat_source:
+            i.sbs.pat_source = i.sbs.pat_source.replace("\n", "<br>")
+        if i.sbs.vib_example:
+            i.sbs.vib_example = i.sbs.vib_example.replace("\n", "<br>")
+        if i.sbs.vib_source:
+            i.sbs.vib_source = i.sbs.vib_source.replace("\n", "<br>")
+        if i.sbs.class_example:
+            i.sbs.class_example = i.sbs.class_example.replace("\n", "<br>")
+        if i.sbs.class_source:
+            i.sbs.class_source = i.sbs.class_source.replace("\n", "<br>")
+        if i.sbs.discourses_example:
+            i.sbs.discourses_example = i.sbs.discourses_example.replace("\n", "<br>")
+        if i.sbs.discourses_source:
+            i.sbs.discourses_source = i.sbs.discourses_source.replace("\n", "<br>")
 
     html: str = ""
     html += "<body>"
@@ -203,8 +198,6 @@ def render_pali_word_dpd_html(
         pth,
         i,
         tt.dpd_definition_templ,
-        sbs,
-        ru,
         rd["make_link"],
         rd["show_id"],
         rd["show_sbs_data"],
@@ -216,7 +209,6 @@ def render_pali_word_dpd_html(
     button_box = render_button_box_templ(
         pth,
         i,
-        sbs,
         rd["cf_set"],
         rd["idioms_set"],
         tt.button_box_templ,
@@ -230,8 +222,6 @@ def render_pali_word_dpd_html(
             pth,
             i,
             rt,
-            sbs,
-            ru,
             tt.grammar_templ,
             rd["show_sbs_data"],
             rd["show_ru_data"],
@@ -244,9 +234,9 @@ def render_pali_word_dpd_html(
         html += example
         size_dict["dpd_example"] += len(example)
 
-    if show_sbs_data and sbs and sbs.needs_sbs_example_button:
+    if show_sbs_data and i.sbs and i.sbs.needs_sbs_example_button:
         sbs_example = render_sbs_example_templ(
-            pth, i, sbs, tt.sbs_example_templ, rd["make_link"]
+            pth, i, tt.sbs_example_templ, rd["make_link"]
         )
         html += sbs_example
         size_dict["sbs_example"] += len(sbs_example)
@@ -419,13 +409,11 @@ def generate_dpd_html(
 
     while offset <= pali_words_count:
         dpd_db_query = (
-            db_session.query(DpdHeadword, FamilyRoot, FamilyWord, SBS, Russian)
+            db_session.query(DpdHeadword, FamilyRoot, FamilyWord)
             .outerjoin(
                 FamilyRoot, DpdHeadword.root_family_key == FamilyRoot.root_family_key
             )
             .outerjoin(FamilyWord, DpdHeadword.family_word == FamilyWord.word_family)
-            .outerjoin(Russian, DpdHeadword.id == Russian.id)
-            .outerjoin(SBS, DpdHeadword.id == SBS.id)
             .options(
                 joinedload(DpdHeadword.rt),
                 joinedload(DpdHeadword.ru),
@@ -440,21 +428,15 @@ def generate_dpd_html(
             pw: DpdHeadword
             fr: FamilyRoot
             fw: FamilyWord
-            sbs: SBS
-            ru: Russian
             (
                 pw,
                 fr,
                 fw,
-                sbs,
-                ru
             ) = i
 
             return DpdHeadwordDbParts(
                 pali_word=pw,
                 pali_root=pw.rt,
-                sbs=sbs,
-                ru=ru,
                 family_root=fr,
                 family_word=fw,
                 family_compounds=get_family_compounds(pw),
@@ -517,8 +499,6 @@ def render_dpd_definition_templ(
     __pth__: ProjectPaths,
     i: DpdHeadword,
     dpd_definition_templ: Template,
-    sbs: SBS | None,
-    ru: Russian | None,
     make_link=False,
     show_id=False,
     show_sbs_data=False,
@@ -541,7 +521,7 @@ def render_dpd_definition_templ(
     # meaning
     meaning = make_meaning_combo_html(i)
     summary = summarize_construction(i)
-    if show_ru_data and ru:
+    if show_ru_data and i.ru:
         complete = rus_degree_of_completion(i)
     else:
         complete = degree_of_completion(i)
@@ -552,7 +532,6 @@ def render_dpd_definition_templ(
     return str(
         dpd_definition_templ.render(
             i=i,
-            sbs=sbs,
             make_link=make_link,
             pos=pos,
             plus_case=plus_case,
@@ -569,7 +548,6 @@ def render_dpd_definition_templ(
 def render_button_box_templ(
     __pth__: ProjectPaths,
     i: DpdHeadword,
-    sbs: SBS,
     cf_set: Set[str],
     idioms_set: Set[str],
     button_box_templ: Template,
@@ -604,8 +582,8 @@ def render_button_box_templ(
     # sbs_example_button
     if (
         show_sbs_data
-        and sbs
-        and sbs.needs_sbs_example_button
+        and i.sbs
+        and i.sbs.needs_sbs_example_button
     ):
         sbs_example_button = button_html.format(
             target=f"sbs_example_{i.lemma_1_}", name="SBS"
@@ -714,8 +692,6 @@ def render_grammar_templ(
     __pth__: ProjectPaths,
     i: DpdHeadword,
     rt: DpdRoot,
-    sbs: SBS,
-    ru: Russian,
     grammar_templ: Template,
     show_sbs_data=False,
     show_ru_data=False,
@@ -735,7 +711,6 @@ def render_grammar_templ(
         grammar_templ.render(
             i=i,
             rt=rt,
-            sbs=sbs,
             show_sbs_data=show_sbs_data,
             show_ru_data=show_ru_data,
             grammar=grammar,
@@ -759,13 +734,12 @@ def render_example_templ(
 def render_sbs_example_templ(
     __pth__: ProjectPaths,
     i: DpdHeadword,
-    sbs: SBS,
     sbs_example_templ: Template,
     make_link=False,
 ) -> str:
     """render sbs examples html"""
 
-    return str(sbs_example_templ.render(i=i, sbs=sbs, make_link=make_link))
+    return str(sbs_example_templ.render(i=i, make_link=make_link))
 
 
 def render_inflection_templ(

@@ -1,15 +1,15 @@
 <div class="dpd">
     <p>
         % if show_sbs_data and sbs:
-            % if sbs.sbs_class_anki:
-                <a class="link" href="${sbs.sbs_class_link}"><i>(cl.${sbs.sbs_class_anki})</i></a>
+            % if i.sbs.sbs_class_anki:
+                <a class="link" href="${i.sbs.sbs_class_link}"><i>(cl.${i.sbs.sbs_class_anki})</i></a>
                 <span class="gray"> | </span>
             % endif
-            % if sbs.sbs_category:
-                <a class="link" href="${sbs.sbs_sutta_link}"><i>(${sbs.sbs_category})</i></a> | 
+            % if i.sbs.sbs_category:
+                <a class="link" href="${i.sbs.sbs_sutta_link}"><i>(${i.sbs.sbs_category})</i></a> | 
             % endif
-            % if sbs.sbs_patimokkha:
-                <a class="link" href="${sbs.sbs_patimokkha_link}"><i>(${sbs.sbs_patimokkha})</i></a> | 
+            % if i.sbs.sbs_patimokkha:
+                <a class="link" href="${i.sbs.sbs_patimokkha_link}"><i>(${i.sbs.sbs_patimokkha})</i></a> | 
             % endif
         % endif
         ${pos}. 
