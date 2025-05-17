@@ -22,27 +22,16 @@ def make_roots_count_dict(db_session: Session) -> Dict[str, int]:
     return roots_count_dict
 
 
-def make_headwords_clean_set(db_session: Session, lang="en") -> set[str]:
+def make_headwords_clean_set(db_session: Session) -> set[str]:
     """Make a set of Pāḷi headwords and English meanings."""
 
     # add headwords
     results = db_session.query(DpdHeadword).all()
     headwords_clean_set = set([i.lemma_clean for i in results])
 
-    if lang == "en":
-        # add all english meanings
-        results = db_session.query(Lookup).filter(Lookup.epd != "").all()
-        headwords_clean_set.update([i.lookup_key for i in results])
-
-    if lang == "ru":
-        # add all english and russian meanings
-        results = (
-            db_session.query(Lookup)
-            .filter(Lookup.epd != "")
-            .filter(Lookup.rpd != "")
-            .all()
-        )
-        headwords_clean_set.update([i.lookup_key for i in results])
+    # add all english meanings
+    results = db_session.query(Lookup).filter(Lookup.epd != "").all()
+    headwords_clean_set.update([i.lookup_key for i in results])
 
     return headwords_clean_set
 

@@ -62,11 +62,6 @@ class DPSPaths:
         self.dps_test_1_path = base_dir.joinpath(Path("temp/dps_test_1.tsv"))
         self.dps_test_2_path = base_dir.joinpath(Path("temp/dps_test_2.tsv"))
 
-        # exporter/goldendict/
-        self.sbs_example_templ_path = (
-            base_dir / "exporter/goldendict/templates/sbs_example.html"
-        )
-
         # /gui/stash
         self.dps_stash_path = base_dir.joinpath(Path("gui/stash/dps_stash.json"))
         self.dps_save_state_path = base_dir.joinpath(Path("gui/stash/dps_gui_state"))

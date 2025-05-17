@@ -1,8 +1,6 @@
 import difflib
 import re
 
-from sqlalchemy.orm import joinedload
-
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword, DpdRoot, FamilyRoot, Lookup
 from exporter.webapp.data_classes import (
@@ -13,7 +11,6 @@ from exporter.webapp.data_classes import (
     HeadwordData,
     HelpData,
     RootsData,
-    RpdData,
     SpellingData,
     VariantData,
 )
@@ -38,7 +35,6 @@ def make_dpd_html(
     roots_count_dict,
     headwords_clean_set,
     ascii_to_unicode_dict,
-    lang="en",
 ) -> tuple[str, str]:
     retries = 3
     for attempt in range(retries):
@@ -48,9 +44,6 @@ def make_dpd_html(
                     dpd_html = ""
                     summary_html = ""
                     q = q.replace("'", "").replace("ṁ", "ṃ").strip()
-
-                    if lang == "ru":
-                        q = q.casefold()
 
                     lookup_results = (
                         db_session.query(Lookup)
@@ -67,7 +60,6 @@ def make_dpd_html(
                                 headword_results = (
                                     db_session.query(DpdHeadword)
                                     .filter(DpdHeadword.id.in_(headwords))
-                                    .options(joinedload(DpdHeadword.ru))
                                     .all()
                                 )
                                 headword_results = sorted(
@@ -144,13 +136,6 @@ def make_dpd_html(
                                     d=d
                                 )
 
-                            # rpd
-                            if lang == "ru" and lookup_result.rpd:
-                                d = RpdData(lookup_result)
-                                dpd_html += templates.get_template("rpd.html").render(
-                                    d=d
-                                )
-
                             # variant
                             if lookup_result.variant:
                                 d = VariantData(lookup_result)
@@ -171,7 +156,6 @@ def make_dpd_html(
                         headword_result = (
                             db_session.query(DpdHeadword)
                             .filter(DpdHeadword.id == search_term)
-                            .options(joinedload(DpdHeadword.ru))
                             .first()
                         )
                         if headword_result:
@@ -186,14 +170,13 @@ def make_dpd_html(
                         # return closest matches
                         else:
                             dpd_html = find_closest_matches(
-                                q, headwords_clean_set, ascii_to_unicode_dict, lang
+                                q, headwords_clean_set, ascii_to_unicode_dict
                             )
 
                     elif re.search(r"\s\d", q):  # eg "kata 5"
                         headword_result = (
                             db_session.query(DpdHeadword)
                             .filter(DpdHeadword.lemma_1 == q)
-                            .options(joinedload(DpdHeadword.ru))
                             .first()
                         )
                         if headword_result:
@@ -208,13 +191,13 @@ def make_dpd_html(
                         # return closest matches
                         else:
                             dpd_html = find_closest_matches(
-                                q, headwords_clean_set, ascii_to_unicode_dict, lang
+                                q, headwords_clean_set, ascii_to_unicode_dict
                             )
 
                     # or finally return closest matches
                     else:
                         dpd_html = find_closest_matches(
-                            q, headwords_clean_set, ascii_to_unicode_dict, lang
+                            q, headwords_clean_set, ascii_to_unicode_dict
                         )
 
                     return dpd_html, summary_html
@@ -226,9 +209,6 @@ def make_dpd_html(
         dpd_html = ""
         summary_html = ""
         q = q.replace("'", "").replace("ṁ", "ṃ").strip()
-
-        if lang == "ru":
-            q = q.casefold()
 
         lookup_results = (
             db_session.query(Lookup).filter(Lookup.lookup_key.ilike(q)).all()
@@ -244,7 +224,6 @@ def make_dpd_html(
                     headword_results = (
                         db_session.query(DpdHeadword)
                         .filter(DpdHeadword.id.in_(headwords))
-                        .options(joinedload(DpdHeadword.ru))
                         .all()
                     )
                     headword_results = sorted(
@@ -315,11 +294,6 @@ def make_dpd_html(
                     d = EpdData(lookup_result)
                     dpd_html += templates.get_template("epd.html").render(d=d)
 
-                # rpd
-                if lang == "ru" and lookup_result.rpd:
-                    d = RpdData(lookup_result)
-                    dpd_html += templates.get_template("rpd.html").render(d=d)
-
         # the two cases below search directly in the DpdHeadwords table
 
         elif q.isnumeric():  # eg 78654
@@ -327,7 +301,6 @@ def make_dpd_html(
             headword_result = (
                 db_session.query(DpdHeadword)
                 .filter(DpdHeadword.id == search_term)
-                .options(joinedload(DpdHeadword.ru))
                 .first()
             )
             if headword_result:
@@ -340,15 +313,12 @@ def make_dpd_html(
             # return closest matches
             else:
                 dpd_html = find_closest_matches(
-                    q, headwords_clean_set, ascii_to_unicode_dict, lang
+                    q, headwords_clean_set, ascii_to_unicode_dict
                 )
 
         elif re.search(r"\s\d", q):  # eg "kata 5"
             headword_result = (
-                db_session.query(DpdHeadword)
-                .filter(DpdHeadword.lemma_1 == q)
-                .options(joinedload(DpdHeadword.ru))
-                .first()
+                db_session.query(DpdHeadword).filter(DpdHeadword.lemma_1 == q).first()
             )
             if headword_result:
                 fc = get_family_compounds(headword_result)
@@ -360,21 +330,23 @@ def make_dpd_html(
             # return closest matches
             else:
                 dpd_html = find_closest_matches(
-                    q, headwords_clean_set, ascii_to_unicode_dict, lang
+                    q, headwords_clean_set, ascii_to_unicode_dict
                 )
 
         # or finally return closest matches
 
         else:
             dpd_html = find_closest_matches(
-                q, headwords_clean_set, ascii_to_unicode_dict, lang
+                q, headwords_clean_set, ascii_to_unicode_dict
             )
 
     return dpd_html, summary_html
 
 
 def find_closest_matches(
-    q, headwords_clean_set, ascii_to_unicode_dict, lang="en"
+    q,
+    headwords_clean_set,
+    ascii_to_unicode_dict,
 ) -> str:
     ascii_matches = ascii_to_unicode_dict[q]
     closest_headword_matches = difflib.get_close_matches(
@@ -387,25 +359,14 @@ def find_closest_matches(
         [item for item in closest_headword_matches if item not in ascii_matches]
     )
 
-    if lang == "en":
-        string = "<h3>No results found. "
-        if combined_list:
-            string += "The closest matches are:</h3><br>"
-            string += "<p>"
-            string += ", ".join(combined_list)
-            string += "</p>"
-        else:
-            string += "</h3>"
-
-    if lang == "ru":
-        string = "<h3>Ничего не найдено. "
-        if combined_list:
-            string += "Ближайшие совпадения:</h3><br>"
-            string += "<p>"
-            string += ", ".join(combined_list)
-            string += "</p>"
-        else:
-            string += "</h3>"
+    string = "<h3>No results found. "
+    if combined_list:
+        string += "The closest matches are:</h3><br>"
+        string += "<p>"
+        string += ", ".join(combined_list)
+        string += "</p>"
+    else:
+        string += "</h3>"
 
     return string
 

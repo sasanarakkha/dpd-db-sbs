@@ -10,11 +10,11 @@ from sqlalchemy.orm import Session
 
 from db.db_helpers import get_db_session
 
-from exporter.goldendict.export_dpd import generate_dpd_html
-from exporter.goldendict.export_epd import generate_epd_html
-from exporter.goldendict.export_help import generate_help_html
-from exporter.goldendict.export_roots import generate_root_html
-from exporter.goldendict.export_variant_spelling import generate_variant_spelling_html
+from exporter.goldendict.export_dpd_ru import generate_dpd_html
+from exporter.goldendict.export_rpd import generate_epd_html
+from exporter.goldendict.export_help_ru import generate_help_html
+from exporter.goldendict.export_roots_ru import generate_root_html
+from exporter.goldendict.export_variant_spelling_ru import generate_variant_spelling_html
 from exporter.goldendict.helpers import make_roots_count_dict
 from tools.cache_load import load_cf_set, load_idioms_set
 from tools.configger import config_read, config_test
@@ -26,6 +26,7 @@ from tools.goldendict_exporter import (
 )
 from tools.mdict_exporter import export_to_mdict
 from tools.paths import ProjectPaths
+from tools.paths_ru import RuPaths
 from tools.printer import printer as pr
 from tools.sandhi_contraction import SandhiContractionFinder
 from tools.utils import RenderedSizes, sum_rendered_sizes
@@ -34,6 +35,7 @@ from tools.utils import RenderedSizes, sum_rendered_sizes
 class ProgData:
     def __init__(self) -> None:
         self.pth = ProjectPaths()
+        self.rupth = RuPaths()
         self.db_session: Session = get_db_session(self.pth.dpd_db_path)
         self.sandhi_finder = SandhiContractionFinder()
         self.sandhi_contractions = self.sandhi_finder.get_sandhi_contractions_simple()
@@ -51,16 +53,8 @@ class ProgData:
         self.make_link: bool = False
         if config_test("dictionary", "make_link", "yes"):
             self.make_link: bool = True
-        self.show_sbs_data: bool = False
-        self.show_ru_data: bool = False
 
-        if config_test("dictionary", "show_sbs_data", "yes"):
-            self.show_sbs_data: bool = True
-
-        if config_test("dictionary", "show_ru_data", "yes"):
-            self.show_ru_data: bool = True
-
-        self.paths = self.pth
+        self.paths = self.rupth
 
 
 def main():
@@ -76,30 +70,32 @@ def main():
 
     dpd_data_list, sizes = generate_dpd_html(
         g.db_session,
-        g.pth,
+        g.rupth,
         g.sandhi_contractions,
         g.cf_set,
         g.idioms_set,
         g.make_link,
-        g.show_sbs_data,
-        g.show_ru_data,
         g.data_limit,
     )
     g.rendered_sizes.append(sizes)
 
     if g.data_limit == 0:
         root_data_list, sizes = generate_root_html(
-            g.db_session, g.pth, g.roots_count_dict, g.show_ru_data
+            g.db_session, g.pth, g.roots_count_dict, g.rupth
         )
         g.rendered_sizes.append(sizes)
 
-        variant_spelling_data_list, sizes = generate_variant_spelling_html(g.pth)
+        variant_spelling_data_list, sizes = generate_variant_spelling_html(
+            g.pth, g.rupth
+        )
         g.rendered_sizes.append(sizes)
 
-        epd_data_list, sizes = generate_epd_html(g.db_session, g.pth, g.show_ru_data)
+        epd_data_list, sizes = generate_epd_html(
+            g.db_session, g.pth, g.rupth, g.make_link)
         g.rendered_sizes.append(sizes)
 
-        help_data_list, sizes = generate_help_html(g.db_session, g.pth, g.show_ru_data)
+        help_data_list, sizes = generate_help_html(
+            g.db_session, g.pth, g.rupth)
         g.rendered_sizes.append(sizes)
 
         g.db_session.close()
@@ -129,22 +125,25 @@ def prepare_export_to_goldendict_mdict(g: ProgData) -> None:
     """Prepare info and variables for export."""
 
     description = """
-    <p>Digital Pāḷi Dictionary by Bodhirasa</p>
-    <p>For more information, please visit
-    <a href=\"https://digitalpalidictionary.github.io\">
-    the Digital Pāḷi Dictionary website</a></p>
-    """
+    <p>Электронный Словарь Пали Дост. Бодхираса</p>
+    <p>Переведен на русский Бхиккху Дэвамитта</p>
+    <p>Для более детальной информации можено посетить
+    <a href=\"https://devamitta.github.io/dpd.rus/\">
+    сайт Пали Словаря</a></p>
+    и оригинальный сайт <a href=\"https://digitalpalidictionary.github.io\">
+    Digital Pāḷi Dictionary</a></p>
+"""
 
     dict_info = DictInfo(
-        bookname="Digital Pāḷi Dictionary",
-        author="Bodhirasa",
+        bookname="Электронный Словарь Пали",
+        author="Дост. Бодхираса, переведено Бхиккху Дэвамитта",
         description=description,
-        website="https://digitalpalidictionary.github.io/",
+        website="https://devamitta.github.io/dpd.rus/",
         source_lang="pi",
-        target_lang="en",
+        target_lang="ru",
     )
 
-    dict_name = "dpd"
+    dict_name = "ru-dpd"
 
     dict_var = DictVariables(
         css_paths=[g.paths.dpd_css_and_fonts_path],

@@ -5,26 +5,26 @@
 import csv
 import json
 import os
-import pandas as pd
 import re
 import sqlite3
+from zipfile import ZIP_DEFLATED, ZipFile
 
+import pandas as pd
 from mako.template import Template
 from sqlalchemy.orm import Session
-from zipfile import ZipFile, ZIP_DEFLATED
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword, DpdRoot, Lookup
 from exporter.goldendict.export_dpd import render_dpd_definition_templ
-from tools.configger import config_test, config_read
+from exporter.goldendict.helpers import TODAY
+from tools.configger import config_read, config_test
+from tools.headwords_clean_set import make_clean_headwords_set
 from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
 from tools.paths_ru import RuPaths
 from tools.printer import printer as pr
-from tools.headwords_clean_set import make_clean_headwords_set
 from tools.tsv_read_write import read_tsv
-from tools.uposatha_day import uposatha_today
-from exporter.goldendict.helpers import TODAY
+from tools.uposatha_day import UposathaManger
 
 from tools.tools_for_ru_exporter import (
     make_ru_meaning_simpl,
@@ -49,7 +49,7 @@ class ProgData:
         self.deconstructor_df: pd.DataFrame
 
         self.show_ru_data: bool = False
-        if config_test("exporter", "language", "en") and config_test(
+        if config_test(
             "dictionary", "show_ru_data", "yes"
         ):
             self.show_ru_data: bool = True
@@ -102,7 +102,7 @@ def generate_tpr_data(g: ProgData):
                 if ru_meaning:
                     html_string += """<tr><th valign="top">Русский</th>"""
                     html_string += f"""<td>{ru_meaning}</td></tr>"""
-
+            
             # grammar
             html_string += """<tr><th valign="top">Grammar</th>"""
             html_string += f"""<td>{i.grammar}"""
@@ -125,8 +125,6 @@ def generate_tpr_data(g: ProgData):
                 html_string += """<tr><th valign="top">Root</th>"""
                 html_string += f"""<td>{i.rt.root_clean} {i.rt.root_group} """
                 html_string += f"""{i.root_sign} ({i.rt.root_meaning}"""
-                # if g.show_ru_data and i.rt.root_ru_meaning:
-                #     html_string += f""" - {i.rt.root_ru_meaning}"""
                 html_string += """)</td></tr>"""
 
                 if i.rt.root_in_comps:
@@ -192,7 +190,7 @@ def generate_tpr_data(g: ProgData):
             if g.show_ru_data and i.ru and i.ru.ru_cognate:
                 html_string += """<tr><th valign="top">Родствен.</th>"""
                 html_string += f"""<td>{i.ru.ru_cognate}</td></tr>"""
-
+            
             if i.link:
                 link_br = i.link.replace("\n", "<br>")
                 html_string += """<tr><th valign="top">Link</th>"""
@@ -213,8 +211,6 @@ def generate_tpr_data(g: ProgData):
                     sk_root_meaning = re.sub("'", "", i.rt.sanskrit_root_meaning)
                     html_string += """<tr><th valign="top">Sanskrit Root</th>"""
                     html_string += f"""<td>{i.rt.sanskrit_root} {i.rt.sanskrit_root_class} ({sk_root_meaning}"""
-                    # if g.show_ru_data and i.rt.sanskrit_root_ru_meaning:
-                    #     html_string += f""" - {i.rt.sanskrit_root_ru_meaning}"""
                     html_string += """)</td></tr>"""
 
             html_string += f"""<tr><td colspan="2"><a href="https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.438735500={i.lemma_link}&entry.1433863141=TPR%20{TODAY}" target="_blank">Submit a correction</a></td></tr>"""
@@ -250,7 +246,7 @@ def generate_tpr_data(g: ProgData):
 
         if g.show_ru_data and r.root_ru_meaning:
             html_string += f""" - {r.root_ru_meaning}"""
-
+        
         html_string += """)"""
 
         try:
@@ -434,7 +430,7 @@ def copy_to_sqlite_db(g: ProgData):
 
         except Exception as e:
             pr.red("an error occurred copying to db")
-            pr.red(e)
+            pr.red(f"{e}")
 
     g.tpr_df = tpr_df
     g.i2h_df = i2h_df
@@ -501,7 +497,7 @@ def copy_zip_to_tpr_downloads(g: ProgData):
 
         if g.show_ru_data:
             version = "dpd_with_rus"
-        elif uposatha_today():
+        elif UposathaManger.uposatha_today():
             version = "release"
         else:
             version = "beta"
@@ -551,6 +547,7 @@ def copy_zip_to_tpr_downloads(g: ProgData):
             }
 
             download_list[27] = dpd_beta_info
+
 
         if version == "dpd_with_rus":
             output_file = g.rupth.tpr_with_rus_path

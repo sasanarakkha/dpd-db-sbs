@@ -218,6 +218,9 @@ class ProjectPaths:
         self.variant_templ_path = (
             base_dir / "exporter/goldendict/templates/dpd_variant_reading.html"
         )
+        self.sbs_example_templ_path = (
+            base_dir / "exporter/goldendict/templates/sbs_example.html"
+        )
 
         # FIXME delete these and whatever uses them
         # exporter/jinja templates

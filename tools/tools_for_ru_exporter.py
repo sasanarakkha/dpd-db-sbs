@@ -264,19 +264,19 @@ def populate_set_ru_and_check_errors(sets_dict):
     return errors_list
 
 
-mdict_ru_description = """
+# mdict_ru_description = """
 
-    <p>Электронный Словарь Пали Дост. Бодхираса</p>
-    <p>Переведен на русский Бхиккху Дэвамитта</p>
-    <p>Для более детальной информации можено посетить
-    <a href=\"https://devamitta.github.io/pali/pali_dict.html\">
-    сайт Пали Словаря</a></p>
-    и оригинальный сайт <a href=\"https://digitalpalidictionary.github.io\">
-    Digital Pāḷi Dictionary</a></p>
+#     <p>Электронный Словарь Пали Дост. Бодхираса</p>
+#     <p>Переведен на русский Бхиккху Дэвамитта</p>
+#     <p>Для более детальной информации можено посетить
+#     <a href=\"https://devamitta.github.io/pali/pali_dict.html\">
+#     сайт Пали Словаря</a></p>
+#     и оригинальный сайт <a href=\"https://digitalpalidictionary.github.io\">
+#     Digital Pāḷi Dictionary</a></p>
 
-"""
+# """
 
-mdict_ru_title = "Электронный Словарь Пали"
+# mdict_ru_title = "Электронный Словарь Пали"
 
 gdict_ru_info = {
     "bookname": "Пали Словарь",
