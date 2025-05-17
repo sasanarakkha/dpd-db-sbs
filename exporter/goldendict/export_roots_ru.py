@@ -14,15 +14,17 @@ from tools.goldendict_exporter import DictEntry
 from tools.niggahitas import add_niggahitas
 from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
+from tools.paths_ru import RuPaths
 from tools.printer import printer as pr
 from tools.utils import RenderedSizes, default_rendered_sizes, squash_whitespaces
+from tools.tools_for_ru_exporter import ru_replace_abbreviations
 
 
 def generate_root_html(
     db_session: Session,
     pth: ProjectPaths,
     roots_count_dict: Dict[str, int],
-    show_ru_data=False,
+    rupth: RuPaths,
 ) -> Tuple[List[DictEntry], RenderedSizes]:
     """compile html components for each pali root"""
 
@@ -30,7 +32,7 @@ def generate_root_html(
     size_dict = default_rendered_sizes()
     root_data_list: List[DictEntry] = []
 
-    header_templ = Template(filename=str(pth.root_header_templ_path))
+    header_templ = Template(filename=str(rupth.root_header_templ_path))
 
     roots_db = db_session.query(DpdRoot).all()
 
@@ -55,16 +57,15 @@ def generate_root_html(
         root_header = css_manager.update_style(root_header, "root")
 
         definition = render_root_definition_templ(
-            pth,
+            rupth,
             r,
             roots_count_dict,
-            show_ru_data
         )
         html += definition
         size_dict["root_definition"] += len(definition)
 
         root_buttons = render_root_buttons_templ(
-            pth,
+            rupth,
             r,
             db_session,
         )
@@ -72,14 +73,14 @@ def generate_root_html(
         size_dict["root_buttons"] += len(root_buttons)
 
         root_info = render_root_info_templ(
-            pth,
+            rupth,
             r,
         )
         html += root_info
         size_dict["root_info"] += len(root_info)
 
         root_matrix = render_root_matrix_templ(
-            pth,
+            rupth,
             r,
             roots_count_dict,
         )
@@ -87,7 +88,7 @@ def generate_root_html(
         size_dict["root_matrix"] += len(root_matrix)
 
         root_families = render_root_families_templ(
-            pth,
+            rupth,
             r,
             db_session,
         )
@@ -134,14 +135,13 @@ def render_root_header_templ(
 
 
 def render_root_definition_templ(
-    pth: ProjectPaths,
+    rupth: RuPaths,
     r: DpdRoot,
     roots_count_dict,
-    show_ru_data=False,
 ):
     """render html of main root info"""
 
-    root_definition_templ = Template(filename=str(pth.root_definition_templ_path))
+    root_definition_templ = Template(filename=str(rupth.root_definition_templ_path))
 
     try:
         count = roots_count_dict[r.root]
@@ -153,19 +153,18 @@ def render_root_definition_templ(
             r=r,
             count=count,
             today=TODAY,
-            show_ru_data=show_ru_data
         )
     )
 
 
 def render_root_buttons_templ(
-    pth: ProjectPaths,
+    rupth: RuPaths,
     r: DpdRoot,
     db_session: Session,
 ):
     """render html of root buttons"""
 
-    root_buttons_templ = Template(filename=str(pth.root_button_templ_path))
+    root_buttons_templ = Template(filename=str(rupth.root_button_templ_path))
 
     frs = db_session.query(FamilyRoot).filter(FamilyRoot.root_key == r.root)
 
@@ -174,24 +173,27 @@ def render_root_buttons_templ(
     return str(root_buttons_templ.render(r=r, frs=frs))
 
 
-def render_root_info_templ(pth: ProjectPaths, r: DpdRoot):
+def render_root_info_templ(
+        rupth: RuPaths,
+        r: DpdRoot
+    ):
     """render html of root grammatical info"""
 
-    root_info_templ = Template(filename=str(pth.root_info_templ_path))
-    root_info = ""
+    root_info_templ = Template(filename=str(rupth.root_info_templ_path))
+    root_info = ru_replace_abbreviations(r.root_info, "root")
 
     return str(root_info_templ.render(r=r, root_info=root_info, today=TODAY))
 
 
 def render_root_matrix_templ(
-    pth: ProjectPaths,
+    rupth: RuPaths,
     r: DpdRoot,
     roots_count_dict,
 ):
     """render html of root matrix"""
 
-    root_matrix_templ = Template(filename=str(pth.root_matrix_templ_path))
-    root_matrix = ""
+    root_matrix_templ = Template(filename=str(rupth.root_matrix_templ_path))
+    root_matrix = ru_replace_abbreviations(r.root_matrix, "root")
 
     try:
         count = roots_count_dict[r.root]
@@ -204,13 +206,13 @@ def render_root_matrix_templ(
 
 
 def render_root_families_templ(
-    pth: ProjectPaths,
+    rupth: RuPaths,
     r: DpdRoot,
     db_session: Session,
 ):
     """render html of root families"""
 
-    root_families_templ = Template(filename=str(pth.root_families_templ_path))
+    root_families_templ = Template(filename=str(rupth.root_families_templ_path))
 
     frs = (
         db_session.query(FamilyRoot)

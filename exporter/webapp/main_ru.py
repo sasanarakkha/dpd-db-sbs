@@ -16,7 +16,10 @@ from exporter.webapp.preloads import (
     make_headwords_clean_set,
     make_roots_count_dict,
 )
-from exporter.webapp.toolkit import fuzzy_replace, make_dpd_html
+from exporter.webapp.preloads_ru import make_headwords_clean_set_ru
+from exporter.webapp.toolkit import make_dpd_html
+from exporter.webapp.toolkit_ru import make_dpd_html_ru
+
 from tools.css_manager import CSSManager
 from tools.paths import ProjectPaths
 from tools.translit_ru import auto_translit_to_roman
@@ -24,7 +27,7 @@ from tools.translit_ru import auto_translit_to_roman
 app = FastAPI()
 app.add_middleware(GZipMiddleware, minimum_size=500)
 app.mount("/static", StaticFiles(directory="exporter/webapp/static"), name="static")
-app.mount("/sbs/static", StaticFiles(directory="exporter/webapp/static"), name="sbs_static") 
+# app.mount("/sbs/static", StaticFiles(directory="exporter/webapp/static"), name="sbs_static") 
 
 pth: ProjectPaths = ProjectPaths()
 
@@ -48,7 +51,7 @@ def get_db():
 with get_db() as db_session:
     roots_count_dict = make_roots_count_dict(db_session)
     headwords_clean_set = make_headwords_clean_set(db_session)
-    headwords_clean_set_ru = make_headwords_clean_set(db_session, "ru")
+    headwords_clean_set_ru = make_headwords_clean_set_ru(db_session)
     ascii_to_unicode_dict = make_ascii_to_unicode_dict(db_session)
     bd_count = db_session.query(BoldDefinition).count()
 
@@ -132,14 +135,13 @@ def db_search_html_ru(request: Request, q: str):
 
     q_roman = auto_translit_to_roman(q)
 
-    dpd_html, summary_html = make_dpd_html(
+    dpd_html, summary_html = make_dpd_html_ru(
         q_roman,
         pth,
         templates_ru,
         roots_count_dict,
         headwords_clean_set_ru,
         ascii_to_unicode_dict,
-        "ru",
     )
     return templates_ru.TemplateResponse(
         "home.html",
@@ -176,14 +178,13 @@ def db_search_json_ru(request: Request, q: str):
 
     q_roman = auto_translit_to_roman(q)
 
-    dpd_html, summary_html = make_dpd_html(
+    dpd_html, summary_html = make_dpd_html_ru(
         q_roman,
         pth,
         templates_ru,
         roots_count_dict,
         headwords_clean_set_ru,
         ascii_to_unicode_dict,
-        "ru",
     )
     response_data = {"summary_html": summary_html, "dpd_html": dpd_html}
     headers = {"Accept-Encoding": "gzip"}
@@ -226,14 +227,13 @@ def db_search_gd_ru(request: Request, search: str):
 
     search_roman = auto_translit_to_roman(search)
 
-    dpd_html, summary_html = make_dpd_html(
+    dpd_html, summary_html = make_dpd_html_ru(
         search_roman,
         pth,
         templates_ru,
         roots_count_dict,
         headwords_clean_set_ru,
         ascii_to_unicode_dict,
-        "ru",
     )
     global dpd_css, dpd_js, home_simple_css
 
@@ -258,42 +258,12 @@ def db_search_bd(
     q2: str,
     option: str,
 ):
-    """Search route for bold defintions."""
+    """Search route for bold definitions."""
 
-    with get_db() as db_session:
-        # no search
-        if not q1 and not q2:
-            results = []
+    from tools.bold_definitions_search import BoldDefinitionsSearchManager
 
-        # starts_with search
-        elif option == "starts_with":
-            search_1_start = f"^{q1}"
-            results = (
-                db_session.query(BoldDefinition)
-                .filter(BoldDefinition.bold.regexp_match(search_1_start))
-                .filter(BoldDefinition.commentary.regexp_match(q2))
-                .all()
-            )
-
-        # regex search
-        elif option == "regex":
-            results = (
-                db_session.query(BoldDefinition)
-                .filter(BoldDefinition.bold.regexp_match(q1))
-                .filter(BoldDefinition.commentary.regexp_match(q2))
-                .all()
-            )
-
-        # fuzzy search
-        elif option == "fuzzy":
-            search_1_fuzzy = fuzzy_replace(q1)
-            search_2_fuzzy = fuzzy_replace(q2)
-            results = (
-                db_session.query(BoldDefinition)
-                .filter(BoldDefinition.bold.regexp_match(search_1_fuzzy))
-                .filter(BoldDefinition.commentary.regexp_match(search_2_fuzzy))
-                .all()
-            )
+    bd_searcher = BoldDefinitionsSearchManager()
+    results = bd_searcher.search(q1, q2, option)
 
     if results:
         message = f"<b>{len(results)}</b> результатов найдено"

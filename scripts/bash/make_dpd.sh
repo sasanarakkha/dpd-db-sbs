@@ -6,7 +6,6 @@ set -e
 
 git checkout sbs-ru
 
-python -c "from tools.configger import config_update; config_update('exporter', 'language', 'en')"
 python -c "from tools.configger import print_config_settings; print_config_settings(['dictionary', 'goldendict', 'exporter'])"
 
 while true; do
@@ -20,8 +19,6 @@ while true; do
             break;;
     esac
 done
-
-scripts/change_in_db/change_ebt_count.py
 
 exporter/grammar_dict/grammar_dict.py
 

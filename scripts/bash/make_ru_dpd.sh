@@ -6,7 +6,6 @@ set -e
 
 git checkout sbs-ru
 
-python -c "from tools.configger import config_update; config_update('exporter', 'language', 'ru')"
 python -c "from tools.configger import config_update; config_update('dictionary', 'link_url', 'https://find.dhamma.gift/bw/')"
 
 python -c "from tools.configger import print_config_settings; print_config_settings(['dictionary', 'goldendict', 'exporter'])"
@@ -26,19 +25,18 @@ done
 
 echo "exporting RU DPD"
 
-exporter/grammar_dict/grammar_dict.py
+exporter/grammar_dict/grammar_dict_ru.py
 
-exporter/goldendict/main.py
+exporter/goldendict/main_ru.py
 
-exporter/deconstructor/deconstructor_exporter.py
+exporter/deconstructor/deconstructor_exporter_ru.py
 
-exporter/kindle/kindle_exporter.py
+exporter/kindle/kindle_exporter_ru.py
 
 scripts/rus_exporter/ru_zip_goldendict_mdict.py
 
 # scripts/moving/move_mdict_ru.py
 
-python -c "from tools.configger import config_update; config_update('exporter', 'language', 'en')"
 python -c "from tools.configger import config_update; config_update('dictionary', 'link_url', 'http://filesrv1:8083/')"
 python -c "from tools.configger import config_update; config_update('exporter', 'make_ebook', 'no')"
 python -c "from tools.configger import config_update; config_update('exporter', 'make_deconstructor', 'no')"

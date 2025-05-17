@@ -156,16 +156,16 @@ jobs:
     # ----------------------------------------
            
     - name: Export Grammar Dictionary
-      run: uv run python exporter/grammar_dict/grammar_dict.py
+      run: uv run python exporter/grammar_dict/grammar_dict_ru.py
     
     - name: Export GoldenDict & MDict
-      run: uv run python exporter/goldendict/main.py
+      run: uv run python exporter/goldendict/main_ru.py
 
     - name: Export Deconstructor
-      run: uv run python exporter/deconstructor/deconstructor_exporter.py
+      run: uv run python exporter/deconstructor/deconstructor_exporter_ru.py
 
     - name: Export Kindle & ePub
-      run: uv run python exporter/kindle/kindle_exporter.py
+      run: uv run python exporter/kindle/kindle_exporter_ru.py
 
     - name: Export Variants
       run: uv run exporter/variants/variants_exporter.py

@@ -10,6 +10,7 @@ from tools.css_manager import CSSManager
 from tools.goldendict_exporter import DictEntry
 from tools.niggahitas import add_niggahitas
 from tools.paths import ProjectPaths
+from tools.paths_ru import RuPaths
 from tools.printer import printer as pr
 from tools.utils import (
     RenderedSizes,
@@ -21,6 +22,7 @@ from tools.utils import (
 
 def generate_variant_spelling_html(
     pth: ProjectPaths,
+    rupth: RuPaths
 ) -> Tuple[List[DictEntry], RenderedSizes]:
     """Generate html for variant readings and spelling corrections."""
 
@@ -28,20 +30,20 @@ def generate_variant_spelling_html(
 
     rendered_sizes = []
 
-    header_templ = Template(filename=str(pth.dpd_header_plain_templ_path))
+    header_templ = Template(filename=str(rupth.dpd_header_plain_templ_path))
 
     variant_dict = test_and_make_variant_dict(pth)
     spelling_dict = test_and_make_spelling_dict(pth)
 
     variant_data_list, sizes = generate_variant_data_list(
-        pth,
+        rupth,
         variant_dict,
         header_templ,
     )
     rendered_sizes.append(sizes)
 
     spelling_data_list, sizes = generate_spelling_data_list(
-        pth,
+        rupth,
         spelling_dict,
         header_templ,
     )
@@ -80,13 +82,13 @@ def test_and_make_variant_dict(pth: ProjectPaths) -> dict:
 
 
 def generate_variant_data_list(
-    pth: ProjectPaths,
+    rupth: RuPaths,
     variant_dict: dict,
     header_templ: Template,
 ) -> Tuple[List[DictEntry], RenderedSizes]:
     size_dict = default_rendered_sizes()
 
-    variant_templ = Template(filename=str(pth.variant_templ_path))
+    variant_templ = Template(filename=str(rupth.variant_templ_path))
 
     header = str(header_templ.render())
 
@@ -149,13 +151,13 @@ def test_and_make_spelling_dict(pth: ProjectPaths) -> dict:
 
 
 def generate_spelling_data_list(
-    pth: ProjectPaths,
+    rupth: RuPaths,
     spelling_dict: dict,
     header_templ: Template,
 ) -> Tuple[List[DictEntry], RenderedSizes]:
     size_dict = default_rendered_sizes()
 
-    spelling_templ = Template(filename=str(pth.spelling_templ_path))
+    spelling_templ = Template(filename=str(rupth.spelling_templ_path))
 
     header = str(header_templ.render())
 
@@ -192,4 +194,5 @@ def generate_spelling_data_list(
 
 if __name__ == "__main__":
     pth = ProjectPaths()
-    generate_variant_spelling_html(pth)
+    ru_path = RuPaths()
+    generate_variant_spelling_html(pth, ru_path)
