@@ -282,7 +282,16 @@ table.freq {
     -webkit-writing-mode: vertical-lr;
     writing-mode: vertical-lr;
     text-orientation: upright;
-    inline-size: fit-content;
+    white-space: nowrap;
+
+    /* Absolute positioning for robust centering */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: -webkit-max-content; /* Safari/Chrome older versions */
+    width: -moz-max-content;    /* Firefox older versions */
+    width: max-content;
 }
 
 table.freq thead th {
@@ -299,10 +308,10 @@ table.freq tbody th {
     vertical-align: middle;
 }
 
-table.freq tbody th.vertical-text {
-    word-break: break-all; /* breaks word at any character */
-    max-width: 1ex; /* no wider than a single character */
-    white-space: break-spaces; /* overrides table.freq tbody th no-wrap */
+/* Style for the specific TH in tbody that has a rowspan (our vertical header cell) */
+table.freq tbody th[rowspan] {
+    min-width: 2.0ch;
+    position: relative;
 }
 
 table.freq td {
