@@ -12,7 +12,7 @@ from db.db_helpers import get_db_session
 from db.models import DpdHeadword
 from tools.pali_alphabet import pali_alphabet
 from tools.paths import ProjectPaths
-from tools.pali_sort_key import pali_sort_key
+from tools.pali_sort_key import pali_list_sorter, pali_sort_key
 from tools.printer import printer as pr
 
 
@@ -25,10 +25,11 @@ class SandhiContrItem:
 SandhiContractionDict = dict[str, list[str]]
 
 
-class SandhiContractionFinder:
+class SandhiContractionManager:
     def __init__(self):
         self._pth: ProjectPaths = ProjectPaths()
-        self._db_session: Session = get_db_session(self._pth.dpd_db_path)
+        self._db_session: Session
+        self.refresh_db_session()
         self._exceptions: list[str] = [
             "maññeti",
             "āyataggaṃ",
@@ -39,19 +40,20 @@ class SandhiContractionFinder:
             "sayissanti",
             "gāmeti",
         ]
-        self._contractions_details: dict[str, SandhiContrItem]
-        self._contractions_simple: SandhiContractionDict
+        self.sandhi_contractions_details: dict[str, SandhiContrItem]
+        self.sandhi_contractions_simple: SandhiContractionDict
         self._load_or_create_data()
+
+    def refresh_db_session(self):
+        self._db_session: Session = get_db_session(self._pth.dpd_db_path)
 
     def _should_regenerate(self) -> bool:
         """Check if cache is older than 1 day"""
 
         return (
-            not self._pth.sandhi_contractions_simple_path.exists()
+            not self._pth.sandhi_contractions_path.exists()
             or datetime.now()
-            - datetime.fromtimestamp(
-                self._pth.sandhi_contractions_simple_path.stat().st_mtime
-            )
+            - datetime.fromtimestamp(self._pth.sandhi_contractions_path.stat().st_mtime)
             > timedelta(days=1)
         )
 
@@ -69,25 +71,33 @@ class SandhiContractionFinder:
     def _load_simple_cache(self) -> None:
         """Load the simple contractions data from database"""
 
-        with open(self._pth.sandhi_contractions_simple_path) as f:
-            self._contractions_simple = load(f)
+        with open(self._pth.sandhi_contractions_path) as f:
+            self.sandhi_contractions_simple = load(f)
 
     def _create_simple_version(self) -> SandhiContractionDict:
         """Create simplified dict of just contractions without IDs"""
 
-        return {k: list(v.contractions) for k, v in self._contractions_details.items()}
+        return {
+            k: list(v.contractions) for k, v in self.sandhi_contractions_details.items()
+        }
 
     def _save_simple_version(self) -> None:
         """Save simplified contractions to JSON file"""
 
+        # sort list of values
+        for key, values in self.sandhi_contractions_simple.items():
+            self.sandhi_contractions_simple[key] = pali_list_sorter(values)
+
+        # sort the keys
         sorted_contractions_simple = dict(
             sorted(
-                self._contractions_simple.items(),
+                self.sandhi_contractions_simple.items(),
                 key=lambda item: pali_sort_key(item[0]),
             )
         )
 
-        with open(self._pth.sandhi_contractions_simple_path, "w") as f:
+        # and dump to file
+        with open(self._pth.sandhi_contractions_path, "w") as f:
             dump(
                 sorted_contractions_simple,
                 f,
@@ -97,29 +107,30 @@ class SandhiContractionFinder:
 
     def get_sandhi_contractions(self) -> dict[str, SandhiContrItem]:
         """Return the simple sandhi contractions dictionary."""
-        return self._contractions_details
+        return self.sandhi_contractions_details
 
     def get_sandhi_contractions_simple(self) -> SandhiContractionDict:
         """Return the simple sandhi contractions dictionary."""
-        return self._contractions_simple
+        return self.sandhi_contractions_simple
 
     def save_contractions(self) -> None:
         """Save the contractions dictionary to a temp file."""
 
         self._save_to_temp_file()
 
-    def update_contractions(self) -> None:
+    def regenerate_contractions(self) -> None:
         """Regenerate and return the contractions dictionary."""
         self._make_sandhi_contractions()
 
-    def update_contractions_simple(self) -> SandhiContractionDict:
+    def regenerate_contractions_simple(self) -> SandhiContractionDict:
         """Regenerate and return the simple contractions dictionary."""
         pr.green("updating sandhi contractions")
 
+        self.refresh_db_session()
         self._make_sandhi_contractions()
-        pr.yes(len(self._contractions_simple))
+        pr.yes(len(self.sandhi_contractions_simple))
 
-        return self._contractions_simple
+        return self.sandhi_contractions_simple
 
     def _replace_split(self, string: str) -> list[str]:
         """Clean and split a string into words."""
@@ -206,8 +217,8 @@ class SandhiContractionFinder:
             print("[red]SANDHI ERRORS IN EG1,2,COMM:", end=" ")
             print([x for x in error_list], end=" ")
 
-        self._contractions_details = sandhi_contraction_dict
-        self._contractions_simple = self._create_simple_version()
+        self.sandhi_contractions_details = sandhi_contraction_dict
+        self.sandhi_contractions_simple = self._create_simple_version()
         self._save_simple_version()
 
     def _save_to_temp_file(self) -> None:
@@ -217,7 +228,7 @@ class SandhiContractionFinder:
         counter = 0
 
         with open(filepath, "w") as f:
-            for key, values in self._contractions_details.items():
+            for key, values in self.sandhi_contractions_details.items():
                 if len(values.contractions) > 1 and key not in self._exceptions:
                     f.write(f"{counter}. {key}: \n")
                     for contraction in values.contractions:
@@ -231,14 +242,25 @@ class SandhiContractionFinder:
         self._make_sandhi_contractions()
         self._save_to_temp_file()
 
+    def update_sandhi_contractions(self, word):
+        pure_word = word.replace("'", "")
+        if pure_word not in self.sandhi_contractions_simple:
+            self.sandhi_contractions_simple[pure_word] = [word]
+            self._save_simple_version()
+            print(f"updated sandhi with {pure_word}: {word}")
+        elif word not in self.sandhi_contractions_simple[pure_word]:
+            self.sandhi_contractions_simple[pure_word].append(word)
+            self._save_simple_version()
+            print(f"updated sandhi with {pure_word}: {word}")
+
 
 def main() -> None:
     pr.tic()
-    finder = SandhiContractionFinder()
-    finder.update_contractions_simple()
-    # finder.run()
-    # print(len(finder.get_sandhi_contractions()))
-    # print(len(finder.get_contractions()))
+    sc_manager = SandhiContractionManager()
+    sc_manager.regenerate_contractions_simple()
+    # sc_manager.run()
+    # print(len(sc_manager.get_sandhi_contractions()))
+    # print(len(sc_manager.get_contractions()))
     pr.toc()
 
 

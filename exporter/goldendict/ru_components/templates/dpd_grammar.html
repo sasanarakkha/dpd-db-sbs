@@ -116,7 +116,13 @@
         <tr>
             <th>Ссылка</th>
             <td>
-                <a class="link" href="${i.link}">${i.link}</a>
+                % for website in i.link_list:
+                    <p style="margin: 0; padding: 0;">
+                        <a href="${website}" target="_blank">
+                            ${website}
+                        </a>
+                    </p>
+                % endfor
             </td>
         </tr>
         % endif

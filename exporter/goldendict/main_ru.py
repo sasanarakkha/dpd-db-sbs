@@ -28,7 +28,7 @@ from tools.mdict_exporter import export_to_mdict
 from tools.paths import ProjectPaths
 from tools.paths_ru import RuPaths
 from tools.printer import printer as pr
-from tools.sandhi_contraction import SandhiContractionFinder
+from tools.sandhi_contraction import SandhiContractionManager
 from tools.utils import RenderedSizes, sum_rendered_sizes
 
 
@@ -37,7 +37,7 @@ class ProgData:
         self.pth = ProjectPaths()
         self.rupth = RuPaths()
         self.db_session: Session = get_db_session(self.pth.dpd_db_path)
-        self.sandhi_finder = SandhiContractionFinder()
+        self.sandhi_finder = SandhiContractionManager()
         self.sandhi_contractions = self.sandhi_finder.get_sandhi_contractions_simple()
         self.cf_set: set = load_cf_set()
         self.idioms_set: set = load_idioms_set()

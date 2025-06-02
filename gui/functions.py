@@ -22,7 +22,7 @@ from gui.functions_db import values_to_pali_word
 from gui.functions_db import make_words_to_add_list_generic
 
 from tools.addition_class import Additions
-from tools.bold_definitions_search import search_bold_definitions
+from tools.bold_definitions_search import BoldDefinitionsSearchManager
 from tools.configger import config_read
 from tools.configger import config_test
 from tools.configger import config_test_option
@@ -492,7 +492,7 @@ def clear_values(values, window, username):
     window["search_for"].update("")
 
 
-def find_commentary_definitions(sg, values, db_session):
+def find_e_definitions(sg, values, db_session):
     config = load_gui_config()
 
     # Get screen width and height
@@ -502,9 +502,8 @@ def find_commentary_definitions(sg, values, db_session):
     window_width = int(screen_width * config["screen_fraction_width"])
     window_height = int(screen_height * config["screen_fraction_height"])
 
-    search_results = search_bold_definitions(
-        db_session, values["search_for"], values["contains"]
-    )
+    searcher = BoldDefinitionsSearchManager()
+    search_results = searcher.search(values["search_for"], values["contains"])
 
     layout_elements = []
     layout_elements.append(
@@ -971,7 +970,7 @@ def test_construction(values, window, lemma_clean_list):
 def replace_sandhi_gui(
     text: str, field: str, sandhi_dict: dict, hyphenations_dict: dict, window
 ) -> None:
-    """Replace Sandhi and hypenated words and update window of the field."""
+    """Replace Sandhi and hyphenated words and update window of the field."""
 
     text = replace_sandhi(text, sandhi_dict, hyphenations_dict)
 

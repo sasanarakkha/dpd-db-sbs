@@ -5,8 +5,6 @@
 import json
 import re
 
-from rich import print
-
 from db.db_helpers import get_db_session
 from db.models import DbInfo, DpdHeadword, FamilyIdiom
 
@@ -29,7 +27,7 @@ from sqlalchemy.orm import joinedload
 
 def main():
     pr.tic()
-    print("[bright_yellow]idioms generator")
+    pr.title("idioms generator")
 
     if not (
         config_test("exporter", "make_dpd", "yes")
@@ -37,19 +35,14 @@ def main():
         or config_test("exporter", "make_tpr", "yes")
         or config_test("exporter", "make_ebook", "yes")
     ):
-        print("[green]disabled in config.ini")
+        pr.green_title("disabled in config.ini")
         pr.toc()
         return
 
     pth = ProjectPaths()
     db_session = get_db_session(pth.dpd_db_path)
 
-    dpd_db = (
-        db_session.query(DpdHeadword)
-        .options(joinedload(DpdHeadword.ru))
-        .filter(DpdHeadword.family_idioms != "")
-        .all()
-    )
+    dpd_db = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.ru)).filter(DpdHeadword.family_idioms != "").all()
     dpd_db = sorted(dpd_db, key=lambda x: pali_sort_key(x.lemma_1))
 
     sync_idiom_numbers_with_family_compound(db_session)
@@ -71,7 +64,7 @@ def sync_idiom_numbers_with_family_compound(db_session):
     - gram does not contain "comp"
     then copy that value to idioms.
     """
-    print("[green]syncing idiom numbers with family compound", end=" ")
+    pr.green("syncing idioms with family compound")
     dpd_db: list[DpdHeadword] = db_session.query(DpdHeadword).all()
 
     count = 0
@@ -89,11 +82,11 @@ def sync_idiom_numbers_with_family_compound(db_session):
             count += 1
 
     db_session.commit()
-    print(count)
+    pr.yes(count)
 
 
 def create_idioms_dict(dpd_db):
-    print("[green]extracting idioms and headwords", end=" ")
+    pr.green("extracting idioms and headwords")
 
     # create a dict of all idioms
     # word: {headwords: [], html: "", data: []}
@@ -114,12 +107,12 @@ def create_idioms_dict(dpd_db):
                         "count": 0,
                     }
 
-    print(len(idioms_dict))
+    pr.yes(len(idioms_dict))
     return idioms_dict
 
 
 def compile_idioms_html(dpd_db, idioms_dict):
-    print("[green]compiling html")
+    pr.green("compiling html")
 
     for i in dpd_db:
         if i.pos in ["idiom", "sandhi"]:
@@ -183,12 +176,12 @@ def compile_idioms_html(dpd_db, idioms_dict):
     for i in idioms_dict:
         idioms_dict[i]["html"] += "</table>"
         idioms_dict[i]["html_ru"] += "</table>"
-
+    pr.yes(len(idioms_dict))
     return idioms_dict
 
 
 def add_idioms_to_db(db_session, idioms_dict):
-    print("[green]adding to db", end=" ")
+    pr.green("adding to db")
 
     add_to_db = []
 
@@ -208,13 +201,13 @@ def add_idioms_to_db(db_session, idioms_dict):
     db_session.add_all(add_to_db)
     db_session.commit()
     db_session.close()
-    print("[white]ok")
+    pr.yes("ok")
 
 
 def update_db_cache(db_session, idioms_dict):
     """Update the db_info with cf_set for use in the exporter."""
 
-    print("[green]adding dbinfo cache item")
+    pr.green("adding DbInfo cache item")
 
     idioms_set = set()
     for word in idioms_dict:
@@ -230,6 +223,7 @@ def update_db_cache(db_session, idioms_dict):
     idioms_set_cache.value = json.dumps(list(idioms_set), ensure_ascii=False, indent=1)
     db_session.add(idioms_set_cache)
     db_session.commit()
+    pr.yes("ok")
 
 
 if __name__ == "__main__":

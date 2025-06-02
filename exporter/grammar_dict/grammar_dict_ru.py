@@ -121,9 +121,7 @@ def generate_html_from_lookup(g: ProgData):
             grammatical_categories = []
             if grammar_str.startswith("reflx"):
                 grammatical_categories.append(
-                    grammar_str.split()[0]
-                    + " "
-                    + grammar_str.split()[1]
+                    grammar_str.split()[0] + " " + grammar_str.split()[1]
                 )
                 grammatical_categories += grammar_str.split()[2:]
                 for grammatical_category in grammatical_categories:

@@ -6,7 +6,7 @@ from db.models import DpdHeadword
 from gui2.dpd_fields import DpdFields
 from gui2.dpd_fields_commentary import DpdCommentaryField
 from gui2.dpd_fields_examples import DpdExampleField
-from gui2.dpd_fields_functions import increment_lemma_1
+from gui2.dpd_fields_functions import clean_lemma_1, increment_lemma_1
 from gui2.dpd_fields_lists import (
     COMPOUND_FIELDS,
     NO_CLONE_LIST,
@@ -17,13 +17,14 @@ from gui2.dpd_fields_lists import (
 )
 from gui2.mixins import PopUpMixin
 from gui2.pass2_auto_control import Pass2AutoController
-from gui2.pass2_file_manager import Pass2AutoFileManager
-
+from gui2.pass2_auto_file_manager import Pass2AutoFileManager
+from gui2.pass2_pre_new_word_manager import Pass2NewWordManager
 from gui2.toolkit import ToolKit
 from scripts.backup.backup_dpd_headwords_and_roots import backup_dpd_headwords_and_roots
 from tools.fast_api_utils import request_dpd_server
+from tools.hyphenations import HyphenationFileManager, HyphenationsDict
 from tools.paths import ProjectPaths  # Import ProjectPaths
-from tools.sandhi_contraction import SandhiContractionDict
+from tools.sandhi_contraction import SandhiContractionDict, SandhiContractionManager
 
 LABEL_WIDTH = 250
 BUTTON_WIDTH = 250
@@ -52,16 +53,26 @@ class Pass2AddView(ft.Column, PopUpMixin):
         self._daily_log = self.toolkit.daily_log
         self.pass2_auto_controller = Pass2AutoController(self, self.toolkit)
         self.test_manager: GuiTestManager = self.toolkit.test_manager
-        self.sandhi_manager = self.toolkit.sandhi_manager
+        self.toolkit: ToolKit = toolkit
+
+        self.sandhi_manager: SandhiContractionManager = self.toolkit.sandhi_manager
         self.sandhi_dict: SandhiContractionDict = (
-            self.sandhi_manager.get_sandhi_contractions_simple()
+            self.sandhi_manager.sandhi_contractions_simple
         )
-        self.hyphenation_manager = self.toolkit.hyphenation_manager
-        self.hyphenation_dict = self.hyphenation_manager.load_hyphenations_dict()
+        self.hyphenations_manager: HyphenationFileManager = (
+            self.toolkit.hyphenation_manager
+        )
+        self.hyphenation_dict: HyphenationsDict = (
+            self.hyphenations_manager.hyphenations_dict
+        )
         self.history_manager = self.toolkit.history_manager
+        self.corrections_manager = self.toolkit.corrections_manager
 
         self.dpd_fields: DpdFields
         self._pass2_auto_file_manager = Pass2AutoFileManager(self.toolkit)
+        self.pass2_new_word_manager: Pass2NewWordManager = (
+            self.toolkit.pass2_new_word_manager
+        )
         self.headword: DpdHeadword | None = None
         self.headword_original: DpdHeadword | None = None
 
@@ -226,20 +237,27 @@ class Pass2AddView(ft.Column, PopUpMixin):
     def add_headword_to_examples_and_commentary(self):
         # add headword to example_1 example_2 and commentary
         if self.headword:
-            example_1_field: DpdExampleField = self.dpd_fields.get_field("example_1")
-            example_1_field.word_to_find_field.value = self.headword.lemma_1[:-1]
-            example_1_field.bold_field.value = self.headword.lemma_clean[:-1]
-
-            example_2_field: DpdExampleField = self.dpd_fields.get_field("example_2")
-            example_2_field.word_to_find_field.value = self.headword.lemma_clean[:-1]
-
+            lemma_clean = clean_lemma_1(self.headword.lemma_1)
             commentary_field: DpdCommentaryField = self.dpd_fields.get_field(
                 "commentary"
             )
-            commentary_field.search_field_1.value = self.headword.lemma_clean[:-1]
+            if commentary_field and hasattr(commentary_field, "search_field_1"):
+                commentary_field.search_field_1.value = lemma_clean[:-1]
+
+            example_1_field: DpdExampleField = self.dpd_fields.get_field("example_1")
+            if example_1_field and hasattr(example_1_field, "word_to_find_field"):
+                example_1_field.word_to_find_field.value = lemma_clean[:-1]
+                example_1_field.bold_field.value = lemma_clean[:-1]
+
+            example_2_field: DpdExampleField = self.dpd_fields.get_field("example_2")
+            if example_2_field and hasattr(example_2_field, "word_to_find_field"):
+                example_2_field.word_to_find_field.value = lemma_clean[:-1]
+                example_2_field.word_to_find_field.value = lemma_clean[:-1]
 
     def _click_edit_headword(self, e: ft.ControlEvent) -> None:
-        id_or_lemma = self._enter_id_or_lemma_field.value
+        id_or_lemma = ""
+        if self._enter_id_or_lemma_field.value:
+            id_or_lemma = self._enter_id_or_lemma_field.value.strip()
 
         if id_or_lemma:
             headword = self._db.get_headword_by_id_or_lemma(id_or_lemma)
@@ -261,7 +279,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
                     if (
                         self.headword.id is not None
                         and str(self.headword.id)
-                        in self._pass2_auto_file_manager.responses
+                        in self._pass2_auto_file_manager.pass2_auto_data
                     ):
                         to_add = self._pass2_auto_file_manager.get_headword(
                             str(self.headword.id)
@@ -334,45 +352,56 @@ class Pass2AddView(ft.Column, PopUpMixin):
         # Clear _add fields as they relate to the original word's auto-data
         self.dpd_fields.clear_fields(target="add")
 
-        self.update_message(
-            f"Split '{old_lemma}' into new entry '{new_lemma}' (ID: {new_id}). Cleared {cleared_count} fields."
-        )
+        self.update_message(f"Split {old_lemma} into {new_lemma} id: {new_id})")
         self.page.update()
-        current_lemma_1_field.focus()  # Focus back on lemma_1
+        current_lemma_1_field.focus()
 
     def _click_load_next_pass2_entry(self, e: ft.ControlEvent | None = None) -> None:
         """Load next pass2 entry into the view."""
-        headword_id, pass2_auto_data = (
-            self._pass2_auto_file_manager.get_next_headword_data()
-        )
 
-        if headword_id is not None:
+        # first try loading new words
+        new_word_data = self.pass2_new_word_manager.get_next_new_word()
+        word_in_text, source_sutta_example = new_word_data
+        if source_sutta_example:
             self.clear_all_fields()
-            headword = self._db.get_headword_by_id(int(headword_id))
+            self.update_message(f"new word: {word_in_text}")
+            self.dpd_fields.update_add_fields(source_sutta_example)
 
-            if headword is not None:
-                self.headword = headword
-                self.headword_original = copy.deepcopy(headword)
-
-                self.dpd_fields.update_db_fields(self.headword)
-                self.dpd_fields.update_add_fields(pass2_auto_data)
-                self.add_headword_to_examples_and_commentary()
-            else:
-                self.update_message(f"{headword_id}: headword not found")
-                self._click_load_next_pass2_entry()
-
+        # then process pass2_auto entries
         else:
-            self._message_field.value = "Current Pass2: None"
-            self.clear_all_fields()
+            headword_id, pass2_auto_data, count = (
+                self._pass2_auto_file_manager.get_next_headword_data()
+            )
 
-        self.update()
+            if headword_id is not None:
+                self.clear_all_fields()
+                headword = self._db.get_headword_by_id(int(headword_id))
+                self.update_message(f"{count} pass2auto remaining")
+
+                if headword is not None:
+                    self.headword = headword
+                    self.headword_original = copy.deepcopy(headword)
+
+                    self.dpd_fields.update_db_fields(self.headword)
+                    self.dpd_fields.update_add_fields(pass2_auto_data)
+                    self.add_headword_to_examples_and_commentary()
+                else:
+                    self.update_message(f"{headword_id}: headword not found—deleting")
+                    self._pass2_auto_file_manager.delete_item(headword_id)
+                    self._click_load_next_pass2_entry()
+
+            else:
+                self.clear_all_fields()
+                self.update_message("No more pass2auto entries")
+
+            self.update()
 
     def _click_clear_all(self, e: ft.ControlEvent):
         self.clear_all_fields()
 
     def _click_update_sandhi(self, e: ft.ControlEvent):
         self.update_message("updating sandhi... please wait...")
-        self.sandhi_dict = self.sandhi_manager.update_contractions_simple()
+        self.sandhi_dict = self.sandhi_manager.regenerate_contractions_simple()
         self.update_message("sandhi updated")
 
     def _handle_filter_change(self, e: ft.ControlEvent):
@@ -436,9 +465,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
     # Add the new builder method
     def _build_middle_section(self) -> ft.Column:
         """Build and return the middle section with DpdFields."""
-        self.dpd_fields = DpdFields(
-            self, self._db, self.sandhi_dict, self.hyphenation_dict
-        )
+        self.dpd_fields = DpdFields(self, self._db, self.toolkit)
         middle_section = ft.Column(
             scroll=ft.ScrollMode.AUTO,
             expand=True,
@@ -506,6 +533,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
         """Add the word to db, or update in db."""
 
         word_to_save = self.dpd_fields.get_current_headword()
+        comment = self.dpd_fields.get_field("comment").value
 
         if (
             hasattr(self, "headword")
@@ -517,6 +545,8 @@ class Pass2AddView(ft.Column, PopUpMixin):
         ):
             committed, message = self._db.update_word_in_db(word_to_save)
             log_key = "pass2_update"  # It's an update if this block runs
+            if self.toolkit.username_manager.is_not_primary():
+                self.corrections_manager.update_corrections(word_to_save, comment)
         else:
             committed, message = self._db.add_word_to_db(word_to_save)
             log_key = "pass2_add"
@@ -548,7 +578,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
                 self._daily_log.increment(log_key)
 
             if item_id is not None:
-                removed_from_auto = self._pass2_auto_file_manager.remove_response(
+                removed_from_auto = self._pass2_auto_file_manager.delete_item(
                     str(item_id)
                 )
                 if removed_from_auto:

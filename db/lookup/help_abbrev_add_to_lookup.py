@@ -32,20 +32,19 @@ def add_help(g: ProgData):
 
     # then update with new values
     for key, values in help_data.items():
-        if key != "Русский":
-            # query the key in Lookup table
-            results = g.db_session.query(Lookup).filter_by(lookup_key=key).first()
+        # query the key in Lookup table
+        results = g.db_session.query(Lookup).filter_by(lookup_key=key).first()
 
-            # if it exists, then update help column
-            if results:
-                results.help_pack(values["meaning"])
+        # if it exists, then update help column
+        if results:
+            results.help_pack(values["meaning"])
 
-            # if not, add it
-            else:
-                lkp = Lookup()
-                lkp.lookup_key = key
-                lkp.help_pack(values["meaning"])
-                g.db_session.add(lkp)
+        # if not, add it
+        else:
+            lkp = Lookup()
+            lkp.lookup_key = key
+            lkp.help_pack(values["meaning"])
+            g.db_session.add(lkp)
 
     # add ru help
     ru_help_data = read_tsv_as_dict_with_different_key(g.pth.help_tsv_path, 2)

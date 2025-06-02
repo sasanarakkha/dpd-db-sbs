@@ -107,7 +107,15 @@
     % if i.link:
     <tr>
         <td class='th'>Ссылка</td>
-        <td>${i.link}</td>
+        <td>
+            % for website in i.link_list:
+                <p style="margin: 0; padding: 0;">
+                    <a href="${website}" target="_blank">
+                        ${website}
+                    </a>
+                </p>
+            % endfor
+        </td>
     </tr>
     % endif
     % if i.non_ia:

@@ -80,8 +80,8 @@ class GuiTestManager(PopUpMixin):
             modal=True,
             content=self.failure_content,
             actions=[
-                ft.TextButton("Add to Exceptions", on_click=self._handle_add_exception),
                 ft.TextButton("Edit", on_click=self._handle_edit),
+                ft.TextButton("Add to Exceptions", on_click=self._handle_add_exception),
                 ft.TextButton("Next", on_click=self._handle_next_failure),
                 ft.TextButton("Close", on_click=self._handle_popup_close),
                 ft.TextButton("Open Tests TSV", on_click=self._handle_open_test_file),
@@ -139,9 +139,9 @@ class GuiTestManager(PopUpMixin):
         if self.current_headword and isinstance(failure, TestFailure):
             test_row = failure.test_row
             test_name = failure.test_name
-            headword_id = self.current_headword.id
+            headword_id = int(self.current_headword.id)
 
-            self.ui.update_message(f"adding exception for {test_name}")
+            self.ui.update_message(f"adding exception for {test_row}: {test_name}")
 
             success = self.db_test_manager.add_exception(test_name, headword_id)
 

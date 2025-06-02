@@ -51,12 +51,7 @@ def main():
     pth = ProjectPaths()
     db_session = get_db_session(pth.dpd_db_path)
 
-    dpd_db = (
-        db_session.query(DpdHeadword)
-        .options(joinedload(DpdHeadword.ru))
-        .filter(DpdHeadword.family_root != "")
-        .all()
-    )
+    dpd_db = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.ru)).filter(DpdHeadword.family_root != "").all()
 
     if config_test("dictionary", "show_ru_data", "yes"):
         show_ru_data = True
@@ -251,7 +246,7 @@ def add_rf_to_db(db_session, rf_dict):
 
 
 def update_lookup_table(db_session):
-    """Add root keys data to lookuptable."""
+    """Add root keys data to lookup table."""
 
     pr.green("adding roots to lookup table")
 

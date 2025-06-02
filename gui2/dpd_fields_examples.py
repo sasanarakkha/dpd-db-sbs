@@ -2,11 +2,15 @@ import flet as ft
 
 from gui2.dpd_fields_classes import DpdTextField
 
+from gui2.toolkit import ToolKit
+from tools.clean_sentence import split_pali_sentence_into_words
 from tools.cst_source_sutta_example import (
     CstSourceSuttaExample,
     find_cst_source_sutta_example,
 )
-from tools.sandhi_contraction import SandhiContractionDict
+
+from tools.hyphenations import HyphenationFileManager, HyphenationsDict
+from tools.sandhi_contraction import SandhiContractionDict, SandhiContractionManager
 from gui2.example_stash_manager import ExampleStashManager
 from gui2.flet_functions import (
     highlight_word_in_sentence,
@@ -111,8 +115,7 @@ class DpdExampleField(ft.Column):
         ui,
         field_name,
         dpd_fields,
-        sandhi_dict,
-        hyphenation_dict,
+        toolkit,
         on_focus=None,
         on_change=None,
         on_submit=None,
@@ -126,8 +129,21 @@ class DpdExampleField(ft.Column):
         self.ui: Pass1AddView | Pass2AddView = ui
         self.field_name = field_name
         self.dpd_fields: DpdFields = dpd_fields
-        self.sandhi_dict: SandhiContractionDict = sandhi_dict
-        self.hyphenation_dict: dict[str, str] = hyphenation_dict
+
+        self.toolkit: ToolKit = toolkit
+
+        self.sandhi_manager: SandhiContractionManager = self.toolkit.sandhi_manager
+        self.sandhi_dict: SandhiContractionDict = (
+            self.sandhi_manager.sandhi_contractions_simple
+        )
+
+        self.hyphenation_manager: HyphenationFileManager = (
+            self.toolkit.hyphenation_manager
+        )
+        self.hyphenation_dict: HyphenationsDict = (
+            self.hyphenation_manager.hyphenations_dict
+        )
+
         self.simple_mode = simple_mode
         self.stash_manager = ExampleStashManager(self.ui.toolkit)
         super().__init__(
@@ -176,6 +192,10 @@ class DpdExampleField(ft.Column):
                 label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=10),
                 editable=True,
                 enable_filter=True,
+                border_color=ft.Colors.GREY_800,
+                border_radius=10,
+                border_width=1,
+                on_blur=self._handle_book_blur,
             )
 
             self.word_to_find_field = ft.TextField(
@@ -184,6 +204,7 @@ class DpdExampleField(ft.Column):
                 label="word to find",
                 label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=10),
                 on_submit=self._click_search_dialog_ok,
+                border_radius=10,
             )
 
             # Toggle Button
@@ -214,6 +235,10 @@ class DpdExampleField(ft.Column):
                     ft.ElevatedButton(
                         "Reload",
                         on_click=self._click_reload_example,
+                    ),
+                    ft.ElevatedButton(
+                        "Last",
+                        on_click=self._click_last_example,
                     ),
                 ],
                 spacing=0,
@@ -275,7 +300,7 @@ class DpdExampleField(ft.Column):
         if are_visible:
             self._toggle_tools_button.icon = ft.Icons.VISIBILITY_OUTLINED
             self._toggle_tools_button.tooltip = "Hide Tools"
-            self.page.update()
+            self.book_dropdown.focus()
         else:
             self._toggle_tools_button.icon = ft.Icons.VISIBILITY_OFF_OUTLINED
             self._toggle_tools_button.tooltip = "Show Tools"
@@ -285,10 +310,38 @@ class DpdExampleField(ft.Column):
         """Handles search submission (e.g., from word_to_find_field on_submit)."""
         self.click_book_and_word(e)
 
+    def _handle_book_blur(self, e: ft.ControlEvent):
+        self.word_to_find_field.focus()
+        self.page.update()
+
     def _handle_last_control_blur(self, e: ft.ControlEvent):
-        """Hides the tools if they are visible when the last control loses focus."""
+        """Hides the tools if they are visible when the last control loses focus.
+        Also adds apostrophes, hyphenations and saves current example"""
+
         if self._search_row.visible:
             self._toggle_tools_visibility(None)
+
+        source, sutta, example = self.get_fields()
+
+        # Save current example to stash
+        if example.value:
+            self.stash_manager.last_example = (
+                source.value or "",
+                sutta.value or "",
+                example.value,
+            )
+
+        # handle hyphenations and apostrophes
+        if "'" in example.value or "-" in example.value:
+            self._handle_hyphens_and_apostrophes(example.value)
+
+    def _handle_hyphens_and_apostrophes(self, text):
+        text_list: list[str] = split_pali_sentence_into_words(text)
+        for word in text_list:
+            if "-" in word:
+                self.hyphenation_manager.update_hyphenations_dict(word)
+            elif "'" in word:
+                self.sandhi_manager.update_sandhi_contractions(word)
 
     def click_book_and_word(self, e: ft.ControlEvent):
         self.word_to_find_field.error_text = None
@@ -457,14 +510,14 @@ class DpdExampleField(ft.Column):
     def _click_stash_example(self, e: ft.ControlEvent):
         """Stashes the current source, sutta, and example values."""
         source, sutta, example = self.get_fields()
-        self.stash_manager.stash(
+        self.stash_manager.stash_shared_example(
             source.value or "", sutta.value or "", example.value or ""
         )
         self.ui.update_message("Stashed current example data")
 
     def _click_reload_example(self, e: ft.ControlEvent):
         """Reloads stashed data into the source, sutta, and example fields."""
-        stashed_data = self.stash_manager.reload()
+        stashed_data = self.stash_manager.reload_shared_example()
         if stashed_data:
             source_val, sutta_val, example_val = stashed_data
             source, sutta, example = self.get_fields()
@@ -475,6 +528,15 @@ class DpdExampleField(ft.Column):
             self.ui.update_message("Reloaded stashed example data")
         else:
             self.ui.update_message("No stashed data found")
+
+    def _click_last_example(self, e: ft.ControlEvent):
+        """Loads the last saved example from stash."""
+        if last_example := self.stash_manager.last_example:
+            source, sutta, example = self.get_fields()
+            source.value = last_example[0]
+            sutta.value = last_example[1]
+            example.value = last_example[2]
+            self.page.update()
 
     def update_counter(self, e: ft.ControlEvent):
         max_length = 300

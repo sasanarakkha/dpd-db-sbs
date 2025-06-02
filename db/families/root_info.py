@@ -1,13 +1,12 @@
 import re
-from rich import print
+from tools.printer import printer as pr
 
 
 def generate_root_info_html(db_session, roots_db, bases_dict, show_ru_data=False):
-    """Create an html table of all info specfic to a pali root."""
-    print("[green]compiling root info")
+    """Create an html table of all info specific to a pali root."""
+    pr.green_title("compiling root info")
 
     for counter, i in enumerate(roots_db):
-
         root_clean = re.sub(" \\d*$", "", i.root)
         root_group_pali = root_grouper(i.root_group)
         try:
@@ -86,9 +85,7 @@ def generate_root_info_html(db_session, roots_db, bases_dict, show_ru_data=False
         i.root_info = html_string
 
         if counter % 100 == 0:
-            print(
-                f"{counter:>10,} / {len(roots_db):<10,} {i.root}")
-
+            pr.counter(counter, len(roots_db), i.root)
     db_session.commit()
 
 
@@ -102,6 +99,6 @@ def root_grouper(root_group: int):
         5: "kiyādigaṇa",
         6: "gahādigaṇa",
         7: "tanādigaṇa",
-        8: "curādigaṇa"
+        8: "curādigaṇa",
     }
     return root_groups.get(root_group, "ERROR!")

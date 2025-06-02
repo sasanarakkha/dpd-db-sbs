@@ -1,7 +1,17 @@
 {
-    "shared_stash": {
-        "source": "DN24",
-        "sutta": "pāthikasuttaṃ, iddhipāṭihāriyakathā",
-        "example": "tass'eva kho, āvuso pāthikaputta, sīhassa migarañño vighāsasaṃvaḍḍho jarasiṅgālo ditto c'eva balavā ca."
+    "shared": {
+        "source": "DN32",
+        "sutta": "āṭānāṭiyasuttaṃ, paṭhamabhāṇavāro",
+        "example": "yo hi koci, mārisa, amanusso ... nāgo vā nāgī vā nāgapotako vā nāgapotikā vā nāgamah'āmatto vā nāgapārisajjo vā nāgapacāro vā paduṭṭhacitto bhikkhuṃ vā bhikkhuniṃ vā upāsakaṃ vā upāsikaṃ vā gacchantaṃ vā anugaccheyya, ṭhitaṃ vā upatiṭṭheyya, nisinnaṃ vā upanisīdeyya, nipannaṃ vā upanipajjeyya."
+    },
+    "last": {
+        "source": "VIN3.6.161",
+        "sutta": "bhesajjakkhandhako, mūlādibhesajjakathā",
+        "example": "bhagavato etam'atthaṃ ārocesuṃ. anujānāmi, bhikkhave, akaṭayūsan'ti. kaṭākaṭena attho hoti."
+    },
+    "stash": {
+        "source": "DN30",
+        "sutta": "lakkhaṇasuttaṃ, āyatapaṇhitāditilakkhaṇaṃ",
+        "example": "bhavati yadi gihī ciraṃ yapeti,\ncirataraṃ pabbajati yadi tato hi,\nyāpayati ca vas'iddhibhāvanāya,\niti dīgh'āyukatāya taṃ nimittan'ti."
     }
 }

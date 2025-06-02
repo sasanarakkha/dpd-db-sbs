@@ -3,86 +3,109 @@
 """Main program to run the GUI."""
 
 import json
-import subprocess
-import PySimpleGUI as sg  # type: ignore
 import re
-import pyperclip
-
+import subprocess
 from copy import deepcopy
+
+import pyperclip
+import PySimpleGUI as sg  # type: ignore
 from rich import print
 
-
-from gui.window_layout import window_layout
-
-from gui.functions_db import update_word_in_db
-from gui.functions_db import get_next_ids
-from gui.functions_db import get_family_root_values
-from gui.functions_db import get_root_sign_values
-from gui.functions_db import get_root_base_values
-from gui.functions_db import get_synonyms
-from gui.functions_db import get_sanskrit
-from gui.functions_db import copy_word_from_db
-from gui.functions_db import edit_word_in_db
-from gui.functions_db import get_lemma_clean_list
-from gui.functions_db import delete_word
-from gui.functions_db import get_root_info
-from gui.functions_db import fetch_id_or_lemma_1
-from gui.functions_db import get_family_compound_values
-from gui.functions_db import get_family_idioms_values
-from gui.functions_db import del_syns_if_pos_meaning_changed
-from gui.functions_db import major_change_record
-
-from gui.functions_show_fields import show_all_fields
-from gui.functions_show_fields import show_compound_fields
-from gui.functions_show_fields import show_root_fields
-from gui.functions_show_fields import show_word_fields
-
-from gui.functions import sandhi_ok
-from gui.functions import test_book_to_add
-from gui.functions import make_words_to_add_list
-from gui.functions import add_sandhi_rule, open_sandhi_rules
-from gui.functions import add_sandhi_correction
-from gui.functions import open_sandhi_corrections
-from gui.functions import add_spelling_mistake
-from gui.functions import open_spelling_mistakes
-from gui.functions import add_variant_reading
-from gui.functions import open_variant_readings
-from gui.functions import open_sandhi_exceptions
-from gui.functions import open_sandhi_ok
-from gui.functions import open_inflection_tables
-from gui.functions import find_sutta_example
-from gui.functions import find_commentary_definitions
-from gui.functions import check_spelling
-from gui.functions import add_spelling
-from gui.functions import edit_spelling
-from gui.functions import clear_errors
-from gui.functions import clear_values
-from gui.functions import add_stem_pattern
-from gui.functions import Flags, reset_flags
-from gui.functions import display_summary
-from gui.functions import test_family_compound
-from gui.functions import test_family_idioms
-from gui.functions import remove_word_to_add
-from gui.functions import add_to_word_to_add
-from gui.functions import save_gui_state
-from gui.functions import load_gui_state
-from gui.functions import test_construction
-from gui.functions import replace_sandhi_gui
-from gui.functions import test_username
-from gui.functions import compare_differences
-from gui.functions import stasher, unstasher
-from gui.functions import increment_lemma_1
-from gui.functions import make_compound_construction
-from gui.functions import make_construction
-from gui.functions import make_lemma_clean
-from gui.functions import example_load
-from gui.functions import example_save
-
-from gui.functions_tests import individual_internal_tests
-from gui.functions_tests import open_internal_tests
-from gui.functions_tests import db_internal_tests
-
+from db.db_helpers import get_db_session
+from db_tests.single.test_allowable_characters import (
+    test_allowable_characters_gui,
+)
+from gui.functions import (
+    Flags,
+    add_sandhi_correction,
+    add_sandhi_rule,
+    add_spelling,
+    add_spelling_mistake,
+    add_stem_pattern,
+    add_to_word_to_add,
+    add_variant_reading,
+    check_spelling,
+    clear_errors,
+    clear_values,
+    compare_differences,
+    display_summary,
+    edit_spelling,
+    example_load,
+    example_save,
+    find_sutta_example,
+    increment_lemma_1,
+    load_gui_state,
+    make_compound_construction,
+    make_construction,
+    make_lemma_clean,
+    make_words_to_add_list,
+    open_inflection_tables,
+    open_sandhi_corrections,
+    open_sandhi_exceptions,
+    open_sandhi_ok,
+    open_sandhi_rules,
+    open_spelling_mistakes,
+    open_variant_readings,
+    remove_word_to_add,
+    replace_sandhi_gui,
+    reset_flags,
+    sandhi_ok,
+    save_gui_state,
+    stasher,
+    test_book_to_add,
+    test_construction,
+    test_family_compound,
+    test_family_idioms,
+    test_username,
+    unstasher,
+)
 from gui.functions_daily_record import daily_record_update
+from gui.functions_db import (
+    copy_word_from_db,
+    del_syns_if_pos_meaning_changed,
+    delete_word,
+    edit_word_in_db,
+    fetch_id_or_lemma_1,
+    get_family_compound_values,
+    get_family_idioms_values,
+    get_family_root_values,
+    get_lemma_clean_list,
+    get_next_ids,
+    get_root_base_values,
+    get_root_info,
+    get_root_sign_values,
+    get_sanskrit,
+    get_synonyms,
+    major_change_record,
+    update_word_in_db,
+)
+
+from gui.functions_show_fields import (
+    show_all_fields,
+    show_compound_fields,
+    show_root_fields,
+    show_word_fields,
+)
+from gui.functions_tests import (
+    db_internal_tests,
+    individual_internal_tests,
+    open_internal_tests,
+)
+
+from gui.pass2 import Pass2Data, pass2_gui, start_from_where_gui
+from gui.window_layout import window_layout
+from scripts.backup.backup_dpd_headwords_and_roots import backup_dpd_headwords_and_roots
+from tools.bold_definitions_search import BoldDefinitionsSearchManager
+from tools.fast_api_utils import (
+    request_bold_def_server,
+    request_dpd_server,
+    start_dpd_server,
+)
+from tools.goldendict_tools import open_in_goldendict
+from tools.missing_meanings import find_missing_meanings
+from tools.paths import ProjectPaths
+from tools.pos import DECLENSIONS, POS, VERBS
+from tools.sandhi_contraction import SandhiContractionManager
 
 from gui.functions_dps import clear_dps
 from gui.functions_dps import translate_with_ai
@@ -134,31 +157,12 @@ from gui.functions_db_dps import dps_get_original_values
 from gui.functions_db_dps import words_in_db_from_source
 from gui.functions_db_dps import words_in_db_with_value_in_field_sbs
 
+
 from gui.functions_tests_dps import dps_open_internal_tests
 from gui.functions_tests_dps import dps_individual_internal_tests
 from gui.functions_tests_dps import dps_db_internal_tests
 from gui.functions_tests_dps import check_repetition
 from gui.functions_tests_dps import dps_dpd_db_internal_tests
-
-from gui.pass2 import pass2_gui, Pass2Data
-from gui.pass2 import start_from_where_gui
-
-from db.db_helpers import get_db_session
-from scripts.backup.backup_dpd_headwords_and_roots import backup_dpd_headwords_and_roots
-from scripts.backup.backup_ru_sbs import backup_ru_sbs
-
-from db_tests.single.test_allowable_characters import test_allowable_characters_gui
-from db_tests.single.test_allowable_characters import test_allowable_characters_gui_dps
-
-from tools.goldendict_tools import open_in_goldendict
-from tools.paths import ProjectPaths
-from tools.pos import DECLENSIONS, VERBS
-from tools.pos import POS
-from tools.sandhi_contraction import make_sandhi_contraction_dict
-from tools.fast_api_utils import start_dpd_server
-from tools.fast_api_utils import request_dpd_server
-from tools.fast_api_utils import request_bold_def_server
-from tools.missing_meanings import find_missing_meanings
 
 from tools.paths_dps import DPSPaths
 
@@ -176,7 +180,9 @@ def main():
 
     family_compound_values = get_family_compound_values(db_session)
     family_idioms_values = get_family_idioms_values(db_session)
-    sandhi_dict = make_sandhi_contraction_dict(db_session)
+
+    sandhi_finder = SandhiContractionManager()
+    sandhi_dict = sandhi_finder.get_sandhi_contractions_simple()
 
     with open(pth.hyphenations_dict_path) as f:
         hyphenations_dict = json.load(f)
@@ -891,9 +897,10 @@ def main():
 
         elif event == "search_for_enter" or event == "definitions_search_button":
             commentary_definitions = None
+            commentary_manager = BoldDefinitionsSearchManager()
             try:
-                commentary_definitions = find_commentary_definitions(
-                    sg, values, db_session
+                commentary_definitions = commentary_manager.search(
+                    values["search_for"], values["contains"]
                 )
             except NameError as e:
                 window["messages"].update(
@@ -1051,7 +1058,7 @@ def main():
             subprocess.Popen(["libreoffice", pth.root_families_sanskrit_path])
 
         elif event == "update_sandhi_button":
-            sandhi_dict = make_sandhi_contraction_dict(db_session)
+            sandhi_dict = sandhi_finder.regenerate_contractions()
 
         elif event == "refresh_db_session_button":
             db_session.close()
@@ -1126,7 +1133,6 @@ def main():
                             book_to_add, pth, values, sg, pali_word_original2, action
                         )
                         clear_errors(window)
-                        window["dps_id_or_lemma_1"].update(values["lemma_1"])
                         clear_values(values, window, username)
                         if username == "primary_user":
                             get_next_ids(db_session, window)

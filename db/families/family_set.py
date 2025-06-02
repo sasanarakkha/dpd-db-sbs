@@ -2,15 +2,14 @@
 
 """Compile sets save to database."""
 
-from rich import print
-
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword, FamilySet
+from tools.degree_of_completion import degree_of_completion
+from tools.degree_of_completion_ru import rus_degree_of_completion
 from tools.printer import printer as pr
 from tools.superscripter import superscripter_uni
 from tools.meaning_construction import make_meaning_combo
-from tools.degree_of_completion import degree_of_completion
-from tools.degree_of_completion_ru import rus_degree_of_completion
+
 from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
 from tools.configger import config_test
@@ -26,7 +25,7 @@ from sqlalchemy.orm import joinedload
 
 def main():
     pr.tic()
-    print("[bright_yellow]sets generator")
+    pr.title("sets generator")
 
     if not (
         config_test("exporter", "make_dpd", "yes")
@@ -34,19 +33,14 @@ def main():
         or config_test("exporter", "make_tpr", "yes")
         or config_test("exporter", "make_ebook", "yes")
     ):
-        print("[green]disabled in config.ini")
+        pr.green("disabled in config.ini")
         pr.toc()
         return
 
     pth = ProjectPaths()
     db_session = get_db_session(pth.dpd_db_path)
 
-    sets_db = (
-        db_session.query(DpdHeadword)
-        .options(joinedload(DpdHeadword.ru))
-        .filter(DpdHeadword.family_set != "")
-        .all()
-    )
+    sets_db = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.ru)).filter(DpdHeadword.family_set != "").all()
     sets_db = sorted(sets_db, key=lambda x: pali_sort_key(x.lemma_1))
 
     sets_dict = make_sets_dict(sets_db)
@@ -57,7 +51,7 @@ def main():
 
 
 def make_sets_dict(sets_db):
-    print("[green]extracting set names", end=" ")
+    pr.green("extracting set names")
 
     # create a dict of all sets
     # set: {headwords: [], html: "", data:, []}
@@ -67,11 +61,11 @@ def make_sets_dict(sets_db):
     for __counter__, i in enumerate(sets_db):
         for fs in i.family_set_list:
             if fs == " ":
-                print("[bright_red]ERROR: spaces found please remove!")
+                pr.red("ERROR: spaces found please remove!")
             elif not fs:
-                print("[bright_red]ERROR: '' found please remove!")
+                pr.red("ERROR: '' found please remove!")
             elif fs == "+":
-                print("[bright_red]ERROR: + found please remove!")
+                pr.red("ERROR: + found please remove!")
 
             if i.meaning_1:
                 if fs in sets_dict:
@@ -86,12 +80,12 @@ def make_sets_dict(sets_db):
                         "data_ru": [],
                     }
 
-    print(len(sets_dict))
+    pr.yes(len(sets_dict))
     return sets_dict
 
 
 def compile_sf_html(sets_db, sets_dict):
-    print("[green]compiling html")
+    pr.green("compiling html")
 
     populate_set_ru_and_check_errors(sets_dict)
 
@@ -151,11 +145,12 @@ def compile_sf_html(sets_db, sets_dict):
         sets_dict[i]["html"] += "</table>"
         sets_dict[i]["html_ru"] += "</table>"
 
+    pr.yes(len(sets_dict))
     return sets_dict
 
 
 def add_sf_to_db(db_session, sets_dict):
-    print("[green]adding to db", end=" ")
+    pr.green("adding to db")
 
     add_to_db = []
     errors_list = []
@@ -182,16 +177,16 @@ def add_sf_to_db(db_session, sets_dict):
     db_session.add_all(add_to_db)
     db_session.commit()
     db_session.close()
-    print("[white]ok")
+    pr.yes("ok")
 
     return errors_list
 
 
 def print_errors_list(errors_list):
     if errors_list != []:
-        print("[bright_red]ERROR: less than 3 names in set: ")
+        pr.red("ERROR: less than 3 names in set: ")
         for error in errors_list:
-            print(f"[red]{error}")
+            pr.red(f"{error}")
 
 
 if __name__ == "__main__":

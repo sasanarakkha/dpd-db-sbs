@@ -1,22 +1,19 @@
 """Render tab to add the next missing word from a text."""
+
 from gui.tooltips import sutta_codes
 
+
 def make_tab_add_next_word(sg, username):
-
-
     tab_add_next_word = [
         [
-            sg.Text(
-                "select book to add:", 
-                pad=((100, 0), (20, 20))
-            ),
+            sg.Text("select book to add:", pad=((100, 0), (20, 20))),
             sg.Input(
                 key="book_to_add",
-                size=(10, 1), 
+                size=(10, 1),
                 pad=((0, 0), (20, 20)),
             ),
             sg.Button(
-                "Add", 
+                "Add",
                 key="books_to_add_button",
                 pad=((10, 0), (20, 20)),
             ),
@@ -38,7 +35,7 @@ def make_tab_add_next_word(sg, username):
                 "sutta codes",
                 size=(50, 1),
                 pad=((10, 0), (20, 20)),
-                tooltip=sutta_codes
+                tooltip=sutta_codes,
             ),
         ],
         [
@@ -185,19 +182,17 @@ def make_tab_add_next_word(sg, username):
         [
             sg.Text("next word to add:", 
             pad=((100, 0), (0, 0))),
+            sg.Text("next word to add:", pad=((100, 0), (0, 0))),
         ],
         [
             sg.Listbox(
                 values=[],
                 key="word_to_add",
-                size=(51, 1), 
+                size=(51, 1),
                 pad=((100, 0), (0, 0)),
-                enable_events=True
-                ),
-            sg.Text(
-                "",
-                key="words_to_add_length",
-                text_color="white"),
+                enable_events=True,
+            ),
+            sg.Text("", key="words_to_add_length", text_color="white"),
             sg.Button(
                 "to simsapa", 
                 key="send_sutta_study_request_button",
@@ -206,26 +201,23 @@ def make_tab_add_next_word(sg, username):
                 visible=username == "deva",
             ),
         ],
-        [
-            sg.Text(
-                "", pad=((100, 0), (0, 0))
-            )
-        ],
+        [sg.Text("", pad=((100, 0), (0, 0)))],
         [
             sg.Button(
                 "sandhi ok",
                 key="sandhi_ok",
                 size=(50, 1),
                 enable_events=True,
-                pad=((100, 0), (0, 0))),
+                pad=((100, 0), (0, 0)),
+            ),
         ],
         [
             sg.Button(
                 "add word to dictionary",
-                key="add_word", 
+                key="add_word",
                 size=(50, 1),
-                enable_events=True, 
-                pad=((100, 0), (0, 0))
+                enable_events=True,
+                pad=((100, 0), (0, 0)),
             ),
         ],
         [
@@ -283,7 +275,7 @@ def make_tab_add_next_word(sg, username):
                 key="fix_sandhi",
                 size=(50, 1),
                 enable_events=True,
-                pad=((100, 0), (0, 0))
+                pad=((100, 0), (0, 0)),
             ),
         ],
         [
@@ -292,7 +284,7 @@ def make_tab_add_next_word(sg, username):
                 key="update_inflection_templates",
                 size=(50, 1),
                 enable_events=True,
-                pad=((100, 0), (0, 0))
+                pad=((100, 0), (0, 0)),
             ),
         ],
         [
@@ -301,7 +293,7 @@ def make_tab_add_next_word(sg, username):
                 key="remove_word",
                 size=(50, 1),
                 enable_events=True,
-                pad=((100, 0), (0, 0))
+                pad=((100, 0), (0, 0)),
             ),
         ],
         [
@@ -356,44 +348,20 @@ def make_tab_add_next_word(sg, username):
             ),
         ],
         [
-            sg.Text(
-                "Added:", 
-                pad=((100, 0), (0, 0))
-            ),
-            sg.Text(
-                "0", key="daily_added",
-                text_color="white"
-            ),
+            sg.Text("Added:", pad=((100, 0), (0, 0))),
+            sg.Text("0", key="daily_added", text_color="white"),
         ],
         [
-            sg.Text(
-                "Edited: ",
-                pad=((100, 0), (0, 0))
-            ),
-            sg.Text(
-                "0", key="daily_edited",
-                text_color="white"
-            ),
+            sg.Text("Edited: ", pad=((100, 0), (0, 0))),
+            sg.Text("0", key="daily_edited", text_color="white"),
         ],
         [
-            sg.Text(
-                "Deleted: ",
-                pad=((100, 0), (0, 0))
-            ),
-            sg.Text(
-                "0", key="daily_deleted",
-                text_color="white"
-            ),
+            sg.Text("Deleted: ", pad=((100, 0), (0, 0))),
+            sg.Text("0", key="daily_deleted", text_color="white"),
         ],
         [
-            sg.Text(
-                "Checked: ",
-                pad=((100, 0), (0, 0))
-            ),
-            sg.Text(
-                "0", key="daily_checked",
-                text_color="white"
-            ),
+            sg.Text("Checked: ", pad=((100, 0), (0, 0))),
+            sg.Text("0", key="daily_checked", text_color="white"),
         ],
     ]
 

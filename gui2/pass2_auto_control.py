@@ -6,7 +6,7 @@ from typing import Any, Iterator, Optional
 from db.models import DpdHeadword
 from gui2.books import SuttaCentralSource, sutta_central_books
 from gui2.database_manager import DatabaseManager
-from gui2.pass2_file_manager import Pass2AutoFileManager
+from gui2.pass2_auto_file_manager import Pass2AutoFileManager
 from gui2.pass2_pre_controller import Pass2PreFileManager
 from gui2.paths import Gui2Paths
 from gui2.toolkit import ToolKit
@@ -110,7 +110,7 @@ class Pass2AutoController:
         """Process all items marked 'yes' in Pass 2 Pre."""
 
         self._book = book
-        self._provider_preference = provider_preference  # Store for batch
+        self._provider_preference = provider_preference
         self._model_name = model_name
 
         self._cst_books = self._sc_books[self._book].cst_books
@@ -135,7 +135,11 @@ class Pass2AutoController:
                 if self.stop_flag:
                     break
 
-                if self._word_in_text not in self._pass2_pre_file_manager.processed:
+                # if self._word_in_text not in self._pass2_pre_file_manager.processed:
+                if (
+                    self._word_in_text
+                    not in self._pass2_auto_file_manager.pass2_auto_data
+                ):
                     self._process_single_item()
 
             if self.stop_flag:
@@ -177,16 +181,17 @@ class Pass2AutoController:
             )
 
             if response_dict:
+                # Add AI model details to the 'comment' field for the JSON output
+                if self._provider_preference and self._model_name:
+                    ai_info = f"{self._provider_preference}: {self._model_name}\n"
+                    current_comment = response_dict.get("comment", "")
+                    response_dict["comment"] = ai_info + current_comment
+
                 # Update the main auto file
-                self._pass2_auto_file_manager.update_response(
+                self._pass2_auto_file_manager.update_pass2_auto_data(
                     str(headword_in_db.id),
                     response_dict,
                 )
-                # Add AI model details to the 'comment' field for the JSON output
-                if self._provider_preference and self._model_name:
-                    ai_info = f"[{self._provider_preference}: {self._model_name}] "
-                    current_comment = response_dict.get("comment", "")
-                    response_dict["comment"] = ai_info + current_comment
 
                 # Move item from matched to processed in the pre-processing file
                 message = self._pass2_pre_file_manager.move_matched_item_to_processed(
@@ -239,9 +244,6 @@ class Pass2AutoController:
             A dictionary with the AI's suggestions, or None if an error occurred.
         """
         try:
-            pr.info(
-                f"Processing {headword.lemma_1} with AI model: {provider_preference}/{model_name}"
-            )
             related_words = self.db.get_related_headwords(headword)
             prompt = self._make_prompt(headword, related_words, sentence_data)
             raw_response = self._send_prompt(
@@ -328,7 +330,7 @@ Please complete ALL fields below EXACTLY as shown, filling missing data and corr
 
 PRESERVE the original formatting, field order, and structure.
 
-Add any comments you wish to add to a `comments` field at the end of the data.
+Add any comments you wish to add to a `comment` field at the end of the data.
 
 Return ONLY the Python dictionary portion, starting and ending with curly braces, with no additional text or explanations.
 
@@ -435,7 +437,7 @@ ve: verbal ending
 ## All other fields
 - Analyse the related dictionary entries above and use the same style and pattern. Only add the required data, no commentary.
 
-## Comments
+## Comment
 - Add your own commentary to this field, not to any other field.
 - Call the field 'comment'
 - Only mention anything relevant or interesting, nothing that is already in other fields. 
@@ -466,7 +468,6 @@ ve: verbal ending
                 provider_preference=provider_preference,
                 model=model,
             )
-            pr.info(f"AI Manager status for pass2_auto: {ai_resp.status_message}")
             if ai_resp.content:
                 # Extract just the dictionary portion
                 start = ai_resp.content.find("{")

@@ -11,8 +11,13 @@ class Gui2Paths:
     daily_log_path: Path = gui2_data_path / "daily_log.json"
     pass2_auto_json_path: Path = gui2_data_path / "pass2_auto.json"
     pass2_auto_failures_path: Path = gui2_data_path / "pass2_auto_failures.txt"
-    history_json_path: Path = gui2_data_path / "history.json"  # Add history path
+    pass2_exceptions_path: Path = gui2_data_path / "pass2_exceptions.json"
+    pass2_new_words_path: Path = gui2_data_path / "pass2_new_words.json"
+    history_json_path: Path = gui2_data_path / "history.json"
     example_stash_json_path: Path = gui2_data_path / "example_stash.json"
+    corrections_path: Path = gui2_data_path / "corrections.json"
+    additions_path: Path = gui2_data_path / "additions.json"
+
     # Other paths
     find_words_dump_path: Path = gui2_dir / "data/find_words_with_examples_dump.json"
     find_words_exceptions_path: Path = (

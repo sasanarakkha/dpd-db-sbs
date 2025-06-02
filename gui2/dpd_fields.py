@@ -1,5 +1,6 @@
 import re
 from typing import Any, Union
+
 import flet as ft
 
 from db.models import DpdHeadword
@@ -12,11 +13,9 @@ from gui2.dpd_fields_classes import (
 )
 from gui2.dpd_fields_commentary import DpdCommentaryField
 from gui2.dpd_fields_compound_construction import DpdCompoundConstructionField
-from gui2.dpd_fields_family_set import DpdFamilySetField
-from gui2.dpd_fields_meaning import DpdMeaningField
-from gui2.dpd_fields_notes import DpdNotesField
-from gui2.dpd_fields_flags import Flags
 from gui2.dpd_fields_examples import DpdExampleField
+from gui2.dpd_fields_family_set import DpdFamilySetField
+from gui2.dpd_fields_flags import Flags
 from gui2.dpd_fields_functions import (
     clean_construction_line1,
     clean_lemma_1,
@@ -26,11 +25,15 @@ from gui2.dpd_fields_functions import (
     make_dpd_headword_from_dict,
     make_lemma_2,
 )
+from gui2.dpd_fields_meaning import DpdMeaningField
+from gui2.dpd_fields_notes import DpdNotesField
 from gui2.mixins import PopUpMixin
-from tools.pos import DECLENSIONS, NOUNS, PARTICIPLES, POS, VERBS  # Import DECLENSIONS
-from tools.sandhi_contraction import SandhiContractionDict
-from tools.spelling import CustomSpellChecker
+from gui2.toolkit import ToolKit
 from tools.fuzzy_tools import find_closest_matches
+from tools.hyphenations import HyphenationFileManager, HyphenationsDict
+from tools.pos import DECLENSIONS, NOUNS, PARTICIPLES, POS, VERBS
+from tools.sandhi_contraction import SandhiContractionDict, SandhiContractionManager
+from tools.spelling import CustomSpellChecker
 
 DpdFieldType = Union[
     DpdTextField,
@@ -50,9 +53,8 @@ class DpdFields(PopUpMixin):
         self,
         ui,
         db: DatabaseManager,
-        sandhi_dict: SandhiContractionDict,
-        hyphenation_dict: dict[str, str],
-        simple_examples: bool = False,  # Add simple_examples flag
+        toolkit,
+        simple_examples: bool = False,
     ):
         super().__init__()  # Initialize PopUpMixin
         from gui2.pass1_add_view import Pass1AddView
@@ -62,8 +64,18 @@ class DpdFields(PopUpMixin):
         self.page = self.ui.page
         self.db: DatabaseManager = db
         self.spellchecker = CustomSpellChecker()
-        self.sandhi_dict = sandhi_dict
-        self.hyphenation_dict = hyphenation_dict
+        self.toolkit: ToolKit = toolkit
+
+        self.sandhi_manager: SandhiContractionManager = self.toolkit.sandhi_manager
+        self.sandhi_dict: SandhiContractionDict = (
+            self.sandhi_manager.sandhi_contractions_simple
+        )
+        self.hyphenations_manager: HyphenationFileManager = (
+            self.toolkit.hyphenation_manager
+        )
+        self.hyphenation_dict: HyphenationsDict = (
+            self.hyphenations_manager.hyphenations_dict
+        )
         self.simple_examples = simple_examples  # Store the flag
 
         # Fetch compound types (ensure db is initialized first if needed)
@@ -119,6 +131,7 @@ class DpdFields(PopUpMixin):
                 "trans",
                 field_type="dropdown",
                 options=[" ", "trans", "intrans", "ditrans"],
+                on_blur=self.trans_blur,
             ),
             FieldConfig(
                 "plus_case",
@@ -256,7 +269,13 @@ class DpdFields(PopUpMixin):
                 on_focus=self.pattern_change,
                 on_change=self.pattern_change,
             ),
-            FieldConfig("comment", multiline=True),
+            FieldConfig(
+                "comment",
+                multiline=True,
+                on_focus=self.comment_change,
+                on_blur=self.comment_change,
+                on_change=self.comment_change,
+            ),
         ]
 
         # Initialize flags
@@ -285,7 +304,7 @@ class DpdFields(PopUpMixin):
                     on_blur=config.on_blur,
                 )
 
-            elif config.field_type == "meaning":  # Add condition for meaning
+            elif config.field_type == "meaning":
                 self.fields[config.name] = DpdMeaningField(
                     self.ui,
                     field_name=config.name,
@@ -302,8 +321,7 @@ class DpdFields(PopUpMixin):
                     self.ui,
                     field_name=config.name,
                     dpd_fields=self,
-                    sandhi_dict=self.sandhi_dict,
-                    hyphenation_dict=self.hyphenation_dict,
+                    toolkit=self.toolkit,
                     on_focus=config.on_focus,
                     on_change=config.on_change,
                     on_submit=config.on_submit,
@@ -316,8 +334,7 @@ class DpdFields(PopUpMixin):
                     self.ui,
                     field_name=config.name,
                     dpd_fields=self,
-                    sandhi_dict=self.sandhi_dict,
-                    hyphenation_dict=self.hyphenation_dict,
+                    toolkit=self.toolkit,
                     on_focus=config.on_focus,
                     on_change=config.on_change,
                     on_submit=config.on_submit,
@@ -536,7 +553,7 @@ class DpdFields(PopUpMixin):
                 main_value = main_field_control.value
                 add_value = add_field_control.value
 
-                if main_value and add_value and main_value != add_value:
+                if main_value != add_value:
                     add_field_control.color = ft.Colors.RED
                 else:
                     add_field_control.color = ft.Colors.GREY_500
@@ -624,16 +641,7 @@ class DpdFields(PopUpMixin):
 
         # Autofill search fields for new entries (not loaded from DB)
         if not self.flags.loaded_from_db and value:
-            lemma_clean = clean_lemma_1(value)
-            commentary_field: DpdCommentaryField | None = self.get_field("commentary")
-            if commentary_field and hasattr(commentary_field, "search_field_1"):
-                commentary_field.search_field_1.value = lemma_clean
-            example_1_field: DpdExampleField | None = self.get_field("example_1")
-            if example_1_field and hasattr(example_1_field, "word_to_find_field"):
-                example_1_field.word_to_find_field.value = lemma_clean
-            example_2_field: DpdExampleField | None = self.get_field("example_2")
-            if example_2_field and hasattr(example_2_field, "word_to_find_field"):
-                example_2_field.word_to_find_field.value = lemma_clean
+            self.ui.add_headword_to_examples_and_commentary()
 
         self.page.update()
         if e.name != "blur":  # only focus on submit, not on blur
@@ -646,8 +654,23 @@ class DpdFields(PopUpMixin):
         self.page.update()
 
     def pos_blur(self, e: ft.ControlEvent) -> None:
-        # update lemma_2 based on lemma_1 and pos
         field, value = self.get_event_field_and_value(e)
+
+        # test for wrong values
+        if value not in self.db.all_pos:
+            suggestions = find_closest_matches(
+                value, list(self.db.all_pos or []), limit=3
+            )
+            if suggestions:
+                field.error_text = ", ".join(suggestions)
+            else:
+                field.error_text = f"Unknown pattern: {value}"
+            field.focus()
+        else:
+            field.error_text = None
+        self.page.update()
+
+        # then update lemma_2 based on lemma_1 and pos
         lemma_1 = self.get_field("lemma_1").value
         lemma_2_field = self.get_field("lemma_2")
         grammar = self.get_field("grammar").value
@@ -685,6 +708,14 @@ class DpdFields(PopUpMixin):
                 self.flags.derived_from_done = True
                 self.page.update()
                 # derived_from_field.focus() # Focus might be better handled elsewhere or removed
+
+    def trans_blur(self, e: ft.ControlEvent) -> None:
+        field, value = self.get_event_field_and_value(e)
+        if value == "trans":
+            plus_case_field = self.get_field("plus_case")
+            plus_case_field.value = "+acc"
+            plus_case_field.focus()
+            self.page.update()
 
     def compound_type_blur(self, e: ft.ControlEvent):
         compound_construction: DpdCompoundConstructionField = self.get_field(
@@ -914,9 +945,8 @@ class DpdFields(PopUpMixin):
 
         field, value = self.get_event_field_and_value(e)
 
-        # Only run if the synonym field is currently empty
-        # AND synonyms haven't been generated yet
-        if not value and not self.flags.synonyms_done:
+        # Only run if the synonyms haven't been generated yet
+        if not self.flags.synonyms_done:
             pos = self.get_field("pos").value
             meaning_1 = self.get_field("meaning_1").value
             lemma_1 = self.get_field("lemma_1").value
@@ -1053,3 +1083,15 @@ class DpdFields(PopUpMixin):
         else:
             field.error_text = None
         self.page.update()
+
+    def comment_change(self, e: ft.ControlEvent) -> None:
+        """Make a noise if there's no comment."""
+
+        if self.toolkit.username_manager.is_not_primary():
+            field, value = self.get_event_field_and_value(e)
+            if not value:
+                field.error_text = "Add a comment"
+                self.page.update()
+            else:
+                field.error_text = None
+                self.page.update()
