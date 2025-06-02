@@ -23,7 +23,7 @@ while true; do
     fi
     case $yn in
         [Yy]* )
-            scripts/backup/backup_all.py
+            scripts/backup/backup_ru_sbs.py
             break;;
         * )
             break;;

@@ -1,5 +1,13 @@
 [
     {
+        "id": 70391,
+        "lemma_1": "vebhūtiya"
+    },
+    {
+        "id": 13544,
+        "lemma_1": "itthannāmasenāsanavāsika"
+    },
+    {
         "id": 16,
         "lemma_1": "akaṭayūsa"
     },
@@ -70,13 +78,5 @@
     {
         "id": 63323,
         "lemma_1": "sīhanādakathā"
-    },
-    {
-        "id": 51976,
-        "lemma_1": "mahāsīhanādasutta 1"
-    },
-    {
-        "id": 28396,
-        "lemma_1": "jāliyasutta"
     }
 ]
