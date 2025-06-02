@@ -1,7 +1,13 @@
 #!/bin/bash
 
+set -euo pipefail # Exit on error, treat unset variables as error, pipeline fails on first error
+
+# Script to synchronize sbs-ru branch from as_upstream,
+# offering a choice between full sync or selective sync based on predefined lists.
+
 PROJECT_DIR="$HOME/Documents/dpd-db"
 FOLDERS=(
+    db
     db_tests
     db_tests_gui
     docs
@@ -9,6 +15,7 @@ FOLDERS=(
     gui2
     scripts
     exporter
+    tools
 )
 FILES=(
     .clinerules
@@ -22,53 +29,120 @@ FILES=(
     README.md
 )
 
+# EXCLUDE_FOLDERS specifies subpaths within items in FOLDERS that should be preserved from sbs-ru
 EXCLUDE_FOLDERS=(
     scripts/cl
 )
-EXCLUDE_FILES=( ) # Add files to exclude here
+# EXCLUDE_FILES is defined but not used in the original selective file sync logic.
+EXCLUDE_FILES=( )
 
 cd "$PROJECT_DIR" || exit 1
 
 # Update as_upstream branch
+echo "ℹ️ Updating as_upstream branch to match upstream/main..."
 git checkout as_upstream || exit 1
-git pull origin as_upstream || exit 1
+# The following pull was in the original but is redundant if resetting to upstream/main immediately after.
+# git pull origin as_upstream || exit 1
 git fetch upstream || exit 1
 git reset --hard upstream/main || exit 1
 
 # Switch to sbs-ru and sync
+echo "ℹ️ Switching to sbs-ru branch..."
 git checkout sbs-ru || exit 1
+SBR_RU_ORIGINAL_SHA=$(git rev-parse HEAD) # Capture SHA of sbs-ru before modifications
 
-echo "🔄 Syncing folders (with exceptions):"
-# Handle 'scripts' folder with exclusion
-echo "  - scripts (excluding cl)"
-# Instead of hardcoding the exception for "scripts", use the EXCLUDE lists
-for FOLDER in "${FOLDERS[@]}"; do
-    EXCLUDE=false
-    for EXCLUDE_FOLDER in "${EXCLUDE_FOLDERS[@]}"; do
-        if [[ "$FOLDER" == "$(dirname "$EXCLUDE_FOLDER")" && "$EXCLUDE_FOLDER" != "$FOLDER" ]]; then
-            EXCLUDE=true
-            break
+echo ""
+echo "--------------------------------------------------"
+echo "How would you like to sync to sbs-ru?"
+echo "--------------------------------------------------"
+echo "1. Full Sync (Recommended: Overwrites sbs-ru with all content from as_upstream)"
+echo "2. Selective Sync (Original logic: Syncs specific folders/files, preserves exclusions from sbs-ru)"
+echo "--------------------------------------------------"
+read -r -p "Enter your choice (1 or 2): " sync_choice
+echo ""
+
+DATE=$(date +"%d-%m")
+COMMIT_MESSAGE_PREFIX="sync: "
+COMMIT_MESSAGE_SUFFIX=" from as_upstream ($DATE)"
+
+if [[ "$sync_choice" == "1" ]]; then
+    echo "🔄 Performing Full Sync from as_upstream to sbs-ru..."
+    git checkout as_upstream -- . || exit 1
+    COMMIT_MESSAGE="${COMMIT_MESSAGE_PREFIX}full update${COMMIT_MESSAGE_SUFFIX}"
+elif [[ "$sync_choice" == "2" ]]; then
+    echo "🔄 Performing Selective Sync from as_upstream to sbs-ru..."
+
+    echo "  ➡️ Syncing specified folders (with exclusions from sbs-ru):"
+    for FOLDER in "${FOLDERS[@]}"; do
+        SHOULD_PRESERVE_SUBPATH=false
+        PATH_TO_PRESERVE="" # Full path like "scripts/cl"
+
+        for EXCLUDE_CANDIDATE in "${EXCLUDE_FOLDERS[@]}"; do
+            # Check if FOLDER is the direct parent of EXCLUDE_CANDIDATE
+            # e.g., FOLDER="scripts", EXCLUDE_CANDIDATE="scripts/cl"
+            if [[ "$FOLDER" == "$(dirname "$EXCLUDE_CANDIDATE")" && "$EXCLUDE_CANDIDATE" != "$FOLDER" ]]; then
+                SHOULD_PRESERVE_SUBPATH=true
+                PATH_TO_PRESERVE="$EXCLUDE_CANDIDATE"
+                break
+            fi
+        done
+
+        if [[ "$SHOULD_PRESERVE_SUBPATH" == "true" ]]; then
+            echo "    - $FOLDER (from as_upstream, preserving sbs-ru's $PATH_TO_PRESERVE)"
+            git checkout as_upstream -- "$FOLDER" || { echo "    ⚠️ Error checking out $FOLDER from as_upstream. Skipping preserve logic for this folder."; continue; }
+            
+            echo "      Restoring $PATH_TO_PRESERVE to its state from sbs-ru (commit $SBR_RU_ORIGINAL_SHA)..."
+            # Check if the path existed in the SBR_RU_ORIGINAL_SHA commit
+            if git rev-parse --verify "${SBR_RU_ORIGINAL_SHA}:${PATH_TO_PRESERVE}" >/dev/null 2>&1; then
+                # Path existed in the original sbs-ru commit, so restore it.
+                git restore --source="$SBR_RU_ORIGINAL_SHA" --staged --worktree "$PATH_TO_PRESERVE" || \
+                    echo "    ⚠️ Warning: Failed to restore $PATH_TO_PRESERVE from $SBR_RU_ORIGINAL_SHA."
+            else
+                # Path did not exist in the original sbs-ru commit.
+                # If `git checkout as_upstream -- "$FOLDER"` created it, we need to remove it to "preserve its absence".
+                if [ -e "$PATH_TO_PRESERVE" ]; then # Check if it exists in the working tree now
+                    echo "      $PATH_TO_PRESERVE did not exist in $SBR_RU_ORIGINAL_SHA, removing it as it was likely added by as_upstream's $FOLDER."
+                    # Unstage it if it got staged by parent folder checkout, then remove from worktree
+                    git rm -r --cached --ignore-unmatch "$PATH_TO_PRESERVE" >/dev/null 2>&1
+                    rm -rf "$PATH_TO_PRESERVE"
+                else
+                    echo "      $PATH_TO_PRESERVE did not exist in $SBR_RU_ORIGINAL_SHA and does not exist now. Nothing to do for preservation."
+                fi
+            fi
+        else
+            echo "    - $FOLDER (fully from as_upstream)"
+            git checkout as_upstream -- "$FOLDER" || { echo "    ⚠️ Error checking out $FOLDER from as_upstream."; exit 1; }
         fi
     done
 
-    if [[ "$EXCLUDE" == "true" ]]; then
-        echo "  - $FOLDER (excluding $(basename "$EXCLUDE_FOLDER"))"
-        rsync -av --delete --exclude="$(basename "$EXCLUDE_FOLDER")" "$(git rev-parse --show-toplevel)/$FOLDER/" "$PROJECT_DIR/$FOLDER/"
-    else
-        echo "  - $FOLDER"
-        git checkout as_upstream -- "$FOLDER" || exit 1
-    fi
-done
+    echo "  ➡️ Syncing specified files from as_upstream:"
+    # EXCLUDE_FILES is not used in this loop, matching original script's behavior.
+    for FILE in "${FILES[@]}"; do
+        echo "    - $FILE"
+        git checkout as_upstream -- "$FILE" || { echo "    ⚠️ Error checking out $FILE from as_upstream."; exit 1; }
+    done
 
-#Sync files, with exclusion
-for FILE in "${FILES[@]}"; do
-    echo "  - $FILE"
-    git checkout as_upstream -- "$FILE" || exit 1
-done
+    echo "  ➕ Staging selected folders and files for commit..."
+    git add "${FOLDERS[@]}" "${FILES[@]}" || exit 1 # Add the top-level items we processed.
+    COMMIT_MESSAGE="${COMMIT_MESSAGE_PREFIX}selective update${COMMIT_MESSAGE_SUFFIX}"
+else
+    echo "❌ Invalid choice: $sync_choice. Exiting."
+    exit 1
+fi
 
 # Commit changes with date
-DATE=$(date +"%d-%m")
-git add "${FOLDERS[@]}" "${FILES[@]}" || exit 1
-git commit -m "sync: update from as_upstream ($DATE)" || exit 1
+echo "📝 Committing changes to sbs-ru..."
+git commit -m "$COMMIT_MESSAGE" || { 
+    echo "⚠️ Commit failed. This might be because there are no changes to commit."
+    echo "   If you expected changes, please review the output above."
+    # Check if there are any staged changes. If not, it's a "no changes" scenario.
+    if git diff --staged --quiet; then
+        echo "   No changes were staged for commit. Sync resulted in current state."
+        # Exit gracefully if no changes
+        echo "✅ Done (no changes to commit)."
+        exit 0
+    fi
+    exit 1; # Exit with error if commit failed for other reasons
+}
 
 echo "✅ Done!"
