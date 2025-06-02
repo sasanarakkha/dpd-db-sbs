@@ -7,7 +7,7 @@ import re
 
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm import aliased
-from sqlalchemy import and_, or_, not_
+from sqlalchemy import and_
 from sqlalchemy.orm import joinedload
 
 from db.models import DpdHeadword, SBS, Russian
@@ -190,93 +190,6 @@ def update_sbs_source_3(
         console.print("[yellow]No entries found matching the criteria. No changes made.")
 
 
-def update_column_for_some_criteria(source_value):
-    # Query the database to find the rows that match the conditions
-    rows_to_update_sbs = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.sbs)).outerjoin(SBS).filter(
-            or_(
-                SBS.sbs_source_1 == source_value,
-                SBS.sbs_source_2 == source_value,
-                SBS.sbs_source_3 == source_value,
-                SBS.sbs_source_4 == source_value,
-            ),
-    ).all()
-
-    # Get the IDs of rows_to_update_sbs
-    ids_to_exclude = [row.id for row in rows_to_update_sbs]
-
-
-    rows_to_update = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.sbs)).outerjoin(SBS).filter(
-            and_(
-                not_(DpdHeadword.id.in_(ids_to_exclude)),
-                or_(
-                    DpdHeadword.source_1 == source_value,
-                    DpdHeadword.source_2 == source_value,
-                ),
-            ),
-    ).all()
-
-    count_changed = 0
-    count_changed_sbs = 0
-    count_added = 0
-    count_sbs_patimokkha = 0
-
-    console.print(f"[bold bright_green]Total rows fit criteria sbs: {len(rows_to_update_sbs)} : ")
-
-    for __word__ in rows_to_update_sbs:
-        old_value = __word__.sbs.sbs_patimokkha
-        if not old_value:
-            __word__.sbs.sbs_patimokkha = "vib"
-
-            console.print(f"[bold bright_yellow]{__word__.id} {__word__.lemma_1} {__word__.sbs.sbs_patimokkha}")
-
-            # Check for "VIN1." in sbs_source fields
-            for idx in range(1, 5):  # Assuming there are 4 positions
-                sbs_source_value = getattr(__word__.sbs, f"sbs_source_{idx}")
-                if sbs_source_value and re.search(source_value, sbs_source_value):
-                    # Copy values to pat fields
-                    for field_prefix in ['source', 'sutta', 'example']:
-                        sbs_value = getattr(__word__.sbs, f"sbs_{field_prefix}_{idx}")
-                        setattr(__word__.sbs, f"vib_{field_prefix}", sbs_value)
-                        print(f"{__word__.id} {sbs_value}")
-                    break
-
-            count_changed_sbs += 1
-        else:
-            console.print(f"[bright_yellow] already {__word__.sbs.sbs_patimokkha} for {__word__.id} {__word__.lemma_1} ")
-            count_sbs_patimokkha += 1
-
-    console.print(f"[bold bright_green]Total rows fit criteria: {len(rows_to_update)} : ")
-
-    for __word__ in rows_to_update:
-        if not __word__.sbs:
-            # If SBS row does not exist, create a new one
-            __word__.sbs = SBS(id=__word__.id, sbs_patimokkha="vib_")
-            console.print(f"[bold bright_yellow]Added {__word__.id} {__word__.lemma_1} {__word__.sbs.sbs_patimokkha}")
-            count_added += 1
-        else:
-            old_value = __word__.sbs.sbs_patimokkha
-            if not old_value:
-                __word__.sbs.sbs_patimokkha = "vib_"
-
-                console.print(f"[bold bright_yellow]{__word__.id} {__word__.lemma_1} {__word__.sbs.sbs_patimokkha}")
-
-                count_changed += 1
-            else:
-                console.print(f"[bright_yellow]already {__word__.sbs.sbs_patimokkha} for {__word__.id} {__word__.lemma_1} ")
-                count_sbs_patimokkha += 1
-
-
-
-    
-    
-    console.print(f"[bold bright_green]Total count of already has: {count_sbs_patimokkha}")
-    console.print(f"[bold bright_green]Total count of changed: {count_changed}")
-    console.print(f"[bold bright_green]Total count of changed sbs: {count_changed_sbs}")
-    console.print(f"[bold bright_green]Total count of added: {count_added}")
-
-    db_session.commit()
-
-
 column_to_filter = DpdHeadword.meaning_1
 filter_value = "(gram)"
 related_table = Russian
@@ -292,8 +205,6 @@ value_to_update = "(грам) "
 # update_notes()
 
 # update_sbs_source_3()
-
-update_column_for_some_criteria("VIN1.4.3.1")
 
 
 
