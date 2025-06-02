@@ -1,5 +1,9 @@
 [
     {
+        "id": 74639,
+        "lemma_1": "sota 1.3"
+    },
+    {
         "id": 70391,
         "lemma_1": "vebhūtiya"
     },
@@ -74,9 +78,5 @@
     {
         "id": 47418,
         "lemma_1": "poṭṭhapādasutta"
-    },
-    {
-        "id": 63323,
-        "lemma_1": "sīhanādakathā"
     }
 ]
