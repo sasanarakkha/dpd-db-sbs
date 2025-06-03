@@ -16,7 +16,7 @@ deva_dir: Path = project_dir.parent.parent  # e.g., /Users/deva
 downloads_dir: Path = deva_dir / "Downloads" / "DPDs" # e.g., /Users/deva/Downloads/DPDs
 
 software_dir: Path = deva_dir / "filesrv1" / "share1" / "Sharing between users" / "1 For Everyone" / "Software"
-gd_dir: Path = software_dir / "Golden Dictionary" / "Default"
+gd_dir: Path = software_dir / "Golden Dictionary" / "Default" / "dpd"
 
 md_dir: Path = software_dir / "MDict" / "dpd"
 

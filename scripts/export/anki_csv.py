@@ -730,8 +730,39 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
     """Returns a list of rows for classes csvs."""
     console.print("[yellow]making classes csv")
 
+    # Ensure the output directory exists
+    output_dir = os.path.join(dpspth.anki_csvs_dps_dir, "pali_class", "classes")
+    os.makedirs(output_dir, exist_ok=True)
+
+
     def _is_needed(i: DpdHeadword):
         return bool(i.sbs and i.sbs.sbs_class_anki)
+
+    def _get_prioritized_example_for_class(sbs: SBS):
+        """Gets the first available (source, sutta, example) set based on priority."""
+        if not sbs:
+            return None, None, None
+
+        sources_priority = [
+            ("class_source", "class_sutta", "class_example"),
+            ("sbs_source_1", "sbs_sutta_1", "sbs_example_1"),
+            ("sbs_source_2", "sbs_sutta_2", "sbs_example_2"),
+            ("dhp_source", "dhp_sutta", "dhp_example"),
+            ("pat_source", "pat_sutta", "pat_example"),
+            ("vib_source", "vib_sutta", "vib_example"),
+        ]
+
+        for src_attr, sut_attr, ex_attr in sources_priority:
+            source_val = getattr(sbs, src_attr, None)
+            if source_val: # Prioritize if source field is non-empty
+                sutta_val = getattr(sbs, sut_attr, None)
+                example_val = getattr(sbs, ex_attr, None)
+                return (
+                    source_val.replace("\n", "<br>") if source_val else None,
+                    sutta_val.replace("\n", "<br>") if sutta_val else None,
+                    example_val.replace("\n", "<br>") if example_val else None,
+                )
+        return None, None, None
 
     columns_names = [
         "id",
@@ -761,30 +792,9 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
         "phonetic",
         "compound_type",
         "compound_construction",
-        "sbs_source_1",
-        "sbs_sutta_1",
-        "sbs_example_1",
-        "sbs_chant_pali_1",
-        "sbs_chant_eng_1",
-        "sbs_chapter_1",
-        "sbs_source_2",
-        "sbs_sutta_2",
-        "sbs_example_2",
-        "sbs_chant_pali_2",
-        "sbs_chant_eng_2",
-        "sbs_chapter_2",
-        "sbs_source_3",
-        "sbs_sutta_3",
-        "sbs_example_3",
-        "sbs_chant_pali_3",
-        "sbs_chant_eng_3",
-        "sbs_chapter_3",
-        "sbs_source_4",
-        "sbs_sutta_4",
-        "sbs_example_4",
-        "sbs_chant_pali_4",
-        "sbs_chant_eng_4",
-        "sbs_chapter_4",
+        "source",
+        "sutta",
+        "example",
         "antonym",
         "synonym",
         "variant",
@@ -799,6 +809,8 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
     ]
 
     def classes_row(i: DpdHeadword) -> List[str]:
+        source, sutta, example = _get_prioritized_example_for_class(i.sbs)
+
         fields = [
             i.id,
             i.lemma_1,
@@ -808,8 +820,15 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
             i.sanskrit,
             *get_root_info(i),
             *get_construction(i),
-            *get_sbs_info(i),
-            i.sbs.sbs_notes.replace("\n", "<br>") if i.sbs else None,
+            source,
+            sutta,
+            example,
+            i.antonym,
+            i.synonym,
+            i.variant,
+            i.commentary.replace("\n", "<br>") if i.commentary else None,
+            i.notes.replace("\n", "<br>") if i.notes else None,
+            i.sbs.sbs_notes.replace("\n", "<br>") if i.sbs and i.sbs.sbs_notes else None,
             i.link.replace("\n", "<br>") if i.link else None,
             SBS_table_tools().generate_sbs_audio(i.lemma_clean),
             current_date,
@@ -823,7 +842,6 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
         output_path = os.path.join(
             dpspth.anki_csvs_dps_dir,
             "pali_class",
-            "classes",
             f"class_{sbs_class_value}.csv",
         )
         with open(output_path, "w", newline="", encoding="utf-8") as f:
@@ -835,6 +853,10 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
                     if _is_needed(i) and i.sbs.sbs_class_anki == sbs_class_value
                 )
             )
+    # Corrected path for individual class files within the 'classes' subdirectory
+    for sbs_class_value in unique_sbs_class_values:
+        output_path = os.path.join(output_dir, f"class_{sbs_class_value}.csv")
+        # ... rest of the writing logic for individual class files
 
     # Save all basic classes to csv
     all_sbs_class_values = [
@@ -888,9 +910,7 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
     # Save all classes including upcoming
     rows_total = (classes_row(i) for i in dpd_db if _is_needed(i))
     rows_total_list = list(rows_total)
-    output_path = os.path.join(
-        dpspth.anki_csvs_dps_dir, "pali_class", "classes", "class_total.csv"
-    )
+    output_path = os.path.join(output_dir, "class_total.csv")
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(rows_total_list)
@@ -900,9 +920,7 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
     rows_upcoming = [
         row for row in rows_total_list if tuple(row) not in all_classes_set
     ]
-    output_path = os.path.join(
-        dpspth.anki_csvs_dps_dir, "pali_class", "classes", "class_upcoming.csv"
-    )
+    output_path = os.path.join(output_dir, "class_upcoming.csv")
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(rows_upcoming)
@@ -1385,7 +1403,7 @@ def main():
     sbs_per(dpspth, dpd_db)
     # parittas(dpspth, dpd_db)
     # dps(dpspth, dpd_db)
-    # classes(dpspth, dpd_db, unique_sbs_class_values)
+    classes(dpspth, dpd_db, unique_sbs_class_values)
     # suttas(dpspth, dpd_db, unique_sbs_category_values)
     # root_phonetic_class(dpspth, dpd_db, unique_sbs_class_values)
     vibhanga(dpspth, dpd_db)
