@@ -1,5 +1,25 @@
 [
     {
+        "id": 54419,
+        "lemma_1": "rajana 2"
+    },
+    {
+        "id": 26005,
+        "lemma_1": "catubhāga"
+    },
+    {
+        "id": 21346,
+        "lemma_1": "kārāpita 1"
+    },
+    {
+        "id": 52493,
+        "lemma_1": "māsaka 1"
+    },
+    {
+        "id": 52133,
+        "lemma_1": "mā 2.1"
+    },
+    {
         "id": 82908,
         "lemma_1": "itthīvāhana"
     },
@@ -58,25 +78,5 @@
     {
         "id": 34962,
         "lemma_1": "dhammābhisamaya"
-    },
-    {
-        "id": 48990,
-        "lemma_1": "brahmayācanakathā"
-    },
-    {
-        "id": 20149,
-        "lemma_1": "kappeti 1"
-    },
-    {
-        "id": 82907,
-        "lemma_1": "kappeti 7"
-    },
-    {
-        "id": 65156,
-        "lemma_1": "soṇadaṇḍaguṇakathā"
-    },
-    {
-        "id": 65158,
-        "lemma_1": "soṇadaṇḍasutta"
     }
 ]
