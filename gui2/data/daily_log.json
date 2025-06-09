@@ -244,13 +244,43 @@
     "2025-06-02": {
         "pass1": 1,
         "pass2_add": 4,
-        "pass2_pre": 588,
+        "pass2_pre": 730,
         "pass2_update": 24
     },
     "2025-06-03": {
         "pass1": 0,
-        "pass2_add": 0,
+        "pass2_add": 3,
+        "pass2_pre": 357,
+        "pass2_update": 79
+    },
+    "2025-06-04": {
+        "pass1": 0,
+        "pass2_add": 9,
+        "pass2_pre": 450,
+        "pass2_update": 80
+    },
+    "2025-06-05": {
+        "pass1": 0,
+        "pass2_add": 12,
+        "pass2_pre": 580,
+        "pass2_update": 72
+    },
+    "2025-06-06": {
+        "pass1": 0,
+        "pass2_add": 26,
+        "pass2_pre": 874,
+        "pass2_update": 39
+    },
+    "2025-06-07": {
+        "pass1": 0,
+        "pass2_add": 11,
         "pass2_pre": 0,
-        "pass2_update": 5
+        "pass2_update": 145
+    },
+    "2025-06-08": {
+        "pass1": 0,
+        "pass2_add": 4,
+        "pass2_pre": 0,
+        "pass2_update": 85
     }
 }
