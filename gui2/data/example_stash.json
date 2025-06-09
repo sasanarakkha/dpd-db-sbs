@@ -5,13 +5,13 @@
         "example": "yo hi koci, mārisa, amanusso ... nāgo vā nāgī vā nāgapotako vā nāgapotikā vā nāgamah'āmatto vā nāgapārisajjo vā nāgapacāro vā paduṭṭhacitto bhikkhuṃ vā bhikkhuniṃ vā upāsakaṃ vā upāsikaṃ vā gacchantaṃ vā anugaccheyya, ṭhitaṃ vā upatiṭṭheyya, nisinnaṃ vā upanisīdeyya, nipannaṃ vā upanipajjeyya."
     },
     "last": {
-        "source": "DN31",
-        "sutta": "siṅgālasuttaṃ, ālasyassa cha ādīnavā",
-        "example": "cha kho'me, gahapatiputta, ādīnavā ālasy'ānuyoge. atisītan'ti kammaṃ na karoti, ati-uṇhan'ti kammaṃ na karoti, atisāyan'ti kammaṃ na karoti, atipāto'ti kammaṃ na karoti, atichāto'smī'ti kammaṃ na karoti, atidhāto'smī'ti kammaṃ na karoti."
+        "source": "VIN1.4.3.4",
+        "sutta": "vassikasāṭikasikkhāpadaṃ",
+        "example": "anāpatti māso seso gimhānan'ti vassikasāṭikacīvaraṃ pariyesati, addhamāso seso gimhānan'ti katvā nivāseti, ūnakamāso seso gimhānan'ti vassikasāṭikacīvaraṃ pariyesati, ūnakaddhamāso seso gimhānan'ti katvā nivāseti, pariyiṭṭhāya vassikasāṭikāya vassaṃ ukkaḍḍhiyyati, nivatthāya vassikasāṭikāya vassaṃ ukkaḍḍhiyyati, dhovitvā nikkhipitabbaṃ, samaye nivāsetabbaṃ, acchinnacīvarassa, naṭṭhacīvarassa, āpadāsu, ummattakassa, ādikammikassā'ti."
     },
     "stash": {
-        "source": "DNa1.6",
-        "sutta": "brahmajālasuttavaṇṇanā, ekaccasassatavādavaṇṇanā",
-        "example": "ekaccasassatikā'ti ekaccasassatavādā. te duvidhā honti, satt'ekaccasassatikā, saṅkhār'ekaccasassatikā'ti."
+        "source": "VIN1.4.3.4",
+        "sutta": "vassikasāṭikasikkhāpadaṃ",
+        "example": "anāpatti māso seso gimhānan'ti vassikasāṭikacīvaraṃ pariyesati, addhamāso seso gimhānan'ti katvā nivāseti, ūnakamāso seso gimhānan'ti vassikasāṭikacīvaraṃ pariyesati, ūnakaddhamāso seso gimhānan'ti katvā nivāseti, pariyiṭṭhāya vassikasāṭikāya vassaṃ ukkaḍḍhiyyati, nivatthāya vassikasāṭikāya vassaṃ ukkaḍḍhiyyati, dhovitvā nikkhipitabbaṃ, samaye nivāsetabbaṃ, acchinnacīvarassa, naṭṭhacīvarassa, āpadāsu, ummattakassa, ādikammikassā'ti."
     }
 }

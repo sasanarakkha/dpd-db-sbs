@@ -127,6 +127,8 @@ def dps_make_words_to_add_list_from_text_no_field(
         for word in text_list:
             f.write(f"{word}\n")
 
+    print(f"Saved to {output_filename}")
+
     return text_list
 
 

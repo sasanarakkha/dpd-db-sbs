@@ -139,7 +139,7 @@ def filter_and_save_txt(source_value):
     SBS, DpdHeadword.id == SBS.id
         ).filter(
             and_(
-                SBS.sbs_patimokkha == "vib",
+                SBS.sbs_patimokkha != "",
                 DpdHeadword.compound_type != "",
                 DpdHeadword.grammar.like('%, comp%'),
                 SBS.vib_source == source_value
@@ -170,12 +170,11 @@ def filter_and_save_txt(source_value):
     constructions = [construction.replace("[", "") for construction in constructions]
     constructions = [construction.replace("]", "") for construction in constructions]
 
-    # join all constructions into one line
-    constructions_str = " ".join(constructions)
-
     # save constructions to text.txt
     with open(f"{pth.temp_dir}/text.txt", "w") as file:
-        file.write(constructions_str)
+        for construction in constructions:
+            file.write(f"{construction}\n")
+ 
 
     # # save constructions to temp.txt
     # with open(f"{pth.temp_dir}/temp.txt", "w") as file:
@@ -199,5 +198,5 @@ if __name__ == "__main__":
     print("filtering words for some conditions")
 
     # filtering_words()
-    filter_and_save_txt("VIN1.4.3.1")
+    filter_and_save_txt("VIN1.4.3.4")
 
