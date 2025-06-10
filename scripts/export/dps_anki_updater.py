@@ -270,7 +270,7 @@ def update_note_values(note, i):
     note["id"] = str(i.id)
     note["pali"] = str(i.lemma_1)
     if i.ru:
-        note["ru_meaning"] = str(i.ru.ru_meaning)
+        # note["ru_meaning"] = str(i.ru.ru_meaning)
         # 'ru_meaning' field
         if i.ru.ru_meaning:
             note["ru_meaning"] = str(i.ru.ru_meaning)
@@ -283,6 +283,8 @@ def update_note_values(note, i):
         note["ru_meaning_lit"] = str(i.ru.ru_meaning_lit)
         note["ru_notes"] = str(i.ru.ru_notes).replace("\n", "<br>")
         note["ru_cognate"] = str(i.ru.ru_cognate)
+    else:
+        print(f"no ru {i.lemma_1}")
 
     if i.sbs:
         note["sbs_meaning"] = str(i.sbs.sbs_meaning)
@@ -443,9 +445,9 @@ def calculate_index(db, db_session):
 
 def deck_selector(i):
     if (
-        i.ru
-        and (i.ru.ru_meaning or i.ru.ru_meaning_raw)
-        and i.sbs
+        # i.ru
+        # and (i.ru.ru_meaning or i.ru.ru_meaning_raw) and
+        i.sbs
         and (
             i.sbs.sbs_chapter_1
             or i.sbs.sbs_chapter_2
