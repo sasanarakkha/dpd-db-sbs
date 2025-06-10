@@ -1278,10 +1278,16 @@ def vibhanga(dpspth, dpd_db):
     source_column_index = columns_names.index("source")
     example_column_index = columns_names.index("example")
 
-    # Sort rows based on the hierarchical VIN value in the source column
-    def parse_vin(value):
-        # Extract the numerical parts from "VIN1.1.1" and return as a tuple of integers
-        return tuple(map(int, re.findall(r"\d+", value)))
+    # Sort rows based on the source column
+    def natural_sort_key(text_to_sort):
+        """
+        Sorts strings in human order (natural sort).
+        E.g., "file1.txt", "file2.txt", "file10.txt"
+        """
+        def atoi(text_chunk):
+            return int(text_chunk) if text_chunk.isdigit() else text_chunk.lower()
+        return [atoi(c) for c in re.split(r'(\d+)', text_to_sort)]
+
 
     def clean_html_tags(text):
         if text:
@@ -1291,7 +1297,7 @@ def vibhanga(dpspth, dpd_db):
     sorted_rows_total_list = sorted(
         rows_total,
         key=lambda x: (
-            parse_vin(x[source_column_index]),
+            natural_sort_key(x[source_column_index]),
             clean_html_tags(x[example_column_index]),
         ),
     )

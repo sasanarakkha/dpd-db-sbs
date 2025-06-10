@@ -5,13 +5,13 @@
         "example": "yo hi koci, mārisa, amanusso ... nāgo vā nāgī vā nāgapotako vā nāgapotikā vā nāgamah'āmatto vā nāgapārisajjo vā nāgapacāro vā paduṭṭhacitto bhikkhuṃ vā bhikkhuniṃ vā upāsakaṃ vā upāsikaṃ vā gacchantaṃ vā anugaccheyya, ṭhitaṃ vā upatiṭṭheyya, nisinnaṃ vā upanisīdeyya, nipannaṃ vā upanipajjeyya."
     },
     "last": {
-        "source": "VIN1.4.3.4",
-        "sutta": "vassikasāṭikasikkhāpadaṃ",
-        "example": "anāpatti māso seso gimhānan'ti vassikasāṭikacīvaraṃ pariyesati, addhamāso seso gimhānan'ti katvā nivāseti, ūnakamāso seso gimhānan'ti vassikasāṭikacīvaraṃ pariyesati, ūnakaddhamāso seso gimhānan'ti katvā nivāseti, pariyiṭṭhāya vassikasāṭikāya vassaṃ ukkaḍḍhiyyati, nivatthāya vassikasāṭikāya vassaṃ ukkaḍḍhiyyati, dhovitvā nikkhipitabbaṃ, samaye nivāsetabbaṃ, acchinnacīvarassa, naṭṭhacīvarassa, āpadāsu, ummattakassa, ādikammikassā'ti."
+        "source": "VIN1.4.3.10",
+        "sutta": "pariṇatasikkhāpadaṃ",
+        "example": "anāpatti kattha demā'ti pucchiyamāno yattha tumhākaṃ deyyadhammo paribhogaṃ vā labheyya paṭisaṅkhāraṃ vā labheyya ciraṭṭhitiko vā assa yattha vā pana tumhākaṃ cittaṃ pasīdati tattha dethā'ti bhaṇati, ummattakassa, ādikammikassā'ti."
     },
     "stash": {
-        "source": "VIN1.4.3.4",
-        "sutta": "vassikasāṭikasikkhāpadaṃ",
-        "example": "anāpatti māso seso gimhānan'ti vassikasāṭikacīvaraṃ pariyesati, addhamāso seso gimhānan'ti katvā nivāseti, ūnakamāso seso gimhānan'ti vassikasāṭikacīvaraṃ pariyesati, ūnakaddhamāso seso gimhānan'ti katvā nivāseti, pariyiṭṭhāya vassikasāṭikāya vassaṃ ukkaḍḍhiyyati, nivatthāya vassikasāṭikāya vassaṃ ukkaḍḍhiyyati, dhovitvā nikkhipitabbaṃ, samaye nivāsetabbaṃ, acchinnacīvarassa, naṭṭhacīvarassa, āpadāsu, ummattakassa, ādikammikassā'ti."
+        "source": "VIN1.4.3.10",
+        "sutta": "pariṇatasikkhāpadaṃ",
+        "example": "anāpatti kattha demā'ti pucchiyamāno yattha tumhākaṃ deyyadhammo paribhogaṃ vā labheyya paṭisaṅkhāraṃ vā labheyya ciraṭṭhitiko vā assa yattha vā pana tumhākaṃ cittaṃ pasīdati tattha dethā'ti bhaṇati, ummattakassa, ādikammikassā'ti."
     }
 }

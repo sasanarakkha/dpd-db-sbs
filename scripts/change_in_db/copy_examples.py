@@ -80,13 +80,13 @@ def update_column_for_some_criteria(source_value, column_to_update, value_to_upd
     console.print(f"[bold bright_green]Total rows fit criteria dpd: {len(rows_to_update)} : ")
 
     for __word__ in rows_to_update:
-        value_with_dash = f"{value_to_update}_"
+        # value_with_dash = f"{value_to_update}_"
         if not __word__.sbs:
             # If SBS row does not exist, create a new one
             # __word__.sbs = SBS(id=__word__.id, sbs_patimokkha="vib_")
             __word__.sbs = SBS(id=__word__.id)
-            setattr(__word__.sbs, column_to_update, value_with_dash)
-            console.print(f"[bold bright_yellow]Added {__word__.id} {__word__.lemma_1} {value_with_dash}")
+            setattr(__word__.sbs, column_to_update, value_to_update)
+            console.print(f"[bold bright_yellow]Added {__word__.id} {__word__.lemma_1} {value_to_update}")
             count_added += 1
             # Check for source_value in source fields
             for idx in range(1, 3):  # Assuming there are 2 positions
@@ -103,9 +103,9 @@ def update_column_for_some_criteria(source_value, column_to_update, value_to_upd
             old_value = getattr(__word__.sbs, column_to_update)
             if not old_value:
                 # __word__.sbs.sbs_patimokkha = "vib_"
-                setattr(__word__.sbs, column_to_update, value_with_dash)
+                setattr(__word__.sbs, column_to_update, value_to_update)
 
-                console.print(f"[bold bright_yellow]{__word__.id} {__word__.lemma_1} {value_with_dash}")
+                console.print(f"[bold bright_yellow]{__word__.id} {__word__.lemma_1} {value_to_update}")
 
                 count_changed += 1
                 # Check for source_value in source fields
@@ -133,7 +133,7 @@ def update_column_for_some_criteria(source_value, column_to_update, value_to_upd
 
 
 # !To use the functions:
-source_value = "VIN1.4.3.4"
+source_value = "VIN1.4.3.10"
 column_to_update = "sbs_patimokkha"
 value_to_update = "vib"
 modifier_column_to_copy = "vib"
