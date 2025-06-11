@@ -59,4 +59,4 @@ fi
 
 echo "${bold}${red}Please check out latest newly added words vib/sutta${reset}"
 scripts/backup/backup_ru_sbs.py
-scripts/work_with_csv/replace_new_id.py
+# scripts/work_with_csv/replace_new_id.py

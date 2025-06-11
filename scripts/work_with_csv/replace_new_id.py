@@ -6,10 +6,12 @@ replace new id with old id according to additions.tsv in the backup files sbs an
 import csv
 
 from tools.paths import ProjectPaths
+from tools.paths_dps import DPSPaths
 
 pth = ProjectPaths()
+dpspth = DPSPaths()
 
-def replace_ids(pth: ProjectPaths, custom_path: str = ""):
+def replace_ids(pth: ProjectPaths, dpspth: DPSPaths, custom_path: str = ""):
     # Read additions.tsv and create a dictionary with new_id and id
     additions_dict = {}
     with open(pth.additions_tsv_path, newline='', encoding='utf-8') as additions_file:
@@ -56,8 +58,8 @@ def replace_ids(pth: ProjectPaths, custom_path: str = ""):
                 file.write('\t'.join(columns) + '\n')
 
     # Use custom_path if provided, otherwise use default paths
-    russian_path = custom_path if custom_path else pth.russian_path
-    sbs_path = custom_path if custom_path else pth.sbs_path
+    russian_path = custom_path if custom_path else dpspth.russian_path
+    sbs_path = custom_path if custom_path else dpspth.sbs_path
 
     process_file(russian_path)
     print("Russian replacements done successfully.")
@@ -65,4 +67,4 @@ def replace_ids(pth: ProjectPaths, custom_path: str = ""):
     process_file(sbs_path)
     print("SBS replacements done successfully.")
 
-replace_ids(pth)
+replace_ids(pth, dpspth)
