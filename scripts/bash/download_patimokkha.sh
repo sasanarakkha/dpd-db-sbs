@@ -35,18 +35,3 @@ for link in "${pat[@]}"; do
     fi
 done
 
-
-# Check if the fileserver is mounted
-if [ -d "$HOME/filesrv1/share1/Sharing between users" ]; then
-
-    echo "Moving folders to the fileserver"
-
-    # Copy folders on the server
-    cp -X -rf "$HOME/Downloads/Pātimokkha Word by Word.xlsx" "$HOME/filesrv1/share1/Sharing between users/16 For Pātimokkha Class/offline/Pātimokkha Word by Word.xlsx"
-
-    echo "Pātimokkha copied to the fileserver"
-
-else
-    echo "Fileserver is not mounted. Skipping copying folders."
-fi
-

@@ -842,6 +842,7 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
         output_path = os.path.join(
             dpspth.anki_csvs_dps_dir,
             "pali_class",
+            "classes",
             f"class_{sbs_class_value}.csv",
         )
         with open(output_path, "w", newline="", encoding="utf-8") as f:
@@ -1405,13 +1406,13 @@ def main():
     dpd_db = sorted(dpd_db, key=lambda x: pali_sort_key(x.lemma_1))
     console.print("[green] db has been set up and sorted successfully")
 
-    # dhp(dpspth, dpd_db)
+    dhp(dpspth, dpd_db)
     sbs_per(dpspth, dpd_db)
-    # parittas(dpspth, dpd_db)
-    # dps(dpspth, dpd_db)
+    parittas(dpspth, dpd_db)
+    dps(dpspth, dpd_db)
     classes(dpspth, dpd_db, unique_sbs_class_values)
-    # suttas(dpspth, dpd_db, unique_sbs_category_values)
-    # root_phonetic_class(dpspth, dpd_db, unique_sbs_class_values)
+    suttas(dpspth, dpd_db, unique_sbs_category_values)
+    root_phonetic_class(dpspth, dpd_db, unique_sbs_class_values)
     vibhanga(dpspth, dpd_db)
     native(dpspth, dpd_db)
     pr.toc()

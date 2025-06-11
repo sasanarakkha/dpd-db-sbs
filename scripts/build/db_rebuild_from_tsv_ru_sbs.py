@@ -98,25 +98,48 @@ def make_sbs_table_data(dpspth: DPSPaths, db_session: Session):
 def make_ru_root_table_data(dpspth: DPSPaths, db_session: Session):
     """Read TSV and return ru columns from DpdRoot."""
     pr.green("filling ru in DpdRoot table")
-    counter = 0
+    updated_counter = 0
+    not_found_in_db_counter = 0
+    
+    # Keep track of roots found in the TSV file
+    roots_in_tsv = set()
+
     with open(dpspth.ru_root_path, "r", newline="") as tsvfile:
         csvreader = csv.reader(tsvfile, delimiter="\t", quotechar='"')
         columns = next(csvreader)
         for row in csvreader:
             data = {}
             for col_name, value in zip(columns, row):
-                # Include 'root' in the data dictionary
                 data[col_name] = value
+            
+            roots_in_tsv.add(data["root"])
+            
             existing_record = (
                 db_session.query(DpdRoot).filter_by(root=data["root"]).first()
             )
             if existing_record:
                 for key, value in data.items():
                     setattr(existing_record, key, value)
+                updated_counter += 1
             else:
-                db_session.add(DpdRoot(**data))
-            counter += 1
-    pr.yes(counter)
+                pr.red(f"Root '{data['root']}' from TSV not found in DpdRoot table.")
+                not_found_in_db_counter += 1
+
+    # Check for roots in DB not present in TSV
+    all_db_roots = db_session.query(DpdRoot.root).all()
+    db_roots_set = {r[0] for r in all_db_roots}
+    
+    roots_in_db_not_in_tsv = db_roots_set - roots_in_tsv
+    if roots_in_db_not_in_tsv:
+        pr.green("Roots in DpdRoot table not found in TSV (no update performed for these):")
+        for root_val in sorted(list(roots_in_db_not_in_tsv)): # Sort for consistent output
+            pr.white(f"  - {root_val}")
+
+    pr.yes(f"Updated: {updated_counter}")
+    if not_found_in_db_counter > 0:
+        pr.no(f"Not found in DB: {not_found_in_db_counter}")
+    if roots_in_db_not_in_tsv:
+        pr.cyan(f"In DB but not TSV: {len(roots_in_db_not_in_tsv)}")
 
 
 if __name__ == "__main__":

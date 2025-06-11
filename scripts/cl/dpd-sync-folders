@@ -14,6 +14,7 @@ FOLDERS=(
     gui2
     scripts
     tools
+    db/backup_tsv
 )
 FILES=(
     .gitattributes
