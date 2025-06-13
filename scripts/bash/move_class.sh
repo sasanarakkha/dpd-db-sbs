@@ -34,36 +34,14 @@ safe_copy_file() {
         return 1 # This will cause script to exit due to set -e
     fi
 
-    if cp $cp_options "$src_file" "$dest_file"; then
+    # Switched to rsync for potentially better handling of metadata with network shares on macOS.
+    # The --times flag preserves modification times.
+    # --no-perms, --no-owner, --no-group prevent rsync from trying to set these on the destination,
+    # which can cause "Operation not permitted" errors on some network shares.
+    if rsync --times --no-perms --no-owner --no-group "$src_file" "$dest_file"; then
         echo "Successfully copied '$src_file' to '$dest_file'."
     else
         echo "Error: Failed to copy '$src_file' to '$dest_file'. Please check permissions and paths."
-        return 1 # This will cause script to exit
-    fi
-}
-
-# Helper function to move a single file, ensuring destination directory exists
-safe_move_file() {
-    local src_file="$1"
-    local dest_file="$2"
-    local mv_options="${3:--f}" # Default to -f, can pass e.g. "-X -f"
-
-    if [ ! -f "$src_file" ]; then
-        echo "Warning: Source file '$src_file' not found. Skipping move."
-        return 0 # Continue script execution
-    fi
-
-    local dest_dir
-    dest_dir=$(dirname "$dest_file")
-    if ! mkdir -p "$dest_dir"; then
-        echo "Error: Could not create destination directory '$dest_dir'. Skipping move of '$src_file'."
-        return 1 # This will cause script to exit
-    fi
-
-    if mv $mv_options "$src_file" "$dest_file"; then
-        echo "Successfully moved '$src_file' to '$dest_file'."
-    else
-        echo "Error: Failed to move '$src_file' to '$dest_file'. Please check permissions and paths."
         return 1 # This will cause script to exit
     fi
 }
@@ -89,12 +67,15 @@ safe_copy_dir_contents() {
         return 1 # This will cause script to exit
     fi
     
-    # The trailing slash on src_dir with * ensures contents are copied, not the dir itself.
-    # The trailing slash on dest_dir ensures it's treated as a directory.
-    if cp $cp_options "${src_dir}/"* "$dest_dir/"; then
+    # Using rsync to copy directory contents.
+    # -r: recursive
+    # --times: preserve modification times
+    # --no-perms, --no-owner, --no-group: avoid permission issues on network shares
+    # The trailing slash on "${src_dir}/" ensures rsync copies the *contents* of the source directory.
+    if rsync -r --times --no-perms --no-owner --no-group "${src_dir}/" "$dest_dir/"; then
         echo "Successfully copied contents of '$src_dir' to '$dest_dir'."
     else
-        echo "Error: Failed to copy contents of '$src_dir' to '$dest_dir'. Check permissions, especially for creating subdirectories like 'grammar' in the destination."
+        echo "Error: Failed to copy contents of '$src_dir' to '$dest_dir' using rsync. Check permissions and paths."
         return 1 # This will cause script to exit
     fi
 }
@@ -102,18 +83,19 @@ safe_copy_dir_contents() {
 cd "$DOWNLOADS_DIR" || { echo "Error: Could not cd to $DOWNLOADS_DIR. Exiting."; exit 1; }
 
 echo "--- Processing APKG files ---"
-safe_copy_file "Vocab Pali Class.apkg" "$TEMP_PUSH_DEST_DIR/vocab-pali-class.apkg"
-safe_move_file "Vocab Pali Class.apkg" "$FILESRV_BASE_DEST_DIR/Vocab Pali Class.apkg" "-f"
-safe_copy_file "Grammar Pali Class.apkg" "$TEMP_PUSH_DEST_DIR/grammar-pali-class.apkg"
-safe_move_file "Grammar Pali Class.apkg" "$FILESRV_BASE_DEST_DIR/Grammar Pali Class.apkg" "-f"
-safe_copy_file "Roots Pali Class.apkg" "$TEMP_PUSH_DEST_DIR/roots-pali-class.apkg"
-safe_move_file "Roots Pali Class.apkg" "$FILESRV_BASE_DEST_DIR/Roots Pali Class.apkg" "-f"
-safe_copy_file "Phonetic Changes Pali Class.apkg" "$TEMP_PUSH_DEST_DIR/phonetic-pali-class.apkg"
-safe_move_file "Phonetic Changes Pali Class.apkg" "$FILESRV_BASE_DEST_DIR/Phonetic Changes Pali Class.apkg" "-f"
-safe_copy_file "Common Roots Pali Class.apkg" "$TEMP_PUSH_DEST_DIR/common-roots-pali-class.apkg"
-safe_move_file "Common Roots Pali Class.apkg" "$FILESRV_BASE_DEST_DIR/Common Roots Pali Class.apkg" "-f"
-safe_copy_file "Suttas Advanced Pali Class.apkg" "$TEMP_PUSH_DEST_DIR/suttas-advanced-pali-class.apkg"
-safe_move_file "Suttas Advanced Pali Class.apkg" "$FILESRV_BASE_DEST_DIR/Suttas Advanced Pali Class.apkg" "-f"
+safe_copy_file "Vocab Pali Class.apkg" "$TEMP_PUSH_DEST_DIR/vocab-pali-class.apkg" "-X -f"
+safe_copy_file "Vocab Pali Class.apkg" "$FILESRV_BASE_DEST_DIR/Vocab Pali Class.apkg" "-X -f"
+safe_copy_file "Grammar Pali Class.apkg" "$TEMP_PUSH_DEST_DIR/grammar-pali-class.apkg" "-X -f"
+safe_copy_file "Grammar Pali Class.apkg" "$FILESRV_BASE_DEST_DIR/Grammar Pali Class.apkg" "-X -f"
+safe_copy_file "Roots Pali Class.apkg" "$TEMP_PUSH_DEST_DIR/roots-pali-class.apkg" "-X -f"
+safe_copy_file "Roots Pali Class.apkg" "$FILESRV_BASE_DEST_DIR/Roots Pali Class.apkg" "-X -f"
+safe_copy_file "Phonetic Changes Pali Class.apkg" "$TEMP_PUSH_DEST_DIR/phonetic-pali-class.apkg" "-X -f"
+safe_copy_file "Phonetic Changes Pali Class.apkg" "$FILESRV_BASE_DEST_DIR/Phonetic Changes Pali Class.apkg" "-X -f"
+safe_copy_file "Common Roots Pali Class.apkg" "$TEMP_PUSH_DEST_DIR/common-roots-pali-class.apkg" "-X -f"
+safe_copy_file "Common Roots Pali Class.apkg" "$FILESRV_BASE_DEST_DIR/Common Roots Pali Class.apkg" "-X -f"
+safe_copy_file "Suttas Advanced Pali Class.apkg" "$TEMP_PUSH_DEST_DIR/suttas-advanced-pali-class.apkg" "-X -f"
+safe_copy_file "Suttas Advanced Pali Class.apkg" "$FILESRV_BASE_DEST_DIR/Suttas Advanced Pali Class.apkg" "-X -f"
+
 echo "APKG processing - done"
 
 echo "--- Processing CSV files ---"
@@ -121,17 +103,15 @@ echo "--- Processing CSV files ---"
 safe_copy_dir_contents "$PALI_CLASS_CSVS_SRC_DIR" "$FILESRV_CSVS_DEST_DIR" "-X -rf"
 
 # Copy specific CSV files to temp-push directory
-safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/class_all.csv" "$TEMP_PUSH_DEST_DIR/vocab-pali-class.csv" "-rf"
-safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/phonetic_class.csv" "$TEMP_PUSH_DEST_DIR/phonetic-pali-class.csv" "-rf"
-safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/roots_class.csv" "$TEMP_PUSH_DEST_DIR/roots-pali-class.csv" "-rf"
-safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/suttas_class.csv" "$TEMP_PUSH_DEST_DIR/suttas-advanced-pali-class.csv" "-rf"
+safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/class_all.csv" "$TEMP_PUSH_DEST_DIR/vocab-pali-class.csv" "-X -f"
+safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/phonetic_class.csv" "$TEMP_PUSH_DEST_DIR/phonetic-pali-class.csv" "-X -f"
+safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/roots_class.csv" "$TEMP_PUSH_DEST_DIR/roots-pali-class.csv" "-X -f"
+safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/suttas_class.csv" "$TEMP_PUSH_DEST_DIR/suttas-advanced-pali-class.csv" "-X -f"
 
 # Copy grammar CSV files
-safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/grammar/cl_sum_abbr.csv" "$TEMP_PUSH_DEST_DIR/grammar-pali-class-abbr.csv" "-rf"
-safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/grammar/cl_sum_gramm.csv" "$TEMP_PUSH_DEST_DIR/grammar-pali-class-gramm.csv" "-rf"
-safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/grammar/cl_sum_sandhi.csv" "$TEMP_PUSH_DEST_DIR/grammar-pali-class-sandhi.csv" "-rf"
-
-# cp -f "$HOME/Documents/dps/csv-for-anki/abbr.xlsx" "$HOME/filesrv1/share1/Sharing between users/13 For Pāli class/Anki Decks/abbreviations.xlsx"
+safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/grammar/cl_sum_abbr.csv" "$TEMP_PUSH_DEST_DIR/grammar-pali-class-abbr.csv" "-X -f"
+safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/grammar/cl_sum_gramm.csv" "$TEMP_PUSH_DEST_DIR/grammar-pali-class-gramm.csv" "-X -f"
+safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/grammar/cl_sum_sandhi.csv" "$TEMP_PUSH_DEST_DIR/grammar-pali-class-sandhi.csv" "-X -f"
 
 echo "CSV processing for Anki - done"
 echo "--- Script finished ---"
