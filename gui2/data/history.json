@@ -1,5 +1,13 @@
 [
     {
+        "id": 82054,
+        "lemma_1": "aggaḷā 2"
+    },
+    {
+        "id": 53108,
+        "lemma_1": "mūlaghacca 1"
+    },
+    {
         "id": 77096,
         "lemma_1": "ādissa 1.3"
     },
@@ -70,13 +78,5 @@
     {
         "id": 82993,
         "lemma_1": "upanetabba 2"
-    },
-    {
-        "id": 82991,
-        "lemma_1": "anupādinna 2"
-    },
-    {
-        "id": 82990,
-        "lemma_1": "upādinna 4"
     }
 ]
