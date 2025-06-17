@@ -119,10 +119,7 @@ def save_words_with_examples_to_csv(sbs_class: int, filename: str):
     # Open the CSV file and write the headers
     with open(filename, 'w', newline='') as csvfile:
         fieldnames = [
-            'id', 'pali', 'pos', 'meaning', 'source_1', 'sutta_1', 'example_1', 
-            'source_2', 'sutta_2', 'example_2',
-            'source_3', 'sutta_3', 'example_3',
-            'source_4', 'sutta_4', 'example_4',
+            'id', 'pali', 'pos', 'meaning'
             ]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
@@ -134,19 +131,7 @@ def save_words_with_examples_to_csv(sbs_class: int, filename: str):
                 'id': word.id,
                 'pali': word.lemma_1,
                 'pos': word.pos,
-                'meaning': word.meaning_1,
-                'source_1': word.sbs.sbs_source_1,
-                'sutta_1': word.sbs.sbs_sutta_1,
-                'example_1': word.sbs.sbs_example_1,
-                'source_2': word.sbs.sbs_source_2,
-                'sutta_2': word.sbs.sbs_sutta_2,
-                'example_2': word.sbs.sbs_example_2,
-                'source_3': word.sbs.sbs_source_3,
-                'sutta_3': word.sbs.sbs_sutta_3,
-                'example_3': word.sbs.sbs_example_3,
-                'source_4': word.sbs.sbs_source_4,
-                'sutta_4': word.sbs.sbs_sutta_4,
-                'example_4': word.sbs.sbs_example_4,
+                'meaning': word.meaning_1
             })
 
 
@@ -166,10 +151,7 @@ def save_words_for_discources(sutta, filename: str):
     # Open the CSV file and write the headers
     with open(filename, 'w', newline='') as csvfile:
         fieldnames = [
-            'id', 'pali', 'pos', 'meaning', 'source_1', 'sutta_1', 'example_1', 
-            'source_2', 'sutta_2', 'example_2',
-            'source_3', 'sutta_3', 'example_3',
-            'source_4', 'sutta_4', 'example_4',
+            'id', 'pali', 'pos', 'meaning'
             ]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
@@ -181,19 +163,7 @@ def save_words_for_discources(sutta, filename: str):
                 'id': word.id,
                 'pali': word.lemma_1,
                 'pos': word.pos,
-                'meaning': word.meaning_1,
-                'source_1': word.sbs.sbs_source_1,
-                'sutta_1': word.sbs.sbs_sutta_1,
-                'example_1': word.sbs.sbs_example_1,
-                'source_2': word.sbs.sbs_source_2,
-                'sutta_2': word.sbs.sbs_sutta_2,
-                'example_2': word.sbs.sbs_example_2,
-                'source_3': word.sbs.sbs_source_3,
-                'sutta_3': word.sbs.sbs_sutta_3,
-                'example_3': word.sbs.sbs_example_3,
-                'source_4': word.sbs.sbs_source_4,
-                'sutta_4': word.sbs.sbs_sutta_4,
-                'example_4': word.sbs.sbs_example_4,
+                'meaning': word.meaning_1
             })
 
 

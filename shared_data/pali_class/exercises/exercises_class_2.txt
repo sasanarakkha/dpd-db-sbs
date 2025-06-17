@@ -1,92 +1,151 @@
-Class 2 Exercises
+Topic: Class 2 Exercises
 
-namo tassa bhagavato arahato sammā-sambuddhassa	 					
-Homage to him, the Blessed One, the Worthy One, the fully Enlightened One.
+Sutta Number: DN21.8
+Pali: namo tassa bhagavato arahato sammā-sambuddhassa
+English Translation: Homage to him, the Blessed One, the Worthy One, the fully Enlightened One.
+
+Sutta Number: SN10.8
+Pali: buddho kira loke uppanno
+English Translation: A Buddha has indeed arisen in the world.
  
-avijjāya tv'eva asesa-virāga-nirodhā saṅkhāra-nirodho, saṅkhāra-nirodhā viññāṇa-nirodho, viññāṇa-nirodhā nāmarūpa-nirodho, nāmarūpa-nirodhā saḷāyatana-nirodho, saḷāyatana-nirodhā phassa-nirodho, phassa-nirodhā vedanā-nirodho, vedanā-nirodhā taṇhā-nirodho, taṇhā-nirodhā upādāna-nirodho, upādāna-nirodhā bhava-nirodho, bhava-nirodhā jāti-nirodho, jāti-nirodhā jarā-maraṇaṃ soka-parideva-dukkha-domanass'upāyāsā nirujjhanti. 
-But from the complete fading away and cessation of ignorance there is cessation of volitional formations; from the cessation of volitional formations, cessation of consciousness; from the cessation of consciousness, cessation of name-and-form; from the cessation of name-and-form, cessation of the six sense bases; from the cessation of the six sense bases, cessation of contact; from the cessation of contact, cessation of feeling; from the cessation of feeling, cessation of craving; from the cessation of craving, cessation of clinging; from the cessation of clinging, cessation of existence; from the cessation of existence, cessation of birth; from the cessation of birth, aging-and-death, sorrow, lamentation, pain, displeasure, and despair cease. 
- 
-buddho kira loke uppanno SN10.8
-A Buddha has indeed arisen in the world.
- 
-TH 257 simpl
-araññe rukkhānaṃ mūlesu, kandarāsu guhāsu ca
-At the foot of a tree in a forest, in valleys, and in caves.
- 
-DN 22.1  simpl
-maggo hoti sokaparidevānaṃ samatikkamāya, ñāyassa adhigamāya, nibbānassa sacchikiriyāya.
-It is the path for the overcoming of sorrow and lamentation, for the attainment of the (right) method, for personal experience of total emancipation.
- 
-AN 10.48
-uttarissa manussassa dhammo alam’ariyo ñāṇadassanassa viseso
-the state of a superior human being, the attainment of knowing and seeing, suitable for a noble person,
- 
-DN 22.5 
-atthi imasmiṃ kāye kesā lomā nakhā dantā taco
-There are in this body, hair [on the head], hairs of the body, nails, teeth, skin.
- 
-VIN PAT SE 55 simpl
-na sāmisena hatthena pānīyassa thālakaṃ paṭiggahessāmi iti sikkhā karaṇīyā
-I will not take a cup for drinking water with a soiled hand.
- 
-VIN PAT NID nidānuddeso
-saṅgho uposathaṃ kareyya, pātimokkhaṃ uddiseyya
-The community of monks could make an observance day [and] would recite the training rules.
+Sutta Number: TH257 (simpl)
+Pali: araññe rukkhānaṃ mūlesu, kandarāsu guhāsu ca
+English Translation: At the foot of a tree in a forest, in valleys, and in caves.
+
+Sutta Number: DN22.1 (simpl)
+Pali: maggo hoti sokaparidevānaṃ samatikkamāya, ñāyassa adhigamāya, nibbānassa sacchikiriyāya.
+English Translation: It is the path for the overcoming of sorrow and lamentation, for the attainment of the (right) method, for personal experience of total emancipation.
+
+Sutta Number: AN10.48
+Pali: uttarissa manussassa dhammo alam’ariyo ñāṇadassanassa viseso
+English Translation: the state of a superior humANbeing, the attainment of knowing and seeing, suitable for a noble person,
+
+Sutta Number: DN22.5
+Pali: atthi imasmiṃ kāye kesā lomā nakhā dantā taco
+English Translation: There are in this body, hair [on the head], hairs of the body, nails, teeth, skin.
+
+Sutta Number: VIN PAT SE 55 (simpl)
+Pali: na sāmisena hatthena pānīyassa thālakaṃ paṭiggahessāmi iti sikkhā karaṇīyā
+English Translation: I will not take a cup for drinking water with a soiled hand.
+
+Sutta Number: VIN PAT NID
+Sutta Name: nidānuddeso
+Pali: saṅgho uposathaṃ kareyya, pātimokkhaṃ uddiseyya
+English Translation: The community of monks could make ANobservance day [and] would recite the training rules.
+
+Sutta Number: SN55.7
+Pali: itipi so bhagavā arahaṃ sammāsambuddho vijjācaraṇasampanno sugato lokavidū anuttaro purisadammasārathi satthā devamanussānaṃ buddho bhagavā’ti
+
+English Translation: It is so (thus) “He [is] the Blessed One, the Worthy One, the fully Enlightened One, endowed with wisdom and ethical conduct, Fortunate One, knower of the world, incomparable leader of persons to be tamed, teacher of gods and humans, the Awakened One, the Blessed One.”
+
+Sutta Number: VIN1.1.3
+Pali: kāyassa bhedā
+English Translation: From the break-up of the body
+
+Sutta Number: AN10.29 
+Pali: samaṇo gotamo
+English Translation: The recluse Gotama
+
+Sutta Number: SN22.57
+Pali: virāgāya nirodhāya 
+English Translation: for dispassion, for cessation
+
+Sutta Number: TH251
+Pali: bālassa mohāya
+English Translation: for the delusion of the fool
+
+Sutta Number: TH251
+Pali: kāmehi lokamhi
+English Translation: [there is no satisfaction] by sensual pleasures in the world
+
+Sutta Number: 
+Pali: devā manussā
+English Translation: gods and humans
+
+Sutta Number: SN56.11
+Pali: cāgo paṭinissaggo anālayo 
+English Translation: The relinquishing, the abandonment, the non-attachment
+
+Sutta Number: MN107
+Pali: pāde pādaṃ
+English Translation: [he places] a foot on a foot
+
+Sutta Number: DN22.18
+Pali: dhammānaṃ uppādāya chandaṃ
+English Translation: [he arouses] desire for the arising of states of mind
+
+Sutta Number: VIBH 6.1
+Pali: khandhānaṃ bhedo 
+English Translation: the break-up of the aggregates
+
+Sutta Number: AN8.79
+Pali: dhammā sekhassa
+English Translation: qualities of a trainee
+
+Sutta Number: SN56.11
+Pali: samaṇena vā brāhmaṇena vā devena vā mārena vā
+English Translation: with either a recluse or a brahmin or a deity or Mara
+
+Sutta Number: SN35.28
+Pali: sokehi paridevehi dukkhehi domanassehi upāyāsehi
+English Translation: (burning) with griefs, lamentations, sufferings, distresses, afflictions
+
+Sutta Number: AN8.53
+Pali: dhammo vinayo 
+English Translation: The Doctrine the Discipline
+
+Sutta Number: SN12.41
+Pali: vinipātaṃ nirayaṃ
+English Translation: [reborn] in a state of suffering, in hell.
+
+Sutta Number: 
+Pali: aparena samayena buddho
+English Translation: on another occasion, the Awakened One…
+
+Sutta Number: VIN 1.4.1.2
+Pali: gabbhe cīvaraṃ
+English Translation: the robe in the room
+
+Sutta Number: VIN 1.1.4
+Pali: āvāse vassaṃ
+English Translation: (entered) the rainy season at the dwelling place.
+
+Sutta Number: MN99
+Pali: nīvaraṇehi brāhmaṇo
+English Translation: The brahmin [filled] with the [five] hindrances
+
+Sutta Number: SN2.8
+Pali: kāme brāhmaṇa
+English Translation: O, brahmin! … sensual pleasures
+
+Sutta Number: DHP 331
+Pali: atthamhi sahāyā
+English Translation: [Good are] friends in [arisen] need 
+English Translation: [Good are] friends when need [arises]
+
+Sutta Number: MN35
+Pali: gotamo sāvake … gotamassa sāvakesu
+English Translation: Gotama [trains] disciples…. Gotama’s [instruction presented] to disciples
+
+Sutta Number: SN19.21
+Pali: kassapassa vinayasmiṃ 
+English Translation: in the discipline of the Kassapa
 
 
-itipi so bhagavā arahaṃ sammāsambuddho vijjācaraṇasampanno sugato lokavidū anuttaro purisadammasārathi satthā devamanussānaṃ buddho bhagavā’ti
-It is so (thus) “He [is] the Blessed One, the Worthy One, the fully Enlightened One, endowed with wisdom and ethical conduct, Fortunate One, knower of the world, incomparable leader of persons to be tamed, teacher of gods and humans, the Awakened One, the Blessed One.”
- 
-1.	kāyassa bhedā VIN1.1.3
-From the break-up of the body
-2.	samaṇo gotamo AN10.29
-The recluse Gotama
-3.	virāgāya nirodhāya SN22.57
-for dispassion, for cessation
-4.	bālassa mohāya TH251
-for the delusion of the fool
-5.	kāmehi lokamhi (TH 251)
-[there is no satisfaction] by sensual pleasures in the world
-6.	devā manussā
-gods and humans
-7.	cāgo paṭinissaggo anālayo SN56.11
-The relinquishing, the abandonment, the non-attachment
-8.	pāde pādaṃ (MN 107)
-[he places] a foot on a foot
-9.	dhammānaṃ uppādāya chandaṃ (DN 22.18)
-[he arouses] desire for the arising of states of mind
-10.	khandhānaṃ bhedo VIBH6.1
-the break-up of the aggregates
-11.	% dhammā virāgāya (AN 8.53) 
-[these] things/qualities [lead] to dispassion
-12.	dhammā sekhassa AN8.79
-qualities of a trainee
-13.	samaṇena vā brāhmaṇena vā devena vā mārena vā SN56.11
-with either a recluse or a brahmin or a deity or Mara
-14.	saṅkhārā ābādhāya (SN 22.59) %
-Volitional formations [are conducive for] disease
-15.	sokehi paridevehi dukkhehi domanassehi upāyāsehi (SN 35.28)
-(burning) with griefs, lamentations, sufferings, distresses, afflictions
-16.	dhammo vinayo 
-The Doctrine-Discipline
-17.	vinipātaṃ nirayaṃ (SN 12.41)
-[reborn] in a state of suffering, in hell.
-18.	aparena samayena buddho
-on another occasion, the Awakened One…
-19.	gabbhe cīvaraṃ VIN1.4.1.2
-the robe in the room
-20.	āvāse vassaṃ (VIN 1.1.4)
-(entered) the rainy season at the dwelling place.
-21.	nīvaraṇehi brāhmaṇo (MN 99)
-The brahmin [filled] with the [five] hindrances
-22.	kāme brāhmaṇa
-O, brahmin! … sensual pleasures
-23.	atthamhi sahāyā (DHP 331)
-[Good are] friends in [arisen] need 
-[Good are] friends when need [arises]
-24.	gotamo sāvake … gotamassa sāvakesu (MN 35)
-Gotama [trains] disciples…. Gotama’s [instruction presented] to disciples
-25.	kassapassa vinayasmiṃ SN19.21
-in the discipline of the Kassapa
-26.	$ saṅghamhā saṅgho (AN 8.19) 
-[far] from the Saṅgha [and] the Saṅgha [is far from]
+Class 2 Extra
+
+Sutta Number: SN12.1
+Pali: avijjāya tv'eva asesa-virāga-nirodhā saṅkhāra-nirodho, saṅkhāra-nirodhā viññāṇa-nirodho, viññāṇa-nirodhā nāmarūpa-nirodho, nāmarūpa-nirodhā saḷāyatana-nirodho, saḷāyatana-nirodhā phassa-nirodho, phassa-nirodhā vedanā-nirodho, vedanā-nirodhā taṇhā-nirodho, taṇhā-nirodhā upādāna-nirodho, upādāna-nirodhā bhava-nirodho, bhava-nirodhā jāti-nirodho, jāti-nirodhā jarā-maraṇaṃ soka-parideva-dukkha-domanass'upāyāsā nirujjhanti.
+English Translation: But from the complete fading away and cessation of ignorance there is cessation of volitional formations; from the cessation of volitional formations, cessation of consciousness; from the cessation of consciousness, cessation of name-and-form; from the cessation of name-and-form, cessation of the six sense bases; from the cessation of the six sense bases, cessation of contact; from the cessation of contact, cessation of feeling; from the cessation of feeling, cessation of craving; from the cessation of craving, cessation of clinging; from the cessation of clinging, cessation of existence; from the cessation of existence, cessation of birth; from the cessation of birth, aging-and-death, sorrow, lamentation, pain, displeasure, and despair cease.
+
+Sutta Number: AN8.53
+Pali: dhammā virāgāya
+English Translation: [these] things/qualities [lead] to dispassion
+
+Sutta Number: SN22.59
+Pali: saṅkhārā ābādhāya
+English Translation: Volitional formations [are conducive for] disease
+
+Sutta Number: AN8.19
+Pali: saṅghamhā saṅgho 
+English Translation: [far] from the Saṅgha [and] the Saṅgha [is far from]

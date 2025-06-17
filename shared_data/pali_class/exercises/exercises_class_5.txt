@@ -1,122 +1,192 @@
+Class 5 Exercises
 
-Class 5 
+Sutta Number: SN22.33
+Pali: viññāṇaṃ na tumhākaṃ, taṃ pajahatha.
+English Translation: Consciousness is not yours, you must abandon it!
 
-SN 22.33 viññāṇaṃ na tumhākaṃ, taṃ pajahatha. 
+Sutta Number: SN22.33
+Pali: taṃ vo pahīnaṃ hitāya sukhāya bhavissati
+English Translation: [When] that is given up by you, it will be beneficial and comfortable [for you].
 
-Consciousness is not yours, you must abandon it!
- 
-SN 22.33 taṃ vo pahīnaṃ hitāya sukhāya bhavissati
+Sutta Number: MN39
+Pali: parisuddho no ājīvo bhavissati
+English Translation: Our lifestyle should be purified.
 
-[When] that is given up by you, it will be beneficial and comfortable [for you].
- 
-MN 39 parisuddho no ājīvo bhavissati
+Sutta Number: MN82 (simpl)
+Pali: ahaṃ yathākammaṃ gamissāmi
+English Translation: I will go according to my actions.
 
-Our lifestyle should be purified.
- 
-MN 82 (simpl) ahaṃ yathākammaṃ gamissāmi
+Sutta Number: UDa5.3
+Pali: ahaṃ te aparimitaṃ dhanaṃ dassāmi
+English Translation: I will give unlimited wealth to you.
 
-I will go according to my actions.
- 
-UD-a 5.3 ahaṃ te aparimitaṃ dhanaṃ dassāmi
+Sutta Number: MN2.4
+Pali: neva davāya, na madāya, na maṇḍanāya, na vibhūsanāya
+English Translation: Neither for fun, nor for intoxication, nor for adornment, nor for physical appearance.
 
-I will give unlimited wealth to you.
- 
-DHP223 (simpl)  jina kadariyaṃ dānena, jina saccena alikavādinaṃ.
+Sutta Number: DN16.32
+Pali: alaṃ ānanda mā soci mā paridevi
+English Translation: Stop Ānanda, don’t cry, don’t lament!
 
-Conquer stinginess by giving; conquer liar by truth.
- 
-MN 2.4 neva davāya, na madāya, na maṇḍanāya, na vibhūsanāya
-Neither for fun, nor for intoxication, nor for adornment, nor for physical appearance.
- 
-DN 16.32 alaṃ ānanda mā soci mā paridevi
-Stop Ānanda, don’t cry, don’t lament!
- 
+Sutta Number: AN3.21
+Pali: upasaṅkamitvā āyasmatā sāriputtena saddhiṃ sammodiṃsu
+English Translation: They approached and had polite conversation with venerable Sariputta.
 
-AN 3.21 upasaṅkamitvā āyasmatā sāriputtena saddhiṃ sammodiṃsu
+Sutta Number: TH195
+Pali: adhammo nirayaṃ neti, dhammo pāpeti suggatiṃ
+English Translation: False teaching leads to no good fortune, the Teaching leads to a good destination.
 
-They approached and had polite conversation with venerable Sariputta.
+Sutta Number: MN118 (simpl)
+Pali: pītiṃ paṭisaṃvedī assasissāmi iti sikkhati.
+English Translation: One trains thus: “I will breathe in experiencing delight.”
+
+Sutta Number: MN118 (simpl)
+Pali: aniccaṃ anupassī passasissāmi iti sikkhati
+English Translation: One trains thus: “I will breathe out, observing impermanence.”
+
+Sutta Number: MN48 (simpl)
+Pali: bhikkhu sabrahmacārīhi saddhiṃ bhogī hoti
+English Translation: The monk is partaking together with (his) fellow monks.
+
+Sutta Number: AN7.23
+Pali: bhikkhū uppannāya taṇhāya na vasaṃ gacchissanti
+English Translation: The monks will not submit to the power of arisen craving.
+
+Sutta Number: AN7.25
+Pali: bhikkhū ottappino bhavissanti
+English Translation: The monks will become conscientious.
+
+Sutta Number: DN16.36 (simpl)
+Pali: vo mayā dhammo ca vinayo ca desito vo mama accayena satthā bhavissati
+English Translation: After my passing away, the Doctrine and Discipline taught by me to you, will become a teacher for you.
+
+Sutta Number: SN22.59
+Pali: evaṃ me rūpaṃ hotu! evaṃ me rūpaṃ mā ahosi!
+English Translation: Let my body be thus, let my body not be thus.
+
+Sutta Number: SN22.59
+Pali: evaṃ me saṅkhārā hontu! evaṃ me saṅkhārā mā ahesuṃ!
+English Translation: Let my volitional formations be thus, let my volitional formations not be thus.
+
+Sutta Number: SN35.28
+Pali: ekaṃ samayaṃ bhagavā gayāyaṃ viharati gayāsīse saddhiṃ bhikkhusahassena.
+English Translation: On one occasion the Blessed One was dwelling in Gayā at Gayā’s Head together with a thousand monks. (historical past)
+
+Sutta Number: SN56.35 (simpl)
+Pali: ahaṃ saha eva sukhena, saha eva somanassena catunnaṃ ariyasaccānaṃ abhisamayaṃ vadāmi.
+English Translation: I say clear comprehension of the four Noble Truths [is] accompanied only by happiness and only by mental ease.
+
+Sutta Number: AN10.93
+Pali: anāthapiṇḍiko gahapati yāvatako ahosi paribbājakehi saddhiṃ kathāsallāpo, taṃ sabbaṃ bhagavato ārocesi.
+English Translation: Whatever conversation the householder Anāthapindika had with the wandering ascetics, all that he told to the Blessed One.
+
+Sutta Number: VIN5.1.1
+Pali: mā kho tumhe eso ajesi.
+English Translation: Do not indeed let this [person] defeat you.
+
+Sutta Number: SN42.2 (simpl)
+Pali: “alaṃ, gāmaṇi. mā maṃ etaṃ pucchi
+English Translation: That’s enough, leader, do not ask me this!
+
+Sutta Number: AN6.61
+Pali: yathā no bhagavā byākarissati, tathā naṃ mayaṃ dhāressāma
+English Translation: As the Blessed One will explain [it] to us, so we will keep that in mind.
+
+Sutta Number: SN12.22 (simpl)
+Pali: kārā amhesu mahapphalā bhavissanti
+English Translation: Services (done) to us could be of great fruits.
+
+Sutta Number: KHP7
+Pali: idaṃ vo ñātīnaṃ hotu, sukhitā hontu ñātayo.
+English Translation: May this be for your relatives; may [your] relatives be happy.
+
+Sutta Number: MN39
+Pali: parisuddho no kāyasamācāro bhavissati.
+English Translation: Our bodily behavior will be pure/purified.
+
+Sutta Number: AN7.61
+Pali: na uccāsoṇḍaṃ paggahetvā kulāni upasaṅkamissāmi
+English Translation: Having not raised up a high trunk, I will approach families. [I will not arrogantly approach families]
+
+Sutta Number: VIN PAT PC 10 (simpl)
+Pali: bhikkhu paṭhaviṃ na khaṇati
+English Translation: A monk does not dig up the ground.
+
+Sutta Number: DN16.27 (simpl)
+Pali: pupphā tathāgatassa sarīraṃ okiranti
+English Translation: Flowers are sprinkled on the dead body of the Tathāgata.
+
+Sutta Number: DN14.13 (simpl)
+Pali: bhagavā migadāye pāturahosi
+English Translation: The Blessed One appeared in the deer park.
+
+Sutta Number: UD45
+Pali: asurā mahāsamudde abhiramanti.
+English Translation: Malevolent beings find high pleasure in the great ocean.
+
+Sutta Number: MN51 (simpl)
+Pali: pakkhī sakuṇo ḍeti.
+English Translation: The bird, [one] with wings, flies...
+
+Sutta Number: VIN1.2.6
+Pali: bhikkhu saṅghaṃ kuṭivatthussa olokanaṃ yācati
+English Translation: A monk asks the Community to check the place of the hut.
+
+Sutta Number: MN43
+Pali: so āyasmantaṃ sāriputtaṃ uttariṃ pañhaṃ apucchi.
+English Translation: He asked venerable Sāriputta a question in addition.
+
+Sutta Number: AN8.53
+Pali: ime dhammā saṃyogāya saṃvattanti, no visaṃyogāya.
+English Translation: These things lead to attachment, not to detachment.
+
+Sutta Number: MN74
+Pali: n'eva tasmiṃ samaye dukkhaṃ vedanaṃ vedeti, na adukkham’asukhaṃ vedanaṃ vedeti
+English Translation: At that time, he feels neither an unpleasant sensation nor a neutral sensation.
+
+Sutta Number: MN82
+Pali: āyasmā raṭṭhapālo n'eva dānaṃ alattha na paccakkhānaṃ, añña'd'atthu akkosaṃ eva alattha!
+English Translation: Venerable Raṭṭhapāla obtained neither alms nor a refusal; on the contrary, he obtained only verbal abuse.
+
+Sutta Number: SN10.5
+Pali: mā akāsi pāpakaṃ kammaṃ
+English Translation: Do not do an evil deed.
+
+Sutta Number: SN21.9
+Pali: kiṃ nu kujjhasi? mā kujjhi!
+English Translation: Why indeed are you getting angry? Don’t be angry!
+
+Sutta Number: MN82
+Pali: aṭṭhi tacena onaddhaṃ, saha vatthebhi sobhati.
+English Translation: A bone covered with skin; it looks beautiful with clothes.
 
 
+Class 5 Extra
 
+Sutta Number: DHP223 (simpl)
+Pali: jina kadariyaṃ dānena, jina saccena alikavādinaṃ.
+English Translation: Conquer stinginess by giving; conquer liar by truth.
 
-1.	adhammo nirayaṃ neti dhammo pāpeti suggatiṃ TH 195 
-False teaching leads to no good fortune, the Teaching leads to a good destination.
-2.	alaṃ bālassa mohāya no pāraṃ gavesino TH 251 (simpl)
-It is enough for the delusion of a fool not for one seeking Nibbāna.
-3.	jhāyatha, bhikkhave, mā pamādaṃ attha, mā pacchā vippaṭisārino ahuvattha. ayaṃ vo amhākaṃ anusāsanī MN 19 (simpl) 
-Meditate, monks! You must not be negligent, do not have remorse afterwards! This [is] our advice for you.
-4.	pītiṃ paṭisaṃvedī assasissāmi iti sikkhati. MN 118 (simpl)
-One trains thus: “I will breathe in experiencing delight.”
-5.	aniccaṃ anupassī passasissāmi iti sikkhati MN 118 (simpl)
-One trains thus: “I will breathe out, observing impermanence.”
-6.	bhikkhu sabrahmacārīhi saddhiṃ bhogī hoti MN 48 (simpl)
-The monk is partaking together with (his) fellow monks.
-7.	bhikkhū uppannāya taṇhāya na vasaṃ gacchissanti AN 7.23
-The monks will not submit to the power of arisen craving.
-8.	bhikkhū ottappino bhavissanti AN 7.25
-The monks will become conscientious.
-9.	vo mayā dhammo ca vinayo ca desito vo mama accayena satthā bhavissati DN 16.36 (simpl)
-After my passing away, the Doctrine and Discipline taught by me to you, will become a teacher for you.
-10.	evaṃ me rūpaṃ hotu! evaṃ me rūpaṃ mā ahosi! SN 22.59
-Let my body be thus, let my body not be thus.
-11.	evaṃ me saṅkhārā hontu! evaṃ me saṅkhārā mā ahesuṃ! SN 22.59
-Let my volitional formations be thus, let my volitional formations not be thus.
-12.	ekaṃ samayaṃ bhagavā gayāyaṃ viharati gayāsīse saddhiṃ bhikkhusahassena. SN 35.28
-On one occasion the Blessed One was dwelling in Gayā at Gayā’s Head together with a thousand monks. (historical past)
-13.	ahaṃ saha eva sukhena, saha eva somanassena catunnaṃ ariyasaccānaṃ abhisamayaṃ vadāmi. SN 56.35 (simpl) 
-I say clear comprehension of the four Noble Truths [is] accompanied only by happiness and only by mental ease.
-14.	anāthapiṇḍiko gahapati yāvatako ahosi paribbājakehi saddhiṃ kathāsallāpo, taṃ sabbaṃ bhagavato ārocesi. AN 10.93
-Whatever conversation the householder Anāthapindika had with the wandering ascetics, all that he told to the Blessed One.
-15.	mā kho tumhe eso ajesi. VIN 5.1.1
-Do not indeed let this [person] defeat you.
-16.	“alaṃ, gāmaṇi. mā maṃ etaṃ pucchi SN 42.2 (simpl)
-That’s enough, leader, do not ask me this!
-17.	yathā no bhagavā byākarissati, tathā naṃ mayaṃ dhāressāma AN 6.61
-As the Blessed One will explain [it] to us, so we will keep that in mind.
-18.	tuvaṃ hi no brahmasamo asi saccaṃ SNP 31 (simpl) 
-You are truly for us equal to the Brahma.
-19.	kārā amhesu mahapphalā bhavissanti SN 12.22 (simpl)
-Services (done) to us could be of great fruits.
-20.	gaccha āvuso, na me tayā saddhiṃ kathā vā nisajjā vā phāsu hoti VIN PAT PC 42 
-Go away, friend, for me there is no comfort talking or sitting down together with you.
-21.	idaṃ vo ñātīnaṃ hotu, sukhitā hontu ñātayo. KHP 7
-May this be for your relatives; may [your] relatives be happy.
-22.	te diṭṭhiṃ n'ābhijānāmi, gotamassa yasassino. SNP 70
-I don’t understand your view; [the view] of the famous Gotama.
-23.	mā, brāhmaṇa, jhānaṃ pamādo, jhāne cittaṃ saṇṭhapehi, jhāne cittaṃ ekodiṃ karohi SN 40.1 (simpl) 
-Monk, don’t be careless about meditation, you must make [your] mind stable in meditation, you must make [your] mind unified!
+Sutta Number: TH251 (simpl)
+Pali: alaṃ bālassa mohāya, no pāraṃ gavesino
+English Translation: It is enough for the delusion of a fool not for one seeking Nibbāna.
 
+Sutta Number: MN19 (simpl)
+Pali: jhāyatha, bhikkhave, mā pamādaṃ attha, mā pacchā vippaṭisārino ahuvattha. ayaṃ vo amhākaṃ anusāsanī
+English Translation: Meditate, monks! You must not be negligent, do not have remorse afterwards! This [is] our advice for you.
 
-1.	parisuddho no kāyasamācāro bhavissati. (MN 39)
-Our bodily behavior will be pure/purified.
-2.	na uccāsoṇḍaṃ paggahetvā kulāni upasaṅkamissāmi (AN 7.61)
-Having not raised up a high trunk, I will approach a good family. [I will not arrogantly approach a good family]
-3.	bhikkhu paṭhaviṃ na khaṇati (VIN PAT PC 10 simpl)
-A monk does not dig up the ground.
-4.	pupphā tathāgatassa sarīraṃ okiranti (DN 16.27 simpl)
-Flowers are sprinkled on the dead body of the Tathāgata.
-5.	bhagavā migadāye pāturahosi (DN 14.13 simpl)
-The Blessed One appeared in the deer park.
-6.	asurā mahāsamudde abhiramanti. (UD 45)
-Malevolent beings find high pleasure in the great ocean.
-7.	pakkhī sakuṇo ḍeti. (MN 51 simpl)
-The bird, [one] with wings, flies... 
-8.	bhikkhu saṅghaṃ kuṭivatthussa olokanaṃ yācati (VIN 1.2.6)
-A monk asks the Community to check the place of the hut.
-9.	so āyasmantaṃ sāriputtaṃ uttariṃ pañhaṃ apucchi. (MN 43)
-He asked venerable Sāriputta a question in addition.
-10.	ime dhammā saṃyogāya saṃvattanti, no visaṃyogāya. AN 8.53
-These things lead to attachment, not to detachment.
-11.	n'eva tasmiṃ samaye dukkhaṃ vedanaṃ vedeti, na adukkham’asukhaṃ vedanaṃ vedeti (MN 74)
-At that time, he feels neither an unpleasant sensation nor a neutral sensation. 
-12.	āyasmā raṭṭhapālo n'eva dānaṃ alattha na paccakkhānaṃ, añña'd'atthu akkosaṃ eva alattha! (MN 82)
-Venerable Raṭṭhapāla obtained neither alms nor a refusal; on the contrary, he obtained only verbal abuse.
-13.	mā akāsi pāpakaṃ kammaṃ (SN 10.5)
-Do not do an evil deed.
-14.	kiṃ nu kujjhasi? mā kujjhi! (SN 21.9)
-Why indeed are you getting angry? Don’t be angry!
-15.	MN 82 
-aṭṭhi tacena onaddhaṃ,
-saha vatthebhi sobhati. 
-A bone covered with skin; it looks beautiful with clothes.
- 
+Sutta Number: SNP31 (simpl)
+Pali: tuvaṃ hi no brahmasamo asi saccaṃ
+English Translation: You are truly for us equal to the Brahma.
+
+Sutta Number: VIN PAT PC 42
+Pali: gaccha āvuso, na me tayā saddhiṃ kathā vā nisajjā vā phāsu hoti
+English Translation: Go away, friend, for me there is no comfort talking or sitting down together with you.
+
+Sutta Number: SNP70
+Pali: te diṭṭhiṃ n'ābhijānāmi, gotamassa yasassino.
+English Translation: I don’t understand your view; [the view] of the famous Gotama.
+
+Sutta Number: SN40.1 (simpl)
+Pali: mā, brāhmaṇa, jhānaṃ pamādo, jhāne cittaṃ saṇṭhapehi, jhāne cittaṃ ekodiṃ karohi
+English Translation: Monk, don’t be careless about meditation, you must make [your] mind stable in meditation, you must make [your] mind unified!

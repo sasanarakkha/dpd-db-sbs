@@ -1,99 +1,160 @@
+Class 6 Exercises
 
-Class 6 
-DN 2.9 bhagavā bhikkhū āmantesi, bhikkhavo’ti. 
+Sutta Number: DN2.9
+Pali: bhagavā bhikkhū āmantesi, bhikkhavo’ti.
+English Translation: The Blessed One addressed the monks, “O monks!”
 
-The Blessed One addressed the monks, “O monks!”
- 
-MN 2.2	bhikkhave, assutavā puthujjano na parimuccati jātiyā 
-Monks, an unlearned common person is not liberated from birth.
- 
-DN 11.6 esa bhagavato sāvakasaṅgho 
-This community of the Blessed One’s disciples is worthy of offerings.
- 
-DN 16.7 atha kho āyasmato ānandassa etad’ahosi
+Sutta Number: MN2.2
+Pali: bhikkhave, assutavā puthujjano na parimuccati jātiyā
+English Translation: Monks, an unlearned common person is not liberated from birth.
 
- Then, this [thought] occurred to Venerable Ananda
+Sutta Number: DN11.6
+Pali: esa bhagavato sāvakasaṅgho
+English Translation: This community of the Blessed One’s disciples is worthy of offerings.
 
- 
-VIN 1.2.12 “mā maṃ āyasmanto kiñci avacuttha kalyāṇaṃ vā pāpakaṃ vā”
-Venerables, don’t say anything to me, good or bad!
- 
-MN 152	(simpl) satthārā karaṇīyaṃ sāvakānaṃ, kataṃ vo taṃ mayā. 
-What should be done by a teacher for (his) disciples, that has been done by me for you. 
- 
-SNP 9	ye keci pāṇabhūtā atthi, tasā vā thāvarā vā anavasesā
-Whatever living beings there are, whether moving or not moving without exception.
- 
-DN 16.26 (simpl) dve kassakā bhātaro hatā, cattāro ca balibaddā
-Two farmers, [who are] brothers, and four oxen were killed.
- 
-SN 1.47	(simpl) ye dadanti upassayaṃ, tesaṃ divā ca ratto ca, sadā puññaṃ pavaḍḍhati
-Whoever gives a dwelling, merit increases for them all the time, day and night.
- 
-AN 8.20 bhagavā tuṇhī ahosi.
+Sutta Number: DN16.7
+Pali: atha kho āyasmato ānandassa etad’ahosi
+English Translation: Then, this [thought] occurred to Venerable Ananda
 
-The Blessed One was silent.
- 
+Sutta Number: VIN1.2.12
+Pali: “mā maṃ āyasmanto kiñci avacuttha kalyāṇaṃ vā pāpakaṃ vā”
+English Translation: Venerables, don’t say anything to me, good or bad!
 
-1.	therā rattaññū ciraṃ pabbajitā saṅghassa pitaro saṅghassa pariṇāyakā AN 7.23 (simpl)
-Senior monks of long-standing, [who] have been ordained for a long time, are fathers of the community of monks, guides of the community of monks.
-2.	bhikkhū there sakkarissanti garuṃ karissanti mānessanti pūjessanti  AN 7.23 (simpl)
-Monks will honor, respect, revere, [and] venerate the elders.
-3.	mātāpitu upaṭṭhānaṃ, puttassa ca dārassa saṅgaho SNP 16 
-The looking after mother and father, the support of the wife and son.
-4.	sabbe dhammā anattā iti, yadā paññāya passati, atha nibbindati dukkhe – esa maggo visuddhiyā DHP 277
-“All things are non-self.” When one sees [this] with wisdom, then one is disenchanted with suffering. This is the path for purification.
-5.	taco ca nahāru ca aṭṭhi ca avasissatu, sarīre upasussatu maṃsalohitaṃ SN 12.22 
-Let [my] skin, sinew, and bone remain, let [my] flesh and blood dry up in [my] body.
-6.	sukhassa dātā medhāvī sukhaṃ so adhigacchati AN 5.37
-The intelligent man [who is] a giver of happiness, acquires happiness.
-7.	tena mahāsenena maccunā saṅgaro na hoti MN 131 (simpl)
-There is no bargaining with that death, with (his) great army. 
-8.	ehi tvaṃ bhikkhu bhojane mattaññū hohi MN 107
-Come, monk, be moderate with regard to food!
-9.	bhikkhū hirimanto bhavissanti, ottappino bhavissanti, satimanto bhavissanti, paññavanto bhavissanti AN 7.25 (simpl)
-Monks should be conscientious, they should be feeling shame, they should be mindful, they should be wise.
-10.	sukhino vā khemino hontu sabbe sattā bhavantu sukhit'attā SNP 8
-May all living beings be safe or at ease, may they be happy.
-11.	ime bhikkhave dhammā sekhassa bhikkhuno aparihānāya saṃvattanti. AN 8.79
-These things, o monks, are conducive for the non-decline of a monk who is a trainee. 
-12.	ajja eva ātappaṃ karohi, ko jānāti maraṇaṃ suve MN 131 (simpl)
-Just make an effort today; who knows [if] death [is] tomorrow?
-13.	sattā tamhā kāyā cutā āgāmino honti āgantāro itthattaṃ AN 4.171
-Living beings [who] have passed away from that group are returners, who come back to this existence.
-14.	mādisaṃ sīlavantaṃ kalyāṇadhammaṃ brahmacāriṃ paricara VIN PAT SA 4 simpl
-You must minister to one like me, observing the moral practices, of upright nature, one living the holy life.
-15.	ce so bhikkhu, pubbe appavārito, upasaṅkamissati cīvare vikappaṃ āpajjissati VIN PAT NP 8 simpl
-If that monk, previously uninvited, approaches [there], causes an alteration in a robe…
-16.	yaṃ kho, bhante, āyasmā veyyāvaccakaraṃ niddisi, saññatto so mayā, upasaṅkamatu āyasmā kālena, cīvarena taṃ acchādessati VIN PAT NP 10
-Indeed, venerable sir, the steward whom the venerable one has indicated has been instructed by me; let the venerable one approach him at a suitable time; he will clothe you with a robe.
-17.	bhikkhu mātugāmassa uttarichappañcavācāhi dhammaṃ deseti, aññatra viññunā purisaviggahena, pācittiyaṃ.	VIN PAT PC 7
-[If any] monk expounds Dhamma to a woman by means of more than five or six sentences, except [together] with a knowledgeable male, [it is] an offence requiring confession.
-18.	na bāhuṃ pacālakaṃ antaraghare nisīdissāmi	VIN PAT SK 18 (simpl)
-I will not sit in an inhabited area swinging [my] arm[s].
-19.	nidhīnaṃ va pavattāraṃ, vajjadassinaṃ  niggayhavādiṃ medhāviṃ paṇḍitaṃ bhajāhi DHP 76 (simpl)
-Associate with an intelligent person, a wise man, one who reproves, who sees fault, he is (like) one who points out the treasure.
-20.	mātari pitari ca, atho jeṭṭhamhi bhātari. ācariye ca, tesu na mānaṃ karohi. SN 7.15 (simpl)
-Towards mother and father, and after that, towards the eldest brother; and towards the teacher. Do not show conceit towards them.
-21.	sabbābhibhuṃ sabbaviduṃ sumedhaṃ, tam naraṃ ekavihārī iti ahaṃ brūmi SN 21.10 (simpl)
-[One who is] all-conquering, all-knowing, wise, that man I call thus, “one who dwells alone.” 
- 
+Sutta Number: MN152 (simpl)
+Pali: satthārā karaṇīyaṃ sāvakānaṃ, kataṃ vo taṃ mayā.
+English Translation: What should be done by a teacher for (his) disciples, that has been done by me for you.
 
-1.	SN 1.1 sā devatā bhagavantaṃ etad’avoca
-The deity said this to the Blessed One.
-2.	DN 3.15 cakkhumanto rūpāni dakkhanti
-A person with sight sees forms.
-3.	MN 152 seyyathāpi balavā puriso samiñjitaṃ vā bāhaṃ pasāreyya
-Just like a strong man would stretch out (his) bent arm or …
-4.	AN 2.40 yasmiṃ, bhikkhave, samaye corā balavanto honti..
-At whichever time, monks, thieves are powerful…
-5.	DN 22.18 upekkhako satimā sukhavihārī’ti
-“He who is equanimous [and] mindful lives at ease.”
-6.	AN 5.81 thero bhikkhu sabrahmacārīnaṃ piyo ca hoti manāpo ca garu ca bhāvanīyo ca.
-An elder monk is dear to [his] fellow monks and pleasant, respected, and worthy of esteem [by them].
-7.	MN 147	taṃ kiṃ maññasi, rāhula, cakkhu niccaṃ vā aniccaṃ vā'ti
-What do you think, Rāhula, “Is the eye permanent or impermanent?”
-8.	MN 118 bhikkhu araññagato vā rukkhamūlagato vā suññāgāragato vā nisīdati.
-A monk, gone to the forest or to the foot of a tree or to an empty dwelling, sits down.
- 
+Sutta Number: SNP9
+Pali: ye keci pāṇabhūtā atthi, tasā vā thāvarā vā anavasesā
+English Translation: Whatever living beings there are, whether moving or not moving without exception.
 
+Sutta Number: DN16.26 (simpl)
+Pali: dve kassakā bhātaro hatā, cattāro ca balibaddā
+English Translation: Two farmers, [who are] brothers, and four oxen were killed.
+
+Sutta Number: SN1.47 (simpl)
+Pali: ye dadanti upassayaṃ, tesaṃ divā ca ratto ca, sadā puññaṃ pavaḍḍhati
+English Translation: Whoever gives a dwelling, merit increases for them all the time, day and night.
+
+Sutta Number: AN8.20
+Pali: bhagavā tuṇhī ahosi.
+English Translation: The Blessed One was silent.
+
+Sutta Number: SN1.1
+Pali: sā devatā bhagavantaṃ etad’avoca
+English Translation: The deity said this to the Blessed One.
+
+Sutta Number: DN3.15
+Pali: cakkhumanto rūpāni dakkhanti
+English Translation: A person with sight sees forms.
+
+Sutta Number: MN152
+Pali: seyyathāpi balavā puriso samiñjitaṃ vā bāhaṃ pasāreyya
+English Translation: Just like a strong man would stretch out (his) bent arm or …
+
+Sutta Number: AN2.40
+Pali: yasmiṃ, bhikkhave, samaye corā balavanto honti..
+English Translation: At whichever time, monks, thieves are powerful…
+
+Sutta Number: DN22.18
+Pali: upekkhako satimā sukhavihārī’ti
+English Translation: “He who is equanimous [and] mindful lives at ease.”
+
+Sutta Number: AN10.71
+Pali: thero bhikkhu sabrahmacārīnaṃ piyo ca hoti manāpo ca garu ca bhāvanīyo ca.
+English Translation: An elder monk is dear to [his] fellow monks and pleasant, respected, and worthy of esteem [by them].
+
+Sutta Number: MN147
+Pali: taṃ kiṃ maññasi, rāhula, cakkhu niccaṃ vā aniccaṃ vā'ti
+English Translation: What do you think, Rāhula, “Is the eye permanent or impermanent?”
+
+Sutta Number: MN118
+Pali: bhikkhu araññagato vā rukkhamūlagato vā suññāgāragato vā nisīdati.
+English Translation: A monk, gone to the forest or to the foot of a tree or to an empty dwelling, sits down.
+
+Sutta Number: AN7.23 (simpl)
+Pali: therā rattaññū ciraṃ pabbajitā saṅghassa pitaro saṅghassa pariṇāyakā
+English Translation: Senior monks of long-standing, [who] have been ordained for a long time, are fathers of the community of monks, guides of the community of monks.
+
+Sutta Number: AN7.23 (simpl)
+Pali: bhikkhū there sakkarissanti garuṃ karissanti mānessanti pūjessanti
+English Translation: Monks will honor, respect, revere, [and] venerate the elders.
+
+Sutta Number: DHP277
+Pali: sabbe dhammā anattā iti, yadā paññāya passati, atha nibbindati dukkhe – esa maggo visuddhiyā
+English Translation: “All things are non-self.” When one sees [this] with wisdom, then one is disenchanted with suffering. This is the path for purification.
+
+Sutta Number: SN12.22
+Pali: taco ca nahāru ca aṭṭhi ca avasissatu, sarīre upasussatu maṃsalohitaṃ
+English Translation: Let [my] skin, sinew, and bone remain, let [my] flesh and blood dry up in [my] body.
+
+Sutta Number: AN5.37
+Pali: sukhassa dātā medhāvī sukhaṃ so adhigacchati
+English Translation: The intelligent man [who is] a giver of happiness, acquires happiness.
+
+Sutta Number: MN131 (simpl)
+Pali: tena mahāsenena maccunā saṅgaro na hoti
+English Translation: There is no bargaining with that death, with (his) great army.
+
+Sutta Number: MN107
+Pali: ehi tvaṃ bhikkhu bhojane mattaññū hohi
+English Translation: Come, monk, be moderate with regard to food!
+
+Sutta Number: AN7.25 (simpl)
+Pali: bhikkhū hirimanto bhavissanti, ottappino bhavissanti, satimanto bhavissanti, paññavanto bhavissanti
+English Translation: Monks should be conscientious, they should be feeling shame, they should be mindful, they should be wise.
+
+Sutta Number: SNP8
+Pali: sukhino vā khemino hontu, sabbe sattā bhavantu sukhit'attā
+English Translation: May all living beings be safe or at ease, may they be happy.
+
+Sutta Number: AN8.79
+Pali: ime bhikkhave dhammā sekhassa bhikkhuno aparihānāya saṃvattanti.
+English Translation: These things, o monks, are conducive for the non-decline of a monk who is a trainee.
+
+Sutta Number: VIN PAT SA 4 (simpl)
+Pali: mādisaṃ sīlavantaṃ kalyāṇadhammaṃ brahmacāriṃ paricara
+English Translation: You must minister to one like me, observing the moral practices, of upright nature, one living the holy life.
+
+Sutta Number: VIN PAT NP 8 (simpl)
+Pali: ce so bhikkhu, pubbe appavārito, upasaṅkamissati cīvare vikappaṃ āpajjissati
+English Translation: If that monk, previously uninvited, approaches [there], causes an alteration in a robe…
+
+Sutta Number: VIN PAT SK 18 (simpl)
+Pali: na bāhuṃ pacālakaṃ antaraghare nisīdissāmi
+English Translation: I will not sit in an inhabited area swinging [my] arm[s].
+
+Sutta Number: SN21.10 (simpl)
+Pali: sabbābhibhuṃ sabbaviduṃ sumedhaṃ, tam naraṃ ekavihārī iti ahaṃ brūmi
+English Translation: [One who is] all-conquering, all-knowing, wise, that man I call thus, “one who dwells alone.”
+
+
+Class 6 Extra
+
+Sutta Number: SNP16
+Pali: mātāpitu upaṭṭhānaṃ, puttassa ca dārassa saṅgaho
+English Translation: The looking after mother and father, the support of the wife and son.
+
+Sutta Number: MN131 (simpl)
+Pali: ajja eva ātappaṃ karohi, ko jānāti maraṇaṃ suve
+English Translation: Just make an effort today; who knows [if] death [is] tomorrow?
+
+Sutta Number: AN4.171
+Pali: sattā tamhā kāyā cutā āgāmino honti āgantāro itthattaṃ
+English Translation: Living beings [who] have passed away from that group are returners, who come back to this existence.
+
+Sutta Number: VIN PAT NP 10
+Pali: yaṃ kho, bhante, āyasmā veyyāvaccakaraṃ niddisi, saññatto so mayā, upasaṅkamatu āyasmā kālena, cīvarena taṃ acchādessati
+English Translation: Indeed, venerable sir, the steward whom the venerable one has indicated has been instructed by me; let the venerable one approach him at a suitable time; he will clothe you with a robe.
+
+Sutta Number: VIN PAT PC 7
+Pali: bhikkhu mātugāmassa uttarichappañcavācāhi dhammaṃ deseti, aññatra viññunā purisaviggahena, pācittiyaṃ.
+English Translation: [If any] monk expounds Dhamma to a woman by means of more than five or six sentences, except [together] with a knowledgeable male, [it is] an offence requiring confession.
+
+Sutta Number: DHP76 (simpl)
+Pali: nidhīnaṃ va pavattāraṃ, vajjadassinaṃ  niggayhavādiṃ medhāviṃ paṇḍitaṃ bhajāhi
+English Translation: Associate with an intelligent person, a wise man, one who reproves, who sees fault, he is (like) one who points out the treasure.
+
+Sutta Number: SN7.15 (simpl)
+Pali: mātari pitari ca, atho jeṭṭhamhi bhātari. ācariye ca, tesu na mānaṃ karohi.
+English Translation: Towards mother and father, and after that, towards the eldest brother; and towards the teacher. Do not show conceit towards them.

@@ -1,87 +1,140 @@
-Class 3
 
-ahaṃ bhavantaṃ gotamaṃ saraṇaṃ gacchāmi
-I go for refuge to the master Gotama
- 
+Class 3   
 
-DHP 130 sabbe tasanti daṇḍassa.
-All are fearful of a stick.
- 
-MN 27 tathāgate saddhaṃ paṭilabhati
-He obtains faith in the Tathāgata.
- 
-MN 64	 so tattha ṭhito āsavānaṃ khayaṃ pāpuṇāti.
-Remaining there, he reaches the destruction of the defilements. 
- 
-DHP 354	sabbarasaṃ dhammaraso jināti
-The flavour of the Dhamma surpasses all other flavours.
- 
+Sutta Number: MN4
+Pali: ahaṃ bhavantaṃ gotamaṃ saraṇaṃ gacchāmi
+English Translation: I go for refuge to the master Gotama
 
-MN 39 so ‘idaṃ dukkhan’ti yathābhūtaṃ pajānāti
-He knows clearly “this [is] suffering” as it truly is.
+Sutta Number: DHP130 
+Pali: sabbe tasanti daṇḍassa.
+English Translation: All are fearful of a stick.
+
+Sutta Number: MN27 
+Pali: tathāgate saddhaṃ paṭilabhati
+English Translation: He obtains faith in the Tathāgata.
+
+Sutta Number: MN64         
+Pali: so tattha ṭhito āsavānaṃ khayaṃ pāpuṇāti.
+English Translation: Remaining there, he reaches the destruction of the defilements. 
+
+Sutta Number: DHP354        
+Pali: sabbarasaṃ dhammaraso jināti
+English Translation: The flavour of the Dhamma surpasses all other flavours.
+
+Sutta Number: MN39 
+Pali: so ‘idaṃ dukkhan’ti yathābhūtaṃ pajānāti
+English Translation: He knows clearly “this [is] suffering” as it truly is.
+
+Sutta Number: VIN PAT NP 10 
+Pali: paṭiggaṇhātu āyasmā cīvaracetāpannaṃ
+English Translation: Let the venerable receive the robe-fund.
+
+Sutta Number: DN19.7 (simpl) 
+Pali: rājā jotipālaṃ māṇavaṃ āmantayati
+English Translation: The king addresses the young gentleman (brahmin), Protector of the Light (Jotipāla). 
+
+Sutta Number: MN39 (simpl) 
+Pali: so kāyaṃ vivekajena pītisukhena paripūreti
+English Translation: He completely fills up the body with joy and happiness produced by seclusion.
+
+Sutta Number: DN22.18         
+Pali: sukhaṃ ca kāyena paṭisaṃvedeti
+English Translation: He experiences pleasure by means of the body.
+
+Sutta Number: SNP22
+Pali: devā manussā ca sitā tiṭṭhanti 
+English Translation: Deities and human beings remain attached.
+
+Sutta Number: SN56.11 (simpl)
+Pali: paṭipadā upasamāya sambodhāya nibbānāya saṃvattati 
+English Translation: The path of practice is conducive for calmness, full awakening [and] total emancipation.
+
+Sutta Number: MN27 (simpl)
+Pali: dhammaṃ suṇāti putto 
+English Translation: The son listens to the Dhamma.
+
+Sutta Number: AN3.71 (simpl)
+Pali: sāvako dhammaṃ anussarati 
+English Translation: The disciple recollects the Dhamma.
+
+Sutta Number: AN4.180 (simpl)
+Pali: āvāse therā viharanti 
+English Translation: The elders dwell in the residence.
+
+Sutta Number: MN2.4
+parikkhāraṃ paṭisevāmi 
+English Translation: I make use of the requisite.
+
+Sutta Number: AN3.79
+Pali: kusalā dhammā abhivaḍḍhanti 
+English Translation: Wholesome states of mind increase more and more.
+
+Sutta Number: SN22.25 (simpl)
+Pali: saṅkhāresu chandaṃ ca rāgaṃ pajahatha. 
+English Translation: Abandon interest and desire for volitional formations.
+
+Sutta Number: MN104 (simpl)
+Pali: passatha, ānanda, vacanassa pathaṃ 
+English Translation: You see, Ānanda, a course of speech
+
+Sutta Number: SN55.6 (simpl)
+Pali: suṇāma: kosalehi mallesu pakkamati 
+English Translation: We hear: (the Blessed One) sets out from the Kosalans (on tour) in the Mallans.
+
+Sutta Number: MN133 (simpl)
+Pali: dhārehi, bhikkhu, uddesaṃ ca vibhaṅgaṃ ca 
+English Translation: Remember, monk, the summary and the analysis.
+
+Sutta Number: SN35.248 (simpl)
+Pali: puthujjano punabbhavāya ceteti 
+English Translation: A common person intends for rebirth.
+
+Sutta Number: SNP34
+Pali: passa lokassa pariyāyaṃ. 
+English Translation: See the nature of the world.
+
+Sutta Number: MN36
+Pali: taṃ suṇāhi, sādhukaṃ manasi karohi, bhāsissāmi 
+English Translation: Listen to that, pay attention, I will speak.
+
+Sutta Number: MN107 (simpl)
+Pali: pātimokkhe saṃvarena viharāhi 
+English Translation: Dwell with restraint according to the disciplinary code!
+
+Sutta Number: VIN PAT PC 36
+Pali: handa bhikkhu khāda vā bhuñja vā
+English Translation: Come on, bhikkhu, eat or consume!
+
+Sutta Number: MN43
+Pali: āyasmato sāriputtassa bhāsitaṃ evaṃ ājānāma
+English Translation: We understand the statement of venerable Sāriputta thus.
+
+Sutta Number: MN48
+Pali: labhāmi paccattaṃ samathaṃ
+English Translation: I obtain serenity individually.
+
+Sutta Number: VIN
+Pali: passasi taṃ āpattiṃ
+English Translation: You see that offence.
+
+Sutta Number: SN41.3
+Pali: gahapati, pucchasi — “... diṭṭhiyo loke uppajjanti…
+English Translation: You ask, householder: “…views arise in the world…”
+
+Class 3 Extra 
+
+Sutta Number: MN30 (simpl) 
+Pali: brāhmaṇa, puggalaṃ vadāmi. 
+English Translation: O brahmin, I speak (about) a person.
+
+Sutta Number: SN22.1 (simpl) 
+Pali: sādhu āyasmantaṃ sāriputtaṃ paṭibhātu etassa bhāsitassa attho 
+English Translation: It would be good if the meaning of this statement may become evident to Venerable Sāriputta. (so that he could explain it to us); Fig: It would be good if Ven. Sāriputta would explain the meaning of this statement.
 
 
- 
-
-VIN PAT NP 10 paṭiggaṇhātu āyasmā cīvaracetāpannaṃ
-Let the venerable receive the robe-fund.
-
- 
-DN 19.7 (simpl) rājā jotipālaṃ māṇavaṃ āmantayati
-The king addresses the young gentleman (brahmin), Protector of the Light (Jotipāla). 
- 
-MN 39	 (simpl) so kāyaṃ vivekajena pītisukhena paripūreti
-He completely fills up the body with joy and happiness produced by seclusion.
- 
-
-DN 22.18	 sukhaṃ ca kāyena paṭisaṃvedeti
-He experiences pleasure by means of the body.
-
-1.	devā manussā ca sitā tiṭṭhanti SNP 22
-Deities and human beings remain attached.
-2.	paṭipadā upasamāya sambodhāya nibbānāya saṃvattati SN 56.11  (simpl)
-The path of practice is conducive for calmness, full awakening [and] total emancipation.
-3.	dhammaṃ suṇāti putto MN 27 (simpl)
-The son listens to the Dhamma.
-4.	sāvako dhammaṃ anussarati AN 3.71 (simpl)
-The disciple recollects the Dhamma.
-5.	āvāse therā viharanti AN 4.180 (simpl)
-The elders dwell in the residence.
-6.	parikkhāraṃ paṭisevāmi MN 2.4
-I make use of the requisite.
-7.	kusalā dhammā abhivaḍḍhanti AN 3.79
-Wholesome states of mind increase more and more.
-8.	brāhmaṇa, puggalaṃ vadāmi. MN 30 (simpl) 
-O brahmin, I speak (about) a person.
-9.	saṅkhāresu chandaṃ ca rāgaṃ pajahatha. SN 22.25 (simpl)
-Abandon interest and desire for volitional formations.
-10.	passatha, ānanda, vacanassa pathaṃ MN 104 (simpl)
-You see, Ānanda, a course of speech
-11.	suṇāma: kosalehi mallesu pakkamati SN 55.6 (simpl)
-We hear: (the Blessed One) sets out from the Kosalans (on tour) in the Mallans.
-12.	dhārehi, bhikkhu, uddesaṃ ca vibhaṅgaṃ ca MN 133 (simpl)
-Remember, monk, the summary and the analysis.
-13.	sādhu āyasmantaṃ sāriputtaṃ paṭibhātu etassa bhāsitassa attho SN 22.1 (simpl) 
-It would be good if the meaning of this statement may become evident to Venerable Sāriputta. (so that he could explain it to us)
-fig: It would be good if Ven. Sāriputta would explain the meaning of this statement.
-14.	puthujjano punabbhavāya ceteti SN 35.248 (simpl)
-A common person intends for rebirth.
-15.	passa lokassa pariyāyaṃ. SNP 34
-See the nature of the world.
-16.	taṃ suṇāhi, sādhukaṃ manasi karohi, bhāsissāmi MN 36
-Listen to that, pay attention, I will speak.
-17.	pātimokkhe saṃvarena viharāhi MN 107 (simpl)
-Dwell with restraint according to the disciplinary code!
-18.	handa bhikkhu khāda vā bhuñja vā (VIN PAT PC 36)
-Come on, bhikkhu, eat or consume!
-19.	āyasmato sāriputtassa bhāsitaṃ evaṃ ājānāma (MN 43)
-We understand the statement of venerable Sāriputta thus.
-20.	labhāmi paccattaṃ samathaṃ (MN 48)
-I obtain serenity individually.
-21.	passasi taṃ āpattiṃ (VIN)
-You see that offence.
-22.	gahapati, pucchasi — “... diṭṭhiyo loke uppajjanti… (SN 41.3)
-You ask, householder: “…views arise in the world…”
+	
 
 
- 
+
+	
+

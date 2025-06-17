@@ -133,7 +133,7 @@ def update_column_for_some_criteria(source_value, column_to_update, value_to_upd
 
 
 # !To use the functions:
-source_value = "VIN1.4.2.6"
+source_value = "VIN1.4.3.1"
 column_to_update = "sbs_patimokkha"
 value_to_update = "vib"
 modifier_column_to_copy = "vib"

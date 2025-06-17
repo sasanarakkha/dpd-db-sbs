@@ -1,5 +1,17 @@
 [
     {
+        "id": 23613,
+        "lemma_1": "khādana 1"
+    },
+    {
+        "id": 41983,
+        "lemma_1": "patthodana"
+    },
+    {
+        "id": 49018,
+        "lemma_1": "brahmavihāra"
+    },
+    {
         "id": 82054,
         "lemma_1": "aggaḷā 2"
     },
@@ -66,17 +78,5 @@
     {
         "id": 24869,
         "lemma_1": "gāhitāgāhita"
-    },
-    {
-        "id": 24868,
-        "lemma_1": "gāhita"
-    },
-    {
-        "id": 82994,
-        "lemma_1": "āyoga 4"
-    },
-    {
-        "id": 82993,
-        "lemma_1": "upanetabba 2"
     }
 ]

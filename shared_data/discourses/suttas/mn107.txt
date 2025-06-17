@@ -1,6 +1,12 @@
-mn107 gaṇakamoggallānasuttaṃ
+SUTTA: mn107 gaṇakamoggallānasuttaṃ
 
-evaṃ me sutaṃ, ekaṃ samayaṃ bhagavā sāvatthiyaṃ viharati pubb'ārāme migāramātupāsāde. atha kho gaṇakamoggallāno brāhmaṇo yena bhagavā ten'upasaṅkami, upasaṅkamitvā bhagavatā saddhiṃ sammodi. sammodanīyaṃ kathaṃ sāraṇīyaṃ vītisāretvā ekam'antaṃ nisīdi. ekam'antaṃ nisinno kho gaṇakamoggallāno brāhmaṇo bhagavantaṃ etad'avoca 
+evaṃ me sutaṃ, ekaṃ samayaṃ bhagavā sāvatthiyaṃ viharati pubb'ārāme migāramātupāsāde.
+
+atha kho gaṇakamoggallāno brāhmaṇo yena bhagavā ten'upasaṅkami, upasaṅkamitvā bhagavatā saddhiṃ sammodi.
+
+sammodanīyaṃ kathaṃ sāraṇīyaṃ vītisāretvā ekam'antaṃ nisīdi.
+
+ekam'antaṃ nisinno kho gaṇakamoggallāno brāhmaṇo bhagavantaṃ etad'avoca 
 
  seyyathā'pi, bho gotama, imassa migāramātupāsādassa dissati anupubbasikkhā anupubbakiriyā anupubbapaṭipadā yad'idaṃ 
 
@@ -8,7 +14,7 @@ yāva pacchimasopānakaḷevarā, imesam'pi hi, bho gotama, brāhmaṇānaṃ di
 
 imesam'pi hi, bho gotama, issāsānaṃ dissati anupubbasikkhā anupubbakiriyā anupubbapaṭipadā yad'idaṃ issatthe.
 
-amhākam'pi hi, bho gotama, gaṇakānaṃ gaṇan'ājīvānaṃ dissati anupubbasikkhā anupubbakiriyā anupubbapaṭipadā yad'idaṃ, saṅkhāne. 
+amhākam'pi hi, bho gotama, gaṇakānaṃ gaṇan'ājīvānaṃ dissati anupubbasikkhā anupubbakiriyā anupubbapaṭipadā yad'idaṃ, saṅkhāne.
 
 mayañ'hi, bho gotama, antevāsiṃ labhitvā paṭhamaṃ evaṃ gaṇāpema,
 
@@ -34,9 +40,15 @@ yatv'ādhikaraṇam'enaṃ cakkhu'ndriyaṃ asaṃvutaṃ viharantaṃ abhijjhā
 
 rakkhāhi cakkhu'ndriyaṃ, cakkhu'ndriye saṃvaraṃ āpajjāhi.
 
-sotena saddaṃ sutvā ... ghānena gandhaṃ ghāyitvā ... jivhāya rasaṃ sāyitvā ... kāyena phoṭṭhabbaṃ phusitvā
+sotena saddaṃ sutvā ...
 
-manasā dhammaṃ viññāya mā nimittaggāhī hohi m'ānubyañjanaggāhī. 
+ghānena gandhaṃ ghāyitvā ...
+
+jivhāya rasaṃ sāyitvā ...
+
+kāyena phoṭṭhabbaṃ phusitvā
+
+manasā dhammaṃ viññāya mā nimittaggāhī hohi m'ānubyañjanaggāhī.
 
 yatv'ādhikaraṇam'enaṃ man'indriyaṃ asaṃvutaṃ viharantaṃ abhijjhādomanassā pāpakā akusalā dhammā anvāssaveyyuṃ tassa saṃvarāya paṭipajjāhi,
 
@@ -44,7 +56,9 @@ rakkhāhi man'indriyaṃ, manindriye saṃvaraṃ āpajjāhīti.
 
 yato kho, brāhmaṇa, bhikkhu indriyesu guttadvāro hoti, tam'enaṃ tathāgato uttariṃ vineti,
 
-ehi tvaṃ, bhikkhu, bhojane mattaññū hohi. paṭisaṅkhā yoniso āhāraṃ āhāreyyāsi,
+ehi tvaṃ, bhikkhu, bhojane mattaññū hohi.
+
+paṭisaṅkhā yoniso āhāraṃ āhāreyyāsi,
 
 n'eva davāya na madāya na maṇḍanāya na vibhūsanāya, yāva'd'eva imassa kāyassa ṭhitiyā yāpanāya vihiṃs'ūparatiyā brahmacariy'ānuggahāya, iti purāṇañ'ca vedanaṃ paṭihaṅkhāmi, navañ'ca vedanaṃ na uppādessāmi, yātrā ca me bhavissati anavajjatā ca phāsuvihāro cā'ti.
 
@@ -90,7 +104,7 @@ savitakkaṃ savicāraṃ vivekajaṃ pītisukhaṃ paṭhamaṃ jhānaṃ upasa
 
 so imam'eva kāyaṃ vivekajena pītisukhena abhisandeti parisandeti paripūreti parippharati, n'āssa kiñci sabbāvato kāyassa vivekajena pītisukhena apphuṭaṃ hoti.
 
-puna caparaṃ, bhikkhave, bhikkhu vitakkavicārānaṃ vūpasamā ajjhattaṃ sampasādanaṃ cetaso ekodibhāvaṃ avitakkaṃ avicāraṃ samādhijaṃ pītisukhaṃ dutiyaṃ jhānaṃ upasampajja viharati. 
+puna caparaṃ, bhikkhave, bhikkhu vitakkavicārānaṃ vūpasamā ajjhattaṃ sampasādanaṃ cetaso ekodibhāvaṃ avitakkaṃ avicāraṃ samādhijaṃ pītisukhaṃ dutiyaṃ jhānaṃ upasampajja viharati.
 
 puna caparaṃ, bhikkhave, bhikkhu pītiyā ca virāgā upekkhako ca viharati, sato ca sampajāno, sukhañ'ca kāyena paṭisaṃvedeti, yaṃ taṃ ariyā ācikkhanti, upekkhako satimā sukhavihārī'ti tatiyaṃ jhānaṃ upasampajja viharati.
 
@@ -102,7 +116,7 @@ ye pana te bhikkhū arahanto khīṇ'āsavā vusitavanto katakaraṇīyā ohitab
 
 evaṃ vutte, gaṇakamoggallāno brāhmaṇo bhagavantaṃ etad'avoca,
 
-kiṃ nu kho bhoto gotamassa sāvakā bhotā gotamena evaṃ ovadīyamānā evaṃ anusāsīyamānā sabbe accantaṃ niṭṭhaṃ nibbānaṃ ārādhenti udāhu ekacce n'ārādhentī'ti? 
+kiṃ nu kho bhoto gotamassa sāvakā bhotā gotamena evaṃ ovadīyamānā evaṃ anusāsīyamānā sabbe accantaṃ niṭṭhaṃ nibbānaṃ ārādhenti udāhu ekacce n'ārādhentī'ti?
 
 app'ekacce kho, brāhmaṇa, mama sāvakā mayā evaṃ ovadīyamānā evaṃ anusāsīyamānā accantaṃ niṭṭhaṃ nibbānaṃ ārādhenti, ekacce n'ārādhentī'ti.
 
@@ -112,13 +126,15 @@ atha ca pana bhoto gotamassa sāvakā bhotā gotamena evaṃ ovadīyamānā eva�
 
 tena hi, brāhmaṇa, taṃ'y'ev'ettha paṭipucchissāmi.
 
-yathā te khameyya tathā naṃ byākareyyāsi. taṃ kiṃ maññasi, brāhmaṇa, kusalo tvaṃ rājagahagāmissa maggassā'ti? 
+yathā te khameyya tathā naṃ byākareyyāsi.
+
+taṃ kiṃ maññasi, brāhmaṇa, kusalo tvaṃ rājagahagāmissa maggassā'ti?
 
 evaṃ, bho, kusalo ahaṃ rājagahagāmissa maggassā'ti.
 
 taṃ kiṃ maññasi, brāhmaṇa, idha puriso āgaccheyya rājagahaṃ gantu'kāmo.
 
-so taṃ upasaṅkamitvā evaṃ vadeyya, icchām'ahaṃ, bhante, rājagahaṃ gantuṃ, tassa me rājagahassa maggaṃ upadisā'ti. 
+so taṃ upasaṅkamitvā evaṃ vadeyya, icchām'ahaṃ, bhante, rājagahaṃ gantuṃ, tassa me rājagahassa maggaṃ upadisā'ti.
 
 tam'enaṃ tvaṃ evaṃ vadeyyāsi, eh'ambho purisa, ayaṃ maggo rājagahaṃ gacchati.
 
@@ -128,21 +144,29 @@ tena muhuttaṃ gaccha, tena muhuttaṃ gantvā dakkhissasi rājagahassa ārāma
 
 so tayā evaṃ ovadīyamāno evaṃ anusāsīyamāno ummaggaṃ gahetvā pacchāmukho gaccheyya.
 
-atha dutiyo puriso āgaccheyya rājagahaṃ gantu'kāmo. 
+atha dutiyo puriso āgaccheyya rājagahaṃ gantu'kāmo.
 
-so taṃ upasaṅkamitvā evaṃ vadeyya, icchām'ahaṃ, bhante, rājagahaṃ gantuṃ, tassa me rājagahassa maggaṃ upadisā'ti. tam'enaṃ tvaṃ evaṃ vadeyyāsi, eh'ambho purisa, ayaṃ maggo rājagahaṃ gacchati. tena muhuttaṃ gaccha, tena muhuttaṃ gantvā dakkhissasi amukaṃ nāma gāmaṃ, tena muhuttaṃ gaccha, tena muhuttaṃ gantvā dakkhissasi amukaṃ nāma nigamaṃ, tena muhuttaṃ gaccha, tena muhuttaṃ gantvā dakkhissasi rājagahassa ārāmarāmaṇeyyakaṃ vanarāmaṇeyyakaṃ bhūmirāmaṇeyyakaṃ pokkharaṇīrāmaṇeyyakan'ti.
+so taṃ upasaṅkamitvā evaṃ vadeyya, icchām'ahaṃ, bhante, rājagahaṃ gantuṃ, tassa me rājagahassa maggaṃ upadisā'ti.
+
+tam'enaṃ tvaṃ evaṃ vadeyyāsi, eh'ambho purisa, ayaṃ maggo rājagahaṃ gacchati.
+
+tena muhuttaṃ gaccha, tena muhuttaṃ gantvā dakkhissasi amukaṃ nāma gāmaṃ, tena muhuttaṃ gaccha, tena muhuttaṃ gantvā dakkhissasi amukaṃ nāma nigamaṃ, tena muhuttaṃ gaccha, tena muhuttaṃ gantvā dakkhissasi rājagahassa ārāmarāmaṇeyyakaṃ vanarāmaṇeyyakaṃ bhūmirāmaṇeyyakaṃ pokkharaṇīrāmaṇeyyakan'ti.
 
 so tayā evaṃ ovadīyamāno evaṃ anusāsīyamāno sotthinā rājagahaṃ gaccheyya.
 
 ko nu kho, brāhmaṇa, hetu ko paccayo yaṃ tiṭṭhat'eva rājagahaṃ, tiṭṭhati rājagahagāmī maggo, tiṭṭhasi tvaṃ samādapetā, atha ca pana tayā evaṃ ovadīyamāno evaṃ anusāsīyamāno eko puriso ummaggaṃ gahetvā pacchāmukho gaccheyya, eko sotthinā rājagahaṃ gaccheyyā'ti?
 
-ettha ky'āhaṃ, bho gotama, karomi? magg'akkhāyī'haṃ, bho gotamā'ti.
+ettha ky'āhaṃ, bho gotama, karomi?
+
+magg'akkhāyī'haṃ, bho gotamā'ti.
 
 evam'eva kho, brāhmaṇa, tiṭṭhat'eva nibbānaṃ, tiṭṭhati nibbānagāmī maggo, tiṭṭhām'ahaṃ samādapetā,
 
 atha ca pana mama sāvakā mayā evaṃ ovadīyamānā evaṃ anusāsīyamānā app'ekacce accantaṃ niṭṭhaṃ nibbānaṃ ārādhenti, ekacce nārādhenti.
 
-ettha ky'āhaṃ, brāhmaṇa, karomi? magg'akkhāyī'haṃ, brāhmaṇa, tathāgato'ti.
+ettha ky'āhaṃ, brāhmaṇa, karomi?
+
+magg'akkhāyī'haṃ, brāhmaṇa, tathāgato'ti.
 
 evaṃ vutte, gaṇakamoggallāno brāhmaṇo bhagavantaṃ etad'avoca,
 
@@ -156,4 +180,6 @@ seyyathā'pi, bho gotama, nikkujjitaṃ vā ukkujjeyya, paṭicchannaṃ vā viv
 
 evam'evaṃ bhotā gotamena anekapariyāyena dhammo pakāsito.
 
-es'āhaṃ bhavantaṃ gotamaṃ saraṇaṃ gacchāmi dhammañ'ca bhikkhusaṅghañ'ca. upāsakaṃ maṃ bhavaṃ gotamo dhāretu ajja't'agge pāṇ'upetaṃ saraṇaṃ gatan'ti.
+es'āhaṃ bhavantaṃ gotamaṃ saraṇaṃ gacchāmi dhammañ'ca bhikkhusaṅghañ'ca.
+
+upāsakaṃ maṃ bhavaṃ gotamo dhāretu ajja't'agge pāṇ'upetaṃ saraṇaṃ gatan'ti.
