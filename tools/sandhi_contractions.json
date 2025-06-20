@@ -149,6 +149,9 @@
   "akappiyabhaṇḍameva": [
     "akappiyabhaṇḍam'eva"
   ],
+  "akappiyamañcova": [
+    "akappiyamañco'va"
+  ],
   "akappiyameva": [
     "akappiyam'eva"
   ],
@@ -615,6 +618,9 @@
   "akkhānanti": [
     "akkhānan'ti"
   ],
+  "akkhāyatīti": [
+    "akkhāyatī'ti"
+  ],
   "akkhāsīti": [
     "akkhāsī'ti"
   ],
@@ -680,8 +686,7 @@
     "akhilamanimittamakaṇṭakan'ti"
   ],
   "akhilamanimittamakaṇṭakaṃ": [
-    "akhilam'animittam'akaṇṭakaṃ",
-    "akhilamanimittamakaṇṭakaṃ"
+    "akhilam'animittam'akaṇṭakaṃ"
   ],
   "akhīṇavacanoti": [
     "akhīṇavacano'ti"
@@ -1318,9 +1323,6 @@
   "aṅguttaratikanipātaṭīkā": [
     "aṅg'uttaratikanipātaṭīkā"
   ],
-  "aṅguttaranikāyavare": [
-    "aṅg'uttaranikāyavare"
-  ],
   "aṅguttaranikāyo": [
     "aṅg'uttaranikāyo"
   ],
@@ -1346,7 +1348,7 @@
     "aṅg'uttar'āpo"
   ],
   "aṅguttarepi": [
-    "aṅg'uttare'pi"
+    "aṅguttare'pi"
   ],
   "aṅgulantaraṃ": [
     "aṅgul'antaraṃ"
@@ -1635,6 +1637,9 @@
   "accukkaṭṭhanti": [
     "accukkaṭṭhan'ti"
   ],
+  "accutagāmabyāmaṅkoti": [
+    "accutagāmabyāmaṅko'ti"
+  ],
   "accutanti": [
     "accutan'ti"
   ],
@@ -1751,6 +1756,9 @@
   ],
   "acchādehīti": [
     "acchādehī'ti"
+  ],
+  "acchidāti": [
+    "acchidā'ti"
   ],
   "acchiddakādipāṭhagaṇakā": [
     "acchiddak'ādipāṭhagaṇakā"
@@ -2039,6 +2047,9 @@
   "ajjeva": [
     "ajj'eva"
   ],
+  "ajjhagamopanīto": [
+    "ajjhagam'opanīto"
+  ],
   "ajjhagāti": [
     "ajjhagā'ti"
   ],
@@ -2063,9 +2074,6 @@
   ],
   "ajjhattaratoti": [
     "ajjhattarato'ti"
-  ],
-  "ajjhattarūpādīnaṃ": [
-    "ajjhattarūp'ādīnaṃ"
   ],
   "ajjhattarūpeti": [
     "ajjhattarūpe'ti"
@@ -3087,9 +3095,6 @@
   ],
   "aṭṭhametaṃ": [
     "aṭṭham'etaṃ"
-  ],
-  "aṭṭhavassasahassāyukā": [
-    "aṭṭhavassasahass'āyukā"
   ],
   "aṭṭhavidhampi": [
     "aṭṭhavidham'pi"
@@ -4261,9 +4266,6 @@
   "attabhāvavantānanti": [
     "attabhāvavantānan'ti"
   ],
-  "attabhāvassetaṃ": [
-    "attabhāvass'etaṃ"
-  ],
   "attabhāvāti": [
     "attabhāvā'ti"
   ],
@@ -4620,7 +4622,8 @@
     "atthañ'ca"
   ],
   "atthañceva": [
-    "atthañ'c'eva"
+    "atthañ'c'eva",
+    "atthañceva"
   ],
   "atthañcopaparikkhati": [
     "atthañ'c'opaparikkhati"
@@ -4956,6 +4959,9 @@
   "athaccuto": [
     "ath'accuto",
     "athaccuto"
+  ],
+  "athaccutoti": [
+    "ath'accuto'ti"
   ],
   "athaññamanusāseyya": [
     "ath'aññam'anusāseyya"
@@ -5847,6 +5853,9 @@
   "adhipātāti": [
     "adhipātā'ti"
   ],
+  "adhipātimokkhanti": [
+    "adhipātimokkhan'ti"
+  ],
   "adhipātīti": [
     "adhipātī'ti"
   ],
@@ -6011,9 +6020,6 @@
   ],
   "adhivutthañca": [
     "adhivutthañ'ca"
-  ],
-  "adhivutthoti": [
-    "adhivuttho'ti"
   ],
   "adhisayitānīti": [
     "adhisayitānī'ti"
@@ -6382,9 +6388,6 @@
   "anatthikoti": [
     "anatthiko'ti"
   ],
-  "anatthuppattito": [
-    "anatth'uppattito"
-  ],
   "anatthopi": [
     "anattho'pi"
   ],
@@ -6712,6 +6715,9 @@
   "anavakāsoti": [
     "anavakāso'ti"
   ],
+  "anavakkantāti": [
+    "anavakkantā'ti"
+  ],
   "anavakhaṇḍananti": [
     "anavakhaṇḍanan'ti"
   ],
@@ -6880,9 +6886,6 @@
   ],
   "anāgataṃpāhaṃ": [
     "anāgataṃ'p'āhaṃ"
-  ],
-  "anāgataṃsañāṇa": [
-    "anāgat'aṃsañāṇa"
   ],
   "anāgataṃse": [
     "anāgat'aṃse"
@@ -7769,9 +7772,6 @@
   "anuḍahanaṭṭhena": [
     "anuḍahan'aṭṭhena"
   ],
-  "anuḍahanaṭṭheneva": [
-    "anuḍahan'aṭṭhen'eva"
-  ],
   "anutapissatīti": [
     "anutapissatī'ti"
   ],
@@ -8238,7 +8238,8 @@
     "anuppatto'ti"
   ],
   "anuppadassāmāti": [
-    "anuppadassāmā'ti"
+    "anuppadassāmā'ti",
+    "anuppadassāmāti"
   ],
   "anuppadassāmīti": [
     "anuppadassāmī'ti"
@@ -9287,7 +9288,6 @@
     "antarā'va"
   ],
   "antarāvāti": [
-    "antarā'vā'ti",
     "antarāvā'ti"
   ],
   "antarikāyampi": [
@@ -9307,6 +9307,9 @@
   ],
   "antānantikāti": [
     "ant'ānantikā'ti"
+  ],
+  "antimadehadhārīti": [
+    "antimadehadhārī'ti"
   ],
   "antimadehinanti": [
     "antimadehinan'ti"
@@ -9900,9 +9903,6 @@
   "aparantameva": [
     "apar'antam'eva"
   ],
-  "aparantasahagatā": [
-    "apar'antasahagatā"
-  ],
   "aparantasahagatānaṃ": [
     "apar'antasahagatānaṃ"
   ],
@@ -9913,7 +9913,6 @@
     "apar'ant'ānudiṭṭhino"
   ],
   "aparantānudiṭṭhiyā": [
-    "apar'ant'ānudiṭṭhiyā",
     "aparant'ānudiṭṭhiyā"
   ],
   "aparantānudiṭṭhiyoti": [
@@ -9960,6 +9959,15 @@
   ],
   "aparājitasaṅghanti": [
     "aparājitasaṅghan'ti"
+  ],
+  "aparājitotipi": [
+    "aparājito'ti'pi"
+  ],
+  "aparājitova": [
+    "aparājito'va"
+  ],
+  "aparādhatthoti": [
+    "aparādh'attho'ti"
   ],
   "aparādhānurūpaaṃ": [
     "aparādh'ānurūpaaṃ"
@@ -10193,8 +10201,14 @@
   "aparesampi": [
     "aparesam'pi"
   ],
+  "aparehipi": [
+    "aparehi'pi"
+  ],
   "aparopi": [
     "aparo'pi"
+  ],
+  "apalāpāti": [
+    "apalāpā'ti"
   ],
   "apalāpāyaṃ": [
     "apalāp'āyaṃ"
@@ -11678,6 +11692,9 @@
   "abbhantaragatoti": [
     "abbhantaragato'ti"
   ],
+  "abbhantaranti": [
+    "abbhantaran'ti"
+  ],
   "abbhantarapassayanti": [
     "abbhantarapassayan'ti"
   ],
@@ -11974,8 +11991,7 @@
     "abhayo'ti'ssa"
   ],
   "abhavenassa": [
-    "abhaven'assa",
-    "abhavenassa"
+    "abhaven'assa"
   ],
   "abhavoti": [
     "abhavo'ti"
@@ -12121,9 +12137,6 @@
   ],
   "abhijātanti": [
     "abhijātan'ti"
-  ],
-  "abhijātiyoti": [
-    "abhijātiyo'ti"
   ],
   "abhijātihetūti": [
     "abhijātihetū'ti"
@@ -13099,6 +13112,9 @@
   "amatadundubhinti": [
     "amatadundubhin'ti"
   ],
+  "amatadundubhītipi": [
+    "amatadundubhī'ti'pi"
+  ],
   "amataddasoti": [
     "amataddaso'ti"
   ],
@@ -13193,9 +13209,6 @@
   ],
   "amanāpamidanti": [
     "amanāpam'idan'ti"
-  ],
-  "amanāpasaddameva": [
-    "amanāpasaddam'eva"
   ],
   "amanāpasaddasaṃvattanikoti": [
     "amanāpasaddasaṃvattaniko'ti"
@@ -14506,7 +14519,7 @@
     "alaṅ'kārakasabhāvo"
   ],
   "alaṅkāratthañceva": [
-    "alaṅ'kār'atthañ'c'eva"
+    "alaṅ'kāratthañ'c'eva"
   ],
   "alaṅkāratthaṃ": [
     "alaṅ'kār'atthaṃ"
@@ -15138,9 +15151,6 @@
   "avicakkhaṇoti": [
     "avicakkhaṇo'ti"
   ],
-  "avicārenāti": [
-    "avicārenā'ti"
-  ],
   "avicāroti": [
     "avicāro'ti"
   ],
@@ -15216,9 +15226,6 @@
   ],
   "avijjāpubbaṅgamattā": [
     "avijjāpubbaṅ'gamattā"
-  ],
-  "avijjāpubbaṅgamā": [
-    "avijjāpubbaṅ'gamā"
   ],
   "avijjābhavataṇhādi": [
     "avijjābhavataṇh'ādi"
@@ -15310,11 +15317,8 @@
   "aviññātāresūti": [
     "aviññātāresū'ti"
   ],
-  "aviññāpitatthā": [
-    "aviññāpit'atthā"
-  ],
   "aviññāpitatthāti": [
-    "aviññāpit'atthā'ti"
+    "aviññāpitatthā'ti"
   ],
   "avitakkajhāyīti": [
     "avitakkajhāyī'ti"
@@ -16502,6 +16506,9 @@
   "asisūnanti": [
     "asisūnan'ti"
   ],
+  "asisūnāti": [
+    "asisūnā'ti"
+  ],
   "asisūnūpamā": [
     "asisūn'ūpamā"
   ],
@@ -16548,7 +16555,7 @@
     "asīsu'pi"
   ],
   "asukamahāmattassāti": [
-    "asukamah'āmattassā'ti"
+    "asukamahāmattassā'ti"
   ],
   "asukassāti": [
     "asukassā'ti"
@@ -16597,6 +16604,12 @@
   ],
   "asucīyeva": [
     "asucī'y'eva"
+  ],
+  "asuññatanti": [
+    "asuññatan'ti"
+  ],
+  "asuññatoti": [
+    "asuññato'ti"
   ],
   "asuṇitukāmatā": [
     "asuṇitu'kāmatā"
@@ -17331,6 +17344,9 @@
     "aham'assa",
     "ahamassa"
   ],
+  "ahamahosiṃ": [
+    "aham'ahosiṃ"
+  ],
   "ahamāvuso": [
     "aham'āvuso"
   ],
@@ -17350,7 +17366,8 @@
     "aham'etthā'ti"
   ],
   "ahameva": [
-    "aham'eva"
+    "aham'eva",
+    "ahameva"
   ],
   "ahameveko": [
     "aham'ev'eko"
@@ -17390,12 +17407,6 @@
   ],
   "ahāsīti": [
     "ahāsī'ti"
-  ],
-  "ahikampi": [
-    "ahikam'pi"
-  ],
-  "ahikaṃpi": [
-    "ahikaṃ'pi"
   ],
   "ahichattakanti": [
     "ahichattakan'ti"
@@ -17546,6 +17557,9 @@
   ],
   "ahorattānusikkhī": [
     "ahoratt'ānusikkhī"
+  ],
+  "ahorattiyoti": [
+    "ahorattiyo'ti"
   ],
   "ahosinti": [
     "ahosin'ti"
@@ -18019,7 +18033,7 @@
     "āgatenā'pi"
   ],
   "āgatepi": [
-    "āgate'pi"
+    "āgat'epi"
   ],
   "āgatoti": [
     "āgato'ti"
@@ -18264,6 +18278,9 @@
   "ācariyupajjhāyehi": [
     "ācariy'upajjhāyehi"
   ],
+  "ācariyūpaddavena": [
+    "ācariy'ūpaddavena"
+  ],
   "ācariyūpaddavenāti": [
     "ācariy'ūpaddavenā'ti",
     "ācariyūpaddavenā'ti"
@@ -18328,6 +18345,9 @@
   ],
   "ācikkhissatīti": [
     "ācikkhissatī'ti"
+  ],
+  "ācikkhissāmīti": [
+    "ācikkhissāmī'ti"
   ],
   "ācikkhissāmyanāgataṃ": [
     "ācikkhissāmy'anāgataṃ"
@@ -18829,8 +18849,8 @@
   "ādhānanti": [
     "ādhānan'ti"
   ],
-  "ādhārakanti": [
-    "ādhārakan'ti"
+  "ādhārakantiādinā": [
+    "ādhārakan'tiādinā"
   ],
   "ādhāranti": [
     "ādhāran'ti"
@@ -19045,6 +19065,9 @@
   "ānentiyevāti": [
     "ānentiy'evā'ti"
   ],
+  "ānemīti": [
+    "ānemī'ti"
+  ],
   "ānehīti": [
     "ānehī'ti"
   ],
@@ -19217,9 +19240,6 @@
   ],
   "āpāthamāgacchanti": [
     "āpātham'āgacchanti"
-  ],
-  "āpādakāti": [
-    "āpādakā'ti"
   ],
   "āpāditoti": [
     "āpādito'ti"
@@ -19557,8 +19577,7 @@
     "āmeḍitan'ti"
   ],
   "āmoti": [
-    "āmo'ti",
-    "āmoti"
+    "āmo'ti"
   ],
   "āyañca": [
     "āyañ'ca"
@@ -19756,9 +19775,6 @@
   "āyogādinimittaṃ": [
     "āyog'ādinimittaṃ"
   ],
-  "āyogeti": [
-    "āyoge'ti"
-  ],
   "āyoti": [
     "āyo'ti"
   ],
@@ -19906,9 +19922,6 @@
   ],
   "āramantīti": [
     "āramantī'ti"
-  ],
-  "āramitabbaṭṭhena": [
-    "āramitabb'aṭṭhena"
   ],
   "ārambhajāti": [
     "ārambhajā'ti"
@@ -20664,9 +20677,6 @@
   ],
   "āsavañca": [
     "āsavañ'ca"
-  ],
-  "āsavaṭṭhāniyehīti": [
-    "āsavaṭṭhāniyehī'ti"
   ],
   "āsavaṭṭhānīyāti": [
     "āsavaṭṭhānīyā'ti"
@@ -21478,7 +21488,8 @@
     "iti'p'ime"
   ],
   "itipīti": [
-    "iti'pī'ti"
+    "iti'pī'ti",
+    "itipī'ti"
   ],
   "itipetaṃ": [
     "iti'p'etaṃ"
@@ -21645,6 +21656,7 @@
     "itthan'nāma"
   ],
   "itthannāmañca": [
+    "itthan'nāmañ'ca",
     "itthannāmañ'ca"
   ],
   "itthannāmasenāsanavāsikaṃ": [
@@ -23094,9 +23106,6 @@
   "uggahaparipucchāvaseneva": [
     "uggahaparipucchāvasen'eva"
   ],
-  "uggahādi": [
-    "uggah'ādi"
-  ],
   "uggahitakālasadisameva": [
     "uggahitakālasadisam'eva"
   ],
@@ -23142,7 +23151,11 @@
   "ugghātitāti": [
     "ugghātitā'ti"
   ],
+  "uccaṅgamāyo": [
+    "ucc'aṅgamāyo"
+  ],
   "uccaṅgamāyoti": [
+    "ucc'aṅgamāyo'ti",
     "uccaṅgamāyo'ti"
   ],
   "uccatarepīti": [
@@ -23209,8 +23222,7 @@
     "ucc'āvacā'ti"
   ],
   "uccāvacāni": [
-    "ucc'āvacāni",
-    "uccāvacāni"
+    "ucc'āvacāni"
   ],
   "uccāvacānīti": [
     "ucc'āvacānī'ti"
@@ -24383,9 +24395,6 @@
   "udakenāti": [
     "udakenā'ti"
   ],
-  "udakeneva": [
-    "udaken'eva"
-  ],
   "udakepi": [
     "udake'pi"
   ],
@@ -24660,9 +24669,6 @@
   "udumbarapadarampi": [
     "udumbarapadaram'pi"
   ],
-  "udumbarīceva": [
-    "udumbarīc'eva"
-  ],
   "udetayaṃ": [
     "udet'ayaṃ",
     "udetayaṃ"
@@ -24771,7 +24777,8 @@
     "uddh'aggāni"
   ],
   "uddhaggāssa": [
-    "uddhagg'āssa"
+    "uddhagg'āssa",
+    "uddhaggāssa"
   ],
   "uddhaggikanti": [
     "uddhaggikan'ti"
@@ -25014,9 +25021,6 @@
   "upakappessāmīti": [
     "upakappessāmī'ti"
   ],
-  "upakaraṇabhaṇḍañca": [
-    "upakaraṇabhaṇḍañ'ca"
-  ],
   "upakārakāti": [
     "upakārakā'ti"
   ],
@@ -25092,6 +25096,9 @@
   ],
   "upagacchītipi": [
     "upagacchī'ti'pi"
+  ],
+  "upagaccheyyāti": [
+    "upagaccheyyā'ti"
   ],
   "upagaccheyyunti": [
     "upagaccheyyun'ti"
@@ -25230,6 +25237,9 @@
   "upajjhāyādīhi": [
     "upajjhāy'ādīhi"
   ],
+  "upajjhāyehīti": [
+    "upajjhāyehī'ti"
+  ],
   "upajjhāyoti": [
     "upajjhāyo'ti"
   ],
@@ -25302,6 +25312,9 @@
   ],
   "upaṭṭhānavīriyañca": [
     "upaṭṭhānavīriyañ'ca"
+  ],
+  "upaṭṭhānasamaṅgitāti": [
+    "upaṭṭhānasamaṅgitā'ti"
   ],
   "upaṭṭhānasamayoti": [
     "upaṭṭhānasamayo'ti"
@@ -25470,6 +25483,9 @@
   "upadhāritanti": [
     "upadhāritan'ti"
   ],
+  "upadhāremīti": [
+    "upadhārem'īti"
+  ],
   "upadhāvantiyeva": [
     "upadhāvanti'y'eva"
   ],
@@ -25547,6 +25563,9 @@
   ],
   "upanāmitanti": [
     "upanāmitan'ti"
+  ],
+  "upanāmitāti": [
+    "upanāmitā'ti"
   ],
   "upanāmentīti": [
     "upanāmentī'ti"
@@ -26141,8 +26160,14 @@
   "upasamānussatīti": [
     "upasam'ānussatīti"
   ],
+  "upasamārammaṇattā": [
+    "upasam'ārammaṇattā"
+  ],
   "upasameti": [
     "upasame'ti"
+  ],
+  "upasamenāti": [
+    "upasamenā'ti"
   ],
   "upasamoti": [
     "upasamo'ti"
@@ -26437,9 +26462,6 @@
   "upādinnupādāniyā": [
     "upādinn'upādāniyā"
   ],
-  "upādinneti": [
-    "upādinne'ti"
-  ],
   "upādinnoti": [
     "upādinno'ti"
   ],
@@ -26466,6 +26488,9 @@
   ],
   "upāyakusalenāhaṃ": [
     "upāyakusalen'āhaṃ"
+  ],
+  "upāyanañca": [
+    "upāyanañ'ca"
   ],
   "upāyāsaupakaṭṭhādīsu": [
     "upāyāsaupakaṭṭh'ādīsu"
@@ -26759,9 +26784,6 @@
   "uposathikopi": [
     "uposathiko'pi"
   ],
-  "uposathupavāse": [
-    "uposath'upavāse"
-  ],
   "uposatheti": [
     "uposathe'ti"
   ],
@@ -26951,13 +26973,15 @@
     "uppann'ābhisandhinā"
   ],
   "uppannuppannaṃ": [
-    "uppann'uppannaṃ"
+    "uppann'uppannaṃ",
+    "uppannuppannaṃ"
   ],
   "uppannuppannānaṃ": [
     "uppann'uppannānaṃ"
   ],
   "uppannuppanne": [
-    "uppann'uppanne"
+    "uppann'uppanne",
+    "uppannuppanne"
   ],
   "uppannoti": [
     "uppanno'ti"
@@ -27367,6 +27391,9 @@
   "umaṅgasadisanti": [
     "umaṅgasadisan'ti"
   ],
+  "umaṅgāti": [
+    "umaṅgā'ti"
+  ],
   "umāpupphanibhāsinoti": [
     "umāpupphanibhāsino'ti"
   ],
@@ -27510,6 +27537,9 @@
   "urabbhadhananti": [
     "urabbhadhanan'ti"
   ],
+  "urabbhādi": [
+    "urabbh'ādi"
+  ],
   "urampi": [
     "uram'pi"
   ],
@@ -27596,6 +27626,9 @@
   ],
   "ullittāvalittāti": [
     "ullitt'āvalittā'ti"
+  ],
+  "ullittāvalittāni": [
+    "ullitt'āvalittāni"
   ],
   "ullittāvalittesu": [
     "ullitt'āvalittesu"
@@ -27695,9 +27728,6 @@
   ],
   "ussannadhātukanti": [
     "ussannadhātukan'ti"
-  ],
-  "ussannanti": [
-    "ussannan'ti"
   ],
   "ussannāyāti": [
     "ussannāyā'ti"
@@ -27868,10 +27898,6 @@
   ],
   "ūnakaddhamāsaṃ": [
     "ūnak'addhamāsaṃ"
-  ],
-  "ūnakaddhamāse": [
-    "ūnak'addhamāse",
-    "ūnakaddhamāse"
   ],
   "ūnakamāsaddhamāsesūti": [
     "ūnakamās'addhamāsesū'ti"
@@ -28917,7 +28943,8 @@
     "ekā'pi"
   ],
   "ekābaddhaṃ": [
-    "ek'ābaddhaṃ"
+    "ek'ābaddhaṃ",
+    "ekābaddhaṃ"
   ],
   "ekābaddhāni": [
     "ek'ābaddhāni",
@@ -28952,6 +28979,9 @@
   ],
   "ekārammaṇanti": [
     "ek'ārammaṇan'ti"
+  ],
+  "ekāralopasandhīti": [
+    "ekāralopasandhī'ti"
   ],
   "ekārāmataṃ": [
     "ek'ārāmataṃ"
@@ -29055,7 +29085,8 @@
     "ek'idan'ti"
   ],
   "ekidaṃ": [
-    "ek'idaṃ"
+    "ek'idaṃ",
+    "ekidaṃ"
   ],
   "ekindriyanti": [
     "ek'indriyan'ti"
@@ -29171,11 +29202,8 @@
   "ekekapaṇṇo": [
     "ek'ekapaṇṇo"
   ],
-  "ekekapādarakkhakā": [
-    "ek'ekapādarakkhakā"
-  ],
   "ekekamakkharaṃ": [
-    "ek'ekam'akkharaṃ"
+    "ekekam'akkharaṃ"
   ],
   "ekekameva": [
     "ek'ekam'eva"
@@ -29184,7 +29212,8 @@
     "ek'ekalom'ūpacit'aṅgavā"
   ],
   "ekekalomūpacitaṅgavāti": [
-    "ek'ekalom'ūpacit'aṅgavā'ti"
+    "ek'ekalom'ūpacit'aṅgavā'ti",
+    "ekekalom'ūpacit'aṅgavā'ti"
   ],
   "ekekalomo": [
     "ek'ekalomo"
@@ -29221,12 +29250,6 @@
   ],
   "ekekissā": [
     "ek'ekissā"
-  ],
-  "ekekena": [
-    "ek'ekena"
-  ],
-  "ekekehi": [
-    "ek'ekehi"
   ],
   "ekeko": [
     "ek'eko"
@@ -29510,6 +29533,9 @@
   "etāhīti": [
     "etāhī'ti"
   ],
+  "etitthiyo": [
+    "et'itthiyo"
+  ],
   "etiyeva": [
     "eti'y'eva"
   ],
@@ -29738,6 +29764,18 @@
   ],
   "elanti": [
     "elan'ti"
+  ],
+  "elamukātipi": [
+    "elamukā'ti'pi"
+  ],
+  "elamukhāti": [
+    "elamukhā'ti"
+  ],
+  "elamukhātipi": [
+    "elamukhā'ti'pi"
+  ],
+  "elamugāti": [
+    "elamugā'ti"
   ],
   "elāti": [
     "elā'ti"
@@ -29977,8 +30015,7 @@
     "evam'imehi"
   ],
   "evamīdise": [
-    "evam'īdise",
-    "evamīdise"
+    "evam'īdise"
   ],
   "evamīdisesu": [
     "evam'īdisesu"
@@ -30311,9 +30348,6 @@
   ],
   "esanīti": [
     "esanī'ti"
-  ],
-  "esanoti": [
-    "esano'ti"
   ],
   "esantova": [
     "esanto'va"
@@ -30697,7 +30731,8 @@
     "oj'āpaharaṇiyo"
   ],
   "ojāyetaṃ": [
-    "ojāy'etaṃ"
+    "ojāy'etaṃ",
+    "ojāyetaṃ"
   ],
   "oṭṭhaddhoti": [
     "oṭṭh'addho'ti",
@@ -31087,6 +31122,9 @@
   "obhāseti": [
     "obhāse'ti"
   ],
+  "obhāsetīti": [
+    "obhāsetī'ti"
+  ],
   "obhāsetvāti": [
     "obhāsetvā'ti"
   ],
@@ -31147,6 +31185,9 @@
   ],
   "orabbhikāti": [
     "orabbhikā'ti"
+  ],
+  "orabbhikādīhi": [
+    "orabbhik'ādīhi"
   ],
   "oramattakassāti": [
     "oramattakassā'ti"
@@ -31838,6 +31879,9 @@
   ],
   "kaṭṭhasminti": [
     "kaṭṭhasmin'ti"
+  ],
+  "kaṭṭhahārikapaṇṇahārikādayo": [
+    "kaṭṭhahārikapaṇṇahārik'ādayo"
   ],
   "kaṭṭhahārikādīnaṃ": [
     "kaṭṭhahārik'ādīnaṃ"
@@ -32553,9 +32597,6 @@
   "kathaṅkathā": [
     "kathaṅ'kathā"
   ],
-  "kathaṅkathī": [
-    "kathaṅ'kathī"
-  ],
   "kathajja": [
     "kath'ajja"
   ],
@@ -32702,9 +32743,6 @@
   ],
   "kathinānatthataṃ": [
     "kathin'ānatthataṃ"
-  ],
-  "kathinuddhāradivasaṃ": [
-    "kathin'uddhāradivasaṃ"
   ],
   "kathinuddhāraṃ": [
     "kathin'uddhāraṃ"
@@ -32913,6 +32951,12 @@
   "kantārāvaseso": [
     "kantār'āvaseso"
   ],
+  "kantitasuttanti": [
+    "kantitasuttan'ti"
+  ],
+  "kantitāti": [
+    "kantitā'ti"
+  ],
   "kantoti": [
     "kanto'ti"
   ],
@@ -33094,9 +33138,6 @@
   ],
   "kappasatānāhaṃ": [
     "kappasatān'āhaṃ"
-  ],
-  "kappasahassāyukesu": [
-    "kappasahass'āyukesu"
   ],
   "kappasahassāyuparimāṇe": [
     "kappasahass'āyuparimāṇe"
@@ -33599,6 +33640,9 @@
   ],
   "kammākammavidhāyakaṃ": [
     "kamm'ākammavidhāyakaṃ"
+  ],
+  "kammākammavinicchayena": [
+    "kamm'ākammavinicchayena"
   ],
   "kammākammavinicchayo": [
     "kamm'ākammavinicchayo"
@@ -34297,12 +34341,6 @@
   ],
   "kavacamivāti": [
     "kavacam'ivā'ti"
-  ],
-  "kavāṭañca": [
-    "kavāṭañ'ca"
-  ],
-  "kavāṭapiṭṭhanti": [
-    "kavāṭapiṭṭhan'ti"
   ],
   "kavāṭabaddhavihāranti": [
     "kavāṭabaddhavihāran'ti"
@@ -35075,9 +35113,6 @@
   "kāmavitakkoti": [
     "kāmavitakko'ti"
   ],
-  "kāmasaṅkappādi": [
-    "kāmasaṅkapp'ādi"
-  ],
   "kāmasaṅkappādimicchāvitakkā": [
     "kāmasaṅkapp'ādimicchāvitakkā"
   ],
@@ -35086,9 +35121,6 @@
   ],
   "kāmasaṅgasattāti": [
     "kāmasaṅgasattā'ti"
-  ],
-  "kāmasaññādi": [
-    "kāmasaññ'ādi"
   ],
   "kāmasaññādiṃ": [
     "kāmasaññ'ādiṃ"
@@ -35354,6 +35386,9 @@
   ],
   "kāmesumicchācārampāhaṃ": [
     "kāmesumicchācāram'p'āhaṃ"
+  ],
+  "kāmesumicchācārassa": [
+    "kāmesumicch'ācārassa"
   ],
   "kāmesumicchācāroti": [
     "kāmesumicchācāro'ti"
@@ -35718,9 +35753,6 @@
   "kāyasamphassāyatanaṃ": [
     "kāyasamphass'āyatanaṃ"
   ],
-  "kāyasaṃsaggādinā": [
-    "kāyasaṃsagg'ādinā"
-  ],
   "kāyasaṃsaggoti": [
     "kāyasaṃsaggo'ti"
   ],
@@ -35827,9 +35859,6 @@
   ],
   "kāyālasiyatāti": [
     "kāy'ālasiyatā'ti"
-  ],
-  "kāyālasiyatāya": [
-    "kāy'ālasiyatāya"
   ],
   "kāyālasiyapaṭippassaddhi": [
     "kāy'ālasiyapaṭippassaddhi"
@@ -36115,9 +36144,6 @@
   "kālaṅkatamanussā": [
     "kālaṅ'katamanussā"
   ],
-  "kālaṅkatassa": [
-    "kālaṅ'katassa"
-  ],
   "kālaṅkataṃ": [
     "kālaṅ'kataṃ"
   ],
@@ -36234,9 +36260,6 @@
   ],
   "kālamatināmeti": [
     "kālam'atināmeti"
-  ],
-  "kālameghova": [
-    "kālamegho'va"
   ],
   "kālasamayoti": [
     "kālasamayo'ti"
@@ -36450,9 +36473,6 @@
     "kāḷ'ānusārigandho",
     "kāḷānusārigandho"
   ],
-  "kāḷānusāritagandhādayo": [
-    "kāḷ'ānusāritagandh'ādayo"
-  ],
   "kāḷānusāriyaṃ": [
     "kāḷ'ānusāriyaṃ"
   ],
@@ -36510,7 +36530,7 @@
     "kiṅ'kusalagavesī"
   ],
   "kiṅkusalānuesī": [
-    "kiṅ'kusal'ānuesī"
+    "kiṅkusal'ānuesī"
   ],
   "kiccakaraṇīyānīti": [
     "kiccakaraṇīyānī'ti"
@@ -37127,9 +37147,6 @@
   "kilesadukkhenapi": [
     "kilesadukkhena'pi"
   ],
-  "kilesadhammehīti": [
-    "kilesadhammehī'ti"
-  ],
   "kilesandhakāranāsakaṃ": [
     "kiles'andhakāranāsakaṃ"
   ],
@@ -37248,6 +37265,9 @@
   ],
   "kilesūpasamatthaṃ": [
     "kiles'ūpasamatthaṃ"
+  ],
+  "kilesūpasamante": [
+    "kiles'ūpasamante"
   ],
   "kilesūpasame": [
     "kiles'ūpasame"
@@ -37852,7 +37872,7 @@
     "kumārabhūtā'ti"
   ],
   "kumāramādisanti": [
-    "kumāram'ādisanti"
+    "kumāram'ādisan'ti"
   ],
   "kumārāti": [
     "kumārā'ti"
@@ -37904,9 +37924,6 @@
   ],
   "kumbhaṭṭhānakathāti": [
     "kumbhaṭṭhānakathā'ti"
-  ],
-  "kumbhaṇḍamahāmatto": [
-    "kumbhaṇḍamah'āmatto"
   ],
   "kumbhaṇḍāti": [
     "kumbhaṇḍā'ti"
@@ -37971,6 +37988,9 @@
   "kumbhīlabhayanti": [
     "kumbhīlabhayan'ti"
   ],
+  "kumbhīlādayo": [
+    "kumbhīl'ādayo"
+  ],
   "kumbhūpamanti": [
     "kumbh'ūpaman'ti"
   ],
@@ -37988,9 +38008,6 @@
   ],
   "kummamhāva": [
     "kummamhā'va"
-  ],
-  "kummāsādi": [
-    "kummās'ādi"
   ],
   "kummoti": [
     "kummo'ti"
@@ -38559,8 +38576,14 @@
   "kūṭampi": [
     "kūṭam'pi"
   ],
+  "kūṭavinicchayikānampi": [
+    "kūṭavinicchayikānam'pi"
+  ],
   "kūṭasakkhīti": [
     "kūṭasakkhī'ti"
+  ],
+  "kūṭasakkhīnampi": [
+    "kūṭasakkhīnam'pi"
   ],
   "kūṭasamugghātāti": [
     "kūṭasamugghātā'ti"
@@ -38628,6 +38651,9 @@
   "kūṭāgārāni": [
     "kūṭ'āgārāni"
   ],
+  "kūṭāgārānipi": [
+    "kūṭ'āgārāni'pi"
+  ],
   "kūṭāgāre": [
     "kūṭ'āgāre"
   ],
@@ -38679,17 +38705,12 @@
   "ketunāyeva": [
     "ketunā'y'eva"
   ],
-  "ketumatīpuruttamaṃ": [
-    "ketumatīpur'uttamaṃ"
-  ],
-  "ketumatīpuruttame": [
-    "ketumatīpur'uttame"
-  ],
   "ketumatīpuruttameti": [
-    "ketumatīpur'uttame'ti"
+    "ketumatīpuruttame'ti"
   ],
   "ketumiva": [
-    "ketum'iva"
+    "ketum'iva",
+    "ketumiva"
   ],
   "ketuhāti": [
     "ketuhā'ti"
@@ -39311,7 +39332,8 @@
     "komārikā'ti"
   ],
   "komārikāpīti": [
-    "komārikā'pī'ti"
+    "komārikā'pī'ti",
+    "komārikāpī'ti"
   ],
   "komārīti": [
     "komārī'ti"
@@ -40103,9 +40125,6 @@
   "khayeñāṇanti": [
     "khayeñāṇan'ti"
   ],
-  "khayeti": [
-    "khaye'ti"
-  ],
   "khayoti": [
     "khayo'ti"
   ],
@@ -40146,9 +40165,6 @@
   "kharigatanti": [
     "kharigatan'ti"
   ],
-  "khalatīti": [
-    "khalatī'ti"
-  ],
   "khalamaṇḍalādiso": [
     "khalamaṇḍal'ādiso"
   ],
@@ -40184,6 +40200,9 @@
   ],
   "khaḷuṅkassā": [
     "khaḷuṅk'assā"
+  ],
+  "khaḷuṅkeneva": [
+    "khaḷuṅken'eva"
   ],
   "khaḷopiyanti": [
     "khaḷopiyan'ti"
@@ -40592,9 +40611,6 @@
   "khīṇāsavasamaṇānaṃyeva": [
     "khīṇ'āsavasamaṇānaṃ'y'eva"
   ],
-  "khīṇāsavasīlena": [
-    "khīṇ'āsavasīlena"
-  ],
   "khīṇāsavassa": [
     "khīṇ'āsavassa"
   ],
@@ -40623,13 +40639,14 @@
     "khīṇ'āsavā'va"
   ],
   "khīṇāsave": [
-    "khīṇ'āsave"
+    "khīṇ'āsave",
+    "khīṇāsave"
   ],
   "khīṇāsavena": [
     "khīṇ'āsavena"
   ],
   "khīṇāsavenapi": [
-    "khīṇ'āsavena'pi"
+    "khīṇāsavena'pi"
   ],
   "khīṇāsavesu": [
     "khīṇ'āsavesu"
@@ -41287,11 +41304,8 @@
   "gajjitāti": [
     "gajjitā'ti"
   ],
-  "gaṇakamahāmattā": [
-    "gaṇakamah'āmattā"
-  ],
   "gaṇakamahāmattāti": [
-    "gaṇakamah'āmattā'ti"
+    "gaṇakamahāmattā'ti"
   ],
   "gaṇakīti": [
     "gaṇakī'ti"
@@ -41758,9 +41772,6 @@
   ],
   "gandhabbadevagaṇanti": [
     "gandhabbadevagaṇan'ti"
-  ],
-  "gandhabbamahāmatto": [
-    "gandhabbamah'āmatto"
   ],
   "gandhabbarājāti": [
     "gandhabbarājā'ti"
@@ -42957,10 +42968,6 @@
   "gāhāpentīti": [
     "gāhāpentī'ti"
   ],
-  "gāhitāgāhitañca": [
-    "gāhit'āgāhitañ'ca",
-    "gāhitāgāhitañca"
-  ],
   "gāhetumpi": [
     "gāhetum'pi"
   ],
@@ -43230,7 +43237,8 @@
     "gihī'ti"
   ],
   "gihīpi": [
-    "gihī'pi"
+    "gihī'pi",
+    "gihīpi"
   ],
   "gītañca": [
     "gītañ'ca"
@@ -43570,6 +43578,9 @@
   "gehasitānañceva": [
     "gehasitānañ'c'eva"
   ],
+  "gehassitānīti": [
+    "gehassitānī'ti"
+  ],
   "gehānañca": [
     "gehānañ'ca"
   ],
@@ -43765,6 +43776,9 @@
   "gonakādīni": [
     "gonak'ādīni"
   ],
+  "gonakoti": [
+    "gonako'ti"
+  ],
   "gonaṅgulamigāyutā": [
     "gonaṅgulamig'āyutā"
   ],
@@ -43797,6 +43811,9 @@
   ],
   "gopānasivaṅkanti": [
     "gopānasivaṅkan'ti"
+  ],
+  "gopālakuposatho": [
+    "gopālak'uposatho"
   ],
   "gopālakuposathoti": [
     "gopālak'uposatho'ti"
@@ -43967,11 +43984,15 @@
   "ghaṭādīhi": [
     "ghaṭ'ādīhi"
   ],
+  "ghaṭāyāti": [
+    "ghaṭāyā'ti"
+  ],
   "ghaṭikañca": [
     "ghaṭikañ'ca"
   ],
   "ghaṭikañcāti": [
-    "ghaṭikañ'cā'ti"
+    "ghaṭikañ'cā'ti",
+    "ghaṭikañcā'ti"
   ],
   "ghaṭikāyapi": [
     "ghaṭikāya'pi"
@@ -44440,6 +44461,9 @@
   "cakkhudhātūti": [
     "cakkhudhātū'ti"
   ],
+  "cakkhunāpi": [
+    "cakkhunā'pi"
+  ],
   "cakkhunāva": [
     "cakkhunā'va"
   ],
@@ -44535,9 +44559,6 @@
   ],
   "cakkhuvidhāti": [
     "cakkhuvidhā'ti"
-  ],
-  "cakkhusamudayoti": [
-    "cakkhusamudayo'ti"
   ],
   "cakkhusamuddanti": [
     "cakkhusamuddan'ti"
@@ -44775,6 +44796,9 @@
   "catupatiṭṭhānoti": [
     "catupatiṭṭhāno'ti"
   ],
+  "catuparivaṭṭotipi": [
+    "catuparivaṭṭo'ti'pi"
+  ],
   "catupārisuddhisīlālaṅkāro": [
     "catupārisuddhisīl'ālaṅ'kāro"
   ],
@@ -44871,6 +44895,9 @@
   ],
   "caturaṅgulādhikalomena": [
     "caturaṅgul'ādhikalomena"
+  ],
+  "caturaṅgulādhikāni": [
+    "caturaṅgul'ādhikāni"
   ],
   "caturaṅgulomakoti": [
     "caturaṅgul'omako'ti"
@@ -44973,9 +45000,6 @@
   "catūhuppanne": [
     "catū'h'uppanne"
   ],
-  "cattanti": [
-    "cattan'ti"
-  ],
   "cattavaṇṇaṃ": [
     "c'attavaṇṇaṃ"
   ],
@@ -44991,14 +45015,8 @@
   "cattārimāni": [
     "cattār'imāni"
   ],
-  "cattārivassasahassāyukānaṃ": [
-    "cattārivassasahass'āyukānaṃ"
-  ],
   "cattārīti": [
     "cattārī'ti"
-  ],
-  "cattārīsachabbassasatāyukā": [
-    "cattārīsachabbassasat'āyukā"
   ],
   "cattārīsampi": [
     "cattārīsam'pi"
@@ -45011,9 +45029,6 @@
   ],
   "cattārīsavassāyukā": [
     "cattārīsavass'āyukā"
-  ],
-  "cattārīsavassāyukāti": [
-    "cattārīsavass'āyukā'ti"
   ],
   "cattārīsavassāyukānaṃ": [
     "cattārīsavass'āyukānaṃ"
@@ -46322,6 +46337,9 @@
   "cittuppādassa": [
     "citt'uppādassa"
   ],
+  "cittuppādaṃ": [
+    "citt'uppādaṃ"
+  ],
   "cittuppādeneva": [
     "citt'uppāden'eva"
   ],
@@ -46839,7 +46857,8 @@
     "cullāsītī'ti"
   ],
   "cussade": [
-    "c'ussade"
+    "c'ussade",
+    "cussade"
   ],
   "cūpadhāvatha": [
     "c'ūpadhāvatha"
@@ -48527,7 +48546,8 @@
     "janehī'ti"
   ],
   "janoghamaparena": [
-    "jan'ogham'aparena"
+    "jan'ogham'aparena",
+    "janogham'aparena"
   ],
   "janoghaṃ": [
     "jan'oghaṃ"
@@ -49345,6 +49365,9 @@
   ],
   "jāpetunti": [
     "jāpetun'ti"
+  ],
+  "jāmātāti": [
+    "jāmātā'ti"
   ],
   "jāyatīti": [
     "jāyatī'ti"
@@ -50257,9 +50280,6 @@
   "ñāṇañcāti": [
     "ñāṇañ'cā'ti"
   ],
-  "ñāṇatthāya": [
-    "ñāṇ'atthāya"
-  ],
   "ñāṇadassanapaṭilābhatthāya": [
     "ñāṇadassanapaṭilābh'atthāya"
   ],
@@ -50488,6 +50508,9 @@
   ],
   "ñātīpi": [
     "ñātī'pi"
+  ],
+  "ñātībhīti": [
+    "ñātībhī'ti"
   ],
   "ñātīva": [
     "ñātī'va"
@@ -51536,9 +51559,6 @@
   "tatiyāti": [
     "tatiyā'ti"
   ],
-  "tatiyādi": [
-    "tatiy'ādi"
-  ],
   "tatiyāpi": [
     "tatiyā'pi"
   ],
@@ -51653,7 +51673,7 @@
     "tatth'ekacce"
   ],
   "tatthekekā": [
-    "tatth'ek'ekā"
+    "tatth'ekekā"
   ],
   "tattheko": [
     "tatth'eko"
@@ -51892,6 +51912,9 @@
   ],
   "tathatto": [
     "tath'atto"
+  ],
+  "tathattoti": [
+    "tathatto'ti"
   ],
   "tathaddasā": [
     "tath'addasā"
@@ -52292,10 +52315,10 @@
     "tadā'ti"
   ],
   "tadādhigacchati": [
-    "tad'ādhigacchati"
+    "tadā'dhigacchati"
   ],
   "tadādhigacchatīti": [
-    "tad'ādhigacchatī'ti"
+    "tadā'dhigacchatī'ti"
   ],
   "tadādhimuttotipi": [
     "tadādhimutto'ti'pi"
@@ -52314,8 +52337,7 @@
     "tadāyatanaṃ"
   ],
   "tadāyaṃ": [
-    "tad'āyaṃ",
-    "tadāyaṃ"
+    "tad'āyaṃ"
   ],
   "tadārammaṇañca": [
     "tadārammaṇañ'ca"
@@ -52754,6 +52776,12 @@
   "tamanussaramānoti": [
     "tam'anussaramāno'ti"
   ],
+  "tamantarahissanti": [
+    "tam'antarahissanti"
+  ],
+  "tamantarahissantīti": [
+    "tam'antarahissantī'ti"
+  ],
   "tamandhakāraṃ": [
     "tam'andhakāraṃ"
   ],
@@ -52999,8 +53027,7 @@
     "talañ'ca"
   ],
   "talamassa": [
-    "talam'assa",
-    "talamassa"
+    "talam'assa"
   ],
   "talamāhacca": [
     "talam'āhacca"
@@ -53190,6 +53217,9 @@
   ],
   "tassānubhāvena": [
     "tass'ānubhāvena"
+  ],
+  "tassānuyantā": [
+    "tass'ānuyantā"
   ],
   "tassānuyantādha": [
     "tass'ānuyantā'dha"
@@ -53402,10 +53432,6 @@
   ],
   "tādiseneva": [
     "tādisen'eva"
-  ],
-  "tādiseyeva": [
-    "tādise'y'eva",
-    "tādisey'eva"
   ],
   "tādiseheva": [
     "tādiseh'eva"
@@ -54013,9 +54039,6 @@
   "tiṇavatthārakasadisattā": [
     "tiṇ'avatthārakasadisattā"
   ],
-  "tiṇavatthārakasamathe": [
-    "tiṇ'avatthārakasamathe"
-  ],
   "tiṇavatthārakena": [
     "tiṇ'avatthārakena"
   ],
@@ -54039,6 +54062,9 @@
   ],
   "tiṇasanthāroti": [
     "tiṇasanthāro'ti"
+  ],
+  "tiṇāgārā": [
+    "tiṇ'āgārā"
   ],
   "tiṇādīnaṃ": [
     "tiṇ'ādīnaṃ"
@@ -54574,6 +54600,9 @@
   "tissāti": [
     "tissā'ti"
   ],
+  "tissūpatissā": [
+    "tiss'ūpatissā"
+  ],
   "tissoti": [
     "tisso'ti"
   ],
@@ -54780,9 +54809,6 @@
   ],
   "tumbāti": [
     "tumbā'ti"
-  ],
-  "tumbānīti": [
-    "tumbānī'ti"
   ],
   "tumhākañca": [
     "tumhākañ'ca"
@@ -55173,7 +55199,8 @@
     "ten'āhu"
   ],
   "tenupasaṅkantoti": [
-    "ten'upasaṅkanto'ti"
+    "ten'upasaṅkanto'ti",
+    "tenupasaṅkanto'ti"
   ],
   "tenupasaṅkama": [
     "ten'upasaṅkama"
@@ -55253,6 +55280,9 @@
   "tenevassa": [
     "ten'ev'assa"
   ],
+  "tenevārammaṇena": [
+    "ten'ev'ārammaṇena"
+  ],
   "tenevāha": [
     "ten'ev'āha"
   ],
@@ -55282,9 +55312,6 @@
   ],
   "tebhūmakadhammameva": [
     "tebhūmakadhammam'eva"
-  ],
-  "tebhūmakadhammehīti": [
-    "tebhūmakadhammehī'ti"
   ],
   "tebhūmakavaṭṭassetaṃ": [
     "tebhūmakavaṭṭass'etaṃ"
@@ -55368,9 +55395,6 @@
   ],
   "telamakkhanādirahitattā": [
     "telamakkhan'ādirahitattā"
-  ],
-  "telamadāsīti": [
-    "telam'adāsī'ti"
   ],
   "telamadhuphāṇitādīti": [
     "telamadhuphāṇit'ādī'ti"
@@ -56285,8 +56309,20 @@
   "dajjāmīti": [
     "dajjāmī'ti"
   ],
+  "dajjāhanti": [
+    "dajj'āhan'ti"
+  ],
+  "dajjāhaṃ": [
+    "dajj'āhaṃ"
+  ],
+  "dajjeti": [
+    "dajje'ti"
+  ],
   "dajjeyyāsīti": [
     "dajjeyyāsī'ti"
+  ],
+  "dajjehantipi": [
+    "dajje'han'ti'pi"
   ],
   "daṭṭhabbanti": [
     "daṭṭhabban'ti"
@@ -56929,12 +56965,6 @@
   "dasavassasahassāyukānaṃ": [
     "dasavassasahass'āyukānaṃ"
   ],
-  "dasavassasahassāyukesu": [
-    "dasavassasahass'āyukesu"
-  ],
-  "dasavassāyukā": [
-    "dasavass'āyukā"
-  ],
   "dasavassāyukānaṃ": [
     "dasavass'āyukānaṃ"
   ],
@@ -57064,6 +57094,9 @@
   ],
   "dasikasuttādinti": [
     "dasikasutt'ādin'ti"
+  ],
+  "dasikasuttādiṃ": [
+    "dasikasutt'ādiṃ"
   ],
   "dasuttarasatasuttantā": [
     "das'uttarasatasutt'antā"
@@ -58114,6 +58147,9 @@
   "diṭṭhinijjhānakkhantīti": [
     "diṭṭhinijjhānakkhantī'ti"
   ],
+  "diṭṭhipaṭilābhaṃpāhaṃ": [
+    "diṭṭhipaṭilābhaṃ'p'āhaṃ"
+  ],
   "diṭṭhipaṭivedheti": [
     "diṭṭhipaṭivedhe'ti"
   ],
@@ -58853,9 +58889,6 @@
   "dīpaṅkaro": [
     "dīpaṅ'karo"
   ],
-  "dīpaṅkaroti": [
-    "dīpaṅ'karo'ti"
-  ],
   "dīpañca": [
     "dīpañ'ca"
   ],
@@ -59145,6 +59178,9 @@
   ],
   "dukkhamupenti": [
     "dukkham'upenti"
+  ],
+  "dukkhamūlanti": [
+    "dukkhamūlan'ti"
   ],
   "dukkhameti": [
     "dukkham'eti"
@@ -59498,6 +59534,9 @@
   "dukhudrānīti": [
     "dukh'udrānī'ti"
   ],
+  "duggaṇhosi": [
+    "duggaṇho'si"
+  ],
   "duggatapurisehipi": [
     "duggatapurisehi'pi"
   ],
@@ -59600,11 +59639,17 @@
   "dujjahoti": [
     "dujjaho'ti"
   ],
+  "dujjivhanti": [
+    "dujjivhan'ti"
+  ],
   "dujjivhoti": [
     "dujjivho'ti"
   ],
   "dujjīvikāyātipi": [
     "dujjīvikāyā'ti'pi"
+  ],
+  "duṭṭhacittoti": [
+    "duṭṭhacitto'ti"
   ],
   "duṭṭhaceṭakāti": [
     "duṭṭhaceṭakā'ti"
@@ -60457,6 +60502,9 @@
   "devadahoti": [
     "devadaho'ti"
   ],
+  "devadahonupado": [
+    "devadaho'nupado"
+  ],
   "devadudrabhīti": [
     "devadudrabhī'ti"
   ],
@@ -60828,7 +60876,8 @@
     "desetu'kāmo"
   ],
   "desetunti": [
-    "desetun'ti"
+    "desetun'ti",
+    "desetunti"
   ],
   "desetūti": [
     "desetū'ti"
@@ -61150,9 +61199,6 @@
   "dvayadhammamāhūti": [
     "dvayadhammam'āhū'ti"
   ],
-  "dvayanti": [
-    "dvayan'ti"
-  ],
   "dvayameva": [
     "dvayam'eva"
   ],
@@ -61252,11 +61298,11 @@
   "dvārampi": [
     "dvāram'pi"
   ],
+  "dvārarakkhakoti": [
+    "dvārarakkhako'ti"
+  ],
   "dvārarakkhanakeneva": [
     "dvārarakkhanaken'eva"
-  ],
-  "dvāravātapānādi": [
-    "dvāravātapān'ādi"
   ],
   "dvārasālāyānti": [
     "dvārasālāyān'ti"
@@ -61514,7 +61560,8 @@
     "dhajapaṭāk'ādīhi"
   ],
   "dhajamiva": [
-    "dhajam'iva"
+    "dhajam'iva",
+    "dhajamiva"
   ],
   "dhajālūti": [
     "dhajālū'ti"
@@ -61789,9 +61836,6 @@
   ],
   "dhammacakkhunti": [
     "dhammacakkhun'ti"
-  ],
-  "dhammacakkhupaṭilābhoti": [
-    "dhammacakkhupaṭilābho'ti"
   ],
   "dhammacakkhūti": [
     "dhammacakkhū'ti"
@@ -62308,6 +62352,9 @@
   "dhammādāsaṃ": [
     "dhamm'ādāsaṃ"
   ],
+  "dhammādāsotipi": [
+    "dhammādāso'ti'pi"
+  ],
   "dhammādhammena": [
     "dhamm'ādhammena"
   ],
@@ -62467,9 +62514,6 @@
   ],
   "dhammābhisamayo": [
     "dhamm'ābhisamayo"
-  ],
-  "dhammābhisamayoti": [
-    "dhamm'ābhisamayo'ti"
   ],
   "dhammāmisavasena": [
     "dhamm'āmisavasena"
@@ -62715,8 +62759,7 @@
     "dhāniyañ'ca"
   ],
   "dhārañca": [
-    "dhārañ'ca",
-    "dhārañca"
+    "dhārañ'ca"
   ],
   "dhārañcāpi": [
     "dhārañ'cā'pi"
@@ -62793,6 +62836,9 @@
   ],
   "dhāresunti": [
     "dhāresun'ti"
+  ],
+  "dhāressatīti": [
+    "dhāressatī'ti"
   ],
   "dhāressantīti": [
     "dhāressantī'ti"
@@ -62946,6 +62992,9 @@
   ],
   "dhuradhorayhanti": [
     "dhuradhorayhan'ti"
+  ],
+  "dhuranikkhepavaseneva": [
+    "dhuranikkhepavasen'eva"
   ],
   "dhuranti": [
     "dhuran'ti"
@@ -63315,6 +63364,12 @@
   "naccagītavāditādirati": [
     "naccagītavādit'ādirati"
   ],
+  "naccantavaṇṇā": [
+    "n'accantavaṇṇā"
+  ],
+  "naccantavaṇṇāti": [
+    "n'accantavaṇṇā'ti"
+  ],
   "naccantipi": [
     "naccanti'pi"
   ],
@@ -63432,8 +63487,7 @@
     "n'atth'añño"
   ],
   "natthānanda": [
-    "n'atth'ānanda",
-    "natthānanda"
+    "n'atth'ānanda"
   ],
   "natthāvahaṃ": [
     "n'atth'āvahaṃ"
@@ -63484,7 +63538,7 @@
     "n'atthipaccayo"
   ],
   "natthibhāvanti": [
-    "n'atthibhāvan'ti"
+    "natthibhāvan'ti"
   ],
   "natthibhāvaṃ": [
     "n'atthibhāvaṃ"
@@ -63505,8 +63559,7 @@
     "n'atthī"
   ],
   "natthīti": [
-    "n'atthī'ti",
-    "natthī'ti"
+    "n'atthī'ti"
   ],
   "natthukammanti": [
     "natthukamman'ti"
@@ -63530,8 +63583,7 @@
     "nadaṃ'va"
   ],
   "nadādi": [
-    "nad'ādi",
-    "nadādi"
+    "nad'ādi"
   ],
   "nadiñca": [
     "nadiñ'ca"
@@ -63904,11 +63956,13 @@
     "nar'indehi"
   ],
   "naruttama": [
-    "nar'uttama",
-    "naruttama"
+    "nar'uttama"
   ],
   "naruttamaṃ": [
     "nar'uttamaṃ"
+  ],
+  "naruttamānaṃ": [
+    "nar'uttamānaṃ"
   ],
   "naruttamo": [
     "nar'uttamo"
@@ -63975,9 +64029,6 @@
   ],
   "navanītapiṇḍādi": [
     "navanītapiṇḍ'ādi"
-  ],
-  "navanītādi": [
-    "navanīt'ādi"
   ],
   "navanti": [
     "navan'ti"
@@ -64070,12 +64121,10 @@
     "navo'pi"
   ],
   "navoropitehi": [
-    "nav'oropitehi",
-    "navoropitehi"
+    "nav'oropitehi"
   ],
   "nasi": [
-    "n'asi",
-    "nasi"
+    "n'asi"
   ],
   "nassatīti": [
     "nassatī'ti"
@@ -64106,8 +64155,7 @@
     "nahāyantī'ti"
   ],
   "nahāyitukāmo": [
-    "nahāyitu'kāmo",
-    "nahāyitukāmo"
+    "nahāyitu'kāmo"
   ],
   "nahāyeyyāti": [
     "nahāyeyyā'ti"
@@ -64141,6 +64189,12 @@
   ],
   "naḷāgāraṃva": [
     "naḷ'āgāraṃ'va"
+  ],
+  "naḷāgārā": [
+    "naḷ'āgārā"
+  ],
+  "naḷāgārāti": [
+    "naḷ'āgārā'ti"
   ],
   "naḷādayo": [
     "naḷ'ādayo"
@@ -64208,9 +64262,6 @@
   "nāgataṃ": [
     "n'āgataṃ"
   ],
-  "nāgadantakādike": [
-    "nāgadantak'ādike"
-  ],
   "nāganāgoti": [
     "nāganāgo'ti"
   ],
@@ -64252,9 +64303,6 @@
   ],
   "nāgarājadamanādīni": [
     "nāgarājadaman'ādīni"
-  ],
-  "nāgarājāti": [
-    "nāgarājā'ti"
   ],
   "nāgarājānamāsi": [
     "nāgarājānam'āsi"
@@ -64347,8 +64395,7 @@
     "n'ācikkhati"
   ],
   "nācikkhi": [
-    "n'ācikkhi",
-    "nācikkhi"
+    "n'ācikkhi"
   ],
   "nācikkhiṃ": [
     "n'ācikkhiṃ"
@@ -64417,12 +64464,10 @@
     "n'ājjhagamuṃ"
   ],
   "nājjhagā": [
-    "n'ājjhagā",
-    "nājjhagā"
+    "n'ājjhagā"
   ],
   "nājjhagāti": [
-    "n'ājjhagā'ti",
-    "nājjhagā'ti"
+    "n'ājjhagā'ti"
   ],
   "nājjheti": [
     "n'ājjheti"
@@ -64506,8 +64551,7 @@
     "n'ātikālena"
   ],
   "nātikālenāti": [
-    "n'ātikālenā'ti",
-    "nātikālenā'ti"
+    "n'ātikālenā'ti"
   ],
   "nātikāḷatā": [
     "n'ātikāḷatā"
@@ -64577,6 +64621,9 @@
   ],
   "nātithokaṃ": [
     "n'ātithokaṃ"
+  ],
+  "nātidaḷhamittā": [
+    "n'ātidaḷhamittā"
   ],
   "nātidivā": [
     "n'ātidivā"
@@ -64902,9 +64949,6 @@
   "nānattāti": [
     "nānattā'ti"
   ],
-  "nānattekatta": [
-    "nānatt'ekatta"
-  ],
   "nānatthañceva": [
     "nān'atthañ'c'eva"
   ],
@@ -65179,8 +65223,7 @@
     "n'ānupassatī'ti"
   ],
   "nānupādāya": [
-    "n'ānupādāya",
-    "nānupādāya"
+    "n'ānupādāya"
   ],
   "nānupāpuṇāti": [
     "n'ānupāpuṇāti"
@@ -65285,8 +65328,7 @@
     "n'ānussarati"
   ],
   "nānussaratīti": [
-    "n'ānussaratī'ti",
-    "nānussaratī'ti"
+    "n'ānussaratī'ti"
   ],
   "nānussaritabbo": [
     "n'ānussaritabbo"
@@ -65334,8 +65376,7 @@
     "n'āpajji"
   ],
   "nāpadānaṃ": [
-    "n'āpadānaṃ",
-    "nāpadānaṃ"
+    "n'āpadānaṃ"
   ],
   "nāpaneti": [
     "n'āpaneti"
@@ -65351,9 +65392,6 @@
   ],
   "nāpasādaye": [
     "n'āpasādaye"
-  ],
-  "nāpasādetā": [
-    "n'āpasādetā"
   ],
   "nāpasādeyya": [
     "n'āpasādeyya"
@@ -65404,8 +65442,7 @@
     "n'ābbhācikkhanti"
   ],
   "nābhavissa": [
-    "n'ābhavissa",
-    "nābhavissa"
+    "n'ābhavissa"
   ],
   "nābhavissaṃ": [
     "n'ābhavissaṃ"
@@ -65453,8 +65490,7 @@
     "n'ābhijjhati"
   ],
   "nābhijjhatīti": [
-    "n'ābhijjhatī'ti",
-    "nābhijjhatī'ti"
+    "n'ābhijjhatī'ti"
   ],
   "nābhijjhātā": [
     "n'ābhijjhātā"
@@ -65538,8 +65574,7 @@
     "n'ābhiramati"
   ],
   "nābhiramatīti": [
-    "n'ābhiramatī'ti",
-    "nābhiramatī'ti"
+    "n'ābhiramatī'ti"
   ],
   "nābhiramanti": [
     "n'ābhiramanti"
@@ -65641,8 +65676,7 @@
     "nāmaggahaṇamaṅgal'ādīni"
   ],
   "nāmajja": [
-    "nām'ajja",
-    "nāmajja"
+    "nām'ajja"
   ],
   "nāmañca": [
     "nāmañ'ca"
@@ -65699,8 +65733,7 @@
     "nāmam'pi"
   ],
   "nāmamhi": [
-    "nām'amhi",
-    "nāmamhi"
+    "nām'amhi"
   ],
   "nāmaraṇaṃ": [
     "n'āmaraṇaṃ"
@@ -65754,8 +65787,7 @@
     "nām'ānugamena"
   ],
   "nāmāyanti": [
-    "nām'āyan'ti",
-    "nāmāyan'ti"
+    "nām'āyan'ti"
   ],
   "nāmāyaṃ": [
     "nām'āyaṃ"
@@ -65892,9 +65924,6 @@
   ],
   "nārūpiṃ": [
     "n'ārūpiṃ"
-  ],
-  "nārūpī": [
-    "n'ārūpī"
   ],
   "nāroceti": [
     "n'āroceti"
@@ -66131,12 +66160,6 @@
   "nāsīsatīti": [
     "n'āsīsatī'ti"
   ],
-  "nāsekkho": [
-    "n'āsekkho"
-  ],
-  "nāsekkhoti": [
-    "n'āsekkho'ti"
-  ],
   "nāsetabboti": [
     "nāsetabbo'ti"
   ],
@@ -66243,8 +66266,7 @@
     "nāḷiker'ādīnam'pi"
   ],
   "nāḷikodananti": [
-    "nāḷik'odanan'ti",
-    "nāḷikodanan'ti"
+    "nāḷik'odanan'ti"
   ],
   "nāḷikodanaparamatāya": [
     "nāḷik'odanaparamatāya"
@@ -66606,6 +66628,9 @@
   "niggahessāmīti": [
     "niggahessāmī'ti"
   ],
+  "niggāhanti": [
+    "niggāhan'ti"
+  ],
   "nigghosanti": [
     "nigghosan'ti"
   ],
@@ -66920,15 +66945,6 @@
   "nittaṇhohamasmīti": [
     "nittaṇho'ham'asmī'ti"
   ],
-  "nittudanamattanti": [
-    "nittudanamattan'ti"
-  ],
-  "nittudanamattampi": [
-    "nittudanamattam'pi"
-  ],
-  "nittudanamattopi": [
-    "nittudanamatto'pi"
-  ],
   "nittejabhūtoti": [
     "nittejabhūto'ti"
   ],
@@ -67201,6 +67217,9 @@
   ],
   "nipajjitunti": [
     "nipajjitun'ti"
+  ],
+  "nipajjiyantīti": [
+    "nipajjiyantī'ti"
   ],
   "nipajjissāmīti": [
     "nipajjissāmī'ti"
@@ -69139,9 +69158,6 @@
   "nīcāti": [
     "nīcā'ti"
   ],
-  "nīcāsanaṃ": [
-    "nīc'āsanaṃ"
-  ],
   "nīceti": [
     "nīce'ti"
   ],
@@ -69262,9 +69278,6 @@
   ],
   "nīluppalasadisāni": [
     "nīl'uppalasadisāni"
-  ],
-  "nīluppalasamasādiso": [
-    "nīl'uppalasamasādiso"
   ],
   "nīluppalassa": [
     "nīl'uppalassa"
@@ -69415,9 +69428,6 @@
   ],
   "nuppajjanti": [
     "n'uppajjanti"
-  ],
-  "nuppādetā": [
-    "n'uppādetā"
   ],
   "numāni": [
     "nu'māni"
@@ -69831,9 +69841,6 @@
   "nevarūpiṃ": [
     "n'evarūpiṃ"
   ],
-  "nevarūpī": [
-    "n'evarūpī"
-  ],
   "nevasaññā": [
     "n'evasaññā"
   ],
@@ -69894,17 +69901,11 @@
   "nevasassato": [
     "n'ev'asassato"
   ],
-  "nevasekkha": [
-    "n'evasekkha"
-  ],
   "nevasekkhanāsekkhoti": [
     "n'evasekkhan'āsekkho'ti"
   ],
   "nevasekkhānāsekkhā": [
     "n'evasekkhān'āsekkhā"
-  ],
-  "nevasekkho": [
-    "n'evasekkho"
   ],
   "nevasekkhonāsekkho": [
     "n'evasekkhon'āsekkho"
@@ -71127,6 +71128,12 @@
   "paccekabodhimpi": [
     "paccekabodhim'pi"
   ],
+  "paccekamevajjhagamaṃsu": [
+    "paccekam'ev'ajjhagamaṃsu"
+  ],
+  "paccekamevajjhagamuṃ": [
+    "paccekam'ev'ajjhagamuṃ"
+  ],
   "paccekavasavattinoti": [
     "paccekavasavattino'ti"
   ],
@@ -71652,9 +71659,6 @@
   ],
   "pañcavassasatāyukā": [
     "pañcavassasat'āyukā"
-  ],
-  "pañcavassasatāyukānaṃ": [
-    "pañcavassasat'āyukānaṃ"
   ],
   "pañcavassasatāyukesu": [
     "pañcavassasat'āyukesu"
@@ -72400,6 +72404,9 @@
   "paṭikūlasammatanti": [
     "paṭikūlasammatan'ti"
   ],
+  "paṭikūlāhārena": [
+    "paṭikūl'āhārena"
+  ],
   "paṭikūloti": [
     "paṭikūlo'ti"
   ],
@@ -72414,9 +72421,6 @@
   ],
   "paṭikkantanti": [
     "paṭikkantan'ti"
-  ],
-  "paṭikkanteti": [
-    "paṭikkante'ti"
   ],
   "paṭikkamanakāleti": [
     "paṭikkamanakāle'ti"
@@ -74837,8 +74841,7 @@
     "patthehaṃ"
   ],
   "patthodananti": [
-    "patth'odanan'ti",
-    "patthodanan'ti"
+    "patth'odanan'ti"
   ],
   "patthodanaṃ": [
     "patth'odanaṃ"
@@ -75753,9 +75756,6 @@
   ],
   "pannagoti": [
     "pannago'ti"
-  ],
-  "pannattāti": [
-    "pannattā'ti"
   ],
   "pannaddhajoti": [
     "pannaddhajo'ti"
@@ -76728,7 +76728,8 @@
     "paraghos'ānusārino"
   ],
   "paraṅkatañca": [
-    "paraṅ'katañ'ca"
+    "paraṅ'katañ'ca",
+    "paraṅkatañ'ca"
   ],
   "paraṅkataṃ": [
     "paraṅ'kataṃ"
@@ -77862,6 +77863,9 @@
   "parittanti": [
     "parittan'ti"
   ],
+  "parittapaccuppannabahiddhārammaṇaṃ": [
+    "parittapaccuppannabahiddh'ārammaṇaṃ"
+  ],
   "parittamettha": [
     "parittam'ettha"
   ],
@@ -78872,7 +78876,7 @@
     "parivāraṇan'ti"
   ],
   "parivāratthañca": [
-    "parivār'atthañ'ca"
+    "parivāratthañ'ca"
   ],
   "parivārasampadāti": [
     "parivārasampadā'ti"
@@ -79490,9 +79494,6 @@
   "palibuddhāti": [
     "palibuddhā'ti"
   ],
-  "palibundhatīti": [
-    "palibundhatī'ti"
-  ],
   "palibundhanakilesoti": [
     "palibundhanakileso'ti"
   ],
@@ -79565,6 +79566,9 @@
   "pallaṅkanti": [
     "pallaṅkan'ti"
   ],
+  "pallaṅkoti": [
+    "pallaṅko'ti"
+  ],
   "pallatthikāyāti": [
     "pallatthikāyā'ti"
   ],
@@ -79576,6 +79580,9 @@
   ],
   "pavakkhāmīti": [
     "pavakkhāmī'ti"
+  ],
+  "pavakkhāmītiādimāha": [
+    "pavakkhāmī'tiādim'āha"
   ],
   "pavajamānānanti": [
     "pavajamānānan'ti"
@@ -79748,9 +79755,6 @@
   ],
   "pavāraṇādi": [
     "pavāraṇ'ādi"
-  ],
-  "pavāraṇāsaṅgaheti": [
-    "pavāraṇāsaṅgahe'ti"
   ],
   "pavāritāpavāritabhāvaṃ": [
     "pavārit'āpavāritabhāvaṃ"
@@ -81075,6 +81079,9 @@
   "pāṭikañca": [
     "pāṭikañ'ca"
   ],
+  "pāṭipadoti": [
+    "pāṭipado'ti"
+  ],
   "pāṭibhogoti": [
     "pāṭibhogo'ti"
   ],
@@ -81682,8 +81689,7 @@
     "pān'aṭṭhikassa"
   ],
   "pānanti": [
-    "pānan'ti",
-    "pānanti"
+    "pānan'ti"
   ],
   "pānabhojanadāyakampi": [
     "pānabhojanadāyakam'pi"
@@ -81885,6 +81891,9 @@
   ],
   "pāpitoti": [
     "pāpito'ti"
+  ],
+  "pāpimatāti": [
+    "pāpimatā'ti"
   ],
   "pāpimatoti": [
     "pāpimato'ti"
@@ -82260,6 +82269,9 @@
   "pārupissāmīti": [
     "pārupissāmī'ti"
   ],
+  "pārupīyantīti": [
+    "pārupīyantī'ti"
+  ],
   "pāremīti": [
     "pāremī'ti"
   ],
@@ -82391,6 +82403,9 @@
   ],
   "pāsāṇasakkharikanti": [
     "pāsāṇasakkharikan'ti"
+  ],
+  "pāsāṇādīni": [
+    "pāsāṇ'ādīni"
   ],
   "pāsāṇādīsu": [
     "pāsāṇ'ādīsu"
@@ -82887,9 +82902,6 @@
   ],
   "piyamanāpānanti": [
     "piyamanāpānan'ti"
-  ],
-  "piyamānassāpi": [
-    "piyamānassā'pi"
   ],
   "piyameva": [
     "piyam'eva"
@@ -83893,9 +83905,6 @@
   "puttānañca": [
     "puttānañ'ca"
   ],
-  "puttānañhi": [
-    "puttānañ'hi"
-  ],
   "puttānanti": [
     "puttānan'ti"
   ],
@@ -84352,14 +84361,8 @@
   "pubbadevatāti": [
     "pubbadevatā'ti"
   ],
-  "pubbaddhaṃ": [
-    "pubb'addhaṃ"
-  ],
   "pubbanimittanti": [
     "pubbanimittan'ti"
-  ],
-  "pubbanimittamassa": [
-    "pubbanimittam'assa"
   ],
   "pubbantakappikā": [
     "pubb'antakappikā"
@@ -84599,7 +84602,8 @@
     "pubbenivās'ānussati"
   ],
   "pubbenivāsānussatiñāṇaṃ": [
-    "pubbenivās'ānussatiñāṇaṃ"
+    "pubbenivās'ānussatiñāṇaṃ",
+    "pubbenivāsānussatiñāṇaṃ"
   ],
   "pubbenivāsānussatiñāṇāya": [
     "pubbenivās'ānussatiñāṇāya"
@@ -85056,7 +85060,7 @@
     "pur'issaro"
   ],
   "puruttamanti": [
-    "pur'uttaman'ti"
+    "puruttaman'ti"
   ],
   "puruttamaṃ": [
     "pur'uttamaṃ"
@@ -85065,7 +85069,7 @@
     "pur'uttame"
   ],
   "puruttameti": [
-    "pur'uttame'ti"
+    "puruttame'ti"
   ],
   "purekkhārañca": [
     "purekkhārañ'ca"
@@ -86058,9 +86062,6 @@
   "phāṇitādi": [
     "phāṇit'ādi"
   ],
-  "phāṇitādīti": [
-    "phāṇit'ādī'ti"
-  ],
   "phāṇitādīhi": [
     "phāṇit'ādīhi"
   ],
@@ -86219,6 +86220,9 @@
   ],
   "phusitaggaḷaṃ": [
     "phusit'aggaḷaṃ"
+  ],
+  "phusitaggaḷāni": [
+    "phusit'aggaḷāni"
   ],
   "phusitabbeti": [
     "phusitabbe'ti"
@@ -86504,6 +86508,9 @@
   "bandhupādāpacceti": [
     "bandhupād'āpacce'ti"
   ],
+  "bandhumāti": [
+    "bandhumā'ti"
+  ],
   "bandhurotissa": [
     "bandhuro'ti'ssa"
   ],
@@ -86517,7 +86524,8 @@
     "bandho'ti"
   ],
   "barihisatthāya": [
-    "barihis'atthāya"
+    "barihis'atthāya",
+    "barihisatthāya"
   ],
   "barihisatthāyāti": [
     "barihis'atthāyā'ti"
@@ -86896,6 +86904,9 @@
   ],
   "bahudhaññasannicayanti": [
     "bahudhaññasannicayan'ti"
+  ],
+  "bahudhātukotipi": [
+    "bahudhātuko'ti'pi"
   ],
   "bahudhāpi": [
     "bahudhā'pi"
@@ -87500,9 +87511,6 @@
   "bījasampadāti": [
     "bījasampadā'ti"
   ],
-  "bījādīni": [
-    "bīj'ādīni"
-  ],
   "bījiyatīti": [
     "bījiyatī'ti"
   ],
@@ -87767,8 +87775,7 @@
     "buddh'uppādadhammadesanāsu"
   ],
   "buddhuppādaṃ": [
-    "buddh'uppādaṃ",
-    "buddhuppādaṃ"
+    "buddh'uppādaṃ"
   ],
   "buddhuppāde": [
     "buddh'uppāde"
@@ -88950,9 +88957,6 @@
   "bhaṭṭhaloṇikāyāti": [
     "bhaṭṭhaloṇikāyā'ti"
   ],
-  "bhaṭṭhaṃva": [
-    "bhaṭṭhaṃ'va"
-  ],
   "bhaṇatīti": [
     "bhaṇatī'ti"
   ],
@@ -89953,8 +89957,7 @@
     "bhaven'amhi"
   ],
   "bhavenassa": [
-    "bhaven'assa",
-    "bhavenassa"
+    "bhaven'assa"
   ],
   "bhavenāti": [
     "bhavenā'ti"
@@ -89990,7 +89993,7 @@
     "bhav'esanā"
   ],
   "bhavesanāti": [
-    "bhav'esanā'ti"
+    "bhavesanā'ti"
   ],
   "bhavesūti": [
     "bhavesū'ti"
@@ -90295,9 +90298,6 @@
   ],
   "bhāvanāyāti": [
     "bhāvanāyā'ti"
-  ],
-  "bhāvanārāmatā": [
-    "bhāvan'ārāmatā"
   ],
   "bhāvanārāmatāya": [
     "bhāvan'ārāmatāya"
@@ -90801,6 +90801,15 @@
   "bhinnapaṭandharo": [
     "bhinnapaṭan'dharo"
   ],
+  "bhinnamantoti": [
+    "bhinnamanto'ti"
+  ],
+  "bhinnamantosi": [
+    "bhinnamanto'si"
+  ],
+  "bhinnamantosīti": [
+    "bhinnamanto'sī'ti"
+  ],
   "bhinnamivodakaṃ": [
     "bhinnam'iv'odakaṃ"
   ],
@@ -90818,6 +90827,9 @@
   ],
   "bhinnoti": [
     "bhinno'ti"
+  ],
+  "bhinnotipi": [
+    "bhinno'ti'pi"
   ],
   "bhiyyatarābhiñño": [
     "bhiyyatar'ābhiñño"
@@ -91384,9 +91396,6 @@
   "bhogavipattiādinā": [
     "bhogavipatti'ādinā"
   ],
-  "bhogasampadāyapi": [
-    "bhogasampadāya'pi"
-  ],
   "bhogasaṃharaṇatthaṃ": [
     "bhogasaṃharaṇ'atthaṃ"
   ],
@@ -91519,9 +91528,6 @@
   ],
   "bhojjañca": [
     "bhojjañ'ca"
-  ],
-  "bhojjamatha": [
-    "bhojjam'atha"
   ],
   "bhojjampi": [
     "bhojjam'pi"
@@ -91658,6 +91664,9 @@
   "maggaṅgāni": [
     "magg'aṅgāni"
   ],
+  "maggaṅgehi": [
+    "magg'aṅgehi"
+  ],
   "maggacittasamaṅgīti": [
     "maggacittasamaṅgī'ti"
   ],
@@ -91784,9 +91793,6 @@
   ],
   "maggasseva": [
     "maggass'eva"
-  ],
-  "maggādayo": [
-    "magg'ādayo"
   ],
   "maggādi": [
     "magg'ādi"
@@ -92263,8 +92269,7 @@
     "majjhesarasmin'ti"
   ],
   "mañca": [
-    "mañ'ca",
-    "mañca"
+    "mañ'ca"
   ],
   "mañcakasmiṃyeva": [
     "mañcakasmiṃ'y'eva"
@@ -93106,6 +93111,9 @@
   "manujāti": [
     "manujā'ti"
   ],
+  "manujādhipa": [
+    "manuj'ādhipa"
+  ],
   "manujādhipati": [
     "manuj'ādhipati"
   ],
@@ -93328,9 +93336,6 @@
   "manussesvetaṃ": [
     "manussesv'etaṃ"
   ],
-  "manussopabhoga": [
-    "manuss'opabhoga"
-  ],
   "manejāti": [
     "manejā'ti"
   ],
@@ -93426,6 +93431,9 @@
   "manomayiddhiṃ": [
     "manomay'iddhiṃ"
   ],
+  "manomayoti": [
+    "manomayo'ti"
+  ],
   "manomunimanāsavaṃ": [
     "manomunim'anāsavaṃ"
   ],
@@ -93485,6 +93493,9 @@
   ],
   "mantadharoti": [
     "mantadharo'ti"
+  ],
+  "mantanātikkantattāyeva": [
+    "mantan'ātikkantattā'y'eva"
   ],
   "mantapadanti": [
     "mantapadan'ti"
@@ -94032,9 +94043,6 @@
   ],
   "maraṇasaññāti": [
     "maraṇasaññā'ti"
-  ],
-  "maraṇasaññīti": [
-    "maraṇasaññī'ti"
   ],
   "maraṇasaññītiādimāha": [
     "maraṇasaññī'tiādim'āha"
@@ -94584,11 +94592,9 @@
   "mahānisaṃsanti": [
     "mah'ānisaṃsan'ti"
   ],
-  "mahānisaṃsaṃ": [
-    "mah'ānisaṃsaṃ"
-  ],
   "mahānisaṃsā": [
-    "mah'ānisaṃsā"
+    "mah'ānisaṃsā",
+    "mahānisaṃsā"
   ],
   "mahānisaṃsāti": [
     "mah'ānisaṃsā'ti"
@@ -94597,7 +94603,7 @@
     "mah'ānisaṃso"
   ],
   "mahānisaṃsoti": [
-    "mah'ānisaṃso'ti"
+    "mahānisaṃso'ti"
   ],
   "mahānubhāva": [
     "mah'ānubhāva"
@@ -94798,26 +94804,15 @@
   "mahāmaggameva": [
     "mahāmaggam'eva"
   ],
-  "mahāmatta": [
-    "mah'āmatta"
-  ],
-  "mahāmattakathaṃ": [
-    "mah'āmattakathaṃ"
-  ],
   "mahāmattanti": [
-    "mah'āmattan'ti"
-  ],
-  "mahāmattaṃ": [
-    "mah'āmattaṃ"
+    "mahāmattan'ti"
   ],
   "mahāmattā": [
-    "mah'āmattā"
+    "mah'āmattā",
+    "mahāmattā"
   ],
   "mahāmattāti": [
     "mah'āmattā'ti"
-  ],
-  "mahāmattikapariyanto": [
-    "mah'āmattikapariyanto"
   ],
   "mahāmatto": [
     "mah'āmatto"
@@ -94850,8 +94845,7 @@
     "mahāyaso'ti"
   ],
   "mahāyaṃ": [
-    "mah'āyaṃ",
-    "mahāyaṃ"
+    "mah'āyaṃ"
   ],
   "mahāyo": [
     "mah'āyo"
@@ -95026,7 +95020,8 @@
     "mahāsenenā'ti"
   ],
   "mahāssa": [
-    "mah'āssa"
+    "mah'āssa",
+    "mahāssa"
   ],
   "mahicchatādi": [
     "mahicchat'ādi"
@@ -95324,9 +95319,6 @@
   "māgadhakoti": [
     "māgadhako'ti"
   ],
-  "māgadhamahāmattaṃ": [
-    "māgadhamah'āmattaṃ"
-  ],
   "māgadhova": [
     "māgadho'va"
   ],
@@ -95577,6 +95569,9 @@
   "mānaganthābhibhuno": [
     "mānaganth'ābhibhuno",
     "mānaganthābhibhuno"
+  ],
+  "mānacchidoti": [
+    "mānacchido'ti"
   ],
   "mānañca": [
     "mānañ'ca"
@@ -96961,7 +96956,6 @@
     "muṭṭhassaccan'ti"
   ],
   "muṭṭhassaccaṃ": [
-    "muṭṭhassaccaṃ",
     "muṭṭhassaccaṃ'"
   ],
   "muṭṭhassatinoti": [
@@ -97343,9 +97337,6 @@
   "musāvādissāti": [
     "musāvādissā'ti"
   ],
-  "musāvādupasañhitaṃ": [
-    "musāvād'upasañhitaṃ"
-  ],
   "musāvādoti": [
     "musāvādo'ti"
   ],
@@ -97367,17 +97358,11 @@
   "mūlakammaṭṭhānanti": [
     "mūlakammaṭṭhānan'ti"
   ],
-  "mūlakesupi": [
-    "mūlakesu'pi"
-  ],
   "mūlakhandhādīsu": [
     "mūlakhandh'ādīsu"
   ],
   "mūlakhādanīyādi": [
     "mūlakhādanīy'ādi"
-  ],
-  "mūlagandhādīnaṃ": [
-    "mūlagandh'ādīnaṃ"
   ],
   "mūlagandhoti": [
     "mūlagandho'ti"
@@ -97825,7 +97810,8 @@
     "moghapurisā'tiādim'āha"
   ],
   "moghamaññanti": [
-    "mogham'aññan'ti"
+    "mogham'aññan'ti",
+    "moghamaññan'ti"
   ],
   "moghamāhu": [
     "mogham'āhu"
@@ -98087,9 +98073,6 @@
   "yakkhapacāroti": [
     "yakkhapacāro'ti"
   ],
-  "yakkhamahāmatto": [
-    "yakkhamah'āmatto"
-  ],
   "yakkhampi": [
     "yakkham'pi"
   ],
@@ -98113,7 +98096,7 @@
   ],
   "yakkhāyevāti": [
     "yakkhā'y'evā'ti",
-    "yakkhāy'evā'ti"
+    "yakkhāyevāti"
   ],
   "yakkhāva": [
     "yakkhā'va"
@@ -98411,8 +98394,8 @@
   "yatharivāhaṃ": [
     "yathar'iv'āhaṃ"
   ],
-  "yathākammūpagañāṇa": [
-    "yathākamm'ūpagañāṇa"
+  "yathāakusalenāti": [
+    "yathāakusalenā'ti"
   ],
   "yathākammūpagañāṇakiccaṃ": [
     "yathākamm'ūpagañāṇakiccaṃ"
@@ -98676,6 +98659,9 @@
   "yathāladdhanti": [
     "yathāladdhan'ti"
   ],
+  "yathāvajjantipi": [
+    "yathāvajjan'ti'pi"
+  ],
   "yathāvajjenapi": [
     "yathāvajjena'pi"
   ],
@@ -98846,8 +98832,7 @@
     "yadākhv'āhaṃ"
   ],
   "yadānulomikaṃ": [
-    "yad'ānulomikaṃ",
-    "yadānulomikaṃ"
+    "yad'ānulomikaṃ"
   ],
   "yadāpi": [
     "yadā'pi"
@@ -99770,9 +99755,6 @@
   "yuganti": [
     "yugan'ti"
   ],
-  "yugandharapabbatavāsīyeva": [
-    "yugan'dharapabbatavāsī'y'eva"
-  ],
   "yugandharo": [
     "yugan'dharo"
   ],
@@ -100559,9 +100541,6 @@
   ],
   "rajananippakkasaṅkhepameva": [
     "rajananippakkasaṅkhepam'eva"
-  ],
-  "rajanapacanādinā": [
-    "rajanapacan'ādinā"
   ],
   "rajanabhājanādi": [
     "rajanabhājan'ādi"
@@ -101600,9 +101579,6 @@
   "rāgādisaṃkilesikaṃ": [
     "rāg'ādisaṃkilesikaṃ"
   ],
-  "rāgādīnañca": [
-    "rāg'ādīnañ'ca"
-  ],
   "rāgādīnaṃ": [
     "rāg'ādīnaṃ"
   ],
@@ -101786,6 +101762,9 @@
   "rājantepure": [
     "rāj'antepure"
   ],
+  "rājapallaṅkeyeva": [
+    "rājapallaṅke'y'eva"
+  ],
   "rājapiṇḍanti": [
     "rājapiṇḍan'ti"
   ],
@@ -101822,14 +101801,13 @@
   "rājamatto": [
     "rāj'amatto"
   ],
-  "rājamahāmattassa": [
-    "rājamah'āmattassa"
-  ],
   "rājamahāmattaṃ": [
-    "rājamah'āmattaṃ"
+    "rājamah'āmattaṃ",
+    "rājamahāmattaṃ"
   ],
   "rājamahāmattā": [
-    "rājamah'āmattā"
+    "rājamah'āmattā",
+    "rājamahāmattā"
   ],
   "rājamahāmattānañca": [
     "rājamah'āmattānañ'ca"
@@ -101847,13 +101825,10 @@
     "rājarath'ūpamaṃ"
   ],
   "rājarājamahāmattādayo": [
-    "rājarājamah'āmatt'ādayo"
-  ],
-  "rājarājamahāmattehi": [
-    "rājarājamah'āmattehi"
+    "rājarājamahāmatt'ādayo"
   ],
   "rājarājamahāmattehipi": [
-    "rājarājamah'āmattehi'pi"
+    "rājarājamahāmattehi'pi"
   ],
   "rājavallabhāti": [
     "rājavallabhā'ti"
@@ -102383,9 +102358,6 @@
   "ruhiramassaveti": [
     "ruhiram'assave'ti"
   ],
-  "ruhirādīhi": [
-    "ruhir'ādīhi"
-  ],
   "ruḷhanīyanti": [
     "ruḷhanīyan'ti"
   ],
@@ -102436,9 +102408,6 @@
   ],
   "rūpaññeva": [
     "rūpaññ'eva"
-  ],
-  "rūpataṇhādīsu": [
-    "rūpataṇh'ādīsu"
   ],
   "rūpattā": [
     "rūp'attā"
@@ -102500,17 +102469,11 @@
   "rūpanti": [
     "rūpan'ti"
   ],
-  "rūpapaṭilābhādi": [
-    "rūpapaṭilābh'ādi"
-  ],
   "rūpapaṇṇattiyāpi": [
     "rūpapaṇṇattiyā'pi"
   ],
   "rūpapariyesanāti": [
     "rūpapariyesanā'ti"
-  ],
-  "rūpapariyesanādi": [
-    "rūpapariyesan'ādi"
   ],
   "rūpapariḷāhanti": [
     "rūpapariḷāhan'ti"
@@ -102879,9 +102842,6 @@
   "rūpeti": [
     "rūpe'ti"
   ],
-  "rūpetiādi": [
-    "rūpe'ti'ādi"
-  ],
   "rūpenāti": [
     "rūpenā'ti"
   ],
@@ -103190,6 +103150,9 @@
   ],
   "latāva": [
     "latā'va"
+  ],
+  "laddhattāpi": [
+    "laddhattā'pi"
   ],
   "laddhanti": [
     "laddhan'ti"
@@ -103513,9 +103476,6 @@
   "lābhakāmāti": [
     "lābhakāmā'ti"
   ],
-  "lābhagga": [
-    "lābh'agga"
-  ],
   "lābhagganti": [
     "lābh'aggan'ti"
   ],
@@ -103814,10 +103774,11 @@
     "ludd'ācārakammunā"
   ],
   "luddācārā": [
-    "ludd'ācārā"
+    "ludd'ācārā",
+    "luddācārā"
   ],
   "luddācārāti": [
-    "ludd'ācārā'ti"
+    "luddācārā'ti"
   ],
   "luddāti": [
     "luddā'ti"
@@ -103877,13 +103838,7 @@
     "lūkhasā'ti"
   ],
   "lūkhājīvinti": [
-    "lūkh'ājīvin'ti"
-  ],
-  "lūkhājīviṃ": [
-    "lūkh'ājīviṃ"
-  ],
-  "lūkhājīvī": [
-    "lūkh'ājīvī"
+    "lūkhājīvin'ti"
   ],
   "lūkhāyaṃ": [
     "lūkh'āyaṃ",
@@ -105103,6 +105058,9 @@
   "vajantanti": [
     "vajantan'ti"
   ],
+  "vajāmahaṃ": [
+    "vajām'ahaṃ"
+  ],
   "vajirasaṅghātabalanti": [
     "vajirasaṅghātabalan'ti"
   ],
@@ -105987,8 +105945,7 @@
     "vatth'ālaṅ'kāramāl'ādīnam'pi"
   ],
   "vatthālaṅkārādi": [
-    "vatth'ālaṅ'kār'ādi",
-    "vatth'ālaṅkār'ādi"
+    "vatth'ālaṅ'kār'ādi"
   ],
   "vatthālaṅkārānuppadānādinā": [
     "vatth'ālaṅ'kār'ānuppadān'ādinā"
@@ -106010,6 +105967,9 @@
   ],
   "vatthukammanti": [
     "vatthukamman'ti"
+  ],
+  "vatthukāmatthāya": [
+    "vatthukām'atthāya"
   ],
   "vatthujjhācārā": [
     "vatthu'jjhācārā"
@@ -106799,9 +106759,6 @@
   "valāhakāssarājappamukhāni": [
     "valāhak'āssarājappamukhāni"
   ],
-  "valāhakūpamā": [
-    "valāhak'ūpamā"
-  ],
   "valittacapalitādiñca": [
     "valittacapalit'ādiñ'ca"
   ],
@@ -107111,12 +107068,6 @@
   ],
   "vassasatampi": [
     "vassasatam'pi"
-  ],
-  "vassasatasahassāyukā": [
-    "vassasatasahass'āyukā"
-  ],
-  "vassasatasahassāyukesu": [
-    "vassasatasahass'āyukesu"
   ],
   "vassasatāpi": [
     "vassasatā'pi"
@@ -107709,6 +107660,9 @@
   "vāditampi": [
     "vāditam'pi"
   ],
+  "vāditānurūpaṃ": [
+    "vādit'ānurūpaṃ"
+  ],
   "vādentipi": [
     "vādenti'pi"
   ],
@@ -107765,6 +107719,9 @@
   "vāyatīti": [
     "vāyatī'ti"
   ],
+  "vāyanaṭṭhānaṃ": [
+    "vāyan'aṭṭhānaṃ"
+  ],
   "vāyantīti": [
     "vāyantī'ti"
   ],
@@ -107804,6 +107761,9 @@
   ],
   "vāyāmoti": [
     "vāyāmo'ti"
+  ],
+  "vāyitanti": [
+    "vāyitan'ti"
   ],
   "vāyitavatthānīti": [
     "vāyitavatthānī'ti"
@@ -107890,11 +107850,17 @@
     "vāl'agga"
   ],
   "vālaggakoṭi": [
-    "vāl'aggakoṭi",
-    "vālaggakoṭi"
+    "vāl'aggakoṭi"
   ],
   "vālaggakoṭinittudanamattanti": [
+    "vāl'aggakoṭinittudanamattan'ti",
     "vālaggakoṭinittudanamattan'ti"
+  ],
+  "vālaggakoṭinittudanamattopi": [
+    "vāl'aggakoṭinittudanamatto'pi"
+  ],
+  "vālaggakoṭinipātamattakaṃ": [
+    "vāl'aggakoṭinipātamattakaṃ"
   ],
   "vālaggamattaṃ": [
     "vāl'aggamattaṃ"
@@ -108107,6 +108073,9 @@
   ],
   "vāḷarūpādīhi": [
     "vāḷarūp'ādīhi"
+  ],
+  "vāḷarūpānīti": [
+    "vāḷarūpānī'ti"
   ],
   "vāḷavāti": [
     "vāḷavā'ti"
@@ -109350,9 +109319,6 @@
   ],
   "viditakaraṇaṭṭhenāti": [
     "viditakaraṇaṭṭhenā'ti"
-  ],
-  "viditakaraṇaṭṭhenāpi": [
-    "viditakaraṇ'aṭṭhenā'pi"
   ],
   "viditañhi": [
     "viditañ'hi"
@@ -111793,6 +111759,9 @@
   "vissaṭṭhattāyeva": [
     "vissaṭṭhattāy'eva"
   ],
+  "vissaṭṭhasabbaesanoti": [
+    "vissaṭṭhasabbaesano'ti"
+  ],
   "vissaṭṭhācāratā": [
     "vissaṭṭh'ācāratā"
   ],
@@ -112485,12 +112454,6 @@
   ],
   "vīsatiguṇampi": [
     "vīsatiguṇam'pi"
-  ],
-  "vīsatitivassasatāyukā": [
-    "vīsatitivassasat'āyukā"
-  ],
-  "vīsatitivassasatāyukānaṃ": [
-    "vīsatitivassasat'āyukānaṃ"
   ],
   "vīsatipi": [
     "vīsati'pi"
@@ -113206,6 +113169,9 @@
   "vedanūpāyaṃ": [
     "vedan'ūpāyaṃ"
   ],
+  "vedanūpāyādīsupi": [
+    "vedan'ūpāy'ādīsu'pi"
+  ],
   "vedantagū": [
     "ved'antagū"
   ],
@@ -113381,9 +113347,6 @@
   "venāgapurikoti": [
     "venāgapuriko'ti"
   ],
-  "venāti": [
-    "venā'ti"
-  ],
   "veneyyānurūpena": [
     "veneyy'ānurūpena"
   ],
@@ -113480,6 +113443,9 @@
   ],
   "veramaṇīti": [
     "veramaṇī'ti"
+  ],
+  "veramaṇītiādinā": [
+    "veramaṇī'tiādinā"
   ],
   "verameva": [
     "veram'eva"
@@ -114498,6 +114464,9 @@
   "sagāravoti": [
     "sagāravo'ti"
   ],
+  "sagāhanti": [
+    "sagāhan'ti"
+  ],
   "saggakāyamagamaṃ": [
     "saggakāyam'agamaṃ"
   ],
@@ -115034,8 +115003,7 @@
     "saṅgaṇhantā'pi"
   ],
   "saṅgaṇhāti": [
-    "saṅgaṇhā'ti",
-    "saṅgaṇhāti"
+    "saṅgaṇhā'ti"
   ],
   "saṅgaṇhātīti": [
     "saṅgaṇhātī'ti"
@@ -116002,6 +115970,12 @@
   "saññāpaccayāpi": [
     "saññāpaccayā'pi"
   ],
+  "saññāpaṭilābhaṃpāhaṃ": [
+    "saññāpaṭilābhaṃ'p'āhaṃ"
+  ],
+  "saññāpaṭilābhepi": [
+    "saññāpaṭilābhe'pi"
+  ],
   "saññāpabhavāti": [
     "saññāpabhavā'ti"
   ],
@@ -116119,6 +116093,9 @@
   "saṭṭhikaṇḍarasambandhoti": [
     "saṭṭhikaṇḍarasambandho'ti"
   ],
+  "saṭṭhipi": [
+    "saṭṭhi'pi"
+  ],
   "saṭṭhimattāpi": [
     "saṭṭhimattā'pi"
   ],
@@ -116127,9 +116104,6 @@
   ],
   "saṭṭhivassasatāyukā": [
     "saṭṭhivassasat'āyukā"
-  ],
-  "saṭṭhivassasatāyukānaṃ": [
-    "saṭṭhivassasat'āyukānaṃ"
   ],
   "saṭṭhivassasahassānīti": [
     "saṭṭhivassasahassānī'ti"
@@ -116347,6 +116321,9 @@
   "sataraṃsīti": [
     "sataraṃsī'ti"
   ],
+  "sataraṃsīva": [
+    "sataraṃsī'va"
+  ],
   "satarājikanti": [
     "satarājikan'ti"
   ],
@@ -116355,9 +116332,6 @@
   ],
   "sataliṅgassāti": [
     "sataliṅgassā'ti"
-  ],
-  "satasahassakappādhikānaṃ": [
-    "satasahassakapp'ādhikānaṃ"
   ],
   "satasahassagghanakena": [
     "satasahass'agghanakena"
@@ -116624,6 +116598,9 @@
   "sattatinti": [
     "sattatin'ti"
   ],
+  "sattatipi": [
+    "sattati'pi"
+  ],
   "sattattiṃsabodhipakkhiyadhammanissitātipi": [
     "sattattiṃsabodhipakkhiyadhammanissitā'ti'pi"
   ],
@@ -116783,6 +116760,9 @@
   "sattasappāyādisampattikāle": [
     "sattasappāy'ādisampattikāle"
   ],
+  "sattasārāti": [
+    "sattasārā'ti"
+  ],
   "sattasuññatadhammamattameva": [
     "sattasuññatadhammamattam'eva"
   ],
@@ -116924,9 +116904,6 @@
   "sattāhātikkantassa": [
     "satt'āh'ātikkantassa"
   ],
-  "sattāhātikkantaṃ": [
-    "satt'āh'ātikkantaṃ"
-  ],
   "sattāhātikkante": [
     "satt'āh'ātikkante"
   ],
@@ -117039,7 +117016,8 @@
     "satth'antarakappena"
   ],
   "satthantarakappo": [
-    "satth'antarakappo"
+    "satth'antarakappo",
+    "satthantarakappo"
   ],
   "satthantarakappoti": [
     "satth'antarakappo'ti"
@@ -118132,6 +118110,9 @@
   "sandassesīti": [
     "sandassesī'ti"
   ],
+  "sandiṭṭhasambhattehīti": [
+    "sandiṭṭhasambhattehī'ti"
+  ],
   "sandiṭṭhikamakālikaṃ": [
     "sandiṭṭhikam'akālikaṃ"
   ],
@@ -118291,9 +118272,6 @@
   ],
   "sannipatitanti": [
     "sannipatitan'ti"
-  ],
-  "sannipatitabbanti": [
-    "sannipatitabban'ti"
   ],
   "sannipatitāti": [
     "sannipatitā'ti"
@@ -118499,6 +118477,10 @@
   "sappabhāsanti": [
     "sappabhāsan'ti"
   ],
+  "sappabhāsaṃ": [
+    "sa'p'pabhāsaṃ",
+    "sappabhāsaṃ"
+  ],
   "sappavisaṃva": [
     "sappavisaṃ'va"
   ],
@@ -118622,11 +118604,9 @@
   "sappurisupassayo": [
     "sappuris'upassayo"
   ],
-  "sappurisūpanissayo": [
-    "sappuris'ūpanissayo"
-  ],
   "sappurisūpanissayoti": [
-    "sappuris'ūpanissayo'ti"
+    "sappuris'ūpanissayo'ti",
+    "sappurisūpanissayo'ti"
   ],
   "sappoti": [
     "sappo'ti"
@@ -119192,6 +119172,9 @@
   "sabbalokuttaro": [
     "sabbalok'uttaro"
   ],
+  "sabbalokeanabhiratisaññāti": [
+    "sabbalokeanabhiratisaññā'ti"
+  ],
   "sabbaloketi": [
     "sabbaloke'ti"
   ],
@@ -119230,6 +119213,9 @@
   ],
   "sabbasaṅkhārasamathoti": [
     "sabbasaṅkhārasamatho'ti"
+  ],
+  "sabbasaṅkhārāti": [
+    "sabbasaṅkhārā'ti"
   ],
   "sabbasaṅkhārūpasamaṃ": [
     "sabbasaṅkhār'ūpasamaṃ"
@@ -119653,9 +119639,6 @@
   "sabbotukaṃ": [
     "sabb'otukaṃ"
   ],
-  "sabbopakaraṇehi": [
-    "sabb'opakaraṇehi"
-  ],
   "sabbopi": [
     "sabbo'pi"
   ],
@@ -119753,10 +119736,12 @@
     "sabhā'pi"
   ],
   "sabhāyupaviṭṭhā": [
-    "sabhāy'upaviṭṭhā"
+    "sabhāy'upaviṭṭhā",
+    "sabhāyupaviṭṭhā"
   ],
   "sabhāyupaviṭṭhāti": [
-    "sabhāy'upaviṭṭhā'ti"
+    "sabhāy'upaviṭṭhā'ti",
+    "sabhāyupaviṭṭhā'ti"
   ],
   "sabhāvakkosena": [
     "sabhāv'akkosena"
@@ -119857,6 +119842,9 @@
   ],
   "samaṅgibhūtāti": [
     "samaṅgibhūtā'ti"
+  ],
+  "samaṅgīti": [
+    "samaṅgī'ti"
   ],
   "samaṅgībhūtoti": [
     "samaṅgībhūto'ti"
@@ -120001,9 +119989,6 @@
   ],
   "samaṇabrāhmaṇānametaṃ": [
     "samaṇabrāhmaṇānam'etaṃ"
-  ],
-  "samaṇabrāhmaṇupaṭṭhāneti": [
-    "samaṇabrāhmaṇ'upaṭṭhāne'ti"
   ],
   "samaṇabhattasamayoti": [
     "samaṇabhattasamayo'ti"
@@ -120219,7 +120204,8 @@
     "samatenā'ti"
   ],
   "samateneva": [
-    "samaten'eva"
+    "samaten'eva",
+    "samateneva"
   ],
   "samattamācari": [
     "samattam'ācari"
@@ -120479,7 +120465,8 @@
   ],
   "samamapi": [
     "samam'api",
-    "samama'pi"
+    "samama'pi",
+    "samamapi"
   ],
   "samameva": [
     "samam'eva"
@@ -120540,10 +120527,11 @@
     "samavatthacāre'ti"
   ],
   "samavayasaṭṭhesano": [
-    "samavayasaṭṭh'esano"
+    "samavayasaṭṭh'esano",
+    "samavayasaṭṭhesano"
   ],
   "samavayasaṭṭhesanoti": [
-    "samavayasaṭṭh'esano'ti"
+    "samavayasaṭṭhesano'ti"
   ],
   "samavassarīti": [
     "samavassarī'ti"
@@ -120583,9 +120571,6 @@
   ],
   "samasamagatiyoti": [
     "samasamagatiyo'ti"
-  ],
-  "samasamaṭṭhena": [
-    "samasam'aṭṭhena"
   ],
   "samasamaphalāti": [
     "samasamaphalā'ti"
@@ -120855,6 +120840,9 @@
   "samānattatānaṃ": [
     "samān'attatānaṃ"
   ],
+  "samānattatāya": [
+    "samān'attatāya"
+  ],
   "samānattā": [
     "samān'attā"
   ],
@@ -121093,8 +121081,7 @@
     "samāhitassā'ti"
   ],
   "samāhitassāyaṃ": [
-    "samāhitass'āyaṃ",
-    "samāhitassāyaṃ"
+    "samāhitass'āyaṃ"
   ],
   "samāhitindriyo": [
     "samāhit'indriyo"
@@ -121142,11 +121129,13 @@
     "samiddhatan'ti"
   ],
   "samiddhanti": [
-    "samiddhan'ti",
-    "samiddhanti"
+    "samiddhan'ti"
   ],
   "samiddhimattano": [
     "samiddhim'attano"
+  ],
+  "samiddhoti": [
+    "samiddho'ti"
   ],
   "samihitanti": [
     "samihitan'ti"
@@ -122626,7 +122615,8 @@
     "samhi"
   ],
   "sayaṅkatañca": [
-    "sayaṅ'katañ'ca"
+    "sayaṅ'katañ'ca",
+    "sayaṅkatañ'ca"
   ],
   "sayaṅkataṃ": [
     "sayaṅ'kataṃ"
@@ -122720,9 +122710,6 @@
   ],
   "sayampaṭibhānaṃ": [
     "sayam'paṭibhānaṃ"
-  ],
-  "sayampabhā": [
-    "sayam'pabhā"
   ],
   "sayampi": [
     "sayam'pi"
@@ -123091,9 +123078,6 @@
   ],
   "sarūpavacchāyāti": [
     "sarūpavacchāyā'ti"
-  ],
-  "sarūpenāti": [
-    "sarūpenā'ti"
   ],
   "sarūpeneva": [
     "sarūpen'eva"
@@ -123579,6 +123563,9 @@
   "sahatthāti": [
     "sahatthā'ti"
   ],
+  "sahattheneva": [
+    "sahatthen'eva"
+  ],
   "sahadhammikesūti": [
     "sahadhammikesū'ti"
   ],
@@ -123860,6 +123847,9 @@
   "saḷāyatanaṃ": [
     "saḷ'āyatanaṃ",
     "saḷāyatanaṃ"
+  ],
+  "saḷāyatanoti": [
+    "saḷāyatano'ti"
   ],
   "saḷeva": [
     "saḷ'eva"
@@ -125151,9 +125141,6 @@
   "sāmaṇerapesakasammutīti": [
     "sāmaṇerapesakasammutī'ti"
   ],
-  "sāmaṇerādayo": [
-    "sāmaṇer'ādayo"
-  ],
   "sāmaṇeriñca": [
     "sāmaṇeriñ'ca"
   ],
@@ -125303,9 +125290,6 @@
   "sāyaṃ": [
     "s'āyaṃ",
     "sāyaṃ"
-  ],
-  "sāyitanti": [
-    "sāyitan'ti"
   ],
   "sāyiteti": [
     "sāyite'ti"
@@ -125602,14 +125586,12 @@
   "sālindanti": [
     "sālindan'ti"
   ],
-  "sālimaṃsodanaṃ": [
-    "sālimaṃs'odanaṃ"
-  ],
   "sālimaṃsodanāhāro": [
     "sālimaṃs'odan'āhāro"
   ],
   "sālimaṃsodano": [
-    "sālimaṃs'odano"
+    "sālimaṃs'odano",
+    "sālimaṃsodano"
   ],
   "sāliyavakanti": [
     "sāliyavakan'ti"
@@ -125832,16 +125814,17 @@
     "s'āhaṃ"
   ],
   "sāhāranti": [
-    "sāhāran'ti"
+    "s'āhāran'ti"
+  ],
+  "sāhāraṃ": [
+    "s'āhāraṃ",
+    "sāhāraṃ"
   ],
   "sāhuneyyakāni": [
     "s'āhuneyyakāni"
   ],
   "sāhuḷicīrenāti": [
     "sāhuḷicīrenā'ti"
-  ],
-  "sāḷikasaddetthāti": [
-    "sāḷikasadd'etthā'ti"
   ],
   "sāḷikānañca": [
     "sāḷikānañ'ca"
@@ -127144,9 +127127,6 @@
   "sīhapubbaddhakāyo": [
     "sīhapubb'addhakāyo"
   ],
-  "sīhapubbaddhasusaṇṭhito": [
-    "sīhapubb'addhasusaṇṭhito"
-  ],
   "sīhappapātadahoti": [
     "sīhappapātadaho'ti"
   ],
@@ -127236,6 +127216,9 @@
   ],
   "sukasāḷikasaddettha": [
     "sukasāḷikasadd'ettha"
+  ],
+  "sukasāḷikasaddetthāti": [
+    "sukasāḷikasadd'etthā'ti"
   ],
   "sukānañca": [
     "sukānañ'ca"
@@ -127892,7 +127875,8 @@
     "sugatiyo'ti"
   ],
   "sugatīsuyeva": [
-    "sugatīsu'y'eva"
+    "sugatīsu'y'eva",
+    "sugatīsuyeva"
   ],
   "sugandhakaraṇucchādanena": [
     "sugandhakaraṇ'ucchādanena"
@@ -128152,6 +128136,7 @@
     "suññ'āgāre'va"
   ],
   "suññāgāresu": [
+    "suñ'ñāgāresu",
     "suññ'āgāresu"
   ],
   "suṭṭhūti": [
@@ -130064,9 +130049,6 @@
   "seṭṭhattañca": [
     "seṭṭhattañ'ca"
   ],
-  "seṭṭhatthena": [
-    "seṭṭh'atthena"
-  ],
   "seṭṭhanti": [
     "seṭṭhan'ti"
   ],
@@ -130222,6 +130204,9 @@
   ],
   "senakanti": [
     "senakan'ti"
+  ],
+  "senakādīhi": [
+    "senak'ādīhi"
   ],
   "senakotissa": [
     "senako'ti'ssa"
@@ -130393,6 +130378,9 @@
   "seyyathāpissu": [
     "seyyathā'pissu"
   ],
+  "seyyathidanti": [
+    "seyyathidan'ti"
+  ],
   "seyyathidaṃ": [
     "seyyath'idaṃ"
   ],
@@ -130533,6 +130521,9 @@
   "sevitabbāsevitabba": [
     "sevitabb'āsevitabba"
   ],
+  "sevitabbāsevitabbasuttaṃ": [
+    "sevitabb'āsevitabbasuttaṃ"
+  ],
   "sevitabbāsevitabbaṃ": [
     "sevitabb'āsevitabbaṃ"
   ],
@@ -130550,9 +130541,6 @@
   ],
   "sesakenamhi": [
     "sesaken'amhi"
-  ],
-  "sesakhandhāyatanādi": [
-    "sesakhandh'āyatan'ādi"
   ],
   "sesadvayepi": [
     "sesadvaye'pi"
@@ -131204,7 +131192,8 @@
     "sobheyyā'ti"
   ],
   "somadevatāti": [
-    "somadevatā'ti"
+    "somadevatā'ti",
+    "somadevatāti"
   ],
   "somanassaṭṭhāniyanti": [
     "somanassaṭṭhāniyan'ti"
@@ -131816,9 +131805,6 @@
   ],
   "hatthādijhāpanaṭṭhena": [
     "hatth'ādijhāpan'aṭṭhena"
-  ],
-  "hatthādibhede": [
-    "hatth'ādibhede"
   ],
   "hatthādīnaṃ": [
     "hatth'ādīnaṃ"

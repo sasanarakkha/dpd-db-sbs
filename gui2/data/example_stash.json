@@ -5,13 +5,13 @@
         "example": "yo hi koci, mārisa, amanusso ... nāgo vā nāgī vā nāgapotako vā nāgapotikā vā nāgamah'āmatto vā nāgapārisajjo vā nāgapacāro vā paduṭṭhacitto bhikkhuṃ vā bhikkhuniṃ vā upāsakaṃ vā upāsikaṃ vā gacchantaṃ vā anugaccheyya, ṭhitaṃ vā upatiṭṭheyya, nisinnaṃ vā upanisīdeyya, nipannaṃ vā upanipajjeyya."
     },
     "last": {
-        "source": "SN54.11",
-        "sutta": "ānāpānasaṃyuttaṃ, icchānaṅgalasuttaṃ",
-        "example": "ān'āpānassatisamādhiṃ sammā vadamāno vadeyya, ariyavihāro iti'pi, brahmavihāro iti'pi, tathāgatavihāro iti'pī'ti. paṭhamaṃ."
+        "source": "MN119",
+        "sutta": "kāyagatāsatisuttaṃ",
+        "example": "seyyathā'pi, bhikkhave, dakkho goghātako vā goghātak'antevāsī vā gāviṃ vadhitvā cātummahāpathe bilaso paṭivibhajitvā nisinno assa"
     },
     "stash": {
-        "source": "VIN1.4.3.1",
-        "sutta": "pattasikkhāpadaṃ",
-        "example": "ukkaṭṭho nāma patto aḍḍh'āḷhak'odanaṃ gaṇhāti catubhāgaṃ khādanaṃ tadupiyaṃ byañjanaṃ."
+        "source": "THa73",
+        "sutta": "māṇavattheragāthāvaṇṇanā",
+        "example": "so tena puññakammena sugatīsu'y'eva saṃsaranto imasmiṃ buddh'uppāde sāvatthiyaṃ brāhmaṇamahāsālassa gehe nibbattitvā yāva sattavassāni, tāva antoghare'y'eva vaḍḍhitvā sattame saṃvacchare upanayan'atthaṃ uyyānaṃ nīto antarāmagge jiṇṇ'āturamate disvā tesaṃ adiṭṭhapubbattā te parijane pucchitvā..."
     }
 }
