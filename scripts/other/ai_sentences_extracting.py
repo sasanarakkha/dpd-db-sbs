@@ -399,18 +399,16 @@ if __name__ == "__main__":
     # task_to_run = "batch_discourse_deepseek"
 
     # --- Default paths for "batch_deepseek" ---
-    # These are examples, replace with your actual paths
-    vocab_csv_for_batch = "shared_data/pali_class/vocab/vocab_test.csv"
-    exercise_file_for_batch = "shared_data/pali_class/exercises/exercises_test.txt"
-    output_csv_for_batch = "shared_data/pali_class/output/test.csv"
-    # Optional: class_num for default output naming if output_csv_for_batch is not set by user
-    # class_num_for_batch = "2" 
+    class_num = "16"
+    vocab_csv_for_batch = f"shared_data/pali_class/vocab/vocab_class_{class_num}.csv"
+    exercise_file_for_batch = f"shared_data/pali_class/exercises/exercises_class_{class_num}.txt"
+    output_csv_for_batch = f"shared_data/pali_class/output/class_{class_num}_output.csv" 
 
     # --- Default paths for "batch_discourse_deepseek" ---
-    # These are examples, replace with your actual paths
-    discourse_vocab_csv_path = "shared_data/discourses/vocab/vocab_test.csv"
-    sutta_text_file_for_discourse = "shared_data/discourses/suttas/test.txt"
-    output_csv_for_discourse = "shared_data/discourses/output/test.csv"
+    sutta_code = "sn47"
+    discourse_vocab_csv_path = f"shared_data/discourses/vocab/vocab_{sutta_code}.csv"
+    sutta_text_file_for_discourse = f"shared_data/discourses/suttas/{sutta_code}.txt"
+    output_csv_for_discourse = f"shared_data/discourses/output/{sutta_code}_output.csv"
     # --- End Configuration ---
 
     # Ensure cache directory exists
