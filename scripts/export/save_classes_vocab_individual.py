@@ -33,7 +33,7 @@ def main():
     with pd.ExcelWriter(outputxlsx) as writer: # type: ignore
         total_words_saved = 0
         # Save words for each class to a separate CSV file
-        for sbs_class in range(2, 30):
+        for sbs_class in range(1, 30):
             filename = os.path.join(dpspth.sbs_class_vocab_dir, f'vocab-class{sbs_class}.csv')
             words_saved = save_words_to_csv(sbs_class, filename)
 
@@ -43,11 +43,11 @@ def main():
 
         print(f"Total words saved to all CSVs: {total_words_saved}")
 
-    print("saving words with examples for vocab pali class")
-    # save vocab with examples
-    for sbs_class in range(2, 30):
+    print("saving words for vocab pali class")
+    # save vocab
+    for sbs_class in range(1, 30):
         filename = os.path.join(dpspth.pali_class_vocab_dir, f'vocab_class_{sbs_class}.csv')
-        save_words_with_examples_to_csv(sbs_class, filename)
+        save_words_for_class_to_csv(sbs_class, filename)
 
     print("saving words with examples for discources")
     # Iterate through all values in sbs_category_list
@@ -105,7 +105,7 @@ def save_words_to_csv(sbs_class: int, filename: str) -> int:
     return words_saved
 
 
-def save_words_with_examples_to_csv(sbs_class: int, filename: str):
+def save_words_for_class_to_csv(sbs_class: int, filename: str):
     # Get all words that meet the conditions
     
 

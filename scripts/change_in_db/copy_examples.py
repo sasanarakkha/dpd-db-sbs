@@ -21,6 +21,13 @@ db_session = get_db_session(pth.dpd_db_path)
 
 
 def update_column_for_some_criteria(source_value, column_to_update, value_to_update, modifier_column_to_copy):
+
+    rows_already_have = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.sbs)).outerjoin(SBS).filter(
+            or_(
+                SBS.vib_source == source_value,
+            ),
+    ).all()
+
     # Query the database to find the rows that match the conditions
     rows_to_update_sbs = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.sbs)).outerjoin(SBS).filter(
             or_(
@@ -49,6 +56,11 @@ def update_column_for_some_criteria(source_value, column_to_update, value_to_upd
     count_changed_sbs = 0
     count_added = 0
     count_already_have = 0
+
+    console.print(f"[bold bright_green]Total rows already have {value_to_update}_source: {len(rows_already_have)} : ")
+
+    for __word__ in rows_already_have:
+        console.print(f"[bold bright_yellow] already {value_to_update}_source have example {__word__.id} {__word__.lemma_1}")
 
     console.print(f"[bold bright_green]Total rows fit criteria sbs: {len(rows_to_update_sbs)} : ")
 
@@ -128,12 +140,14 @@ def update_column_for_some_criteria(source_value, column_to_update, value_to_upd
     console.print(f"[bold bright_green]Total count of changed: {count_changed}")
     console.print(f"[bold bright_green]Total count of changed sbs: {count_changed_sbs}")
     console.print(f"[bold bright_green]Total count of added: {count_added}")
+    console.print("")
+    console.print(f"[bold bright_green] finished for {source_value} ")
 
     db_session.commit()
 
 
 # !To use the functions:
-source_value = "VIN1.4.3.1"
+source_value = "VIN1.4.3.10"
 column_to_update = "sbs_patimokkha"
 value_to_update = "vib"
 modifier_column_to_copy = "vib"

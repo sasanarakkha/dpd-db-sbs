@@ -18,9 +18,9 @@ if config_test("dictionary", "make_mdict", "yes"):
 
    # Assuming the script is in the 'Documents/dpd-db/scripts/moving' directory
    script_dir = os.path.dirname(os.path.realpath(__file__))
-   deva_dir = os.path.abspath(os.path.join(script_dir, '..', '..', '..', '..', '..'))
+   deva_dir = os.path.abspath(os.path.join(script_dir, '..', '..', '..', '..'))
 
-   sync_mdict_dir = os.path.join(deva_dir, 'Mdict')
+   sync_mdict_dir = os.path.join(deva_dir, 'Library', 'Mobile Documents', 'com~apple~CloudDocs', 'MDict ')
 
    share_dir = os.path.join(
       deva_dir, 
@@ -45,8 +45,3 @@ if config_test("dictionary", "make_mdict", "yes"):
 
 else:
    print("moving is disabled in the config")
-
-
-
-
-
