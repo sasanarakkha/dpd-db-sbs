@@ -1,19 +1,15 @@
 Class 10 Exercises
 
 Sutta Number: AN10.176
-Pali: so ajānaṃ vā āha jānāmī’ti, jānaṃ vā āha na jānāmī’ti, apassaṃ vā āha passāmī’ti, passaṃ vā āha na passāmī’ti
-English Translation: Not knowing, he said, “I know”, Or knowing, he said, “I don’t know”, Or, not seeing, he said, “I see”, Or, seeing, he said, “I don’t see”
-
-Sutta Number: MN10.11
-Pali: idha, bhikkhave, bhikkhu santaṃ vā ajjhattaṃ kāmacchandaṃ, atthi me ajjhattaṃ kāmacchando’ti pajānāti, asantaṃ vā ajjhattaṃ kāmacchandaṃ, natthi me ajjhattaṃ kāmacchando’ti pajānāti
-English Translation: When a monk having desire for sense pleasure internally...He knows, “There is desire for sense pleasure for me internally.” (Internally, I have desire for sense pleasure)
+Pali: so ajānaṃ vā āha jānāmī'ti, jānaṃ vā āha na jānāmī'ti, apassaṃ vā āha passāmī'ti, passaṃ vā āha na passāmī'ti
+English Translation: Not knowing, he said, "I know", Or knowing, he said, "I don't know", Or, not seeing, he said, "I see", Or, seeing, he said, "I don't see"
 
 Sutta Number: AN5.23
 Pali: so sace ākaṅkhati, dibbena cakkhunā satte passeyyaṃ cavamāne upapajjamāne
 English Translation: If he wishes, I myself could see beings passing away and re-arising with the divine eye
 
 Sutta Number: MN86
-Pali: atha kho āyasmā aṅgulimālo lohitena gaḷantena yena bhagavā ten’upasaṅkami
+Pali: atha kho āyasmā aṅgulimālo lohitena gaḷantena yena bhagavā ten'upasaṅkami
 English Translation: And then Ven. Aṅgulimāla approached the Blessed One with blood dripping.
 
 Sutta Number: AN3.83
@@ -25,7 +21,7 @@ Pali: ye ca pana loke sukhaṃ senti, ahaṃ tesaṃ aññataro'ti
 English Translation: Those who sleep comfortably in the world, I am one of them.
 
 Sutta Number: MN39
-Pali: so imam’eva kāyaṃ vivekajena pītisukhena abhisandeti
+Pali: so imam'eva kāyaṃ vivekajena pītisukhena abhisandeti
 English Translation: He fills up this very body with joy and ease born from seclusion.
 
 Sutta Number: AN10.61
@@ -33,7 +29,7 @@ Pali: ko ca āhāro avijjāya?
 English Translation: And what is the nutriment of ignorance?
 
 Sutta Number: SN35.234
-Pali: so evaṃ asamanupassanto na ca kiñci loke upādiyati, anupādiyaṃ na paritassati, aparitassaṃ paccattaññ’eva parinibbāyati
+Pali: so evaṃ asamanupassanto na ca kiñci loke upādiyati, anupādiyaṃ na paritassati, aparitassaṃ paccattaññ'eva parinibbāyati
 English Translation: he's not perceiving in that way, he does not grasp onto anything in the world. not grasping, he is not perturbed, not shaking, he thus personally attains final liberation.
 
 Sutta Number: VIN PAT PC 22
@@ -41,8 +37,8 @@ Pali: sammato api ce bhikkhu atthaṅ'gate suriye bhikkhuniyo ovadeyya, pācitti
 English Translation: Even if authorized, should a monk instruct the nuns when the sun has set, [this is an offence] requiring confession.
 
 Sutta Number: MN118
-Pali: dīghaṃ vā assasanto dīghaṃ assasāmī’ti pajānāti. dīghaṃ vā passasanto dīghaṃ passasāmī’ti pajānāti.
-English Translation: Breathing in long, he knows clearly, “I breathe in long” or breathing out long, he knows clearly, “I breathe out long.”
+Pali: dīghaṃ vā assasanto dīghaṃ assasāmī'ti pajānāti. dīghaṃ vā passasanto dīghaṃ passasāmī'ti pajānāti.
+English Translation: Breathing in long, he knows clearly, "I breathe in long" or breathing out long, he knows clearly, "I breathe out long."
 
 Sutta Number: SN12.61
 Pali: seyyathāpi bhikkhave makkaṭo araññe pavane caramāno
@@ -54,7 +50,7 @@ English Translation: A man could see a school of fish roaming about [and] standi
 
 Sutta Number: MN62
 Pali: abhippamodayaṃ cittaṃ assasissāmī'ti sikkhati, abhippamodayaṃ cittaṃ passasissāmī'ti sikkhati.
-English Translation: He trains [thus]: “I will breathe in gladdening the mind,” he trains [thus]: “I will breathe out gladdening the mind.”
+English Translation: He trains [thus]: "I will breathe in gladdening the mind," he trains [thus]: "I will breathe out gladdening the mind."
 
 Sutta Number: MN75
 Pali: aññatitthiyā paribbājakā andhā acakkhukā ajānantā ārogyaṃ, apassantā nibbānaṃ, atha ca pana imaṃ gāthaṃ bhāsanti.
@@ -69,8 +65,8 @@ Pali: āturakāyassa me sato cittaṃ anāturaṃ bhavissati
 English Translation: Although I am sick in body, (my) mind will be healthy.
 
 Sutta Number: SN22.59
-Pali: ‘etaṃ mama, eso ahaṃ asmi, eso me attā’ti? “no hi etaṃ, bhante”.
-English Translation: [Is what is impermanent…fit to be regarded thus:] “This is mine, this I am, this is my self?” Certainly not, venerable sir.
+Pali: etaṃ mama, eso ahaṃ asmi, eso me attā'ti? no hi etaṃ, bhante.
+English Translation: [Is what is impermanent fit to be regarded thus:] "This is mine, this I am, this is my self?" Certainly not, venerable sir.
 
 Sutta Number: TH257
 Pali: saritvā pubbake yogī, tesaṃ vattaṃ anussaraṃ.
@@ -88,17 +84,13 @@ Sutta Number: VIN PAT SK 71
 Pali: na pacchato gacchanto purato gacchantassa agilānassa dhammaṃ desessāmi
 English Translation: I will not preach the Dhamma walking behind, to one going in front, who is not ill.
 
-Sutta Number: DHP153
-Pali: anekajāti saṃsāraṃ, sandhāvissaṃ anibbisaṃ, gahakāraṃ gavesanto, dukkhā jāti punappunaṃ.
-English Translation: With many births I transmigrated in cyclic existence, not understanding, searching the builder of this house. Birth again and again [is] suffering.
-
 Sutta Number: SN46.3
 Pali: tassa taṃ dhammaṃ paññāya pavicinato pavicarato parivīmaṃsaṃ āpajjato āraddhaṃ hoti vīriyaṃ
 English Translation: For one examining that Dhamma with wisdom, exhibiting a thorough investigation, energy is aroused.
 
 Sutta Number: MN39
-Pali: tassa evaṃ jānato evaṃ passato kām’āsavā api cittaṃ vimuccati
-English Translation: When one knows and sees in this way, [his] mind is released from the taint of sensual pleasure.
+Pali: tassa evaṃ jānato evaṃ passato kām'āsavā api cittaṃ vimuccati
+English Translation: When one knows and sees in this way, [his] mind is released from the taint of sensual pleasure too.
 
 Sutta Number: MN107
 Pali: ye kho te bhikkhū sekkhā apattamānasā anuttaraṃ yogakkhemaṃ patthayamānā viharanti tesu me ayaṃ evarūpī anusāsanī hoti.
@@ -113,15 +105,15 @@ Pali: tathārūpaṃ bhikkhu adinnaṃ ādiyamāno, ayaṃ api pārājiko hoti a
 English Translation: A monk, stealing of such a kind something that is not given, this one is also defeated, expelled.
 
 Sutta Number: VIN PAT SA 10
-Pali: sametu āyasmā saṅghena, samaggo hi saṅgho, sammodamāno avivadamāno ek’uddeso, phāsu viharati
-English Translation: “Let the venerable one agree with the community of monks, a unified community, on friendly terms, not quarrelling, [which] dwells easily, following one Pātimokkha.”
+Pali: sametu āyasmā saṅghena, samaggo hi saṅgho, sammodamāno avivadamāno ek'uddeso, phāsu viharati
+English Translation: "Let the venerable one agree with the community of monks, a unified community, on friendly terms, not quarrelling, [which] dwells easily, following one Pātimokkha."
 
 Sutta Number: VIN PAT PC 14
 Pali: taṃ pakkamanto n'eva uddhareyya na uddharāpeyya anāpucchaṃ vā gaccheyya
 English Translation: [When] departing, should he not remove it [i.e. the bed or mattress] nor cause it to be removed, or should he go not asking permission.
 
 Sutta Number: VIN PAT PC 68
-Pali: ye ime antarāyikā dhammā vuttā bhagavatā te paṭisevato n’ālaṃ antarāyāya
+Pali: ye ime antarāyikā dhammā vuttā bhagavatā te paṭisevato n'ālaṃ antarāyāya
 English Translation: These obstructive things which have been spoken [of] by the Blessed One: they are not enough [to be] an obstruction for one engaging in [them]
 
 Sutta Number: SN12.61
@@ -138,26 +130,30 @@ English Translation: Monks, these [are] roots of trees, these [are] empty dwelli
 
 Sutta Number: SN22.85
 Pali: yato kho te bhikkhū n'āsakkhiṃsu āyasmantaṃ yamakaṃ etasmā pāpakā diṭṭhigatā vivecetuṃ
-English Translation: Since those monks were unable to separate Venerable Yamaka from that wrong belief…
+English Translation: Since those monks were unable to separate Venerable Yamaka from that wrong belief
 
 Sutta Number: VIN PAT PC 71
 Pali: na tāva ahaṃ, āvuso, etasmiṃ sikkhāpade sikkhissāmi yāva na aññaṃ bhikkhuṃ, byattaṃ vinayadharaṃ, paripucchāmi
 English Translation: Friends, I will not train in this training rule until I [can] question another monk, a competent expert in Vinaya, [about it].
 
 Sutta Number: SN22.79
-Pali: sabbe ete pañc’upādānakkhandhe anussaranti etesaṃ vā aññataraṃ.
+Pali: sabbe ete pañc'upādānakkhandhe anussaranti etesaṃ vā aññataraṃ.
 English Translation: All of them recollect five aggregates that are clung to, or one of them.
 
 
 Class 10 Extra
 
+Sutta Number: MN10.11
+Pali: idha, bhikkhave, bhikkhu santaṃ vā ajjhattaṃ kāmacchandaṃ, atthi me ajjhattaṃ kāmacchando'ti pajānāti, asantaṃ vā ajjhattaṃ kāmacchandaṃ, natthi me ajjhattaṃ kāmacchando'ti pajānāti
+English Translation: When a monk having desire for sense pleasure internally...He knows, "There is desire for sense pleasure for me internally." (Internally, I have desire for sense pleasure)
+
 Sutta Number: SNP16
-Pali: bahū devā manussā ca, maṅgalāni acintayuṃ, ākaṅkhamānā sotthānaṃ, brūhi maṅgalam’uttamaṃ.
+Pali: bahū devā manussā ca, maṅgalāni acintayuṃ, ākaṅkhamānā sotthānaṃ, brūhi maṅgalam'uttamaṃ.
 English Translation: Many devas and humans thought about blessings, wishing for well-being, say (what is) the highest blessing!
 
 Sutta Number: SNP8
-Pali: tiṭṭhaṃ caraṃ nisinno vā sayāno vā yāvat’āssa vigatamiddho
-English Translation: Standing, walking, seated or lying down, as long as he may be without drowsiness (or) … as long as there is freedom from drowsiness for him.
+Pali: tiṭṭhaṃ caraṃ nisinno vā sayāno vā yāvat'āssa vigatamiddho
+English Translation: Standing, walking, seated or lying down, as long as he may be without drowsiness (or) as long as there is freedom from drowsiness for him.
 
 Sutta Number: MN51
 Pali: ito sutvā na amutra akkhātā imesaṃ bhedāya, amutra vā sutvā na imesaṃ akkhātā amūsaṃ bhedāya
@@ -170,3 +166,7 @@ English Translation: How many are sleeping when [others] are awake? How many sta
 Sutta Number: DHP85
 Pali: appakā te manussesu, ye janā pāragāmino. atha ayaṃ itarā pajā, tīraṃ eva anudhāvati.
 English Translation: Few people [are] they among humans who cross over, but this ordinary generation only runs along the shore.
+
+Sutta Number: DHP153
+Pali: anekajāti saṃsāraṃ, sandhāvissaṃ anibbisaṃ, gahakāraṃ gavesanto, dukkhā jāti punappunaṃ.
+English Translation: With many births I wandered in cyclic existence, not finding, searching the builder of this house. Birth again and again [is] suffering.

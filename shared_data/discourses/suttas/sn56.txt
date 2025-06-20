@@ -27,7 +27,7 @@ katamāni cattāri?
 
 dukkhaṃ ariyasaccaṃ, dukkhasamudayaṃ ariyasaccaṃ, dukkhanirodhaṃ ariyasaccaṃ, dukkhanirodhagāminī paṭipadā ariyasaccaṃ.
 
-ye hi keci bhikkhave, atītam'addhānaṃ samaṇā vā brāhmaṇā vā … anāgatam'addhānaṃ samaṇā vā brāhmaṇā vā … eta'r'ahi samaṇā vā brāhmaṇā vā yathābhūtaṃ abhisambujjhanti, sabbe te imāni cattāri ariyasaccāni yathābhūtaṃ abhisambujjhanti.
+eta'r'ahi samaṇā vā brāhmaṇā vā yathābhūtaṃ abhisambujjhanti, sabbe te imāni cattāri ariyasaccāni yathābhūtaṃ abhisambujjhanti.
 
 
 SUTTA: sn56.7 vitakkasuttaṃ
@@ -36,16 +36,13 @@ mā, bhikkhave, pāpake akusale vitakke vitakketha, seyyath'īdaṃ, kāmavitakk
 
 taṃ kissa hetu?
 
-n'ete,
-bhikkhave, vitakkā atthasaṃhitā n'ādibrahmacariyakā na nibbidāya na virāgāya na nirodhāya na upasamāya na abhiññāya na sambodhāya na nibbānāya saṃvattanti.
+n'ete, bhikkhave, vitakkā atthasaṃhitā n'ādibrahmacariyakā na nibbidāya na virāgāya na nirodhāya na upasamāya na abhiññāya na sambodhāya na nibbānāya saṃvattanti.
 
-vitakkentā ca kho tumhe, bhikkhave, idaṃ dukkhan'ti vitakkeyyātha, ayaṃ
-dukkhasamudayo'ti vitakkeyyātha, ayaṃ dukkhanirodho'ti vitakkeyyātha, ayaṃ dukkhanirodhagāminī paṭipadā'ti vitakkeyyātha.
+vitakkentā ca kho tumhe, bhikkhave, idaṃ dukkhan'ti vitakkeyyātha, ayaṃ dukkhasamudayo'ti vitakkeyyātha, ayaṃ dukkhanirodho'ti vitakkeyyātha, ayaṃ dukkhanirodhagāminī paṭipadā'ti vitakkeyyātha.
 
 taṃ kissa hetu?
 
-ete,
-bhikkhave, vitakkā atthasaṃhitā ete ādibrahmacariyakā ete nibbidāya virāgāya nirodhāya upasamāya abhiññāya sambodhāya nibbānāya saṃvattanti.
+ete, bhikkhave, vitakkā atthasaṃhitā ete ādibrahmacariyakā ete nibbidāya virāgāya nirodhāya upasamāya abhiññāya sambodhāya nibbānāya saṃvattanti.
 
 SUTTA: sn56.13 khandhasuttaṃ
 
@@ -53,8 +50,7 @@ cattār'imāni, bhikkhave, ariyasaccāni.
 
 katamāni cattāri?
 
-dukkhaṃ
-ariyasaccaṃ, dukkhasamudayaṃ ariyasaccaṃ, dukkhanirodhaṃ ariyasaccaṃ, dukkhanirodhagāminī paṭipadā ariyasaccaṃ.
+dukkhaṃ ariyasaccaṃ, dukkhasamudayaṃ ariyasaccaṃ, dukkhanirodhaṃ ariyasaccaṃ, dukkhanirodhagāminī paṭipadā ariyasaccaṃ.
 
 
 katamañ'ca, bhikkhave, dukkhaṃ ariyasaccaṃ?
@@ -65,8 +61,7 @@ idaṃ vuccati, bhikkhave, dukkhaṃ ariyasaccaṃ.
 
 katamañ'ca, bhikkhave, dukkhasamudayaṃ ariyasaccaṃ?
 
-y'āyaṃ taṇhā
-ponobhavikā nandirāgasahagatā tatratatr'ābhinandinī, seyyath'īdaṃ, kāmataṇhā, bhavataṇhā, vibhavataṇhā.
+y'āyaṃ taṇhā ponobhavikā nandirāgasahagatā tatratatr'ābhinandinī, seyyath'īdaṃ, kāmataṇhā, bhavataṇhā, vibhavataṇhā.
 
 idaṃ vuccati, bhikkhave, dukkhasamudayaṃ ariyasaccaṃ.
 
@@ -77,6 +72,7 @@ yo tassā'y'eva taṇhāya asesavirāganirodho cāgo paṭinissaggo mutti anāla
 idaṃ vuccati, bhikkhave, dukkhanirodhaṃ ariyasaccaṃ.
 
 katamañ'ca, bhikkhave, dukkhanirodhagāminī paṭipadā ariyasaccaṃ?
+
 ayam'eva ariyo aṭṭh'aṅgiko maggo, seyyath'īdaṃ, sammādiṭṭhi sammāsaṅkappo sammāvācā sammākamm'anto sammā-ājīvo sammāvāyāmo sammāsati sammāsamādhi.
 
 idaṃ vuccati, bhikkhave, dukkhanirodhagāminī paṭipadā ariyasaccaṃ.
@@ -92,35 +88,25 @@ tatra kho bhagavā bhikkhū āmantesi, catunnaṃ, bhikkhave, ariyasaccānaṃ a
 
 katamesaṃ catunnaṃ?
 
-dukkhassa, bhikkhave, ariyasaccassa ananubodhā
-appaṭivedhā evam'idaṃ dīgham'addhānaṃ sandhāvitaṃ saṃsaritaṃ
-mamañ'c'eva tumhākañ'ca.
+dukkhassa, bhikkhave, ariyasaccassa ananubodhā appaṭivedhā evam'idaṃ dīgham'addhānaṃ sandhāvitaṃ saṃsaritaṃ mamañ'c'eva tumhākañ'ca.
 
-dukkhasamudayassa ariyasaccassa …
-dukkhanirodhassa ariyasaccassa … dukkhanirodhagāminiyā paṭipadāya
-ariyasaccassa ananubodhā appaṭivedhā evam'idaṃ dīgham'addhānaṃ
-sandhāvitaṃ saṃsaritaṃ mamañ'c'eva tumhākañ'ca.
+dukkhanirodhagāminiyā paṭipadāya ariyasaccassa ananubodhā appaṭivedhā evam'idaṃ dīgham'addhānaṃ sandhāvitaṃ saṃsaritaṃ mamañ'c'eva tumhākañ'ca.
 
 ta'y'idaṃ, bhikkhave, dukkhaṃ ariyasaccaṃ anubuddhaṃ paṭividdhaṃ, dukkhasamudayaṃ ariyasaccaṃ anubuddhaṃ paṭividdhaṃ, dukkhanirodhaṃ ariyasaccaṃ anubuddhaṃ paṭividdhaṃ, dukkhanirodhagāminī paṭipadā ariyasaccaṃ anubuddhaṃ paṭividdhaṃ, ucchinnā bhavataṇhā, khīṇā bhavanetti, n'atth'idāni punabbhavo'ti.
 
 SUTTA: sn56.25 āsavakkhayasuttaṃ
 
-jānatohaṃ, bhikkhave, passato āsavānaṃ khayaṃ vadāmi, no ajānato
-apassato.
+jānatohaṃ, bhikkhave, passato āsavānaṃ khayaṃ vadāmi, no ajānato apassato.
 
 kiñ'ca, bhikkhave, jānato passato āsavānaṃ khayo hoti?
 
-idaṃ
-dukkhan'ti, bhikkhave, jānato passato āsavānaṃ khayo hoti.
+idaṃ dukkhan'ti, bhikkhave, jānato passato āsavānaṃ khayo hoti.
 
-ayaṃ
-dukkhasamudayo'ti jānato passato āsavānaṃ khayo hoti.
+ayaṃ dukkhasamudayo'ti jānato passato āsavānaṃ khayo hoti.
 
-ayaṃ
-dukkhanirodho'ti jānato passato āsavānaṃ khayo hoti.
+ayaṃ dukkhanirodho'ti jānato passato āsavānaṃ khayo hoti.
 
-ayaṃ
-dukkhanirodhagāminī paṭipadā'ti jānato passato āsavānaṃ khayo hoti.
+ayaṃ dukkhanirodhagāminī paṭipadā'ti jānato passato āsavānaṃ khayo hoti.
 
 evaṃ kho, bhikkhave, jānato evaṃ passato āsavānaṃ khayo hoti.
 
@@ -131,17 +117,15 @@ cattār'imāni, bhikkhave, ariyasaccāni.
 
 katamāni cattāri?
 
-dukkhaṃ
-ariyasaccaṃ, dukkhasamudayaṃ ariyasaccaṃ, dukkhanirodhaṃ ariyasaccaṃ, dukkhanirodhagāminī paṭipadā ariyasaccaṃ.
+dukkhaṃ ariyasaccaṃ, dukkhasamudayaṃ ariyasaccaṃ, dukkhanirodhaṃ ariyasaccaṃ, dukkhanirodhagāminī paṭipadā ariyasaccaṃ.
 
 imāni kho, bhikkhave, cattāri ariyasaccāni tathāni avitathāni anaññathāni, tasmā ariyasaccānī'ti vuccanti.
 
 SUTTA: sn56.28 lokasuttaṃ
 
-cattār'imāni, bhikkhave, ariyasaccāni….
+cattār'imāni, bhikkhave, ariyasaccāni
 
-sadevake loke samārake
-sabrahmake, sassamaṇabrāhmaṇiyā pajāya sadevamanussāya, tathāgato ariyo, tasmā ariyasaccānī'ti vuccanti.
+sadevake loke samārake sabrahmake, sassamaṇabrāhmaṇiyā pajāya sadevamanussāya, tathāgato ariyo, tasmā ariyasaccānī'ti vuccanti.
 
 
 SUTTA: sn56.29 pariññeyyasuttaṃ
@@ -152,9 +136,7 @@ imesaṃ kho, bhikkhave, catunnaṃ ariyasaccānaṃ atthi ariyasaccaṃ pariñ�
 
 katamañ'ca, bhikkhave, ariyasaccaṃ pariññeyyaṃ?
 
-dukkhaṃ, bhikkhave,
-ariyasaccaṃ pariññeyyaṃ, dukkhasamudayaṃ ariyasaccaṃ pahātabbaṃ,
-dukkhanirodhaṃ ariyasaccaṃ sacchikātabbaṃ, dukkhanirodhagāminī paṭipadā ariyasaccaṃ bhāvetabbaṃ.
+dukkhaṃ, bhikkhave, ariyasaccaṃ pariññeyyaṃ, dukkhasamudayaṃ ariyasaccaṃ pahātabbaṃ, dukkhanirodhaṃ ariyasaccaṃ sacchikātabbaṃ, dukkhanirodhagāminī paṭipadā ariyasaccaṃ bhāvetabbaṃ.
 
 SUTTA: sn56.31 sīsapāvanasuttaṃ
 
@@ -164,19 +146,15 @@ atha kho bhagavā parittāni sīsapāpaṇṇāni pāṇinā gahetvā bhikkhū �
 
 appamattakāni, bhante, bhagavatā parittāni sīsapāpaṇṇāni pāṇinā gahitāni, atha kho etān'eva bahutarāni yadidaṃ upari sīsapāvane'ti.
 
-evam'eva kho, bhikkhave, etadeva bahutaraṃ yaṃ o mayā abhiññāya
-anakkhātaṃ.
+evam'eva kho, bhikkhave, etadeva bahutaraṃ yaṃ o mayā abhiññāya anakkhātaṃ.
 
 kasmā c'etaṃ, bhikkhave, mayā anakkhātaṃ?
 
-na h'etaṃ,
-bhikkhave, atthasaṃhitaṃ n'ādibrahmacariyakaṃ na nibbidāya na virāgāya na nirodhāya na upasamāya na abhiññāya na sambodhāya na nibbānāya
-saṃvattati, tasmā taṃ mayā anakkhātaṃ.
+na h'etaṃ, bhikkhave, atthasaṃhitaṃ n'ādibrahmacariyakaṃ na nibbidāya na virāgāya na nirodhāya na upasamāya na abhiññāya na sambodhāya na nibbānāya saṃvattati, tasmā taṃ mayā anakkhātaṃ.
 
 kiñ'ca, bhikkhave, mayā akkhātaṃ?
 
-idaṃ dukkhan'ti, bhikkhave, mayā
-akkhātaṃ, ayaṃ dukkhasamudayo'ti mayā akkhātaṃ, ayaṃ dukkhanirodho'ti mayā akkhātaṃ, ayaṃ dukkhanirodhagāminī paṭipadā'ti mayā akkhātaṃ.
+idaṃ dukkhan'ti, bhikkhave, mayā akkhātaṃ, ayaṃ dukkhasamudayo'ti mayā akkhātaṃ, ayaṃ dukkhanirodho'ti mayā akkhātaṃ, ayaṃ dukkhanirodhagāminī paṭipadā'ti mayā akkhātaṃ.
 
 kasmā c'etaṃ, bhikkhave, mayā akkhātaṃ?
 
@@ -184,38 +162,23 @@ etaṃ hi, bhikkhave, atthasaṃhitaṃ etaṃ ādibrahmacariyakaṃ etaṃ nibb
 
 SUTTA: sn56.33 daṇḍasuttaṃ
 
-seyyathā'pi, bhikkhave, daṇḍo uparivehāsaṃ khitto sakim'pi mūlena nipatati,
-sakim'pi aggena nipatati, evam'eva kho, bhikkhave, avijjānīvaraṇā sattā
-taṇhāsaṃyojanā sandhāvantā saṃsarantā sakim'pi asmā lokā paraṃ lokaṃ
-gacchanti, sakim'pi parasmā lokā imaṃ lokaṃ āgacchanti.
+seyyathā'pi, bhikkhave, daṇḍo uparivehāsaṃ khitto sakim'pi mūlena nipatati, sakim'pi aggena nipatati, evam'eva kho, bhikkhave, avijjānīvaraṇā sattā taṇhāsaṃyojanā sandhāvantā saṃsarantā sakim'pi asmā lokā paraṃ lokaṃ gacchanti, sakim'pi parasmā lokā imaṃ lokaṃ āgacchanti.
 
-taṃ kissa hetu?
-adiṭṭhattā, bhikkhave, catunnaṃ ariyasaccānaṃ.
-
-katamesaṃ catunnaṃ?
-dukkhassa ariyasaccassa … dukkhanirodhagāminiyā paṭipadāya ariyasaccassa.
+taṃ kissa hetu? adiṭṭhattā, bhikkhave, catunnaṃ ariyasaccānaṃ.
 
 SUTTA: sn56.34 celasuttaṃ
 
 āditte, bhikkhave, cele vā sīse vā, kim'assa karaṇīyan'ti?
 
-āditte, bhante, cele vā sīse vā, tass'eva celassa vā sīsassa vā nibbāpanāya
-adhimatto chando ca vāyāmo ca ussāho ca ussoḷhī ca appaṭivānī ca sati ca
-sampajaññañ'ca karaṇīyan'ti.
+āditte, bhante, cele vā sīse vā, tass'eva celassa vā sīsassa vā nibbāpanāya adhimatto chando ca vāyāmo ca ussāho ca ussoḷhī ca appaṭivānī ca sati ca sampajaññañ'ca karaṇīyan'ti.
 
-ādittaṃ, bhikkhave, celaṃ vā sīsaṃ vā ajjhupekkhitvā amanasikaritvā
-anabhisametānaṃ catunnaṃ ariyasaccānaṃ yathābhūtaṃ abhisamayāya
-adhimatto chando ca vāyāmo ca ussāho ca ussoḷhī ca appaṭivānī ca sati ca
-sampajaññañ'ca karaṇīyaṃ.
+ādittaṃ, bhikkhave, celaṃ vā sīsaṃ vā ajjhupekkhitvā amanasikaritvā anabhisametānaṃ catunnaṃ ariyasaccānaṃ yathābhūtaṃ abhisamayāya adhimatto chando ca vāyāmo ca ussāho ca ussoḷhī ca appaṭivānī ca sati ca sampajaññañ'ca karaṇīyaṃ.
 
 SUTTA: sn56.37 paṭhamasūriyasuttaṃ
 
-sūriyassa, bhikkhave, udayato etaṃ pubbaṅ'gamaṃ etaṃ pubbanimittaṃ,
-yadidaṃ aruṇ'uggaṃ.
+sūriyassa, bhikkhave, udayato etaṃ pubbaṅ'gamaṃ etaṃ pubbanimittaṃ, yadidaṃ aruṇ'uggaṃ.
 
-evam'eva kho, bhikkhave, bhikkhuno catunnaṃ
-ariyasaccānaṃ yathābhūtaṃ abhisamayāya etaṃ pubbaṅ'gamaṃ etaṃ
-pubbanimittaṃ, yadidaṃ sammādiṭṭhi.
+evam'eva kho, bhikkhave, bhikkhuno catunnaṃ ariyasaccānaṃ yathābhūtaṃ abhisamayāya etaṃ pubbaṅ'gamaṃ etaṃ pubbanimittaṃ, yadidaṃ sammādiṭṭhi.
 
 SUTTA: sn56.38 dutiyasūriyasuttaṃ
 
@@ -223,8 +186,7 @@ yāvakīvañ'ca, bhikkhave, candimasūriyā loke n'uppajjanti, n'eva tāva mahat
 
 andhatamaṃ tadā hoti andhakāratimisā.
 
-n'eva tāva rattin'divā paññāyanti, na mās'addhamāsā
-paññāyanti, na utusaṃvaccharā paññāyanti.
+n'eva tāva rattin'divā paññāyanti, na mās'addhamāsā paññāyanti, na utusaṃvaccharā paññāyanti.
 
 yato ca kho, bhikkhave, candimasūriyā loke uppajjanti, atha mahato ālokassa pātubhāvo hoti mahato obhāsassa.
 
@@ -246,26 +208,27 @@ atha kho catunnaṃ ariyasaccānaṃ ācikkhaṇā hoti desanā paññāpanā pa
 
 SUTTA: sn56.42 papātasuttaṃ
 
-ye hi keci, bhikkhave, samaṇā vā brāhmaṇā vā idaṃ dukkhan'ti yathā-bhūtaṃ nappajānanti, ayaṃ dukkhasamudayo'ti yathābhūtaṃ nappajānanti, ayaṃ dukkhanirodho'ti yathābhūtaṃ nappajānanti, ayaṃ dukkhanirodhagāminī paṭipadā'ti yathābhūtaṃ nappajānanti, te jātisaṃvattanikesu saṅkhāresu abhiramanti, jarāsaṃvattanikesu
-saṅkhāresu abhiramanti, maraṇasaṃvattanikesu saṅkhāresu abhiramanti, soka-parideva-dukkha-domanass'upāyāsasaṃvattanikesu saṅkhāresu abhiramanti.
+ye hi keci, bhikkhave, samaṇā vā brāhmaṇā vā idaṃ dukkhan'ti yathā-bhūtaṃ nappajānanti, ayaṃ dukkhasamudayo'ti yathābhūtaṃ nappajānanti, ayaṃ dukkhanirodho'ti yathābhūtaṃ nappajānanti, ayaṃ dukkhanirodhagāminī paṭipadā'ti yathābhūtaṃ nappajānanti,
 
-te jātisaṃvattanikesu saṅkhāresu abhiratā, jarāsaṃvattanikesu saṅkhāresu
-abhiratā, maraṇasaṃvattanikesu saṅkhāresu abhiratā, soka-parideva-dukkha-domanass'upāyāsasaṃvattanikesu saṅkhāresu abhiratā, jātisaṃvattanike'pi saṅkhāre abhisaṅkharonti, jarāsaṃvattanike'pi saṅkhāre abhisaṅkharonti, maraṇasaṃvattanike'pi saṅkhāre abhisaṅkharonti, soka-parideva-dukkha-domanass'upāyāsasaṃvattanikepi saṅkhāre abhisaṅkharonti.
+te jātisaṃvattanikesu saṅkhāresu abhiramanti, jarāsaṃvattanikesu saṅkhāresu abhiramanti, maraṇasaṃvattanikesu saṅkhāresu abhiramanti, soka-parideva-dukkha-domanass'upāyāsasaṃvattanikesu saṅkhāresu abhiramanti.
+
+te jātisaṃvattanikesu saṅkhāresu abhiratā, jarāsaṃvattanikesu saṅkhāresu abhiratā, maraṇasaṃvattanikesu saṅkhāresu abhiratā, soka-parideva-dukkha-domanass'upāyāsasaṃvattanikesu saṅkhāresu abhiratā, jātisaṃvattanike'pi saṅkhāre abhisaṅkharonti, jarāsaṃvattanike'pi saṅkhāre abhisaṅkharonti, maraṇasaṃvattanike'pi saṅkhāre abhisaṅkharonti, soka-parideva-dukkha-domanass'upāyāsasaṃvattanikepi saṅkhāre abhisaṅkharonti.
 
 te jātisaṃvattanike'pi saṅkhāre abhisaṅkharitvā, jarāsaṃvattanike'pi saṅkhāre abhisaṅkharitvā, maraṇasaṃvattanike'pi saṅkhāre abhisaṅkharitvā, soka-parideva-dukkha-domanass'upāyāsasaṃvattanikepi saṅkhāre abhisaṅkharitvā, jātipapātam'pi papatanti, jarāpapātam'pi papatanti, maraṇapapātam'pi papatanti, soka-parideva-dukkha-domanass'upāyāsapapātam'pi papatanti.
 
-te na parimuccanti jātiyā jarāya maraṇena sokehi paridevehi dukkhehi
-domanassehi upāyāsehi.
+te na parimuccanti jātiyā jarāya maraṇena sokehi paridevehi dukkhehi domanassehi upāyāsehi.
 
 na parimuccanti dukkhasmā'ti vadāmi.
 
 ye ca kho keci, bhikkhave, samaṇā vā brāhmaṇā vā idaṃ dukkhan'ti
-yathābhūtaṃ pajānanti … ayaṃ dukkhanirodhagāminī paṭipadā'ti
-yathābhūtaṃ pajānanti, te jātisaṃvattanikesu saṅkhāresu n'ābhiramanti….
 
-te jātisaṃvattanikesu saṅkhāresu anabhiratā … jātisaṃvattanike'pi saṅkhāre n'ābhisaṅkharonti….
+yathābhūtaṃ pajānanti, te jātisaṃvattanikesu saṅkhāresu n'ābhiramanti.
 
-te jātisaṃvattanike'pi saṅkhāre anabhisaṅkharitvā … jātipapātam'pi nappapatanti, jarāpapātam'pi nappapatanti, maraṇapapātam'pi nappapatanti, soka-parideva-dukkha-domanass'upāyāsapapātampi nappapatanti.
+te jātisaṃvattanikesu saṅkhāresu anabhiratā
+
+jātisaṃvattanike'pi saṅkhāre n'ābhisaṅkharonti
+
+jātipapātam'pi nappapatanti, jarāpapātam'pi nappapatanti, maraṇapapātam'pi nappapatanti, soka-parideva-dukkha-domanass'upāyāsapapātampi nappapatanti.
 
 te parimuccanti jātiyā jarāya maraṇena sokehi paridevehi dukkhehi
 domanassehi upāyāsehi.
@@ -276,10 +239,9 @@ SUTTA: sn56.44 kūṭāgārasuttaṃ
 
 yo hi, bhikkhave, evaṃ vadeyya, ahaṃ dukkhaṃ ariyasaccaṃ yathābhūtaṃ anabhisamecca … dukkhanirodhagāminiṃ paṭipadaṃ ariyasaccaṃ yathābhūtaṃ anabhisamecca sammā dukkhass'antaṃ karissāmī'ti, n'etaṃ ṭhānaṃ vijjati.
 
-seyyathā'pi, bhikkhave, yo evaṃ vadeyya, ahaṃ kūṭ'āgārassa heṭṭhimaṃ
-gharaṃ akaritvā uparimaṃ gharaṃ āropessāmī'ti, n'etaṃ ṭhānaṃ vijjati,
-evam'eva kho, bhikkhave, yo evaṃ vadeyya, ahaṃ dukkhaṃ ariyasaccaṃ
-yathābhūtaṃ anabhisamecca … dukkhanirodhagāminiṃ paṭipadaṃ
+seyyathā'pi, bhikkhave, yo evaṃ vadeyya, ahaṃ kūṭ'āgārassa heṭṭhimaṃ gharaṃ akaritvā uparimaṃ gharaṃ āropessāmī'ti, n'etaṃ ṭhānaṃ vijjati, evam'eva kho, bhikkhave, yo evaṃ vadeyya, ahaṃ dukkhaṃ ariyasaccaṃ yathābhūtaṃ anabhisamecca
+
+dukkhanirodhagāminiṃ paṭipadaṃ
 ariyasaccaṃ yathābhūtaṃ anabhisamecca sammā dukkhass'antaṃ karissāmī'ti, n'etaṃ ṭhānaṃ vijjati.
 
 yo ca kho, bhikkhave, evaṃ vadeyya, ahaṃ dukkhaṃ ariyasaccaṃ

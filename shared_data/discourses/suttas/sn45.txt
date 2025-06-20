@@ -12,7 +12,19 @@ kalyāṇamittass'etaṃ, ānanda, bhikkhuno pāṭikaṅkhaṃ kalyāṇasahāy
 
 kathañ'c'ānanda, bhikkhu kalyāṇamitto kalyāṇasahāyo kalyāṇasampavaṅko ariyaṃ aṭṭh'aṅgikaṃ maggaṃ bhāveti, ariyaṃ aṭṭh'aṅgikaṃ maggaṃ bahulīkaroti?
 
-idh'ānanda, bhikkhu sammādiṭṭhiṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ, sammāsaṅkappaṃ bhāveti vivekanissitaṃ … sammāvācaṃ bhāveti … sammākammantaṃ bhāveti … sammāājīvaṃ bhāveti … sammāvāyāmaṃ bhāveti … sammāsatiṃ bhāveti … sammāsamādhiṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ.
+idh'ānanda, bhikkhu sammādiṭṭhiṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ, sammāsaṅkappaṃ bhāveti vivekanissitaṃ
+
+sammāvācaṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ
+
+sammākammantaṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ
+
+sammāājīvaṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ
+
+sammāvāyāmaṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ
+
+sammāsatiṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ
+
+sammāsamādhiṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ.
 
 evaṃ kho, ānanda, bhikkhu kalyāṇamitto kalyāṇasahāyo kalyāṇasampavaṅko ariyaṃ aṭṭh'aṅgikaṃ maggaṃ bhāveti, ariyaṃ aṭṭh'aṅgikaṃ maggaṃ bahulīkaroti.
 
@@ -24,16 +36,11 @@ iminā kho etaṃ, ānanda, pariyāyena veditabbaṃ yathā sakalam'ev'idaṃ br
 
 SUTTA: sn45.5 kimatthiyasuttaṃ
 
-
-atha kho sambahulā bhikkhū yena bhagavā ten'upasaṅkamiṃsu … ekam'antaṃ nisīdiṃsu.
-
 ekam'antaṃ nisinnā kho te bhikkhū bhagavantaṃ etadavocuṃ, idha no, bhante, aññatitthiyā paribbājakā amhe evaṃ pucchanti, kim'atthiyaṃ, āvuso, samaṇe gotame brahmacariyaṃ vussatī'ti?
 
 evaṃ puṭṭhā mayaṃ, bhante, tesaṃ aññatitthiyānaṃ paribbājakānaṃ evaṃ byākaroma, dukkhassa kho, āvuso, pariññ'atthaṃ bhagavati brahmacariyaṃ vussatī'ti.
 
 kacci mayaṃ, bhante, evaṃ puṭṭhā evaṃ byākaramānā vuttavādino c'eva bhagavato homa, na ca bhagavantaṃ abhūtena abbhācikkhāma, dhammassa c'ānudhammaṃ byākaroma, na ca koci sahadhammiko vād'ānuvādo gārayhaṃ ṭhānaṃ āgacchatī'ti?
-
-2.
 
 taggha tumhe, bhikkhave, evaṃ puṭṭhā evaṃ byākaramānā vuttavādino c'eva me hotha, na ca maṃ abhūtena abbhācikkhatha, dhammassa c'ānudhammaṃ byākarotha, na ca koci sahadhammiko vād'ānuvādo gārayhaṃ ṭhānaṃ āgacchati.
 
@@ -42,8 +49,6 @@ dukkhassa hi pariññ'atthaṃ mayi brahmacariyaṃ vussati.
 sace vo, bhikkhave, aññatitthiyā paribbājakā evaṃ puccheyyuṃ, atthi pan'āvuso, maggo, atthi paṭipadā etassa dukkhassa pariññāyā'ti, evaṃ puṭṭhā tumhe, bhikkhave, tesaṃ aññatitthiyānaṃ paribbājakānaṃ evaṃ byākareyyātha, atthi kho, āvuso, maggo, atthi paṭipadā etassa dukkhassa pariññāyā'ti.
 
 katamo ca, bhikkhave, maggo, katamā paṭipadā etassa dukkhassa pariññāyā'ti?
-
-ayam'eva ariyo aṭṭh'aṅgiko maggo, seyyath'idaṃ, sammādiṭṭhi … sammāsamādhi.
 
 ayaṃ, bhikkhave, maggo, ayaṃ paṭipadā etassa dukkhassa pariññāyā'ti.
 
@@ -60,8 +65,6 @@ evaṃ, bhante'ti kho te bhikkhū bhagavato paccassosuṃ.
 bhagavā etadavoca
 
 katamo ca, bhikkhave, ariyo aṭṭh'aṅgiko maggo?
-
-seyyath'idaṃ, sammādiṭṭhi … sammāsamādhi.
 
 katamā ca, bhikkhave, sammādiṭṭhi?
 
@@ -85,7 +88,11 @@ idha, bhikkhave, ariyasāvako micchāājīvaṃ pahāya sammāājīvena jīvita�
 
 katamo ca, bhikkhave, sammāvāyāmo?
 
-idha, bhikkhave, bhikkhu anuppannānaṃ pāpakānaṃ akusalānaṃ dhammānaṃ anuppādāya chandaṃ janeti vāyamati vīriyaṃ ārabhati cittaṃ paggaṇhāti padahati, uppannānaṃ pāpakānaṃ akusalānaṃ dhammānaṃ pahānāya chandaṃ janeti … anuppannānaṃ kusalānaṃ dhammānaṃ uppādāya chandaṃ janeti … uppannānaṃ kusalānaṃ dhammānaṃ ṭhitiyā asammosāya bhiyyobhāvāya vepullāya bhāvanāya pāripūriyā chandaṃ janeti vāyamati vīriyaṃ ārabhati cittaṃ paggaṇhāti padahati, ayaṃ vuccati, bhikkhave, sammāvāyāmo.
+idha, bhikkhave, bhikkhu anuppannānaṃ pāpakānaṃ akusalānaṃ dhammānaṃ anuppādāya chandaṃ janeti vāyamati vīriyaṃ ārabhati cittaṃ paggaṇhāti padahati, uppannānaṃ pāpakānaṃ akusalānaṃ dhammānaṃ pahānāya chandaṃ janeti
+
+anuppannānaṃ kusalānaṃ dhammānaṃ uppādāya chandaṃ janeti
+
+uppannānaṃ kusalānaṃ dhammānaṃ ṭhitiyā asammosāya bhiyyobhāvāya vepullāya bhāvanāya pāripūriyā chandaṃ janeti vāyamati vīriyaṃ ārabhati cittaṃ paggaṇhāti padahati, ayaṃ vuccati, bhikkhave, sammāvāyāmo.
 
 katamā ca, bhikkhave, sammāsati?
 
@@ -107,9 +114,7 @@ gihino v'āhaṃ, bhikkhave, pabbajitassa vā micchāpaṭipadaṃ na vaṇṇem
 
 gihi vā, bhikkhave, pabbajito vā micchāpaṭipanno micchāpaṭipatt'ādhikaraṇahetu n'ārādhako hoti ñāyaṃ dhammaṃ kusalaṃ.
 
-katamā ca, bhikkhave, micchāpaṭipadā?
-
-seyyath'idaṃ, micchādiṭṭhi … micchāsamādhi.
+katamā ca, bhikkhave, micchāpaṭipadā? seyyath'idaṃ, micchādiṭṭhi ... micchāsamādhi.
 
 ayaṃ vuccati, bhikkhave, micchāpaṭipadā.
 
@@ -121,9 +126,7 @@ gihino v'āhaṃ, bhikkhave, pabbajitassa vā sammāpaṭipadaṃ vaṇṇemi.
 
 gihi vā, bhikkhave, pabbajito vā sammāpaṭipanno sammāpaṭipatt'ādhikaraṇahetu ārādhako hoti ñāyaṃ dhammaṃ kusalaṃ.
 
-katamā ca, bhikkhave, sammāpaṭipadā?
-
-seyyath'idaṃ, sammādiṭṭhi … sammāsamādhi.
+katamā ca, bhikkhave, sammāpaṭipadā? seyyath'idaṃ, sammādiṭṭhi ... sammāsamādhi.
 
 ayaṃ vuccati, bhikkhave, sammāpaṭipadā.
 
@@ -140,7 +143,9 @@ kalyāṇamittass'etaṃ, bhikkhave, bhikkhuno pāṭikaṅkhaṃ, ariyaṃ aṭ
 
 kathañ'ca, bhikkhave, bhikkhu kalyāṇamitto ariyaṃ aṭṭh'aṅgikaṃ maggaṃ bhāveti, ariyaṃ aṭṭh'aṅgikaṃ maggaṃ bahulīkaroti?
 
-idha, bhikkhave, bhikkhu sammādiṭṭhiṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ … sammāsamādhiṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ.
+idha, bhikkhave, bhikkhu sammādiṭṭhiṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ
+
+sammāsamādhiṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ.
 
 evaṃ kho, bhikkhave, bhikkhu kalyāṇamitto ariyaṃ aṭṭh'aṅgikaṃ maggaṃ bhāveti, ariyaṃ aṭṭh'aṅgikaṃ maggaṃ bahulīkarotī'ti.
 
@@ -150,7 +155,9 @@ seyyathā'pi, bhikkhave, gaṅgā nadī pācīnaninnā pācīnapoṇā pācīnap
 
 kathañ'ca, bhikkhave, bhikkhu ariyaṃ aṭṭh'aṅgikaṃ maggaṃ bhāvento ariyaṃ aṭṭh'aṅgikaṃ maggaṃ bahulīkaronto nibbānaninno hoti nibbānapoṇo nibbānapabbhāro?
 
-idha, bhikkhave, bhikkhu sammādiṭṭhiṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ … sammāsamādhiṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ.
+idha, bhikkhave, bhikkhu sammādiṭṭhiṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ
+
+sammāsamādhiṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ.
 
 evaṃ kho, bhikkhave, bhikkhu ariyaṃ aṭṭh'aṅgikaṃ maggaṃ bhāvento ariyaṃ aṭṭh'aṅgikaṃ maggaṃ bahulīkaronto nibbānaninno hoti nibbānapoṇo nibbānapabbhāroti.
 
@@ -158,7 +165,9 @@ SUTTA: sn45.103 paṭhamapācīnaninnasuttaṃ
 
 kathañ'ca, bhikkhave, bhikkhu ariyaṃ aṭṭh'aṅgikaṃ maggaṃ bhāvento ariyaṃ aṭṭh'aṅgikaṃ maggaṃ bahulīkaronto nibbānaninno hoti nibbānapoṇo nibbānapabbhāro?
 
-idha, bhikkhave, bhikkhu sammādiṭṭhiṃ bhāveti rāgavinayapariyosānaṃ dosavinayapariyosānaṃ mohavinayapariyosānaṃ … sammāsamādhiṃ bhāveti rāgavinayapariyosānaṃ dosavinayapariyosānaṃ mohavinayapariyosānaṃ.
+idha, bhikkhave, bhikkhu sammādiṭṭhiṃ bhāveti rāgavinayapariyosānaṃ dosavinayapariyosānaṃ mohavinayapariyosānaṃ
+
+sammāsamādhiṃ bhāveti rāgavinayapariyosānaṃ dosavinayapariyosānaṃ mohavinayapariyosānaṃ.
 
 evaṃ kho, bhikkhave, bhikkhu ariyaṃ aṭṭh'aṅgikaṃ maggaṃ bhāvento ariyaṃ aṭṭh'aṅgikaṃ maggaṃ bahulīkaronto nibbānaninno hoti nibbānapoṇo nibbānapabbhāroti.
 
@@ -190,4 +199,8 @@ yañ'hi taṃ, bhikkhave, cittaṃ dīgharattaṃ vivekaninnaṃ vivekapoṇaṃ
 
 kathañ'ca, bhikkhave, bhikkhu ariyaṃ aṭṭh'aṅgikaṃ maggaṃ bhāveti ariyaṃ aṭṭh'aṅgikaṃ maggaṃ bahulīkaroti?
 
-idha, bhikkhave, bhikkhu sammādiṭṭhiṃ bhāveti vivekanissitaṃ … sammāsamādhiṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ … evaṃ kho, bhikkhave, bhikkhu ariyaṃ aṭṭh'aṅgikaṃ maggaṃ bhāveti, ariyaṃ aṭṭh'aṅgikaṃ maggaṃ bahulīkarotī'ti.
+idha, bhikkhave, bhikkhu sammādiṭṭhiṃ bhāveti vivekanissitaṃ
+
+sammāsamādhiṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ
+
+evaṃ kho, bhikkhave, bhikkhu ariyaṃ aṭṭh'aṅgikaṃ maggaṃ bhāveti, ariyaṃ aṭṭh'aṅgikaṃ maggaṃ bahulīkarotī'ti.

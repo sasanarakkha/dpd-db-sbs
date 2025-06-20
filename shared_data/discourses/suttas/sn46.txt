@@ -6,7 +6,17 @@ evam'eva kho, bhikkhave, bhikkhu sīlaṃ nissāya sīle patiṭṭhāya satta b
 
 kathañ'ca, bhikkhave, bhikkhu sīlaṃ nissāya sīle patiṭṭhāya satta bojjh'aṅge bhāvento satta bojjh'aṅge bahulīkaronto mahantattaṃ vepullattaṃ pāpuṇāti dhammesū'ti?
 
-idha, bhikkhave, bhikkhu satisambojjh'aṅgaṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ, dhammavicayasambojjh'aṅgaṃ bhāveti … vīriyasambojjh'aṅgaṃ bhāveti … pītisambojjhaṅgaṃ bhāveti … passaddhisambojjhaṅgaṃ bhāveti … samādhisambojjhaṅgaṃ bhāveti … upekkhāsambojjhaṅgaṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ.
+idha, bhikkhave, bhikkhu satisambojjh'aṅgaṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ, dhammavicayasambojjh'aṅgaṃ bhāveti
+
+vīriyasambojjh'aṅgaṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ
+
+pītisambojjhaṅgaṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ,
+
+passaddhisambojjhaṅgaṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ,
+
+samādhisambojjhaṅgaṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ,
+
+upekkhāsambojjhaṅgaṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ.
 
 evaṃ kho, bhikkhave, bhikkhu sīlaṃ nissāya sīle patiṭṭhāya satta bojjh'aṅge bhāvento satta bojjh'aṅge bahulīkaronto mahantattaṃ vepullattaṃ pāpuṇāti dhammesū'ti.
 
@@ -130,13 +140,17 @@ yasmiṃ samaye, bhikkhave, bhikkhu tathāsamāhitaṃ cittaṃ sādhukaṃ ajjh
 
 SUTTA: sn46.5 bhikkhusuttaṃ
 
-atha kho aññataro bhikkhu yena bhagavā ten'upasaṅkami … ekam'antaṃ nisinno kho so bhikkhu bhagavantaṃ etadavoca, bojjh'aṅgā, bojjh'aṅgā'ti, bhante, vuccanti.
+atha kho aññataro bhikkhu yena bhagavā ten'upasaṅkami
+
+ekam'antaṃ nisinno kho so bhikkhu bhagavantaṃ etadavoca, bojjh'aṅgā, bojjh'aṅgā'ti, bhante, vuccanti.
 
 kittāvatā nu kho, bhante, bojjh'aṅgā'ti vuccantī'ti?
 
 bodhāya saṃvattantī'ti kho, bhikkhu, tasmā bojjh'aṅgā'ti vuccanti.
 
-idha, bhikkhu, satisambojjh'aṅgaṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ … upekkhāsambojjhaṅgaṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ.
+idha, bhikkhu, satisambojjh'aṅgaṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ
+
+upekkhāsambojjhaṅgaṃ bhāveti vivekanissitaṃ virāganissitaṃ nirodhanissitaṃ vossaggapariṇāmiṃ.
 
 tass'ime satta bojjh'aṅge bhāvayato kām'āsavā'pi cittaṃ vimuccati, bhav'āsavā'pi cittaṃ vimuccati, avijj'āsavā'pi cittaṃ vimuccati.
 

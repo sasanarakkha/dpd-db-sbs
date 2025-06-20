@@ -9,8 +9,8 @@ Pali: so tathāgataṃ pūjeti paramāya pūjāya
 English Translation: He honors the Buddha with the highest veneration.
 
 Sutta Number: DN16.14
-Pali: assosuṃ mallā, bhagavā kusinārāyaṃ parinibbuto’ti
-English Translation: The Mallans heard, “The Blessed One had final Nibbāna in Kusinara”
+Pali: assosuṃ mallā, bhagavā kusinārāyaṃ parinibbuto'ti
+English Translation: The Mallans heard, "The Blessed One had final Nibbāna in Kusinara"
 
 Sutta Number: AN8.53
 Pali: ekaṃ samayaṃ bhagavā vesāliyaṃ viharati mahāvane kūṭāgāra-sālāyaṃ
@@ -21,7 +21,7 @@ Pali: bhikkhu seyyathāpi passeyya sarīraṃ sivathikāya chaḍḍitaṃ
 English Translation: Imagine if a monk could see a dead body discarded in a charnel ground.
 
 Sutta Number: MN14
-Pali: kin’ti me bhoge na corā hareyyuṃ
+Pali: kin'ti me bhoge na corā hareyyuṃ
 English Translation: How then could thieves not steal my valuables?
 
 Sutta Number: AN7.61
@@ -33,15 +33,15 @@ Pali: so aparena samayena tamhā ābādhā mucceyya
 English Translation: After some time, he could become free from that illness.
 
 Sutta Number: VIN PAT PC 57
-Pali: yo pana bhikkhu oren’addhamāsaṃ nahāyeyya, pācittiyan’ti
-English Translation: whichever monk should bathe within half a month, that is a pācittiya (a case requiring confession).
+Pali: yo pana bhikkhu oren'addhamāsaṃ nahāyeyya, pācittiyaṃ
+English Translation: whichever monk should bathe within half a month, that is an offence requiring confession.
 
 Sutta Number: VIN PAT PA 2
 Pali: rājāno coraṃ gahetvā haneyyuṃ vā bandheyyuṃ vā pabbājeyyuṃ vā
-English Translation: The king’s men, having captured a thief, could kill (him) or imprison him or banish him.
+English Translation: The king's men, having captured a thief, could kill (him) or imprison him or banish him.
 
 Sutta Number: DN10
-Pali: te tāvataken’eva attamanā assu
+Pali: te tāvataken'eva attamanā assu
 English Translation: With just this much they would be pleased.
 
 Sutta Number: SN22.3
@@ -61,16 +61,16 @@ Pali: evaṃ no ayaṃ amhākaṃ pabbajjā avaṅkatā avañjhā bhaveyya
 English Translation: In this way, indeed, our renunciation would not be sterile, would not be dishonest.
 
 Sutta Number: MN107 (simpl)
-Pali: abhijjhaṃ loke pajaheyyuṃ vigat’ābhijjhena cetasā vihareyyuṃ; abhijjhāya cittaṃ parisodheyyuṃ
+Pali: abhijjhaṃ loke pajaheyyuṃ vigat'ābhijjhena cetasā vihareyyuṃ; abhijjhāya cittaṃ parisodheyyuṃ
 English Translation: They would abandon covetousness with reference to the world, they would dwell with a mind free from covetousness, they would purify the mind from covetousness.
 
 Sutta Number: DN16.36 (simpl)
 Pali: siyā kho pana ananda, tumhākaṃ evaṃ assa — "n'atthi no satthā" iti.
-English Translation: And now, Ananda, it could be thus would occur to you: “there is no teacher for us.”
+English Translation: And now, Ananda, it could be thus would occur to you: "There is no teacher for us."
 
 Sutta Number: AN8.53
 Pali: ye kho tvaṃ dhamme jāneyyāsi
-English Translation: Indeed, whatever things you might know…
+English Translation: Indeed, whatever things you might know
 
 Sutta Number: SNP16
 Pali: devatā bhagavantaṃ gāthāya ajjhabhāsi
@@ -81,11 +81,11 @@ Pali: so tatonidānaṃ labheyya pāmojjaṃ, adhigaccheyya somanassaṃ
 English Translation: Because of that he would obtain gladness, he would experience pleasure.
 
 Sutta Number: MN131
-Pali: atītaṃ n’ānvāgameyya, nappaṭikaṅkhe anāgataṃ.
+Pali: atītaṃ n'ānvāgameyya, nappaṭikaṅkhe anāgataṃ.
 English Translation: He should not return to the past, he should not anticipate the future.
 
 Sutta Number: SN22.80
-Pali: n’atthi taṃ kiñci lokasmiṃ yaṃ ahaṃ upādiyamāno na vajjavā assaṃ.
+Pali: n'atthi taṃ kiñci lokasmiṃ yaṃ ahaṃ upādiyamāno na vajjavā assaṃ.
 English Translation: There is not anything in the world which I am grasping [and] would not be with faults [i.e. and would not be blameworthy].
 
 Sutta Number: DN1.1
@@ -98,33 +98,33 @@ English Translation: In this regard, householder, some think [lit: there is thus
 
 Sutta Number: MN25 (simpl)
 Pali: mayaṃ migajātānaṃ āsayaṃ passeyyāma, yattha te gāhaṃ gaccheyyun'ti.
-English Translation: “We could see the dwelling of a species of deer, where they would go [for] a hiding place.”
+English Translation: "We could see the dwelling of a species of deer, where they would go [for] a hiding place."
 
 Sutta Number: VIN PAT SA 3 (simpl)
 Pali: yo pana bhikkhu mātugāmaṃ duṭṭhullāhi vācāhi obhāseyya
-English Translation: If any monk should speak to a woman coarsely by means of obscene words…
+English Translation: If any monk should speak to a woman coarsely by means of obscene words
 
 Sutta Number: AN8.30 (simpl)
 Pali: idha bhikkhuno pavivittassa viharato bhaveyyuṃ upasaṅkamitāro bhikkhū upāsakā upāsikāyo
 English Translation: In this regard, for a monk dwelling secluded, visitors would (come) - monks, male lay disciples, [and] female lay disciples.
 
 Sutta Number: MN2.4
-Pali: yāva’d’eva uppannānaṃ veyyābādhikānaṃ vedanānaṃ paṭighātāya abyāpajjhaparamatāya
+Pali: yāva'd'eva uppannānaṃ veyyābādhikānaṃ vedanānaṃ paṭighātāya abyāpajjhaparamatāya
 English Translation: Only as much as for the freedom from oppressive pain at the most, for the warding off of oppressive feelings that have arisen.
 
 Class 7 Extra
 
 Sutta Number: MN104
-Pali: ime ce tumhe cha sāraṇīye dhamme samādāya vatteyyātha, passatha no tumhe taṃ vacanapathaṃ, aṇuṃ vā thūlaṃ vā, yaṃ tumhe n’ādhivāseyyātha?
+Pali: ime ce tumhe cha sāraṇīye dhamme samādāya vatteyyātha, passatha no tumhe taṃ vacanapathaṃ, aṇuṃ vā thūlaṃ vā, yaṃ tumhe n'ādhivāseyyātha?
 English Translation: If you could practice undertaking these six cordial things, do you see any way of saying things (i.e. mode of expression), gross or subtle, which you could not tolerate?
 
 Sutta Number: AN7.23
-Pali: bhikkhave, bhikkhū paccattaṃ satiṃ upaṭṭhāpessanti: “kin’ti anāgatā ca pesalā sabrahmacārī āgaccheyyuṃ, āgatā ca pesalā sabrahmacārī phāsuṃ vihareyyuṃ?” iti
-English Translation: Bhikkhus, the monks will establish mindfulness individually [with the intention]: “How then well-behaved fellow monks [who] have not come could come and (how) well-behaved monks [who] have come could dwell at ease?”
+Pali: bhikkhave, bhikkhū paccattaṃ satiṃ upaṭṭhāpessanti: kin'ti anāgatā ca pesalā sabrahmacārī āgaccheyyuṃ, āgatā ca pesalā sabrahmacārī phāsuṃ vihareyyuṃ? iti
+English Translation: Bhikkhus, the monks will establish mindfulness individually [with the intention]: "How then well-behaved fellow monks [who] have not come could come and (how) well-behaved monks [who] have come could dwell at ease?"
 
 Sutta Number: VIN PAT PC 49
 Pali: siyā ca tassa bhikkhuno koci'd'eva paccayo senaṃ gamanāya
-English Translation: And if there might be some or other reason for that monk for going to see an army…
+English Translation: And if there might be some or other reason for that monk for going to see an army
 
 Sutta Number: UD69
 Pali: kiṃ kareyya udapānena, āpā ce sabbadā siyuṃ, taṇhāya mūlato chetvā, kissa pariyesanaṃ care?

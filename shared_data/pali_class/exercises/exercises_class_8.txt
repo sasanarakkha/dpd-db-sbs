@@ -13,7 +13,7 @@ Pali: mahānadiyo mahāsamuddaṃ patvā jahanti purimāni nāmagottāni
 English Translation: The great rivers, upon reaching the mighty ocean, they give up (their) old names.
 
 Sutta Number: UD45
-Pali: mahāmoggallāno taṃ puggalaṃ bāhāyaṃ gahetvā nikkhāmetvā yena bhagavā ten’upasaṅkami.
+Pali: mahāmoggallāno taṃ puggalaṃ bāhāyaṃ gahetvā nikkhāmetvā yena bhagavā ten'upasaṅkami.
 English Translation: The Great Mogallana seized that person by the arm, expelled (him), then approached the Blessed One.
 
 Sutta Number: SN47.10
@@ -53,8 +53,8 @@ Pali: kaṇhaṃ dhammaṃ vippahāya, sukkaṃ bhāve paṇḍito, okā anoka�
 English Translation: A wise person, completely abandoning dark qualities, would cultivate pure [qualities], coming from home to homelessness, [living] in seclusion, where [it is] difficult to find delight.
 
 Sutta Number: MN27 (simpl)
-Pali: yan’nūn’āhaṃ kesamassuṃ ohāretvā kāsāyāni vatthāni acchādetvā agārasmā anagāriyaṃ pabbajeyyāmi
-English Translation: Having shaved hair and beard, and having clothed myself in brown robes, let me go forth from the household life to homelessness. [What if I shave hair and beard, clothe myself in brown robes and go forth…?]
+Pali: yan'nūn'āhaṃ kesamassuṃ ohāretvā kāsāyāni vatthāni acchādetvā agārasmā anagāriyaṃ pabbajeyyāmi
+English Translation: Having shaved hair and beard, and having clothed myself in brown robes, let me go forth from the household life to homelessness. [What if I shave hair and beard, clothe myself in brown robes and go forth?]
 
 Sutta Number: MN118
 Pali: idha bhikkhu pallaṅkaṃ ābhujitvā, ujuṃ kāyaṃ paṇidhāya, parimukhaṃ satiṃ upaṭṭhapetvā.
@@ -66,23 +66,23 @@ English Translation: On one occasion, the Blessed One was dwelling in Varanasi, 
 
 Sutta Number: VIN PAT SA 5
 Pali: yo pana bhikkhu sañcarittaṃ samāpajjeyya itthiyā vā purisamatiṃ purisassa vā itthimatiṃ
-English Translation: If any monk should engage in carrying proposals of man’s intention to a woman or woman’s intention to a man…
+English Translation: If any monk should engage in carrying proposals of man's intention to a woman or woman's intention to a man
 
 Sutta Number: VIN PAT SA 11 (simpl)
 Pali: dhammavādī ca eso bhikkhu vinayavādī ca eso bhikkhu amhākaṃ ca eso bhikkhu chandaṃ ca ruciṃ ca ādāya voharati
-English Translation: This monk who speaks according to the Dhamma, and this monk who speaks according to the Vinaya, speaks according to (i.e. in accordance with) our preference and approval…
+English Translation: This monk who speaks according to the Dhamma, and this monk who speaks according to the Vinaya, speaks according to (i.e. in accordance with) our preference and approval
 
 Sutta Number: VIN PAT SA
 Pali: ciṇṇamānatto bhikkhu yattha siyā vīsatigaṇo bhikkhusaṅgho tattha so bhikkhu abbhetabbo.
 English Translation: A monk who has performed penance, where there could be a community of twenty monks, in that place he should be rehabilitated.
 
 Sutta Number: VIN PAT PC 42
-Pali: ekakassa me kathā vā nisajjā vā phāsu hotī”ti, etaṃ eva paccayaṃ karitvā anaññaṃ, pācittiyaṃ.
-English Translation: “There is ease for me talking or sitting down by myself;” having made this just for that reason, [and] no other, [this is] an offence requiring confession.
+Pali: ekakassa me kathā vā nisajjā vā phāsu hotī'ti, etaṃ eva paccayaṃ karitvā anaññaṃ, pācittiyaṃ.
+English Translation: "There is ease for me talking or sitting down by myself;" having made this just for that reason, [and] no other, [this is] an offence requiring confession.
 
 Sutta Number: MN107
 Pali: rattiyā majjhimaṃ yāmaṃ dakkhiṇena passena sīhaseyyaṃ kappeyyāsi pāde pādaṃ accādhāya sato sampajāno uṭṭhānasaññaṃ manasikaritvā
-English Translation: In the middle watch of the night, you should make the lion’s pose, [lying] on the right flank, placing [one] foot on the [other] foot, mindful, fully knowing, having noted in the mind the wake-up time.
+English Translation: In the middle watch of the night, you should make the lion's pose, [lying] on the right flank, placing [one] foot on the [other] foot, mindful, fully knowing, having noted in the mind the wake-up time.
 
 Sutta Number: MN62 (simpl)
 Pali: atha kho āyasmā rāhulo, ajja bhagavatā sammukhā ovādena ovadito gāmaṃ piṇḍāya pavisitvā, tato paṭinivattitvā aññatarasmiṃ rukkhamūle nisīditvā
@@ -97,8 +97,8 @@ Pali: dve kho, āvuso, paccayā animittāya cetovimuttiyā samāpattiyā, sabban
 English Translation: Friend, [there are] indeed two supporting conditions for the attainment of the signless liberation of mind: non-attention to all objects and attention to the signless state.
 
 Sutta Number: SN15.1
-Pali: ayaṃ me mātā, tassā me mātu ayaṃ mātā iti, apariyādinnā va bhikkhave, tassa purisassa mātumātaro assu.
-English Translation: “This [is] my mother, this [is] the mother of my mother”; [the sequence] of that man’s mothers’ mothers would not even be exhausted.
+Pali: ayaṃ me mātā, tassā me mātu ayaṃ mātā iti, apariyādinnā eva bhikkhave, tassa purisassa mātumātaro assu.
+English Translation: "This [is] my mother, this [is] the mother of my mother"; [the sequence] of that man's mothers' mothers would not even be exhausted.
 
 Sutta Number: VIN1.3.1
 Pali: mātugāmo nāma manuss'itthī, na yakkhī na petī na tiracchānagatā. antamaso tad'ahujātā api dārikā, pag'eva mahattarī.
@@ -121,7 +121,7 @@ English Translation: He strives, applies [his] mind, arouses effort, exerts hims
 
 Sutta Number: VIN PAT NP 3 (simpl)
 Pali: no ce assa pāripūri, māsaparamaṃ so bhikkhu taṃ cīvaraṃ nikkhipeyya, ce assa ūnassa pāripūriyā paccāsā.
-English Translation: If it [i.e. the robe-cloth] should not be [enough] for completion, that monk should set [it] aside for a month at the most if there should be the expectation for the completion of the deficiency…
+English Translation: If it [i.e. the robe-cloth] should not be [enough] for completion, that monk should set [it] aside for a month at the most if there should be the expectation for the completion of the deficiency
 
 Sutta Number: SNP56
 Pali: yattha nāmaṃ ca rūpaṃ ca asesaṃ uparujjhati, viññāṇassa nirodhena, ettha etaṃ uparujjhati.

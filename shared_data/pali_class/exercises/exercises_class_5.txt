@@ -26,7 +26,7 @@ English Translation: Neither for fun, nor for intoxication, nor for adornment, n
 
 Sutta Number: DN16.32
 Pali: alaṃ ānanda mā soci mā paridevi
-English Translation: Stop Ānanda, don’t cry, don’t lament!
+English Translation: Stop Ānanda, don't cry, don't lament!
 
 Sutta Number: AN3.21
 Pali: upasaṅkamitvā āyasmatā sāriputtena saddhiṃ sammodiṃsu
@@ -38,11 +38,11 @@ English Translation: False teaching leads to no good fortune, the Teaching leads
 
 Sutta Number: MN118 (simpl)
 Pali: pītiṃ paṭisaṃvedī assasissāmi iti sikkhati.
-English Translation: One trains thus: “I will breathe in experiencing delight.”
+English Translation: One trains thus: "I will breathe in experiencing delight."
 
 Sutta Number: MN118 (simpl)
 Pali: aniccaṃ anupassī passasissāmi iti sikkhati
-English Translation: One trains thus: “I will breathe out, observing impermanence.”
+English Translation: One trains thus: "I will breathe out, observing impermanence."
 
 Sutta Number: MN48 (simpl)
 Pali: bhikkhu sabrahmacārīhi saddhiṃ bhogī hoti
@@ -70,7 +70,7 @@ English Translation: Let my volitional formations be thus, let my volitional for
 
 Sutta Number: SN35.28
 Pali: ekaṃ samayaṃ bhagavā gayāyaṃ viharati gayāsīse saddhiṃ bhikkhusahassena.
-English Translation: On one occasion the Blessed One was dwelling in Gayā at Gayā’s Head together with a thousand monks. (historical past)
+English Translation: On one occasion the Blessed One was dwelling in Gayā at Gayā's Head together with a thousand monks. (historical past)
 
 Sutta Number: SN56.35 (simpl)
 Pali: ahaṃ saha eva sukhena, saha eva somanassena catunnaṃ ariyasaccānaṃ abhisamayaṃ vadāmi.
@@ -85,8 +85,8 @@ Pali: mā kho tumhe eso ajesi.
 English Translation: Do not indeed let this [person] defeat you.
 
 Sutta Number: SN42.2 (simpl)
-Pali: “alaṃ, gāmaṇi. mā maṃ etaṃ pucchi
-English Translation: That’s enough, leader, do not ask me this!
+Pali: alaṃ, gāmaṇi. mā maṃ etaṃ pucchi
+English Translation: That's enough, leader, do not ask me this!
 
 Sutta Number: AN6.61
 Pali: yathā no bhagavā byākarissati, tathā naṃ mayaṃ dhāressāma
@@ -141,7 +141,7 @@ Pali: ime dhammā saṃyogāya saṃvattanti, no visaṃyogāya.
 English Translation: These things lead to attachment, not to detachment.
 
 Sutta Number: MN74
-Pali: n'eva tasmiṃ samaye dukkhaṃ vedanaṃ vedeti, na adukkham’asukhaṃ vedanaṃ vedeti
+Pali: n'eva tasmiṃ samaye dukkhaṃ vedanaṃ vedeti, na adukkham'asukhaṃ vedanaṃ vedeti
 English Translation: At that time, he feels neither an unpleasant sensation nor a neutral sensation.
 
 Sutta Number: MN82
@@ -154,7 +154,7 @@ English Translation: Do not do an evil deed.
 
 Sutta Number: SN21.9
 Pali: kiṃ nu kujjhasi? mā kujjhi!
-English Translation: Why indeed are you getting angry? Don’t be angry!
+English Translation: Why indeed are you getting angry? Don't be angry!
 
 Sutta Number: MN82
 Pali: aṭṭhi tacena onaddhaṃ, saha vatthebhi sobhati.
@@ -185,8 +185,8 @@ English Translation: Go away, friend, for me there is no comfort talking or sitt
 
 Sutta Number: SNP70
 Pali: te diṭṭhiṃ n'ābhijānāmi, gotamassa yasassino.
-English Translation: I don’t understand your view; [the view] of the famous Gotama.
+English Translation: I don't understand your view; [the view] of the famous Gotama.
 
 Sutta Number: SN40.1 (simpl)
 Pali: mā, brāhmaṇa, jhānaṃ pamādo, jhāne cittaṃ saṇṭhapehi, jhāne cittaṃ ekodiṃ karohi
-English Translation: Monk, don’t be careless about meditation, you must make [your] mind stable in meditation, you must make [your] mind unified!
+English Translation: Monk, don't be careless about meditation, you must make [your] mind stable in meditation, you must make [your] mind unified!

@@ -9,7 +9,7 @@ Pali: dūrato mayaṃ āgaccheyyāma āyasmato sāriputtassa santike etassa bhā
 English Translation: We would come from far away in the presence of Ven. Sāriputta to learn the meaning of this saying.
 
 Sutta Number: SN12.61
-Pali: assutavā puthujjano n’ālaṃ nibbindituṃ n’ālaṃ virajjituṃ n’ālaṃ vimuccituṃ
+Pali: assutavā puthujjano n'ālaṃ nibbindituṃ n'ālaṃ virajjituṃ n'ālaṃ vimuccituṃ
 English Translation: An uneducated common person [is] not able to become disenchanted, [is] not able to become dispassionate, [is] not able to become free.
 
 Sutta Number: AN3.112
@@ -17,8 +17,8 @@ Pali: tīṇi imāni, bhikkhave, nidānāni kammānaṃ samudayāya. katamāni t
 English Translation: Monks, [there are] these three origins for the arising of kamma.
 
 Sutta Number: SN22.59
-Pali: yaṃ aniccaṃ dukkhaṃ vipariṇāmadhammaṃ, kallaṃ taṃ samanupassituṃ, etaṃ mama, esohamasmi, eso me attā’ti?
-English Translation: Whatever is impermanent, unsatisfactory, subject to change. Is it suitable to regard that [as]: “this is mine, I am this, this is my self”?
+Pali: yaṃ aniccaṃ dukkhaṃ vipariṇāmadhammaṃ, kallaṃ taṃ samanupassituṃ, etaṃ mama, esohamasmi, eso me attā'ti?
+English Translation: Whatever is impermanent, unsatisfactory, subject to change. Is it suitable to regard that [as]: "this is mine, I am this, this is my self"?
 
 Sutta Number: AN4.42
 Pali: cattāri imāni, bhikkhave, pañha-vyākaraṇāni . katamāni cattāri?
@@ -30,7 +30,7 @@ English Translation: It is definitely suitable for you, Kalamas, to doubt, it is
 
 Sutta Number: MN13
 Pali: atha kho tesaṃ bhikkhūnaṃ etadahosi, atippago sāvatthiyaṃ piṇḍāya carituṃ, yaṃ nūna mayaṃ yena paribbājakānaṃ ārāmo tena upasaṅkameyyāmā'ti
-English Translation: And then, this [thought] occurred to those monks: It’s too early to walk for alms in Sāvatthi. Let us approach the park of the wandering ascetics.
+English Translation: And then, this [thought] occurred to those monks: It's too early to walk for alms in Sāvatthi. Let us approach the park of the wandering ascetics.
 
 Sutta Number: MN39
 Pali: seyyathāpi bhikkhave puriso odātena vatthena sasīsaṃ pārupetvā nisinno assa
@@ -41,8 +41,8 @@ Pali: samaṇo gotamo arahati bhavantaṃ kūṭadantaṃ dassanāya upasaṅkam
 English Translation: The recluse Gotama ought to visit sir Kūṭadanta to see him.
 
 Sutta Number: MN13
-Pali: atha kho te bhikkhū sāvatthiyaṃ piṇḍāya caritvā …
-English Translation: After that, those monks, having walked for alms food in Sāvatthi…
+Pali: atha kho te bhikkhū sāvatthiyaṃ piṇḍāya caritvā
+English Translation: After that, those monks, having walked for alms food in Sāvatthi
 
 Sutta Number: MN107 (simpl)
 Pali: aṇumattesu vajjesu bhayaṃ dassāvī, samādāya sikkhāhi sikkhāpadesu
@@ -53,15 +53,15 @@ Pali: ahesumha nu kho mayaṃ atītam'addhānaṃ, nanu kho ahesumha atītam'add
 English Translation: Were we in the past? Were we not in the past? What indeed were we in the past?
 
 Sutta Number: DN16.21
-Pali: taṃ assa bahujanahitāya bahujanasukhāya lok’ānukampāya atthāya hitāya sukhāya devamanussānaṃ
+Pali: taṃ assa bahujanahitāya bahujanasukhāya lok'ānukampāya atthāya hitāya sukhāya devamanussānaṃ
 English Translation: That would be for the benefit [and] the happiness of many people, out of compassion for the world, [it would be] for the benefit, advantage and comfort of gods and humans.
 
 Sutta Number: MN107
-Pali: sakkā nu kho, bho gotama, imasmiṃ dhammavinaye evam’eva anupubbasikkhā anupubbakiriyā anupubbapaṭipadā paññapetuṃ?
+Pali: sakkā nu kho, bho gotama, imasmiṃ dhammavinaye evam'eva anupubbasikkhā anupubbakiriyā anupubbapaṭipadā paññapetuṃ?
 English Translation: Master Gotama, is it possible, similarly, to describe gradual training, gradual undertaking, gradual progress in this Doctrine-and-Discipline?
 
 Sutta Number: DN16.21
-Pali: seyyathidaṃ — cattāro satipaṭṭhānā cattāro sammappadhānā cattāro iddhipādā pañc’indriyāni pañca balāni satta bojjh'aṅgā ariyo aṭṭh’aṅgiko maggo.
+Pali: seyyathidaṃ — cattāro satipaṭṭhānā cattāro sammappadhānā cattāro iddhipādā pañc'indriyāni pañca balāni satta bojjh'aṅgā ariyo aṭṭh'aṅgiko maggo.
 English Translation: [They are] as follows: four foundations of mindfulness, four right efforts, four bases for psychic power, five faculties, five mental powers, seven enlightenment factors [and] the Noble Eightfold Path.
 
 Sutta Number: SN12.2
@@ -73,7 +73,7 @@ Pali: ghānasmiṃ api nibbindati gandhesu api nibbindati ghānaviññāṇe api
 English Translation: He is disenchanted with regard to the nose, also with regard to smell, he is disenchanted with regard to nose consciousness as well, he is even disenchanted with regard to nose contact.
 
 Sutta Number: MN27
-Pali: na sukaraṃ agāraṃ ajjhāvasatā ek’antaparipuṇṇaṃ ek’antaparisuddhaṃ saṅkhalikhitaṃ brahmacariyaṃ carituṃ.
+Pali: na sukaraṃ agāraṃ ajjhāvasatā ek'antaparipuṇṇaṃ ek'antaparisuddhaṃ saṅkhalikhitaṃ brahmacariyaṃ carituṃ.
 English Translation: It is not easy [for] one domestically settled at home to live the completely perfect, completely pure holy life, polished like mother-of-pearl.
 
 Sutta Number: SN42.6
@@ -81,12 +81,12 @@ Pali: bhagavā pana, bhante, arahaṃ sammāsambuddho pahoti tathā kātuṃ yat
 English Translation: But, venerable sir, the Blessed One, the Worthy One, the Perfectly Enlightened One is able to make all the world thus, so that after the breaking up of the body, after death, that it might be reborn in a good destination, a heavenly world.
 
 Sutta Number: SN22.33
-Pali: yaṃ, bhikkhave, na tumhākaṃ, taṃ pajahatha. taṃ vo pahīnaṃ hitāya sukhāya bhavissati. kiñ’ca, bhikkhave, na tumhākaṃ?
+Pali: yaṃ, bhikkhave, na tumhākaṃ, taṃ pajahatha. taṃ vo pahīnaṃ hitāya sukhāya bhavissati. kiñ'ca, bhikkhave, na tumhākaṃ?
 English Translation: Whatever is not yours, monks, abandon that; [when] that has been abandoned by you, it will be for [your] benefit and happiness. And what, monks, is not yours?
 
 Sutta Number: MN2.2
-Pali: ‘ahaṃ nu kho asmi? no nu kho asmi? kiṃ nu kho asmi? kathaṃ nu kho asmi? ayaṃ nu kho satto kuto āgato? so kuhiṃ gāmī bhavissati iti?
-English Translation: “Am I? Am I not? What am I? How am I? From where has this living being come? Where will he be heading?”
+Pali: ahaṃ nu kho asmi? no nu kho asmi? kiṃ nu kho asmi? kathaṃ nu kho asmi? ayaṃ nu kho satto kuto āgato? so kuhiṃ gāmī bhavissati iti?
+English Translation: "Am I? Am I not? What am I? How am I? From where has this living being come? Where will he be heading?"
 
 Sutta Number: SN12.63
 Pali: atha puriso āgaccheyya jīvitu'kāmo amaritu'kāmo sukhakāmo dukkhappaṭikūlo
@@ -94,7 +94,7 @@ English Translation: Then a man would come along, wishing to live, not wishing t
 
 Sutta Number: MN107
 Pali: taṃ kiṃ maññasi, brāhmaṇa, idha puriso āgaccheyya rājagahaṃ gantu'kāmo. so taṃ upasaṅkamitvā evaṃ vadeyya, "icchāmi ahaṃ, bhante, rājagahaṃ gantuṃ, tassa me rājagahassa maggaṃ upadisā'ti.
-English Translation: What do you think [about] this, brahmin; here, a man would come along wishing to go to Rājagaha. Having approached you, he would say, “Venerable sir, I wish to go to Rājagaha. Point out the way to Rājagaha to me.”
+English Translation: What do you think [about] this, brahmin; here, a man would come along wishing to go to Rājagaha. Having approached you, he would say, "Venerable sir, I wish to go to Rājagaha. Point out the way to Rājagaha to me."
 
 Sutta Number: SN22.59
 Pali: yasmā ca kho, bhikkhave, rūpaṃ anattā, tasmā rūpaṃ ābādhāya saṃvattati
@@ -108,11 +108,11 @@ English Translation: Monks, the Dhamma explained by me [is] similar to a raft, i
 Class 9 Extra
 
 Sutta Number: DHP185
-Pali: mattaññutā ca bhattasmiṃ, pantaṃ ca sayan’āsanaṃ,  adhicitte ca āyogo, etaṃ buddhānaṃ sāsanaṃ.
+Pali: mattaññutā ca bhattasmiṃ, pantaṃ ca sayan'āsanaṃ,  adhicitte ca āyogo, etaṃ buddhānaṃ sāsanaṃ.
 English Translation: Moderation in regard to food, a secluded living place [i.e. living in seclusion], and devotion to mental development; this is the teaching of the Buddhas.
 
 Sutta Number: TH251
-Pali: tasmā hi paññā eva dhanena seyyā, yāya vosānaṃ idha adhigacchati. Abyositattā hi bhav’ābhavesu, pāpāni kammāni karoti mohā.
+Pali: tasmā hi paññā eva dhanena seyyā, yāya vosānaṃ idha adhigacchati. Abyositattā hi bhav'ābhavesu, pāpāni kammāni karoti mohā.
 English Translation: Therefore, only wisdom is indeed better than wealth; by it [i.e. wisdom] one attains perfection here/in this world; indeed, because of not being accomplished, out of delusion, one does evil actions in any states of existence.
 
 Sutta Number: TH257

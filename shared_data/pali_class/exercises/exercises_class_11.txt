@@ -2,7 +2,7 @@ Class 11 Exercises
 
 Sutta Number: SN22.43
 Pali: attadīpā, bhikkhave, viharatha attasaraṇā anaññasaraṇā, dhammadīpā dhammasaraṇā anaññasaraṇā.
-English Translation: you should stay independent, with one's own refuge, does not depend on another, with Dhamma as one’s solid ground, taking refuge in the Dhamma, does not depend on another.
+English Translation: you should stay independent, with one's own refuge, does not depend on another, with Dhamma as one's solid ground, taking refuge in the Dhamma, does not depend on another.
 
 Sutta Number: VIN0
 Pali: taṃ bhavantaṃ gotamaṃ evaṃ kalyāṇo kittisaddo abbhuggato
@@ -14,7 +14,7 @@ English Translation: Monks, there is [something] not born, not become, not made,
 
 Sutta Number: AN8.74
 Pali: seyyathāpi, bhikkhave, ādittasīso vā ādittasīso vā
-English Translation: Monks, just as [a man whose] clothes were on fire or [whose] head was burning…
+English Translation: Monks, just as [a man whose] clothes were on fire or [whose] head was burning
 
 Sutta Number: ITI111
 Pali: āraddhaṃ hoti vīriyaṃ asallīnaṃ, upaṭṭhitā sati asammuṭṭhā, passaddho kāyo asāraddho, samāhitaṃ cittaṃ ekaggaṃ
@@ -25,7 +25,7 @@ Pali: asite pīte khāyite sāyite sampajānakārī
 English Translation: [He is] cultivating attention while eating, drinking, chewing and tasting.
 
 Sutta Number: MN39
-Pali: seyyathā’pi puriso ābādhiko assa dukkhito bāḷhagilāno
+Pali: seyyathā'pi puriso ābādhiko assa dukkhito bāḷhagilāno
 English Translation: imagine if a person would be ill, miserable, very sick.
 
 Sutta Number: AN2.135
@@ -33,7 +33,7 @@ Pali: bālo abyatto asappuriso khataṃ upahataṃ attānaṃ pariharati
 English Translation: The foolish, uneducated, wicked man maintains himself injured and damaged.
 
 Sutta Number: AN5.114
-Pali: ye te, ānanda, bhikkhū navā acirapabbajitā adhun’āgatā imaṃ dhammavinayaṃ
+Pali: ye te, ānanda, bhikkhū navā acirapabbajitā adhun'āgatā imaṃ dhammavinayaṃ
 English Translation: Ananda, those monks who [are] recently ordained, [who] recently come to this teaching and discipline.
 
 Sutta Number: MN152
@@ -53,8 +53,8 @@ Pali: atthi dinnaṃ atthi yiṭṭhaṃ atthi hutaṃ
 English Translation: There is what is given, there is what is sacrificed, there is what is offered
 
 Sutta Number: DN14.14
-Pali: seyyathā’pi suddhaṃ vatthaṃ apagataṃ kāḷakā …
-English Translation: Just as clean cloth free from stain…
+Pali: seyyathā'pi suddhaṃ vatthaṃ apagataṃ kāḷakā
+English Translation: Just as clean cloth free from stain
 
 Sutta Number: AN11.15 (simpl)
 Pali: mettāya cetovimuttiyā āsevitāya bhāvitāya bahulīkatāya yānīkatāya vatthukatāya anuṭṭhitāya paricitāya susamāraddhāya ekādasa ānisaṃsā pāṭikaṅkhā.
@@ -66,11 +66,11 @@ English Translation: The noble disciple, [who] by means of wealth acquired by ef
 
 Sutta Number: MN48 (simpl)
 Pali: yāni tāni sīlāni akhaṇḍāni acchiddāni asabalāni akammāsāni bhujissāni viññūhi pasatthāni aparāmaṭṭhāni samādhino saṃvattanikāni
-English Translation: Whichever [of] those virtues, which are unbroken, without cracks, not mottled, unblemished, liberating, commended by wise persons, irreproachable and conducive for stability of mind…
+English Translation: Whichever [of] those virtues, which are unbroken, without cracks, not mottled, unblemished, liberating, commended by wise persons, irreproachable and conducive for stability of mind
 
 Sutta Number: SN22.59
 Pali: rūpaṃ atīt'ānāgatapaccuppannaṃ ajjhattaṃ vā bahiddhā vā oḷārikaṃ vā sukhumaṃ vā hīnaṃ vā paṇītaṃ vā yaṃ dūre santike vā sabbaṃ rūpaṃ
-English Translation: Materiality in the past, present, and future, internally or externally, coarse or fine, low or superior, [that] which [is] near or far away – all materiality ...
+English Translation: Materiality in the past, present, and future, internally or externally, coarse or fine, low or superior, [that] which [is] near or far away – all materiality
 
 Sutta Number: MN64
 Pali: yad eva tattha hoti rūpagataṃ vedanāgataṃ saññāgataṃ saṅkhāragataṃ viññāṇagataṃ, te dhamme aniccato dukkhato rogato gaṇḍato sallato aghato ābādhato parato palokato suññato anattato samanupassati.
@@ -81,24 +81,24 @@ Pali: idha, gahapati, assutavā puthujjano ariyānaṃ adassāvī ariyadhammassa
 English Translation: In this regard, householder, an uninstructed ordinary person who has no regard for noble persons, [who is] not proficient in the noble teaching, [who is] uneducated about the noble teaching, who has no regard for righteous men, [who is] not proficient in the teaching of righteous men, [who is] uneducated about the teaching of righteous men, regards form as self.
 
 Sutta Number: MN137
-Pali: cakkhuviññeyyānaṃ rūpānaṃ iṭṭhānaṃ kantānaṃ manāpānaṃ manoramānaṃ lok’āmisena paṭisaṃyuttānaṃ paṭilābhaṃ paṭilābhato samanupassato …
-English Translation: For one perceiving acquisition as a personal acquisition of forms perceivable by the eye, related to worldly pleasure, wished for, desirable, pleasant, [and] delightful …
+Pali: cakkhuviññeyyānaṃ rūpānaṃ iṭṭhānaṃ kantānaṃ manāpānaṃ manoramānaṃ lok'āmisena paṭisaṃyuttānaṃ paṭilābhaṃ paṭilābhato samanupassato
+English Translation: For one perceiving acquisition as a personal acquisition of forms perceivable by the eye, related to worldly pleasure, wished for, desirable, pleasant, [and] delightful
 
 Sutta Number: SN11.3
 Pali: svākkhāto bhagavatā dhammo sandiṭṭhiko akāliko ehipassiko opanayiko paccattaṃ veditabbo viññūhi
 English Translation: The teaching by the Blessed One [is] well taught, directly visible, timeless, inviting one to come and see, practical, [and is] to be understood individually by wise persons.
 
 Sutta Number: MN51 (simpl)
-Pali: evam’eva kho bhikkhu santuṭṭho hoti kāyaṃ parihārikena cīvarena kucchiṃ parihārikena piṇḍapātena.
+Pali: evam'eva kho bhikkhu santuṭṭho hoti kāyaṃ parihārikena cīvarena kucchiṃ parihārikena piṇḍapātena.
 English Translation: In the same way, a monk is content with sustaining [his] body with [his] robe, [and] with looking after [his] stomach with alms food.
 
 Sutta Number: MN39
-Pali: evaṃ samāhite citte parisuddhe pariyodāte anaṅgaṇe vigat’ūpakkilese mudubhūte kammaniye ṭhite āneñjappatte pubbenivās'ānussatiñāṇāya cittaṃ abhininnāmeti.
+Pali: evaṃ samāhite citte parisuddhe pariyodāte anaṅgaṇe vigat'ūpakkilese mudubhūte kammaniye ṭhite āneñjappatte pubbenivās'ānussatiñāṇāya cittaṃ abhininnāmeti.
 English Translation: When [his] mind is thus collected, [when it] has become pure, bright, spotless, without defilement, pliable workable, stabilized, [and] imperturbable, he inclines [his] mind for the knowledge from the recollection of previous lives.
 
 Sutta Number: SN22.59
-Pali: nibbindaṃ virajjati; virāgā vimuccati. vimuttasmiṃ vimuttam’iti ñāṇaṃ hoti. 'khīṇā jāti vusitaṃ brahmacariyaṃ
-English Translation: Being disenchanted, he becomes dispassionate. On account of the dispassion, he is released. When liberated, there is the knowledge, “[the mind is] liberated.” [He understands:] “Birth is exhausted, the holy life is completed…”
+Pali: nibbindaṃ virajjati; virāgā vimuccati. vimuttasmiṃ vimuttam'iti ñāṇaṃ hoti. 'khīṇā jāti vusitaṃ brahmacariyaṃ
+English Translation: Being disenchanted, he becomes dispassionate. On account of the dispassion, he is released. When liberated, there is the knowledge, "[the mind is] liberated." [He understands:] "Birth is exhausted, the holy life is completed"
 
 Sutta Number: SN12.70
 Pali: tassa me, bhante, bhagavā accayaṃ accayato paṭiggaṇhātu, āyatiṃ saṁvarāya
@@ -116,10 +116,10 @@ English Translation: And the teacher determined this world for me as impermanent
 
 Sutta Number: MN22
 Pali: attani ca, bhikkhave, attaniye ca saccato thetato anupalabbhamāne, yam'pi taṃ diṭṭhiṭṭhānaṃ, — so loko so attā, so pecca bhavissāmi nicco dhuvo sassato avipariṇāmadhammo, sassatisamaṃ tath'eva ṭhassāmī'ti, — nanu ayaṃ, bhikkhave, kevalo paripūro bāladhammo'ti?
-English Translation: “Monks, since oneself and what belongs to oneself is not being found as true and reliable, [then] the ground for views, [namely,] ‘that which the world [is] the self (world = self); after death I will be permanent, enduring, eternal; with an unchanging nature I will remain in the same way for ever and ever’ – wouldn’t this, monks, [be] a totally complete doctrine of fools?”
+English Translation: "Monks, since oneself and what belongs to oneself is not being found as true and reliable, [then] the ground for views, [namely,] ‘that which the world [is] the self (world = self); after death I will be permanent, enduring, eternal; with an unchanging nature I will remain in the same way for ever and ever' – wouldn't this, monks, [be] a totally complete doctrine of fools?"
 
 Sutta Number: SN6.2
-Pali: ye ca atītā sambuddhā, ye ca buddhā anāgatā. yo ca eta’r’ahi sambuddho, bahunnaṃ sokanāsano.
+Pali: ye ca atītā sambuddhā, ye ca buddhā anāgatā. yo ca eta'r'ahi sambuddho, bahunnaṃ sokanāsano.
 English Translation: The Awakened Ones who are past, and the Buddhas not yet come and the present Awakened One [are] dispeller[s] of sorrow for many.
 
 Sutta Number: DHP86 (simpl)
@@ -127,5 +127,5 @@ Pali: ye ca kho sammā-akkhāte dhamme dhammaṃ anuvattino, te janā pāraṃ e
 English Translation: Indeed, whoever acting according to the teaching in the perfectly declared teaching, those people will go to the far shore; the realm of death, extremely difficult to cross.
 
 Sutta Number: SNP16
-Pali: phuṭṭhassa lokadhammehi, cittaṃ yassa na kampati. asokaṃ virajaṃ khemaṃ, etaṃ maṅgalam’uttamaṃ.
+Pali: phuṭṭhassa lokadhammehi, cittaṃ yassa na kampati. asokaṃ virajaṃ khemaṃ, etaṃ maṅgalam'uttamaṃ.
 English Translation: A mind of [a person] who, touched by worldly matters, is not disturbed, [but rather] free from sadness, untainted, at peace – this [is] the ultimate blessing.

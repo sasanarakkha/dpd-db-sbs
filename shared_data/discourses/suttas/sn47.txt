@@ -2,8 +2,6 @@ SUTTA: sn47.1 ambapālisuttaṃ
 
 evaṃ me sutaṃ, ekaṃ samayaṃ bhagavā vesāliyaṃ viharati ambapālivane.
 
-tatra kho bhagavā … etadavoca 
-
 ek'āyano ayaṃ, bhikkhave, maggo sattānaṃ visuddhiyā sokaparidevānaṃ samatikkamāya dukkhadomanassānaṃ atthaṅ'gamāya ñāyassa adhigamāya nibbānassa sacchikiriyāya, yadidaṃ, cattāro satipaṭṭhānā.
 
 katame cattāro?
@@ -20,7 +18,9 @@ ayaṃ vo amhākaṃ anusāsanī.
 
 kathañ'ca, bhikkhave, bhikkhu sato hoti?
 
-idha, bhikkhave, bhikkhu kāye kāy'ānupassī viharati ātāpī sampajāno satimā, vineyya loke abhijjhādomanassaṃ, vedanāsu … citte … dhammesu dhamm'ānupassī viharati ātāpī sampajāno satimā, vineyya loke abhijjhādomanassaṃ.
+idha, bhikkhave, bhikkhu kāye kāy'ānupassī viharati ātāpī sampajāno satimā, vineyya loke abhijjhādomanassaṃ, vedanāsu
+
+dhammesu dhamm'ānupassī viharati ātāpī sampajāno satimā, vineyya loke abhijjhādomanassaṃ.
 
 evaṃ kho, bhikkhave, bhikkhu sato hoti.
 
@@ -95,7 +95,9 @@ yadidaṃ, pañca kāmaguṇā.
 
 katame pañca?
 
-cakkhuviññeyyā rūpā iṭṭhā kantā manāpā piyarūpā kām'ūpasaṃhitā rajanīyā, sotaviññeyyā saddā … ghānaviññeyyā gandhā… jivhāviññeyyā rasā… kāyaviññeyyā phoṭṭhabbā iṭṭhā kantā manāpā piyarūpā kām'ūpasaṃhitā rajanīyā.
+cakkhuviññeyyā rūpā iṭṭhā kantā manāpā piyarūpā kām'ūpasaṃhitā rajanīyā, 
+
+sotaviññeyyā saddā ... ghānaviññeyyā gandhā ... jivhāviññeyyā rasā ... kāyaviññeyyā phoṭṭhabbā iṭṭhā kantā manāpā piyarūpā kām'ūpasaṃhitā rajanīyā.
 
 ayaṃ, bhikkhave, bhikkhuno agocaro paravisayo.
 
@@ -109,7 +111,9 @@ yadidaṃ, cattāro satipaṭṭhānā.
 
 katame cattāro?
 
-idha, bhikkhave, bhikkhu kāye kāy'ānupassī viharati ātāpī sampajāno satimā, vineyya loke abhijjhādomanassaṃ, vedanāsu … citte … dhammesu dhamm'ānupassī viharati ātāpī sampajāno satimā, vineyya loke abhijjhādomanassaṃ.
+idha, bhikkhave, bhikkhu kāye kāy'ānupassī viharati ātāpī sampajāno satimā, vineyya loke abhijjhādomanassaṃ, vedanāsu
+
+dhammesu dhamm'ānupassī viharati ātāpī sampajāno satimā, vineyya loke abhijjhādomanassaṃ.
 
 ayaṃ, bhikkhave, bhikkhuno gocaro sako pettiko visayo'ti.
 
@@ -170,7 +174,9 @@ yasmiṃ, ānanda, samaye tathāgato sabbanimittānaṃ amanasikārā ekaccāna�
 
 kathañ'c'ānanda, bhikkhu attadīpo viharati attasaraṇo anaññasaraṇo, dhammadīpo dhammasaraṇo anaññasaraṇo?
 
-idh'ānanda, bhikkhu kāye kāy'ānupassī viharati ātāpī sampajāno satimā, vineyya loke abhijjhādomanassaṃ, vedanāsu … citte … dhammesu dhamm'ānupassī viharati ātāpī sampajāno satimā, vineyya loke abhijjhādomanassaṃ.
+idh'ānanda, bhikkhu kāye kāy'ānupassī viharati ātāpī sampajāno satimā, vineyya loke abhijjhādomanassaṃ, vedanāsu
+
+dhammesu dhamm'ānupassī viharati ātāpī sampajāno satimā, vineyya loke abhijjhādomanassaṃ.
 
 evaṃ kho, ānanda, bhikkhu attadīpo viharati attasaraṇo anaññasaraṇo, dhammadīpo dhammasaraṇo anaññasaraṇo.
 

@@ -11,7 +11,7 @@ id,pali,selected_pali_word,class_source,extra,class_example,english_translation
 4127,anicca 1,aniccaṃ,MN147,,"taṃ kiṃ maññasi, rāhula, cakkhu niccaṃ vā <b>aniccaṃ</b> vā'ti","What do you think, Rāhula, “Is the eye permanent or impermanent?”"
 5680,antaraghara 1,antaraghare,VIN PAT SK 18 (simpl),no,na bāhuṃ pacālakaṃ <b>antaraghare</b> nisīdissāmi,I will not sit in an inhabited area swinging [my] arm[s].
 6447,aparihāna,aparihānāya,AN8.79,,ime bhikkhave dhammā sekhassa bhikkhuno <b>aparihānāya</b> saṃvattanti.,"These things, o monks, are conducive for the non-decline of a monk who is a trainee."
-7057,appavārita,appavārito,VIN PAT NP 8 (simpl),,"ce so bhikkhu, pubbe <b>appavārito</b>, upasaṅkamissati cīvare vikappaṃ āpajjissati","If that monk, previously uninvited, approaches [there], causes an alteration in a robe…"
+7057,appavārita,appavārito,VIN PAT NP 8 (simpl),,"ce so bhikkhu, pubbe <b>appavārito</b>, upasaṅkamissati cīvare vikappaṃ āpajjissati","If that monk, previously uninvited, approaches [there], causes an alteration in a robe"
 8014,abhibhū 1,sabbābhibhuṃ,SN21.10 (simpl),,"[One who is] <b>sabbābhibhuṃ</b>, all-knowing, wise, that man I call thus, “one who dwells alone.”","[One who is] all-conquering, all-knowing, wise, that man I call thus, “one who dwells alone.”"
 8847,araññagata 1,araññagato,MN118,,bhikkhu <b>araññagato</b> vā rukkhamūlagato vā suññāgāragato vā nisīdati.,"A monk, gone to the forest or to the foot of a tree or to an empty dwelling, sits down."
 10106,assutavant,assutavā,MN2.2,,"bhikkhave, <b>assutavā</b> puthujjano na parimuccati jātiyā","Monks, an unlearned common person is not liberated from birth."
@@ -20,7 +20,7 @@ id,pali,selected_pali_word,class_source,extra,class_example,english_translation
 11178,āgantar 2,āgantāro,AN4.171,yes,sattā tamhā kāyā cutā āgāmino honti <b>āgantāro</b> itthattaṃ,"Living beings [who] have passed away from that group are returners, who come back to this existence."
 11229,āgāmī 1,āgāmino,AN4.171,yes,sattā tamhā kāyā cutā <b>āgāmino</b> honti āgantāro itthattaṃ,"Living beings [who] have passed away from that group are returners, who come back to this existence."
 11459,ātappa,ātappaṃ,MN131 (simpl),yes,"ajja eva <b>ātappaṃ</b> karohi, ko jānāti maraṇaṃ suve",Just make an effort today; who knows [if] death [is] tomorrow?
-11839,āpajjati 5,āpajjissati,VIN PAT NP 8 simpl,,"ce so bhikkhu, pubbe appavārito, upasaṅkamissati cīvare vikappaṃ <b>āpajjissati</b>","If that monk, previously uninvited, approaches [there], causes an alteration in a robe…"
+11839,āpajjati 5,āpajjissati,VIN PAT NP 8 simpl,,"ce so bhikkhu, pubbe appavārito, upasaṅkamissati cīvare vikappaṃ <b>āpajjissati</b>","If that monk, previously uninvited, approaches [there], causes an alteration in a robe"
 12241,āyasmant 1,āyasmanto,VIN1.2.12,,“mā maṃ <b>āyasmanto</b> kiñci avacuttha kalyāṇaṃ vā pāpakaṃ vā”,"Venerables, don't say anything to me, good or bad!"
 13466,iti,iti,DHP277,,"sabbe dhammā anattā <b>iti</b>, yadā paññāya passati, atha nibbindati dukkhe – esa maggo visuddhiyā","“All things are non-self.” When one sees [this] with wisdom, then one is disenchanted with suffering. This is the path for purification."
 13539,itthatta 1,itthattaṃ,AN4.171,yes,sattā tamhā kāyā cutā āgāmino honti āgantāro <b>itthattaṃ</b>,"Living beings [who] have passed away from that group are returners, who come back to this existence."
@@ -54,9 +54,9 @@ id,pali,selected_pali_word,class_source,extra,class_example,english_translation
 25746,cakkhumant 2,cakkhumanto,DN3.15,,<b>cakkhumanto</b> rūpāni dakkhanti,A person with sight sees forms.
 26128,cattāro,cattāro,DN16.26 (simpl),,"dve kassakā bhātaro hatā, <b>cattāro</b> ca balibaddā","Two farmers, [who are] brothers, and four oxen were killed."
 26775,cirapabbajita,ciraṃ pabbajitā,AN7.23 (simpl),,therā rattaññū <b>ciraṃ pabbajitā</b> saṅghassa pitaro saṅghassa pariṇāyakā,"Senior monks of long-standing, [who] have been ordained for a long time, are fathers of the community of monks, guides of the community of monks."
-26877,cīvare vikappaṃ āpajjati,cīvare vikappaṃ āpajjissati,VIN PAT NP 8 (simpl),,"ce so bhikkhu, pubbe appavārito, upasaṅkamissati <b>cīvare vikappaṃ āpajjissati</b>","If that monk, previously uninvited, approaches [there], causes an alteration in a robe…"
+26877,cīvare vikappaṃ āpajjati,cīvare vikappaṃ āpajjissati,VIN PAT NP 8 (simpl),,"ce so bhikkhu, pubbe appavārito, upasaṅkamissati <b>cīvare vikappaṃ āpajjissati</b>","If that monk, previously uninvited, approaches [there], causes an alteration in a robe"
 26896,cuta 1.1,cutā,AN4.171,yes,sattā tamhā kāyā <b>cutā</b> āgāmino honti āgantāro itthattaṃ,"Living beings [who] have passed away from that group are returners, who come back to this existence."
-27021,ce 1,ce,VIN PAT NP 8 (simpl),,"so bhikkhu, pubbe appavārito, upasaṅkamissati cīvare vikappaṃ āpajjissati","If that monk, previously uninvited, approaches [there], causes an alteration in a robe…"
+27021,ce 1,ce,VIN PAT NP 8 (simpl),,"so bhikkhu, pubbe appavārito, upasaṅkamissati cīvare vikappaṃ āpajjissati","If that monk, previously uninvited, approaches [there], causes an alteration in a robe"
 28313,jānāti 1,jānāti,MN131 (simpl),yes,"ajja eva ātappaṃ karohi, ko <b>jānāti</b> maraṇaṃ suve",Just make an effort today; who knows [if] death [is] tomorrow?
 28666,jeṭṭha 1,jeṭṭhamhi,SN7.15 (simpl),yes,"mātari pitari ca, atho <b>jeṭṭhamhi</b> bhātari. ācariye ca, tesu na mānaṃ karohi.","Towards mother and father, and after that, towards the eldest brother; and towards the teacher. Do not show conceit towards them."
 30060,tamhā,tamhā,AN4.171,yes,sattā <b>tamhā</b> kāyā cutā āgāmino honti āgantāro itthattaṃ,"Living beings [who] have passed away from that group are returners, who come back to this existence."
@@ -92,7 +92,7 @@ id,pali,selected_pali_word,class_source,extra,class_example,english_translation
 43321,paricarati 3,paricara,VIN PAT SA 4 (simpl),,mādisaṃ sīlavantaṃ kalyāṇadhammaṃ brahmacāriṃ <b>paricara</b>,"You must minister to one like me, observing the moral practices, of upright nature, one living the holy life."
 43452,pariṇāyaka 2,pariṇāyakā,AN7.23 (simpl),,therā rattaññū ciraṃ pabbajitā saṅghassa pitaro saṅghassa <b>pariṇāyakā</b>,"Senior monks of long-standing, [who] have been ordained for a long time, are fathers of the community of monks, guides of the community of monks."
 43900,parimuccati,parimuccati,MN2.2,,"bhikkhave, assutavā puthujjano na <b>parimuccati</b> jātiyā","Monks, an unlearned common person is not liberated from birth."
-44688,pasāreti 1,pasāreyya,MN152,,seyyathāpi balavā puriso samiñjitaṃ vā bāhaṃ <b>pasāreyya</b>,Just like a strong man would stretch out (his) bent arm or …
+44688,pasāreti 1,pasāreyya,MN152,,seyyathāpi balavā puriso samiñjitaṃ vā bāhaṃ <b>pasāreyya</b>,Just like a strong man would stretch out (his) bent arm or 
 44739,passati 2,,,,,
 44810,pavaḍḍhati 1,pavaḍḍhati,SN1.47 (simpl),,"ye dadanti upassayaṃ, tesaṃ divā ca ratto ca, sadā puññaṃ <b>pavaḍḍhati</b>","Whoever gives a dwelling, merit increases for them all the time, day and night."
 44846,pavattar 1,pavattāraṃ,DHP76 (simpl),yes,"nidhīnaṃ va <b>pavattāraṃ</b>, vajjadassinaṃ  niggayhavādiṃ medhāviṃ paṇḍitaṃ bhajāhi","Associate with an intelligent person, a wise man, one who reproves, who sees fault, he is (like) one who points out the treasure."
@@ -102,13 +102,13 @@ id,pali,selected_pali_word,class_source,extra,class_example,english_translation
 46170,piya 1,piyo,AN10.71,,thero bhikkhu sabrahmacārīnaṃ <b>piyo</b> ca hoti manāpo ca garu ca bhāvanīyo ca.,"An elder monk is dear to [his] fellow monks and pleasant, respected, and worthy of esteem [by them]."
 46519,puñña 1,puññaṃ,SN1.47 (simpl),,"ye dadanti upassayaṃ, tesaṃ divā ca ratto ca, sadā <b>puññaṃ</b> pavaḍḍhati","Whoever gives a dwelling, merit increases for them all the time, day and night."
 46631,puttadāra 1,puttadārassa,SNP16,yes,"mātāpitu upaṭṭhānaṃ, <b>puttadārassa</b> saṅgaho","The looking after mother and father, the support of the wife and son."
-46920,pubbe 1,pubbe,VIN PAT NP 8 (simpl),,"ce so bhikkhu, <b>pubbe</b> appavārito, upasaṅkamissati cīvare vikappaṃ āpajjissati","If that monk, previously uninvited, approaches [there], causes an alteration in a robe…"
-47031,purisa 1,puriso,MN152,,seyyathāpi balavā <b>puriso</b> samiñjitaṃ vā bāhaṃ pasāreyya,Just like a strong man would stretch out (his) bent arm or …
+46920,pubbe 1,pubbe,VIN PAT NP 8 (simpl),,"ce so bhikkhu, <b>pubbe</b> appavārito, upasaṅkamissati cīvare vikappaṃ āpajjissati","If that monk, previously uninvited, approaches [there], causes an alteration in a robe"
+47031,purisa 1,puriso,MN152,,seyyathāpi balavā <b>puriso</b> samiñjitaṃ vā bāhaṃ pasāreyya,Just like a strong man would stretch out (his) bent arm or 
 47094,purisaviggaha,purisaviggahena,VIN PAT PC 7,yes,"bhikkhu mātugāmassa uttarichappañcavācāhi dhammaṃ deseti, aññatra viññunā <b>purisaviggahena</b>, pācittiyaṃ.","[If any] monk expounds Dhamma to a woman by means of more than five or six sentences, except [together] with a knowledgeable male, [it is] an offence requiring confession."
 47176,pūjeti 1,pūjessanti,AN7.23 (simpl),,bhikkhū there sakkarissanti garuṃ karissanti mānessanti <b>pūjessanti</b>,"Monks will honor, respect, revere, [and] venerate the elders."
-48017,balavant 1,balavanto,AN2.40,,"yasmiṃ, bhikkhave, samaye corā <b>balavanto</b> honti..","At whichever time, monks, thieves are powerful…"
+48017,balavant 1,balavanto,AN2.40,,"yasmiṃ, bhikkhave, samaye corā <b>balavanto</b> honti..","At whichever time, monks, thieves are powerful"
 48045,balibadda,balibaddā,DN16.26 (simpl),,"dve kassakā bhātaro hatā, cattāro ca <b>balibaddā</b>","Two farmers, [who are] brothers, and four oxen were killed."
-48317,bāhā 1,bāhaṃ,MN152,,seyyathāpi balavā puriso samiñjitaṃ vā <b>bāhaṃ</b> pasāreyya,Just like a strong man would stretch out (his) bent arm or …
+48317,bāhā 1,bāhaṃ,MN152,,seyyathāpi balavā puriso samiñjitaṃ vā <b>bāhaṃ</b> pasāreyya,Just like a strong man would stretch out (his) bent arm or 
 48380,bāhu,bāhuṃ,VIN PAT SK 18 (simpl),,na <b>bāhuṃ</b> pacālakaṃ antaraghare nisīdissāmi,I will not sit in an inhabited area swinging [my] arm[s].
 48388,bāhuppacālakaṃ,bāhuṃ pacālakaṃ,VIN PAT SK 18 (simpl),,na <b>bāhuppacālakaṃ</b> antaraghare nisīdissāmi,I will not sit in an inhabited area swinging [my] arm[s].
 48943,brahmacārī 2,brahmacāriṃ,VIN PAT SA 4 (simpl),,mādisaṃ sīlavantaṃ kalyāṇadhammaṃ <b>brahmacāriṃ</b> paricara,"You must minister to one like me, observing the moral practices, of upright nature, one living the holy life."
@@ -139,7 +139,7 @@ id,pali,selected_pali_word,class_source,extra,class_example,english_translation
 52331,māneti,mānessanti,AN7.23 (simpl),,bhikkhū there sakkarissanti garuṃ karissanti <b>mānessanti</b> pūjessanti,"Monks will honor, respect, revere, [and] venerate the elders."
 53286,medhāvī,medhāviṃ,DHP76 (simpl),yes,"nidhīnaṃ va pavattāraṃ, vajjadassinaṃ  niggayhavādiṃ <b>medhāviṃ</b> paṇḍitaṃ bhajāhi","Associate with an intelligent person, a wise man, one who reproves, who sees fault, he is (like) one who points out the treasure."
 53738,yadā,yadā,DHP277,,"sabbe dhammā anattā iti, <b>yadā</b> paññāya passati, atha nibbindati dukkhe – esa maggo visuddhiyā","“All things are non-self.” When one sees [this] with wisdom, then one is disenchanted with suffering. This is the path for purification."
-53840,yasmiṃ samaye,yasmiṃ,AN2.40,,"<b>yasmiṃ</b>, bhikkhave, samaye corā balavanto honti..","At whichever time, monks, thieves are powerful…"
+53840,yasmiṃ samaye,yasmiṃ,AN2.40,,"<b>yasmiṃ</b>, bhikkhave, samaye corā balavanto honti..","At whichever time, monks, thieves are powerful"
 53873,yaṃ 2,yaṃ,VIN PAT NP 10,,"yaṃ kho, bhante, āyasmā veyyāvaccakaraṃ niddisi, saññatto so mayā, upasaṅkamatu āyasmā kālena, cīvarena taṃ acchādessati","Indeed, venerable sir, the steward whom the venerable one has indicated has been instructed by me; let the venerable one approach him at a suitable time; he will clothe you with a robe."
 54156,ye keci,ye keci,SNP9,,"<b>ye keci</b> pāṇabhūtā atthi, tasā vā thāvarā vā anavasesā","Whatever living beings there are, whether moving or not moving without exception."
 54158,ye 1,ye,SNP9,,"<b>ye</b> keci pāṇabhūtā atthi, tasā vā thāvarā vā anavasesā","Whatever living beings there are, whether moving or not moving without exception."
@@ -160,7 +160,7 @@ id,pali,selected_pali_word,class_source,extra,class_example,english_translation
 57946,sadā,sadā,SN1.47 (simpl),,"ye dadanti upassayaṃ, tesaṃ divā ca ratto ca, <b>sadā</b> puññaṃ pavaḍḍhati","Whoever gives a dwelling, merit increases for them all the time, day and night."
 58994,sabbavidū 1,,,,,
 59010,sabbābhibhū,sabbābhibhuṃ,SN21.10 (simpl),,"<b>sabbābhibhuṃ</b> sabbaviduṃ sumedhaṃ, tam naraṃ ekavihārī iti ahaṃ brūmi","[One who is] all-conquering, all-knowing, wise, that man I call thus, “one who dwells alone.”"
-59841,samiñjita 2,samiñjitaṃ,MN152,,seyyathāpi balavā puriso <b>samiñjitaṃ</b> vā bāhaṃ pasāreyya,Just like a strong man would stretch out (his) bent arm or …
+59841,samiñjita 2,samiñjitaṃ,MN152,,seyyathāpi balavā puriso <b>samiñjitaṃ</b> vā bāhaṃ pasāreyya,Just like a strong man would stretch out (his) bent arm or 
 62637,sāvakasaṅgha,sāvakasaṅgho,DN11.6,,esa bhagavato <b>sāvakasaṅgho</b>,This community of the Blessed One's disciples is worthy of offerings.
 63230,sīlavant,sīlavantaṃ,VIN PAT SA 4 (simpl),,mādisaṃ <b>sīlavantaṃ</b> kalyāṇadhammaṃ brahmacāriṃ paricara,"You must minister to one like me, observing the moral practices, of upright nature, one living the holy life."
 63548,sukhavihārī,sukhavihārī,DN22.18,,upekkhako satimā <b>sukhavihārī</b>'ti,“He who is equanimous [and] mindful lives at ease.”
@@ -169,11 +169,11 @@ id,pali,selected_pali_word,class_source,extra,class_example,english_translation
 63746,suññāgāragata,suññāgāragato,MN118,,bhikkhu araññagato vā rukkhamūlagato vā <b>suññāgāragato</b> vā nisīdati.,"A monk, gone to the forest or to the foot of a tree or to an empty dwelling, sits down."
 64312,sumedha 1,sumedhaṃ,SN21.10 (simpl),,"sabbābhibhuṃ sabbaviduṃ <b>sumedhaṃ</b>, tam naraṃ ekavihārī iti ahaṃ brūmi","[One who is] all-conquering, all-knowing, wise, that man I call thus, “one who dwells alone.”"
 64642,suve,suve,MN131 (simpl),yes,"ajja eva ātappaṃ karohi, ko jānāti maraṇaṃ <b>suve</b>",Just make an effort today; who knows [if] death [is] tomorrow?
-64953,seyyathāpi,seyyathāpi,MN152,,<b>seyyathāpi</b> balavā puriso samiñjitaṃ vā bāhaṃ pasāreyya,Just like a strong man would stretch out (his) bent arm or …
+64953,seyyathāpi,seyyathāpi,MN152,,<b>seyyathāpi</b> balavā puriso samiñjitaṃ vā bāhaṃ pasāreyya,Just like a strong man would stretch out (his) bent arm or 
 65082,so 1.1,,,,,
 65715,vajjadassī,vajjadassinaṃ,DHP76 (simpl),yes,"nidhīnaṃ va pavattāraṃ, <b>vajjadassinaṃ</b>  niggayhavādiṃ medhāviṃ paṇḍitaṃ bhajāhi","Associate with an intelligent person, a wise man, one who reproves, who sees fault, he is (like) one who points out the treasure."
 66665,vā 1,vā,MN147,,"taṃ kiṃ maññasi, rāhula, cakkhu niccaṃ <b>vā</b> aniccaṃ vā'ti","What do you think, Rāhula, “Is the eye permanent or impermanent?”"
-67107,vikappa 1.1,vikappaṃ,VIN PAT NP 8 (simpl),,"ce so bhikkhu, pubbe appavārito, upasaṅkamissati cīvare <b>vikappaṃ</b> āpajjissati","If that monk, previously uninvited, approaches [there], causes an alteration in a robe…"
+67107,vikappa 1.1,vikappaṃ,VIN PAT NP 8 (simpl),,"ce so bhikkhu, pubbe appavārito, upasaṅkamissati cīvare <b>vikappaṃ</b> āpajjissati","If that monk, previously uninvited, approaches [there], causes an alteration in a robe"
 67800,viññū 1,viññunā,VIN PAT PC 7,,"bhikkhu mātugāmassa uttarichappañcavācāhi dhammaṃ deseti, aññatra <b>viññunā</b> purisaviggahena, pācittiyaṃ.","[If any] monk expounds Dhamma to a woman by means of more than five or six sentences, except [together] with a knowledgeable male, [it is] an offence requiring confession."
 67983,vidū 1,,,,,
 69713,vihārī,vihārī,DN22.18,,upekkhako satimā <b>sukhavihārī</b>'ti,“He who is equanimous [and] mindful lives at ease.”

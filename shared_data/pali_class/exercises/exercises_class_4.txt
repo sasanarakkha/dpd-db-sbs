@@ -13,8 +13,8 @@ Pali: abhisaṅkharoti kāyena kusalaṃ
 English Translation: He does good deeds by means of the body.  
 
 Sutta Number: DN22.5  
-Pali: ime sālī ime vīhī ime muggā ime māsā ime tilā ime taṇḍulā’ti  
-English Translation: “These are fine rices, these are paddy, these are mung beans, these are speckled beans, these are sesame, these are dehusked rice.”  
+Pali: ime sālī ime vīhī ime muggā ime māsā ime tilā ime taṇḍulā'ti  
+English Translation: "These are fine rices, these are paddy, these are mung beans, these are speckled beans, these are sesame, these are dehusked rice."  
 
 Sutta Number: UD45  
 Pali: atha kho bhagavā bhikkhū āmantesi  
@@ -37,8 +37,8 @@ Pali: byādhi dhammo amhi
 English Translation: I am of the nature to get sick. (lit. I am of the sickness nature)   
 
 Sutta Number: MN39  
-Pali: samaṇā amhā’ti paṭijānātha  
-English Translation: You all claim, “We are ascetics.”  
+Pali: samaṇā amhā'ti paṭijānātha  
+English Translation: You all claim, "We are ascetics."  
 
 Sutta Number: MN39 (simpl)  
 Pali: tatra evaṃ aṭṭhāsiṃ evaṃ nisīdiṃ evaṃ abhāsiṃ evaṃ tuṇhī ahosiṃ  
@@ -69,12 +69,12 @@ Pali: gahassa kāraka, diṭṭho asi
 English Translation: Builder of a house, you are seen.  
 
 Sutta Number: MN10 (simpl)  
-Pali: atthi kāyo’ti sati hoti  
-English Translation: There is mindfulness: “there is a body.”  
+Pali: atthi kāyo'ti sati hoti  
+English Translation: There is mindfulness: "there is a body."  
 
 Sutta Number: VIN2.5.1.2  
-Pali: santi idha ekacce khattiyā ca brāhmaṇā’ti bhaṇati  
-English Translation: He says, “There are here some noblemen [and] brahmins.”  
+Pali: santi idha ekacce khattiyā ca brāhmaṇā'ti bhaṇati  
+English Translation: He says, "There are here some noblemen [and] brahmins."  
 
 Sutta Number: MN39  
 Pali: me āsi kāye balaṃ  
@@ -101,16 +101,16 @@ Pali: arogā sukhitā hotha
 English Translation: May you all be happy (and) free from disease. 
 
 Sutta Number: MN86  
-Pali: coro ahaṃ pure āsiṃ, aṅgulimālo vissuto … buddhaṃ saraṇaṃ āgamiṃ  
-English Translation: I was formerly a thief, the famous Angulimāla … I came to the Buddha (for) refuge.  
+Pali: coro ahaṃ pure āsiṃ, aṅgulimālo vissuto ... buddhaṃ saraṇaṃ āgamiṃ  
+English Translation: I was formerly a thief, the famous Angulimāla ... I came to the Buddha (for) refuge.  
 
 Sutta Number: AN5.28 (simpl)  
 Pali: ariyassa samādhissa bhāvanaṃ desesiṃ  
 English Translation: I taught the cultivation of noble composure.  
 
 Sutta Number: DN16.39  
-Pali: upaddutā homa — ‘idaṃ kappati…'  
-English Translation: We are afflicted—“this is suitable …”  
+Pali: upaddutā homa — idaṃ kappati  
+English Translation: We are afflicted—"this is suitable"  
 
 
 
@@ -118,7 +118,7 @@ Class 4 Extra
 
 Sutta Number: MN98  
 Pali: kassako kammunā hoti, sippiko hoti kammunā, vāṇijo kammunā hoti, pessako hoti kammunā  
-English Translation: By one’s actions, one is a farmer, a craftsman, a trader, a messenger.  
+English Translation: By one's actions, one is a farmer, a craftsman, a trader, a messenger.  
 
 Sutta Number: DHP183  
 Pali: nibbindati dukkhe esa maggo visuddhiyā  

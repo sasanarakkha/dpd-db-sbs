@@ -22,8 +22,8 @@ Pali: sabbarasaṃ dhammaraso jināti
 English Translation: The flavour of the Dhamma surpasses all other flavours.
 
 Sutta Number: MN39 
-Pali: so ‘idaṃ dukkhan’ti yathābhūtaṃ pajānāti
-English Translation: He knows clearly “this [is] suffering” as it truly is.
+Pali: so idaṃ dukkhan'ti yathābhūtaṃ pajānāti
+English Translation: He knows clearly "this [is] suffering" as it truly is.
 
 Sutta Number: VIN PAT NP 10 
 Pali: paṭiggaṇhātu āyasmā cīvaracetāpannaṃ
@@ -118,8 +118,8 @@ Pali: passasi taṃ āpattiṃ
 English Translation: You see that offence.
 
 Sutta Number: SN41.3
-Pali: gahapati, pucchasi — “... diṭṭhiyo loke uppajjanti…
-English Translation: You ask, householder: “…views arise in the world…”
+Pali: gahapati, pucchasi — ... diṭṭhiyo loke uppajjanti ...
+English Translation: You ask, householder: "... views arise in the world ..."
 
 Class 3 Extra 
 

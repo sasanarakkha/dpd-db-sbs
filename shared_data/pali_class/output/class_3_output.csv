@@ -8,11 +8,11 @@ id,pali,selected_pali_word,class_source,extra,class_example,english_translation
 12076,āmantayati 1,āmantayati,DN19.7 (simpl),,rājā jotipālaṃ māṇavaṃ <b>āmantayati</b>,"The king addresses the young gentleman (brahmin), Protector of the Light (Jotipāla)."
 15144,uddesa 1,uddesaṃ,MN133 (simpl),no,"dhārehi, bhikkhu, <b>uddesaṃ</b> ca vibhaṅgaṃ ca","Remember, monk, the summary and the analysis."
 16108,upasama 1,upasamāya,SN56.11 (simpl),,paṭipadā <b>upasamāya</b> sambodhāya nibbānāya saṃvattati,"The path of practice is conducive for calmness, full awakening [and] total emancipation."
-16535,uppajjati 1,uppajjanti,SN41.3,,"gahapati, pucchasi — “... diṭṭhiyo loke <b>uppajjanti</b>…","You ask, householder: “…views arise in the world…”"
+16535,uppajjati 1,uppajjanti,SN41.3,,"gahapati, pucchasi — “... diṭṭhiyo loke <b>uppajjanti</b>","You ask, householder: “...views arise in the world”"
 20568,karohi,karohi,MN36,,"taṃ suṇāhi, sādhukaṃ manasi <b>karohi</b>, bhāsissāmi","Listen to that, pay attention, I will speak."
 23186,kosalā,kosalehi,SN55.6 (simpl),,suṇāma: <b>kosalehi</b> mallesu pakkamati,We hear: (the Blessed One) sets out from the Kosalans (on tour) in the Mallans.
 23612,khādati,khāda,VIN PAT PC 36,,handa bhikkhu <b>khāda</b> vā bhuñja vā,"Come on, bhikkhu, eat or consume!"
-24654,gahapati,gahapati,SN41.3,,"<b>gahapati</b>, pucchasi — “... diṭṭhiyo loke uppajjanti…","You ask, householder: “…views arise in the world…”"
+24654,gahapati,gahapati,SN41.3,,"<b>gahapati</b>, pucchasi — “... diṭṭhiyo loke uppajjanti","You ask, householder: “...views arise in the world”"
 26837,cīvaracetāpanna,cīvaracetāpannaṃ,VIN PAT NP 10,,paṭiggaṇhātu āyasmā <b>cīvaracetāpannaṃ</b>,Let the venerable receive the robe-fund.
 27111,ceteti 2,ceteti,SN35.248 (simpl),,puthujjano punabbhavāya <b>ceteti</b>,A common person intends for rebirth.
 28484,jināti 2,jināti,DHP354,,sabbarasaṃ dhammaraso <b>jināti</b>,The flavour of the Dhamma surpasses all other flavours.
@@ -22,7 +22,7 @@ id,pali,selected_pali_word,class_source,extra,class_example,english_translation
 30135,tasati 1.1,tasanti,DHP130,,sabbe <b>tasanti</b> daṇḍassa.,All are fearful of a stick.
 30488,tiṭṭhati 3,tiṭṭhanti,SNP22,,devā manussā ca sitā <b>tiṭṭhanti</b>,Deities and human beings remain attached.
 31761,daṇḍa 1,daṇḍassa,DHP130,,sabbe tasanti <b>daṇḍassa</b>.,All are fearful of a stick.
-32479,diṭṭhi 1,diṭṭhiyo,SN41.3,,"gahapati, pucchasi — “... <b>diṭṭhiyo</b> loke uppajjanti…","You ask, householder: “…views arise in the world…”"
+32479,diṭṭhi 1,diṭṭhiyo,SN41.3,,"gahapati, pucchasi — “... <b>diṭṭhiyo</b> loke uppajjanti","You ask, householder: “...views arise in the world”"
 34841,dhammarasa,dhammaraso,DHP354,,sabbarasaṃ <b>dhammaraso</b> jināti,The flavour of the Dhamma surpasses all other flavours.
 35128,dhāreti 3,dhārehi,MN133 (simpl),no,"<b>dhārehi</b>, bhikkhu, uddesaṃ ca vibhaṅgaṃ ca","Remember, monk, the summary and the analysis."
 37570,nibbāna 2,nibbānāya,SN56.11 (simpl),,paṭipadā upasamāya sambodhāya <b>nibbānāya</b> saṃvattati,"The path of practice is conducive for calmness, full awakening [and] total emancipation."
@@ -44,7 +44,7 @@ id,pali,selected_pali_word,class_source,extra,class_example,english_translation
 45428,pātimokkha 2,pātimokkhe,MN107 (simpl),,<b>pātimokkhe</b> saṃvarena viharāhi,Dwell with restraint according to the disciplinary code!
 45663,pāpuṇāti 1,pāpuṇāti,MN64,,so tattha ṭhito āsavānaṃ khayaṃ <b>pāpuṇāti</b>.,"Remaining there, he reaches the destruction of the defilements."
 46448,puggala,puggalaṃ,MN30 (simpl),yes,"brāhmaṇa, <b>puggalaṃ</b> vadāmi.","O brahmin, I speak (about) a person."
-46484,pucchati,pucchasi,SN41.3,,"gahapati, <b>pucchasi</b> — “... diṭṭhiyo loke uppajjanti…","You ask, householder: “…views arise in the world…”"
+46484,pucchati,pucchasi,SN41.3,,"gahapati, <b>pucchasi</b> — “... diṭṭhiyo loke uppajjanti","You ask, householder: “...views arise in the world”"
 46624,putta 1,putto,MN27 (simpl),no,dhammaṃ suṇāti <b>putto</b>,The son listens to the Dhamma.
 46680,puthujjana,puthujjano,SN35.248 (simpl),,<b>puthujjano</b> punabbhavāya ceteti,A common person intends for rebirth.
 46750,punabbhava,punabbhavāya,SN35.248 (simpl),,puthujjano <b>punabbhavāya</b> ceteti,A common person intends for rebirth.

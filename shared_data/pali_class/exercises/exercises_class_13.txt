@@ -5,19 +5,19 @@ Pali: samaṃ pādaṃ bhūmiyaṃ nikkhipati, samaṃ uddharati, samaṃ sabbā
 English Translation: He puts down [his] foot evenly on the earth. He lifts [his foot] up in a balanced manner. He touches the earth evenly with the entire sole of [his] foot.
 
 Sutta Number: MN20
-Pali: kiṃ nu kho ahaṃ sīghaṃ gacchāmi? yaṃnūn’āhaṃ saṇikaṃ gaccheyyan’ti. so saṇikaṃ gaccheyya
-English Translation: “Why on earth am I going quickly?” “What if I were to go slowly?” [So] he would walk slowly.
+Pali: kiṃ nu kho ahaṃ sīghaṃ gacchāmi? yaṃnūn'āhaṃ saṇikaṃ gaccheyyan'ti. so saṇikaṃ gaccheyya
+English Translation: "Why on earth am I going quickly?" "What if I were to go slowly?" [So] he would walk slowly.
 
 Sutta Number: SNP23
 Pali: bhagavā āyasmantaṃ rāhulaṃ imāhi gāthāhi abhiṇhaṃ ovadatī'ti
 English Translation: The Blessed One frequently advises Venerable Rāhula with these verses.
 
 Sutta Number: AN10.176
-Pali: ime sattā haññantu vā bajjhantu vā ucchijjantu vā vinassantu vā mā vā ahesun’ti
-English Translation: “May these beings be killed, be tied up, be chopped up, be destroyed, may they cease to exist!”
+Pali: ime sattā haññantu vā bajjhantu vā ucchijjantu vā vinassantu vā mā vā ahesun'ti
+English Translation: "May these beings be killed, be tied up, be chopped up, be destroyed, may they cease to exist!"
 
 Sutta Number: SN22.79
-Pali: ahaṃ kho eta’r’ahi rūpena khajjāmi. atītam’p’āhaṃ addhānaṃ evam’eva rūpena khajjiṃ
+Pali: ahaṃ kho eta'r'ahi rūpena khajjāmi. atītam'p'āhaṃ addhānaṃ evam'eva rūpena khajjiṃ
 English Translation: Right now, I am truly being eaten by matter. In the past, I was also eaten by matter in the same way [as] at [this] time.
 
 Sutta Number: AN4.186
@@ -25,8 +25,8 @@ Pali: kena nu kho, bhante, loko nīyati, kena loko parikassati
 English Translation: Master, by what is the world lead? By what is the world dragged around?
 
 Sutta Number: MN2.2
-Pali: assutavā puthujjano na parimuccati jātiyā … , na parimuccati dukkhasmā’ti vadāmi
-English Translation: I say: “An unlearned common person is not freed from birth. He is not completely freed from suffering."
+Pali: assutavā puthujjano na parimuccati jātiyā ... , na parimuccati dukkhasmā'ti vadāmi
+English Translation: I say: "An unlearned common person is not freed from birth. He is not completely freed from suffering."
 
 Sutta Number: MN20
 Pali: kiṃ nu kho ahaṃ saṇikaṃ gacchāmi?
@@ -37,8 +37,8 @@ Pali: passaddhakāyassa sukhino cittaṃ samādhiyati
 English Translation: For one [whose] body [is] relaxed [and] who [is] at ease, the mind becomes composed.
 
 Sutta Number: VIN PAT PC 73
-Pali: ce bhikkhuṃ aññe bhikkhū jāneyyuṃ nisinnapubbaṃ iminā bhikkhunā dvattikkhattuṃ pātimokkhe uddissamāne, ko pana vādo bhiyyo’ti
-English Translation: If other monks should know [about] [that] monk: “this monk has sat in two or three times before, while the disciplinary code was being recited, what to say of more [times]”.
+Pali: ce bhikkhuṃ aññe bhikkhū jāneyyuṃ nisinnapubbaṃ iminā bhikkhunā dvattikkhattuṃ pātimokkhe uddissamāne, ko pana vādo bhiyyo'ti
+English Translation: If other monks should know [about] [that] monk: "this monk has sat in two or three times before, while the disciplinary code was being recited, what to say of more [times]".
 
 Sutta Number: DHP201
 Pali: jayaṃ veraṃ pasavati, dukkhaṃ seti parājito, upasanto sukhaṃ seti, hitvā jayaparājayaṃ.
@@ -49,8 +49,8 @@ Pali: taṃ kiṃ maññasi, sunakkhatta, api nu tassa purisassa tasmiṃ vante 
 English Translation: What do you think, Sunakkhatta, after that man has vomited [some delectable food], would he have desire to eat [it] again?
 
 Sutta Number: SN22.59
-Pali: imasmiṃ ca pana veyyākaraṇasmiṃ bhaññamāne pañcavaggiyānaṃ bhikkhūnaṃ anupādāya āsavehi cittāni vimucciṃsū’ti.
-English Translation: “And so, while this detailed exposition was being spoken, the minds of the group of five monks, by not grasping, were freed from taints.”
+Pali: imasmiṃ ca pana veyyākaraṇasmiṃ bhaññamāne pañcavaggiyānaṃ bhikkhūnaṃ anupādāya āsavehi cittāni vimucciṃsū'ti.
+English Translation: "And so, while this detailed exposition was being spoken, the minds of the group of five monks, by not grasping, were freed from taints."
 
 Sutta Number: MN75
 Pali: aññe satte passāmi kāmesu avītarāge kāmataṇhāhi khajjamāne kāmapariḷāhena pariḍayhamāne kāme paṭisevante.
@@ -73,18 +73,18 @@ Pali: tassa kho pāpakā samācārā dissanti c'eva suyyanti ca kulāni ca tena 
 English Translation: His bad activities (lit: behaviors) are seen as well as heard [about] and the householders corrupted by him are seen as well as heard [about].
 
 Sutta Number: UD10
-Pali: tato tvaṃ, bāhiya, na tena; yato tvaṃ, bāhiya, na tena tato tvaṃ, bāhiya, na tattha; yato tvaṃ, bāhiya, na tattha, tato tvaṃ, bāhiya, n'eva idha na huraṃ na ubhayam'antarena. es'ev'anto dukkhassā”ti.
-English Translation: “Therefore, Bāhiya, you [won’t be] with that; because you [are] not with that, therefore, you, Bāhiya, [will] not [be] there. Since, you, Bāhiya, [are] not there, therefore, you, Bāhiya, [are] neither not here, nor in another world, nor in-between the two; just this is the end of suffering.”
+Pali: tato tvaṃ, bāhiya, na tena; yato tvaṃ, bāhiya, na tena tato tvaṃ, bāhiya, na tattha; yato tvaṃ, bāhiya, na tattha, tato tvaṃ, bāhiya, n'eva idha na huraṃ na ubhayam'antarena. es'ev'anto dukkhassā'ti.
+English Translation: "Therefore, Bāhiya, you [won't be] with that; because you [are] not with that, therefore, you, Bāhiya, [will] not [be] there. Since, you, Bāhiya, [are] not there, therefore, you, Bāhiya, [are] neither not here, nor in another world, nor in-between the two; just this is the end of suffering."
 
 
 Class 13 Extra
 
 Sutta Number: SNP37
-Pali: na munī gāmam’āgamma, kulesu sahasā care
+Pali: na munī gāmam'āgamma, kulesu sahasā care
 English Translation: A monk, having arrived in the village, should not walk rashly among the households.
 
 Sutta Number: APA3 (simpl)
-Pali: jahanti purimaṃ nāmaṃ, buddhaputtā’ti ñāyanti
+Pali: jahanti purimaṃ nāmaṃ, buddhaputtā'ti ñāyanti
 English Translation: They give up their former names and are known as "Buddha's sons"
 
 Sutta Number: SNP8
@@ -109,7 +109,7 @@ English Translation: It was different when the Protector of the world, the supre
 
 Sutta Number: DHP265
 Pali: yo ca sameti pāpāni, aṇuṃ thūlāni sabbaso, samitattā hi pāpānaṃ, samaṇo'ti pavuccati.
-English Translation: He [is one] who makes subside evil deeds, [both] miniscule and large; because of the subsiding completely of evil deeds, he is indeed called “an ascetic.”
+English Translation: He [is one] who makes subside evil deeds, [both] miniscule and large; because of the subsiding completely of evil deeds, he is indeed called "an ascetic."
 
 Sutta Number: SNP22
 Pali: uṭṭhahatha nisīdatha, ko attho supitena vo, āturānaṃ hi kā niddā, sallaviddhānaṃ ruppataṃ.

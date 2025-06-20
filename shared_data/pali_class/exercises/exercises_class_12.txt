@@ -1,24 +1,24 @@
 Class 12 Exercises
 
 Sutta Number: MN4
-Pali: anekavihitaṃ pubbenivāsaṃ anussarāmi, seyyathidaṃ - ekam’pi jātiṃ dve’pi jātiyo tisso’pi jātiyo catasso’pi jātiyo pañca’pi jātiyo dasa’pi jātiyo vīsam’pi jātiyo tiṃsam’pi jātiyo cattālīsam’pi jātiyo paññāsam’pi jātiyo jātisatam’pi jātisahassam’pi jātisatasahassam’pi
+Pali: anekavihitaṃ pubbenivāsaṃ anussarāmi, seyyathidaṃ - ekam'pi jātiṃ dve'pi jātiyo tisso'pi jātiyo catasso'pi jātiyo pañca'pi jātiyo dasa'pi jātiyo vīsam'pi jātiyo tiṃsam'pi jātiyo cattālīsam'pi jātiyo paññāsam'pi jātiyo jātisatam'pi jātisahassam'pi jātisatasahassam'pi
 English Translation: I recollected manifold past lives, that is, one birth, two births, three births, four births, five births, ten births, twenty births, thirty births, forty births, fifty births, a hundred births, a thousand births, a hundred thousand births
 
 Sutta Number: MN16
 Pali: seyyathāpi, bhikkhave, kukkuṭiyā aṇḍāni aṭṭha vā dasa vā dvādasa vā.
-English Translation: Imagine if, monks, there could be hen’s eggs, eight or ten or twelve.
+English Translation: Imagine if, monks, there could be hen's eggs, eight or ten or twelve.
 
 Sutta Number: UD45
-Pali: seyyathāpi, bhikkhave, mahāsamuddo ekaraso loṇaraso, evam’eva kho, bhikkhave, ayaṃ dhammavinayo ekaraso vimuttiraso
+Pali: seyyathāpi, bhikkhave, mahāsamuddo ekaraso loṇaraso, evam'eva kho, bhikkhave, ayaṃ dhammavinayo ekaraso vimuttiraso
 English Translation: Monks, just as the great ocean has one taste, the taste of salt. Likewise, monks, this teaching and training has one taste, the flavour of liberation.
 
 Sutta Number: SN1.37
-Pali: ekaṃ samayaṃ bhagavā sakkesu viharati bhikkhusaṅghena saddhiṃ pañcamattehi bhikkhusatehi sabbeh’eva arahantehi
+Pali: ekaṃ samayaṃ bhagavā sakkesu viharati bhikkhusaṅghena saddhiṃ pañcamattehi bhikkhusatehi sabbeh'eva arahantehi
 English Translation: On one occasion, the Blessed One was dwelling among the Sakyans. With a community of monks, five hundred monks, all exclusively arahants.
 
 Sutta Number: AN1.12
-Pali: n’āhaṃ, bhikkhave, aññaṃ ekadhammam’pi samanupassāmi yena anuppanno byāpādo uppajjati, yathayidaṃ, bhikkhave, paṭighanimittaṃ
-English Translation: I don’t see even one single other thing, monks, because of which unarisen ill-will arises, such as a disliked image.
+Pali: n'āhaṃ, bhikkhave, aññaṃ ekadhammam'pi samanupassāmi yena anuppanno byāpādo uppajjati, yathayidaṃ, bhikkhave, paṭighanimittaṃ
+English Translation: I don't see even one single other thing, monks, because of which unarisen ill-will arises, such as a disliked image.
 
 Sutta Number: SN56.14
 Pali: cattāri imāni, bhikkhave, ariyasaccāni. katamāni cattāri?
@@ -38,7 +38,7 @@ English Translation: He dwells/abides having pervaded one direction with a mind 
 
 Sutta Number: DN9.6
 Pali: eke samaṇabrāhmaṇā evaṃvādino evaṃdiṭṭhino
-English Translation: Some monks and brahmins who hold the view, [who are] of the opinion…
+English Translation: Some monks and brahmins who hold the view, [who are] of the opinion
 
 Sutta Number: SN36.22
 Pali: aṭṭhārasa api mayā vedanā vuttā pariyāyena; chattiṃsa api mayā vedanā vuttā pariyāyena; aṭṭhasataṃ api mayā vedanā vuttā pariyāyena.
@@ -46,11 +46,11 @@ English Translation: I have spoken [of] eighteen feelings in one way, also I hav
 
 Sutta Number: SN56.11 (simpl)
 Pali: yāvakīvañ'ca me, bhikkhave, imesu catūsu ariyasaccesu saha tīhi parivaṭṭehi saha dvādasahi ākārehi yathābhūtaṃ ñāṇadassanaṃ na suvisuddhaṃ ahosi,
-English Translation: Monks, as long as for me, knowledge and vision were not perfectly purified with regard to the Four Noble Truths as they truly are in [their] three phases together with [their] twelve aspects….
+English Translation: Monks, as long as for me, knowledge and vision were not perfectly purified with regard to the Four Noble Truths as they truly are in [their] three phases together with [their] twelve aspects
 
 Sutta Number: VIN PAT SA 11
 Pali: tassa eva kho pana bhikkhussa bhikkhū honti, anuvattakā vaggavādakā, eko vā dve vā tayo vā, te evaṃ vadeyyuṃ
-English Translation: But now there are monks who are followers of just that monk, [and] who are proponents of [his] faction – one or two or three – [and] they should say thus…
+English Translation: But now there are monks who are followers of just that monk, [and] who are proponents of [his] faction – one or two or three – [and] they should say thus
 
 Sutta Number: SN12.2
 Pali: cattāro ca mahābhūtā, catunnaṃ ca mahābhūtānaṃ upādāya rūpaṃ – idaṃ vuccati rūpaṃ.
@@ -74,7 +74,7 @@ English Translation: I speak of five hindrances with nutriment, [they are] not w
 
 Sutta Number: SN12.63 (simpl)
 Pali: taṃ kiṃ maññatha, api nu so puriso divasaṃ tīhi sattīhi satehi haññamāno tatonidānaṃ dukkhaṃ domanassaṃ paṭisaṃvediyeyya?
-English Translation: “What do you think? Wouldn’t that man, being struck during the day with three hundred spears, experience suffering and distress on that account?”
+English Translation: "What do you think? Wouldn't that man, being struck during the day with three hundred spears, experience suffering and distress on that account?"
 
 Sutta Number: AN4.67
 Pali: namo bhagavato, namo sattannaṃ sammāsambuddhānaṃ
@@ -82,11 +82,11 @@ English Translation: Homage to the Blessed One, homage to the seven Perfectly En
 
 Sutta Number: SN12.61
 Pali: dissati ayaṃ, bhikkhave, cātumahābhūtiko kāyo ekaṃ api vassaṁ tiṭṭhamāno dve api vassāni tiṭṭhamāno tīṇi ... cattāri ... pañca ... dasa ... vīsati ... tiṃsaṃ ... cattārīsaṃ api vassāni tiṭṭhamāno paññāsaṃ api vassāni tiṭṭhamāno vassasataṃ api tiṭṭhamāno, bhiyyo api tiṭṭhamāno.
-English Translation: It is observed, monks, [that] this body, composed of the four great elements, is standing just one year, [or] just two years, … three … four … five … ten … twenty … thirty … forty … fifty [or] remaining one hundred years [or] even remaining more than [that].
+English Translation: It is observed, monks, [that] this body, composed of the four great elements, is standing just one year, [or] just two years ... three ... four ... five ... ten ... twenty ... thirty ... forty ... fifty [or] remaining one hundred years [or] even remaining more than [that].
 
 Sutta Number: UD46
 Pali: evaṃ, bhante'ti kho āyasmā soṇo bhagavato paṭissutvā soḷasa aṭṭhakavaggikāni sabbāni eva sarena abhaṇi.
-English Translation: “Yes, venerable sir.” Having responded in agreement to the Blessed One, Venerable Soṇa indeed recited melodiously all sixteen [suttas], belonging to the groups of eight.
+English Translation: "Yes, venerable sir." Having responded in agreement to the Blessed One, Venerable Soṇa indeed recited melodiously all sixteen [suttas], belonging to the groups of eight.
 
 Sutta Number: MN91
 Pali: tassa imāni satta ratanāni bhavanti, seyyath'idaṃ, cakkaratanaṃ, hatthiratanaṃ, assaratanaṃ, maṇiratanaṃ, itthiratanaṃ, gahapatiratanaṃ, pariṇāyakaratanaṃ eva sattamaṃ.
@@ -95,7 +95,7 @@ English Translation: [A Wheel-turning Monarch] has these seven treasures, namely
 Class 12 Extra
 
 Sutta Number: SNP5
-Pali: caturo samaṇā na pañcam’atthi, te te āvikaromi sakkhipuṭṭho.
+Pali: caturo samaṇā na pañcam'atthi, te te āvikaromi sakkhipuṭṭho.
 English Translation: There are four (kinds of) ascetics, there is not a fifth. Questioned face to face, I will clarify those for you.
 
 Sutta Number: SNP13 (simpl)
@@ -108,10 +108,10 @@ English Translation: They who understand clearly the Noble Truths well taught by
 
 Sutta Number: VIN PAT AN 1
 Pali: tam'enaṃ saddheyyavacasā upāsikā disvā tiṇṇaṃ dhammānaṃ aññatarena vadeyya, pārājikena vā saṅghādisesena vā pācittiyena vā
-English Translation: …a lay woman, whose words can be trusted, having then seen that should speak in accordance with one of three rules: according to an offence involving defeat, according to an offence requiring suspension, according to an offence requiring confession.
+English Translation: A lay woman, whose words can be trusted, having then seen that should speak in accordance with one of three rules: according to an offence involving defeat, according to an offence requiring suspension, according to an offence requiring confession.
 
 Sutta Number: SNP13
-Pali: vanappagumbe yathā phussit’agge, gimhāna-māse paṭhamasmiṃ gimhe, tath’ūpamaṃ dhamma-varaṃ adesayi, nibbāna-gāmiṃ paramaṃ hitāya.
+Pali: vanappagumbe yathā phussit'agge, gimhāna-māse paṭhamasmiṃ gimhe, tath'ūpamaṃ dhamma-varaṃ adesayi, nibbāna-gāmiṃ paramaṃ hitāya.
 English Translation: Like a forest grove with a flowering crest,
 in the first heat of the hot month,
 (The Buddha) taught the sublime teaching,

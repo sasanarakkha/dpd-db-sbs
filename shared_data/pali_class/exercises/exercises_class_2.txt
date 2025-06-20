@@ -17,8 +17,8 @@ Pali: maggo hoti sokaparidevānaṃ samatikkamāya, ñāyassa adhigamāya, nibb�
 English Translation: It is the path for the overcoming of sorrow and lamentation, for the attainment of the (right) method, for personal experience of total emancipation.
 
 Sutta Number: AN10.48
-Pali: uttarissa manussassa dhammo alam’ariyo ñāṇadassanassa viseso
-English Translation: the state of a superior humANbeing, the attainment of knowing and seeing, suitable for a noble person,
+Pali: uttarissa manussassa dhammo alam'ariyo ñāṇadassanassa viseso
+English Translation: the state of a superior human being, the attainment of knowing and seeing, suitable for a noble person,
 
 Sutta Number: DN22.5
 Pali: atthi imasmiṃ kāye kesā lomā nakhā dantā taco
@@ -31,12 +31,12 @@ English Translation: I will not take a cup for drinking water with a soiled hand
 Sutta Number: VIN PAT NID
 Sutta Name: nidānuddeso
 Pali: saṅgho uposathaṃ kareyya, pātimokkhaṃ uddiseyya
-English Translation: The community of monks could make ANobservance day [and] would recite the training rules.
+English Translation: The community of monks could make an observance day [and] would recite the training rules.
 
 Sutta Number: SN55.7
-Pali: itipi so bhagavā arahaṃ sammāsambuddho vijjācaraṇasampanno sugato lokavidū anuttaro purisadammasārathi satthā devamanussānaṃ buddho bhagavā’ti
+Pali: itipi so bhagavā arahaṃ sammāsambuddho vijjācaraṇasampanno sugato lokavidū anuttaro purisadammasārathi satthā devamanussānaṃ buddho bhagavā'ti
 
-English Translation: It is so (thus) “He [is] the Blessed One, the Worthy One, the fully Enlightened One, endowed with wisdom and ethical conduct, Fortunate One, knower of the world, incomparable leader of persons to be tamed, teacher of gods and humans, the Awakened One, the Blessed One.”
+English Translation: It is so (thus) "He [is] the Blessed One, the Worthy One, the fully Enlightened One, endowed with wisdom and ethical conduct, Fortunate One, knower of the world, incomparable leader of persons to be tamed, teacher of gods and humans, the Awakened One, the Blessed One."
 
 Sutta Number: VIN1.1.3
 Pali: kāyassa bhedā
@@ -100,7 +100,7 @@ English Translation: [reborn] in a state of suffering, in hell.
 
 Sutta Number: 
 Pali: aparena samayena buddho
-English Translation: on another occasion, the Awakened One…
+English Translation: on another occasion, the Awakened One
 
 Sutta Number: VIN 1.4.1.2
 Pali: gabbhe cīvaraṃ
@@ -116,7 +116,7 @@ English Translation: The brahmin [filled] with the [five] hindrances
 
 Sutta Number: SN2.8
 Pali: kāme brāhmaṇa
-English Translation: O, brahmin! … sensual pleasures
+English Translation: O, brahmin, sensual pleasures
 
 Sutta Number: DHP 331
 Pali: atthamhi sahāyā
@@ -124,8 +124,8 @@ English Translation: [Good are] friends in [arisen] need
 English Translation: [Good are] friends when need [arises]
 
 Sutta Number: MN35
-Pali: gotamo sāvake … gotamassa sāvakesu
-English Translation: Gotama [trains] disciples…. Gotama’s [instruction presented] to disciples
+Pali: gotamo sāvake ... gotamassa sāvakesu
+English Translation: Gotama [trains] disciples ... Gotama's [instruction presented] to disciples
 
 Sutta Number: SN19.21
 Pali: kassapassa vinayasmiṃ 

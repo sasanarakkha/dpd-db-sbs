@@ -28,8 +28,13 @@ class DPSPaths:
         self.pat_links_path = base_dir.joinpath(Path("shared_data/sbs_csvs/pat_links.tsv"))
         self.ru_total_root_path = base_dir.joinpath(Path("shared_data/rus/ru_total_roots.tsv"))
         self.ru_total_comp_path = base_dir.joinpath(Path("shared_data/rus/ru_total_comps.tsv"))
+        
         self.pali_class_vocab_dir = base_dir.joinpath(Path("shared_data/pali_class/vocab/"))
+        self.pali_class_output_dir = base_dir.joinpath(Path("shared_data/pali_class/output/"))
+
         self.discourses_vocab_dir = base_dir.joinpath(Path("shared_data/discourses/vocab/"))
+        self.discourses_output_dir = base_dir.joinpath(Path("shared_data/discourses/output/"))
+
         self.dps_internal_tests_path = base_dir.joinpath(Path("shared_data/sbs_csvs/dps_internal_tests.tsv"))
 
         # backup_tsv folder

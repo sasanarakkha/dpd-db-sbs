@@ -39,8 +39,8 @@ id,pali,selected_pali_word,class_source,extra,class_example,english_translation
 18077,evamassa 1,,,,,
 18180,evaṃrūpa,evaṃrūpo,SN22.3,,evaṃrūpo siyaṃ anāgatamaddhānaṃ,May I be of such form in the future.
 18208,evaṃvedana,evaṃvedano,SN22.3,,"idha, gahapati, ekaccassa evaṃ hoti, evaṃrūpo siyaṃ anāgatam'addhānaṃ, <b>evaṃvedano</b> siyaṃ anāgatam'addhānaṃ","In this regard, householder, some think [lit: there is thus for some], may I be of such form in the future, may I be having such feeling in the future."
-18775,obhāsati 1.1,obhāseyya,VIN PAT SA 3 (simpl),yes,yo pana bhikkhu mātugāmaṃ duṭṭhullāhi vācāhi <b>obhāseyya</b>,If any monk should speak to a woman coarsely by means of obscene words…
-18876,orenaddhamāsaṃ,oren'addhamāsaṃ,VIN PAT PC 57,,"yo pana bhikkhu <b>oren'addhamāsaṃ</b> nahāyeyya, pācittiyan'ti","whichever monk should bathe within half a month, that is a pācittiya (a case requiring confession)."
+18775,obhāsati 1.1,obhāseyya,VIN PAT SA 3 (simpl),yes,yo pana bhikkhu mātugāmaṃ duṭṭhullāhi vācāhi <b>obhāseyya</b>,If any monk should speak to a woman coarsely by means of obscene words
+18876,orenaddhamāsaṃ,oren'addhamāsaṃ,VIN PAT PC 57,,"yo pana bhikkhu <b>oren'addhamāsaṃ</b> nahāyeyya, pācittiyaṃ","whichever monk should bathe within half a month, that is an offence requiring confession."
 20551,kareyya 2,kareyya,UD69,yes,"kiṃ <b>kareyya</b> udapānena, āpā ce sabbadā siyuṃ, taṇhāya mūlato chetvā, kissa pariyesanaṃ care?","What one could do with the well, if always there could be water?; Having cut off the craving from the source, why would he go about searching?"
 21727,kinti,kin'ti,MN14,,<b>kin'ti</b> me bhoge na corā hareyyuṃ,How then could thieves not steal my valuables?
 21930,kissa 1,kissa,UD69,yes,"kiṃ kareyya udapānena, āpā ce sabbadā siyuṃ, taṇhāya mūlato chetvā, <b>kissa</b> pariyesanaṃ care?","What one could do with the well, if always there could be water?; Having cut off the craving from the source, why would he go about searching?"
@@ -51,7 +51,7 @@ id,pali,selected_pali_word,class_source,extra,class_example,english_translation
 22792,kūṭāgārasālā 2,kūṭāgāra-sālāyaṃ,AN8.53,,ekaṃ samayaṃ bhagavā vesāliyaṃ viharati mahāvane <b>kūṭāgāra-sālāyaṃ</b>,"At one time the Blessed One was living in Vesali, in the great wood, in the hall of the building with the peaked roof."
 22949,kocideva,,,,,
 23967,kho pana,kho pana,DN16.36 (simpl),,"siyā <b>kho pana</b> ananda, tumhākaṃ evaṃ assa — ""n'atthi no satthā"" iti.","And now, Ananda, it could be thus would occur to you: “there is no teacher for us.”"
-24431,gamanāya,gamanāya,VIN PAT PC 49,yes,siyā ca tassa bhikkhuno koci'd'eva paccayo senaṃ <b>gamanāya</b>,And if there might be some or other reason for that monk for going to see an army…
+24431,gamanāya,gamanāya,VIN PAT PC 49,yes,siyā ca tassa bhikkhuno koci'd'eva paccayo senaṃ <b>gamanāya</b>,And if there might be some or other reason for that monk for going to see an army
 24711,gahetvā 5,gahetvā,VIN PAT PA 2,,rājāno coraṃ <b>gahetvā</b> haneyyuṃ vā bandheyyuṃ vā pabbājeyyuṃ vā,"The king's men, having captured a thief, could kill (him) or imprison him or banish him."
 24726,gāthā 1,gāthāya,SN8.11 (simpl),,yaṃnūn'āhaṃ bhagavantaṃ sammukhā sāruppāya <b>gāthāya</b> abhitthaveyyāmi,Maybe I should praise the Blessed One face-to-face with an appropriate verse.
 24853,gāha 2.2,gāhaṃ,MN25 (simpl),yes,"mayaṃ migajātānaṃ āsayaṃ passeyyāma, yattha te <b>gāhaṃ</b> gaccheyyun'ti.","“We could see the dwelling of a species of deer, where they would go [for] a hiding place.”"
@@ -59,7 +59,7 @@ id,pali,selected_pali_word,class_source,extra,class_example,english_translation
 27056,cetasā,cetasā,MN107 (simpl),,abhijjhaṃ loke pajaheyyuṃ vigat'ābhijjhena <b>cetasā</b> vihareyyuṃ; abhijjhāya cittaṃ parisodheyyuṃ,"They would abandon covetousness with reference to the world, they would dwell with a mind free from covetousness, they would purify the mind from covetousness."
 27315,chaḍḍita,chaḍḍitaṃ,DN22.7,,bhikkhu seyyathāpi passeyya sarīraṃ sivathikāya <b>chaḍḍitaṃ</b>,Imagine if a monk could see a dead body discarded in a charnel ground.
 27732,chetvā 1,chetvā,UD69,,"kiṃ kareyya udapānena, āpā ce sabbadā siyuṃ, taṇhāya mūlato <b>chetvā</b>, kissa pariyesanaṃ care?","What one could do with the well, if always there could be water?; Having cut off the craving from the source, why would he go about searching?"
-28343,jāneyya,jāneyyāsi,AN8.53,,ye kho tvaṃ dhamme <b>jāneyyāsi</b>,"Indeed, whatever things you might know…"
+28343,jāneyya,jāneyyāsi,AN8.53,,ye kho tvaṃ dhamme <b>jāneyyāsi</b>,"Indeed, whatever things you might know"
 28513,jivhā,jivhāya,MN152,,<b>jivhāya</b> rasaṃ sāyitvā uppajjati manāpaṃ,"Having tasted a flavour with the tongue, a pleasant experience arises."
 29568,tatonidānaṃ,tatonidānaṃ,MN39,,"so <b>tatonidānaṃ</b> labheyya pāmojjaṃ, adhigaccheyya somanassaṃ","Because of that he would obtain gladness, he would experience pleasure."
 30379,tāvatakeneva,tāvataken'eva,DN10,,te <b>tāvataken'eva</b> attamanā assu,With just this much they would be pleased.
@@ -70,17 +70,17 @@ id,pali,selected_pali_word,class_source,extra,class_example,english_translation
 31217,tena 2,,,,,
 31576,thūla 2,thūlaṃ,MN104,yes,"ime ce tumhe cha sāraṇīye dhamme samādāya vatteyyātha, passatha no tumhe taṃ vacanapathaṃ, aṇuṃ vā <b>thūlaṃ</b> vā, yaṃ tumhe n'ādhivāseyyātha?","If you could practice undertaking these six cordial things, do you see any way of saying things (i.e. mode of expression), gross or subtle, which you could not tolerate?"
 32650,disā 1,disā,AN7.61,,tvaṃ moggallāna <b>disā</b> anuvilokeyyāsi nakkhattāni ullokeyyāsi,"Moggallāna, you should look all around in all directions, and look up at the constellations."
-33101,duṭṭhulla 2,duṭṭhullāhi,VIN PAT SA 3 (simpl),yes,yo pana bhikkhu mātugāmaṃ <b>duṭṭhullāhi</b> vācāhi obhāseyya,If any monk should speak to a woman coarsely by means of obscene words…
+33101,duṭṭhulla 2,duṭṭhullāhi,VIN PAT SA 3 (simpl),yes,yo pana bhikkhu mātugāmaṃ <b>duṭṭhullāhi</b> vācāhi obhāseyya,If any monk should speak to a woman coarsely by means of obscene words
 35372,nakkhatta 1,nakkhattāni,AN7.61,,tvaṃ moggallāna disā anuvilokeyyāsi <b>nakkhattāni</b> ullokeyyāsi,"Moggallāna, you should look all around in all directions, and look up at the constellations."
 35540,natthi 1,n'atthi,DN16.36 (simpl),,"siyā kho pana ananda, tumhākaṃ evaṃ assa — <b>n'atthi</b> no satthā"" iti.","And now, Ananda, it could be thus would occur to you: “there is no teacher for us.”"
 35710,nappaṭikaṅkhati,nappaṭikaṅkhe,MN131,,"atītaṃ n'ānvāgameyya, <b>nappaṭikaṅkhe</b> anāgataṃ.","He should not return to the past, he should not anticipate the future."
-35986,nahāyati,nahāyeyya,VIN PAT PC 57,,"yo pana bhikkhu oren'addhamāsaṃ <b>nahāyeyya</b>, pācittiyan'ti","whichever monk should bathe within half a month, that is a pācittiya (a case requiring confession)."
+35986,nahāyati,nahāyeyya,VIN PAT PC 57,,"yo pana bhikkhu oren'addhamāsaṃ <b>nahāyeyya</b>, pācittiyaṃ","whichever monk should bathe within half a month, that is an offence requiring confession."
 36220,nādhivāseti,n'ādhivāseyyātha,MN104,yes,"ime ce tumhe cha sāraṇīye dhamme samādāya vatteyyātha, passatha no tumhe taṃ vacanapathaṃ, aṇuṃ vā thūlaṃ vā, yaṃ tumhe <b>n'ādhivāseyyātha</b>?","If you could practice undertaking these six cordial things, do you see any way of saying things (i.e. mode of expression), gross or subtle, which you could not tolerate?"
 36361,nānvāgameti,n'ānvāgameyya,MN131,,"atītaṃ <b>n'ānvāgameyya</b>, nappaṭikaṅkhe anāgataṃ.","He should not return to the past, he should not anticipate the future."
 38885,no 1.3,,,,,
 39376,paccaya 2,,,,,
 40353,paṭighāta 1,,,,,
-42281,pana,pana,VIN PAT PC 57,,"yo <b>pana</b> bhikkhu oren'addhamāsaṃ nahāyeyya, pācittiyan'ti","whichever monk should bathe within half a month, that is a pācittiya (a case requiring confession)."
+42281,pana,pana,VIN PAT PC 57,,"yo <b>pana</b> bhikkhu oren'addhamāsaṃ nahāyeyya, pācittiyaṃ","whichever monk should bathe within half a month, that is an offence requiring confession."
 42491,pabbajjā 1,pabbajjā,SN12.22 (simpl),,evaṃ no ayaṃ amhākaṃ <b>pabbajjā</b> avaṅkatā avañjhā bhaveyya,"In this way, indeed, our renunciation would not be sterile, would not be dishonest."
 42544,pabbājeti 1,pabbājeyyuṃ,VIN PAT PA 2,,rājāno coraṃ gahetvā haneyyuṃ vā bandheyyuṃ vā <b>pabbājeyyuṃ</b> vā,"The king's men, having captured a thief, could kill (him) or imprison him or banish him."
 42964,parama 1,paramāya,DN16.27,,so tathāgataṃ pūjeti <b>paramāya</b> pūjāya,He honors the Buddha with the highest veneration.
@@ -105,8 +105,8 @@ id,pali,selected_pali_word,class_source,extra,class_example,english_translation
 53542,yattha,yattha,MN25 (simpl),,"mayaṃ migajātānaṃ āsayaṃ passeyyāma, <b>yattha</b> te gāhaṃ gaccheyyun'ti.","“We could see the dwelling of a species of deer, where they would go [for] a hiding place.”"
 53888,yaṃnūnāhaṃ,yaṃnūn'āhaṃ,SN8.11 (simpl),,<b>yaṃnūn'āhaṃ</b> bhagavantaṃ sammukhā sāruppāya gāthāya abhitthaveyyāmi,Maybe I should praise the Blessed One face-to-face with an appropriate verse.
 54046,yāvadeva,yāva'd'eva,MN2.4,,yāva'd'eva uppannānaṃ veyyābādhikānaṃ vedanānaṃ paṭighātāya abyāpajjhaparamatāya,"Only as much as for the freedom from oppressive pain at the most, for the warding off of oppressive feelings that have arisen."
-54208,yo,yo,VIN PAT PC 57,,"<b>yo</b> pana bhikkhu oren'addhamāsaṃ nahāyeyya, pācittiyan'ti","whichever monk should bathe within half a month, that is a pācittiya (a case requiring confession)."
-54210,yo pana bhikkhu,yo pana bhikkhu,VIN PAT PC 57,,"<b>yo pana bhikkhu</b> oren'addhamāsaṃ nahāyeyya, pācittiyan'ti","whichever monk should bathe within half a month, that is a pācittiya (a case requiring confession)."
+54208,yo,yo,VIN PAT PC 57,,"<b>yo</b> pana bhikkhu oren'addhamāsaṃ nahāyeyya, pācittiyaṃ","whichever monk should bathe within half a month, that is an offence requiring confession."
+54210,yo pana bhikkhu,yo pana bhikkhu,VIN PAT PC 57,,"<b>yo pana bhikkhu</b> oren'addhamāsaṃ nahāyeyya, pācittiyaṃ","whichever monk should bathe within half a month, that is an offence requiring confession."
 54409,rajakkha,,,,,
 54956,rājāno,rājāno,VIN PAT PA 2,,<b>rājāno</b> coraṃ gahetvā haneyyuṃ vā bandheyyuṃ vā pabbājeyyuṃ vā,"The king's men, having captured a thief, could kill (him) or imprison him or banish him."
 58858,sabbadā,sabbadā,UD69,yes,"kiṃ kareyya udapānena, āpā ce <b>sabbadā</b> siyuṃ, taṇhāya mūlato chetvā, kissa pariyesanaṃ care?","What one could do with the well, if always there could be water?; Having cut off the craving from the source, why would he go about searching?"
@@ -119,7 +119,7 @@ id,pali,selected_pali_word,class_source,extra,class_example,english_translation
 62985,siyā 2,siyā,DN16.36 (simpl),,"siyā kho pana ananda, tumhākaṃ evaṃ assa — ""n'atthi no satthā"" iti.","And now, Ananda, it could be thus would occur to you: “there is no teacher for us.”"
 62986,siyuṃ,siyuṃ,UD69,yes,"kiṃ kareyya udapānena, āpā ce sabbadā <b>siyuṃ</b>, taṇhāya mūlato chetvā, kissa pariyesanaṃ care?","What one could do with the well, if always there could be water?; Having cut off the craving from the source, why would he go about searching?"
 63071,sivathikā,sivathikāya,DN22.7,,bhikkhu seyyathāpi passeyya sarīraṃ <b>sivathikāya</b> chaḍḍitaṃ,Imagine if a monk could see a dead body discarded in a charnel ground.
-64905,senā,senaṃ,VIN PAT PC 49,yes,siyā ca tassa bhikkhuno koci'd'eva paccayo <b>senaṃ</b> gamanāya,And if there might be some or other reason for that monk for going to see an army…
+64905,senā,senaṃ,VIN PAT PC 49,yes,siyā ca tassa bhikkhuno koci'd'eva paccayo <b>senaṃ</b> gamanāya,And if there might be some or other reason for that monk for going to see an army
 65589,vacanapatha,vacanapathaṃ,MN104,yes,"ime ce tumhe cha sāraṇīye dhamme samādāya vatteyyātha, passatha no tumhe taṃ <b>vacanapathaṃ</b>, aṇuṃ vā thūlaṃ vā, yaṃ tumhe n'ādhivāseyyātha?","If you could practice undertaking these six cordial things, do you see any way of saying things (i.e. mode of expression), gross or subtle, which you could not tolerate?"
 65726,vajjavant,vajjavā,SN22.80,,n'atthi taṃ kiñci lokasmiṃ yaṃ ahaṃ upādiyamāno na <b>vajjavā</b> assaṃ.,There is not anything in the world which I am grasping [and] would not be with faults [i.e. and would not be blameworthy].
 65996,vattati 1,,,,,

@@ -1,8 +1,8 @@
 Class 6 Exercises
 
 Sutta Number: DN2.9
-Pali: bhagavā bhikkhū āmantesi, bhikkhavo’ti.
-English Translation: The Blessed One addressed the monks, “O monks!”
+Pali: bhagavā bhikkhū āmantesi, bhikkhavo'ti.
+English Translation: The Blessed One addressed the monks, "O monks!”
 
 Sutta Number: MN2.2
 Pali: bhikkhave, assutavā puthujjano na parimuccati jātiyā
@@ -10,15 +10,15 @@ English Translation: Monks, an unlearned common person is not liberated from bir
 
 Sutta Number: DN11.6
 Pali: esa bhagavato sāvakasaṅgho
-English Translation: This community of the Blessed One’s disciples is worthy of offerings.
+English Translation: This community of the Blessed One's disciples is worthy of offerings.
 
 Sutta Number: DN16.7
-Pali: atha kho āyasmato ānandassa etad’ahosi
+Pali: atha kho āyasmato ānandassa etad'ahosi
 English Translation: Then, this [thought] occurred to Venerable Ananda
 
 Sutta Number: VIN1.2.12
-Pali: “mā maṃ āyasmanto kiñci avacuttha kalyāṇaṃ vā pāpakaṃ vā”
-English Translation: Venerables, don’t say anything to me, good or bad!
+Pali: mā maṃ āyasmanto kiñci avacuttha kalyāṇaṃ vā pāpakaṃ vā
+English Translation: Venerables, don't say anything to me, good or bad!
 
 Sutta Number: MN152 (simpl)
 Pali: satthārā karaṇīyaṃ sāvakānaṃ, kataṃ vo taṃ mayā.
@@ -41,7 +41,7 @@ Pali: bhagavā tuṇhī ahosi.
 English Translation: The Blessed One was silent.
 
 Sutta Number: SN1.1
-Pali: sā devatā bhagavantaṃ etad’avoca
+Pali: sā devatā bhagavantaṃ etad'avoca
 English Translation: The deity said this to the Blessed One.
 
 Sutta Number: DN3.15
@@ -50,15 +50,15 @@ English Translation: A person with sight sees forms.
 
 Sutta Number: MN152
 Pali: seyyathāpi balavā puriso samiñjitaṃ vā bāhaṃ pasāreyya
-English Translation: Just like a strong man would stretch out (his) bent arm or …
+English Translation: Just like a strong man would stretch out (his) bent arm or 
 
 Sutta Number: AN2.40
-Pali: yasmiṃ, bhikkhave, samaye corā balavanto honti..
-English Translation: At whichever time, monks, thieves are powerful…
+Pali: yasmiṃ, bhikkhave, samaye corā balavanto honti.
+English Translation: At whichever time, monks, thieves are powerful
 
 Sutta Number: DN22.18
-Pali: upekkhako satimā sukhavihārī’ti
-English Translation: “He who is equanimous [and] mindful lives at ease.”
+Pali: upekkhako satimā sukhavihārī'ti
+English Translation: "He who is equanimous [and] mindful lives at ease.”
 
 Sutta Number: AN10.71
 Pali: thero bhikkhu sabrahmacārīnaṃ piyo ca hoti manāpo ca garu ca bhāvanīyo ca.
@@ -66,7 +66,7 @@ English Translation: An elder monk is dear to [his] fellow monks and pleasant, r
 
 Sutta Number: MN147
 Pali: taṃ kiṃ maññasi, rāhula, cakkhu niccaṃ vā aniccaṃ vā'ti
-English Translation: What do you think, Rāhula, “Is the eye permanent or impermanent?”
+English Translation: What do you think, Rāhula, "Is the eye permanent or impermanent?”
 
 Sutta Number: MN118
 Pali: bhikkhu araññagato vā rukkhamūlagato vā suññāgāragato vā nisīdati.
@@ -82,7 +82,7 @@ English Translation: Monks will honor, respect, revere, [and] venerate the elder
 
 Sutta Number: DHP277
 Pali: sabbe dhammā anattā iti, yadā paññāya passati, atha nibbindati dukkhe – esa maggo visuddhiyā
-English Translation: “All things are non-self.” When one sees [this] with wisdom, then one is disenchanted with suffering. This is the path for purification.
+English Translation: "All things are non-self.” When one sees [this] with wisdom, then one is disenchanted with suffering. This is the path for purification.
 
 Sutta Number: SN12.22
 Pali: taco ca nahāru ca aṭṭhi ca avasissatu, sarīre upasussatu maṃsalohitaṃ
@@ -118,7 +118,7 @@ English Translation: You must minister to one like me, observing the moral pract
 
 Sutta Number: VIN PAT NP 8 (simpl)
 Pali: ce so bhikkhu, pubbe appavārito, upasaṅkamissati cīvare vikappaṃ āpajjissati
-English Translation: If that monk, previously uninvited, approaches [there], causes an alteration in a robe…
+English Translation: If that monk, previously uninvited, approaches [there], causes an alteration in a robe
 
 Sutta Number: VIN PAT SK 18 (simpl)
 Pali: na bāhuṃ pacālakaṃ antaraghare nisīdissāmi
@@ -126,7 +126,7 @@ English Translation: I will not sit in an inhabited area swinging [my] arm[s].
 
 Sutta Number: SN21.10 (simpl)
 Pali: sabbābhibhuṃ sabbaviduṃ sumedhaṃ, tam naraṃ ekavihārī iti ahaṃ brūmi
-English Translation: [One who is] all-conquering, all-knowing, wise, that man I call thus, “one who dwells alone.”
+English Translation: [One who is] all-conquering, all-knowing, wise, that man I call thus, "one who dwells alone.”
 
 
 Class 6 Extra
