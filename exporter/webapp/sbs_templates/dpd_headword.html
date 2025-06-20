@@ -523,28 +523,6 @@
         </p>
         {% endif %}
         {% endif %}
-        {% if d.i.sbs.sbs_example_3 %}
-        <p>{{ d.i.sbs.sbs_example_3|safe }}</p>
-        <p class="sutta">
-            {% if d.make_link and d.i.sbs.sbs_source_link_3 %}
-            <a class="sutta_link" href="{{ d.i.sbs.sbs_source_link_3 }}" target="_blank">{{ d.i.sbs.sbs_source_3 }}</a>
-            {% else %}
-            {{ d.i.sbs.sbs_source_3 }}
-            {% endif %}
-            {{ d.i.sbs.sbs_sutta_3|safe }}
-        </p>
-        {% endif %}
-        {% if d.i.sbs.sbs_example_4 %}
-        <p>{{ d.i.sbs.sbs_example_4|safe }}</p>
-        <p class="sutta">
-            {% if d.make_link and d.i.sbs.sbs_source_link_4 %}
-            <a class="sutta_link" href="{{ d.i.sbs.sbs_source_link_4 }}" target="_blank">{{ d.i.sbs.sbs_source_4 }}</a>
-            {% else %}
-            {{ d.i.sbs.sbs_source_4 }}
-            {% endif %}
-            {{ d.i.sbs.sbs_sutta_4|safe }}
-        </p>
-        {% endif %}
         {% endif %}
         {% if d.i.sbs.needs_dhp_example %}
         <b>DHP:</b>
@@ -629,7 +607,7 @@
                 Correct it here.</a>
         </p>
     </div>
-    {% endif %}
+{% endif %}
 
 
     <!-- declension -->

@@ -33,28 +33,6 @@
             % endif
         % endif
 
-        % if i.sbs.sbs_example_3:
-        <p>${i.sbs.sbs_example_3}</p>
-        <p class="sutta">
-            % if make_link and i.sbs.sbs_source_link_3:
-            <a class="sutta_link" href="${i.sbs.sbs_source_link_3}">${i.sbs.sbs_source_3}</a>
-            % else:
-            ${i.sbs.sbs_source_3}
-            % endif
-            ${i.sbs.sbs_sutta_3}</p>
-        % endif
-
-        % if i.sbs.sbs_example_4:
-        <p>${i.sbs.sbs_example_4}</p>
-        <p class="sutta">
-            % if make_link and i.sbs.sbs_source_link_4:
-            <a class="sutta_link" href="${i.sbs.sbs_source_link_4}">${i.sbs.sbs_source_4}</a>
-            % else:
-            ${i.sbs.sbs_source_4}
-            % endif
-            ${i.sbs.sbs_sutta_4}</p>
-        % endif
-
     % endif
 
     % if i.sbs.needs_dhp_example:

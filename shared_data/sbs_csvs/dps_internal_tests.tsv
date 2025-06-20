@@ -67,8 +67,6 @@ ru lit meaning: roman	ru.ru_meaning_lit	is not empty	-	ru.ru_meaning_lit	contain
 sbs meaning: cyrillic	sbs.sbs_meaning	is not empty	-	sbs.sbs_meaning	contains	[а-яА-Я]													sbs.sbs_meaning	pali_1	meaning_1	sbs.sbs_meaning	[]	10
 sbs_example_1 but no sourse	sbs.sbs_example_1	is not empty	-	sbs.sbs_source_1	is empty	-													sbs.sbs_source_1	pali_1	sbs.sbs_sutta_1		[]	10
 sbs_example_2 but no sourse	sbs.sbs_example_2	is not empty	-	sbs.sbs_source_2	is empty	-													sbs.sbs_source_2	pali_1	sbs.sbs_sutta_2		[]	10
-sbs_example_3 but no sourse	sbs.sbs_example_3	is not empty	-	sbs.sbs_source_3	is empty	-													sbs.sbs_source_3	pali_1	sbs.sbs_sutta_3		[]	10
-sbs_example_4 but no sourse	sbs.sbs_example_4	is not empty	-	sbs.sbs_source_4	is empty	-													sbs.sbs_source_4	pali_1	sbs.sbs_sutta_4		[]	10
 dhp_example but no sourse	sbs.dhp_example	is not empty	-	sbs.dhp_example	is empty	-													sbs.dhp_example	pali_1	sbs.dhp_sutta		[]	10
 pat_example but no sourse	sbs.pat_example	is not empty	-	sbs.pat_example	is empty	-													sbs.pat_example	pali_1	sbs.pat_sutta		[]	10
 vib_example but no sourse	sbs.vib_example	is not empty	-	sbs.vib_example	is empty	-													sbs.vib_example	pali_1	sbs.vib_sutta		[]	10
@@ -76,8 +74,6 @@ class_example but no sourse	sbs.class_example	is not empty	-	sbs.class_example	i
 discourses_example but no sourse	sbs.discourses_example	is not empty	-	sbs.discourses_example	is empty	-													sbs.discourses_example	pali_1	sbs.discourses_sutta		[]	10
 sbs_example_1 but no sutta	sbs.sbs_example_1	is not empty	-	sbs.sbs_source_1	does not contain	MJG|Sri Lanka|Thai|Trad	sbs.sbs_sutta_1	is empty	-										sbs.sbs_sutta_1	pali_1	sbs.sbs_source_1		[]	10
 sbs_example_2 but no sutta	sbs.sbs_example_2	is not empty	-	sbs.sbs_source_2	does not contain	MJG|Sri Lanka|Thai|Trad	sbs.sbs_sutta_2	is empty	-										sbs.sbs_sutta_2	pali_1	sbs.sbs_source_2		[]	10
-sbs_example_3 but no sutta	sbs.sbs_example_3	is not empty	-	sbs.sbs_source_3	does not contain	MJG|Sri Lanka|Thai|Trad	sbs.sbs_sutta_3	is empty	-										sbs.sbs_sutta_3	pali_1	sbs.sbs_source_3		[]	10
-sbs_example_4 but no sutta	sbs.sbs_example_4	is not empty	-	sbs.sbs_source_4	does not contain	MJG|Sri Lanka|Thai|Trad	sbs.sbs_sutta_4	is empty	-										sbs.sbs_sutta_4	pali_1	sbs.sbs_source_4		[]	10
 dhp_example but no sutta	sbs.dhp_example	is not empty	-	sbs.dhp_source	does not contain	MJG|Sri Lanka|Thai|Trad	sbs.dhp_sutta	is empty	-										sbs.dhp_sutta	pali_1	sbs.dhp_source		[]	10
 pat_example but no sutta	sbs.pat_example	is not empty	-	sbs.pat_source	does not contain	MJG|Sri Lanka|Thai|Trad	sbs.pat_sutta	is empty	-										sbs.pat_sutta	pali_1	sbs.pat_source		[]	10
 vib_example but no sutta	sbs.vib_example	is not empty	-	sbs.vib_source	does not contain	MJG|Sri Lanka|Thai|Trad	sbs.vib_sutta	is empty	-										sbs.vib_sutta	pali_1	sbs.vib_source		[]	10
@@ -85,8 +81,6 @@ class_example but no sutta	sbs.class_example	is not empty	-	sbs.class_source	doe
 discourses_example but no sutta	sbs.discourses_example	is not empty	-	sbs.discourses_source	does not contain	MJG|Sri Lanka|Thai|Trad	sbs.discourses_sutta	is empty	-										sbs.discourses_sutta	pali_1	sbs.discourses_source		[]	10
 sbs_example_1 has capital letter	sbs.sbs_example_1	is not empty	-	sbs.sbs_example_1	contains	[A-Z]													sbs.sbs_example_1	pali_1	sbs.sbs_example_1		[]	10
 sbs_example_2 has capital letter	sbs.sbs_example_2	is not empty	-	sbs.sbs_example_2	contains	[A-Z]													sbs.sbs_example_2	pali_1	sbs.sbs_example_2		[]	10
-sbs_example_3 has capital letter	sbs.sbs_example_3	is not empty	-	sbs.sbs_example_3	contains	[A-Z]													sbs.sbs_example_3	pali_1	sbs.sbs_example_3		[]	10
-sbs_example_4 has capital letter	sbs.sbs_example_4	is not empty	-	sbs.sbs_example_4	contains	[A-Z]													sbs.sbs_example_4	pali_1	sbs.sbs_example_4		[]	10
 dhp_example has capital letter	sbs.dhp_example	is not empty	-	sbs.dhp_example	contains	[A-Z]													sbs.dhp_example	pali_1	sbs.dhp_example		[]	10
 pat_example has capital letter	sbs.pat_example	is not empty	-	sbs.pat_example	contains	[A-Z]													sbs.pat_example	pali_1	sbs.pat_example		[]	10
 vib_example has capital letter	sbs.vib_example	is not empty	-	sbs.vib_example	contains	[A-Z]													sbs.vib_example	pali_1	sbs.vib_example		[]	10
@@ -102,12 +96,6 @@ example_1 space fullstop	sbs.sbs_example_1	contains	 \.$| \. 																sbs
 example_2 space comma	sbs.sbs_example_2	contains	 ,																sbs.sbs_example_2	pali_1	sbs.sbs_example_2		[]	20
 example_2 space comma	sbs.sbs_example_2	contains	 ,$| , 																sbs.sbs_example_2	pali_1	sbs.sbs_example_2		[]	20
 example_2 space fullstop	sbs.sbs_example_2	contains	 \.$| \. 																sbs.sbs_example_2	pali_1	sbs.sbs_example_2		[]	20
-example_3 space comma	sbs.sbs_example_3	contains	 ,																sbs.sbs_example_3	pali_1	sbs.sbs_example_3		[]	30
-example_3 space comma	sbs.sbs_example_3	contains	 ,$| , 																sbs.sbs_example_3	pali_1	sbs.sbs_example_3		[]	30
-example_3 space fullstop	sbs.sbs_example_3	contains	 \.$| \. 																sbs.sbs_example_3	pali_1	sbs.sbs_example_3		[]	30
-example_4 space comma	sbs.sbs_example_4	contains	 ,																sbs.sbs_example_4	pali_1	sbs.sbs_example_4		[]	40
-example_4 space comma	sbs.sbs_example_4	contains	 ,$| , 																sbs.sbs_example_4	pali_1	sbs.sbs_example_4		[]	40
-example_4 space fullstop	sbs.sbs_example_4	contains	 \.$| \. 																sbs.sbs_example_4	pali_1	sbs.sbs_example_4		[]	40
 dhp_example space comma	sbs.dhp_example	contains	 ,																sbs.dhp_example	pali_1	sbs.dhp_example		[]	10
 dhp_example space comma	sbs.dhp_example	contains	 ,$| , 																sbs.dhp_example	pali_1	sbs.dhp_example		[]	10
 dhp_example space fullstop	sbs.dhp_example	contains	 \.$| \. 																sbs.dhp_example	pali_1	sbs.dhp_example		[]	10
@@ -125,8 +113,6 @@ discourses_example space comma	sbs.discourses_example	contains	 ,$| , 										
 discourses_example space fullstop	sbs.discourses_example	contains	 \.$| \. 																sbs.discourses_example	pali_1	sbs.discourses_example		[]	10
 sbs_source_1 contains space	sbs.sbs_source_1	contains	 	sbs.sbs_source_1	does not contain	PAT	sbs.sbs_source_1	does not contain	Sri Lanka										sbs.sbs_source_1	pali_1	grammar	sbs.sbs_source_1	[]	10
 sbs_source_2 contains space	sbs.sbs_source_2	contains	 	sbs.sbs_source_2	does not contain	PAT	sbs.sbs_source_2	does not contain	Sri Lanka										sbs.sbs_source_2	pali_1	grammar	sbs.sbs_source_2	[]	10
-sbs_source_3 contains space	sbs.sbs_source_3	contains	 	sbs.sbs_source_3	does not contain	PAT	sbs.sbs_source_3	does not contain	Sri Lanka										sbs.sbs_source_3	pali_1	grammar	sbs.sbs_source_3	[]	10
-sbs_source_4 contains space	sbs.sbs_source_4	contains	 	sbs.sbs_source_4	does not contain	PAT	sbs.sbs_source_4	does not contain	Sri Lanka										sbs.sbs_source_4	pali_1	grammar	sbs.sbs_source_4	[]	10
 dhp_source contains space	sbs.dhp_source	contains	 	sbs.dhp_source	does not contain	PAT	sbs.dhp_source	does not contain	Sri Lanka										sbs.dhp_source	pali_1	grammar	sbs.dhp_source	[]	10
 pat_source contains space	sbs.pat_source	contains	 	sbs.pat_source	does not contain	PAT	sbs.pat_source	does not contain	Sri Lanka										sbs.pat_source	pali_1	grammar	sbs.pat_source	[]	10
 vib_source contains space	sbs.vib_source	contains	 	sbs.vib_source	does not contain	PAT	sbs.vib_source	does not contain	Sri Lanka										sbs.vib_source	pali_1	grammar	sbs.vib_source	[]	10
@@ -134,8 +120,6 @@ class_source contains space	sbs.class_source	contains	 	sbs.class_source	does no
 discourses_source contains space	sbs.discourses_source	contains	 	sbs.discourses_source	does not contain	PAT	sbs.discourses_source	does not contain	Sri Lanka										sbs.discourses_source	pali_1	grammar	sbs.discourses_source	[]	10
 sbs_source_1 is empty	sbs.sbs_example_1	is not empty	-	sbs.sbs_source_1	is empty	-													sbs.sbs_source_1	pali_1	grammar	sbs.sbs_source_1	[]	10
 sbs_source_2 is empty	sbs.sbs_example_2	is not empty	-	sbs.sbs_source_2	is empty	-													sbs.sbs_source_2	pali_1	grammar	sbs.sbs_source_2	[]	10
-sbs_source_3 is empty	sbs.sbs_example_3	is not empty	-	sbs.sbs_source_3	is empty	-													sbs.sbs_source_3	pali_1	grammar	sbs.sbs_source_3	[]	10
-sbs_source_4 is empty	sbs.sbs_example_4	is not empty	-	sbs.sbs_source_4	is empty	-													sbs.sbs_source_4	pali_1	grammar	sbs.sbs_source_4	[]	10
 dhp_source is empty	sbs.dhp_example	is not empty	-	sbs.dhp_source	is empty	-													sbs.dhp_source	pali_1	grammar	sbs.dhp_source	[]	10
 pat_source is empty	sbs.pat_example	is not empty	-	sbs.pat_source	is empty	-													sbs.pat_source	pali_1	grammar	sbs.pat_source	[]	10
 vib_source is empty	sbs.vib_example	is not empty	-	sbs.vib_source	is empty	-													sbs.vib_source	pali_1	grammar	sbs.vib_source	[]	10

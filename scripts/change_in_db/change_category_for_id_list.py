@@ -59,15 +59,15 @@ def condition_check_all_examples(word, __sutta_identifier__):
         [
             getattr(word.sbs, "sbs_example_1", None),
             getattr(word.sbs, "sbs_example_2", None),
-            getattr(word.sbs, "sbs_example_3", None),
-            getattr(word.sbs, "sbs_example_4", None),
+            # getattr(word.sbs, "sbs_example_3", None),
+            # getattr(word.sbs, "sbs_example_4", None),
         ]
     )
 
 
 # Condition function to check if any sbs_source contains the desired value
 def condition_check_sbs_source(word, sutta_identifier):
-    for i in range(1, 5):
+    for i in range(1, 3):
         sbs_source_attr = getattr(word.sbs, f"sbs_source_{i}", None)
         if sbs_source_attr and sutta_identifier in sbs_source_attr:
             return True

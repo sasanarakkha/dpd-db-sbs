@@ -36,8 +36,8 @@ def main():
             examples = [
                 i.sbs.sbs_example_1,
                 i.sbs.sbs_example_2,
-                i.sbs.sbs_example_3,
-                i.sbs.sbs_example_4,
+                # i.sbs.sbs_example_3,
+                # i.sbs.sbs_example_4,
             ]
             for idx1, example1 in enumerate(examples):
                 for idx2, example2 in enumerate(examples):

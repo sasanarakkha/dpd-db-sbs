@@ -311,7 +311,7 @@ def dhp(df, sbs_ped_link):
     conditions = [
         (df[f'sbs_source_{i}'].str.contains('DHP', case=False)) & 
         (df[f'sbs_sutta_{i}'].str.contains('vaggo', case=False))
-        for i in range(1, 5)
+        for i in range(1, 3)
     ]
 
     # Combine the conditions with 'OR' (|) to get the final filtering condition

@@ -105,7 +105,7 @@ def save_filtered_words():
                     comment in getattr(word.sbs, f"sbs_source_{i}", "")
                     for comment in commentary_list
                 )
-                for i in range(1, 5)
+                for i in range(1, 3)
             )
         )
     ]
@@ -122,7 +122,7 @@ def save_filtered_words():
                     comment in getattr(word.sbs, f"sbs_source_{i}", "")
                     for comment in commentary_list
                 )
-                for i in range(1, 5)
+                for i in range(1, 3)
             )
         )
     ]
@@ -145,7 +145,7 @@ def save_filtered_words():
                     comment in getattr(word.sbs, f"sbs_source_{i}", "")
                     for comment in commentary_list
                 )
-                for i in range(1, 5)
+                for i in range(1, 3)
             )
         )
     ]

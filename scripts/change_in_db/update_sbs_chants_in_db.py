@@ -19,7 +19,7 @@ db_session = get_db_session(pth.dpd_db_path)
 
 def update_sbs_chants_in_db(dpspth, db_session, dpd_word):
     """Update SBS chants and chapters directly in the database."""
-    for number in range(1, 5):
+    for number in range(1, 3):
         chant_field = f"sbs_chant_pali_{number}"
         chant = getattr(dpd_word, chant_field, None)
         

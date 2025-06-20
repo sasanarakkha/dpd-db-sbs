@@ -28,7 +28,7 @@ def process_tsv():
         corrections_header = corrections_reader.fieldnames
 
         # Load the existing `sbs.tsv` file data
-        with open(pth.sbs_path, mode="r", newline="", encoding="utf-8") as sbs_file:
+        with open(dpspth.sbs_path, mode="r", newline="", encoding="utf-8") as sbs_file:
             sbs_reader = csv.DictReader(sbs_file, delimiter="\t")
             sbs_data = {row["id"]: row for row in sbs_reader}
             sbs_header = sbs_reader.fieldnames
@@ -38,7 +38,7 @@ def process_tsv():
             id_ = correction_row["id"]
 
             # Check for `n` in any correct_{i} fields and copy the corresponding example fields
-            for set_number in range(1, 5):
+            for set_number in range(1, 3):
                 correct_key = f"correct_{set_number}"
                 if correction_row[correct_key] == "n":
                     # Fields to be copied
@@ -63,7 +63,7 @@ def process_tsv():
         console.print("[bold green]writing updated SBS table updated")
         # Write the updated data back to the `sbs.tsv`
         with open(
-            pth.sbs_path, mode="w", newline="", encoding="utf-8"
+            dpspth.sbs_path, mode="w", newline="", encoding="utf-8"
         ) as sbs_file_output:
             csvwriter = csv.writer(
                 sbs_file_output, delimiter="\t", quotechar='"', quoting=csv.QUOTE_ALL

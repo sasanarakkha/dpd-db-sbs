@@ -231,13 +231,16 @@ def process_additions_added_and_update_tsvs():
     Loads ID map from additions_added.json and updates TSV files.
     """
     pr.title("Processing additions_added.json and updating TSVs...")
+    pr.red("find a way to track which been replaced, maybe mark them in addition_added.")
+    return
+
     gui_paths = Gui2Paths()
     id_map = load_id_map_from_additions_added(gui_paths)
 
     if id_map:
         replace_old_ids_in_tsv_files(id_map)
     else:
-        pr.warning("No ID map loaded or map is empty, TSV files will not be updated.")
+        pr.red("No ID map loaded or map is empty, TSV files will not be updated.")
     pr.yes("ok")
     pr.title("Finished processing additions_added.json.")
 

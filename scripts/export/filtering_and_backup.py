@@ -36,8 +36,8 @@ def saving():
             or_(
                 SBS.sbs_example_1 != "",
                 SBS.sbs_example_2 != "",
-                SBS.sbs_example_3 != "",
-                SBS.sbs_example_4 != "",
+                # SBS.sbs_example_3 != "",
+                # SBS.sbs_example_4 != "",
             )
         )
         .all()

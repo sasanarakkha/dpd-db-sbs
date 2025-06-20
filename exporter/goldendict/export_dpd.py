@@ -156,18 +156,10 @@ def render_pali_word_dpd_html(
             i.sbs.sbs_sutta_1 = i.sbs.sbs_sutta_1.replace("\n", "<br>")
         if i.sbs.sbs_sutta_2:
             i.sbs.sbs_sutta_2 = i.sbs.sbs_sutta_2.replace("\n", "<br>")
-        if i.sbs.sbs_sutta_3:
-            i.sbs.sbs_sutta_3 = i.sbs.sbs_sutta_3.replace("\n", "<br>")
-        if i.sbs.sbs_sutta_4:
-            i.sbs.sbs_sutta_4 = i.sbs.sbs_sutta_4.replace("\n", "<br>")
         if i.sbs.sbs_example_1:
             i.sbs.sbs_example_1 = i.sbs.sbs_example_1.replace("\n", "<br>")
         if i.sbs.sbs_example_2:
             i.sbs.sbs_example_2 = i.sbs.sbs_example_2.replace("\n", "<br>")
-        if i.sbs.sbs_example_3:
-            i.sbs.sbs_example_3 = i.sbs.sbs_example_3.replace("\n", "<br>")
-        if i.sbs.sbs_example_4:
-            i.sbs.sbs_example_4 = i.sbs.sbs_example_4.replace("\n", "<br>")
         if i.sbs.dhp_example:
             i.sbs.dhp_example = i.sbs.dhp_example.replace("\n", "<br>")
         if i.sbs.dhp_source:

@@ -69,12 +69,6 @@ def save_filtered_words():
             "sbs_source_2",
             "sbs_sutta_2",
             "sbs_example_2",
-            "sbs_source_3",
-            "sbs_sutta_3",
-            "sbs_example_3",
-            "sbs_source_4",
-            "sbs_sutta_4",
-            "sbs_example_4",
         ]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter="\t")
 
@@ -96,12 +90,6 @@ def save_filtered_words():
                     "sbs_source_2": word.sbs.sbs_source_2,
                     "sbs_sutta_2": word.sbs.sbs_sutta_2,
                     "sbs_example_2": word.sbs.sbs_example_2,
-                    "sbs_source_3": word.sbs.sbs_source_3,
-                    "sbs_sutta_3": word.sbs.sbs_sutta_3,
-                    "sbs_example_3": word.sbs.sbs_example_3,
-                    "sbs_source_4": word.sbs.sbs_source_4,
-                    "sbs_sutta_4": word.sbs.sbs_sutta_4,
-                    "sbs_example_4": word.sbs.sbs_example_4,
                 }
             )
 

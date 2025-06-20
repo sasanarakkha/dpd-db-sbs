@@ -33,8 +33,8 @@ def update_column_for_some_criteria(source_value, column_to_update, value_to_upd
             or_(
                 SBS.sbs_source_1 == source_value,
                 SBS.sbs_source_2 == source_value,
-                SBS.sbs_source_3 == source_value,
-                SBS.sbs_source_4 == source_value,
+                # SBS.sbs_source_3 == source_value,
+                # SBS.sbs_source_4 == source_value,
             ),
     ).all()
 
@@ -74,7 +74,7 @@ def update_column_for_some_criteria(source_value, column_to_update, value_to_upd
             console.print(f"[bold bright_yellow]{__word__.id} {__word__.lemma_1} {value_to_update}")
 
             # Check for source_value in sbs_source fields
-            for idx in range(1, 5):  # Assuming there are 4 positions
+            for idx in range(1, 3):  # Assuming there are 2 positions
                 sbs_source_value = getattr(__word__.sbs, f"sbs_source_{idx}")
                 if sbs_source_value and re.search(source_value, sbs_source_value):
                     # Copy values to pat fields

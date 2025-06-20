@@ -90,9 +90,7 @@ def display_dps_summary(values, window, sg, original_values):
     "dps_pat_source", "dps_pat_sutta", "dps_pat_example",
     "dps_vib_source", "dps_vib_sutta", "dps_vib_example",
     "dps_class_source", "dps_class_sutta", "dps_class_example",
-    "dps_discourses_source", "dps_discourses_sutta", "dps_discourses_example",
-    "dps_sbs_source_3", "dps_sbs_sutta_3", "dps_sbs_example_3", 
-    "dps_sbs_source_4", "dps_sbs_sutta_4", "dps_sbs_example_4", 
+    "dps_discourses_source", "dps_discourses_sutta", "dps_discourses_example", 
     "dps_sbs_class_anki", "dps_sbs_class", "dps_sbs_category", "dps_sbs_patimokkha"]
 
     summary = []

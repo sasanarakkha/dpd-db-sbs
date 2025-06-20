@@ -1314,9 +1314,7 @@ class SBS(Base):
     sbs_class_anki: Mapped[int] = mapped_column(default="")
     sbs_class: Mapped[int] = mapped_column(default="")
 
-    # TODO  remove after populating discourses
     sbs_category: Mapped[str] = mapped_column(default="")
-    # TODO  remove after populating pat
     sbs_patimokkha: Mapped[str] = mapped_column(default="")
 
     sbs_meaning: Mapped[str] = mapped_column(default="")
@@ -1352,24 +1350,25 @@ class SBS(Base):
     class_sutta: Mapped[str] = mapped_column(default="")
     class_example: Mapped[str] = mapped_column(default="")
     class_example_translation: Mapped[str] = mapped_column(default="")
+    class_extra: Mapped[str] = mapped_column(default="")
 
     discourses_source: Mapped[str] = mapped_column(default="")
     discourses_sutta: Mapped[str] = mapped_column(default="")
     discourses_example: Mapped[str] = mapped_column(default="")
 
     # TODO  remove after filling class and discourses
-    sbs_source_3: Mapped[str] = mapped_column(default="")
-    sbs_sutta_3: Mapped[str] = mapped_column(default="")
-    sbs_example_3: Mapped[str] = mapped_column(default="")
-    sbs_chant_pali_3: Mapped[str] = mapped_column(default="")
-    sbs_chant_eng_3: Mapped[str] = mapped_column(default="")
-    sbs_chapter_3: Mapped[str] = mapped_column(default="")
-    sbs_source_4: Mapped[str] = mapped_column(default="")
-    sbs_sutta_4: Mapped[str] = mapped_column(default="")
-    sbs_example_4: Mapped[str] = mapped_column(default="")
-    sbs_chant_pali_4: Mapped[str] = mapped_column(default="")
-    sbs_chant_eng_4: Mapped[str] = mapped_column(default="")
-    sbs_chapter_4: Mapped[str] = mapped_column(default="")
+    extra_source: Mapped[str] = mapped_column(default="")
+    extra_sutta: Mapped[str] = mapped_column(default="")
+    extra_example: Mapped[str] = mapped_column(default="")
+    # sbs_chant_pali_3: Mapped[str] = mapped_column(default="")
+    # sbs_chant_eng_3: Mapped[str] = mapped_column(default="")
+    # sbs_chapter_3: Mapped[str] = mapped_column(default="")
+    # sbs_source_4: Mapped[str] = mapped_column(default="")
+    # sbs_sutta_4: Mapped[str] = mapped_column(default="")
+    # sbs_example_4: Mapped[str] = mapped_column(default="")
+    # sbs_chant_pali_4: Mapped[str] = mapped_column(default="")
+    # sbs_chant_eng_4: Mapped[str] = mapped_column(default="")
+    # sbs_chapter_4: Mapped[str] = mapped_column(default="")
 
     @declared_attr
     def sbs_index(cls):
@@ -1398,8 +1397,8 @@ class SBS(Base):
             for example in (
                 self.sbs_example_1,
                 self.sbs_example_2,
-                self.sbs_example_3,
-                self.sbs_example_4,
+                # self.sbs_example_3,
+                # self.sbs_example_4,
                 self.dhp_example,
                 self.pat_example,
                 self.vib_example,
@@ -1415,8 +1414,8 @@ class SBS(Base):
             for example in (
                 self.sbs_example_1,
                 self.sbs_example_2,
-                self.sbs_example_3,
-                self.sbs_example_4,
+                # self.sbs_example_3,
+                # self.sbs_example_4,
             )
         )
 
@@ -1427,8 +1426,8 @@ class SBS(Base):
             examples = [
                 self.sbs_example_1,
                 self.sbs_example_2,
-                self.sbs_example_3,
-                self.sbs_example_4,
+                # self.sbs_example_3,
+                # self.sbs_example_4,
             ]
             if not any(examples):
                 return True
@@ -1446,8 +1445,8 @@ class SBS(Base):
             examples = [
                 self.sbs_example_1,
                 self.sbs_example_2,
-                self.sbs_example_3,
-                self.sbs_example_4,
+                # self.sbs_example_3,
+                # self.sbs_example_4,
             ]
             if not any(examples):
                 return True
@@ -1465,8 +1464,8 @@ class SBS(Base):
             examples = [
                 self.sbs_example_1,
                 self.sbs_example_2,
-                self.sbs_example_3,
-                self.sbs_example_4,
+                # self.sbs_example_3,
+                # self.sbs_example_4,
             ]
             if not any(examples):
                 return True
@@ -1484,8 +1483,8 @@ class SBS(Base):
             examples = [
                 self.sbs_example_1,
                 self.sbs_example_2,
-                self.sbs_example_3,
-                self.sbs_example_4,
+                # self.sbs_example_3,
+                # self.sbs_example_4,
                 self.dhp_example,
                 self.pat_example,
                 self.vib_example,
@@ -1507,8 +1506,8 @@ class SBS(Base):
             examples = [
                 self.sbs_example_1,
                 self.sbs_example_2,
-                self.sbs_example_3,
-                self.sbs_example_4,
+                # self.sbs_example_3,
+                # self.sbs_example_4,
             ]
             if not any(examples):
                 return True
@@ -1531,15 +1530,15 @@ class SBS(Base):
         chant_link_map = SBS_table_tools().load_chant_link_map()
         return chant_link_map.get(self.sbs_chant_pali_2, "")
 
-    @property
-    def sbs_chant_link_3(self):
-        chant_link_map = SBS_table_tools().load_chant_link_map()
-        return chant_link_map.get(self.sbs_chant_pali_3, "")
+    # @property
+    # def sbs_chant_link_3(self):
+    #     chant_link_map = SBS_table_tools().load_chant_link_map()
+    #     return chant_link_map.get(self.sbs_chant_pali_3, "")
 
-    @property
-    def sbs_chant_link_4(self):
-        chant_link_map = SBS_table_tools().load_chant_link_map()
-        return chant_link_map.get(self.sbs_chant_pali_4, "")
+    # @property
+    # def sbs_chant_link_4(self):
+    #     chant_link_map = SBS_table_tools().load_chant_link_map()
+    #     return chant_link_map.get(self.sbs_chant_pali_4, "")
 
     @property
     def sbs_class_link(self):
@@ -1564,13 +1563,13 @@ class SBS(Base):
     def sbs_source_link_2(self) -> str:
         return generate_link(self.sbs_source_2) if self.sbs_source_2 else ""
 
-    @property
-    def sbs_source_link_3(self) -> str:
-        return generate_link(self.sbs_source_3) if self.sbs_source_3 else ""
+    # @property
+    # def sbs_source_link_3(self) -> str:
+    #     return generate_link(self.sbs_source_3) if self.sbs_source_3 else ""
 
-    @property
-    def sbs_source_link_4(self) -> str:
-        return generate_link(self.sbs_source_4) if self.sbs_source_4 else ""
+    # @property
+    # def sbs_source_link_4(self) -> str:
+    #     return generate_link(self.sbs_source_4) if self.sbs_source_4 else ""
 
     @property
     def dhp_source_link(self) -> str:

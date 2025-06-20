@@ -26,7 +26,7 @@ def dhp():
         # if i.sbs:
 
         #     # Check for "DHP" followed by a digit in sbs_source fields
-        #     for idx in range(1, 5):  # Assuming there are 4 positions
+        #     for idx in range(1, 3):  # Assuming there are 2 positions
         #         sbs_source_value = getattr(i.sbs, f"sbs_source_{idx}")
         #         if sbs_source_value and re.search(r"DHP\d", sbs_source_value):
         #             # Copy values to dhp fields
@@ -86,7 +86,7 @@ def pat():
             if i.sbs:
                 if i.sbs.sbs_patimokkha and not i.sbs.pat_source:
                     # Check for "VIN PAT" in sbs_source fields
-                    for idx in range(1, 5):  # Assuming there are 4 positions
+                    for idx in range(1, 3):  # Assuming there are 4 positions
                         sbs_source_value = getattr(i.sbs, f"sbs_source_{idx}")
                         if sbs_source_value and re.search(r"VIN PAT", sbs_source_value):
                             # Copy values to pat fields
@@ -159,7 +159,7 @@ def vib():
             if i.sbs:
                 if i.sbs.sbs_patimokkha == "vib":
                     # Check for "VIN1." in sbs_source fields
-                    for idx in range(1, 5):  # Assuming there are 4 positions
+                    for idx in range(1, 3):  # Assuming there are 4 positions
                         sbs_source_value = getattr(i.sbs, f"sbs_source_{idx}")
                         if sbs_source_value and re.search(r"VIN1", sbs_source_value):
                             # Copy values to pat fields
@@ -179,7 +179,7 @@ def discor():
         for i in db:
             # if i.sbs:
             #     # Iterate over each sbs_source field
-            #     for idx in range(1, 5):  # Assuming there are 4 positions
+            #     for idx in range(1, 3):  # Assuming there are 2 positions
             #         sbs_source_value = getattr(i.sbs, f"sbs_source_{idx}")
             #         if sbs_source_value:
             #             # Check if any discourse from the list is in the sbs_source_value
@@ -286,11 +286,11 @@ def moving_sbs_ex():
     with db_session.no_autoflush:
         for i in db:
             if i.sbs:
-                if i.sbs.sbs_example_1 and not i.sbs.sbs_chapter_1 and not i.sbs.sbs_example_3:
-                    # move from example_1 to example_3
-                    i.sbs.sbs_example_3 = i.sbs.sbs_example_1
-                    i.sbs.sbs_source_3 = i.sbs.sbs_source_1
-                    i.sbs.sbs_sutta_3 = i.sbs.sbs_sutta_1
+                if i.sbs.sbs_example_1 and not i.sbs.sbs_chapter_1:
+                    # move from example_1 to example_2
+                    i.sbs.sbs_example_2 = i.sbs.sbs_example_1
+                    i.sbs.sbs_source_2 = i.sbs.sbs_source_1
+                    i.sbs.sbs_sutta_2 = i.sbs.sbs_sutta_1
 
                     # clean example_1
                     i.sbs.sbs_example_1 = ""
