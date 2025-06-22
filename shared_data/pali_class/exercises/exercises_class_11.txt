@@ -2,7 +2,7 @@ Class 11 Exercises
 
 Sutta Number: SN22.43
 Pali: attadīpā, bhikkhave, viharatha attasaraṇā anaññasaraṇā, dhammadīpā dhammasaraṇā anaññasaraṇā.
-English Translation: you should stay independent, with one's own refuge, does not depend on another, with Dhamma as one's solid ground, taking refuge in the Dhamma, does not depend on another.
+English Translation: Bhikkhus you should dwell with yourselves as an island, with yourselves as a refuge, with no other refuge, with the Dhamma as an island, with the Dhamma as a refuge with no other refuge.
 
 Sutta Number: VIN0
 Pali: taṃ bhavantaṃ gotamaṃ evaṃ kalyāṇo kittisaddo abbhuggato
@@ -38,11 +38,11 @@ English Translation: Ananda, those monks who [are] recently ordained, [who] rece
 
 Sutta Number: MN152
 Pali: upekkhako tattha viharati sato sampajāno
-English Translation: He remains there, equanimous, mindful and attentive.
+English Translation: He remains there, equanimous, mindful and completely comprehending.
 
 Sutta Number: SNP8
 Pali: sakko ujū ca suhujū ca suvaco cassa mudu anatimānī
-English Translation: He should be able, straight, upright, meek, gentle and not arrogant.
+English Translation: He should be able, straight, upright, meek, soft and not arrogant.
 
 Sutta Number: SN12.66
 Pali: samaṇā vā brāhmaṇā vā yaṃ loke piyarūpaṃ sātarūpaṃ taṃ aniccato dakkhissanti dukkhato dakkhissanti anattato dakkhissanti rogato dakkhissanti bhayato dakkhissanti, te taṇhaṃ pajahissanti.

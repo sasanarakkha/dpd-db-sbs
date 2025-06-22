@@ -65,7 +65,7 @@ Pali: abhijjhaṃ loke pajaheyyuṃ vigat'ābhijjhena cetasā vihareyyuṃ; abhi
 English Translation: They would abandon covetousness with reference to the world, they would dwell with a mind free from covetousness, they would purify the mind from covetousness.
 
 Sutta Number: DN16.36 (simpl)
-Pali: siyā kho pana ananda, tumhākaṃ evaṃ assa — "n'atthi no satthā" iti.
+Pali: siyā kho pana ananda, tumhākaṃ evaṃ assa — n'atthi no satthā iti.
 English Translation: And now, Ananda, it could be thus would occur to you: "There is no teacher for us."
 
 Sutta Number: AN8.53

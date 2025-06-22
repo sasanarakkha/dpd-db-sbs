@@ -53,7 +53,7 @@ Pali: seyyathāpi balavā puriso samiñjitaṃ vā bāhaṃ pasāreyya
 English Translation: Just like a strong man would stretch out (his) bent arm or 
 
 Sutta Number: AN2.40
-Pali: yasmiṃ, bhikkhave, samaye corā balavanto honti.
+Pali: yasmiṃ, bhikkhave, samaye corā balavanto honti
 English Translation: At whichever time, monks, thieves are powerful
 
 Sutta Number: DN22.18
@@ -125,7 +125,7 @@ Pali: na bāhuṃ pacālakaṃ antaraghare nisīdissāmi
 English Translation: I will not sit in an inhabited area swinging [my] arm[s].
 
 Sutta Number: SN21.10 (simpl)
-Pali: sabbābhibhuṃ sabbaviduṃ sumedhaṃ, tam naraṃ ekavihārī iti ahaṃ brūmi
+Pali: sabb'ābhibhuṃ sabbaviduṃ sumedhaṃ, tam naraṃ ekavihārī iti ahaṃ brūmi
 English Translation: [One who is] all-conquering, all-knowing, wise, that man I call thus, "one who dwells alone.”
 
 

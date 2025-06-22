@@ -112,7 +112,7 @@ Pali: mattaññutā ca bhattasmiṃ, pantaṃ ca sayan'āsanaṃ,  adhicitte ca 
 English Translation: Moderation in regard to food, a secluded living place [i.e. living in seclusion], and devotion to mental development; this is the teaching of the Buddhas.
 
 Sutta Number: TH251
-Pali: tasmā hi paññā eva dhanena seyyā, yāya vosānaṃ idha adhigacchati. Abyositattā hi bhav'ābhavesu, pāpāni kammāni karoti mohā.
+Pali: tasmā hi paññā eva dhanena seyyā, yāya vosānaṃ idha adhigacchati. abyositattā hi bhav'ābhavesu, pāpāni kammāni karoti mohā.
 English Translation: Therefore, only wisdom is indeed better than wealth; by it [i.e. wisdom] one attains perfection here/in this world; indeed, because of not being accomplished, out of delusion, one does evil actions in any states of existence.
 
 Sutta Number: TH257

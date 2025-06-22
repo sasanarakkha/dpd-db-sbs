@@ -31,7 +31,10 @@ import datetime
 
 from sqlalchemy.orm import joinedload
 
-from tools.sbs_table_functions import SBS_table_tools
+from tools.sbs_table_functions import SBS_table_tools, paragraphs_are_similar
+from tools.clean_machine import clean_machine
+
+
 
 current_date = datetime.date.today().strftime("%m-%d")
 
@@ -141,88 +144,7 @@ def get_sbs_info(i: DpdHeadword):
     return sbs_info
 
 
-def get_examples(i: DpdHeadword):
-    """Get all examples info from a DpdHeadword object."""
-    examples_info = [
-        i.sbs.sbs_source_1.replace("\n", "<br>") if i.sbs else None,
-        i.sbs.sbs_sutta_1.replace("\n", "<br>") if i.sbs else None,
-        i.sbs.sbs_example_1.replace("\n", "<br>") if i.sbs else None,
-        i.sbs.sbs_source_2.replace("\n", "<br>") if i.sbs else None,
-        i.sbs.sbs_sutta_2.replace("\n", "<br>") if i.sbs else None,
-        i.sbs.sbs_example_2.replace("\n", "<br>") if i.sbs else None,
-        i.antonym,
-        i.synonym,
-        i.variant,
-        i.commentary.replace("\n", "<br>") if i.commentary else None,
-        i.notes.replace("\n", "<br>") if i.notes else None,
-        i.sbs.sbs_notes.replace("\n", "<br>") if i.sbs else None,
-        i.link.replace("\n", "<br>") if i.link else None,
-    ]
-
-    # sbs_audio
-    examples_info.append(SBS_table_tools().generate_sbs_audio(i.lemma_clean))
-
-    return examples_info
-
-
-def get_dhp_source(i: DpdHeadword):
-    """Get DHP source info from SBS info in a DpdHeadword object."""
-
-    dhp_sources = []
-    dhp_suttas = []
-    dhp_examples = []
-
-    sources = [i.source_1, i.source_2]
-    if i.sbs:
-        sources.extend(
-            [
-                i.sbs.sbs_source_1,
-                i.sbs.sbs_source_2,
-                i.sbs.sbs_source_3,
-                i.sbs.sbs_source_4,
-            ]
-        )
-
-    for source in sources:
-        if source and "DHP" in source and "a" not in source:
-            dhp_sources.append(source)
-            dhp_suttas.append(
-                i.sutta_1
-                if source == i.source_1
-                else i.sutta_2
-                if source == i.source_2
-                else getattr(i.sbs, f"sbs_sutta_{sources.index(source) - 1}")
-            )
-            dhp_examples.append(
-                i.example_1
-                if source == i.source_1
-                else i.example_2
-                if source == i.source_2
-                else getattr(i.sbs, f"sbs_example_{sources.index(source) - 1}")
-            )
-
-    # Choose the source with the smallest number
-    if dhp_sources:
-        dhp_source = min(dhp_sources, key=lambda x: int(re.findall(r"\d+", x)[0]))
-        dhp_sutta = dhp_suttas[dhp_sources.index(dhp_source)]
-        dhp_example = dhp_examples[dhp_sources.index(dhp_source)]
-
-        dhp_example_info = [
-            dhp_source,
-            dhp_sutta,
-            dhp_example,
-        ]
-    else:
-        dhp_example_info = [
-            "",
-            "",
-            "",
-        ]
-
-    return dhp_example_info
-
-
-def get_paritta_source(i: DpdHeadword, chant_names: List[str]) -> List[str]:
+def get_paritta_source(i: DpdHeadword, chant_names: List[str]):
     """Get Paritta source info from SBS info in a DpdHeadword object."""
     sbs_sources = [i.sbs.sbs_source_1, i.sbs.sbs_source_2]
     sbs_suttas = [i.sbs.sbs_sutta_1, i.sbs.sbs_sutta_2]
@@ -233,17 +155,79 @@ def get_paritta_source(i: DpdHeadword, chant_names: List[str]) -> List[str]:
         sbs_sources, sbs_suttas, sbs_examples, sbs_palichants
     ):
         if any(chant_name in palichant for chant_name in chant_names):
-            return [
-                source,
-                sutta,
-                example,
-            ]
+            return (
+                source.replace("\n", "<br>") if source else None,
+                sutta.replace("\n", "<br>") if sutta else None,
+                example.replace("\n", "<br>") if example else None,
+            )
 
-    return [
-        "",
-        "",
-        "",
+    return None, None, None
+
+
+def get_example_for_class(sbs: SBS):
+        """Gets the first available (source, sutta, example) set based on priority."""
+        if not sbs:
+            return None, None, None
+
+        sources_priority = [
+            ("class_source", "class_sutta", "class_example"),
+            ("sbs_source_1", "sbs_sutta_1", "sbs_example_1"),
+            ("sbs_source_2", "sbs_sutta_2", "sbs_example_2"),
+            ("dhp_source", "dhp_sutta", "dhp_example"),
+            ("pat_source", "pat_sutta", "pat_example"),
+            ("vib_source", "vib_sutta", "vib_example"),
+            ("discourses_source", "discourses_sutta", "discourses_example"),
+        ]
+
+        for src_attr, sut_attr, ex_attr in sources_priority:
+            source_val = getattr(sbs, src_attr, None)
+            if source_val: # Prioritize if source field is non-empty
+                sutta_val = getattr(sbs, sut_attr, None)
+                example_val = getattr(sbs, ex_attr, None)
+                return (
+                    source_val.replace("\n", "<br>") if source_val else None,
+                    sutta_val.replace("\n", "<br>") if sutta_val else None,
+                    example_val.replace("\n", "<br>") if example_val else None,
+                )
+        return None, None, None
+
+
+def get_unique_example_2(sbs: SBS):
+    """
+    Checks i.sbs.class_example against other example fields for similarity (factor 0.7).
+    Returns the source, sutta, and example of the first unique instance found
+    in the priority list.
+    """
+    if not sbs:
+        return None, None, None
+
+    class_example_cleaned = clean_machine(sbs.class_example)
+
+    other_examples_attrs = [
+        ("sbs_source_1", "sbs_sutta_1", "sbs_example_1"),
+        ("sbs_source_2", "sbs_sutta_2", "sbs_example_2"),
+        ("dhp_source", "dhp_sutta", "dhp_example"),
+        ("pat_source", "pat_sutta", "pat_example"),
+        ("vib_source", "vib_sutta", "vib_example"),
+        ("discourses_source", "discourses_sutta", "discourses_example"),
     ]
+
+    for src_attr, sut_attr, ex_attr in other_examples_attrs:
+        current_source = getattr(sbs, src_attr, None)
+        current_sutta = getattr(sbs, sut_attr, None)
+        current_example = getattr(sbs, ex_attr, None)
+        if current_example:
+            current_example_cleaned = clean_machine(current_example)
+
+            if current_example_cleaned and class_example_cleaned:
+                if not paragraphs_are_similar(class_example_cleaned, current_example_cleaned, 0.7):
+                    return (
+                        current_source.replace("\n", "<br>") if current_source else None,
+                        current_sutta.replace("\n", "<br>") if current_sutta else None,
+                        current_example.replace("\n", "<br>") if current_example else None,
+                    )
+
+    return None, None, None
 
 
 def dhp(dpspth, dpd_db):
@@ -251,18 +235,7 @@ def dhp(dpspth, dpd_db):
     console.print("[yellow]making dhp csv")
 
     def _is_needed(i: DpdHeadword) -> bool:
-        sources = [i.source_1, i.source_2]
-        if i.sbs and i.meaning_1:
-            sources.extend(
-                [
-                    i.sbs.sbs_source_1,
-                    i.sbs.sbs_source_2,
-                    i.sbs.sbs_source_3,
-                    i.sbs.sbs_source_4,
-                ]
-            )
-
-        return bool(any(re.search(r"DHP\d", source) for source in sources))
+        return bool(i.sbs and i.sbs.dhp_source)
 
     columns_names = [
         "id",
@@ -310,7 +283,9 @@ def dhp(dpspth, dpd_db):
             i.sanskrit,
             *get_root_info(i),
             *get_construction(i),
-            *get_dhp_source(i),
+            i.sbs.dhp_source.replace("\n", "<br>") if i.sbs else None,
+            i.sbs.dhp_sutta.replace("\n", "<br>") if i.sbs else None,
+            i.sbs.dhp_example.replace("\n", "<br>") if i.sbs else None,
             i.link.replace("\n", "<br>") if i.link else None,
             SBS_table_tools().generate_sbs_audio(i.lemma_clean),
             current_date,
@@ -462,8 +437,6 @@ def parittas(dpspth, dpd_db):
             sources = [
                 i.sbs.sbs_chant_pali_1,
                 i.sbs.sbs_chant_pali_2,
-                i.sbs.sbs_chant_pali_3,
-                i.sbs.sbs_chant_pali_4,
             ]
             return bool(
                 any(
@@ -545,22 +518,19 @@ def dps(dpspth, dpd_db):
     console.print("[yellow]making dps csv")
 
     def _is_needed(i: DpdHeadword):
-        if i.sbs:
-            sources = [
-                i.sbs.sbs_source_1,
-                i.sbs.sbs_source_2,
-                i.sbs.sbs_source_3,
-                i.sbs.sbs_source_4,
-            ]
-            return bool(i.ru and any(source for source in sources if source))
+        return bool(
+            i.sbs
+            and (
+                i.sbs.sbs_class_anki
+                or i.sbs.sbs_category
+                or i.sbs.sbs_patimokkha
+                or i.sbs.sbs_index
+            )
+        )
 
     columns_names = [
         "id",
         "pali",
-        "sbs_class_anki",
-        "sbs_category",
-        "sbs_class",
-        "sbs_patimokkha",
         "grammar",
         "neg",
         "verb",
@@ -574,12 +544,14 @@ def dps(dpspth, dpd_db):
         "sanskrit",
         "sanskrit_root",
         "sanskrit_root_meaning",
+        "sanskrit_root_ru_meaning",
         "sanskrit_root_class",
         "root",
         "root_has_verb",
         "root_group",
         "root_sign",
         "root_meaning",
+        "root_ru_meaning",
         "root_base",
         "construction",
         "derivative",
@@ -587,18 +559,12 @@ def dps(dpspth, dpd_db):
         "phonetic",
         "compound_type",
         "compound_construction",
-        "sbs_source_1",
-        "sbs_sutta_1",
-        "sbs_example_1",
-        "sbs_chant_pali_1",
-        "sbs_chant_eng_1",
-        "sbs_chapter_1",
-        "sbs_source_2",
-        "sbs_sutta_2",
-        "sbs_example_2",
-        "sbs_chant_pali_2",
-        "sbs_chant_eng_2",
-        "sbs_chapter_2",
+        "source_1",
+        "sutta_1",
+        "example_1",
+        "source_2",
+        "sutta_2",
+        "example_2",
         "antonym",
         "synonym",
         "variant",
@@ -607,7 +573,6 @@ def dps(dpspth, dpd_db):
         "sbs_notes",
         "ru_notes",
         "link",
-        "sbs_index",
         "audio",
         "test",
         "feedback",
@@ -615,16 +580,20 @@ def dps(dpspth, dpd_db):
     ]
 
     def dps_row(i: DpdHeadword) -> List[str]:
+        source, sutta, example = get_example_for_class(i.sbs)
+        if i.source_1:
+            source = i.source_1.replace("\n", "<br>")
+        if i.sutta_1:
+            sutta = i.sutta_1.replace("\n", "<br>")
+        if i.example_1:
+            example = i.example_1.replace("\n", "<br>")
+
         if i.rt is not None:
             root_key = re.sub(r" \d*$", "", str(i.root_key))
 
         fields = [
             i.id,
             i.lemma_1,
-            i.sbs.sbs_class_anki if i.sbs else None,
-            i.sbs.sbs_category if i.sbs else None,
-            i.sbs.sbs_class if i.sbs else None,
-            i.sbs.sbs_patimokkha if i.sbs else None,
             *get_grammar_and_meaning(i),
             i.ru.ru_meaning if i.ru else None,
             i.ru.ru_meaning_lit if i.ru else None,
@@ -642,11 +611,20 @@ def dps(dpspth, dpd_db):
             i.rt.root_ru_meaning if i.rt else None,
             i.root_base if i.rt else None,
             *get_construction(i),
-            *get_sbs_info(i),
+            source,
+            sutta,
+            example,
+            i.source_2.replace("\n", "<br>") if i.source_2 else None,
+            i.sutta_2.replace("\n", "<br>") if i.sutta_2 else None,
+            i.example_2.replace("\n", "<br>") if i.example_2 else None,
+            i.antonym,
+            i.synonym,
+            i.variant,
+            i.commentary.replace("\n", "<br>") if i.commentary else None,
+            i.notes.replace("\n", "<br>") if i.notes else None,
             i.sbs.sbs_notes.replace("\n", "<br>") if i.sbs else None,
             i.ru.ru_notes.replace("\n", "<br>") if i.ru else None,
             i.link.replace("\n", "<br>") if i.link else None,
-            i.sbs.sbs_index if i.sbs else None,
             SBS_table_tools().generate_sbs_audio(i.lemma_clean),
             current_date,
             get_feedback(i, "dps"),
@@ -686,32 +664,6 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
 
     def _is_needed(i: DpdHeadword):
         return bool(i.sbs and i.sbs.sbs_class_anki)
-
-    def _get_prioritized_example_for_class(sbs: SBS):
-        """Gets the first available (source, sutta, example) set based on priority."""
-        if not sbs:
-            return None, None, None
-
-        sources_priority = [
-            ("class_source", "class_sutta", "class_example"),
-            ("sbs_source_1", "sbs_sutta_1", "sbs_example_1"),
-            ("sbs_source_2", "sbs_sutta_2", "sbs_example_2"),
-            ("dhp_source", "dhp_sutta", "dhp_example"),
-            ("pat_source", "pat_sutta", "pat_example"),
-            ("vib_source", "vib_sutta", "vib_example"),
-        ]
-
-        for src_attr, sut_attr, ex_attr in sources_priority:
-            source_val = getattr(sbs, src_attr, None)
-            if source_val: # Prioritize if source field is non-empty
-                sutta_val = getattr(sbs, sut_attr, None)
-                example_val = getattr(sbs, ex_attr, None)
-                return (
-                    source_val.replace("\n", "<br>") if source_val else None,
-                    sutta_val.replace("\n", "<br>") if sutta_val else None,
-                    example_val.replace("\n", "<br>") if example_val else None,
-                )
-        return None, None, None
 
     columns_names = [
         "id",
@@ -760,7 +712,7 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
     ]
 
     def classes_row(i: DpdHeadword) -> List[str]:
-        source, sutta, example = _get_prioritized_example_for_class(i.sbs)
+        source, sutta, example = get_example_for_class(i.sbs)
 
         fields = [
             i.id,
@@ -927,12 +879,9 @@ def suttas(dpspth, dpd_db, unique_sbs_category_values):
         "phonetic",
         "compound_type",
         "compound_construction",
-        "sbs_source_1",
-        "sbs_sutta_1",
-        "sbs_example_1",
-        "sbs_source_2",
-        "sbs_sutta_2",
-        "sbs_example_2",
+        "source",
+        "sutta",
+        "example",
         "antonym",
         "synonym",
         "variant",
@@ -956,7 +905,17 @@ def suttas(dpspth, dpd_db, unique_sbs_category_values):
             i.sanskrit,
             *get_root_info(i),
             *get_construction(i),
-            *get_examples(i),
+            i.sbs.discourses_source.replace("\n", "<br>") if i.sbs else None,
+            i.sbs.discourses_sutta.replace("\n", "<br>") if i.sbs else None,
+            i.sbs.discourses_example.replace("\n", "<br>") if i.sbs else None,
+            i.antonym,
+            i.synonym,
+            i.variant,
+            i.commentary.replace("\n", "<br>") if i.commentary else None,
+            i.notes.replace("\n", "<br>") if i.notes else None,
+            i.sbs.sbs_notes.replace("\n", "<br>") if i.sbs and i.sbs.sbs_notes else
+            i.link.replace("\n", "<br>") if i.link else None,
+            SBS_table_tools().generate_sbs_audio(i.lemma_clean),
             current_date,
             get_feedback(i, "suttas"),
         ]
@@ -1045,12 +1004,12 @@ def root_phonetic_class(dpspth, dpd_db, unique_sbs_class_values):
         "phonetic",
         "compound_type",
         "compound_construction",
-        "sbs_source_1",
-        "sbs_sutta_1",
-        "sbs_example_1",
-        "sbs_source_2",
-        "sbs_sutta_2",
-        "sbs_example_2",
+        "source_1",
+        "sutta_1",
+        "example_1",
+        "source_2",
+        "sutta_2",
+        "example_2",
         "antonym",
         "synonym",
         "variant",
@@ -1065,6 +1024,8 @@ def root_phonetic_class(dpspth, dpd_db, unique_sbs_class_values):
     ]
 
     def root_phonetic_row(i: DpdHeadword) -> List[str]:
+        source, sutta, example = get_example_for_class(i.sbs)
+        source_2, sutta_2, example_2 = get_unique_example_2(i.sbs)
         fields = [
             i.id,
             i.lemma_1,
@@ -1074,7 +1035,20 @@ def root_phonetic_class(dpspth, dpd_db, unique_sbs_class_values):
             i.sanskrit,
             *get_root_info(i),
             *get_construction(i),
-            *get_examples(i),
+            source,
+            sutta,
+            example,
+            source_2,
+            sutta_2,
+            example_2,
+            i.antonym,
+            i.synonym,
+            i.variant,
+            i.commentary.replace("\n", "<br>") if i.commentary else None,
+            i.notes.replace("\n", "<br>") if i.notes else None,
+            i.sbs.sbs_notes.replace("\n", "<br>") if i.sbs else None,
+            i.link.replace("\n", "<br>") if i.link else None,
+            SBS_table_tools().generate_sbs_audio(i.lemma_clean),
             current_date,
             get_feedback(i, "root-phonetic"),
         ]
@@ -1199,9 +1173,9 @@ def vibhanga(dpspth, dpd_db):
             i.sanskrit,
             *get_root_info(i),
             *get_construction(i),
-            i.sbs.vib_source.replace("\n", "<br>"),
-            i.sbs.vib_sutta.replace("\n", "<br>"),
-            i.sbs.vib_example.replace("\n", "<br>"),
+            i.sbs.vib_source.replace("\n", "<br>") if i.sbs else None,
+            i.sbs.vib_sutta.replace("\n", "<br>") if i.sbs else None,
+            i.sbs.vib_example.replace("\n", "<br>") if i.sbs else None,
             i.antonym,
             i.synonym,
             i.variant,

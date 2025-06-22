@@ -52,8 +52,8 @@ id,pali,selected_pali_word,sutta_number,sutta_name,class_example
 30164,tassa 2,,,,
 30212,taṃ kiṃ maññasi,taṃ kiṃ maññasi,mn107,gaṇakamoggallānasuttaṃ,"taṃ kiṃ maññasi, brāhmaṇa, kusalo tvaṃ rājagahagāmissa maggassā'ti?"
 31138,te 2.3,,,,
-31216,tena 1,tena,mn107,gaṇakamoggallānasuttaṃ,"atha kho gaṇakamoggallāno brāhmaṇo yena bhagavā <b>tena</b> upasaṅkami, upasaṅkamitvā bhagavatā saddhiṃ sammodi."
-31218,tena 3,tena,mn107,gaṇakamoggallānasuttaṃ,"tam'enaṃ tvaṃ evaṃ vadeyyāsi, eh'ambho purisa, ayaṃ maggo rājagahaṃ gacchati. <b>tena</b> muhuttaṃ gaccha, tena muhuttaṃ gantvā dakkhissasi amukaṃ nāma gāmaṃ, tena muhuttaṃ gaccha, tena muhuttaṃ gantvā dakkhissasi amukaṃ nāma nigamaṃ,"
+31216,tena 1,,,,
+31218,tena 3,tena,mn107,gaṇakamoggallānasuttaṃ,"atha kho gaṇakamoggallāno brāhmaṇo yena bhagavā <b>tena</b> upasaṅkami, upasaṅkamitvā bhagavatā saddhiṃ sammodi."
 31287,telapajjota,telapajjota,mn107,gaṇakamoggallānasuttaṃ,"seyyathā'pi, bho gotama, nikkujjitaṃ vā ukkujjeyya, paṭicchannaṃ vā vivareyya, mūḷhassa vā maggaṃ ācikkheyya, andhakāre vā <b>telapajjotaṃ</b> dhāreyya, cakkhumanto rūpāni dakkhantī'ti,"
 31315,tesaṃ 1,,,,
 31316,tesaṃ 2,,,,
@@ -61,7 +61,7 @@ id,pali,selected_pali_word,sutta_number,sutta_name,class_example
 32428,diṭṭha 1.1,,,,
 33690,dubbalī,dubbalī,mn107,gaṇakamoggallānasuttaṃ,"so ime pañca nīvaraṇe pahāya cetaso upakkilese paññāya <b>dubbalī</b>karaṇe, vivicc'eva kāmehi vivicca akusalehi dhammehi,"
 34631,dhamma 1.06,,,,
-35126,dhāreti 1,dhāreyya,mn107,gaṇakamoggallānasuttaṃ,"andhakāre vā telapajjotaṃ <b>dhāreyya</b>, cakkhumanto rūpāni dakkhantī'ti,"
+35126,dhāreti 1,dhāreyya,mn107,gaṇakamoggallānasuttaṃ,"seyyathā'pi, bho gotama, nikkujjitaṃ vā ukkujjeyya, paṭicchannaṃ vā vivareyya, mūḷhassa vā maggaṃ ācikkheyya, andhakāre vā telapajjotaṃ <b>dhāreyya</b>, cakkhumanto rūpāni dakkhantī'ti,"
 35128,dhāreti 3,,,,
 35885,nava 1.1,nava,mn107,gaṇakamoggallānasuttaṃ,"ekaṃ ekakaṃ, dve dukā, tīṇi tikā, cattāri catukkā, pañca pañcakā, cha chakkā, satta sattakā, aṭṭha aṭṭhakā, <b>nava</b> navakā, dasa dasakā'ti,"
 36019,naṃ,naṃ,mn107,gaṇakamoggallānasuttaṃ,yathā te khameyya tathā <b>naṃ</b> byākareyyāsi.
@@ -108,7 +108,7 @@ id,pali,selected_pali_word,sutta_number,sutta_name,class_example
 52700,middha 1,thinamiddhaṃ,mn107,gaṇakamoggallānasuttaṃ,"thinamiddhaṃ pahāya vigatathinamiddho viharati ālokasaññī sato sampajāno, <b>thinamiddhā</b> cittaṃ parisodheti,"
 53089,mūla 1,mūla,mn107,gaṇakamoggallānasuttaṃ,"seyyathā'pi, bho gotama, ye keci <b>mūla</b>gandhā, kāl'ānusāri tesaṃ aggam'akkhāyati, ye keci sāragandhā, lohitacandanaṃ tesaṃ aggam'akkhāyati, ye keci pupphagandhā, vassikaṃ tesaṃ aggam'akkhāyati, evam'eva bhoto gotamassa ovādo param'ajjadhammesu."
 53154,mūḷha 2,mūḷhassa,mn107,gaṇakamoggallānasuttaṃ,"seyyathā'pi, bho gotama, nikkujjitaṃ vā ukkujjeyya, paṭicchannaṃ vā vivareyya, <b>mūḷhassa</b> vā maggaṃ ācikkheyya, andhakāre vā telapajjotaṃ dhāreyya, cakkhumanto rūpāni dakkhantī'ti,"
-53165,me 3,me,mn107,gaṇakamoggallānasuttaṃ,"evaṃ <b>me</b> sutaṃ, ekaṃ samayaṃ bhagavā sāvatthiyaṃ viharati pubb'ārāme migāramātupāsāde."
+53164,me 2,me,mn107,gaṇakamoggallānasuttaṃ,"evaṃ <b>me</b> sutaṃ, ekaṃ samayaṃ bhagavā sāvatthiyaṃ viharati pubb'ārāme migāramātupāsāde."
 53308,moggallāna 2,gaṇakamoggallāno,mn107,gaṇakamoggallānasuttaṃ,"atha kho <b>gaṇakamoggallāno</b> brāhmaṇo yena bhagavā ten'upasaṅkami, upasaṅkamitvā bhagavatā saddhiṃ sammodi."
 53575,yathā 1,yathā,mn107,gaṇakamoggallānasuttaṃ,"seyyathā'pi, bho gotama, imassa migāramātupāsādassa dissati anupubbasikkhā anupubbakiriyā anupubbapaṭipadā yad'idaṃ"
 54013,yāva 1,yāva,mn107,gaṇakamoggallānasuttaṃ,"n'eva davāya na madāya na maṇḍanāya na vibhūsanāya, <b>yāva</b>'d'eva imassa kāyassa ṭhitiyā yāpanāya vihiṃs'ūparatiyā brahmacariy'ānuggahāya, iti purāṇañ'ca vedanaṃ paṭihaṅkhāmi, navañ'ca vedanaṃ na uppādessāmi, yātrā ca me bhavissati anavajjatā ca phāsuvihāro cā'ti."
@@ -133,7 +133,7 @@ id,pali,selected_pali_word,sutta_number,sutta_name,class_example
 66203,vanappattha,vanappatthaṃ,mn107,gaṇakamoggallānasuttaṃ,so vivittaṃ sen'āsanaṃ bhajati araññaṃ rukkhamūlaṃ pabbataṃ kandaraṃ giriguhaṃ susānaṃ <b>vanappatthaṃ</b> abbhokāsaṃ palālapuñjaṃ.
 68644,vibhūsanāya,vibhūsanāya,mn107,gaṇakamoggallānasuttaṃ,"n'eva davāya na madāya na maṇḍanāya na <b>vibhūsanāya</b>, yāva'd'eva imassa kāyassa ṭhitiyā yāpanāya vihiṃs'ūparatiyā brahmacariy'ānuggahāya, iti purāṇañ'ca vedanaṃ paṭihaṅkhāmi, navañ'ca vedanaṃ na uppādessāmi, yātrā ca me bhavissati anavajjatā ca phāsuvihāro cā'ti."
 69552,vivarati 1,,,,
-69687,vihāra 3,viharati,mn107,gaṇakamoggallānasuttaṃ,"evaṃ me sutaṃ, ekaṃ samayaṃ bhagavā sāvatthiyaṃ <b>viharati</b> pubb'ārāme migāramātupāsāde."
+69687,vihāra 3,,,,
 69728,vihiṃsā 1,vihiṃs'ūparatiyā,mn107,gaṇakamoggallānasuttaṃ,"n'eva davāya na madāya na maṇḍanāya na vibhūsanāya, yāva'd'eva imassa kāyassa ṭhitiyā yāpanāya <b>vihiṃs'ūparatiyā</b> brahmacariy'ānuggahāya, iti purāṇañ'ca vedanaṃ paṭihaṅkhāmi, navañ'ca vedanaṃ na uppādessāmi, yātrā ca me bhavissati anavajjatā ca phāsuvihāro cā'ti."
 70035,vutta 2.1,,,,
 70118,vusitavant 1,vusitavanto,mn107,gaṇakamoggallānasuttaṃ,"ye pana te bhikkhū arahanto khīṇ'āsavā <b>vusitavanto</b> katakaraṇīyā ohitabhārā anuppattasadatthā parikkhīṇabhavasaṃyojanā samma'd'aññā vimuttā tesaṃ ime dhammā diṭṭhadhammasukhavihārāya c'eva saṃvattanti, satisampajaññāya cā'ti."

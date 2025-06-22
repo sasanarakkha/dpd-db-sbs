@@ -1,6 +1,6 @@
 """Update examples for class and discorses from csv"""
 
-
+import os
 from rich.console import Console
 
 from db.db_helpers import get_db_session
@@ -15,32 +15,32 @@ pth = ProjectPaths()
 dpspth = DPSPaths()
 
 
-def update_sbs_from_tsv_with_filter(tsv_path: str, sbs_anki_class_filter: int):
+def update_sbs_from_tsv_with_filter(csv_path: str, sbs_anki_class_filter: int):
     """
-    Updates SBS table from a TSV file based on sbs_anki_class_filter.
+    Updates SBS table from a CSV file based on sbs_anki_class_filter.
 
     Args:
-        tsv_path (str): Path to the TSV file.
+        csv_path (str): Path to the CSV file.
         sbs_anki_class_filter (int): The value to filter sbs_anki_class by.
     """
     db_session = get_db_session(pth.dpd_db_path)
-    console.print(f"[yellow]Updating SBS table from {tsv_path} with sbs_anki_class_filter: {sbs_anki_class_filter}")
+    console.print(f"[yellow]Updating SBS table from {csv_path} with sbs_anki_class_filter: {sbs_anki_class_filter}")
 
     try:
-        # Read the TSV file
-        tsv_data = read_tsv_dot_dict(tsv_path)
+        # Read the CSV file
+        tsv_data = read_tsv_dot_dict(csv_path)
         if not tsv_data:
-            console.print(f"[red]TSV file is empty or could not be read: {tsv_path}")
+            console.print(f"[red]CSV file is empty or could not be read: {csv_path}")
             return
 
-        console.print(f"[blue]First data row from TSV: {tsv_data[0]} ")
-        # console.print(f"[blue]Columns in TSV: {list(tsv_data[0].keys())}")
+        console.print(f"[blue]First data row from CSV: {tsv_data[0]} ")
+        # console.print(f"[blue]Columns in CSV: {list(tsv_data[0].keys())}")
 
         tsv_ids = {int(row.id) for row in tsv_data}
         updated_count = 0
         filter_mismatch_ids_in_tsv = []
 
-        # Iterate through the TSV data
+        # Iterate through the CSV data
         for row_idx, tsv_row in enumerate(tsv_data, start=1):
             try:
                 word_id = int(tsv_row.id)
@@ -63,23 +63,23 @@ def update_sbs_from_tsv_with_filter(tsv_path: str, sbs_anki_class_filter: int):
                     else:
                         filter_mismatch_ids_in_tsv.append(word_id)
                 # else:
-                    # console.print(f"[red]ID {word_id} from TSV not found in database.")
+                    # console.print(f"[red]ID {word_id} from CSV not found in database.")
             except ValueError:
-                console.print(f"[red]Invalid ID format in TSV row {row_idx}: {tsv_row.id}")
+                console.print(f"[red]Invalid ID format in CSV row {row_idx}: {tsv_row.id}")
             except Exception as e:
-                console.print(f"[red]Error processing TSV row {row_idx} (ID: {tsv_row.id}): {e}")
+                console.print(f"[red]Error processing CSV row {row_idx} (ID: {tsv_row.id}): {e}")
 
-        console.print(f"[green]{updated_count} records updated from TSV.")
+        console.print(f"[green]{updated_count} records updated from CSV.")
         if filter_mismatch_ids_in_tsv:
-            console.print(f"[yellow]IDs in TSV where sbs_class_anki did not match {sbs_anki_class_filter}: {filter_mismatch_ids_in_tsv}")
+            console.print(f"[yellow]IDs in CSV where sbs_class_anki did not match {sbs_anki_class_filter}: {filter_mismatch_ids_in_tsv}")
 
-        # Check for IDs in DB with matching sbs_anki_class_filter but not in TSV
+        # Check for IDs in DB with matching sbs_anki_class_filter but not in CSV
         db_entries_with_filter = db_session.query(DpdHeadword).join(SBS).filter(
             SBS.sbs_class_anki == sbs_anki_class_filter).all()
 
         missing_from_tsv = [entry.id for entry in db_entries_with_filter if entry.id not in tsv_ids]
         if missing_from_tsv:
-            console.print(f"[yellow]IDs in DB with sbs_class_anki == {sbs_anki_class_filter} but NOT found in TSV: {missing_from_tsv}")
+            console.print(f"[yellow]IDs in DB with sbs_class_anki == {sbs_anki_class_filter} but NOT found in CSV: {missing_from_tsv}")
 
         # db_session.commit()
         # console.print("[bold green]Changes committed to the database.")
@@ -92,12 +92,11 @@ def update_sbs_from_tsv_with_filter(tsv_path: str, sbs_anki_class_filter: int):
 
 if __name__ == "__main__":
     # Example usage:
-    # Replace with the actual path to your TSV file
-    tsv_file_path = "path/to/your/input.tsv"  # <--- !!! UPDATE THIS PATH !!!
-    # Replace with the sbs_anki_class value you want to filter by
-    sbs_anki_class_to_filter = 10          # <--- !!! UPDATE THIS FILTER VALUE !!!
+    class_number = 1
+    base_path = dpspth.pali_class_output_dir
+    csv_path = os.path.join(base_path, "done", f"class_{class_number}_output done.csv")
 
-    if not tsv_file_path:
-        console.print("[bold red]Please update 'tsv_file_path' in the script with the actual path to your TSV file.")
+    if not csv_path:
+        console.print("[bold red]Please update 'csv_path' in the script with the actual path to your CSV file.")
     else:
-        update_sbs_from_tsv_with_filter(tsv_file_path, sbs_anki_class_to_filter)
+        update_sbs_from_tsv_with_filter(csv_path, class_number)
