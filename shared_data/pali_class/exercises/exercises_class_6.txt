@@ -92,10 +92,6 @@ Sutta Number: AN5.37
 Pali: sukhassa dātā medhāvī sukhaṃ so adhigacchati
 English Translation: The intelligent man [who is] a giver of happiness, acquires happiness.
 
-Sutta Number: MN131 (simpl)
-Pali: tena mahāsenena maccunā saṅgaro na hoti
-English Translation: There is no bargaining with that death, with (his) great army.
-
 Sutta Number: MN107
 Pali: ehi tvaṃ bhikkhu bhojane mattaññū hohi
 English Translation: Come, monk, be moderate with regard to food!
@@ -158,3 +154,7 @@ English Translation: Associate with an intelligent person, a wise man, one who r
 Sutta Number: SN7.15 (simpl)
 Pali: mātari pitari ca, atho jeṭṭhamhi bhātari. ācariye ca, tesu na mānaṃ karohi.
 English Translation: Towards mother and father, and after that, towards the eldest brother; and towards the teacher. Do not show conceit towards them.
+
+Sutta Number: MN131 (simpl)
+Pali: tena mahāsenena maccunā saṅgaraṃ na hoti
+English Translation: There is no bargaining with that death, with (his) great army.

@@ -82,7 +82,7 @@ English Translation: "There is ease for me talking or sitting down by myself;" h
 
 Sutta Number: MN107
 Pali: rattiyā majjhimaṃ yāmaṃ dakkhiṇena passena sīhaseyyaṃ kappeyyāsi pāde pādaṃ accādhāya sato sampajāno uṭṭhānasaññaṃ manasikaritvā
-English Translation: In the middle watch of the night, you should make the lion's pose, [lying] on the right flank, placing [one] foot on the [other] foot, mindful, fully knowing, having noted in the mind the wake-up time.
+English Translation: In the middle watch of the night, you should adopt the lion's pose, [lying] on the right flank, placing [one] foot on the [other] foot, mindful, fully knowing, having noted in the mind the wake-up time.
 
 Sutta Number: MN62 (simpl)
 Pali: atha kho āyasmā rāhulo, ajja bhagavatā sammukhā ovādena ovadito gāmaṃ piṇḍāya pavisitvā, tato paṭinivattitvā aññatarasmiṃ rukkhamūle nisīditvā
@@ -125,7 +125,7 @@ English Translation: If it [i.e. the robe-cloth] should not be [enough] for comp
 
 Sutta Number: SNP56
 Pali: yattha nāmaṃ ca rūpaṃ ca asesaṃ uparujjhati, viññāṇassa nirodhena, ettha etaṃ uparujjhati.
-English Translation: Wherever name and form is completely ended, here this thing is ended by means of the cessation of consciousness.
+English Translation: Wherever name and form is completely ended, with the cessation of consciousness, here this is ended.
 
 Sutta Number: SNP16
 Pali: etādisāni katvāna, sabbattha aparājitā, sabbattha sotthiṃ gacchanti
@@ -137,4 +137,4 @@ English Translation: Here, venerable sir, some or other issue [concerning] the t
 
 Sutta Number: DHP284
 Pali: yāva hi vanatho na chijjati, aṇumatto api narassa nārīsu, paṭibaddhamano eva tāva so, vaccho khīrapako va mātari.
-English Translation: Indeed, as long as desire is not cut off, even the smallest, of a man enamoured with regard to women, just to that extent he [is] like a suckling calf towards [its] mother.
+English Translation: Indeed, as long as desire is not cut off, even the smallest, of a man enamoured with regard to women, just that long he [is] like a suckling calf towards [its] mother.

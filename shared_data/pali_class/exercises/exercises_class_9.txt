@@ -46,7 +46,7 @@ English Translation: After that, those monks, having walked for alms food in Sā
 
 Sutta Number: MN107 (simpl)
 Pali: aṇumattesu vajjesu bhayaṃ dassāvī, samādāya sikkhāhi sikkhāpadesu
-English Translation: Seeing fear with regard to the slightest fault, train yourself [by] undertaking the training precepts.
+English Translation: Seeing danger in the slightest fault, train yourself [by] undertaking the training precepts.
 
 Sutta Number: MN38
 Pali: ahesumha nu kho mayaṃ atītam'addhānaṃ, nanu kho ahesumha atītam'addhānaṃ, kiṃ nu kho ahesumha atītam'addhānaṃ?
@@ -70,7 +70,7 @@ English Translation: Ageing, decrepitude, brokenness, grayness of hair, wrinkled
 
 Sutta Number: SN35.28
 Pali: ghānasmiṃ api nibbindati gandhesu api nibbindati ghānaviññāṇe api nibbindati ghānasamphasse api nibbindati
-English Translation: He is disenchanted with regard to the nose, also with regard to smell, he is disenchanted with regard to nose consciousness as well, he is even disenchanted with regard to nose contact.
+English Translation: He is disenchanted with regard to the nose, also with regard to smell, he is disenchanted with regard to nose consciousness as well, he is also disenchanted with regard to nose contact.
 
 Sutta Number: MN27
 Pali: na sukaraṃ agāraṃ ajjhāvasatā ek'antaparipuṇṇaṃ ek'antaparisuddhaṃ saṅkhalikhitaṃ brahmacariyaṃ carituṃ.
@@ -137,7 +137,7 @@ English Translation: He is one who hates to sit or lie down on excrement or urin
 
 Sutta Number: MN52
 Pali: evam'eva kho ahaṃ, bhante, imesaṃ ekādasannaṃ amatadvārānaṃ ekam'ekena api amatadvārena sakkuṇissāmi attānaṃ sotthiṃ kātuṃ.
-English Translation: Indeed, in the same way [as the man fleeing from a fire in a house with eleven doors], I, too, by myself will be able to safely flee [lit: do] through any of the eleven doors to the deathless state
+English Translation: Venerable sir, indeed, in the same way, even by one door to the deathless state of these eleven doors to the deathless state, I, too,will myself be able to make safety.
 
 Sutta Number: SNP61
 Pali: eko ahaṃ sakka mahantaṃ oghaṃ, anissito no visahāmi tārituṃ
