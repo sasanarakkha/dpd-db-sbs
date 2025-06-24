@@ -53,12 +53,17 @@ class ProgData:
             self.make_link: bool = True
         self.show_sbs_data: bool = False
         self.show_ru_data: bool = False
+        self.show_grammar: bool = False
+
 
         if config_test("dictionary", "show_sbs_data", "yes"):
             self.show_sbs_data: bool = True
 
         if config_test("dictionary", "show_ru_data", "yes"):
             self.show_ru_data: bool = True
+
+        if config_test("dictionary", "show_grammar", "yes"):
+            self.show_grammar: bool = True
 
         self.paths = self.pth
 
@@ -83,6 +88,7 @@ def main():
         g.make_link,
         g.show_sbs_data,
         g.show_ru_data,
+        g.show_grammar,
         g.data_limit,
     )
     g.rendered_sizes.append(sizes)

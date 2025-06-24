@@ -100,6 +100,7 @@ class DpdHeadwordRenderDataBase(TypedDict):
     show_id: bool
     show_sbs_data: bool
     show_ru_data: bool
+    show_grammar: bool
 
 class DpdHeadwordRenderData(DpdHeadwordRenderDataBase):
     pth: ProjectPaths
@@ -111,6 +112,7 @@ def render_pali_word_dpd_html(
     render_data: DpdHeadwordRenderData,
     show_sbs_data=False,
     show_ru_data=False,
+    show_grammar=False,
 ) -> Tuple[DictEntry, RenderedSizes]:
     rd = render_data
     size_dict = default_rendered_sizes()
@@ -203,11 +205,12 @@ def render_pali_word_dpd_html(
         rd["idioms_set"],
         tt.button_box_templ,
         rd["show_sbs_data"],
+        rd["show_grammar"],
     )
     html += button_box
     size_dict["dpd_button_box"] += len(button_box)
 
-    if i.needs_grammar_button or show_sbs_data:
+    if i.needs_grammar_button or show_grammar:
         grammar = render_grammar_templ(
             pth,
             i,
@@ -215,6 +218,7 @@ def render_pali_word_dpd_html(
             tt.grammar_templ,
             rd["show_sbs_data"],
             rd["show_ru_data"],
+            rd["show_grammar"],
         )
         html += grammar
         size_dict["dpd_grammar"] += len(grammar)
@@ -323,7 +327,8 @@ def _parse_batch_top_level(
     render_data: DpdHeadwordRenderData,
     show_sbs_data: bool,
     dpd_data_results_list: ListProxy,
-    rendered_sizes_results_list: ListProxy
+    rendered_sizes_results_list: ListProxy,
+    show_grammar: bool,
 ):
     """Helper function for multiprocessing, now at top level."""
     # Create templates locally in child process
@@ -338,7 +343,7 @@ def _parse_batch_top_level(
 
     res: List[Tuple[DictEntry, RenderedSizes]] = [
         render_pali_word_dpd_html(
-            i, full_render_data, show_sbs_data
+            i, full_render_data, show_sbs_data, show_grammar
         )
         for i in batch
     ]
@@ -357,6 +362,7 @@ def generate_dpd_html(
     make_link=False,
     show_sbs_data=False,
     show_ru_data=False,
+    show_grammar=False,
     data_limit: int = 0,
 ) -> Tuple[List[DictEntry], RenderedSizes]:
     pr.green_title("generating dpd html")
@@ -453,6 +459,7 @@ def generate_dpd_html(
             "show_id": show_id,
             "show_sbs_data": show_sbs_data,
             "show_ru_data": show_ru_data,
+            "show_grammar": show_grammar,
         }
 
         for batch in batches:
@@ -464,7 +471,8 @@ def generate_dpd_html(
                     render_data,
                     show_sbs_data,
                     dpd_data_results_list,
-                    rendered_sizes_results_list
+                    rendered_sizes_results_list,
+                    show_grammar
                 )
             )
             p.start()
@@ -542,16 +550,19 @@ def render_button_box_templ(
     idioms_set: Set[str],
     button_box_templ: Template,
     show_sbs_data=False,
+    show_grammar=False
 ) -> str:
     """render buttons for each section of the dictionary"""
 
     button_html = '<a class="button" href="#" data-target="{target}">{name}</a>'
 
     # grammar_button
-    if i.needs_grammar_button or show_sbs_data:
+    if i.needs_grammar_button or show_grammar:
         grammar_button = button_html.format(
             target=f"grammar_{i.lemma_1_}", name="grammar"
         )
+    else:
+        grammar_button = ""
 
     # example_button
     if i.needs_example_button:
@@ -685,10 +696,11 @@ def render_grammar_templ(
     grammar_templ: Template,
     show_sbs_data=False,
     show_ru_data=False,
+    show_grammar=False,
 ) -> str:
     """html table of grammatical information"""
 
-    if (i.meaning_1 is not None and i.meaning_1) or show_sbs_data:
+    if (i.meaning_1 is not None and i.meaning_1) or show_grammar:
         if i.construction is not None and i.construction:
             i.construction = i.construction.replace("\n", "<br>")
         else:
