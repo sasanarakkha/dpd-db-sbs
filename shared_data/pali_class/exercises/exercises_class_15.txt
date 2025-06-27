@@ -69,7 +69,7 @@ Pali: upayupādānābhinivesavinibandho kho ayaṃ, kaccāna, loko yebhuyyena.
 English Translation: Certainly, Kaccāna, this world is for the most part attached to engaging, grasping, and clinging. 
 
 Sutta Number: SN12.15
-Pali: taṃ ce ayaṃ upayupādānaṃ cetaso adhiṭṭhānaṃ abhinives'ānusayaṃ na upeti na upādiyati n'ādhiṭṭhāti — attā me'ti.
+Pali: taṃ ca ayaṃ upayupādānaṃ cetaso adhiṭṭhānaṃ abhinives'ānusayaṃ na upeti na upādiyati n'ādhiṭṭhāti — attā me'ti.
 English Translation: But this (person) does not get involved with engagement and grasping, mental standpoint, adherence and underlying tendency, he does not grasp at that idea of non-existence; he does not take a stand "(this is) my self."
 
 Sutta Number: SN12.15
@@ -81,12 +81,8 @@ Pali: ettāvatā kho, kaccāna, sammādiṭṭhi hoti.
 English Translation: Truly, Kaccāna, to this extent there is right view.
 
 Sutta Number: SN12.15
-Pali: sabbaṃ atthī'ti kho, kaccāna, ayaṃ eko anto.
-English Translation: "Everything exists," Kaccāna: this is one extreme. 
-
-Sutta Number: SN12.15
-Pali: sabbaṃ n'atthī'ti ayaṃ dutiyo anto.
-English Translation: "Everything does not exist,": this is the second extreme.
+Pali: sabbaṃ atthī'ti kho, kaccāna, ayaṃ eko anto. sabbaṃ n'atthī'ti ayaṃ dutiyo anto.
+English Translation: "Everything exists," Kaccāna: this is one extreme. "Everything does not exist,": this is the second extreme. 
 
 Sutta Number: SN12.15
 Pali: ete te, kaccāna, ubho ante anupagamma majjhena tathāgato dhammaṃ deseti.

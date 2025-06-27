@@ -43,10 +43,6 @@ sbs_example_1 no bold </b>	sbs.sbs_example_1	is not empty	-	sbs.sbs_example_1	do
 sbs_example_1 no bold <b>	sbs.sbs_example_1	is not empty	-	sbs.sbs_example_1	does not contain	<b>	ru.ru_meaning	is not empty	-										sbs.sbs_example_1	pali_1	grammar	meaning_1	[]	10
 sbs_example_2 no bold </b>	sbs.sbs_example_2	is not empty	-	sbs.sbs_example_2	does not contain	</b>	ru.ru_meaning	is not empty	-										sbs.sbs_example_2	pali_1	grammar	meaning_1	[]	10
 sbs_example_2 no bold <b>	sbs.sbs_example_2	is not empty	-	sbs.sbs_example_2	does not contain	<b>	ru.ru_meaning	is not empty	-										sbs.sbs_example_2	pali_1	grammar	meaning_1	[]	10
-sbs_example_3 no bold </b>	sbs.sbs_example_3	is not empty	-	sbs.sbs_example_3	does not contain	</b>	ru.ru_meaning	is not empty	-										sbs.sbs_example_3	pali_1	grammar	meaning_1	[]	10
-sbs_example_3 no bold <b>	sbs.sbs_example_3	is not empty	-	sbs.sbs_example_3	does not contain	<b>	ru.ru_meaning	is not empty	-										sbs.sbs_example_3	pali_1	grammar	meaning_1	[]	10
-sbs_example_4 no bold </b>	sbs.sbs_example_4	is not empty	-	sbs.sbs_example_4	does not contain	</b>	ru.ru_meaning	is not empty	-										sbs.sbs_example_4	pali_1	grammar	meaning_1	[]	10
-sbs_example_4 no bold <b>	sbs.sbs_example_4	is not empty	-	sbs.sbs_example_4	does not contain	<b>	ru.ru_meaning	is not empty	-										sbs.sbs_example_4	pali_1	grammar	meaning_1	[]	10
 dhp_example no bold </b>	sbs.dhp_example	is not empty	-	sbs.dhp_example	does not contain	</b>	ru.ru_meaning	is not empty	-										sbs.dhp_example	pali_1	grammar	meaning_1	[]	10
 dhp_example no bold <b>	sbs.dhp_example	is not empty	-	sbs.dhp_example	does not contain	<b>	ru.ru_meaning	is not empty	-										sbs.dhp_example	pali_1	grammar	meaning_1	[]	10
 pat_example no bold </b>	sbs.pat_example	is not empty	-	sbs.pat_example	does not contain	</b>	ru.ru_meaning	is not empty	-										sbs.pat_example	pali_1	grammar	meaning_1	[]	10
@@ -88,8 +84,6 @@ class_example has capital letter	sbs.class_example	is not empty	-	sbs.class_exam
 discourses_example has capital letter	sbs.discourses_example	is not empty	-	sbs.discourses_example	contains	[A-Z]													sbs.discourses_example	pali_1	sbs.discourses_example		[]	10
 ru_meaning empty while ex1	ru.ru_meaning	is empty	-	sbs.sbs_example_1	is not empty	-													ru.ru_meaning	pali_1	meaning_1		[]	10
 ru_meaning empty while ex2	ru.ru_meaning	is empty	-	sbs.sbs_example_2	is not empty	-													ru.ru_meaning	pali_1	meaning_1		[]	10
-ru_meaning empty while ex3	ru.ru_meaning	is empty	-	sbs.sbs_example_3	is not empty	-													ru.ru_meaning	pali_1	meaning_1		[]	10
-ru_meaning empty while ex4	ru.ru_meaning	is empty	-	sbs.sbs_example_4	is not empty	-													ru.ru_meaning	pali_1	meaning_1		[]	10
 example_1 space comma	sbs.sbs_example_1	contains	 ,																sbs.sbs_example_1	pali_1	sbs.sbs_example_1		[]	10
 example_1 space comma	sbs.sbs_example_1	contains	 ,$| , 																sbs.sbs_example_1	pali_1	sbs.sbs_example_1		[]	10
 example_1 space fullstop	sbs.sbs_example_1	contains	 \.$| \. 																sbs.sbs_example_1	pali_1	sbs.sbs_example_1		[]	10
