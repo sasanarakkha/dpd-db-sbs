@@ -91,8 +91,8 @@ safe_copy_file "Roots Pali Class.apkg" "$TEMP_PUSH_DEST_DIR/roots-pali-class.apk
 safe_copy_file "Roots Pali Class.apkg" "$FILESRV_BASE_DEST_DIR/Roots Pali Class.apkg" "-X -f"
 safe_copy_file "Phonetic Changes Pali Class.apkg" "$TEMP_PUSH_DEST_DIR/phonetic-pali-class.apkg" "-X -f"
 safe_copy_file "Phonetic Changes Pali Class.apkg" "$FILESRV_BASE_DEST_DIR/Phonetic Changes Pali Class.apkg" "-X -f"
-safe_copy_file "Common Roots Pali Class.apkg" "$TEMP_PUSH_DEST_DIR/common-roots-pali-class.apkg" "-X -f"
-safe_copy_file "Common Roots Pali Class.apkg" "$FILESRV_BASE_DEST_DIR/Common Roots Pali Class.apkg" "-X -f"
+safe_copy_file "Common Roots.apkg" "$TEMP_PUSH_DEST_DIR/common-roots.apkg" "-X -f"
+safe_copy_file "Common Roots.apkg" "$FILESRV_BASE_DEST_DIR/Common Roots.apkg" "-X -f"
 safe_copy_file "Suttas Advanced Pali Class.apkg" "$TEMP_PUSH_DEST_DIR/suttas-advanced-pali-class.apkg" "-X -f"
 safe_copy_file "Suttas Advanced Pali Class.apkg" "$FILESRV_BASE_DEST_DIR/Suttas Advanced Pali Class.apkg" "-X -f"
 
@@ -107,6 +107,8 @@ safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/class_all.csv" "$TEMP_PUSH_DEST_DIR/voc
 safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/phonetic_class.csv" "$TEMP_PUSH_DEST_DIR/phonetic-pali-class.csv" "-X -f"
 safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/roots_class.csv" "$TEMP_PUSH_DEST_DIR/roots-pali-class.csv" "-X -f"
 safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/suttas_class.csv" "$TEMP_PUSH_DEST_DIR/suttas-advanced-pali-class.csv" "-X -f"
+safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/common_roots.csv" "$TEMP_PUSH_DEST_DIR/common-roots.csv" "-X -f"
+
 
 # Copy grammar CSV files
 safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/grammar/cl_sum_abbr.csv" "$TEMP_PUSH_DEST_DIR/grammar-pali-class-abbr.csv" "-X -f"

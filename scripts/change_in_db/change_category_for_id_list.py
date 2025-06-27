@@ -59,8 +59,6 @@ def condition_check_all_examples(word, __sutta_identifier__):
         [
             getattr(word.sbs, "sbs_example_1", None),
             getattr(word.sbs, "sbs_example_2", None),
-            # getattr(word.sbs, "sbs_example_3", None),
-            # getattr(word.sbs, "sbs_example_4", None),
         ]
     )
 

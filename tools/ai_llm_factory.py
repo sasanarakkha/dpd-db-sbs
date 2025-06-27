@@ -2,6 +2,7 @@
 import re
 import json
 from langchain_deepseek import ChatDeepSeek
+from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableMap
 
@@ -81,6 +82,59 @@ class ChatDeepSeekWrapper():
         return []
 
 
+class ChatOpenAIWrapper():
+    def __init__(self, framework: str, api_key: str, model: str = "gpt-4.1", temperature: float = 0.7):
+        self.framework = framework
+        self.api_key = api_key
+        self.model = model
+        self.temperature = temperature
+
+    def langchain_openai(self):
+        # Create an instance of ChatOpenAI from langchain_openai
+        return ChatOpenAI(
+            model_name=self.model,
+            openai_api_key=self.api_key,
+            temperature=self.temperature
+        )
+
+    def chat(self, system_prompt: str, user_prompt: str) -> str:
+        if self.framework == "langchain":
+            openai_llm = self.langchain_openai()
+            messages = [
+                (
+                    "system",
+                    system_prompt,
+                ),
+                ("human", user_prompt),
+            ]
+            ai_msg = openai_llm.invoke(messages)
+            response_content = ai_msg.content
+            return response_content
+        return "Invalid provider type."
+
+    def batch_processing(self, system_prompt: str, user_prompt: str, batch_input: list[dict]) -> list[dict]:
+        if self.framework == "langchain":
+            openai_llm = self.langchain_openai()
+            prompt = ChatPromptTemplate([("system", system_prompt.strip()), ("human", user_prompt.strip())])
+            chain = prompt | openai_llm
+            batch_chain = RunnableMap({"response": chain})
+            result = batch_chain.batch(batch_input)
+            parsed_result = []
+            for r in result:
+                raw = r["response"].content
+                cleaned = re.sub(r'^```json\s*|\s*```$', '', raw.strip(), flags=re.DOTALL)
+                try:
+                    parsed = json.loads(cleaned)
+                except json.JSONDecodeError:
+                    try:
+                        parsed = json.loads(json.loads(cleaned)) # fallback for escaped JSON
+                    except:
+                        parsed = {"error": "Failed to parse", "raw": raw}
+                parsed_result.append(parsed)
+            return parsed_result
+        return []
+
+
 class LLMFactory:
     def __init__(self, provider: str, framework: str, model: str, api_key: str,  temperature: float = 0.7):
         self.provider = provider
@@ -92,6 +146,13 @@ class LLMFactory:
     def get_llm(self):
         if self.provider == "deepseek":
             return ChatDeepSeekWrapper(
+                framework=self.framework,
+                model=self.model,
+                api_key=self.api_key,
+                temperature=self.temperature
+            )
+        elif self.provider == "openai":
+            return ChatOpenAIWrapper(
                 framework=self.framework,
                 model=self.model,
                 api_key=self.api_key,

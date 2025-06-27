@@ -115,7 +115,7 @@ You are an AI assistant specialized in Pali language processing. Your primary ta
 """
 
 # User Prompt Templates
-USER_PROMPT_DEEPSEEK_BATCH_TEMPLATE = """
+USER_PROMPT_UNIFIED_BATCH_TEMPLATE = """
 For the given Pali word: "{pali}" with ID: "{id}", using the provided exercise data: "{exercise}", extract the relevant information as per the system prompt instructions.
 """
 
@@ -205,18 +205,9 @@ For the given Pali word: "{pali}" with ID: "{id}", using the provided `exercise_
 """
 
 
-# --- LLM Initialization ---
-if config_read("apis", "deepseek"):
-    DEEPSEEK_API_KEY = config_read("apis", "deepseek")
-else:
-    raise ValueError("SBS_DEEPSEEK_API_KEY not found in environment variables.")
-
-deepseek_llm_instance = LLMFactory("deepseek", "langchain", "deepseek-chat", DEEPSEEK_API_KEY, 0.7).get_llm() # type: ignore
-
-
-def run_batch_deepseek_inference(vocab_csv_path, exercise_text_file_path, output_csv_path):
-    """Runs batch inference using DeepSeek."""
-    print("\n--- Running Batch DeepSeek Inference ---")
+def run_batch_class_inference(vocab_csv_path, exercise_text_file_path, output_csv_path, provider:str):
+    """Runs batch inference using provider."""
+    print(f"\n--- Running Batch {provider.upper()} Class Inference ---")
     print(f"Vocab: {vocab_csv_path}, Exercise File: {exercise_text_file_path}, Output: {output_csv_path}")
 
     try:
@@ -227,7 +218,7 @@ def run_batch_deepseek_inference(vocab_csv_path, exercise_text_file_path, output
     
     exercise_data_content = load_exercise_data_from_file(exercise_text_file_path)
     if not exercise_data_content:
-        print("Could not load exercise data. Aborting batch DeepSeek inference.")
+        print(f"Could not load exercise data. Aborting batch {provider.upper()} inference.")
         return
 
     batch_input_for_llm = []
@@ -259,18 +250,26 @@ def run_batch_deepseek_inference(vocab_csv_path, exercise_text_file_path, output
     if not batch_input_for_llm:
         print("No valid data for batch processing after preparing inputs.")
         return
-
-    print(f"Prepared {len(batch_input_for_llm)} items for DeepSeek batch processing.")
     
-    batch_results_raw = deepseek_llm_instance.batch_processing(
+    # --- LLM Initialization ---
+    api_key = config_read("apis", provider)
+    if not api_key:
+        print(f"Error: API key for {provider.upper()} not found in config. Aborting.")
+        return
+
+    llm_instance = LLMFactory(provider, "langchain", "deepseek-chat" if provider == "deepseek" else "gpt-4o-mini", api_key, 0.7).get_llm() # type: ignore
+
+    print(f"Prepared {len(batch_input_for_llm)} items for {provider.upper()} batch processing.")
+    
+    batch_results_raw = llm_instance.batch_processing(
         SYSTEM_PROMPT_UNIFIED,
-        USER_PROMPT_DEEPSEEK_BATCH_TEMPLATE,
+        USER_PROMPT_UNIFIED_BATCH_TEMPLATE,
         batch_input_for_llm
     )
 
     parsed_results = []
     for res_text in batch_results_raw:
-        # res_text is already a dictionary from deepseek_llm_instance.batch_processing
+        # res_text is already a dictionary from llm_instance.batch_processing
         if isinstance(res_text, dict): 
             original_input = next((item for item in batch_input_for_llm if item['pali'] == res_text.get('pali')), None)
             if original_input and 'id' not in res_text: # Use res_text here
@@ -284,12 +283,12 @@ def run_batch_deepseek_inference(vocab_csv_path, exercise_text_file_path, output
     
     os.makedirs(os.path.dirname(output_csv_path), exist_ok=True)
     df_results.to_csv(output_csv_path, index=False, encoding="utf-8")
-    print(f"DeepSeek batch results saved to {output_csv_path}")
+    print(f"{provider.upper()} batch results saved to {output_csv_path}")
 
 
-def run_batch_deepseek_discourse_inference(vocab_csv_path, sutta_text_file_path, output_csv_path):
-    """Runs batch inference for a discourse text using DeepSeek."""
-    print("\n--- Running Batch DeepSeek Discourse Inference ---")
+def run_batch_discourse_inference(vocab_csv_path, sutta_text_file_path, output_csv_path, provider: str):
+    """Runs batch inference for a discourse text using provider."""
+    print(f"\n--- Running Batch {provider.upper()} Discourse Inference ---")
     print(f"Vocab: {vocab_csv_path}, Sutta File: {sutta_text_file_path}, Output: {output_csv_path}")
 
     try:
@@ -323,17 +322,18 @@ def run_batch_deepseek_discourse_inference(vocab_csv_path, sutta_text_file_path,
     if not batch_input_for_llm:
         print("No valid data for batch processing after preparing inputs.")
         return
-
-    print(f"Prepared {len(batch_input_for_llm)} items for DeepSeek batch discourse processing.")
     
-    # Note: The USER_PROMPT_DISCOURSE_BATCH_TEMPLATE expects {exercise_data}
-    # The deepseek_llm_instance.batch_processing will need to map the 'exercise_data' field
-    # from batch_input_for_llm to the {exercise_data} placeholder in the template.
-    # If your LLMFactory's batch_processing doesn't do this automatically, you might need
-    # to adjust how USER_PROMPT_DISCOURSE_BATCH_TEMPLATE is formatted or how batch_input_for_llm is structured.
-    # Assuming it handles the placeholder correctly:
+    # Initialize LLM instance based on provider
+    api_key = config_read("apis", provider)
+    if not api_key:
+        print(f"Error: API key for {provider.upper()} not found in config. Aborting.")
+        return
+    
+    llm_instance = LLMFactory(provider, "langchain", "deepseek-chat" if provider == "deepseek" else "gpt-4o-mini", api_key, 0.7).get_llm() # type: ignore
 
-    batch_results_raw = deepseek_llm_instance.batch_processing(
+    print(f"Prepared {len(batch_input_for_llm)} items for {provider.upper()} batch discourse processing.")
+    
+    batch_results_raw = llm_instance.batch_processing(
         SYSTEM_PROMPT_DISCOURSE,
         USER_PROMPT_DISCOURSE_BATCH_TEMPLATE,
         batch_input_for_llm
@@ -341,7 +341,7 @@ def run_batch_deepseek_discourse_inference(vocab_csv_path, sutta_text_file_path,
 
     parsed_results = []
     for i, res_text_dict in enumerate(batch_results_raw):
-        # res_text_dict should already be a dictionary from deepseek_llm_instance.batch_processing
+        # res_text_dict should already be a dictionary from llm_instance.batch_processing
         # which internally calls parse_llm_response on the raw LLM output for each item.
         if isinstance(res_text_dict, dict):
             # Ensure 'id' and 'pali' from the original request are present if not returned by LLM
@@ -368,7 +368,7 @@ def run_batch_deepseek_discourse_inference(vocab_csv_path, sutta_text_file_path,
     # Ensure output directory exists
     os.makedirs(os.path.dirname(output_csv_path), exist_ok=True)
     df_results.to_csv(output_csv_path, index=False, encoding="utf-8")
-    print(f"DeepSeek batch discourse results saved to {output_csv_path}")
+    print(f"{provider.upper()} batch discourse results saved to {output_csv_path}")
 
 
 
@@ -380,14 +380,14 @@ if __name__ == "__main__":
     # You'll need to configure the `task_to_run` variable and the
     # corresponding file paths below.
     #
-    # Example for Batch DeepSeek Inference:
-    # task_to_run = "batch_deepseek"
+    # Example for Batch Class Inference:
+    # task_to_run = "batch_class_inference"
     # vocab_csv_for_batch = "path/to/your/vocab.csv"
     # exercise_file_for_batch = "path/to/your/exercise.txt"
     # output_csv_for_batch = "path/to/your/output_batch.csv"
     #
-    # Example for Batch DeepSeek Discourse Inference:
-    # task_to_run = "batch_discourse_deepseek"
+    # Example for Batch Discourse Inference:
+    # task_to_run = "batch_discourse_inference"
     # discourse_vocab_csv_path = "path/to/your/discourse_vocab.csv"
     # sutta_text_file_for_discourse = "path/to/your/sutta.txt"
     # output_csv_for_discourse = "path/to/your/output_discourse.csv"
@@ -395,30 +395,33 @@ if __name__ == "__main__":
 
     # --- Configuration for direct script run ---
     # Choose which task to run by uncommenting one of the following:
-    task_to_run = "batch_deepseek"
-    # task_to_run = "batch_discourse_deepseek"
+    task_to_run = "batch_class_inference"
+    # task_to_run = "batch_discourse_inference"
 
-    # --- Default paths for "batch_deepseek" ---
-    class_num = "16"
+    provider = "deepseek"
+    # provider = "openai"
+
+    # --- Default paths for "batch_class_inference" ---
+    class_num = "29"
     vocab_csv_for_batch = f"shared_data/pali_class/vocab/vocab_class_{class_num}.csv"
     exercise_file_for_batch = f"shared_data/pali_class/exercises/exercises_class_{class_num}.txt"
-    output_csv_for_batch = f"shared_data/pali_class/output/class_{class_num}_output.csv" 
+    output_csv_for_batch = f"shared_data/pali_class/output/class_{class_num}_output2.csv" 
 
-    # --- Default paths for "batch_discourse_deepseek" ---
-    sutta_code = "sn47"
-    discourse_vocab_csv_path = f"shared_data/discourses/vocab/vocab_{sutta_code}.csv"
+    # --- Default paths for "batch_discourse_inference" ---
+    sutta_code = "sn56"
+    discourse_vocab_csv_path = f"shared_data/discourses/vocab/vocab_rest.csv"
     sutta_text_file_for_discourse = f"shared_data/discourses/suttas/{sutta_code}.txt"
-    output_csv_for_discourse = f"shared_data/discourses/output/{sutta_code}_output.csv"
+    output_csv_for_discourse = f"shared_data/discourses/output/rest_{sutta_code}_output.csv"
     # --- End Configuration ---
 
     # Ensure cache directory exists
     os.makedirs(DEEPSEEK_CACHE_DIR, exist_ok=True)
 
-    if task_to_run == "batch_deepseek":
-        run_batch_deepseek_inference(vocab_csv_for_batch, exercise_file_for_batch, output_csv_for_batch)
-    elif task_to_run == "batch_discourse_deepseek":
-        run_batch_deepseek_discourse_inference(discourse_vocab_csv_path, sutta_text_file_for_discourse, output_csv_for_discourse)
+    if task_to_run == "batch_class_inference":
+        run_batch_class_inference(vocab_csv_for_batch, exercise_file_for_batch, output_csv_for_batch, provider)
+    elif task_to_run == "batch_discourse_inference":
+        run_batch_discourse_inference(discourse_vocab_csv_path, sutta_text_file_for_discourse, output_csv_for_discourse, provider)
     else:
-        print(f"Unknown task: {task_to_run}. Please set 'task_to_run' to 'batch_deepseek' or 'batch_discourse_deepseek'.")
+        print(f"Unknown task: {task_to_run}. Please set 'task_to_run' to 'batch_class_inference' or 'batch_discourse_inference'.")
 
     print("\n--- Script Finished ---")

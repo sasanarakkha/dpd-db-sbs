@@ -1356,19 +1356,9 @@ class SBS(Base):
     discourses_sutta: Mapped[str] = mapped_column(default="")
     discourses_example: Mapped[str] = mapped_column(default="")
 
-    # TODO  remove after filling class and discourses
     extra_source: Mapped[str] = mapped_column(default="")
     extra_sutta: Mapped[str] = mapped_column(default="")
     extra_example: Mapped[str] = mapped_column(default="")
-    # sbs_chant_pali_3: Mapped[str] = mapped_column(default="")
-    # sbs_chant_eng_3: Mapped[str] = mapped_column(default="")
-    # sbs_chapter_3: Mapped[str] = mapped_column(default="")
-    # sbs_source_4: Mapped[str] = mapped_column(default="")
-    # sbs_sutta_4: Mapped[str] = mapped_column(default="")
-    # sbs_example_4: Mapped[str] = mapped_column(default="")
-    # sbs_chant_pali_4: Mapped[str] = mapped_column(default="")
-    # sbs_chant_eng_4: Mapped[str] = mapped_column(default="")
-    # sbs_chapter_4: Mapped[str] = mapped_column(default="")
 
     @declared_attr
     def sbs_index(cls):
@@ -1395,10 +1385,8 @@ class SBS(Base):
         return any(
             example and example.strip()
             for example in (
-                self.sbs_example_1,
-                self.sbs_example_2,
-                # self.sbs_example_3,
-                # self.sbs_example_4,
+                self.sbs_example_1 if self.sbs_chapter_1 else "",
+                self.sbs_example_2 if self.sbs_chapter_1 else "",
                 self.dhp_example,
                 self.pat_example,
                 self.vib_example,
@@ -1412,10 +1400,8 @@ class SBS(Base):
         return any(
             example and example.strip()
             for example in (
-                self.sbs_example_1,
-                self.sbs_example_2,
-                # self.sbs_example_3,
-                # self.sbs_example_4,
+                self.sbs_example_1 if self.sbs_chapter_1 else "",
+                self.sbs_example_2 if self.sbs_chapter_1 else "",
             )
         )
 
@@ -1424,16 +1410,15 @@ class SBS(Base):
     def needs_dhp_example(self) -> bool:
         if self.dhp_example:
             examples = [
-                self.sbs_example_1,
-                self.sbs_example_2,
-                # self.sbs_example_3,
-                # self.sbs_example_4,
+                self.sbs_example_1 if self.sbs_chapter_1 else "",
+                self.sbs_example_2 if self.sbs_chapter_1 else "",
+                self.class_example,
             ]
             if not any(examples):
                 return True
             for example in examples:
                 if example and paragraphs_are_similar(
-                    clean_machine(example), clean_machine(self.dhp_example), 0.9
+                    clean_machine(example), clean_machine(self.dhp_example), 0.8
                 ):
                     return False
             return True
@@ -1443,16 +1428,15 @@ class SBS(Base):
     def needs_pat_example(self) -> bool:
         if self.pat_example:
             examples = [
-                self.sbs_example_1,
-                self.sbs_example_2,
-                # self.sbs_example_3,
-                # self.sbs_example_4,
+                self.sbs_example_1 if self.sbs_chapter_1 else "",
+                self.sbs_example_2 if self.sbs_chapter_1 else "",
+                self.class_example,
             ]
             if not any(examples):
                 return True
             for example in examples:
                 if example and paragraphs_are_similar(
-                    clean_machine(example), clean_machine(self.pat_example), 0.9
+                    clean_machine(example), clean_machine(self.pat_example), 0.8
                 ):
                     return False
             return True
@@ -1462,16 +1446,15 @@ class SBS(Base):
     def needs_vib_example(self) -> bool:
         if self.vib_example:
             examples = [
-                self.sbs_example_1,
-                self.sbs_example_2,
-                # self.sbs_example_3,
-                # self.sbs_example_4,
+                self.sbs_example_1 if self.sbs_chapter_1 else "",
+                self.sbs_example_2 if self.sbs_chapter_1 else "",
+                self.class_example,
             ]
             if not any(examples):
                 return True
             for example in examples:
                 if example and paragraphs_are_similar(
-                    clean_machine(example), clean_machine(self.vib_example), 0.9
+                    clean_machine(example), clean_machine(self.vib_example), 0.8
                 ):
                     return False
             return True
@@ -1481,20 +1464,14 @@ class SBS(Base):
     def needs_class_example(self) -> bool:
         if self.class_example:
             examples = [
-                self.sbs_example_1,
-                self.sbs_example_2,
-                # self.sbs_example_3,
-                # self.sbs_example_4,
-                self.dhp_example,
-                self.pat_example,
-                self.vib_example,
-                self.discourses_example,
+                self.sbs_example_1 if self.sbs_chapter_1 else "",
+                self.sbs_example_2 if self.sbs_chapter_1 else "",
             ]
             if not any(examples):
                 return True
             for example in examples:
                 if example and paragraphs_are_similar(
-                    clean_machine(example), clean_machine(self.class_example), 0.9
+                    clean_machine(example), clean_machine(self.class_example), 0.8
                 ):
                     return False
             return True
@@ -1504,16 +1481,15 @@ class SBS(Base):
     def needs_discourses_example(self) -> bool:
         if self.discourses_example:
             examples = [
-                self.sbs_example_1,
-                self.sbs_example_2,
-                # self.sbs_example_3,
-                # self.sbs_example_4,
+                self.sbs_example_1 if self.sbs_chapter_1 else "",
+                self.sbs_example_2 if self.sbs_chapter_1 else "",
+                self.class_example,
             ]
             if not any(examples):
                 return True
             for example in examples:
                 if example and paragraphs_are_similar(
-                    clean_machine(example), clean_machine(self.discourses_example), 0.9
+                    clean_machine(example), clean_machine(self.discourses_example), 0.8
                 ):
                     return False
             return True
@@ -1529,16 +1505,6 @@ class SBS(Base):
     def sbs_chant_link_2(self):
         chant_link_map = SBS_table_tools().load_chant_link_map()
         return chant_link_map.get(self.sbs_chant_pali_2, "")
-
-    # @property
-    # def sbs_chant_link_3(self):
-    #     chant_link_map = SBS_table_tools().load_chant_link_map()
-    #     return chant_link_map.get(self.sbs_chant_pali_3, "")
-
-    # @property
-    # def sbs_chant_link_4(self):
-    #     chant_link_map = SBS_table_tools().load_chant_link_map()
-    #     return chant_link_map.get(self.sbs_chant_pali_4, "")
 
     @property
     def sbs_class_link(self):
@@ -1562,14 +1528,6 @@ class SBS(Base):
     @property
     def sbs_source_link_2(self) -> str:
         return generate_link(self.sbs_source_2) if self.sbs_source_2 else ""
-
-    # @property
-    # def sbs_source_link_3(self) -> str:
-    #     return generate_link(self.sbs_source_3) if self.sbs_source_3 else ""
-
-    # @property
-    # def sbs_source_link_4(self) -> str:
-    #     return generate_link(self.sbs_source_4) if self.sbs_source_4 else ""
 
     @property
     def dhp_source_link(self) -> str:

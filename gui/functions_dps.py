@@ -619,8 +619,6 @@ def take_example_from_archive(dpspth, window, current_id, ex_1, ex_2, ex_3, ex_4
             sbs_examples = [
                 row.get("sbs_example_1"),
                 row.get("sbs_example_2"),
-                row.get("sbs_example_3"),
-                row.get("sbs_example_4"),
             ]
 
             # Rotate through examples starting from `archived_example_index`

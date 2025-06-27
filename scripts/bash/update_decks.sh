@@ -170,28 +170,25 @@ while true; do
 done
 
 
-# cd "$HOME/Documents/sasanarakkha/study-tools/temp-push"
+cd "$HOME/Documents/sasanarakkha/study-tools/temp-push"
 
-# echo -ne "\033[1;34m before pushing all on GitHub need to make zip for all class docs \033[0m"
-
-
-# while true; do
-#     echo -ne "\033[1;34m need to push all on GitHub? \033[0m"
-#     read -n 1 -s yn
-#     echo
-#     if [[ $yn == "q" ]]; then
-#         echo -e "\n\033[1;31m Aborted by user.\033[0m"
-#         exit 1
-#     fi
-#     case $yn in
-#         [Yy]* )
-#             echo -e "\033[1;33m pushing all...\033[0m"
-#             bash github-assets-uploader.sh
-#             break;;
-#         *  )
-#             break;;
-#     esac
-# done
+while true; do
+    echo -ne "\033[1;34m need to push all on GitHub? \033[0m"
+    read -n 1 -s yn
+    echo
+    if [[ $yn == "q" ]]; then
+        echo -e "\n\033[1;31m Aborted by user.\033[0m"
+        exit 1
+    fi
+    case $yn in
+        [Yy]* )
+            echo -e "\033[1;33m pushing all...\033[0m"
+            bash github-assets-uploader.sh
+            break;;
+        *  )
+            break;;
+    esac
+done
 
 
 echo -e "\033[1;32m what have to be done has been done! \033[0m"

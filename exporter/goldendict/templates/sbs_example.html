@@ -2,41 +2,43 @@
 <div id="sbs_example_${i.lemma_1_}" class="dpd content hidden">
     % if i.sbs.needs_sbs_example:
         % if i.sbs.sbs_example_1:
-        <p>${i.sbs.sbs_example_1}</p>
-        <p class="sutta">
-            % if make_link and i.sbs.sbs_source_link_1:
-            <a class="sutta_link" href="${i.sbs.sbs_source_link_1}">${i.sbs.sbs_source_1}</a>
-            % else:
-            ${i.sbs.sbs_source_1}
-            % endif
-            ${i.sbs.sbs_sutta_1}</p>
-            % if i.sbs.sbs_chapter_1:
+            <p>${i.sbs.sbs_example_1}</p>
             <p class="sutta">
-                ${i.sbs.sbs_chapter_1} <a class="sutta_link" href="${i.sbs.sbs_chant_link_1}">${i.sbs.sbs_chant_pali_1}</a>
-                ${i.sbs.sbs_chant_eng_1}
+                % if make_link and i.sbs.sbs_source_link_1:
+                <a class="sutta_link" href="${i.sbs.sbs_source_link_1}">${i.sbs.sbs_source_1}</a>
+                % else:
+                ${i.sbs.sbs_source_1}
+                % endif
+                ${i.sbs.sbs_sutta_1}
+            </p>
+            % if i.sbs.sbs_chapter_1:
+                <p class="sutta">
+                    ${i.sbs.sbs_chapter_1} <a class="sutta_link" href="${i.sbs.sbs_chant_link_1}">${i.sbs.sbs_chant_pali_1}</a>
+                    ${i.sbs.sbs_chant_eng_1}
+                </p>
             % endif
         % endif
 
         % if i.sbs.sbs_example_2:
-        <p>${i.sbs.sbs_example_2}</p>
-        <p class="sutta">
-            % if make_link and i.sbs.sbs_source_link_2:
-            <a class="sutta_link" href="${i.sbs.sbs_source_link_2}">${i.sbs.sbs_source_2}</a>
-            % else:
-            ${i.sbs.sbs_source_2}
-            % endif
-            ${i.sbs.sbs_sutta_2}</p>
-            % if i.sbs.sbs_chapter_2:
+            <p>${i.sbs.sbs_example_2}</p>
             <p class="sutta">
-                ${i.sbs.sbs_chapter_2} <a class="sutta_link" href="${i.sbs.sbs_chant_link_2}">${i.sbs.sbs_chant_pali_2}</a>
-                ${i.sbs.sbs_chant_eng_2}
+                % if make_link and i.sbs.sbs_source_link_2:
+                <a class="sutta_link" href="${i.sbs.sbs_source_link_2}">${i.sbs.sbs_source_2}</a>
+                % else:
+                ${i.sbs.sbs_source_2}
+                % endif
+                ${i.sbs.sbs_sutta_2}
+            </p>
+            % if i.sbs.sbs_chapter_2:
+                <p class="sutta">
+                    ${i.sbs.sbs_chapter_2} <a class="sutta_link" href="${i.sbs.sbs_chant_link_2}">${i.sbs.sbs_chant_pali_2}</a>
+                    ${i.sbs.sbs_chant_eng_2}
+                </p>
             % endif
         % endif
-
     % endif
 
     % if i.sbs.needs_dhp_example:
-        <b>DHP:</b>
         <p>${i.sbs.dhp_example}</p>
         <p class="sutta">
             % if make_link and i.sbs.dhp_source_link:
@@ -44,11 +46,11 @@
             % else:
             ${i.sbs.dhp_source}
             % endif
-            ${i.sbs.dhp_sutta}</p>
+            ${i.sbs.dhp_sutta}
+        </p>
     % endif
 
     % if i.sbs.needs_pat_example:
-        <b>Pātimokkha:</b>
         <p>${i.sbs.pat_example}</p>
         <p class="sutta">
             % if make_link and i.sbs.pat_source_link:
@@ -56,11 +58,11 @@
             % else:
             ${i.sbs.pat_source}
             % endif
-            ${i.sbs.pat_sutta}</p>
+            ${i.sbs.pat_sutta}
+        </p>
     % endif
 
     % if i.sbs.needs_vib_example:
-        <b>Vibhaṅga:</b>
         <p>${i.sbs.vib_example}</p>
         <p class="sutta">
             % if make_link and i.sbs.vib_source_link:
@@ -68,11 +70,12 @@
             % else:
             ${i.sbs.vib_source}
             % endif
-            ${i.sbs.vib_sutta}</p>
+            ${i.sbs.vib_sutta}
+        </p>
     % endif
 
     % if i.sbs.needs_class_example:
-    <b>Pāli Class:</b>
+    <p class="sutta"><b>Pāli Class:</b></p>
     <p>${i.sbs.class_example}</p>
     <p class="sutta">
         % if make_link and i.sbs.class_source_link:
@@ -80,11 +83,11 @@
         % else:
         ${i.sbs.class_source}
         % endif
-        ${i.sbs.class_sutta}</p>
+        ${i.sbs.class_sutta}
+    </p>
     % endif
 
     % if i.sbs.needs_discourses_example:
-        <b>Discourses:</b>
         <p>${i.sbs.discourses_example}</p>
         <p class="sutta">
             % if make_link and i.sbs.discourses_source_link:
@@ -92,7 +95,8 @@
             % else:
             ${i.sbs.discourses_source}
             % endif
-            ${i.sbs.discourses_sutta}</p>
+            ${i.sbs.discourses_sutta}
+        </p>
     % endif
 
     <p class='footer'>

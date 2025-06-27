@@ -29,27 +29,47 @@ def get_pali_sentences_from_txt(filepath: str) -> set[str]:
     return sentences
 
 
-def find_mismatched_examples(class_number: int, dpspth: DPSPaths):
+def txt_contains_sentence(txt_path: str, sentence: str) -> bool:
+    """Check if the cleaned sentence exists anywhere in the txt file."""
+    try:
+        with open(txt_path, "r", encoding="utf-8") as f:
+            txt_content = f.read()
+        return sentence in txt_content
+    except FileNotFoundError:
+        print(f"Error: Exercises file not found at {txt_path}")
+        return False
+
+
+def find_mismatched_examples(mode: str, source: str, dpspth: DPSPaths):
     """
     Finds examples in a CSV file that, after cleaning, do not exist
     in a corresponding text file and prints their IDs.
 
     Args:
-        class_number: The class number to process.
+        mode: The type of data to check ("pali_class" or "discourses").
+        source: The class number or sutta name to process.
     """
-    # Assuming the script is run from a directory where this path is valid.
-    # You can adjust this base_path if needed.
-    base_path = dpspth.pali_class_output_dir
-    csv_path = os.path.join(base_path, "output", f"class_{class_number}_output.csv")
-    txt_path = os.path.join(base_path, "exercises", f"exercises_class_{class_number}.txt")
+    if mode == "pali_class":
+        base_path = dpspth.pali_class_output_dir
+        csv_path = os.path.join(base_path, "done", f"class_{source}_output done.csv")
+        txt_path = os.path.join(base_path, "exercises", f"exercises_class_{source}.txt")
+    elif mode == "discourses": 
+        base_path = dpspth.discourses_output_dir
+        csv_path = os.path.join(base_path, "done", f"{source} done.csv")
+        txt_path = os.path.join(base_path, "suttas", f"{source}.txt")
+    else:
+        print(f"Unknown mode: {mode}")
+        return
+
 
     print(f"Checking CSV: {csv_path}")
     print(f"Against TXT: {txt_path}\n")
 
-    pali_sentences = get_pali_sentences_from_txt(txt_path)
-    if not pali_sentences:
-        print("No sentences found in the exercises file. Exiting.")
-        return
+    if mode == "pali_class":
+        pali_sentences = get_pali_sentences_from_txt(txt_path)
+        if not pali_sentences:
+            print("No sentences found in the exercises file. Exiting.")
+            return
 
     try:
         df = pd.read_csv(csv_path)
@@ -75,8 +95,14 @@ def find_mismatched_examples(class_number: int, dpspth: DPSPaths):
 
         cleaned_example = re.sub(r"</?b>", "", str(example)).strip()
 
-        if cleaned_example not in pali_sentences:
-            mismatched_ids.append(row["id"])
+        # Check if the cleaned example exists anywhere in the txt file
+        if mode == "pali_class":
+            if cleaned_example not in pali_sentences:
+                mismatched_ids.append(row["id"])
+
+        elif mode == "discourses": 
+            if not txt_contains_sentence(txt_path, cleaned_example):
+                mismatched_ids.append(row["id"])
 
     if mismatched_ids:
         print("Mismatched IDs (example from CSV not found in TXT):")
@@ -87,14 +113,17 @@ def find_mismatched_examples(class_number: int, dpspth: DPSPaths):
 
 
 def main():
-    """Main function to run the check for a specific class."""
-    # --- SET THE CLASS NUMBER TO CHECK HERE ---
-    class_to_check = 15
+    """Main function to run the check"""
+    # --- SET THE MODE and CLASS NUMBER or SUTTA TO CHECK HERE ---
+    # source = "16"
+    source = "mn107"
+    # mode = "pali_class"
+    mode = "discourses"
     # -----------------------------------------
 
     dpspth = DPSPaths()
-    print(f"--> Checking data for class: {class_to_check}\n")
-    find_mismatched_examples(class_to_check, dpspth)
+    print(f"--> Checking data for {mode} : {source}\n")
+    find_mismatched_examples(mode, source, dpspth)
 
 
 if __name__ == "__main__":

@@ -135,47 +135,47 @@ def update_notes():
         # db_session.commit()
 
 
-# def update_sbs_source_3(
-#     new_source_3: str = "",
-#     new_sutta_3: str = "",
-#     new_example_3: str = ""
+# def update_sbs_source_2(
+#     new_source_2: str = "",
+#     new_sutta_2: str = "",
+#     new_example_2: str = ""
 # ) -> None:
 #     """
-#     Filters DpdHeadword entries where SBS.sbs_source_3 is not empty,
-#     replaces sbs_source_3, sbs_sutta_3, and sbs_example_3 with empty strings,
+#     Filters DpdHeadword entries where SBS.sbs_source_2 is not empty,
+#     replaces sbs_source_2, sbs_sutta_2, and sbs_example_2 with empty strings,
 #     and saves changes to the database.
 #     """
 #     console.print("[bold blue]Updating SBS source 3 entries...")
 
-#     # Query words with non-empty sbs_source_3, loading the related SBS object
+#     # Query words with non-empty sbs_source_2, loading the related SBS object
 #     words_to_update = db_session.query(DpdHeadword).options(
 #         joinedload(DpdHeadword.sbs)
 #     ).join(SBS, DpdHeadword.id == SBS.id).filter(
 #         and_(
-#             SBS.sbs_source_3.isnot(None),
-#             SBS.sbs_source_3 != ''
+#             SBS.sbs_source_2.isnot(None),
+#             SBS.sbs_source_2 != ''
 #         )
 #     ).all()
 
 #     count_updated = 0
 #     for word in words_to_update:
 #         if word.sbs: # Ensure SBS object exists
-#             old_source_3 = word.sbs.sbs_source_3
-#             old_sutta_3 = word.sbs.sbs_sutta_3
-#             old_example_3 = word.sbs.sbs_example_3
+#             old_source_2 = word.sbs.sbs_source_2
+#             old_sutta_2 = word.sbs.sbs_sutta_2
+#             old_example_2 = word.sbs.sbs_example_2
 
 #             # Update the values
-#             word.sbs.sbs_source_3 = new_source_3
-#             word.sbs.sbs_sutta_3 = new_sutta_3
-#             word.sbs.sbs_example_3 = new_example_3
+#             word.sbs.sbs_source_2 = new_source_2
+#             word.sbs.sbs_sutta_2 = new_sutta_2
+#             word.sbs.sbs_example_2 = new_example_2
 
 #             console.print(f"[cyan]Updating word ID:[/cyan] {word.id}")
-#             console.print(f"  [yellow]Old source_3:[/yellow] {old_source_3}")
-#             console.print(f"  [green]New source_3:[/green] {new_source_3}")
-#             console.print(f"  [yellow]Old sutta_3:[/yellow] {old_sutta_3}")
-#             console.print(f"  [green]New sutta_3:[/green] {new_sutta_3}")
-#             console.print(f"  [yellow]Old example_3:[/yellow] {old_example_3}")
-#             console.print(f"  [green]New example_3:[/green] {new_example_3}")
+#             console.print(f"  [yellow]Old source_2:[/yellow] {old_source_2}")
+#             console.print(f"  [green]New source_2:[/green] {new_source_2}")
+#             console.print(f"  [yellow]Old sutta_2:[/yellow] {old_sutta_2}")
+#             console.print(f"  [green]New sutta_2:[/green] {new_sutta_2}")
+#             console.print(f"  [yellow]Old example_2:[/yellow] {old_example_2}")
+#             console.print(f"  [green]New example_2:[/green] {new_example_2}")
 #             print()
 #             count_updated += 1
 #         else:
@@ -204,7 +204,7 @@ value_to_update = "(грам) "
 
 # update_notes()
 
-# update_sbs_source_3()
+# update_sbs_source_2()
 
 
 

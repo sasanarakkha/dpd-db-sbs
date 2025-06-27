@@ -8,11 +8,12 @@ from tools.tools_for_ru_exporter import (
 from tools.configger import config_test
 from tools.date_and_time import year_month_day_dash
 from tools.degree_of_completion_ru import rus_degree_of_completion
-from tools.meaning_construction import summarize_construction
+from tools.meaning_construction import summarize_construction, make_meaning_combo_html
 
 
 class HeadwordData:
     def __init__(self, i, fc, fi, fs):
+        self.meaning = make_meaning_combo_html(i)
         self.ru_meaning = make_ru_meaning(i)
         self.summary = summarize_construction(i)
         self.rus_complete = rus_degree_of_completion(i)

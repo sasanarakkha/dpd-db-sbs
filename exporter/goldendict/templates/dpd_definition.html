@@ -2,7 +2,9 @@
     <p>
         % if show_sbs_data and i.sbs:
             % if i.sbs.sbs_class_anki:
-                <a class="link" href="${i.sbs.sbs_class_link}"><i>(cl.${i.sbs.sbs_class_anki})</i></a>
+                <a class="link" href="${i.sbs.sbs_class_link}">
+                    <i>(cl.${i.sbs.sbs_class_anki}${'*' if i.sbs.class_extra else ''})</i>
+                </a>
                 <span class="gray"> | </span>
             % endif
             % if i.sbs.sbs_category:

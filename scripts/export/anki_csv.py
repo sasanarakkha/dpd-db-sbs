@@ -19,8 +19,9 @@ import os
 from rich.console import Console
 
 from typing import List
+from sqlalchemy import func
 
-from db.models import DpdHeadword, SBS
+from db.models import DpdHeadword, SBS, DpdRoot
 from db.db_helpers import get_db_session
 
 from tools.pali_sort_key import pali_sort_key
@@ -43,6 +44,130 @@ console = Console()
 sbs_ped_link = 'Spot a mistake? <a class="link" href="https://docs.google.com/forms/d/e/1FAIpQLScNC5v2gQbBCM3giXfYIib9zrp-WMzwJuf_iVXEMX2re4BFFw/viewform?usp=pp_url&entry.438735500'
 
 dps_link = 'Нашли ошибку? <a class="link" href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500'
+
+
+def common_roots(db_session, dpspth):
+    """
+    Export the most common roots (with at least 50 words) and their most frequent words to a CSV.
+    """
+    console.print("[yellow]Exporting most common roots to CSV")
+
+    # Subquery: count headwords per root
+    root_counts = (
+        db_session.query(
+            DpdHeadword.root_key.label("root"),
+            func.count(DpdHeadword.id).label("root_count")
+        )
+        .group_by(DpdHeadword.root_key)
+        .subquery()
+    )
+
+    # Join DpdRoot with the subquery and filter
+    roots_db = (
+        db_session.query(DpdRoot, root_counts.c.root_count)
+        .join(root_counts, DpdRoot.root == root_counts.c.root)
+        .filter(root_counts.c.root_count >= 50)
+        .order_by(root_counts.c.root_count.desc())
+        .limit(200)
+        .all()
+    )
+
+    columns_names = [
+        "root",
+        "root_group",
+        "root_sign",
+        "root_meaning",
+        "main_verb",  
+        "examples_or_words",
+    ]
+
+    rows = []
+    for root_obj, _ in roots_db:
+        root = root_obj.root
+        exclude_pos = ["adj", "imperf", "perf", "opt", "fut", "cond", "ind"]
+
+        # --- Find main_verb ---
+        main_verb_obj = (
+            db_session.query(DpdHeadword)
+            .filter(DpdHeadword.root_key == root)
+            .filter(~DpdHeadword.stem.contains("!"))
+            .filter(DpdHeadword.pos == "pr")
+            .filter(~DpdHeadword.grammar.contains("pass"))
+            .filter(~DpdHeadword.grammar.contains("caus"))
+            .filter(~DpdHeadword.family_root.contains(" "))
+            .order_by(DpdHeadword.ebt_count.desc())
+            .first()
+        )
+        main_verb = main_verb_obj.lemma_clean if main_verb_obj else ""
+        # # debug
+        # if not main_verb:
+        #     print(f"for {root} no main verb")
+
+        words_query = (
+            db_session.query(DpdHeadword)
+            .filter(DpdHeadword.root_key == root)
+            .filter(DpdHeadword.example_2 != "")
+            .filter(~DpdHeadword.pos.in_(exclude_pos))
+            .filter(~DpdHeadword.stem.contains("!"))
+            .order_by(DpdHeadword.ebt_count.desc())
+            .all()
+        )
+
+        
+        exclude_lemma = [
+            "paṭhamaṃ", "thera", "ṭhita", "ṭha", "ṭhā", "añña", "aññā", 
+        ]
+        unique_lemma_clean = set()
+        unique_stems = set()
+        unique_words = []
+        for w in words_query:
+            if (
+                w.lemma_clean
+                and w.lemma_clean != main_verb
+                and w.lemma_clean not in unique_lemma_clean
+                and w.lemma_clean not in exclude_lemma
+                and w.stem not in unique_stems
+                and w.derived_from not in unique_lemma_clean
+            ):
+                unique_lemma_clean.add(w.lemma_clean)
+                unique_stems.add(w.stem)
+                unique_words.append(w)
+                if w.derived_from:
+                    exclude_lemma.append(w.derived_from)
+            if len(unique_words) == 5:
+                break
+        examples = ", ".join([w.lemma_clean for w in unique_words])
+
+        root_clean = re.sub(r" \d*$", "", str(root))
+        feedback = f"""{sbs_ped_link}={root_clean}&entry.1433863141=common-roots-{current_date}">Fix it here.</a>"""
+
+        row = [
+            root_obj.root,
+            root_obj.root_group,
+            root_obj.root_sign,
+            root_obj.root_meaning,
+            main_verb,
+            examples,
+            feedback,
+        ]
+        rows.append([x if x is not None else "" for x in row])
+
+    output_path = os.path.join(dpspth.anki_csvs_dps_dir, "pali_class", "common_roots.csv")
+    with open(output_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f, delimiter="\t")
+        writer.writerows(rows)
+
+    # Save the list of field names to a text file
+    if dpspth.sbs_anki_style_dir:
+        with open(f"{dpspth.sbs_anki_style_dir}/field-list-common-roots.txt", "w") as file:
+            file.write("\n".join(columns_names))
+        console.print(
+            f"[green] names of the SBS columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the txt"
+        )
+    else:
+        console.print("[bold red] sbs_anki_style_dir not found")
+
+    console.print(f"[bold green]{len(rows)}[/bold green] roots saved to {output_path}")
 
 
 def join(*args):
@@ -1330,6 +1455,7 @@ def main():
     root_phonetic_class(dpspth, dpd_db, unique_sbs_class_values)
     vibhanga(dpspth, dpd_db)
     native(dpspth, dpd_db)
+    common_roots(db_session, dpspth)
     pr.toc()
 
 

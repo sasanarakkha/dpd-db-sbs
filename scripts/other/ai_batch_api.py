@@ -5,7 +5,7 @@ import openai
 import os
 import json
 
-from tools.ai_related import get_openai_client
+from tools.ai_related import get_ai_client
 
 from db.db_helpers import get_db_session
 from db.models import Russian
@@ -16,10 +16,17 @@ dpspth = DPSPaths()
 pth = ProjectPaths()
 db_session = get_db_session(pth.dpd_db_path)
 
+# Configuration
+# provider = "deepseek"
+provider = "openai"
+
+# models openai
+model="gpt-4.1"
+
 
 def upload_and_create_batch(file_name):
     """Uploads a file and creates a batch for processing."""
-    client = get_openai_client()
+    client = get_ai_client(provider)
     if client is None:
         print("OpenAI client is not initialized. Cannot proceed with batch creation.")
         return
@@ -63,7 +70,7 @@ def upload_and_create_batch(file_name):
 
 
 def check_batch_list():
-    client = get_openai_client()
+    client = get_ai_client(provider)
     if client is None:
         print("OpenAI client is not initialized. Cannot retrieve batch list.")
         return
@@ -78,7 +85,7 @@ def check_batch_list():
 
 
 def check_batch_status(batch_id):
-    client = get_openai_client()
+    client = get_ai_client(provider)
     if client is None:
         print("OpenAI client is not initialized. Cannot retrieve batch status.")
         return
@@ -105,7 +112,7 @@ def serialize_request_counts(request_counts):
 
 
 def print_batch_info(batch_id):
-    client = get_openai_client()
+    client = get_ai_client(provider)
     if client is None:
         print("OpenAI client is not initialized. Cannot retrieve batch info.")
         return
@@ -145,7 +152,7 @@ def print_batch_info(batch_id):
 
 
 def cancel_batch(batch_id):
-    client = get_openai_client()
+    client = get_ai_client(provider)
     if client is None:
         print("OpenAI client is not initialized. Cannot cancel batch.")
         return
@@ -166,7 +173,7 @@ def cancel_batch(batch_id):
 
 
 def save_batch_results(batch_id, file_name):
-    client = get_openai_client()
+    client = get_ai_client(provider)
     if client is None:
         print("OpenAI client is not initialized. Cannot retrieve batch data.")
         return
@@ -262,13 +269,13 @@ def update_ru_meaning_raw(ids_and_contents):
 
 if __name__ == "__main__":
 
-    file_name_in = ""
+    # file_name_in = "meaning-2025-06-25-18-19"
 
     # upload_and_create_batch(file_name_in)
 
     # check_batch_list()
 
-    specific_batch_id = ""
+    # specific_batch_id = "batch_685bcd5a17d481908ecea4f51ece1141"
 
     # print_batch_info(specific_batch_id)
 

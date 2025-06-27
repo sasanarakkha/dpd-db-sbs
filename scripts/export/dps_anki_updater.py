@@ -50,7 +50,7 @@ def main():
 
     calculate_index(db, db_session)
 
-    decks = ["Пали Словарь"]
+    decks = ["Pali"]
     (col, data_dict, deck_dict, model_dict, carry_on) = setup_anki_updater(decks)
 
     if carry_on:
@@ -316,6 +316,8 @@ def update_note_values(note, i):
         note["class_source"] = str(i.sbs.class_source)
         note["class_sutta"] = str(i.sbs.class_sutta).replace("\n", "<br>")
         note["class_example"] = str(i.sbs.class_example).replace("\n", "<br>")
+        note["class_example_translation"] = str(i.sbs.class_example_translation).replace("\n", "<br>")
+        note["class_extra"] = str(i.sbs.class_extra).replace("\n", "<br>")
         note["discourses_source"] = str(i.sbs.discourses_source)
         note["discourses_sutta"] = str(i.sbs.discourses_sutta).replace("\n", "<br>")
         note["discourses_example"] = str(i.sbs.discourses_example).replace("\n", "<br>")
@@ -458,7 +460,7 @@ def deck_selector(i):
             or i.sbs.discourses_example
         )
     ):
-        return "Пали Словарь"
+        return "Pali"
     else:
         return None
 

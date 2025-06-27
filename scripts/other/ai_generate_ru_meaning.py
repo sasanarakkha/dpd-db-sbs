@@ -36,18 +36,18 @@ db_session = get_db_session(pth.dpd_db_path)
 date = year_month_day_hour_minute_dash()
 
 # Configuration
-provider = "deepseek"
-# provider = "openai"
+# provider = "deepseek"
+provider = "openai"
 
 # models openai
-# model="gpt-4o"
+model="gpt-4.1"
 # model="gpt-4o-mini"
 # model="gpt-4o-2024-08-06"
 # hight_model="gpt-4o-2024-08-06"
 
 # models deepseek
 # model = "deepseek-reasoner"
-model ="deepseek-chat"
+# model ="deepseek-chat"
 
 
 def remove_irrelevant(limit: int):
@@ -329,14 +329,14 @@ if __name__ == "__main__":
 
     print("Translationg with the help of AI")
 
-    limit: int = 1
+    limit: int = 100
 
     # remove_irrelevant(limit)
 
-    translation_generate("meaning", limit)
+    # translation_generate("meaning", limit)
 
     # translation_generate("note", limit)
 
-    # make_json("meaning", limit)
+    make_json("meaning", limit)
 
     # make_json("note", limit)
