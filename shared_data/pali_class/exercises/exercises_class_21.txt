@@ -26,7 +26,7 @@ Pali: appevanām'imassa kevalassa dukkhakkhandhassa antakiriyā paññāyethā't
 English Translation: “If only the destruction of this whole mass of suffering would be apparent. (lit. make itself known)”
 
 7. Sutta Number: AN10.44
-Pali: "iṅgha tāva āyasmā kāyikaṃ sikkhassū"ti, iti'ssa bhavanti vattāro.
+Pali: iṅgha tāva āyasmā kāyikaṃ sikkhassū'ti, iti'ssa bhavanti vattāro.
 English Translation: “Please, Venerable, first you must train yourself bodily”; there are those who speak thus to him.
 
 8. Sutta Number: SNP70
@@ -35,7 +35,7 @@ kathaṃ lokaṃ avekkhantaṃ, maccurājā na passati.
 English Translation: I myself, a seeker, have come to [the one] of such excellent vision, with a question. How is one viewing the world [and] the king of death does not see [him]?
 
 9. Sutta Number: SN1.31
-Pali: sabbhireva samāsetha,
+Pali: sabbhi'r'eva samāsetha,
 sabbhi kubbetha santhavaṃ,
 sataṃ saddhammamaññāya,
 sattā gacchanti suggatin'ti.
