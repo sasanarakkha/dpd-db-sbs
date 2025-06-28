@@ -54,7 +54,7 @@ Pali: api cāhaṃ imāni bhagavato vicitrāni pañhapaṭibhānāni sotukāmo, 
 English Translation: But wishing to hear these varied intelligent answers of the Blessed One, I just thought I should oppose the Blessed One (lit. an opposition should be made)
 
 10. Sutta Number: SN22.96
-Pali: ettako cepi, bhikkhu, attabhāvapaṭilābho abhavissa nicco dhuvo sassato avipariṇāmadhammo, nayidaṃ brahmacariyavāso paññāyetha sammā dukkhakkhayāya.
+Pali: ettako cepi, bhikkhu, attabhāvapaṭilābho abhavissa nicco dhuvo sassato avipariṇāmadhammo, na'y'idaṃ brahmacariyavāso paññāyetha sammā dukkhakkhayāya.
 English Translation: Monk, even if there were this much personal existence that is stable, permanent, eternal, with an unchanging nature, living this holy life for the complete destruction of suffering would not be evident.
 
 11. Sutta Number: MN73
@@ -62,11 +62,11 @@ Pali: sace hi, bho gotama, imaṃ dhammaṃ bhavaṃyeva gotamo ārādhako abhav
 English Translation: Sir Gotama, if only you were successful in this holy life, but the monks would not be successful, this holy life would be incomplete in that regard.
 
 12. Sutta Number: SN22.59
-Pali: saṅkhārā ca hidaṃ, bhikkhave, attā abhavissaṃsu, nayidaṃ saṅkhārā ābādhāya saṃvatteyyuṃ, labbhetha ca saṅkhāresu — evaṃ me saṅkhārā hontu, evaṃ me saṅkhārā mā ahesun'ti.
+Pali: saṅkhārā ca h'idaṃ, bhikkhave, attā abhavissaṃsu, na'y'idaṃ saṅkhārā ābādhāya saṃvatteyyuṃ, labbhetha ca saṅkhāresu — evaṃ me saṅkhārā hontu, evaṃ me saṅkhārā mā ahesun'ti.
 English Translation: If thought processes were yourself, monks, then thought processes would/could not lead to affliction; this could be obtained from (lit. in) mental processes: “May my mental processes be like this, may my mental processes not be like this.”
 
 13. Sutta Number: UD73
-Pali: no cetaṃ bhikkhave abhavissa ajātaṃ abhūtaṃ akataṃ asaṅkhataṃ nayidha jātassa bhūtassa katassa saṅkhatassa nissaraṇaṃ paññāyetha.
+Pali: no cetaṃ bhikkhave abhavissa ajātaṃ abhūtaṃ akataṃ asaṅkhataṃ nay'i'dha jātassa bhūtassa katassa saṅkhatassa nissaraṇaṃ paññāyetha.
 English Translation: Monks, if there were not an unborn, unbecome, unmade and uncreated, there would be no evident escape from the born, the become, the made and the created.
 
 14. Sutta Number: MN39
@@ -89,13 +89,14 @@ petānaṃ dakkhiṇaṃ dajjā, pubbe katam'anussaraṃ.
 English Translation: “He gave to me, he did for me, they [were] my family, friends, and companions”; one should give a donation to the departed, remembering what was done before (by them).
 
 4. Sutta Number: MN65
-Pali: etha, tumhepi, bhikkhave, ekāsanabhojanaṃ bhuñjatha; ekāsanabhojanaṃ kho, bhikkhave, tumhepi bhuñjamānā appābādhatañca sañjānissatha appātaṅkatañca lahuṭṭhānañca balañca phāsuvihārañcā'ti.
+Pali: etha, tumhe'pi, bhikkhave, ekāsanabhojanaṃ bhuñjatha; ekāsanabhojanaṃ kho, bhikkhave, tumhe'pi bhuñjamānā appābādhatañca sañjānissatha appātaṅkatañca lahuṭṭhānañca balañca phāsuvihārañcā'ti.
 English Translation: “Come monks! You all too should eat (your) meal in one sitting. Eating (your) meal in one sitting, you too will experience good health and well-being, physical lightness, strength and a comfortable existence”.
 
 5. Sutta Number: SN35.194
-Pali: evameva kho, bhikkhave, sace tumhepi na orimaṃ tīraṃ upagacchatha, na pārimaṃ tīraṃ upagacchatha; na majjhe saṃsīdissatha, na thale ussīdissatha, na manussaggāho gahessati, na amanussaggāho gahessati, na āvaṭṭaggāho gahessati, na antopūtī bhavissatha; evaṃ tumhe, bhikkhave, nibbānaninnā bhavissatha nibbānapoṇā nibbānapabbhārā.
+Pali: evam'eva kho, bhikkhave, sace tumhe'pi na orimaṃ tīraṃ upagacchatha, na pārimaṃ tīraṃ upagacchatha; na majjhe saṃsīdissatha, na thale ussīdissatha, na manussaggāho gahessati, na amanussaggāho gahessati, na āvaṭṭaggāho gahessati, na antopūtī bhavissatha; evaṃ tumhe, bhikkhave, nibbānaninnā bhavissatha nibbānapoṇā nibbānapabbhārā.
+"evaṃ kho, bhikkhave, sace tumhe'pi na <b>orimaṃ</b> tīraṃ upagacchatha, na pārimaṃ tīraṃ upagacchatha; na majjhe saṃsīdissatha, na thale ussīdissatha, na manussaggāho gahessati, na amanussaggāho gahessati, na āvaṭṭaggāho gahessati, na antopūtī bhavissatha; evaṃ tumhe, bhikkhave, nibbānaninnā bhavissatha nibbānapoṇā nibbānapabbhārā.
 English Translation: Similarly, monks, if you don't veer towards the near bank, nor veer towards the far bank, not sink down in the middle, nor wash up on dry land, nor be grabbed by humans, nor be grabbed by non-humans, nor be grabbed by a whirlpool, nor become rotten inside, like this you will be sloping to, slanting to, inclining to Nibbāna.
 
 6. Sutta Number: AN2.9
-Pali: ime kho, bhikkhave, dve sukkā dhammā lokaṃ na pāleyyuṃ, nayidha paññāyetha mātāti vā mātucchāti vā mātulānīti vā ācariyabhariyāti vā garūnaṃ dārāti vā. sambhedaṃ loko agamissa, yathā ajeḷakā kukkuṭasūkarā soṇasiṅgālā.
+Pali: ime kho, bhikkhave, dve sukkā dhammā lokaṃ na pāleyyuṃ, nay'i'dha paññāyetha mātāti vā mātucchāti vā mātulānīti vā ācariyabhariyāti vā garūnaṃ dārāti vā. sambhedaṃ loko agamissa, yathā ajeḷakā kukkuṭasūkarā soṇasiṅgālā.
 English Translation: If these two wholesome principles did not protect the world, it would not be clear, (this is my) mother, (this is my) mother's sister, (this is my) uncle's wife, (these are) wives of teachers. The world would become confused like goats and sheep, chickens and pigs, dogs and jackals.

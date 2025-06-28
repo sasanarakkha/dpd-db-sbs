@@ -7,7 +7,7 @@ from tools.paths_dps import DPSPaths
 
 def get_pali_sentences_from_txt(filepath: str) -> set[str]:
     """
-    Reads a text file and extracts all Pali sentences.
+    Reads a text file and extracts all Pali sentences, including multi-line sentences.
 
     Args:
         filepath: The path to the text file.
@@ -18,11 +18,24 @@ def get_pali_sentences_from_txt(filepath: str) -> set[str]:
     sentences = set()
     try:
         with open(filepath, "r", encoding="utf-8") as f:
-            for line in f:
-                if line.strip().startswith("Pali:"):
-                    # Extract the sentence part, which is after "Pali: "
-                    sentence = line.split(":", 1)[1].strip()
-                    sentences.add(sentence)
+            lines = f.readlines()
+        i = 0
+        while i < len(lines):
+            line = lines[i].strip()
+            if line.startswith("Pali:"):
+                # Start collecting lines for this Pali sentence
+                sentence = line.split(":", 1)[1].strip()
+                i += 1
+                while i < len(lines):
+                    next_line = lines[i].strip()
+                    # Stop if we hit a blank line or a new section
+                    if not next_line or next_line.startswith("English Translation:") or next_line.startswith("Sutta Number:") or next_line.startswith("Pali:"):
+                        break
+                    sentence += " " + next_line
+                    i += 1
+                sentences.add(sentence)
+            else:
+                i += 1
     except FileNotFoundError:
         print(f"Error: Exercises file not found at {filepath}")
         return set()
@@ -94,10 +107,19 @@ def find_mismatched_examples(mode: str, source: str, dpspth: DPSPaths):
             continue
 
         cleaned_example = re.sub(r"</?b>", "", str(example)).strip()
+        # Normalize whitespace in the example
+        cleaned_example_norm = re.sub(r"\s+", " ", cleaned_example)
 
         # Check if the cleaned example exists anywhere in the txt file
         if mode == "pali_class":
-            if cleaned_example not in pali_sentences:
+            found = False
+            for sent in pali_sentences:
+                # Normalize whitespace in the txt sentence
+                sent_norm = re.sub(r"\s+", " ", sent)
+                if cleaned_example_norm in sent_norm:
+                    found = True
+                    break
+            if not found:
                 mismatched_ids.append(row["id"])
 
         elif mode == "discourses": 
@@ -115,10 +137,10 @@ def find_mismatched_examples(mode: str, source: str, dpspth: DPSPaths):
 def main():
     """Main function to run the check"""
     # --- SET THE MODE and CLASS NUMBER or SUTTA TO CHECK HERE ---
-    # source = "16"
-    source = "mn107"
-    # mode = "pali_class"
-    mode = "discourses"
+    source = "28"
+    # source = "mn107"
+    mode = "pali_class"
+    # mode = "discourses"
     # -----------------------------------------
 
     dpspth = DPSPaths()
