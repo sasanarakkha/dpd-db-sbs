@@ -329,7 +329,7 @@ if __name__ == "__main__":
 
     print("Translationg with the help of AI")
 
-    limit: int = 100
+    limit: int = 10000
 
     # remove_irrelevant(limit)
 

@@ -1038,7 +1038,7 @@ def suttas(dpspth, dpd_db, unique_sbs_category_values):
             i.variant,
             i.commentary.replace("\n", "<br>") if i.commentary else None,
             i.notes.replace("\n", "<br>") if i.notes else None,
-            i.sbs.sbs_notes.replace("\n", "<br>") if i.sbs and i.sbs.sbs_notes else
+            i.sbs.sbs_notes.replace("\n", "<br>") if i.sbs and i.sbs.sbs_notes else None,
             i.link.replace("\n", "<br>") if i.link else None,
             SBS_table_tools().generate_sbs_audio(i.lemma_clean),
             current_date,

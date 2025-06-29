@@ -57,24 +57,67 @@ def main():
         for row in reader:
             pali_word_ids.add(row[id_col_idx])
 
-    for tsv_info in [
-        {"path": dpspth.russian_path, "label": "Russian"},
-        {"path": dpspth.sbs_path, "label": "SBS"}
-    ]:
-        missing_ids = []
-        with open(tsv_info["path"], "r", newline="") as f:
-            reader = csv.reader(f, delimiter="\t", quotechar='"')
-            id_col_idx = 0  # assuming first column is id
-            for row in reader:
-                tsv_id = row[id_col_idx]
-                if tsv_id not in pali_word_ids:
-                    missing_ids.append(tsv_id)
-        if missing_ids:
-            pr.red(f"IDs in {tsv_info['label']} TSV not found in pali_word_path:")
-            for mid in missing_ids:
-                pr.red(f"  - {mid}")
-            pr.red("Please fix the TSV file(s) and try again.")
+    # --- SBS: print missing, ask, remove if yes ---
+    sbs_missing_rows = []
+    sbs_rows = []
+    with open(dpspth.sbs_path, "r", newline="") as f:
+        reader = csv.reader(f, delimiter="\t", quotechar='"')
+        sbs_columns = next(reader)
+        sbs_rows.append(sbs_columns)
+        for row in reader:
+            sbs_rows.append(row)
+            tsv_id = row[0]
+            if tsv_id not in pali_word_ids:
+                sbs_missing_rows.append(row)
+
+    if sbs_missing_rows:
+        pr.red("IDs in SBS TSV not found in pali_word_path:")
+        for row in sbs_missing_rows:
+            pr.red("  - " + "\t".join(row))
+        answer = input("Can we remove them? (y/n): ").strip().lower()
+        if answer == "y":
+            # Remove missing rows from SBS TSV
+            new_sbs_rows = [row for row in sbs_rows[1:] if row[0] in pali_word_ids]
+            with open(dpspth.sbs_path, "w", newline="") as f:
+                csvwriter = csv.writer(
+                    f, delimiter="\t", quotechar='"', quoting=csv.QUOTE_ALL
+                )
+                column_names = [column.name for column in SBS.__mapper__.columns]
+                csvwriter.writerow(column_names)
+                for row in new_sbs_rows:
+                    csvwriter.writerow(row)
+            pr.green("Removed unused IDs from SBS TSV.")
+        else:
+            pr.red("Aborted by user.")
             sys.exit(1)
+
+    # --- Russian: print missing, remove silently ---
+    russian_missing_rows = []
+    russian_rows = []
+    with open(dpspth.russian_path, "r", newline="") as f:
+        reader = csv.reader(f, delimiter="\t", quotechar='"')
+        ru_columns = next(reader)
+        for row in reader:
+            if row[0] in pali_word_ids:
+                russian_rows.append(row)
+            else:
+                russian_missing_rows.append(row)
+    if russian_missing_rows:
+        pr.red("IDs in Russian TSV not found in pali_word_path:")
+        for row in russian_missing_rows:
+            pr.red("  - " + "\t".join(row))
+    with open(dpspth.russian_path, "w", newline="") as f:
+        csvwriter = csv.writer(
+            f, delimiter="\t", quotechar='"', quoting=csv.QUOTE_ALL
+        )
+        column_names = [column.name for column in Russian.__mapper__.columns]
+        csvwriter.writerow(column_names)
+        for row in russian_rows:
+            csvwriter.writerow(row)
+
+    if sbs_missing_rows or russian_missing_rows:
+        pr.green("Removed unused IDs, please run again.")
+        sys.exit(0)
 
     db_session = get_db_session(pth.dpd_db_path)
 

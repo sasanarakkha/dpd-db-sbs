@@ -269,18 +269,18 @@ def update_ru_meaning_raw(ids_and_contents):
 
 if __name__ == "__main__":
 
-    # file_name_in = "meaning-2025-06-25-18-19"
+    file_name_in = "meaning-2025-06-29-22-00"
 
     # upload_and_create_batch(file_name_in)
 
     # check_batch_list()
 
-    # specific_batch_id = "batch_685bcd5a17d481908ecea4f51ece1141"
+    specific_batch_id = "batch_6861472c4f78819095c3ac45c3b6e3ba"
 
     # print_batch_info(specific_batch_id)
 
-    # ids_and_contents = save_batch_results(specific_batch_id, file_name_in)
-    # update_ru_meaning_raw(ids_and_contents)
+    ids_and_contents = save_batch_results(specific_batch_id, file_name_in)
+    update_ru_meaning_raw(ids_and_contents)
 
     # cancel_batch(specific_batch_id)
 

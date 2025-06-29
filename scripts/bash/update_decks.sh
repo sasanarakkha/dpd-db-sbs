@@ -50,6 +50,8 @@ while true; do
     esac
 done
 
+cd "$HOME/Documents/dpd-db/"
+
 # grammar.xlsx - https://docs.google.com/spreadsheets/d/1KV5LmebIQpNyNKl03Pmo_Ti-LNW3IYWB6uc7OfGRGPU/
 
 while true; do
