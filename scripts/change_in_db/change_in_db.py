@@ -25,7 +25,7 @@ def filter_and_update(
         column_to_filter: InstrumentedAttribute, 
         filter_value: str,
         related_table,
-        related_column_to_update, 
+        related_column_to_update,  # This is a string
         update_value: str
     ):
     
@@ -35,15 +35,16 @@ def filter_and_update(
     # Find the words that match the filter criteria
     words_to_update = db_session.query(DpdHeadword, related_alias).join(
         related_alias, related_alias.id == DpdHeadword.id
-    ).filter(column_to_filter == filter_value).all()
+    ).filter(getattr(related_alias, column_to_filter.key) == filter_value).all()
+
+    print(f"words_to_update = {len(words_to_update)}")
 
     for __word__, related in words_to_update:
-        old_value = getattr(related, related_column_to_update.key)
+        old_value = getattr(related, related_column_to_update)
         if old_value or update_value:
+            setattr(related, related_column_to_update, update_value)  
 
-            setattr(related, related_column_to_update.key, update_value)  
-
-            console.print(f"[bold bright_yellow]{__word__.id} {related_column_to_update.key}:")
+            console.print(f"[bold bright_yellow]{__word__.id} {related_column_to_update}:")
             print()
             print(f"{old_value}")
             print()
@@ -190,11 +191,11 @@ def update_notes():
 #         console.print("[yellow]No entries found matching the criteria. No changes made.")
 
 
-column_to_filter = DpdHeadword.meaning_1
-filter_value = "(gram)"
-related_table = Russian
-related_column_to_update = "ru_meaning_raw"
-value_to_update = "(грам) "
+column_to_filter = SBS.class_extra
+filter_value = "yes"
+related_table = SBS
+related_column_to_update = "class_extra"
+value_to_update = "extra"
 
 # !To use the functions:
 

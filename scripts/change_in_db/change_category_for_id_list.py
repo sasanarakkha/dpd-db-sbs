@@ -57,8 +57,7 @@ def derive_sutta_identifier(source):
 def condition_check_all_examples(word, __sutta_identifier__):
     return all(
         [
-            getattr(word.sbs, "sbs_example_1", None),
-            getattr(word.sbs, "sbs_example_2", None),
+            getattr(word.sbs, "discourses_example", None),
         ]
     )
 
@@ -149,7 +148,7 @@ def main():
     )
 
     # input source eg "sn56" or "mn107" or "sn22" or "sn35"
-    source = "sn43"
+    source = "check"
 
     # !Update sbs_category based on all examples
     update_sbs_category(
@@ -159,23 +158,23 @@ def main():
         True,
     )
 
-    # !Update sbs_category based on sbs_source
-    update_sbs_category(
-        source,
-        lambda word, sutta_identifier: condition_check_sbs_source(
-            word, sutta_identifier
-        ),
-        f"Checking if any sbs_source has {source}",
-        True,
-    )
+    # # !Update sbs_category based on sbs_source
+    # update_sbs_category(
+    #     source,
+    #     lambda word, sutta_identifier: condition_check_sbs_source(
+    #         word, sutta_identifier
+    #     ),
+    #     f"Checking if any sbs_source has {source}",
+    #     True,
+    # )
 
-    # !Mark sbs_category based on dpd_source
-    update_sbs_category(
-        source,
-        lambda word, sutta_identifier: condition_check_source(word, sutta_identifier),
-        f"Checking if any source has {source}",
-        False,
-    )
+    # # !Mark sbs_category based on dpd_source
+    # update_sbs_category(
+    #     source,
+    #     lambda word, sutta_identifier: condition_check_source(word, sutta_identifier),
+    #     f"Checking if any source has {source}",
+    #     False,
+    # )
 
     pr.toc()
 

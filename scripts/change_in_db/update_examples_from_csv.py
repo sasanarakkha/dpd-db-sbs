@@ -67,11 +67,13 @@ def update_sbs_from_tsv_with_filter(mode:str, csv_path: str, sbs_anki_class_filt
                         else:
                             filter_mismatch_ids_in_tsv.append(word_id)
                     elif mode == "suttas":
-                        if db_entry.sbs.sbs_category == sbs_category and not db_entry.sbs.discourses_example:
+                        if not db_entry.sbs.discourses_example:
                             db_entry.sbs.discourses_source = tsv_row['sutta_number'].upper()
                             db_entry.sbs.discourses_sutta = tsv_row['sutta_name']
                             db_entry.sbs.discourses_example = tsv_row['class_example']
                             updated_count += 1
+                        elif db_entry.sbs.sbs_category == sbs_category and db_entry.sbs.discourses_example:
+                            continue
                         else:
                             filter_mismatch_ids_in_tsv.append(word_id)
             except ValueError:
@@ -81,7 +83,7 @@ def update_sbs_from_tsv_with_filter(mode:str, csv_path: str, sbs_anki_class_filt
 
         console.print(f"[green]{updated_count} records updated from CSV.")
         if filter_mismatch_ids_in_tsv:
-            console.print(f"[yellow]IDs in CSV where sbs_class_anki did not match {sbs_anki_class_filter}: {filter_mismatch_ids_in_tsv}")
+            console.print(f"[yellow]IDs in CSV where section did not match: {filter_mismatch_ids_in_tsv}")
 
         # Check for IDs in DB with matching sbs_anki_class_filter but not in CSV
         if mode == "class":
@@ -109,8 +111,8 @@ if __name__ == "__main__":
     # Example usage:
     # mode = "class"
     mode = "suttas"
-    class_number = 15
-    category = "mn107"
+    class_number = 29
+    category = "rest2"
     
     if mode == "class":
         base_path = dpspth.pali_class_output_dir

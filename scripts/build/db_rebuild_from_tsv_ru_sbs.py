@@ -49,6 +49,33 @@ def main():
         else:
             pr.yes
 
+    # Check that all IDs in russian_path and sbs_path exist in pali_word_path
+    pali_word_ids = set()
+    with open(pth.pali_word_path, "r", newline="") as f:
+        reader = csv.reader(f, delimiter="\t", quotechar='"')
+        id_col_idx = 0  # assuming first column is id
+        for row in reader:
+            pali_word_ids.add(row[id_col_idx])
+
+    for tsv_info in [
+        {"path": dpspth.russian_path, "label": "Russian"},
+        {"path": dpspth.sbs_path, "label": "SBS"}
+    ]:
+        missing_ids = []
+        with open(tsv_info["path"], "r", newline="") as f:
+            reader = csv.reader(f, delimiter="\t", quotechar='"')
+            id_col_idx = 0  # assuming first column is id
+            for row in reader:
+                tsv_id = row[id_col_idx]
+                if tsv_id not in pali_word_ids:
+                    missing_ids.append(tsv_id)
+        if missing_ids:
+            pr.red(f"IDs in {tsv_info['label']} TSV not found in pali_word_path:")
+            for mid in missing_ids:
+                pr.red(f"  - {mid}")
+            pr.red("Please fix the TSV file(s) and try again.")
+            sys.exit(1)
+
     db_session = get_db_session(pth.dpd_db_path)
 
     make_russian_table_data(dpspth, db_session)

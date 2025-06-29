@@ -75,9 +75,9 @@
     % endif
 
     % if i.sbs.needs_class_example:
-    <p class="sutta"><b>Pāli Class:</b></p>
     <p>${i.sbs.class_example}</p>
     <p class="sutta">
+        cl.${i.sbs.sbs_class_anki} 
         % if make_link and i.sbs.class_source_link:
         <a class="sutta_link" href="${i.sbs.class_source_link}">${i.sbs.class_source}</a>
         % else:

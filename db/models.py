@@ -1314,6 +1314,7 @@ class SBS(Base):
     sbs_class_anki: Mapped[int] = mapped_column(default="")
     sbs_class: Mapped[int] = mapped_column(default="")
 
+    #TODO remove after checking
     sbs_category: Mapped[str] = mapped_column(default="")
     sbs_patimokkha: Mapped[str] = mapped_column(default="")
 

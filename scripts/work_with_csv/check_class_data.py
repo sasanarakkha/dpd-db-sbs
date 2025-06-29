@@ -69,7 +69,7 @@ def find_mismatched_examples(mode: str, source: str, dpspth: DPSPaths):
     elif mode == "discourses": 
         base_path = dpspth.discourses_output_dir
         csv_path = os.path.join(base_path, "done", f"{source} done.csv")
-        txt_path = os.path.join(base_path, "suttas", f"{source}.txt")
+        txt_path = os.path.join(base_path, "suttas", f"combined.txt")
     else:
         print(f"Unknown mode: {mode}")
         return
@@ -103,7 +103,9 @@ def find_mismatched_examples(mode: str, source: str, dpspth: DPSPaths):
 
         example = row["class_example"]
 
-        if pd.isna(example):
+        # Print ID if class_example is empty or NaN
+        if pd.isna(example) or str(example).strip() == "":
+            print(f"Empty class_example for ID: {row['id']}")
             continue
 
         cleaned_example = re.sub(r"</?b>", "", str(example)).strip()
@@ -137,10 +139,10 @@ def find_mismatched_examples(mode: str, source: str, dpspth: DPSPaths):
 def main():
     """Main function to run the check"""
     # --- SET THE MODE and CLASS NUMBER or SUTTA TO CHECK HERE ---
-    source = "28"
-    # source = "mn107"
-    mode = "pali_class"
-    # mode = "discourses"
+    # source = "29"
+    source = "rest"
+    # mode = "pali_class"
+    mode = "discourses"
     # -----------------------------------------
 
     dpspth = DPSPaths()

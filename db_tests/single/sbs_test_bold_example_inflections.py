@@ -33,7 +33,7 @@ class GlobalVars:
 
     pali_alphabet: list[str] = pali_alphabet
     i: DpdHeadword
-    fields: list[str] = ["sbs.class_example"]
+    fields: list[str] = ["sbs.discourses_example"]
     field: str
 
     bold_words: list[str]
@@ -188,8 +188,8 @@ def test7(g: GlobalVars):
             pr.summary("pos", g.i.pos)
             pr.summary("meaning", g.i.meaning_combo)
             pr.summary("column", g.field)
-            class_anki = getattr(g.i.sbs, "sbs_class_anki", "")
-            pr.summary("class", class_anki if class_anki is not None else "")
+            category_anki = getattr(g.i.sbs, "sbs_category", "")
+            pr.summary("category", category_anki if category_anki is not None else "")
             print()
             print(sentence.replace(g.bold_word, f"[yellow]{g.bold_word}[/yellow]"))
             print()
@@ -255,8 +255,8 @@ def printer(g: GlobalVars, message):
         pr.summary("meaning", g.i.meaning_combo)
         pr.summary("test", message)
         pr.summary("column", g.field)
-        class_anki = getattr(g.i.sbs, "sbs_class_anki", "")
-        pr.summary("class", class_anki if class_anki is not None else "")
+        category_anki = getattr(g.i.sbs, "sbs_category", "")
+        pr.summary("category", category_anki if category_anki is not None else "")
         print()
         pr.summary("lemma", f"[cyan]{g.i.lemma_1}")
         pr.summary("clean bold", f"[chartreuse2]{g.clean_bold_word}")

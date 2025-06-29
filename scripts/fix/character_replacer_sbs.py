@@ -10,9 +10,11 @@ from tools.paths import ProjectPaths
 
 from sqlalchemy.orm import joinedload
 
-find_char = ' '
-replace_char = " "
-column = "meaning_1"
+find_char = '"'
+replace_char = "'"
+table = "SBS"
+# table = "Russian"
+column = "sbs_example_2"
 
 
 def main():
@@ -22,33 +24,25 @@ def main():
     
     counter = 0
     for i in db:
-        # grab the text from the column
-        if column.startswith("sbs_"):
-            if i.sbs:
-                old_field = getattr(i.sbs, column)
-            else:
-                old_field = ""
-        elif column.startswith("ru_"):
-            if i.ru:
-                old_field = getattr(i.ru, column)
-            else:
-                old_field = ""
+        if table == "SBS":
+            if not i.sbs:
+                continue
+            obj = i.sbs
+        elif table == "Russian":
+            if not i.ru:
+                continue
+            obj = i.ru
         else:
-            old_field = getattr(i, column)
+            obj = i
 
+        old_field = getattr(obj, column, "")
         if find_char in old_field:
             new_field = old_field.replace(find_char, replace_char)
-
             print(f"[white]{i.id}  {i.lemma_1:<40}")
             print(f"[green]{old_field}")
             print(f"[light_green]{new_field}")
             print()
-            if column.startswith("sbs_"):
-                setattr(i.sbs, column, new_field)
-            elif column.startswith("ru_"):
-                setattr(i.ru, column, new_field)
-            else:
-                setattr(i, column, new_field)
+            setattr(obj, column, new_field)
             counter += 1
 
     if counter > 0:
