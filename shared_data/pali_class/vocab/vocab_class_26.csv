@@ -3,7 +3,6 @@ id,pali,pos,meaning
 453,akhārika,adj,mild; not alkaline
 560,agga 1.2,adj,most; very; extremely; superbly
 1213,ajeguccha 1,adj,honourable; respectable; estimable; (comm) likeable
-1228,ajjatana,adj,modern; related to today
 1230,ajjatanāṃ,adj,modern; related to today
 1618,aññātaka 1,adj,unrelated; not blood-related
 2427,atula 1,masc,name of a man
@@ -31,12 +30,12 @@ id,pali,pos,meaning
 14830,uda 1.1,ind,either; or
 15744,upanāhī,adj,resentful; who bears a grudge; who harbours enmity; who is vengeful; having rancour
 17006,uras,masc,breast; heart; chest
+17379,eka 4,adj,only
 17592,ekaputtaka,masc,only young son; single young boy
 18315,okkanta,pp,entered; gone (into)
 18561,ottappiya,nt,regret; shame in wrongdoing; respect for others
 19347,kaṭuka 2,adj,bitter; acerbic
 19351,kaṭukagga,adj,predominantly pungent; very spicy
-20236,kamma 4,nt,action; deed; work (object)
 20830,kahaṃ,ind,where?
 21751,kimaññatra,sandhi,how except for?; what besides?; what apart (from)?
 21842,kilamatha 1,masc,fatigue; tiredness; weariness
@@ -104,6 +103,7 @@ id,pali,pos,meaning
 54115,yuta,pp,engaged (in); devoted (to)
 56092,loṇika,adj,salty
 57481,sañhita,pp,connected with; concerning; having
+57566,sat 2,ind,true; good; right
 57743,sattama 2.1,adj,best; most excellent; highest
 58015,saddahati,pr,believes (in); has faith (in); has confidence (in); has conviction (in)
 58077,saddhādhana,nt,wealth that is confidence; treasure of faith
@@ -111,7 +111,6 @@ id,pali,pos,meaning
 58129,sanantana,adj,eternal; perpetual; everlasting; ancient
 58748,sappurisabhūmi,fem,level of good person; realm of the great man
 60719,sammati 1.1,pr,is calmed; is cooled; is appeased
-60725,sammatta 2.1,nt,goodness; correctness; rightness; perfection
 60727,sammattaniyāma,masc,path with an inevitable destination; fixed correct course; (comm) noble path
 62113,sāṭheyya,nt,treachery; fraud; scamming; conning; deviousness
 63165,sīladhana,nt,wealth that is ethical behaviour; treasure of conduct

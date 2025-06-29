@@ -43,7 +43,6 @@ id,pali,pos,meaning
 16821,ubhatodaṇḍaka,adj,two-handled; double-handled; with handles on both sides
 17156,ussahati 1.1,pr,makes an effort (in); strives (in); actively endeavours (in)
 17248,uḷāra 1,adj,excellent; lofty; high; noble
-17379,eka 4,adj,only
 17382,eka 7,ind,once
 17444,ekaja,adj,once born; live born (not from an egg)
 17831,ekova,sandhi,alone
@@ -118,7 +117,6 @@ id,pali,pos,meaning
 38688,nūna 2,ind,could it be?; what if?; shall?; let's?; perhaps?
 38738,neta,pron,this (is) not
 38817,neso 1,pron,this (is) not
-38818,nesohamasmi,sandhi,this is not me; I am not this
 38824,neva 2,sandhi,not even; not only
 38882,no hetaṃ,idiom,certainly not! definitely not!
 38884,no 1.2,ind,(adds a question mark) surely?; didn't?; isn't it?; definitely
@@ -139,7 +137,6 @@ id,pali,pos,meaning
 45061,paharati,pr,strikes; beats; gives a blow (to)
 45426,pātita,pp,dropped; felled; slain; killed
 46763,punareva,sandhi,just again
-48906,brahma 4,adj,divine; holy; (comm) highest; distinguished
 48921,brahmacariyapariyosāna,nt,perfection of the holy life; ideal of the spiritual path; culmination of the holy life
 50100,bhuñjitvā 1,abs,having eaten
 50459,makkha 1,masc,depreciating; denigrating; smirching
@@ -147,7 +144,6 @@ id,pali,pos,meaning
 51454,maraṇadhammomhi,sandhi,I am liable to die; I am subject to death; death is part of my intrinsic nature
 52851,muñcati 2,pr,gets angry (with)
 52892,muṇḍaka 2,masc,shaveling; skinhead; baldy
-53293,meso,sandhi,this is my
 53633,yathāpi,sandhi,just like; just as
 53845,yassa 1,pron,to whom; for whom; for whoever; for whatever; for whichever
 53847,yassa 3,sandhi,whoever to him
@@ -171,7 +167,6 @@ id,pali,pos,meaning
 62611,sāsanakara,adj,following instructions; practising the teaching; complying with orders
 62619,sāsapa,masc,mustard; mustard seed
 63321,sīhanāda 1,masc,confident assertion; bold statement
-63367,su 1,ind,(interrogative & emphatic particle)
 63610,sugata 3,adj,standard; commonly accepted; (comm) indication that a given measure is to be multiplied by three
 63617,sugatavidatthi,fem,measure of length; standard span; well-gone span; from out-stretched thumb to baby finger; (comm) three hand spans in length
 63878,sudaṃ 2,sandhi,indeed this; truly this; surely this

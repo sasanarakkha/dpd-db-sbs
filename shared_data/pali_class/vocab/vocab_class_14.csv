@@ -5,7 +5,6 @@ id,pali,pos,meaning
 2592,attuddesa,adj,intended for oneself; designated for oneself
 2972,addasa 2,aor,you saw; you have seen
 3180,adhicittamanuyutta,adj,engaged in meditation; devoted to mental development; cultivating the higher mind
-3647,ananuyutta,pp,not devoted (to); not applying oneself (to); not practising
 3759,anabhinanditvā,abs,having not approved (of); having not applauded
 4735,anuparivattiyamāna,prp,being revolved around; being rotated; being done routinely; being done regularly
 4878,anupubbena,ind,gradually; step-by-step; successively; stage-by-stage
@@ -18,6 +17,7 @@ id,pali,pos,meaning
 7468,abhajitabba,ptp,should not be kept company with; should not be associated with; should not be adhered to; (comm) should not be stuck to
 7681,abhiññā 3,ger,directly knowing; understanding experientially
 7794,abhinanditabba,ptp,should be delighted in; should be approved of; should be applauded
+8201,abhisandeti parisandeti paripūreti parippharati,idiom,"douses, drenches, soaks and saturates"
 8308,abhivaditabba,ptp,should be welcomed; should be greeted
 8495,amanasikaraṇīya,ptp,should not be attended to; should not be kept in mind
 8679,ambho,ind,hey!; yo!; look here!
@@ -30,7 +30,6 @@ id,pali,pos,meaning
 10060,assāmika 1,adj,without a paying benefactor; with no patron
 10188,avacanīya 1,ptp,incorrigible; uninstructible; unteachable; unadmonishable
 10693,avissajjetvā,abs,having not got rid (of); having not given up
-10970,aṃsa 1.1,masc,share; portion; part
 11544,ādikalyāṇa,adj,beneficial in the beginning; good from the get go
 12081,āmantāpetvā,abs,having sent (for); having had summoned
 12447,ārādhayi 2,aor,pleased; satisfied
@@ -169,5 +168,5 @@ id,pali,pos,meaning
 69415,vissajjetvā 1,abs,having released; having let go (of); having got rid (of); having given up
 69535,vivattayi,aor,untied; unravelled; (comm) torn out
 70005,vuṭṭhāpiyamāna,prp,being raised; being lifted up
-70618,voropeti,pr,deprives (of); removes (from); cuts off (from); takes down (from)
+70618,voropeti,pr,(of life) deprives (of); removes (from); cuts off (from); takes down (from)
 72221,paricita 2,pp,nurtured (by); consolidated (by); fortified (by); strengthened (by); built up (by)

@@ -9,13 +9,13 @@ id,pali,pos,meaning
 2728,atthāya hitāya sukhāya,idiom,"good (for), beneficial (for) and comfortable (for)"
 2730,atthāya 2,masc,fortunate (for); beneficial (for); useful (for)
 3179,adhicitta,nt,meditation; mental development; higher consciousness
-3545,anatta 2,masc,which is impersonal; non-self; not subject to identification
 3762,anabhineti,pr,does not invite; does not conduct towards
 3828,analasa,adj,active; energetic; industrious; not lazy
 4270,anissita 1,pp,detached (from); disengaged (from); separated (from); independent (of)
 4853,anupubbakiriyā,fem,gradual undertaking; step-by-step activity; successive process
 4858,anupubbapaṭipadā,fem,gradual progress; step-by-step path of practice
 6338,aparikkamana,adj,not accessible; not approachable
+6663,api 1.7,ind,too; also; as well
 7047,appassuta,adj,ignorant; uneducated; unlearned
 7452,abyositatta,nt,fact of not being perfected; fact of not being accomplished
 7828,abhinipajjituṃ,inf,to lie down (on); to lie (in)
@@ -47,7 +47,7 @@ id,pali,pos,meaning
 17378,eka 3,adj,alone; single; solitary
 17545,ekantaparipuṇṇa,adj,completely perfect; utterly complete
 17546,ekantaparisuddha,adj,completely pure; totally perfect
-17625,ekameka 2,masc,each and every person; every individual
+17627,ekamekena 1,ind,by each and every; through every individual
 17719,ekādasa 1,card,eleven (11)
 17894,etassa 2,pron,of this
 18049,esohamasmi,sandhi,I am this; this is me
@@ -92,7 +92,6 @@ id,pali,pos,meaning
 30148,tasmā 2,ind,therefore; that is why
 30315,tārituṃ,inf,to cross; to cross over
 30913,tīṇi,card,three (3)
-31138,te 2.3,pron,for you; to you
 31315,tesaṃ 1,pron,for them; to them; to those
 31683,dakkha,adj,expert; skilled; able; adroit
 32127,dassanāya 2,nt,in order to visit; for the purpose of seeing
@@ -101,7 +100,6 @@ id,pali,pos,meaning
 33906,dūrato,ind,from far away; from afar
 33968,desanā 3,fem,(vinaya) appointing; allocating; indicating; designating; showing
 34005,desetuṃ,inf,to preach (to); to teach (to); to explain (to)
-34626,dhamma 1.01,masc,nature; character
 34917,dhammavinaya,masc,teaching and training; doctrine and discipline
 35340,na sukaraṃ,idiom,it is not easy (to); it is not easy to make
 35594,nanu,ind,surely?; but wouldn't?; is it true?; wasn't?
@@ -134,7 +132,6 @@ id,pali,pos,meaning
 48125,bahujanasukhāya,nt,for the comfort of many people; for the ease of the masses
 48127,bahujanahitāya,nt,for the benefit of many people; for the good of the population
 48409,bāḷhaṃ,ind,excessively; overly; too
-48570,buddhāna,masc,of Buddhas; of Awakened Ones
 49284,bhatta 1.1,nt,food; boiled rice
 49434,bhaya 3,nt,danger (of; from); peril (of; from)
 49608,bhavābhava 1,masc,any state of existence; repeated existence
@@ -165,7 +162,6 @@ id,pali,pos,meaning
 58271,santike 1,ind,to; in the presence (of); near (to); nearby; close (to); on the verge (of)
 59353,samanupassituṃ,inf,to see (as); to regard (as); to consider (as)
 59404,samannāgata,pp,possessing; endowed (with); having
-59824,samāhita 1,pp,composed; centred; collected; settled; steadied
 60953,sayanāsana,nt,living place
 61266,sasīsaṃ,ind,up to the head; including the head
 61942,saṃvidhātuṃ,inf,to organize; to arrange; to take care of
@@ -178,7 +174,6 @@ id,pali,pos,meaning
 63458,sukhakāma,adj,wishing for ease; desiring comfort
 63559,sukhāya,nt,comfortable (for)
 64947,seyya 1.1,adj,better (than); preferable (to)
-65710,vajja 2.1,nt,fault (of); error (of); mistake (of)
 65832,vaḍḍhati,pr,increases (in); grows (in); develops (in)
 66080,vatthu 2,nt,site; location; base; grounds
 66101,vatthudesanā,fem,designating the site; appointing the place

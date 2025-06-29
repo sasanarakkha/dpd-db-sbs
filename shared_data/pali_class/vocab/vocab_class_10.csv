@@ -7,7 +7,6 @@ id,pali,pos,meaning
 1279,ajjhattaṃ,ind,internally; inwardly; personally
 1508,aññatara 2,pron,one (of); either one (of)
 1524,aññatitthiya,adj,who belongs to another sect; who follows another religion
-1660,aññe,pron,others; other people; the rest
 2433,atta 1.1,masc,self; soul; spirit; essence
 2625,atthaṅgata 1,pp,(of the sun) set; gone down
 2630,atthaṅgate sūriye,idiom,after sunset
@@ -34,7 +33,6 @@ id,pali,pos,meaning
 6981,appamāda,masc,alertness; care; carefulness; caution; vigilance; diligence; conscientiousness; heedfulness
 7978,abhippamodayanta,prp,gladdening; pleasing; satisfying
 8200,abhisandeti,pr,fills up; fills to the brim; overflows; drenches
-8201,abhisandeti parisandeti paripūreti parippharati,idiom,"douses, drenches, soaks and saturates"
 8583,amutra,ind,there; in such-and-such a place
 8595,amūsaṃ 2,pron,of such and such; of those people
 9183,alameva,sandhi,it is enough (to); it is quite enough (to); that's quite sufficient (to)
@@ -59,10 +57,10 @@ id,pali,pos,meaning
 13792,imasmiṃ 2,pron,when this
 13796,imassuppādā,sandhi,from the arising of this; when this arises
 13798,imaṃ,pron,this; this person; this thing
+13818,ime,pron,these
 13821,imesaṃ 1,pron,for these; for them; for those
 13826,imehi 2,pron,from these
 14631,uttama 1,adj,best; highest; ultimate; supreme; top
-15210,uddharati 2,pr,removes; takes away; packs up
 15215,uddharāpeti,pr,causes to remove; makes take away; causes to pack up
 15440,upaghātī,adj,who injures; who harms
 15860,upapajjamāna,prp,being reborn; re-arising
@@ -72,7 +70,7 @@ id,pali,pos,meaning
 17888,etasmā 1,pron,from this
 17890,etasmiṃ,pron,in this; in this person
 17903,etāni 1,pron,these
-17920,ete 2,pron,these; these people; these things (object)
+17919,ete 1,pron,these; these people; these things
 17927,etesaṃ 2,pron,of them; of these
 18119,evarūpī,adj,of such kind; of such quality
 19059,ovadati,pr,advises; instructs; admonishes
@@ -90,9 +88,7 @@ id,pali,pos,meaning
 26291,caraṃ,prp,walking; travelling
 26360,cavamāna,prp,falling away; dying
 27906,janā,masc,men; people; population
-28150,jāgara,adj,awake; alert; lucid
 28154,jāgaranta,prp,awake; staying awake; alert; watchful; lucid
-28281,jātisaṃsāra,masc,birth and wandering on; cycle of rebirth; endless rebirth
 28297,jānato passato,idiom,when knowing and seeing; for one who knows and sees
 28304,jānanta,prp,knowing; being aware (of)
 28311,jānaṃ 1,prp,knowing; understanding; being aware of
@@ -155,7 +151,7 @@ id,pali,pos,meaning
 57617,sati 2.1,prp,when is; when exists
 57673,sato,prp,when being; when is; when are
 58152,santa 1.1,prp,existing; being; there is
-58464,sandhāvissaṃ,aor,I transmigrated
+58464,sandhāvissaṃ,aor,I wandered; I transmigrated
 59128,samagga 1,adj,unified; united; in concord; harmonious; in agreement
 59349,samanupassanta,prp,seeing; perceiving
 59554,samācare,opt,could perform; would do

@@ -25,7 +25,6 @@ id,pali,pos,meaning
 11588,ādiyati 1,pr,takes; grasps
 13077,āvikaroti 2,pr,(vinaya) discloses; divulges; openly reveals; confesses
 13585,itthiratana,nt,woman treasure; consort of a universal ruler; one of the seven treasures of a universal ruler
-13779,ima 1.1,pron,this
 13825,imehi 1,pron,by these; with these
 16351,upādāya 2,ind,derived (from); dependent (on); based (on)
 17376,eka 1,card,one (1)
@@ -49,12 +48,10 @@ id,pali,pos,meaning
 25849,catu,card,four (4)
 25899,catuttha 1,ordin,fourth (4th)
 26045,caturāsīti,card,eighty-four (84)
-26068,caturo,card,four (4)
 26113,catūhi 2,card,from four
 26127,cattārīsā,card,forty (40)
 26141,cattālīsā,card,forty (40)
 26408,cātumahābhūtika,adj,composed of four primary states; made of the four great elements
-27264,cha 2.1,card,six (6)
 27290,chaṭṭha,ordin,sixth (6th)
 27358,chattiṃsā,card,thirty-six (36)
 28271,jātisata,nt,one hundred lives
@@ -90,7 +87,6 @@ id,pali,pos,meaning
 39843,pañcamatta,adj,five in number; five measures
 40096,paññāsā,card,fifty (50)
 40345,paṭighanimitta,nt,disliked image in the mind; mental image which irritates one
-40896,paṭisaṃvediyetha,opt,one oneself could experience
 40978,paṭissutvā,abs,having agreed (with); having responded in agreement (to); having assented (to)
 42654,pamatta 1,pp,careless; heedless; negligent; inattentive
 43101,parābhava,masc,ruin; downfall; disgrace
@@ -102,6 +98,7 @@ id,pali,pos,meaning
 46926,pubbenivāsa,masc,previous life; former existence
 47067,purisapuggala,masc,individual; individual person
 47073,purisayuga 1,nt,pair of people; pair of individuals
+47565,pharitvā 1,abs,having suffused; having pervaded; having filled
 47801,phussita 1,pp,flowering; in full blossom
 47804,phussitagga,adj,with a blossoming crest; with flowering tops
 48843,byāpāda,masc,dislike; ill-will; hatred; hostility; enmity; malevolence (towards)

@@ -57,6 +57,7 @@ id,pali,pos,meaning
 21932,kissassu,sandhi,of whom?; of what?; of which?
 22014,kiṃsuka,masc,Bastard Teak; Parrot tree; Butea Monosperma
 22359,kuppati 2,pr,is shaken; is disturbed; is agitated; is upset
+22434,kumbha 1,masc,clay pot; water jar; pitcher
 22487,kumbhūpama,adj,like a clay pot; similar to a water jar
 23617,khādanīya 1,nt,"edible food; raw food; non-staple food (e.g. vegetables, sweets)"
 26010,catumahāpatha,masc,four-way intersection; crossroads; meeting of four great roads
@@ -107,13 +108,13 @@ id,pali,pos,meaning
 54173,yenaññataro,sandhi,where a certain; to another
 54204,yeva,sandhi,only; just; merely; exclusively
 54300,yodheti,pr,fights (against); engages in battle (with); attacks
-55722,lābha 1,masc,gain; acquisition; benefit; profit
 55763,lābhī,adj,who gains; who gets; who has
 58189,santadassāvī,adj,who sees peace (in); who sees (something) as peaceful
 59916,samugghāta 1,masc,eradication; extermination; destruction
 59922,samugghātaṃ gacchati,idiom,is eradicated; is exterminated; is destroyed
 61570,saṃkhitta 1,pp,brief; concise; contracted; abbreviated
 61582,saṃkhittena,ind,in brief; concisely
+63367,su 1,ind,(interrogative & emphatic particle)
 65470,ssu,ind,certainly; definitely
 66157,vadha 2,masc,killing; murder; execution; slaughter
 67609,vijitāvī,adj,who has conquered; who has vanquished

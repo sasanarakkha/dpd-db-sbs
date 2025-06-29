@@ -20,13 +20,11 @@ id,pali,pos,meaning
 10788,avera 1,adj,kind; friendly; peaceful; free of ill-will; without animosity
 13344,iccetaṃ kusalaṃ,idiom,then this is good; then it is OK
 13345,iccetaṃ 1,sandhi,that is
-13686,idha 1,ind,here; now; in this world
-13800,imā,pron,these
 13809,iminā,pron,with this; by this
 13836,iriyā 2,fem,conduct; behaviour; way of living
 14352,ucchijjati,pr,is destroyed; is annihilated
 14500,uṭṭhahati 1,pr,gets up; gets out; arouses oneself
-15130,uddissa 1,ger,in the name of; on account of; for the sake of; especially for
+15130,uddissa 1,ind,in the name of; on account of; for the sake of; especially for
 15136,uddissamāna,prp,being recited; being chanted
 15209,uddharati 1,pr,pulls up; pulls out; lifts up; raises
 15233,uddhaṃ adho tiriyaṃ,idiom,above below and across; in every direction
@@ -37,13 +35,11 @@ id,pali,pos,meaning
 18028,esā,pron,she; this; this woman
 18042,esī,adj,who is seeking; looking for
 18047,esevanto,sandhi,just this is the end (of)
-18053,eva 3,ind,even; too; as well
 18114,evampi,sandhi,likewise; just like this; similarly; so too
 20878,kā 2.1,pron,what?; which?; which woman?
 20990,kāmataṇhā,fem,craving for sensual pleasure
 21012,kāmapariḷāha,masc,fever for sensual pleasures; burning passion for sensual objects
 22529,kula 2,nt,supporter; supporting family
-22623,kusala 4,nt,good; benefit; merit; good deed; doing good
 22832,kena 1,pron,by what?; by who?; with what?; how?
 23289,khajjati 1,pr,is eaten (by); is nibbled (by)
 23299,khajjamāna,prp,being eaten (by); being devoured (by)
@@ -59,8 +55,6 @@ id,pali,pos,meaning
 29228,taggha,ind,truly; surely; definitely; most certainly
 29562,tato 4,ind,therefore; thereupon; thereby; because of that; after that
 30154,tasmiṃ 2,pron,when that
-30431,ti 2,ind,(end of direct speech) ' '
-30496,tiṭṭhanta 2,prp,lasting; remaining; persisting
 30770,tiriyaṃ 1,ind,across
 30959,tucchā,ind,baselessly; groundlessly; emptily
 30992,tuṇhībhūta,pp,silent; quiet; mute
@@ -94,7 +88,6 @@ id,pali,pos,meaning
 46721,puna,ind,again; once more
 46798,pupphabhāṇī,adj,who speaks the truth
 47108,purisuttama,masc,best of men; highest of men; ultimate man; epithet of the Buddha
-47565,pharitvā 1,abs,having suffused; having pervaded; having filled
 47762,phusati 1,pr,touches; contacts; feels; experiences
 47860,bajjhati 1,pr,is bound (by); is tied up (by); is caught (by); is imprisoned (by)
 48332,bāhiya,masc,name of an ascetic; great disciple of the Buddha; foremost disciple in quick realization; Bāhiya Dārucīriya

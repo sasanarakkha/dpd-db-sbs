@@ -12,7 +12,6 @@ id,pali,pos,meaning
 2486,attanā 1,masc,with oneself; by oneself
 2490,attani 1,masc,in oneself; for oneself
 2501,attano 2,masc,of self; of oneself; one's own; my own
-3053,adhamma 1,masc,misconduct; immoral behaviour; unjust means; cheating
 3554,anattani,masc,in what is not oneself; within what is impersonal
 4884,anupekkhita,pp,carefully considered; re-examined; re-looked at
 5194,anusaññātuṃ,inf,to go around; to visit; to inspect
@@ -20,10 +19,7 @@ id,pali,pos,meaning
 7110,appiya 1,adj,not dear (to); unloved (by); disliked (by)
 7114,appiyarūpa,adj,unpleasant; disliked; bad
 7118,appekadā,sandhi,but some days; sometimes; on some occasions
-7751,abhidā,imperf,broke; split; shattered
 8576,amuka,adj,that; such and such (person or place)
-9899,asma,masc,rock; stone
-11283,ācarita,pp,acted; behaved; performed; practised
 11966,āpodhātu 1,fem,liquids; liquid state; (comm) element of cohesion
 12998,āvaraṇa 1,adj,obstructing; blocking; impeding
 13114,āvilatta 1,nt,(of mind) fact of agitation; confusion; disturbance
@@ -32,7 +28,6 @@ id,pali,pos,meaning
 13784,imameva,sandhi,this very; this exact same; this here
 15575,upaṭṭhitakāyassati,adj,with body awareness present; attending mindfully to the body
 17493,ekadā 1,ind,one day; sometimes; at some (unspecified) time
-17919,ete 1,pron,these; these people; these things
 17968,enaṃ,pron,him; her; this one
 19136,ohita 3,pp,(of attention) applied; paid
 19138,ohitasota,adj,listening attentively; with ears directed
@@ -40,11 +35,11 @@ id,pali,pos,meaning
 19637,katapubba,adj,done before; previously performed
 19789,katvā 2,abs,having made
 20450,karaṇa 1,adj,doing; making; causing; effecting
+20559,karoti 2,pr,makes
 21245,kāyassati,fem,awareness of the body; mindfulness of the body
 21301,kāraṇa 1,nt,task; labour
 21382,kāreti 1,pr,makes one do; causes to make
 21383,kāreti 2,pr,performs; practices
-22434,kumbha 1,masc,clay pot; water jar; pitcher
 22811,kecime,sandhi,whoever of these; whichever of these
 23048,kodha 1.1,masc,anger; wrath; rage; temper
 23652,khāri 1,fem,goods carried on a pole across the shoulders
@@ -112,7 +107,6 @@ id,pali,pos,meaning
 52490,māsa 1.1,masc,month
 53378,mosa 2.1,adj,untrue; false; deceitful
 53382,mosavajja,nt,lie; untruth; false speech
-53549,yatthaṭṭhita,adj,where standing; wherever staying; where remaining
 53601,yathāṭhita,adj,however it is standing; just as it is positioned
 53628,yathāpaṇihita,adj,however it is positioned; however it is disposed
 53746,yadi vā,idiom,or; or even; if or
@@ -133,7 +127,6 @@ id,pali,pos,meaning
 62984,siyā 1,opt,could be; may be; might be; should be
 63868,sudanta,adj,well tamed (by); well trained (by); well controlled (by)
 64145,suppaṭividdha,adj,thoroughly penetrated (by); completely understood (by)
-65199,sota 2.1,nt,ear
 65608,vacasā,masc,by word; by speech; verbally
 65708,vajja 1.1,ptp,speaking; saying
 65896,vaṇṇa 1.03,masc,appearance; complexion; countenance

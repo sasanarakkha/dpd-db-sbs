@@ -18,11 +18,10 @@ id,pali,pos,meaning
 5559,anoka 1,adj,homeless; without worldly attachment
 5563,anokamāgamma,ger,becoming homeless; (comm) coming to non-clinging
 5672,antamaso 1,ind,even so much as; even with; even down to; with as little as
+6092,apaccakkhāya,ger,not giving up; not disavowing; not renouncing; not rejecting
 6314,aparājita 1,pp,unconquered; undefeated; victorious; triumphant
 6398,apariyādinna 1,pp,not used up; not exhausted; not consumed; not run out
 6658,api 1.2,ind,even; even then
-6663,api 1.7,ind,too; also; as well
-6780,appaccakkhāya,ger,not giving up; not disavowing; not renouncing; not rejecting
 7371,abbhetabba,ptp,(vinaya) should be rehabilitated; should be reintegrated; should be readmitted
 7555,abhikkanta 3,pp,advanced; progressed; moved on; (comm) ending; depletion
 7559,abhikkantavaṇṇa,adj,stunningly beautiful; of extraordinary appearance
@@ -61,11 +60,11 @@ id,pali,pos,meaning
 17384,ekaka 1,adj,alone; solitary
 17460,ekato 1,ind,on one side
 17702,ekaṃsaṃ,ind,on one shoulder; over one shoulder
-17871,etadeva,sandhi,just this; only this; this exact
 17896,etaṃ 1,pron,this; this thing (subject)
 17901,etādisa,adj,of this kind; of this type; such as this
 17945,ettha 1,ind,here; in this place; in this case; in this regard
 18048,eso,pron,this; this thing; this person; he; it
+18053,eva 3,ind,even; too; as well
 18254,oka 1.1,masc,home; abode
 18788,obhāsetvā,abs,having lit up; having illuminated
 19064,ovadita,pp,advised; instructed; taught; admonished
@@ -92,7 +91,6 @@ id,pali,pos,meaning
 28132,jahati 1,pr,gives up; leaves; abandons; deserts
 29112,ṭhiti 1,fem,stability; constancy; continuity; endurance; persistence; longevity
 29559,tato 1,pron,from that; therefrom; from him
-29586,tattha 1,ind,there; in that place
 29801,tadahujāta,adj,born that very day; born the same day
 30164,tassa 2,pron,of that; his; its
 30178,tassā 2,pron,of her; hers; of that
@@ -114,7 +112,6 @@ id,pali,pos,meaning
 35037,dhātu 1,fem,state; property; condition; element
 35159,dhītar,fem,daughter
 36427,nāma 2,ind,called; means; by the name of; namely
-36430,nāma 4,nt,"mental objects of consciousness; mentality; mental factors of feeling, perception, intention, contact and attention"
 36440,nāmagotta,nt,first name and surname; name and family clan
 36516,nārī,fem,woman
 36791,nikkhāmetvā,abs,having ejected (from); having expelled (from)
@@ -197,7 +194,6 @@ id,pali,pos,meaning
 60102,samuppāda 2,masc,issue; conflict; something which arises
 60224,sampajāna 1,adj,clearly aware; fully knowing; completely comprehending
 60426,sampahaṃsetvā,abs,having delighted; having pleased; having thrilled
-62028,sā,pron,she; that; it
 62066,sākhā 1,fem,branch
 62728,sikkhā 1,fem,training (in); practice (in)
 63350,sīhaseyyā,fem,sleeping posture of a lion
@@ -213,10 +209,10 @@ id,pali,pos,meaning
 68256,vineyya 1,ger,removing; getting rid (of); putting aside
 68513,vippahāya,ger,completely abandoning; totally renouncing
 69591,vivicca,ger,separating (from); aloof (from)
+69662,viharati 2,pr,stays (in); remains (in); continues (in); dwells (in)
 69911,vīriya 1,nt,effort; energy; might; power
 69939,vīsatigaṇa,adj,with a quorum of twenty monks
 70376,vepulla 1,nt,expansion; full development; maturity
-70487,vesālī,fem,name of a city; capital of the Licchavis
 70534,vehāsaṃ,ind,in the air; in the sky
 70655,voharati 1,pr,speaks; communicates; gives expression; uses language
 71238,hitvā,abs,having left; having left behind; having abandoned

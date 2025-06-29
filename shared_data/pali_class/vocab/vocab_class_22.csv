@@ -89,6 +89,7 @@ id,pali,pos,meaning
 35114,dhārā 1.1,fem,rain-shower
 35215,dhura 3,nt,yoke-pole
 35834,nayidha,sandhi,not here; there isn't; wouldn't be here
+36912,niggahita 1,pp,restrained; held back; reigned in
 37315,nindā,fem,blame; criticism; fault-finding; disgrace
 37512,nibandhissaṃ,fut,I myself will bind; I myself shall tie
 37580,nibbānaninna,adj,slanting to Nibbāna; sloping to Nibbāna; inclining to Nibbāna
@@ -98,7 +99,6 @@ id,pali,pos,meaning
 38309,nissaraṇa,nt,escape (from); exit (from); exodus (from); way out (of)
 39333,paccanīka 1,nt,opposition; resistance; conflict; argument
 40133,pañhapaṭibhāna,nt,spontaneous answer to a question; ingenius reply to an enquiry
-40690,paṭibhāna 1.1,nt,eloquence; wit; ingenuity; quick response
 42552,pabbhāra 1,adj,sloping (towards); inclining down (towards); leading (to); aiming (at)
 42824,payutta 3,pp,intent; devoted; applied; employed; engaged (in)
 43542,paridevaneyya,ptp,lamentable; distressing; sorrowful
@@ -154,8 +154,8 @@ id,pali,pos,meaning
 68376,vipassati,pr,sees deeply (into); sees in detail; understands with insight; has insight into
 69687,vihāra 3,masc,mode of living; way of life; way to spend time; mode of existence
 70989,handa,ind,come on!; come now!; well then!
+71240,hidaṃ,sandhi,indeed here; surely in this case
 71288,hirī,fem,conscience; sense of right and wrong; scruples; (comm) originating from inside
 71291,hirīnisedha,adj,prevented by modesty; restrained by conscience; constrained by scruples
 74148,nevassa 2,sandhi,would not even be
-74149,idaṃ 3,ind,here; in this case
 78607,durabhisambhava 2,adj,hard to attain; difficult to achieve

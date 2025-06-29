@@ -23,7 +23,7 @@ id,pali,pos,meaning
 11839,āpajjati 5,pr,causes; effects
 12241,āyasmant 1,masc,sir; venerable; reverend
 13466,iti,ind,thus; like this; this is; and so
-13539,itthatta 1,nt,present state of existence; earthly existence; such an existence
+13539,itthatta 1,nt,present state; existence here; such an existence
 14718,uttarichappañcavācā,fem,more than five or six sentences; more than five or six lines
 15539,upaṭṭhāna 1,nt,attending (to); waiting on; serving
 16176,upasussati,pr,dries up; withers; shrivels
@@ -62,6 +62,7 @@ id,pali,pos,meaning
 30060,tamhā,pron,from that
 30134,tasa,adj,moving; mobile; (comm) with craving
 30212,taṃ kiṃ maññasi,idiom,what do you think about that?; what's your opinion on this?
+30215,taṃ 1.1,pron,it; that
 30217,taṃ 2.1,pron,you (object)
 31216,tena 1,pron,with him; by him; with that; by that
 31320,tesu,pron,in those; in them; among them; among those
@@ -77,7 +78,9 @@ id,pali,pos,meaning
 34001,deseti 1,pr,preach (to); teaches (to); explains (to)
 34038,devatā,fem,deity; god
 34459,dve 1,card,two (2)
+34626,dhamma 1.01,masc,nature; character
 34631,dhamma 1.06,masc,matter; thing; phenomena
+35842,nara,masc,man; person
 35994,nahāru,masc,tendon; sinew
 36907,niggayhavādī,adj,who reproves; who rebukes; who blames
 36976,nicca 1,adj,permanent; lasting; ordered; stable; reliable; immutable
@@ -115,13 +118,13 @@ id,pali,pos,meaning
 49092,brūmi,pr,I say; I tell you; I call
 49139,bhagavant 1,masc,Sublime One; Blessed One; Fortunate One; Auspicious One; epithet of the Buddha
 49178,bhajati 1.1,pr,associates (with); keeps company (with)
-49337,bhadante,masc,venerable; reverend
+49534,bhavati 1,pr,is; is being; becomes
 49695,bhātar,masc,brother
 49818,bhāvanīya 1,ptp,respected; honoured; worthy of esteem
 49868,bhikkhave,masc,monks
 49870,bhikkhavo 2,masc,o monks
 49885,bhikkhu,masc,monk; monastic; mendicant; fully ordained monk
-49917,bhikkhuno 1,masc,for a monk; to the monastic
+49918,bhikkhuno 2,masc,of a monk; monastic's
 50150,bhūta 03,nt,being; living being; entity
 50382,bhojana 2,nt,eating; taking food
 50621,maccu,masc,death; Death
@@ -170,7 +173,7 @@ id,pali,pos,meaning
 64312,sumedha 1,adj,wise; sage
 64642,suve,ind,tomorrow
 64953,seyyathāpi,sandhi,just like; as if; imagine if
-65082,so 1.1,pron,he; that person; that thing
+65710,vajja 2.1,nt,fault (of); error (of); mistake (of)
 65715,vajjadassī,adj,who sees fault
 66665,vā 1,ind,or; either or
 67107,vikappa 1.1,masc,alteration (to); improvement (to); distinction (regarding)

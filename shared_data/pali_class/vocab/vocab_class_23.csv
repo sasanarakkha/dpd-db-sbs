@@ -56,13 +56,11 @@ id,pali,pos,meaning
 19254,kacca,ger,doing; making; acting; performing
 19763,kattukāma,adj,intending to do; wanting to make; wishing to cause
 19770,kattuṃ,inf,to do; to make
-20559,karoti 2,pr,makes
 21168,kāyaduccarita,nt,physical misconduct; bodily misbehaviour
 23438,khandha 2,masc,shoulder; back
 23629,khādi,aor,chewed; devoured; ate
 24504,garu 1,adj,heavy; onerous; weighty
 24557,gala 2.1,masc,neck; throat
-24818,gāmī 1,adj,leading (to); going (to); heading (to)
 25014,gihippaṭisaṃyutta,adj,(vinaya) connected with laypeople
 25037,gihī,masc,householder; layperson
 25065,guṇa 1.5,masc,string; thread; tie
@@ -74,10 +72,8 @@ id,pali,pos,meaning
 27671,chinna 5,pp,(of a stream) cut across; breasted; forded
 27697,chinnasota,adj,who has cut the stream (of craving or becoming)
 28829,jhāyī 1,masc,meditator; yogi
-28830,jhāyī 2,adj,meditating; contemplating
 29018,ṭhapetvā 2,abs,having left; having set aside
 29343,taṇhamabbuyha,sandhi,uprooting desire; pulling out craving; removing thirst
-29973,tapparāyaṇa,adj,having that as one's goal; focussed on that; (comm) made of that
 30404,tāvāhaṃ,sandhi,as long as I; until I
 30549,tiṇavatthāraka,masc,(vinaya) covering with grass; sweeping under the carpet
 30778,tiro,ind,through; across; throughout; from outside
@@ -121,9 +117,11 @@ id,pali,pos,meaning
 48453,biḷāra,masc,cat
 48865,byābādha,masc,injury; harm; affliction
 50116,bhumma 1,adj,earthly; terrestrial
+50151,bhūta 04,pp,become; born
 50684,macchera,nt,selfishness (for); stinginess (about); meanness; tight-fistedness
 51249,manoduccarita,nt,mental misconduct; misbehaviour by mind
 51507,mala 1,nt,dirt; impurity; stain; dross; filth; grime; tarnish; grunge; contaminant
+51514,malamacchera,nt,stain of stinginess; impurity of miserliness
 52093,mahesī 1.1,fem,queen; royal consort
 52919,mutta 2.1,pp,released (from); freed (from); liberated (from); let loose (from)
 52927,muttacāga,adj,giving freely; freely generous; open handed

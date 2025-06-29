@@ -4,7 +4,6 @@ id,pali,pos,meaning
 2397,atīta 2,pp,past; gone past; bygone
 2524,attamana,adj,pleased; happy; delighted; elated
 3562,anattamana,adj,irritated; annoyed; displeased
-3890,anāgata 1,pp,not come; not arrived; not present
 3891,anāgata 2,pp,future
 3899,anāgatamaddhānaṃ,ind,in the future
 5458,anuviloketi,pr,looks around; surveys
@@ -36,7 +35,6 @@ id,pali,pos,meaning
 16430,upāsikā,fem,female disciple; laywomen; female devotee
 17072,ulloketi,pr,looks up (at); gazes up (at)
 17431,ekacca 1,pron,certain; one of
-18077,evamassa 1,sandhi,he would (think) thus; this would occur to him
 18180,evaṃrūpa,adj,of such form; like this
 18208,evaṃvedana,adj,having such feeling; having this kind of sensation
 18775,obhāsati 1.1,pr,speaks coarsely (to); speaks suggestively (to); talks rudely (to); talks dirty (to)
@@ -55,8 +53,8 @@ id,pali,pos,meaning
 24711,gahetvā 5,abs,having arrested; having taken prisoner
 24726,gāthā 1,fem,verse; poem; stanza
 24853,gāha 2.2,masc,hiding place
-26759,cira,adj,(of time) long
 27056,cetasā,masc,with mind; by mind; with thought; with intention
+27264,cha 2.1,card,six (6)
 27315,chaḍḍita,pp,thrown away; discarded; abandoned; disposed of
 27732,chetvā 1,abs,having cut off; having severed; (comm) having killed
 28343,jāneyya,opt,should know; should understand; should find out
@@ -85,7 +83,7 @@ id,pali,pos,meaning
 42544,pabbājeti 1,pr,banishes (from); exiles (from); drives away (from)
 42964,parama 1,adj,highest; most extreme; very best; ultimate; superior; sublime
 43605,parinibbuta 3,pp,(of an arahant) died one's final death; attained final Nibbāna
-44013,pariyesanaṃ,ind,looking for; searching for; on a quest for
+44013,pariyesanaṃ,ind,looking for; in search of; on a quest for
 44177,parisodheti,pr,cleans; purifies (something of)
 44797,passeyya 1,opt,could see; would see
 44980,pavivitta,pp,separated; secluded; detached (from)
@@ -93,7 +91,7 @@ id,pali,pos,meaning
 47334,pesala,adj,well-behaved; good; honest
 47740,phāsuṃ,ind,easily; comfortably
 47898,bandhati 1,pr,binds; ties up; imprisons; confines
-49534,bhavati 1,pr,is; is being; becomes
+49917,bhikkhuno 1,masc,for a monk; to the monastic
 50332,bhoga 1.1,masc,wealth; possessions; property; riches
 51141,manāpa 2,nt,pleasant experience; something nice
 51451,maraṇadhamma,adj,subject to death; liable to die; having death intrinsic to one's nature
@@ -125,8 +123,8 @@ id,pali,pos,meaning
 65996,vattati 1,pr,proceeds; continues; goes forward; practices
 67347,vigatābhijjha,adj,without greed; free from covetousness
 69663,viharanta,prp,living (in); dwelling (in); staying (at); remaining (in); continuing (in)
+70487,vesālī,fem,name of a city; capital of the Licchavis
 70966,hanati 3,pr,punishes; flogs; beats
 71011,harati 2,pr,takes; steals; robs
 75481,pūjā 1,fem,veneration (of); homage (to); honouring
 75649,adhigaccheyya 2,opt,would experience; would feel
-78050,amanāpa 2,nt,unpleasant experience; something disagreeable

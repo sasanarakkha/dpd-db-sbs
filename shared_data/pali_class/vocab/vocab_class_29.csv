@@ -1,5 +1,4 @@
 id,pali,pos,meaning
-239,akubbanta,prp,not doing; not making
 546,agiddha,pp,without greed; without desire
 634,aggahesi 2,aor,seized; caught; grabbed hold (of)
 1259,ajjhatta,adj,inner; internal; personal; in oneself
@@ -12,7 +11,6 @@ id,pali,pos,meaning
 4848,anupucchamāna,prp,asking; enquiring; questioning (somebody about)
 5483,anūpanīta,pp,not led (into); not brought (into)
 5488,anūpalitta,pp,not smeared (by); not sullied (by); untainted (by); unstained (by)
-6714,apurekkharāna,prp,not preferring; not choosing
 7207,abbata,adj,without religious practice; without ritual observances; not keeping vows
 8668,ambu,nt,water
 8672,ambuja 1,adj,born in water; living in water; aquatic
@@ -28,12 +26,9 @@ id,pali,pos,meaning
 15865,upapatti 1,fem,rebirth; re-arising; reappearance
 17915,eti 2,pr,goes (to)
 19474,kaṇḍaka 1,adj,thorny-stemmed; prickly-stemmed
-19851,kathā 2,fem,argument; debate
 20521,karīsa 1,nt,faeces; excrement
-20960,kāma 4,masc,(objects of) pleasure; sensual pleasure; sexual pleasure
 21791,kimevidaṃ 2,sandhi,not to mention this
 22032,kīdisa,adj,of what kind?; how is it?; what is it like?
-23559,kharāna,prp,doing; making
 24269,gantha 1,masc,(mental) tie; knot; bond
 25157,gū 2,masc,who is skilled in; who is fulfilled in; who is complete in
 25482,ghaṭṭayanta,prp,colliding; conflicting; clashing; offending
@@ -89,6 +84,7 @@ id,pali,pos,meaning
 60540,samphusituṃ,inf,to touch; to bring into contact (with)
 63180,sīlabbata,nt,precepts and practices; ethics and observances; rites and rituals
 63810,suti 1,fem,learning; sacred knowledge
+65968,vata 2.1,nt,religious duty; spiritual practice; ritual observance; vow
 66123,vadati 2,pr,disputes; argues; debates
 66145,vadeti 1,pr,say; speaks; calls; describes (as)
 66778,vāda 3,masc,debate; argument; disputation

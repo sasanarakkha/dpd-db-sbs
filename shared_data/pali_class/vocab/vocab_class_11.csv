@@ -50,7 +50,6 @@ id,pali,pos,meaning
 10156,avakkhitta,pp,dropped; thrown down
 10610,avinīta,pp,untrained (in); uneducated (about); undisciplined (in)
 10619,avipariṇāmadhamma,adj,with unchanging nature; of stable condition
-11557,āditta,pp,blazing; burning; on fire
 11559,ādittacela,adj,whose clothes are on fire; with blazing garments
 11565,ādittasīsa,masc,whose head is on fire; with a blazing head
 11810,āneñjappatta,adj,reached the imperturbable state; unflappable; unshakeable
@@ -67,7 +66,7 @@ id,pali,pos,meaning
 16280,upahata 1,pp,injured; impaired; broken; deteriorated
 17411,ekagga 1,adj,unified; collected
 17887,etarahi,ind,now; at present
-17914,eti 1,pr,comes (to)
+18050,essati,fut,will go (to); will come (to); will reach
 18220,ehipassika,adj,open to inspection; inviting to come and see for oneself; verifiable
 18411,ogha 2,masc,(of defilements) deluge; inundation; torrent
 18688,opanayika,adj,pragmatic; applicable; relevant
@@ -91,7 +90,6 @@ id,pali,pos,meaning
 25241,gocara 3,masc,sphere; domain; field; range
 25775,cakkhuviññeyya,adj,visible; perceivable by the eye
 26341,cassa 1,sandhi,and there would be; but there would be; and there might be
-27166,cela 2,nt,clothes; garment
 28468,jina 1,masc,conqueror; victor; champion; epithet of the Buddha
 28848,ñatvā,abs,having known; having found out; having understood
 28854,ñāṇa 2,nt,knowing (of); understanding (of); insight (into)
@@ -117,7 +115,6 @@ id,pali,pos,meaning
 40782,paṭilābhato,ind,as personal acquisition; as gain
 40887,paṭisaṃyutta,pp,connected (to); concerned (with); related (to)
 41568,paṇīta 2,pp,fine; refined; excellent; superior; sublime
-41851,patta 3.1,pp,reached; attained; gained; accomplished; found
 41854,pattakamma,nt,suitable action; appropriate deed
 42905,parato 2,ind,as another; as alien; as something else; as belonging to somebody else; (comm) not one's own possession
 43350,paricita 1,pp,practised; rehearsed; consolidated; familiarized
@@ -171,8 +168,8 @@ id,pali,pos,meaning
 58733,sappurisa 1,masc,good man; moral man; virtuous man; superior man
 58742,sappurisadhamma 1,masc,teaching of righteous men
 59346,samanupassati 2,pr,regards; considers; recognises (as); sees (as)
+59824,samāhita 1,pp,composed; centred; collected; settled; steadied
 60226,sampajānakārī,adj,forming a clear perception (of); creating a clear impression (of); cultivating attention (while)
-60730,sammadakkhāta,adj,well taught; well preached
 60789,sammā 2,ind,perfectly; rightly; correctly; properly
 60835,sammāsaṅkappa 1,masc,correct intention; right volition; proper thought
 61189,sallato,ind,as an arrow; as a dagger
@@ -184,7 +181,6 @@ id,pali,pos,meaning
 62422,sāra 1,adj,essential; fundamental; substantial; valuable; sound
 62423,sāra 2,masc,core; essence; substance; value
 62461,sārato,ind,as essential; as substantial; as valuable
-63261,sīsa 1,nt,head
 63575,sukhuma 1,adj,fine; subtle; refined
 63740,suññato,ind,as empty; as void; as essenceless
 63893,suduttara,adj,extremely difficult to cross; very hard to escape

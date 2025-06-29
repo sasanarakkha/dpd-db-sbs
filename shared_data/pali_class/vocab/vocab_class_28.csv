@@ -79,7 +79,6 @@ id,pali,pos,meaning
 41784,patiṭṭhita 1,pp,firmly grounded (in); well established (in)
 41963,patthayāna,prp,wishing (for); aspiring (for); craving (for)
 41976,patthiya 1,adj,desiring; wishing; aspiring
-42356,panna,pp,dropped; lowered; put down
 42361,pannabhāra,adj,who has dropped the burden; who has laid down the load
 42625,pabhinna 1,pp,(of an elephant in rut) with juices flowing; releasing excretions
 42766,pamodanā,fem,delighting; being happy; being joyful
@@ -88,6 +87,7 @@ id,pali,pos,meaning
 44716,pasuta 1.1,pp,engaged (in); engrossed (by); occupied (with); pursuing; looking (for)
 44899,pavāti,pr,(of a smell) exudes; gives off; releases; diffuses
 45391,pāṇinā,masc,with a hand; by the palm
+45731,pāragavesī 1,adj,seeking salvation; who is looking for the beyond
 46815,pupphita,pp,blossomed; bloomed; flowered
 47110,pure 1,ind,before; earlier
 49338,bhadda 1,adj,good; excellent; lucky; auspicious
@@ -96,7 +96,6 @@ id,pali,pos,meaning
 49652,bhāgī 1,masc,shareholder; who shares (in); who partakes (in)
 49804,bhāvanāpāripūri,fem,maturity by development; completion by cultivation; full development by meditation
 50029,bhiṃsanaka,adj,frightening; terrifying; scary; (comm) producing fear
-50151,bhūta 04,pp,become; born
 50177,bhūtabhabya,adj,who are and who will be; who exist and could exist
 50478,makkhita,pp,smeared (with); stained (with)
 50619,macca,masc,man; mortal man
@@ -114,6 +113,7 @@ id,pali,pos,meaning
 54535,ratī 1,fem,pleasure; enjoyment; delight
 54668,ramati,pr,enjoys; finds pleasure (in); takes delight (in); likes
 55619,labbhati 1,pr,is obtained (among); is acquired (from); is received (from)
+55722,lābha 1,masc,gain; acquisition; benefit; profit
 56555,sagga 1.2,masc,heaven; paradise
 57203,sajitar,masc,designator; assigner; author
 58292,santuṭṭhi,fem,satisfaction; contentment (with)

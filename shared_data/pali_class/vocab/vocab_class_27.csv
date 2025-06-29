@@ -1,4 +1,5 @@
 id,pali,pos,meaning
+239,akubbanta,prp,not doing; not making
 691,aggivessana,masc,name of a Brahman family clan
 1252,ajjeva,sandhi,this very day; just today; right now
 2085,atikkāmayanta,prp,exceeding; going over
@@ -8,7 +9,7 @@ id,pali,pos,meaning
 3733,anabbhita,pp,not rehabilitated; not reintegrated; not re-admitted
 4111,aniketasārī,adj,wandering homeless; roaming without an abode
 6661,api 1.5,ind,but; however; yet
-6713,apurakkharāna,prp,not preferring; not choosing
+6714,apurekkharāna,prp,not preferring; not choosing
 7372,abbheti,pr,(vinaya) rehabilitates; reintegrates; readmits
 7504,abhaviṃsu,aor,they were
 7598,abhigīta,pp,sung over; chanted over
@@ -34,10 +35,13 @@ id,pali,pos,meaning
 16785,ubbhata 2,pp,withdrawn; disallowed; suspended
 17281,ūna 1,adj,deficient (in); lacking; wanting; short (by); less than (by)
 17812,ekenapi,sandhi,by even one; with only a single
+19851,kathā 2,fem,argument; debate
+20960,kāma 4,masc,(objects of) pleasure; sensual pleasure; sexual pleasure
 21252,kāyaviññeyya,adj,touchable; tangible; known by the body
 21380,kāretabba 2,ptp,(vinaya) should be made to do (by); should be dealt with
 21616,kicca 1,ptp,should be done (by); ought to be made (by)
 21624,kiccamātappaṃ,sandhi,effort should be made (by); one should strive
+23559,kharāna,prp,doing; making
 24066,gaṇa 1,masc,group; crowd
 24733,gāthābhigīta,adj,chanted over with verses; recited over
 24775,gāmato,masc,from the village
@@ -45,9 +49,7 @@ id,pali,pos,meaning
 25586,ghātetāya,ptp,fit to be killed; worthy to be executed
 25589,ghātetuṃ,inf,to slay; to kill; to execute; to murder
 26001,catubbhi,card,with four; by four
-27859,jana 2,masc,men; people; population
 28346,jāpetāya,ptp,fit to be fined; worthy to be fined
-28348,jāpetuṃ,inf,to fine; to confiscate
 30991,tuṇhībhāva,masc,silence; keeping quiet; being silent; (comm) not talking
 32088,dasāhaparamaṃ,ind,for ten days at the most; for a maximum of ten days
 32429,diṭṭha 1.2,nt,what is seen
@@ -65,7 +67,6 @@ id,pali,pos,meaning
 41468,paṭhamaṃ 1,ind,first; firstly; at first; first of all
 42322,panudati,pr,dispels; drives out; rejects; pushes away
 42543,pabbājetāya,ptp,fit to be banished; worthy to be exiled
-42546,pabbājetuṃ,inf,to banish (from); to exile (from)
 43002,paramaṃ,ind,at the very most; for a maximum of
 43853,paribhojanīya,nt,washing water; rinsing water
 45253,pācittiya 2,adj,(vinaya) related to an offence requiring confession
@@ -89,7 +90,6 @@ id,pali,pos,meaning
 57088,saṅghika,adj,belonging to the community
 57459,saññāvedayita,nt,perception and felt experience
 57460,saññāvedayitanirodha,masc,ending of recognition and feeling; cessation of conception and what is felt
-57566,sat 2,ind,true; good; right
 57662,satī 1.2,prp,when is; when exists
 59760,samāpanna 1,pp,entered; reached; attained; achieved
 60385,sampassanta,prp,seeing; looking at; regarding; considering

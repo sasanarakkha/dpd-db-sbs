@@ -24,7 +24,7 @@ id,pali,pos,meaning
 12698,āloka,masc,light; brightness; clarity
 12877,āsi 1.1,aor,was
 12891,āsiṃ,aor,I was
-13818,ime,pron,these
+13686,idha 1,ind,here; now; in this world
 13855,isi,masc,seer; sage
 14954,udapādi 1,aor,arose (for); sprung up (for)
 15660,upadduta,pp,afflicted (by); troubled (by); persecuted (by); oppressed (by); tyrannized (by)
@@ -36,6 +36,7 @@ id,pali,pos,meaning
 20404,kammunā,nt,by action; by deed; by doing
 20791,kassaka,masc,farmer; ploughman
 21294,kāraka 2,masc,builder
+22623,kusala 4,nt,good; benefit; merit; good deed; doing good
 23381,khattiya 2,masc,man of the ruling caste; high caste man; nobleman
 23437,khandha 1,masc,mass; heap; pile; volume; aggregation
 24615,gaha 2,nt,house
@@ -68,7 +69,6 @@ id,pali,pos,meaning
 49767,bhāsita 1,nt,saying; speech; statement; utterance; talk; words
 49796,bhāvanā 1,fem,developing; cultivating; meditating
 50496,magga 2,masc,way; means; method
-51427,mayaṃ 1,pron,we
 52492,māsa 2.1,masc,bean
 52807,mugga,masc,mung beans
 53022,muni 1,masc,monk; sage; seer; hermit; silent sage
@@ -78,6 +78,7 @@ id,pali,pos,meaning
 55973,loka 2,masc,world; plane of existence
 56270,saka 1,adj,one's own; my own
 56554,sagga 1.1,adj,heavenly
+56770,saṅkhāra 3,masc,mental formation; mental activity; thought processes; fourth of the five aggregates
 57122,sacca 2,nt,truth; epithet of Nibbāna
 57616,sati 1.2,fem,mindfulness; presence; recollection; awareness
 58259,santi 2.1,pr,they are; there are; they exist

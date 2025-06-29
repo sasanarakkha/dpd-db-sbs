@@ -20,7 +20,6 @@ id,pali,pos,meaning
 9019,ariyasacca,nt,truth of the Buddha; noble truth
 9148,alattha 1,aor,got; obtained
 9201,alaṃ 3,ind,enough; it is enough (for)
-9203,alaṃ 5,ind,that's enough (of)!; stop (with)!
 9235,alika 1,nt,lie; falsehood; untruth
 9237,alikavādī,masc,liar; who lies
 9836,asura 1,masc,titan; anti-god; enemy of the devas
@@ -64,7 +63,6 @@ id,pali,pos,meaning
 24609,gavesī 1,adj,seeking; searching for; looking for
 24765,gāmaṇi,masc,chief; chieftain; headman; leader
 25973,catunnaṃ 2,card,of four
-28483,jināti 1,pr,conquers; overcomes; defeats
 28813,jhāyati 1.2,pr,meditates; contemplates
 28910,ñāti,masc,family; relative; kinsman
 29171,ḍeti,pr,flies; flies up
@@ -72,15 +70,14 @@ id,pali,pos,meaning
 29660,tathā,ind,so; thus; in such a way; likewise; similarly
 30066,tayā 1,pron,by you; with you
 30152,tasmiṃ samaye,idiom,then; on that occasion; at that time
-30215,taṃ 1.1,pron,it; that
 30216,taṃ 1.2,pron,him; her; one; that person; that thing
 31024,tumhākaṃ 3,pron,of you all; yours
 31027,tumhe 2,pron,(object) you all
 31108,tuvaṃ 1,pron,you
+31138,te 2.3,pron,for you; to you
 31139,te 2.4,pron,your; of you
 32103,dassati 1.1,fut,will give (something to)
 32162,dava 1.1,masc,fun; joke; play; sport; pleasure
-32253,dāna 1.1,nt,giving; offering; charity; generosity
 32254,dāna 1.2,nt,alms; almsfood
 32876,dukkha 2,adj,painful
 33987,desita 1,pp,preached (by); taught (by); explained (by); instructed (by)
@@ -113,7 +110,6 @@ id,pali,pos,meaning
 45580,pāpaka 1.1,adj,bad; wicked; evil; wrong; worthless; harmful
 45676,pāpeti 1.1,pr,helps to reach; brings (to); leads (to)
 45726,pāra 1.1,nt,far side; far shore; bank on the other side (of); epithet of Nibbāna
-45731,pāragavesī 1,adj,seeking salvation; who is looking for the beyond
 46392,pīti 1.1,fem,delight; heartfelt joy; pleasure; feeling of love
 46397,pītipaṭisaṃvedī,adj,experiencing heartfelt joy; feeling delight; sensitive to happiness
 46492,pucchi,aor,asked; enquired; questioned (somebody about)
@@ -128,6 +124,7 @@ id,pali,pos,meaning
 51004,mada 1,masc,excess; pleasure; indulgence
 51387,mama 2,pron,my; mine; of me
 51391,mamaccayena,ind,after my passing away; after my death; when I am gone
+51427,mayaṃ 1,pron,we
 51429,mayā 1,pron,by me; with me
 51609,mahapphala,adj,of great fruit; yielding good results
 51943,mahāsamudda,masc,great sea; vast ocean
@@ -155,7 +152,6 @@ id,pali,pos,meaning
 57160,saccaṃ,ind,truly; really
 57518,saṇṭhapeti,pr,makes stable; steadies; establishes
 58108,saddhiṃ,ind,together (with); with
-58771,sabba 1,pron,all; every
 59068,sabrahmacārī,masc,fellow monk; spiritual companion
 60048,samudda,masc,sea; ocean
 61086,sarīra 1,nt,body

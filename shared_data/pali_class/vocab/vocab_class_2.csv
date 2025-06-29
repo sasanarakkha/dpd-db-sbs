@@ -10,7 +10,6 @@ id,pali,pos,meaning
 9869,asesa,adj,complete; without remainder
 10520,avijjā,fem,ignorance; illusion; not knowing; not understanding
 11040,ākāsa 1.2,masc,sky; air
-12812,āsava 1.2,masc,discharge; suppuration; outflow; effluent; (comm) defilement
 13049,āvāsa 1,masc,home (of); dwelling place (of); residence (of)
 13479,itipi,sandhi,(item being named); it is so; thus; just like this
 14712,uttari 1.1,adj,superior; supreme; better; higher
@@ -30,7 +29,6 @@ id,pali,pos,meaning
 21807,kira 1,ind,really; truly; definitely
 22853,kesa 1,masc,(head) hair
 23439,khandha 3,masc,aggregate; combination; conglomeration; bundle
-23520,khaya,masc,wearing away (of); exhaustion (of); erosion (of); depletion (of); destruction (of)
 24043,gacchati 1,pr,goes; walks; moves; wanders around; travels
 24384,gabbha 3,masc,room; inside room; inner chamber
 24742,gāma 1,masc,village; hamlet
@@ -44,7 +42,6 @@ id,pali,pos,meaning
 28867,ñāṇadassanavisesa,masc,distinction in knowledge and vision; attainment of understanding and insight
 28957,ñāya,masc,way; means; method; system; approach
 29346,taṇhā 1,fem,craving (for); wanting; desire (for)
-29667,tathāgata,masc,Such Become; Realised; being in such a state; arrived at the truth; epithet of the Buddha
 30163,tassa 1,pron,to him; for him; to that; for that
 31388,tveva 1,sandhi,however; but; rather; rather than
 31611,thera 1.2,masc,elder; senior monk; monastic of ten or more years standing
@@ -59,7 +56,6 @@ id,pali,pos,meaning
 34630,dhamma 1.05,masc,mental states
 35388,nakha 1,masc,fingernail; toenail
 35805,namo,ind,reverence (to); veneration (to); homage (to)
-35842,nara,masc,man; person
 36456,nāmarūpa 1,nt,name and form; naming and materiality; mental and physical phenomena; mental and physical objects of consciousness
 37999,niraya,masc,hell; hell realm
 38062,nirujjhati,pr,dissolves; finishes; stops; ceases; vanishes
@@ -76,11 +72,9 @@ id,pali,pos,meaning
 48273,bāla 2,masc,fool; idiot; immature person
 48511,buddha 1,masc,Buddha; Awakened One
 49033,brāhmaṇa 1,masc,Brahman; priest; man of the Brahman caste
-49035,brāhmaṇa 3,masc,monk; sage; holy man
 49136,bhagavato 1,masc,to the Buddha; for the Buddha
 49147,bhagavā,masc,Sublime One; Blessed One; Fortunate One; epithet of the Buddha
 49519,bhava 2,masc,being; becoming; existence
-50270,bheda 2,masc,death
 51177,manussa,masc,human being; man; person
 51202,manussadhamma 1,masc,human state; normal condition
 51445,maraṇa,nt,death; dying
@@ -92,7 +86,6 @@ id,pali,pos,meaning
 56030,lokavidū,masc,who knows the world; who understands the universe; epithet of the Buddha
 56117,loma 1,masc,body hair
 56768,saṅkhāra 1,masc,intention; volitional formation; choice; karmic activity
-56770,saṅkhāra 3,masc,mental formation; mental activity; thought processes; fourth of the five aggregates
 56989,saṅgha 1,masc,community; fellowship; monastic order
 57194,sacchikiriyā,fem,personal experience (of); intimate experience (of); personal realization (of)
 57894,satthā,masc,teacher; master; the Buddha
@@ -115,9 +108,7 @@ id,pali,pos,meaning
 68086,vinaya 1,masc,discipline; training
 68182,vinipāta,masc,state of suffering; purgatory; underworld
 68871,virāga 1.1,masc,fading of desire (for); dispassion (towards); detachment (from); indifference (to)
-68872,virāga 2.1,masc,fading (of); disappearance (of); cessation (of); destruction (of)
 69329,visesa 1,masc,distinction; attainment; superior state; eminence
-70132,vūpasama 1,masc,peace (of); calming (of); subsiding (of); settling (of)
 70238,vedanā 1,fem,"(pleasant, unpleasant or neutral) felt experience; feeling; feeling tone; sensation; second of the five aggregates"
 70807,hattha 1,masc,hand
 74544,adhigama 2,masc,attainment; achievement; realization (of)

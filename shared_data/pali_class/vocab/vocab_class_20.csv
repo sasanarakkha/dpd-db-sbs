@@ -1,4 +1,5 @@
 id,pali,pos,meaning
+1,a 1.1,letter,(gram) letter a; 1st letter of the alphabet; guttural vowel
 670,aggiparicārika,masc,fire worshipper; attendant of the sacred fire
 909,acelaka,masc,naked ascetic
 1227,ajjatagge,ind,from today onwards
@@ -56,7 +57,6 @@ id,pali,pos,meaning
 32584,dinna 2,nt,offering (to); gift (to)
 32878,dukkha 4,nt,pain; physical discomfort
 34021,deva 4,masc,sky; heavens
-34213,dosa 2.2,masc,defect; corruption; problem
 34907,dhammavādī 1,adj,who speaks about Dhamma; who speaks according to the teaching
 35098,dhāraṇa 2,nt,wearing
 36218,nādhimuccati 2,pr,does not draw a definite conclusion (about); is not resolved (about)

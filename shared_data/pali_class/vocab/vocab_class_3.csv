@@ -6,20 +6,25 @@ id,pali,pos,meaning
 11718,ānanda 2,masc,"name of an arahant monk; attendant of the Buddha; great disciple of the Buddha; foremost disciple in great learning, remembrance, conduct, resoluteness and service"
 11874,āpatti 2,fem,(vinaya) offence; wrongdoing; transgression
 12076,āmantayati 1,pr,tells; informs; advises
+12812,āsava 1.2,masc,discharge; suppuration; outflow; effluent; (comm) defilement
 15144,uddesa 1,masc,proposition; synopsis; statement in brief; summary; introduction
 16108,upasama 1,masc,calmness (of); tranquility (of); stillness (of); peace (of)
 16535,uppajjati 1,pr,appears; arises; occurs; takes place (for or in)
 20568,karohi,imp,do!; make!
 23186,kosalā,masc,name of the people of Kosala; Kosalans
+23520,khaya,masc,wearing away (of); exhaustion (of); erosion (of); depletion (of); destruction (of)
 23612,khādati,pr,chews; devours; eats
 24654,gahapati,masc,householder; landowner
 26837,cīvaracetāpanna,nt,robe-fund; account for robe-cloth
 27111,ceteti 2,pr,intends; wills (to)
+28483,jināti 1,pr,conquers; overcomes; defeats
 28484,jināti 2,pr,surpasses; beats; wins (over)
 28726,jotipāla 1,masc,name of a Brahman royal advisor
 29089,ṭhita 3,pp,remained; stayed; was
-29587,tattha 2,ind,in that regard; in that case; regarding that matter
+29586,tattha 1,ind,there; in that place
+29667,tathāgata,masc,Such Become; Realised; being in such a state; arrived at the truth; epithet of the Buddha
 30135,tasati 1.1,pr,is afraid (of); fears
+30431,ti 2,ind,(end of direct speech) ' '
 30488,tiṭṭhati 3,pr,remains; persists; lasts
 31761,daṇḍa 1,masc,stick; truncheon; nightstick; club
 32479,diṭṭhi 1,fem,view; belief; opinion; concept; theory; attitude; philosophy; credo; creed; dogma
@@ -58,6 +63,7 @@ id,pali,pos,meaning
 54685,rasa 1,masc,taste; flavour
 54947,rājā,masc,king; sovereign; lord; ruler
 55630,labhati 1,pr,gets; receives; obtains (something for)
+58771,sabba 1,pron,all; every
 58941,sabbarasa,masc,all tastes; every flavour
 59032,sabbe,pron,all; every; everything; everyone
 59296,samatha 1.1,masc,stilling (of); serenity (of); calming (of); settling (of); peace (of); (comm) mental unification
@@ -70,7 +76,7 @@ id,pali,pos,meaning
 62518,sāriputta,masc,name of an arahant monk; chief disciple; great disciple of the Buddha; foremost disciple in great wisdom
 63456,sukha 2,nt,ease; comfort; happiness; pleasure; contentment
 63756,suṇāti 1,pr,hears
-63758,suṇātu,imp,one must listen!; it must hear!
+65082,so 1.1,pron,he; that person; that thing
 66122,vadati 1,pr,says (to); speaks (to); tells (to)
 68557,vibhaṅga 1,masc,analysis; classification; breakdown
 69606,vivekaja,adj,born from seclusion; (or) born from discrimination; (comm) secluded from the defilements

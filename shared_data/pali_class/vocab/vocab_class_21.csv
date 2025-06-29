@@ -63,7 +63,6 @@ id,pali,pos,meaning
 36426,nāma 1,ind,certainly; truly; for sure
 36619,nāhaṃ,sandhi,I (am) not; I (do) not
 36698,nikubbetha,opt,should cheat; should swindle; should defraud
-36912,niggahita 1,pp,restrained; held back; reigned in
 38030,nirākaroti,pr,rejects; spurns; gets rid (of)
 40082,paññāyetha,opt,it would be apparent; it would be evident; it could be discerned
 40347,paṭighasaññā 2,fem,aversion; dislike; ill-will
@@ -82,7 +81,6 @@ id,pali,pos,meaning
 48877,byārosanā,fem,causing anger; infuriating
 49393,bhadra 3,nt,good fortune; good luck; blessing
 50634,maccurāja,masc,King of Death
-51514,malamacchera,nt,stain of stinginess; impurity of miserliness
 53194,metaṃ 2,sandhi,this for me
 53723,yad,pron,whichever; whatever; which (object)
 54110,yuñjantāyasmanto,sandhi,the venerable must try (to) (get back); the venerable must strive (for)
@@ -111,7 +109,6 @@ id,pali,pos,meaning
 63225,sīlavata,nt,precepts and practices; ethics and observances; rites and rituals
 63664,suci 1,adj,clean; pure
 65126,socati,pr,sorrows (over); grieves (about); mourns (over)
-65968,vata 2.1,nt,religious duty; spiritual practice; ritual observance; vow
 66029,vattāro,masc,those who says; those who speak; those who comment
 67832,vitakkayati,pr,thinks (about); reflects (on); ponders (over)
 67853,vitakkūpasama,masc,calming of thoughts; settling the mind
@@ -119,12 +116,10 @@ id,pali,pos,meaning
 68111,vinassa,imp,disappear!; vanish!; get lost!
 68483,vippariṇāma,masc,change; alteration; transformation
 68484,vippariṇāmadhamma,adj,changeable in nature; with the characteristic of transformation; liable to alter
-69323,visenā,fem,disarming; not opposing; (or) disassociating
 69324,viseni,fem,disarming; not opposing; (or) disassociating
 69325,visenikatvā,abs,having disarmed; not opposing; at peace; (or) having disassociated; (comm) having destroyed the army of defilements
 69658,vihanti,pr,wards off; banishes
 71023,harāyati,pr,is ashamed (of); is humiliated (by); is worried (by)
-71240,hidaṃ,sandhi,indeed here; surely in this case
 73905,samādhimānantarikaññamāhu,sandhi,they say that stability of mind with immediate results
 73906,yadajjhagā,sandhi,which he attained; which he experienced
 73907,jīvitamāhu,sandhi,they say life
