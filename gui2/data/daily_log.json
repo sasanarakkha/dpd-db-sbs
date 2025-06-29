@@ -345,8 +345,56 @@
     },
     "2025-06-19": {
         "pass1": 0,
+        "pass2_add": 8,
+        "pass2_pre": 142,
+        "pass2_update": 167
+    },
+    "2025-06-20": {
+        "pass1": 0,
+        "pass2_add": 4,
+        "pass2_pre": 396,
+        "pass2_update": 77
+    },
+    "2025-06-21": {
+        "pass1": 0,
+        "pass2_add": 15,
+        "pass2_pre": 0,
+        "pass2_update": 89
+    },
+    "2025-06-22": {
+        "pass1": 0,
+        "pass2_add": 8,
+        "pass2_pre": 290,
+        "pass2_update": 70
+    },
+    "2025-06-23": {
+        "pass1": 0,
+        "pass2_add": 15,
+        "pass2_pre": 285,
+        "pass2_update": 94
+    },
+    "2025-06-24": {
+        "pass1": 0,
+        "pass2_add": 15,
+        "pass2_pre": 162,
+        "pass2_update": 47
+    },
+    "2025-06-25": {
+        "pass1": 0,
+        "pass2_add": 3,
+        "pass2_pre": 692,
+        "pass2_update": 59
+    },
+    "2025-06-26": {
+        "pass1": 0,
+        "pass2_add": 29,
+        "pass2_pre": 0,
+        "pass2_update": 102
+    },
+    "2025-06-27": {
+        "pass1": 0,
         "pass2_add": 6,
         "pass2_pre": 0,
-        "pass2_update": 165
+        "pass2_update": 82
     }
 }
