@@ -7,15 +7,13 @@ import re
 
 from db.db_helpers import get_db_session
 from db.models import DbInfo, DpdHeadword, FamilyIdiom
-
 from tools.configger import config_test
-from tools.degree_of_completion import degree_of_completion
-from tools.degree_of_completion_ru import rus_degree_of_completion
-from tools.meaning_construction import make_meaning_combo
 from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
-from tools.superscripter import superscripter_uni
 from tools.printer import printer as pr
+from tools.superscripter import superscripter_uni
+
+from tools.degree_of_completion_ru import rus_degree_of_completion
 
 from tools.tools_for_ru_exporter import (
     make_short_ru_meaning,
@@ -23,6 +21,7 @@ from tools.tools_for_ru_exporter import (
 )
 
 from sqlalchemy.orm import joinedload
+
 
 
 def main():
@@ -111,7 +110,7 @@ def create_idioms_dict(dpd_db):
     return idioms_dict
 
 
-def compile_idioms_html(dpd_db, idioms_dict):
+def compile_idioms_html(dpd_db: list[DpdHeadword], idioms_dict):
     pr.green("compiling html")
 
     for i in dpd_db:
@@ -127,13 +126,11 @@ def compile_idioms_html(dpd_db, idioms_dict):
                     else:
                         html_string = idioms_dict[word]["html"]
 
-                    meaning = make_meaning_combo(i)
-
                     html_string += "<tr>"
                     html_string += f"<th>{superscripter_uni(i.lemma_1)}</th>"
                     html_string += f"<td><b>{i.pos}</b></td>"
-                    html_string += f"<td>{meaning}</td>"
-                    html_string += f"<td>{degree_of_completion(i)}</td>"
+                    html_string += f"<td>{i.meaning_combo}</td>"
+                    html_string += f"<td>{i.degree_of_completion_html}</td>"
                     html_string += "</tr>"
 
                     idioms_dict[word]["html"] = html_string
@@ -157,7 +154,12 @@ def compile_idioms_html(dpd_db, idioms_dict):
 
                     # data
                     idioms_dict[word]["data"].append(
-                        (i.lemma_1, i.pos, meaning, degree_of_completion(i, html=False))
+                        (
+                            i.lemma_1,
+                            i.pos,
+                            i.meaning_combo,
+                            i.degree_of_completion,
+                        )
                     )
 
                     # rus data

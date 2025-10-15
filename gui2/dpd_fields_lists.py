@@ -309,6 +309,7 @@ PASS1_FIELDS = [
     "pos",
     "grammar",
     "meaning_2",
+    "meaning_lit",
     "root_key",
     "family_root",
     "root_sign",
@@ -337,6 +338,7 @@ NO_CLONE_LIST = [
     "sutta_2",
     "example_2",
     "translation_2",
+    "synonyms",
 ]
 
 NO_SPLIT_LIST = [

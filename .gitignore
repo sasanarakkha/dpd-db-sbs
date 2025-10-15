@@ -25,7 +25,6 @@ db/sinhala/dpd sinhala 1.2.xlsx
 definitions/
 dpd.db-journal
 dpd/
-csvs
 exporter/goldendict/javascript/family_compound_json.js
 exporter/goldendict/javascript/family_idiom_json.js
 exporter/goldendict/javascript/family_root_json.js
@@ -184,4 +183,11 @@ exporter/tester/tester/
 scratchpad.py
 db/audio/mp3/
 gui2_profile.prof
-uv.lock
+resources/other_pali_texts/kathāsallāpasikkhā-old.txt
+exporter/other_dictionaries/bmp_files/
+
+.gemini/
+gha-creds-*.json
+gui2/!todo.md
+docs_site
+gui2/build/

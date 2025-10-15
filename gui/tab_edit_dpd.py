@@ -8,11 +8,11 @@ from gui.functions_db import get_family_word_values
 from gui.functions_db import get_family_set_values
 from gui.functions_db import get_compound_type_values
 from gui.functions_db import get_patterns
-from gui.tooltips import sutta_codes, types_of_comp
+from gui.tooltips import sutta_codes
 from tools.pos import POS
 
 
-def make_tab_edit_dpd(db_session, sg, username):
+def make_tab_edit_dpd(db_session, sg):
     VERB_VALUES = get_verb_values(db_session)
     TRANS_VALUES = ["", "trans", "intrans", "ditrans"]
     NEG_VALUES = ["", "neg", "neg x2"]
@@ -23,13 +23,6 @@ def make_tab_edit_dpd(db_session, sg, username):
     DERIVATIVE_VALUES = ["", "kicca", "kita", "taddhita"]
     COMPOUND_TYPE_VALUES = get_compound_type_values(db_session)
     PATTERN_VALUES = get_patterns(db_session)
-
-    if username == "primary_user":
-        origin = "pass2"
-    elif username == "deva":
-        origin = "dps"
-    else:
-        origin = "new_user"
 
     add_word_layout = [
         [
@@ -202,28 +195,6 @@ Leave empty for long compounds.",
                 ),
             ),
             sg.Text("", key="meaning_2_error", size=(50, 1), text_color="red"),
-        ],
-        [
-            sg.Text("suggestion", visible=username == "deva", size=(15, 1)),
-            sg.Button(
-                "AI.3", visible=username == "deva", key="online_suggestion_button_1"
-            ),
-            sg.Button(
-                "AI.4", visible=username == "deva", key="online_suggestion_button_2"
-            ),
-            sg.Multiline(
-                key="online_suggestion",
-                visible=username == "deva",
-                size=(39, 2),
-                enable_events=True,
-            ),
-            sg.Text(
-                "",
-                key="online_suggestion_error",
-                size=(50, 1),
-                text_color="red",
-                visible=username == "deva",
-            ),
         ],
         [
             sg.Text("root_key", size=(15, 1)),
@@ -696,7 +667,7 @@ kar + *āpe  > kārāpe > karāpe (caus, irreg).",
                 tooltip="Inflection pattern of the word",
             ),
             sg.Input(
-                origin,
+                "pass2",
                 key="origin",
                 size=(6, 1),
                 tooltip="Where does this word data come from?",
@@ -738,12 +709,6 @@ kar + *āpe  > kārāpe > karāpe (caus, irreg).",
                 tooltip="Show the fields relevant to the type of word",
             ),
             sg.Text("*sutta codes↓", pad=(20, 0), tooltip=sutta_codes),
-            sg.Text(
-                "**↓",
-                pad=(2, 0),
-                tooltip=types_of_comp,
-                visible=username == "deva",
-            ),
             sg.Text("", key="show_fields_error", size=(50, 1), text_color="red"),
         ],
         [
@@ -788,14 +753,6 @@ kar + *āpe  > kārāpe > karāpe (caus, irreg).",
                 "Update DB",
                 key="update_db_button1",
                 tooltip="Add a new word or update existing word in the db",
-                visible=username == "primary_user",
-                font=(None, 10),
-            ),
-            sg.Button(
-                "Update DB",
-                key="update_db_button2",
-                tooltip="Add a new word or update existing word in the db",
-                visible=username == "deva",
                 font=(None, 10),
             ),
             sg.Button(
@@ -827,13 +784,6 @@ kar + *āpe  > kārāpe > karāpe (caus, irreg).",
                 "Open Last",
                 key="open_last_word",
                 tooltip="open the last word edited",
-                font=(None, 10),
-            ),
-            sg.Button(
-                "Log",
-                key="open_corrections_button",
-                tooltip="open corrections tsv in code",
-                visible=username == "deva",
                 font=(None, 10),
             ),
         ],
@@ -881,13 +831,6 @@ kar + *āpe  > kārāpe > karāpe (caus, irreg).",
                 "Clear",
                 key="clear_button",
                 tooltip="Clear all the fields",
-                font=(None, 10),
-            ),
-            sg.Button(
-                "Next Word",
-                key="add_word_from_csv",
-                tooltip="Add next new word from csv file",
-                visible=username == "deva",
                 font=(None, 10),
             ),
             sg.Button(

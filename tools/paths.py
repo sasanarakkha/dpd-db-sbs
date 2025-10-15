@@ -27,20 +27,6 @@ class ProjectPaths:
             base_dir / "db/bold_definitions/bold_definitions.tsv"
         )
 
-        # db/frequency/output
-        self.ebt_raw_text_path = base_dir / "db/frequency/output/raw_text/ebts.txt"
-        self.ebt_word_count_path = base_dir / "db/frequency/output/word_count/ebts.csv"
-        self.freq_html_dir = base_dir / "db/frequency/output/html/"
-        self.frequency_output_dir = base_dir / "db/frequency/output/"
-        self.raw_text_dir = base_dir / "db/frequency/output/raw_text/"
-        self.tipitaka_raw_text_path = (
-            base_dir / "db/frequency/output/raw_text/tipitaka.txt"
-        )
-        self.tipitaka_word_count_path = (
-            base_dir / "db/frequency/output/word_count/tipitaka.csv"
-        )
-        self.word_count_dir = base_dir / "db/frequency/output/word_count"
-
         # exporter/kindle/
         self.epub_dir = base_dir / "exporter/kindle/epub/"
         self.kindlegen_path = base_dir / "exporter/kindle/kindlegen"
@@ -284,6 +270,9 @@ class ProjectPaths:
 
         # exporter/other_dictionaries/css
         self.cone_css_path = base_dir / "exporter/other_dictionaries/code/cone/cone.css"
+        self.dppn_css_path = (
+            base_dir / "exporter/other_dictionaries/code/dppn/dppn.css/"
+        )
         self.dpr_css_path = base_dir / "exporter/other_dictionaries/code/dpr/dpr.css/"
         self.whitney_css_path = (
             base_dir / "exporter/other_dictionaries/code/whitney/whitney.css/"
@@ -302,6 +291,9 @@ class ProjectPaths:
         )
         self.cpd_source_path = (
             base_dir / "exporter/other_dictionaries/code/cpd/source/en-critical.json"
+        )
+        self.dppn_source_path = (
+            base_dir / "exporter/other_dictionaries/code/dppn/source/DPPN.json"
         )
         self.dpr_source_path = (
             base_dir / "exporter/other_dictionaries/code/dpr/source/dpr.json"
@@ -338,11 +330,13 @@ class ProjectPaths:
         self.sin_eng_sin_gd_path = base_dir / "exporter/other_dictionaries/goldendict/"
         self.vri_gd_path = base_dir / "exporter/other_dictionaries/goldendict/vri.zip"
         self.whitney_gd_path = base_dir / "exporter/other_dictionaries/goldendict/"
+        self.dppn_gd_path = base_dir / "exporter/other_dictionaries/goldendict/"
 
         # exporter/other_dictionaries/json
         self.bhs_json_path = base_dir / "exporter/other_dictionaries/json/bhs.json"
         self.cone_json_path = base_dir / "exporter/other_dictionaries/json/cone.json"
         self.cpd_json_path = base_dir / "exporter/other_dictionaries/json/cpd.json"
+        self.dppn_json = base_dir / "exporter/other_dictionaries/json/dppn.json"
         self.dpr_json_path = base_dir / "exporter/other_dictionaries/json/dpr.json"
         self.mw_json_path = base_dir / "exporter/other_dictionaries/json/mw.json"
         self.peu_json_path = base_dir / "exporter/other_dictionaries/json/peu.json"
@@ -361,6 +355,7 @@ class ProjectPaths:
         self.bhs_mdict_path = base_dir / "exporter/other_dictionaries/mdict/"
         self.cone_mdict_path = base_dir / "exporter/other_dictionaries/mdict/"
         self.cpd_mdict_path = base_dir / "exporter/other_dictionaries/mdict/"
+        self.dppn_mdict_path = base_dir / "exporter/other_dictionaries/mdict/"
         self.dpr_mdict_path = base_dir / "exporter/other_dictionaries/mdict/"
         self.mw_mdict_path = base_dir / "exporter/other_dictionaries/mdict/"
         self.peu_mdict_path = base_dir / "exporter/other_dictionaries/mdict/"
@@ -436,24 +431,31 @@ class ProjectPaths:
         )
 
         # resources/sc-data
+
         self.sc_data_dir = base_dir / "resources/sc-data/sc_bilara_data/root/pli/ms/"
         self.sc_variants_dir = (
             base_dir / "resources/sc-data/sc_bilara_data/variant/pli/ms/"
         )
-        self.sc_data_dpd_dir = base_dir / "resources/sc-data/dpd/"
 
-        self.sc_i2h_js_path = base_dir / "resources/sc-data/dpd/dpd_i2h.js"
-        self.sc_i2h_json_path = base_dir / "resources/sc-data/dpd/dpd_i2h.json"
+        self.sc_pli2en_dpd_json = (
+            base_dir / "resources/sc-data/dictionaries/simple/en/pli2en_dpd.json"
+        )  # final dictionary format
 
-        self.sc_dpd_ebts_js_path = base_dir / "resources/sc-data/dpd/dpd_ebts.js"
-        self.sc_dpd_ebts_json_path = base_dir / "resources/sc-data/dpd/dpd_ebts.json"
+        # FIXME part of the old sc exporter, delete when tested
+        # self.sc_data_dpd_dir = base_dir / "resources/sc-data/dpd/"
 
-        self.sc_deconstructor_js_path = (
-            base_dir / "resources/sc-data/dpd/dpd_deconstructor.js"
-        )
-        self.sc_deconstructor_json_path = (
-            base_dir / "resources/sc-data/dpd/dpd_deconstructor.json"
-        )
+        # self.sc_i2h_js_path = base_dir / "resources/sc-data/dpd/dpd_i2h.js"
+        # self.sc_i2h_json_path = base_dir / "resources/sc-data/dpd/dpd_i2h.json"
+
+        # self.sc_dpd_ebts_js_path = base_dir / "resources/sc-data/dpd/dpd_ebts.js"
+        # self.sc_dpd_ebts_json_path = base_dir / "resources/sc-data/dpd/dpd_ebts.json"
+
+        # self.sc_deconstructor_js_path = (
+        #     base_dir / "resources/sc-data/dpd/dpd_deconstructor.js"
+        # )
+        # self.sc_deconstructor_json_path = (
+        #     base_dir / "resources/sc-data/dpd/dpd_deconstructor.json"
+        # )
 
         # resources/syāmaraṭṭha_1927
         self.sya_dir = base_dir / "resources/syāmaraṭṭha_1927/"
@@ -501,53 +503,6 @@ class ProjectPaths:
         )
         self.deconstructor_output_dir = base_dir / "resources/deconstructor_output/"
 
-        # db/deconstructor/assets
-        self.all_inflections_set_path = (
-            base_dir / "db/deconstructor/assets/all_inflections_set"
-        )
-        self.matches_dict_path = base_dir / "db/deconstructor/assets/matches_dict"
-        self.neg_inflections_set_path = (
-            base_dir / "db/deconstructor/assets/neg_inflections_set"
-        )
-        self.sandhi_assets_dir = base_dir / "db/deconstructor/assets"
-        self.text_set_path = base_dir / "db/deconstructor/assets/text_set"
-        self.unmatched_set_path = base_dir / "db/deconstructor/assets/unmatched_set"
-
-        # db/deconstructor/output
-        self.matches_do_path = base_dir / "db/deconstructor/output_do/matches.tsv"
-        self.matches_path = base_dir / "db/deconstructor/output/matches.tsv"
-        self.matches_sorted = base_dir / "db/deconstructor/output/matches_sorted.tsv"
-        self.process_path = base_dir / "db/deconstructor/output/process.tsv"
-        self.rule_counts_path = (
-            base_dir / "db/deconstructor/output/rule_counts/rule_counts.tsv"
-        )
-        self.sandhi_dict_df_path = (
-            base_dir / "db/deconstructor/output/sandhi_dict_df.tsv"
-        )
-        self.sandhi_dict_path = base_dir / "db/deconstructor/output/sandhi_dict"
-        self.sandhi_log_path = base_dir / "db/deconstructor/output/logfile.log"
-        self.sandhi_output_dir = base_dir / "db/deconstructor/output/"
-        self.sandhi_output_do_dir = base_dir / "db/deconstructor/output_do/"
-        self.sandhi_timer_path = base_dir / "db/deconstructor/output/timer.tsv"
-        self.unmatched_path = base_dir / "db/deconstructor/output/unmatched.tsv"
-
-        # db/deconstructor/output/rule_counts
-        self.rule_counts_dir = base_dir / "db/deconstructor/output/rule_counts/"
-
-        # db/deconstructor/output/letters
-        self.letters_dir = base_dir / "db/deconstructor/output/letters/"
-        self.letters = base_dir / "db/deconstructor/output/letters/letters.tsv"
-        self.letters1 = base_dir / "db/deconstructor/output/letters/letters1.tsv"
-        self.letters2 = base_dir / "db/deconstructor/output/letters/letters2.tsv"
-        self.letters3 = base_dir / "db/deconstructor/output/letters/letters3.tsv"
-        self.letters4 = base_dir / "db/deconstructor/output/letters/letters4.tsv"
-        self.letters5 = base_dir / "db/deconstructor/output/letters/letters5.tsv"
-        self.letters6 = base_dir / "db/deconstructor/output/letters/letters6.tsv"
-        self.letters7 = base_dir / "db/deconstructor/output/letters/letters7.tsv"
-        self.letters8 = base_dir / "db/deconstructor/output/letters/letters8.tsv"
-        self.letters9 = base_dir / "db/deconstructor/output/letters/letters9.tsv"
-        self.letters10 = base_dir / "db/deconstructor/output/letters/letters10plus.tsv"
-
         # docs
         self.mk_docs_yaml = base_dir / "mkdocs.yaml"
         self.docs_css_path = base_dir / "docs/stylesheets/extra.css"
@@ -578,7 +533,6 @@ class ProjectPaths:
         )
 
         # share
-        self.all_tipitaka_words_path = base_dir / "shared_data/all_tipitaka_words"
         self.changed_headwords_path = base_dir / "shared_data/changed_headwords"
         self.headword_stem_pattern_dict_path = (
             base_dir / "shared_data/headword_stem_pattern_dict"
@@ -701,21 +655,12 @@ class ProjectPaths:
             self.bjt_roman_txt_dir,
             self.cst_txt_dir,
             self.epub_text_dir,
-            self.freq_html_dir,
-            self.frequency_output_dir,
             self.go_deconstructor_output_dir,
             self.grammar_dict_output_dir,
             self.grammar_dict_output_html_dir,
-            self.letters_dir,
-            self.raw_text_dir,
-            self.rule_counts_dir,
-            self.sandhi_assets_dir,
-            self.sandhi_output_dir,
-            self.sandhi_output_do_dir,
             self.share_dir,
             self.stash_dir,
             self.temp_dir,
             self.tpr_output_dir,
-            self.word_count_dir,
         ]:
             d.mkdir(parents=True, exist_ok=True)

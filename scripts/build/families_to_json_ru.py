@@ -12,7 +12,7 @@ from tools.paths_ru import RuPaths
 from tools.printer import printer as pr
 
 
-class ProgData:
+class GlobalVars:
     pth = ProjectPaths()
     rupth = RuPaths()
     db_session = get_db_session(pth.dpd_db_path)
@@ -28,7 +28,7 @@ class ProgData:
 def main():
     pr.tic()
     pr.title("exporting families .json")
-    g = ProgData()
+    g = GlobalVars()
     export_family_compound(g)
     export_family_idiom(g)
     export_family_root(g)
@@ -46,7 +46,7 @@ def json_dumper(filepath: Path, dict: dict[str, str]):
         f.write(js_content)
 
 
-def export_family_compound(g: ProgData):
+def export_family_compound(g: GlobalVars):
     pr.green("exporting family_compound.json")
     fc_dict = {}
     for i in g.fc_db:
@@ -55,7 +55,7 @@ def export_family_compound(g: ProgData):
     pr.yes(len(fc_dict))
 
 
-def export_family_idiom(g: ProgData):
+def export_family_idiom(g: GlobalVars):
     pr.green("exporting family_idiom.json")
     fi_dict = {}
     for i in g.fi_db:
@@ -64,7 +64,7 @@ def export_family_idiom(g: ProgData):
     pr.yes(len(fi_dict))
 
 
-def export_family_root(g: ProgData):
+def export_family_root(g: GlobalVars):
     pr.green("exporting family_root.json")
     fr_dict = {}
     for i in g.fr_db:
@@ -80,7 +80,7 @@ def export_family_root(g: ProgData):
     pr.yes(len(fr_dict))
 
 
-def export_family_set(g: ProgData):
+def export_family_set(g: GlobalVars):
     pr.green("exporting family_set.json")
     fs_dict = {}
     for i in g.fs_db:
@@ -89,7 +89,7 @@ def export_family_set(g: ProgData):
     pr.yes(len(fs_dict))
 
 
-def export_family_word(g: ProgData):
+def export_family_word(g: GlobalVars):
     pr.green("exporting family_word.json")
     fw_dict = {}
     for i in g.fw_db:

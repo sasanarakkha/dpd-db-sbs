@@ -9,8 +9,6 @@ from db.db_helpers import get_db_session
 from db.models import DbInfo, DpdHeadword, FamilyCompound
 from scripts.build.anki_updater import family_updater
 from tools.configger import config_test
-from tools.degree_of_completion import degree_of_completion
-from tools.meaning_construction import clean_construction, make_meaning_combo
 from tools.degree_of_completion_ru import rus_degree_of_completion
 from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
@@ -100,7 +98,7 @@ def create_comp_fam_dict(dpd_db: list[DpdHeadword]):
     return cf_dict
 
 
-def compile_cf_html(dpd_db, cf_dict):
+def compile_cf_html(dpd_db: list[DpdHeadword], cf_dict):
     pr.green("compiling html")
 
     for __counter__, i in enumerate(dpd_db):
@@ -112,13 +110,13 @@ def compile_cf_html(dpd_db, cf_dict):
                     else:
                         html_string = cf_dict[cf]["html"]
 
-                    meaning = make_meaning_combo(i)
+                    # meaning = i.meaning_combo
 
                     html_string += "<tr>"
                     html_string += f"<th>{superscripter_uni(i.lemma_1)}</th>"
                     html_string += f"<td><b>{i.pos}</b></td>"
-                    html_string += f"<td>{meaning}</td>"
-                    html_string += f"<td>{degree_of_completion(i)}</td>"
+                    html_string += f"<td>{i.meaning_combo}</td>"
+                    html_string += f"<td>{i.degree_of_completion_html}</td>"
                     html_string += "</tr>"
 
                     cf_dict[cf]["html"] = html_string
@@ -146,8 +144,8 @@ def compile_cf_html(dpd_db, cf_dict):
                             (
                                 i.lemma_1,
                                 i.pos,
-                                meaning,
-                                degree_of_completion(i, html=False),
+                                i.meaning_combo,
+                                i.degree_of_completion,
                             )
                         )
 
@@ -161,13 +159,12 @@ def compile_cf_html(dpd_db, cf_dict):
                             )
                         )
 
+
                     # anki data
                     if i.meaning_1:
-                        construction = (
-                            clean_construction(i.construction) if i.meaning_1 else ""
-                        )
+                        construction = i.construction_clean if i.meaning_1 else ""
                         cf_dict[cf]["anki"] += [
-                            (i.lemma_1, i.pos, meaning, construction)
+                            (i.lemma_1, i.pos, i.meaning_combo, construction)
                         ]
 
     for i in cf_dict:

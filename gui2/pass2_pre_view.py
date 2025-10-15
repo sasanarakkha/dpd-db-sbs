@@ -9,6 +9,10 @@ from gui2.pass2_pre_new_word_manager import Pass2NewWordManager
 from gui2.toolkit import ToolKit
 from tools.cst_source_sutta_example import CstSourceSuttaExample
 
+LABEL_COLOUR = ft.Colors.GREY_500
+HIGHLIGHT_COLOUR = ft.Colors.BLUE_200
+TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=10)
+
 
 class Pass2PreProcessView(ft.Column):
     def __init__(
@@ -39,10 +43,6 @@ class Pass2PreProcessView(ft.Column):
         self.selected_sentence_index: int = 0
         self.examples_list: list[SuttaCentralSegment] | list[CstSourceSuttaExample] = []
 
-        # Define constants
-        LABEL_WIDTH: int = 150
-        COLUMN_WIDTH: int = 700
-
         # Define controls
         self.message_field = ft.Text(
             "",
@@ -55,13 +55,21 @@ class Pass2PreProcessView(ft.Column):
             for item in self.controller.sutta_central_books_list
         ]
         self.books_dropdown = ft.Dropdown(
+            label="Book",
+            label_style=TEXT_FIELD_LABEL_STYLE,
             options=self.book_options,
-            width=200,
+            width=300,
             text_size=14,
-            border_color=ft.Colors.BLUE_200,
+            border_color=HIGHLIGHT_COLOUR,
+            border_radius=20,
         )
-        self.preprocessed_count_field = ft.Text(
+        self.preprocessed_count_field = ft.TextField(
             "",
+            label="Counter",
+            label_style=TEXT_FIELD_LABEL_STYLE,
+            width=200,
+            color=HIGHLIGHT_COLOUR,
+            border_radius=20,
             expand=True,
         )
         self.search_bar = ft.SearchBar(
@@ -70,54 +78,53 @@ class Pass2PreProcessView(ft.Column):
             width=300,
             autofocus=True,
         )
-        self.word_in_text_field = ft.Text(
+        self.word_in_text_field = ft.TextField(
             "",
-            width=COLUMN_WIDTH,
             expand=True,
-            color=ft.Colors.BLUE_200,
-            selectable=True,
-            size=14,
+            label="Word in text",
+            label_style=TEXT_FIELD_LABEL_STYLE,
+            color=HIGHLIGHT_COLOUR,
+            border_radius=20,
         )
-        self.headword_lemma_1_field = ft.Text(
+        self.headword_lemma_1_field = ft.TextField(
             "",
             width=500,
-            selectable=True,
-            size=14,
+            label="Headword",
+            label_style=TEXT_FIELD_LABEL_STYLE,
+            color=HIGHLIGHT_COLOUR,
+            border_radius=20,
+            expand=True,
         )
-        self.headword_pos_field = ft.Text(
+        self.headword_pos_field = ft.TextField(
             "",
             width=120,
-            selectable=True,
-            size=14,
+            label="POS",
+            label_style=TEXT_FIELD_LABEL_STYLE,
+            color=HIGHLIGHT_COLOUR,
+            border_radius=20,
         )
-        self.headword_meaning_field = ft.Text(
+        self.headword_meaning_field = ft.TextField(
             "",
-            width=COLUMN_WIDTH,
             expand=True,
-            selectable=True,
-            size=14,
+            label="Meaning",
+            label_style=TEXT_FIELD_LABEL_STYLE,
+            color=HIGHLIGHT_COLOUR,
+            border_radius=20,
         )
 
         self.exceptions_field = ft.TextField(
             "",
             on_submit=self.add_exception,
-            border_radius=10,
+            border_radius=20,
             width=300,
             expand=True,
             label="check meaning_1 before adding exceptions!",
-            label_style=ft.TextStyle(color=ft.Colors.GREY_500, size=10),
+            label_style=TEXT_FIELD_LABEL_STYLE,
         )
 
         top_fixed_section_controls = [
             ft.Row(
                 controls=[
-                    ft.Text("", width=LABEL_WIDTH),
-                    self.message_field,
-                ],
-            ),
-            ft.Row(
-                controls=[
-                    ft.Text("book", width=LABEL_WIDTH, color=ft.Colors.GREY_500),
                     self.books_dropdown,
                     ft.ElevatedButton(
                         "PreProcess Book",
@@ -129,33 +136,18 @@ class Pass2PreProcessView(ft.Column):
             ),
             ft.Row(
                 controls=[
-                    ft.Text(
-                        "word in text",
-                        width=LABEL_WIDTH,
-                        color=ft.Colors.GREY_500,
-                    ),
                     self.word_in_text_field,
                 ],
                 spacing=10,
             ),
             ft.Row(
                 controls=[
-                    ft.Text(
-                        "headword",
-                        width=LABEL_WIDTH,
-                        color=ft.Colors.GREY_500,
-                    ),
                     self.headword_lemma_1_field,
                 ],
                 spacing=10,
             ),
             ft.Row(
                 controls=[
-                    ft.Text(
-                        "meaning",
-                        width=LABEL_WIDTH,
-                        color=ft.Colors.GREY_500,
-                    ),
                     self.headword_pos_field,
                     self.headword_meaning_field,
                 ],
@@ -164,60 +156,48 @@ class Pass2PreProcessView(ft.Column):
             ft.Divider(),
             ft.Row(
                 controls=[
-                    ft.Text(
-                        "",
-                        width=LABEL_WIDTH,
-                        color=ft.Colors.GREY_500,
-                    ),
                     ft.ElevatedButton(
                         "Yes",
-                        width=LABEL_WIDTH,
                         on_click=self.handle_yes_click,
                     ),
                     ft.ElevatedButton(
                         "No",
-                        width=LABEL_WIDTH,
                         on_click=self.handle_no_click,
                     ),
                     ft.ElevatedButton(
                         "New",
-                        width=LABEL_WIDTH,
                         on_click=self.handle_new_click,
                     ),
                     ft.ElevatedButton(
                         "Pass",
-                        width=LABEL_WIDTH,
                         on_click=self.handle_pass_click,
                     ),
                     self.exceptions_field,
                 ],
             ),
+            ft.Row(
+                controls=[
+                    self.message_field,
+                ],
+            ),
         ]
 
-        self.top_fixed_section = ft.Column(
-            controls=top_fixed_section_controls, expand=False, spacing=5
+        self.top_fixed_section = ft.Container(
+            ft.Column(
+                controls=top_fixed_section_controls,
+                expand=False,
+                spacing=5,
+            ),
+            padding=ft.Padding(0, 10, 0, 0),
         )
 
         self.examples_field = ft.Container(
             content=None,
-            width=COLUMN_WIDTH,
             expand=True,
         )
 
-        self.examples_content_row = ft.Row(
-            controls=[
-                ft.Text(
-                    "examples",
-                    width=LABEL_WIDTH,
-                    color=ft.Colors.GREY_500,
-                ),
-                self.examples_field,
-            ],
-            vertical_alignment=ft.CrossAxisAlignment.START,
-        )
-
         self.examples_scrollable_section = ft.Column(
-            controls=[self.examples_content_row],
+            controls=[self.examples_field],
             expand=True,
             spacing=5,
             scroll=ft.ScrollMode.AUTO,
@@ -306,12 +286,48 @@ class Pass2PreProcessView(ft.Column):
         if sentence is None:
             return
 
-        message = self.pass2_new_word_manager.update_new_word(
-            self.controller.word_in_text, sentence
+        def on_ok(e: ft.ControlEvent):
+            self.new_word_dialog.open = False
+            self.page.update()
+            comment_val = comment_input.value or ""
+            message = self.pass2_new_word_manager.update_new_word(
+                self.controller.word_in_text,
+                sentence,
+                comment=comment_val,
+            )
+            self.selected_sentence_index = 0
+            self.update_message(message)
+            self.controller.daily_log.increment("pass2_pre")
+
+        comment_input = ft.TextField(expand=True, autofocus=True, on_submit=on_ok)
+
+        self.new_word_dialog = ft.AlertDialog(
+            modal=True,
+            content=ft.Column(
+                controls=[
+                    ft.Row(
+                        [
+                            ft.Text(
+                                "Whats the meaning of the new word?",
+                                size=14,
+                                color=ft.Colors.GREY_500,
+                            )
+                        ]
+                    ),
+                    ft.Row([comment_input]),
+                ],
+                expand=True,
+                scroll=ft.ScrollMode.AUTO,
+            ),
+            alignment=ft.alignment.center,
+            title_padding=ft.padding.all(25),
+            actions=[
+                ft.TextButton("OK", on_click=on_ok),
+            ],
         )
-        self.selected_sentence_index = 0
-        self.update_message(message)
-        self.controller.daily_log.increment("pass2_pre")
+
+        self.page.open(self.new_word_dialog)
+        self.page.update()
 
     def make_examples_list(
         self,

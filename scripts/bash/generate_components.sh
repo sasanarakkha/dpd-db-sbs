@@ -10,48 +10,48 @@ if [ ! -e "dpd.db" ]; then
     exit 1
 fi
 
-tools/version.py
-# scripts/build/config_uposatha_day.py
+uv run python tools/version.py
+# uv run scripts/build/config_uposatha_day.py
 
-db/inflections/create_inflection_templates.py
-db/inflections/generate_inflection_tables.py
+uv run python db/inflections/create_inflection_templates.py
+uv run python db/inflections/generate_inflection_tables.py
 
-scripts/build/sanskrit_root_families_updater.py
+uv run python scripts/build/sanskrit_root_families_updater.py
 
-db/families/family_root.py
-db/families/family_word.py
-db/families/family_compound.py
-db/families/family_set.py
-db/families/family_idiom.py
-scripts/build/families_to_json.py
+uv run python db/families/family_root.py
+uv run python db/families/family_word.py
+uv run python db/families/family_compound.py
+uv run python db/families/family_set.py
+uv run python db/families/family_idiom.py
+uv run python scripts/build/families_to_json.py
 
-scripts/build/anki_updater.py
+uv run python scripts/build/anki_updater.py
 
-db/variants/main.py 
+uv run python db/variants/main.py 
 
-db/grammar/grammar_to_lookup.py
-
-scripts/build/deconstructor_extract_archive.py
-scripts/build/deconstructor_output_add_to_db.py
+uv run python scripts/build/deconstructor_extract_archive.py
+uv run python scripts/build/deconstructor_output_add_to_db.py
 go run go_modules/deconstructor/main.go
-scripts/build/tarball_deconstructor_output.py
+uv run python scripts/build/tarball_deconstructor_output.py
 
-scripts/build/api_ca_evi_iti.py
-db/inflections/transliterate_inflections.py
-db/inflections/inflections_to_headwords.py
+uv run python scripts/build/api_ca_eva_iti_iva_hi.py
+uv run python db/inflections/transliterate_inflections.py
+uv run python db/inflections/inflections_to_headwords.py
 
-db/lookup/spelling_mistakes.py
+uv run python db/grammar/grammar_to_lookup.py
 
-db/lookup/transliterate_lookup_table.py
-db/lookup/help_abbrev_add_to_lookup.py
+uv run python db/lookup/spelling_mistakes.py
 
-scripts/build/ebt_counter.py
+uv run python db/lookup/transliterate_lookup_table.py
+uv run python db/lookup/help_abbrev_add_to_lookup.py
+
+uv run python scripts/build/ebt_counter.py
 go run go_modules/frequency/main.go
 
-db/epd/epd_to_lookup.py
-db/rpd/rpd_to_lookup.py
+uv run python db/epd/epd_to_lookup.py
+uv run python db/rpd/rpd_to_lookup.py
 
-scripts/build/dealbreakers.py
+uv run python scripts/build/dealbreakers.py
 status=$?
 if [[ $status -ne  0 ]]; then
     echo "dealbreakers exited with $status. Stopping the script."

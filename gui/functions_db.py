@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Database functions related to the GUI."""
 
 import re
@@ -653,7 +654,6 @@ def make_words_to_add_list_generic(
     inflection_func=make_all_inflections_set,
     book=None,
     sutta_name=None,
-    dpspth=None,
     source=None,
     field=None,
     output_filename_template="temp/{prefix}{identifier}.tsv",
@@ -669,7 +669,6 @@ def make_words_to_add_list_generic(
     - inflection_func: Function to generate the inflection set.
     - book: The book name (optional).
     - sutta_name: The sutta name (optional).
-    - dpspth: Path for DPS files (optional).
     - source: Source identifier (optional).
     - field: Field name for inflections (optional).
     - output_filename_template: Template for the output file name.
@@ -678,9 +677,7 @@ def make_words_to_add_list_generic(
     - A sorted list of words to add.
     """
     # Generate CST and SC text lists
-    if dpspth:
-        cst_text_list = make_cst_func(dpspth)
-    elif sutta_name:
+    if sutta_name:
         cst_text_list = make_cst_func(pth, sutta_name, [book])
     else:
         cst_text_list = make_cst_func(pth, [book])
@@ -714,14 +711,18 @@ def make_words_to_add_list_generic(
     print(f"words_to_add: {len(text_list)}")
 
     # Determine filename
-    prefix = "dps_" if "dps" in inflection_func.__name__ else ""
     identifier = (
-        f"{source}_{book}" if source else 
-        f"{sutta_name}_{book}" if sutta_name else 
-        f"text_{field}" if field else 
-        book or "text"
+        f"{source}_{book}"
+        if source
+        else f"{sutta_name}_{book}"
+        if sutta_name
+        else f"text_{field}"
+        if field
+        else book or "text"
     )
-    output_filename = output_filename_template.format(prefix=prefix, identifier=identifier)
+    output_filename = output_filename_template.format(
+        prefix=prefix, identifier=identifier
+    )
 
     # Save to a file
     with open(output_filename, "w") as f:

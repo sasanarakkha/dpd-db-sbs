@@ -1,56 +1,56 @@
 """Compile HTML data for DpdHeadword."""
 
+from multiprocessing import Manager, Process
+from multiprocessing.managers import ListProxy
+from typing import List, Set, Tuple, TypedDict
+
 import psutil
-
-from sqlalchemy.sql import func
-
 
 # from css_html_js_minify import css_minify, js_minify
 from mako.template import Template
 from minify_html import minify
-from multiprocessing.managers import ListProxy
-from multiprocessing import Process, Manager
-from typing import List, Set, TypedDict, Tuple
-
 from sqlalchemy.orm.session import Session
 from sqlalchemy.orm import joinedload
 
+from sqlalchemy.sql import func
 
+from db.models import (
+    DpdHeadword,
+    DpdRoot,
+    FamilyCompound,
+    FamilyIdiom,
+    FamilyRoot,
+    FamilySet,
+    FamilyWord,
+)
 from exporter.goldendict.helpers import TODAY
-
-from db.models import DpdHeadword
-from db.models import DpdRoot
-from db.models import FamilyCompound
-from db.models import FamilyIdiom
-from db.models import FamilyRoot
-from db.models import FamilySet
-from db.models import FamilyWord
-
-
 from tools.configger import config_test
 from tools.css_manager import CSSManager
 from tools.date_and_time import year_month_day_dash
-from tools.degree_of_completion import degree_of_completion
-from tools.degree_of_completion_ru import rus_degree_of_completion
-
 from tools.exporter_functions import (
     get_family_compounds,
     get_family_idioms,
     get_family_set,
 )
 from tools.goldendict_exporter import DictEntry
-from tools.meaning_construction import make_meaning_combo_html, make_grammar_line
-from tools.meaning_construction import summarize_construction
+from tools.meaning_construction import make_grammar_line
 from tools.niggahitas import add_niggahitas
 from tools.paths import ProjectPaths
 from tools.pos import CONJUGATIONS, DECLENSIONS, INDECLINABLES
 from tools.printer import printer as pr
 from tools.sandhi_contraction import SandhiContractionDict
 from tools.superscripter import superscripter_uni
-from tools.utils import RenderedSizes, default_rendered_sizes, list_into_batches
-from tools.utils import sum_rendered_sizes, squash_whitespaces
+from tools.utils import (
+    RenderedSizes,
+    default_rendered_sizes,
+    list_into_batches,
+    squash_whitespaces,
+    sum_rendered_sizes,
+)
 
 from tools.tools_for_ru_exporter import read_set_ru_from_tsv
+from tools.degree_of_completion_ru import rus_degree_of_completion
+
 
 
 class DpdHeadwordTemplates:
@@ -352,7 +352,6 @@ def _parse_batch_top_level(
         dpd_data_results_list.append(i)
         rendered_sizes_results_list.append(j)
 
-
 def generate_dpd_html(
     db_session: Session,
     pth: ProjectPaths,
@@ -509,34 +508,16 @@ def render_dpd_definition_templ(
     4. summary
     5. degree of completion"""
 
-    pos: str = i.pos
-
-    # plus_case
-    plus_case: str = ""
-    if i.plus_case is not None and i.plus_case:
-        plus_case: str = i.plus_case
-
-    # meaning
-    meaning = make_meaning_combo_html(i)
-    summary = summarize_construction(i)
     if show_ru_data and i.ru:
         complete = rus_degree_of_completion(i)
     else:
-        complete = degree_of_completion(i)
-
-    # id
-    id: int = i.id
+        complete = i.degree_of_completion
 
     return str(
         dpd_definition_templ.render(
             i=i,
             make_link=make_link,
-            pos=pos,
-            plus_case=plus_case,
-            meaning=meaning,
-            summary=summary,
             complete=complete,
-            id=id,
             show_id=show_id,
             show_sbs_data=show_sbs_data,
         )
@@ -591,6 +572,7 @@ def render_button_box_templ(
         )
     else:
         sbs_example_button = ""
+
     # conjugation_button
     if i.needs_conjugation_button:
         conjugation_button = button_html.format(
@@ -707,7 +689,6 @@ def render_grammar_templ(
             i.construction = ""
 
     grammar = make_grammar_line(i)
-    meaning = f"{make_meaning_combo_html(i)}"
 
     return str(
         grammar_templ.render(
@@ -716,7 +697,7 @@ def render_grammar_templ(
             show_sbs_data=show_sbs_data,
             show_ru_data=show_ru_data,
             grammar=grammar,
-            meaning=meaning,
+            meaning=i.meaning_combo_html,
             today=TODAY,
         )
     )

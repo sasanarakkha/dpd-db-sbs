@@ -4,34 +4,31 @@
 and add to db."""
 
 import re
-
 from collections import defaultdict
 
-from root_matrix import generate_root_matrix
 from root_info import generate_root_info_html
+from root_matrix import generate_root_matrix
 
 from db.db_helpers import get_db_session
-from db.models import DpdRoot, DpdHeadword, FamilyRoot, Lookup
-
+from db.models import DpdHeadword, DpdRoot, FamilyRoot, Lookup
 from scripts.build.anki_updater import family_updater
-
 from tools.configger import config_test
 from tools.lookup_is_another_value import is_another_value
-from tools.degree_of_completion import degree_of_completion
-from tools.degree_of_completion_ru import rus_degree_of_completion
-from tools.meaning_construction import clean_construction
-from tools.meaning_construction import make_meaning_combo
 from tools.pali_sort_key import pali_list_sorter, pali_sort_key
 from tools.paths import ProjectPaths
-from tools.superscripter import superscripter_uni
 from tools.printer import printer as pr
+from tools.superscripter import superscripter_uni
 from tools.update_test_add import update_test_add
+
+from tools.degree_of_completion_ru import rus_degree_of_completion
+
 from tools.tools_for_ru_exporter import (
     make_short_ru_meaning,
     ru_replace_abbreviations,
 )
 
 from sqlalchemy.orm import joinedload
+
 
 
 def main():
@@ -126,7 +123,7 @@ def make_roots_family_dict_and_bases_dict(dpd_db):
     return rf_dict, bases_dict
 
 
-def compile_rf_html(dpd_db, rf_dict):
+def compile_rf_html(dpd_db: list[DpdHeadword], rf_dict):
     pr.green("compiling html")
 
     for __counter__, i in enumerate(dpd_db):
@@ -138,13 +135,13 @@ def compile_rf_html(dpd_db, rf_dict):
             else:
                 html_string = rf_dict[family]["html"]
 
-            meaning = make_meaning_combo(i)
+            # meaning = i.meaning_combo
 
             html_string += "<tr>"
             html_string += f"<th>{superscripter_uni(i.lemma_1)}</th>"
             html_string += f"<td><b>{i.pos}</b></td>"
-            html_string += f"<td>{meaning}</td>"
-            html_string += f"<td>{degree_of_completion(i)}</td>"
+            html_string += f"<td>{i.meaning_combo}</td>"
+            html_string += f"<td>{i.degree_of_completion_html}</td>"
             html_string += "</tr>"
 
             rf_dict[family]["html"] = html_string
@@ -168,7 +165,12 @@ def compile_rf_html(dpd_db, rf_dict):
 
             # data
             rf_dict[family]["data"].append(
-                (i.lemma_1, i.pos, meaning, degree_of_completion(i, html=False))
+                (
+                    i.lemma_1,
+                    i.pos,
+                    i.meaning_combo,
+                    i.degree_of_completion,
+                )
             )
 
             # rus data
@@ -179,11 +181,11 @@ def compile_rf_html(dpd_db, rf_dict):
             # anki data
             anki_family = f"<b>{i.family_root}</b> "
             anki_family += f"{i.rt.root_group} ({i.rt.root_meaning})"
-            construction = clean_construction(i.construction)
+            construction = i.construction_clean
             if not i.meaning_1:
                 construction = f"-{construction}"
             rf_dict[family]["anki"].append(
-                (anki_family, i.lemma_1, i.pos, meaning, construction)
+                (anki_family, i.lemma_1, i.pos, i.meaning_combo, construction)
             )
 
     for rf in rf_dict:

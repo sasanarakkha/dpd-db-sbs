@@ -33,10 +33,12 @@ func SplitRecursive(w data.WordData) {
 					SplitSu(w)
 				} else if w.StartsWith("du") {
 					SplitDur(w)
+				} else if w.StartsWith("ni") {
+					SplitNir(w)
 				} else if w.EndsWithList([]string{"tissa", "tissā"}) {
 					SplitTissa(w)
-				} else if w.EndsWithList([]string{"pi", "ca", "va", "ti"}) {
-					SplitApiCaEvaIti(w)
+				} else if w.EndsWithList([]string{"pi", "ca", "ce", "va", "ti", "hi"}) {
+					SplitApiCaEvaItiHi(w)
 				}
 			}
 			if w.EndsWith("ādi") {
@@ -52,6 +54,26 @@ func SplitRecursive(w data.WordData) {
 			if w.EndsWithList([]string{"tā", "tta", "ttā", "tāya", "tāyaṃ"}) {
 				SplitTta(w)
 			}
+			// split words ending in -ka inflections
+			if w.EndsWithList(
+				[]string{
+					"ko", "kā", "kāse", "kāyo", "kaṃ", "kāni", "ke",
+					"kena", "kebhi", "kehi", "kāya", "kābhi", "kāhi",
+					"kassa", "kānaṃ", "kato", "kamhā", "kasmā", "kamhi",
+					"kasmiṃ", "kesu", "kāsu"}) {
+				SplitKa(w)
+			}
+			// split words ending in -ika inflections
+			if w.EndsWithList(
+				[]string{
+					"iko", "ikā", "ikāse", "ikāyo", "ikaṃ", "ikāni", "ike",
+					"ikena", "ikebhi", "ikehi", "ikāya", "ikābhi", "ikāhi",
+					"ikassa", "ikānaṃ", "ikato", "ikamhā", "ikasmā",
+					"ikamhi", "ikasmiṃ", "ikesu", "ikāsu",
+				}) {
+				SplitIka(w)
+			}
+
 			if w.ProcessCount >= 1 {
 				Split2(w)
 				Split3(w)

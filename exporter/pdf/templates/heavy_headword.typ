@@ -6,7 +6,7 @@
 // grammar table
 //// if i.meaning_1 \\\\
 #block(
-  stroke: 1pt + rgb("#00A4CC"),
+  stroke: 1pt + rgb("#1a8bdb"),
   radius: 5pt,
   table(
     columns: (1fr, 3fr),
@@ -90,11 +90,11 @@
     [#blue[Sanskrit Root]], [{{ i.rt.sanskrit_root }} {{ i.rt.sanskrit_root_class }} ({{ i.rt.sanskrit_root_meaning }})],
   //// endif \\\\
 
-    table.hline(stroke: 0.1pt + rgb("#00A4CC")),
+    table.hline(stroke: 0.1pt + rgb("#1a8bdb")),
     table.cell(colspan: 2)[
       #feedback-link(
         "Correct a mistake",
-        "https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.438735500={{ i.lemma_link }}&entry.326955045=Grammar&entry.1433863141=DPD%20PDF+{{ date }}"
+        "https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.438735500={{  i.id }}%20{{ i.lemma_link }}&entry.326955045=Grammar&entry.1433863141=DPD%20PDF+{{ date }}"
       )
     ],
   )
@@ -104,7 +104,7 @@
 // example(s)
 //// if i.meaning_1 and i.example_1 \\\\
 #block(
-  stroke: 1pt + rgb("#00A4CC"),
+  stroke: 1pt + rgb("#1a8bdb"),
   radius: 5pt,
   table(
     columns: (1fr),
@@ -120,11 +120,11 @@
     ],
   //// endif \\\\
 
-    table.hline(stroke: 0.1pt + rgb("#00A4CC")),
+    table.hline(stroke: 0.1pt + rgb("#1a8bdb")),
     table.cell(colspan: 1)[
       #feedback-link(
         "Add a better example",
-        "https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.438735500={{ i.lemma_link }}&entry.326955045=Examples&entry.1433863141=DPD%20PDF+{{ date }}"
+        "https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.438735500={{  i.id }}%20{{ i.lemma_link }}&entry.326955045=Examples&entry.1433863141=DPD%20PDF+{{ date }}"
       )
     ]
   )

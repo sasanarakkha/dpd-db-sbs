@@ -21,10 +21,8 @@ from gui2.pass2_auto_control import Pass2AutoController
 from gui2.pass2_auto_file_manager import Pass2AutoFileManager
 from gui2.pass2_pre_new_word_manager import Pass2NewWordManager
 from gui2.toolkit import ToolKit
-from scripts.backup.backup_dpd_headwords_and_roots import backup_dpd_headwords_and_roots
 from tools.fast_api_utils import request_dpd_server
 from tools.hyphenations import HyphenationFileManager, HyphenationsDict
-from tools.paths import ProjectPaths
 from tools.sandhi_contraction import SandhiContractionDict, SandhiContractionManager
 
 LABEL_WIDTH = 250
@@ -67,6 +65,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
             self.hyphenations_manager.hyphenations_dict
         )
         self.history_manager = self.toolkit.history_manager
+        self.history_manager.register_refresh_callback(self._update_history_dropdown)
         self.corrections_manager = self.toolkit.corrections_manager
         self.additions_manager = self.toolkit.additions_manager
 
@@ -92,15 +91,21 @@ class Pass2AddView(ft.Column, PopUpMixin):
             text_size=14,
             width=700,
         )
-        self._next_pass2_auto_button = ft.ElevatedButton(
-            "NextPass2Auto",
-            on_click=self._click_load_next_pass2_entry,
+        self._pass2_auto_button = ft.ElevatedButton(
+            "P2A",
+            on_click=self._click_load_pass2_auto,
+            tooltip="Next Pass2Auto",
+        )
+        self._new_word_button = ft.ElevatedButton(
+            "New",
+            on_click=self._click_load_new_word,
+            tooltip="Next new word",
         )
         self._corrections_button = ft.ElevatedButton(
-            "C", on_click=self._click_corrections_button
+            "Cor", on_click=self._click_corrections_button, tooltip="corrections"
         )
         self._additions_button = ft.ElevatedButton(
-            "A", on_click=self._click_additions_button
+            "Add", on_click=self._click_additions_button, tooltip="additions"
         )
         self._enter_id_or_lemma_field = ft.TextField(
             "",
@@ -171,7 +176,8 @@ class Pass2AddView(ft.Column, PopUpMixin):
                             self._enter_id_or_lemma_field,
                             self._clone_headword_button,
                             self._split_headword_button,
-                            self._next_pass2_auto_button,
+                            self._pass2_auto_button,
+                            self._new_word_button,
                             self._corrections_button,
                             self._additions_button,
                             self._clear_all_button,
@@ -216,11 +222,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
                                 width=BUTTON_WIDTH,
                                 on_hover=self._on_delete_hover,
                             ),
-                            ft.ElevatedButton(
-                                "Backup & Quit",
-                                on_click=self._click_backup_db,
-                                width=BUTTON_WIDTH,
-                            ),  # Add backup button here
+                            # Backup & Quit moved to Global tab
                         ],
                     ),
                 ],
@@ -368,45 +370,57 @@ class Pass2AddView(ft.Column, PopUpMixin):
         self.page.update()
         current_lemma_1_field.focus()
 
-    def _click_load_next_pass2_entry(self, e: ft.ControlEvent | None = None) -> None:
-        """Load next pass2 entry into the view."""
-
-        # first try loading new words
+    def _click_load_new_word(self, e: ft.ControlEvent | None = None) -> None:
+        """Load next new word into the view."""
         new_word_data = self.pass2_new_word_manager.get_next_new_word()
         word_in_text, source_sutta_example = new_word_data
         if source_sutta_example:
             self.clear_all_fields()
-            self.update_message(f"new word: {word_in_text}")
-            self.dpd_fields.update_add_fields(source_sutta_example)
+            # Show the saved comment in the existing message field
+            saved_comment = ""
+            if isinstance(source_sutta_example, dict):
+                saved_comment = str(source_sutta_example.get("comment", ""))
 
-        # then process pass2_auto entries
-        else:
-            headword_id, pass2_auto_data, count = (
-                self._pass2_auto_file_manager.get_next_headword_data()
+            remaining = len(self.pass2_new_word_manager.new_words_dict)
+            prefix = f"[{remaining}] {word_in_text}"
+
+            self.update_message(
+                prefix if not saved_comment else f"{prefix}: {saved_comment}"
             )
+            self.dpd_fields.update_add_fields(source_sutta_example)
+        else:
+            self.clear_all_fields()
+            self.update_message("No more new words")
+        self.update()
 
-            if headword_id is not None:
-                self.clear_all_fields()
-                headword = self._db.get_headword_by_id(int(headword_id))
-                self.update_message(f"{count} pass2auto remaining")
+    def _click_load_pass2_auto(self, e: ft.ControlEvent | None = None) -> None:
+        """Load next pass2_auto entry into the view."""
+        headword_id, pass2_auto_data, count = (
+            self._pass2_auto_file_manager.get_next_headword_data()
+        )
 
-                if headword is not None:
-                    self.headword = headword
-                    self.headword_original = copy.deepcopy(headword)
+        if headword_id is not None:
+            self.clear_all_fields()
+            headword = self._db.get_headword_by_id(int(headword_id))
+            self.update_message(f"{count} pass2auto remaining")
 
-                    self.dpd_fields.update_db_fields(self.headword)
-                    self.dpd_fields.update_add_fields(pass2_auto_data)
-                    self.add_headword_to_examples_and_commentary()
-                else:
-                    self.update_message(f"{headword_id}: headword not found—deleting")
-                    self._pass2_auto_file_manager.delete_item(headword_id)
-                    self._click_load_next_pass2_entry()
+            if headword is not None:
+                self.headword = headword
+                self.headword_original = copy.deepcopy(headword)
 
+                self.dpd_fields.update_db_fields(self.headword)
+                self.dpd_fields.update_add_fields(pass2_auto_data)
+                self.add_headword_to_examples_and_commentary()
             else:
-                self.clear_all_fields()
-                self.update_message("No more pass2auto entries")
+                self.update_message(f"{headword_id}: headword not found—deleting")
+                self._pass2_auto_file_manager.delete_item(headword_id)
+                self._click_load_pass2_auto()
 
-            self.update()
+        else:
+            self.clear_all_fields()
+            self.update_message("No more pass2auto entries")
+
+        self.update()
 
     def _click_clear_all(self, e: ft.ControlEvent) -> None:
         self.clear_all_fields()
@@ -717,23 +731,6 @@ class Pass2AddView(ft.Column, PopUpMixin):
     def _click_delete_cancel(self, e: ft.ControlEvent) -> None:
         self.delete_alert.open = False
         self.page.update()
-
-    def _click_backup_db(self, e: ft.ControlEvent) -> None:
-        """Runs the backup script for DpdHeadword and DpdRoot tables."""
-        # Instantiate ProjectPaths here
-        pth = ProjectPaths()
-
-        self.update_message("Running database backup...")
-
-        try:
-            # Call the function directly
-            backup_dpd_headwords_and_roots(pth)
-            self.update_message("Database backup completed successfully.")
-            self.page.window.close()
-
-        except Exception as ex:
-            self.update_message(f"An unexpected error occurred during backup: {ex}")
-            print(f"Backup error: {ex}")  # Log the error to console for debugging
 
     def _click_corrections_button(self, e: ft.ControlEvent) -> None:
         """Loads the next correction and populates the _add fields."""

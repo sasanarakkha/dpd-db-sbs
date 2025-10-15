@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from json import JSONDecodeError, dump, dumps, load, loads
+import threading
+from json import JSONDecodeError, dump, dumps, loads
 from pathlib import Path
 
 from gui2.books import (
@@ -7,6 +8,7 @@ from gui2.books import (
     SuttaCentralSource,
     sutta_central_books,
 )
+from gui2.pass1_file_manager import Pass1FileManager
 from gui2.spelling import SpellingMistakesFileManager
 from gui2.toolkit import ToolKit
 from gui2.variants import VariantReadingFileManager
@@ -27,6 +29,8 @@ class Pass1AutoController:
         self.ui: Pass1AutoView = ui
         self.db = toolkit.db_manager
         self.ai_manager = toolkit.ai_manager
+        self.file_manager = Pass1FileManager(toolkit.paths)
+        self._lock = threading.Lock()
 
         self.gui2pth = toolkit.paths
         self.pass1_books: dict[str, SuttaCentralSource] = sutta_central_books
@@ -51,40 +55,62 @@ class Pass1AutoController:
 
         self.variant_readings = VariantReadingFileManager()
         self.spelling_mistakes = SpellingMistakesFileManager()
+        self.gd_toggle: bool = True
+        self.current_book_processed: int = 0
+        self.initial_auto_processed: int = 0
+        self.total_missing: int = 0
+
+    def get_auto_processed_dict(self, book: str) -> dict:
+        with self._lock:
+            current_book = getattr(self, "book", None)
+            if not self.auto_processed_dict or current_book != book:
+                self.auto_processed_dict = self.file_manager.read(book)
+            return self.auto_processed_dict.copy()
+
+    def remove_word(self, book: str, word: str):
+        def update_func(data):
+            if word in data:
+                del data[word]
+            return data
+
+        self.file_manager.update(book, update_func)
+        if hasattr(self, "book") and self.book == book:
+            self.auto_processed_dict = self.file_manager.read(book)
+
+    def add_word(self, book: str, word: str, data: dict):
+        def update_func(current_data):
+            current_data[word] = data
+            return current_data
+
+        self.file_manager.update(book, update_func)
+        if self.book == book:
+            self.auto_processed_dict = self.file_manager.read(book)
 
     def load_auto_processed(self):
         self.ui.update_message(f"Loading auto processed data for {self.book}")
-
-        self.auto_processed_path: Path = (
-            self.gui2pth.gui2_data_path / f"pass1_auto_{self.book}.json"
-        )
-        if self.auto_processed_path.exists():
-            self.auto_processed_dict = load(
-                self.auto_processed_path.open("r", encoding="utf-8")
-            )
-            self.auto_processed_keys = list(self.auto_processed_dict.keys())
-
-        else:
-            self.auto_processed_dict = {}
-
-        self.ui.update_auto_processed_count(
-            f"{len(self.auto_processed_dict)} / {len(self.missing_words_dict)}"
-        )
+        self.auto_processed_dict = self.get_auto_processed_dict(self.book)
+        self.auto_processed_keys = list(self.auto_processed_dict.keys())
+        self.ui.update_auto_processed_count("0 / 0")
 
     def auto_process_book(self, book: str):
+        self.ui.clear_all_fields()
         self.stop_flag = False
+        self.missing_words_dict = {}  # Clear for new book
 
-        # should only run once.
-        # actually no, should run clean every time to update changes in db
-        # if not self.db.all_inflections:
+        # should run clean every time to update changes in db
         self.ui.update_message("Loading database...")
         self.db.make_inflections_lists()
 
         self.book = book
         self.cst_books = sutta_central_books[book].cst_books
         self.load_auto_processed()
+        self.current_book_processed = 0
         self.find_missing_words_in_cst()
         self.find_missing_words_in_sutta_central()
+        self.initial_auto_processed = len(self.auto_processed_dict)
+        self.total_missing = len(self.missing_words_dict)
+        self.unbroken_loop = True
+
         for self.word_in_text, self.sentence_data in self.missing_words_dict.items():
             self.ui.update_message(f"Processing {self.word_in_text}")
 
@@ -108,17 +134,22 @@ class Pass1AutoController:
             self.ai_status_message = ai_resp.status_message
             self.ui.update_message(ai_resp.status_message)
             if self.response is None:
+                self.unbroken_loop = False
+                self.ui.update_message(f"Error processing {self.book}")
                 break
 
             elif not self.update_auto_processed(provider_preference, model_name):
+                self.ui.update_message(f"Error processing {self.book}")
                 pass
 
             if self.stop_flag:
                 self.ui.clear_all_fields()
-                self.ui.update_message("stopped")
+                self.ui.update_message(f"Stopped processing {self.book}")
+                self.unbroken_loop = False
                 break
 
-        #
+        if self.unbroken_loop:
+            self.ui.update_message(f"Finished processing {self.book}")
 
     def is_missing(self, word: str):
         if (
@@ -292,23 +323,43 @@ ve: verbal ending
     def send_prompt(
         self, provider_preference: str | None = None, model: str | None = None
     ) -> AIResponse:  # Changed return type
-        self.ui.update_message(
-            f"Sending prompt for {self.word_in_text} using {model or 'default model'}..."
+        import time  # Add at top if not present
+        
+        max_retries: int = 3
+        retry_delay: float = 1.0  # Seconds between retries
+        
+        for attempt in range(max_retries):
+            self.ui.update_message(
+                f"Sending prompt for {self.word_in_text} using {model or 'default model'}... (Attempt {attempt + 1}/{max_retries})"
+            )
+            
+            try:
+                ai_response = self.ai_manager.request(
+                    prompt=self.prompt,
+                    prompt_sys="Follow the instructions very carefully.",
+                    provider_preference=provider_preference,
+                    model=model,
+                )
+                
+                if ai_response.content is not None:
+                    return ai_response  # Success, no need for more retries
+                
+                # Log failure for this attempt
+                pr.warning(f"AI request failed for {self.word_in_text} on attempt {attempt + 1}: {ai_response.status_message}")
+                
+                if attempt < max_retries - 1:  # Not the last attempt
+                    time.sleep(retry_delay)
+            
+            except Exception as e:
+                pr.error(f"Exception during AI request for {self.word_in_text} on attempt {attempt + 1}: {e}")
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay)
+        
+        # All retries failed
+        return AIResponse(
+            content=None,
+            status_message=f"Failed after {max_retries} attempts for {self.word_in_text}. Last error: {ai_response.status_message if 'ai_response' in locals() else 'Unknown'}",
         )
-
-        try:
-            ai_response = self.ai_manager.request(
-                prompt=self.prompt,
-                prompt_sys="Follow the instructions very carefully.",
-                provider_preference=provider_preference,
-                model=model,
-            )
-            return ai_response
-        except Exception as e:
-            return AIResponse(
-                content=None,
-                status_message=f"Exception during AI request for {self.word_in_text}: {e}",
-            )
 
     def update_auto_processed(self, provider: str | None, model: str | None) -> bool:
         if not isinstance(self.response, str):
@@ -337,33 +388,26 @@ ve: verbal ending
             with open(tempfile, "w") as f:
                 dump(parsed_json, f, ensure_ascii=False, indent=4)
 
-            # update auto processed_dict
-            self.auto_processed_dict[self.word_in_text] = parsed_json
-
             # add examples and translations
             if len(self.sentence_data) > 0:
                 first_sentence = self.sentence_data[0]
-                self.auto_processed_dict[self.word_in_text]["example_1"] = (
-                    first_sentence.pali
-                )
-                self.auto_processed_dict[self.word_in_text]["translation_1"] = (
-                    first_sentence.english
-                )
+                parsed_json["example_1"] = first_sentence.pali
+                parsed_json["translation_1"] = first_sentence.english
 
             if len(self.sentence_data) > 1:
                 second_sentence = self.sentence_data[1]
-                self.auto_processed_dict[self.word_in_text]["example_2"] = (
-                    second_sentence.pali
-                )
-                self.auto_processed_dict[self.word_in_text]["translation_2"] = (
-                    second_sentence.english
-                )
+                parsed_json["example_2"] = second_sentence.pali
+                parsed_json["translation_2"] = second_sentence.english
+
+            self.add_word(self.book, self.word_in_text, parsed_json)
 
             # update gui
-            open_in_goldendict_os(self.word_in_text)
+            if self.gd_toggle:
+                open_in_goldendict_os(self.word_in_text)
             self.ui.update_word_in_text(self.word_in_text)
+            self.current_book_processed += 1
             self.ui.update_auto_processed_count(
-                f"{len(self.auto_processed_dict)} / {len(self.missing_words_dict)}"
+                f"{self.initial_auto_processed + self.current_book_processed} / {self.initial_auto_processed + self.total_missing}"
             )
             self.ui.update_ai_results(
                 dumps(
@@ -373,15 +417,6 @@ ve: verbal ending
                     separators=("", ":"),
                 )
             )
-
-            # save updated dictionary to main file
-            with self.auto_processed_path.open("w") as f:
-                dump(
-                    self.auto_processed_dict,
-                    f,
-                    indent=4,
-                    ensure_ascii=False,
-                )
 
         except JSONDecodeError as e:
             # Handle the case where the response is not valid JSON

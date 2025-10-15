@@ -20,23 +20,20 @@ class AIResponse(NamedTuple):
 
 
 class AIManager:
-    # Ordered list of (provider, model) tuples as fallback defaults
-    DEFAULT_MODELS = [
-        ("gemini", "gemini-2.5-flash-preview-04-17"),
-        ("gemini", "gemini-2.5-flash-preview-05-20"),
-        ("gemini", "gemini-2.5-pro-exp-03-25"),
-        ("deepseek", "deepseek-chat"),
-        ("deepseek", "deepseek-reasoner"),
-        ("openrouter", "google/gemini-2.5-pro-preview"),
-        ("openrouter", "openai/gpt-4.1"),
-        ("openrouter", "anthropic/claude-sonnet-4"),
-        ("openrouter", "meta-llama/llama-4-maverick:free"),
-        ("openrouter", "qwen/qwen3-235b-a22b:free"),
+    # Ordered list of (provider, model, delay_seconds) tuples as fallback defaults
+    DEFAULT_MODELS: list[tuple[str, str, int]] = [
+        ("gemini", "gemini-2.5-pro", 12),
+        ("gemini", "gemini-2.5-flash", 6),
+        ("gemini", "gemini-2.5-flash-lite", 4),
+        ("openrouter", "x-ai/grok-4-fast:free", 5),
+        ("openrouter", "deepseek/deepseek-chat-v3.1:free", 5),
+        ("openrouter", "z-ai/glm-4.5-air:free", 5),
+        ("openrouter", "qwen/qwen3-235b-a22b:free", 5),
     ]
 
     # Grounded models for internet searches
     GROUNDED_MODELS = [
-        ("gemini", "gemini-2.5-flash-preview-04-17"),
+        ("gemini", "gemini-2.5-flash", 6),
     ]
 
     def __init__(self):
@@ -65,7 +62,19 @@ class AIManager:
             pr.warning("Gemini API key not found, manager not initialized.")
 
         self.last_request_time: float = 0
-        self.min_delay_seconds: float = 0
+        self.min_delay_seconds: float = 5
+        # NEW: Track last request time per model for model-specific rate limiting
+        self.model_last_request: dict[str, float] = {}
+
+    def _get_model_delay(self, provider: str, model: str) -> float:
+        """Get delay for specific model, with fallback to global delay."""
+        # Look through all model lists for this provider/model combination
+        for model_tuple in self.DEFAULT_MODELS + self.GROUNDED_MODELS:
+            if model_tuple[0] == provider and model_tuple[1] == model:
+                return model_tuple[2]
+
+        # Fallback to global delay if model not found
+        return self.min_delay_seconds
 
     def request(
         self,
@@ -81,15 +90,7 @@ class AIManager:
         provider_preference and model are not specified.
         Returns an AIResponse object.
         """
-        # Rate Limiting
-        current_time = time.monotonic()
-        elapsed_since_last = current_time - self.last_request_time
-        wait_time = self.min_delay_seconds - elapsed_since_last
-
-        if wait_time > 0:
-            pr.info(f"RATE LIMITING for {wait_time:.2f}s")
-            time.sleep(wait_time)
-
+        # NEW: Model-specific rate limiting
         models_to_try = []
 
         # Use a grounded model for internet searches
@@ -104,7 +105,26 @@ class AIManager:
         else:
             models_to_try.extend(self.DEFAULT_MODELS)
 
-        for provider_name, model_name in models_to_try:
+        # NEW: Check rate limits for each model before trying them
+        for model_tuple in models_to_try:
+            provider_name, model_name = model_tuple[0], model_tuple[1]
+            model_key = f"{provider_name}:{model_name}"
+            model_delay = self._get_model_delay(provider_name, model_name)
+
+            current_time = time.monotonic()
+            last_request = self.model_last_request.get(model_key, 0)
+            elapsed_since_last = current_time - last_request
+            wait_time = model_delay - elapsed_since_last
+
+            if wait_time > 0:
+                pr.info(f"RATE LIMITING for {model_key} - {wait_time:.2f}s")
+                time.sleep(wait_time)
+
+            # Update last request time for this model
+            self.model_last_request[model_key] = time.monotonic()
+
+        for model_tuple in models_to_try:
+            provider_name, model_name = model_tuple[0], model_tuple[1]
             if provider_name not in self.providers:
                 continue
 

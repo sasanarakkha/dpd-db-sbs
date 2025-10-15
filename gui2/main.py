@@ -11,6 +11,8 @@ from tools.fast_api_utils import start_dpd_server
 
 class App:
     def __init__(self, page: ft.Page) -> None:
+        from gui2.filter_tab_view import FilterTabView
+        from gui2.global_tab_view import GlobalTabView
         from gui2.pass1_add_view import Pass1AddView
         from gui2.pass1_auto_view import Pass1AutoView
         from gui2.pass2_add_view import Pass2AddView
@@ -42,8 +44,13 @@ class App:
         )
 
         # Now create views
+        self.global_view: GlobalTabView = GlobalTabView(self.page, self.toolkit)
         self.pass1_auto_view: Pass1AutoView = Pass1AutoView(self.page, self.toolkit)
-        self.pass1_add_view: Pass1AddView = Pass1AddView(self.page, self.toolkit)
+        self.pass1_add_view: Pass1AddView = Pass1AddView(
+            self.page,
+            self.toolkit,
+            self.pass1_auto_view.controller,
+        )
         self.pass2_pre_view: Pass2PreProcessView = Pass2PreProcessView(
             self.page, self.toolkit
         )
@@ -51,6 +58,7 @@ class App:
         self.pass2_add_view: Pass2AddView = Pass2AddView(self.page, self.toolkit)
         self.tests_tab_view: TestsTabView = TestsTabView(self.page, self.toolkit)
         self.sandhi_view = SandhiFindReplaceView(self.page, self.toolkit)
+        self.filter_tab_view = FilterTabView(self.page, self.toolkit)
 
         self.build_ui()
 
@@ -62,9 +70,14 @@ class App:
             self.page.window.close()
         elif e.key == "A" and e.ctrl and e.shift:
             self.toolkit.ai_search_popup.open_popup()
+        elif e.key == "F" and e.ctrl:
+            self.toolkit.wordfinder_popup.open_popup()
         elif e.key == "W" and e.ctrl:
+            # Universal close key - close any open dialog
             if self.toolkit.ai_search_popup.is_dialog_open():
                 self.toolkit.ai_search_popup.close_dialog()
+            elif self.toolkit.wordfinder_popup.is_dialog_open():
+                self.toolkit.wordfinder_popup.close_dialog()
 
     def tab_clicked(self, e: ft.ControlEvent) -> None:
         """Handles tab clicks."""
@@ -81,6 +94,10 @@ class App:
             animation_duration=300,
             on_click=self.tab_clicked,
             tabs=[
+                ft.Tab(
+                    text="Global",
+                    content=self.global_view,
+                ),
                 ft.Tab(
                     text="Pass1Auto",
                     content=self.pass1_auto_view,
@@ -102,16 +119,16 @@ class App:
                     content=self.pass2_add_view,
                 ),
                 ft.Tab(
-                    text="Tests",
-                    content=self.tests_tab_view,
-                ),
-                ft.Tab(
                     text="'",
                     content=self.sandhi_view,
                 ),
                 ft.Tab(
-                    text="-",
-                    content=ft.Column(),
+                    text="DB",
+                    content=self.filter_tab_view,
+                ),
+                ft.Tab(
+                    text="Tests",
+                    content=self.tests_tab_view,
                 ),
             ],
             expand=True,

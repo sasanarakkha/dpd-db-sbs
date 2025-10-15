@@ -5,6 +5,7 @@ from gui2.database_manager import DatabaseManager
 from gui2.dpd_fields import DpdFields
 from gui2.dpd_fields_lists import PASS1_FIELDS
 from gui2.mixins import PopUpMixin
+from gui2.pass1_auto_controller import Pass1AutoController
 from gui2.toolkit import ToolKit
 from tools.sandhi_contraction import SandhiContractionManager
 
@@ -12,6 +13,7 @@ LABEL_WIDTH = 250
 BUTTON_WIDTH = 250
 LABEL_COLOUR = ft.Colors.GREY_500
 HIGHLIGHT_COLOUR = ft.Colors.BLUE_200
+TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=10)
 
 
 class Pass1AddView(ft.Column, PopUpMixin):
@@ -19,6 +21,7 @@ class Pass1AddView(ft.Column, PopUpMixin):
         self,
         page: ft.Page,
         toolkit: ToolKit,
+        pass1_auto_controller: Pass1AutoController,
     ) -> None:
         # Main column: expands, does NOT scroll
         super().__init__(
@@ -34,98 +37,101 @@ class Pass1AddView(ft.Column, PopUpMixin):
         self.toolkit: ToolKit = toolkit
 
         self.db: DatabaseManager = self.toolkit.db_manager
-        self.controller = Pass1AddController(self, self.toolkit)
+        self.controller = Pass1AddController(self, self.toolkit, pass1_auto_controller)
         self.dpd_fields: DpdFields
         self.sandhi_manager: SandhiContractionManager = self.toolkit.sandhi_manager
         self.history_manager = self.toolkit.history_manager
+        self.history_manager.register_refresh_callback(self._update_history_dropdown)
         self.sandhi_dict = self.sandhi_manager.get_sandhi_contractions_simple()
         self.test_manager: GuiTestManager = self.toolkit.test_manager
 
         # --- Top Section Controls ---
-        self.message_field = ft.Text("", color=HIGHLIGHT_COLOUR, selectable=True)
+        self.message_field = ft.TextField(
+            # color=HIGHLIGHT_COLOUR,
+            expand=True,
+            border_radius=20,
+            text_style=ft.TextStyle(color=ft.Colors.BLUE_200),
+        )
         self.book_options = [
             ft.dropdown.Option(key=item, text=item)
             for item in self.controller.pass1_books_list
         ]
         self.books_dropdown = ft.Dropdown(
+            label="Book",
+            label_style=TEXT_FIELD_LABEL_STYLE,
             autofocus=True,
             options=self.book_options,
             width=300,
             text_size=14,
             border_color=HIGHLIGHT_COLOUR,
+            border_radius=20,
         )
         self.word_in_text = ft.TextField(
-            value="",
+            label="Word in text",
+            label_style=TEXT_FIELD_LABEL_STYLE,
             width=LABEL_WIDTH,
             color=HIGHLIGHT_COLOUR,
             expand=True,
+            border_radius=20,
         )
         self.remaining_to_process = ft.TextField(
-            value="",
-            width=LABEL_WIDTH,
+            label="Remaining",
+            label_style=TEXT_FIELD_LABEL_STYLE,
+            width=150,
             color=HIGHLIGHT_COLOUR,
+            border_radius=20,
+        )
+        self._history_dropdown = ft.Dropdown(
+            hint_text="History",
+            hint_style=ft.TextStyle(color=ft.Colors.BLUE_200),
+            options=[],
             expand=True,
+            expand_loose=True,
+            border_radius=20,
+            text_size=14,
+            on_change=self._handle_history_selection,
         )
 
         # Create the top section Column
-        self.top_section = ft.Column(
-            controls=[
-                ft.Row(
-                    controls=[
-                        ft.Text("", width=LABEL_WIDTH),
-                        self.message_field,
-                    ],
-                ),
-                ft.Row(
-                    controls=[
-                        ft.Text(
-                            "book",
-                            color=ft.Colors.GREY_500,
-                            width=150,
-                            size=12,
-                        ),
-                        self.books_dropdown,
-                        ft.ElevatedButton(
-                            "Process Book",
-                            width=BUTTON_WIDTH,
-                            on_click=self.handle_process_book_click,
-                        ),
-                        ft.ElevatedButton(
-                            "Refresh DB",
-                            width=BUTTON_WIDTH,
-                            on_click=self.handle_refresh_db_click,
-                        ),
-                        ft.ElevatedButton(
-                            "Clear All",
-                            width=BUTTON_WIDTH,
-                            on_click=self.clear_all_fields,
-                        ),
-                    ],
-                ),
-                ft.Row(
-                    controls=[
-                        ft.Text(
-                            "word_in_text",
-                            color=ft.Colors.GREY_500,
-                            width=150,
-                            size=12,
-                        ),
-                        self.word_in_text,
-                    ],
-                ),
-                ft.Row(
-                    controls=[
-                        ft.Text(
-                            "remaining",
-                            color=ft.Colors.GREY_500,
-                            width=150,
-                            size=12,
-                        ),
-                        self.remaining_to_process,
-                    ],
-                ),
-            ],
-            spacing=5,
+        self.top_section = ft.Container(
+            content=ft.Column(
+                controls=[
+                    ft.Row(
+                        controls=[
+                            self.books_dropdown,
+                            ft.ElevatedButton(
+                                "Process Book",
+                                width=BUTTON_WIDTH,
+                                on_click=self.handle_process_book_click,
+                            ),
+                            ft.ElevatedButton(
+                                "Refresh DB",
+                                width=BUTTON_WIDTH,
+                                on_click=self.handle_refresh_db_click,
+                            ),
+                            ft.ElevatedButton(
+                                "Clear All",
+                                width=BUTTON_WIDTH,
+                                on_click=self.clear_all_fields,
+                            ),
+                            self._history_dropdown,
+                        ],
+                    ),
+                    ft.Row(
+                        controls=[
+                            self.word_in_text,
+                            self.remaining_to_process,
+                        ],
+                    ),
+                    ft.Row(
+                        controls=[self.message_field],
+                    ),
+                    ft.Divider(height=10, color=HIGHLIGHT_COLOUR),
+                ],
+                spacing=10,
+            ),
+            border_radius=20,
+            padding=ft.Padding(0, 10, 0, 0),
         )
 
         # Initialize middle section
@@ -201,6 +207,9 @@ class Pass1AddView(ft.Column, PopUpMixin):
             self.bottom_section,
         ]
 
+        # Populate history dropdown initially
+        self._update_history_dropdown()
+
     def load_database(self) -> None:
         self.controller.db.make_inflections_lists()
 
@@ -208,8 +217,8 @@ class Pass1AddView(ft.Column, PopUpMixin):
         self.message_field.value = message
         self.page.update()
 
-    def update_remaining(self, message: str):
-        self.remaining_to_process.value = message
+    def update_remaining(self, count: int):
+        self.remaining_to_process.value = str(count)
         self.page.update()
 
     def handle_process_book_click(self, e: ft.ControlEvent) -> None:
@@ -270,16 +279,24 @@ class Pass1AddView(ft.Column, PopUpMixin):
 
     def handle_pass_click(self, e: ft.ControlEvent) -> None:
         self.clear_all_fields()
-        self.controller.get_next_item()
-        self.controller.load_into_gui()
+        # For pass, we just want to load the next item without removing current from JSON
+        # So we need to get next item from the current iterator state
+        is_next_item = self.controller.get_next_item()
+        if is_next_item:
+            self.controller.load_into_gui()
+        else:
+            self.clear_all_fields()
 
     def handle_delete_click(self, e: ft.ControlEvent) -> None:
         print(self.dpd_fields)
         if self.word_in_text.value:
             self.controller.remove_word_and_save_json()
             self.clear_all_fields()
-            self.controller.get_next_item()
-            self.controller.load_into_gui()
+            is_next_item = self.controller.get_next_item()
+            if is_next_item:
+                self.controller.load_into_gui()
+            else:
+                self.clear_all_fields()
         else:
             self.update_message("No word_in_text.")
 
@@ -382,3 +399,40 @@ class Pass1AddView(ft.Column, PopUpMixin):
             self.test_manager._handle_open_test_file(e)
             self.add_to_db_button.color = None  # Reset to default text color
         self.page.update()
+
+    def _update_history_dropdown(self) -> None:
+        """Populates the history dropdown with the latest history."""
+        history_items = self.history_manager.get_history()
+        if self._history_dropdown.options is not None:
+            self._history_dropdown.options.clear()
+            for item in history_items:
+                self._history_dropdown.options.append(
+                    ft.dropdown.Option(
+                        key=str(item.get("id")),  # Key must be string for Dropdown
+                        text=f"{item.get('id')}: {item.get('lemma_1', 'N/A')}",
+                    )
+                )
+        self.page.update()
+
+    def _handle_history_selection(self, e: ft.ControlEvent) -> None:
+        """Loads the selected headword from history."""
+        selected_id_str = e.control.value
+        if selected_id_str:
+            try:
+                selected_id = int(selected_id_str)
+                headword = self.db.get_headword_by_id(selected_id)
+                if headword:
+                    # Load into fields
+                    for field_name, ui_field in self.dpd_fields.fields.items():
+                        if hasattr(headword, field_name):
+                            ui_field.value = getattr(headword, field_name)
+                    self.update_message(f"loaded {headword.lemma_clean} from history")
+                else:
+                    self.update_message(
+                        f"History item ID {selected_id} not found in DB"
+                    )
+            except ValueError:
+                self.update_message("Invalid history item ID selected")
+            finally:
+                self._history_dropdown.value = None  # Reset dropdown selection
+                self.page.update()

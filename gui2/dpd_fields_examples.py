@@ -155,7 +155,7 @@ class DpdExampleField(ft.Column):
             name=field_name,
             multiline=True,
             on_focus=self.update_counter,
-            on_change=self.update_counter,
+            on_change=self.clean_text,
             on_submit=on_submit,
             on_blur=on_blur,
         )
@@ -193,7 +193,7 @@ class DpdExampleField(ft.Column):
                 editable=True,
                 enable_filter=True,
                 border_color=ft.Colors.GREY_800,
-                border_radius=10,
+                border_radius=20,
                 border_width=1,
                 on_blur=self._handle_book_blur,
             )
@@ -204,7 +204,7 @@ class DpdExampleField(ft.Column):
                 label="word to find",
                 label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=10),
                 on_submit=self._click_search_dialog_ok,
-                border_radius=10,
+                border_radius=20,
             )
 
             # Toggle Button
@@ -361,9 +361,11 @@ class DpdExampleField(ft.Column):
         if not self.cst_examples:
             return
 
+        # Limit the number of examples to prevent UI issues
+        examples_to_show = self.cst_examples[:50]
         example_list = []
 
-        for counter, i in enumerate(self.cst_examples):
+        for counter, i in enumerate(examples_to_show):
             source, sutta, example = i
             example_list.append(
                 ft.Column(
@@ -537,6 +539,15 @@ class DpdExampleField(ft.Column):
             sutta.value = last_example[1]
             example.value = last_example[2]
             self.page.update()
+
+    def clean_text(self, e: ft.ControlEvent):
+        self.text_field.value = (
+            e.control.value.replace(" ...", "…")
+            .replace("...", "…")
+            .replace("'nti", "n'ti")
+        )
+        self.update_counter(e)
+        self.page.update()
 
     def update_counter(self, e: ft.ControlEvent):
         max_length = 300

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """Create an EPUB and MOBI version of DPD.
 The word set is limited to
 - CST EBTS
@@ -8,30 +9,25 @@ The word set is limited to
 import subprocess
 import platform
 import shutil
-from pathlib import Path
-
 from datetime import datetime
+from pathlib import Path
+from zipfile import ZIP_DEFLATED, ZipFile
+
 from mako.template import Template
 from rich import print
-from zipfile import ZipFile, ZIP_DEFLATED
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword, Lookup
-
 from tools.configger import config_test
-from tools.cst_sc_text_sets import make_cst_text_set
-from tools.cst_sc_text_sets import make_sc_text_set
+from tools.cst_sc_text_sets import make_cst_text_set, make_sc_text_set
+from tools.deconstructed_words import make_words_in_deconstructions
 from tools.diacritics_cleaner import diacritics_cleaner
 from tools.first_letter import find_first_letter
-from tools.meaning_construction import make_meaning_combo_html
 from tools.meaning_construction import make_grammar_line
-from tools.meaning_construction import summarize_construction
-from tools.degree_of_completion import degree_of_completion
 from tools.niggahitas import add_niggahitas
 from tools.pali_alphabet import pali_alphabet
 from tools.pali_sort_key import pali_list_sorter, pali_sort_key
 from tools.paths import ProjectPaths
-from tools.deconstructed_words import make_words_in_deconstructions
 from tools.printer import printer as pr
 from tools.tsv_read_write import read_tsv_dict
 
@@ -200,13 +196,13 @@ def render_ebook_entry(
     summary = f"{i.pos}. "
     if i.plus_case:
         summary += f"({i.plus_case}) "
-    summary += make_meaning_combo_html(i)
+    summary += i.meaning_combo_html
 
-    construction = summarize_construction(i)
+    construction = i.construction_summary
     if construction:
         summary += f" [{construction}]"
 
-    summary += f" {degree_of_completion(i)}"
+    summary += f" {i.degree_of_completion_html}"
 
     if "&" in summary:
         summary = summary.replace(" & ", " &amp; ")
@@ -259,16 +255,13 @@ def render_grammar_templ(
 
     if i.meaning_1:
         grammar = make_grammar_line(i)
-
-        meaning = f"{make_meaning_combo_html(i)}"
-
         ebook_grammar_templ = Template(filename=str(pth.ebook_grammar_templ_path))
 
         return str(
             ebook_grammar_templ.render(
                 i=i,
                 grammar=grammar,
-                meaning=meaning,
+                meaning=i.meaning_combo_html,
             )
         )
 

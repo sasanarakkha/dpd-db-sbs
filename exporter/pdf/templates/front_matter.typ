@@ -12,17 +12,29 @@
   author: "Bodhirasa Bhikkhu",
   date: auto
   )
+
 #hide[
   #heading(level: 1)[Title Page]
 ]
 
-#align(left, text(20pt)[
-  *Digital Pāḷi Dictionary*
-])
+#align(center + top)[
+  #image(
+    "images/dpd-logo-512.png",
+    format: "png",
+    width: 7%,
+    height: auto,
+    alt: "DPD logo"
+  ),
+  #text(20pt)[
+    *Digital Pāḷi Dictionary*
+  ]
+]
 
-#align(left, text(15pt)[
-  Created by Bodhirasa
-])
+#align(center + top)[
+  #text(15pt)[
+    Created by Bodhirasa
+  ]
+]
 
 #pagebreak()
 
@@ -45,7 +57,7 @@
   DPD Docs Website
   #link("https://digitalpalidictionary.github.io/")[#blue("https://digitalpalidictionary.github.io/")]
 
-  Github Repository
+  GitHub Repository
   #link("https://github.com/digitalpalidictionary/dpd-db")[#blue("https://github.com/digitalpalidictionary/dpd-db")]
 
   Get the latest version

@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from json import dump, load
-from pathlib import Path
 
 import flet as ft
 import pyperclip
@@ -14,6 +12,7 @@ from gui2.database_manager import DatabaseManager
 from gui2.dpd_fields_functions import make_dpd_headword_from_dict
 from gui2.mixins import SandhiOK, SnackBarMixin
 from gui2.pass1_add_view import Pass1AddView
+from gui2.pass1_auto_controller import Pass1AutoController
 from gui2.paths import Gui2Paths
 from gui2.spelling import SpellingMistakesFileManager
 from gui2.toolkit import ToolKit
@@ -21,6 +20,7 @@ from gui2.user import UsernameManager
 from gui2.variants import VariantReadingFileManager
 from tools.fast_api_utils import request_dpd_server
 from tools.goldendict_tools import open_in_goldendict_os
+from tools.wordfinder_manager import WordFinderManager
 
 LABEL_WIDTH = 250
 BUTTON_WIDTH = 250
@@ -35,6 +35,7 @@ class Pass1AddController(SandhiOK, SnackBarMixin):
         self,
         ui: Pass1AddView,
         toolkit: ToolKit,
+        pass1_auto_controller: Pass1AutoController,
     ) -> None:
         self.ui: Pass1AddView = ui
         self.db: DatabaseManager = toolkit.db_manager
@@ -42,12 +43,13 @@ class Pass1AddController(SandhiOK, SnackBarMixin):
         self.gui2pth: Gui2Paths = toolkit.paths
         self.additions_manager: AdditionsManager = toolkit.additions_manager
         self.username_manager: UsernameManager = toolkit.username_manager
+        self.wordfinder_manager: WordFinderManager = toolkit.wordfinder_manager
+        self.pass1_auto_controller = pass1_auto_controller
 
         self.pass1_books = sutta_central_books
         self.pass1_books_list = [k for k in self.pass1_books]
         self.book_to_process: str
 
-        self.auto_processed_filepath: Path
         self.auto_processed_dict: dict[str, dict[str, str]] = {}
         self.auto_processed_iter = iter([])
 
@@ -67,31 +69,36 @@ class Pass1AddController(SandhiOK, SnackBarMixin):
             self.ui.clear_all_fields()
 
     def load_json(self):
-        self.auto_processed_filepath = (
-            self.gui2pth.gui2_data_path / f"pass1_auto_{self.book_to_process}.json"
+        self.auto_processed_dict = self.pass1_auto_controller.get_auto_processed_dict(
+            self.book_to_process
         )
-        try:
-            self.auto_processed_dict = load(
-                self.auto_processed_filepath.open("r", encoding="utf-8")
-            )
-            # dict will change size, so work on a copy
-            self.auto_processed_dict_copy = self.auto_processed_dict.copy()
-            self.auto_processed_iter = iter(self.auto_processed_dict_copy.items())
-            self.ui.update_remaining(f"{len(self.auto_processed_dict)}")
-        except FileNotFoundError:
-            self.ui.update_message("file not found.")
+        if not self.auto_processed_dict:
+            self.ui.update_message("file not found or empty.")
+            self.auto_processed_dict_copy = {}
+            self.auto_processed_iter = iter([])
+            self.ui.update_remaining(0)
+            return
+
+        # dict will change size, so work on a copy
+        self.auto_processed_dict_copy = self.auto_processed_dict.copy()
+        self.auto_processed_iter = iter(self.auto_processed_dict_copy.items())
+        self.ui.update_remaining(len(self.auto_processed_dict))
 
     def get_next_item(self):
         try:
             self.word_in_text, self.sentence_data = next(self.auto_processed_iter)
-            self.ui.update_remaining(f"{len(self.auto_processed_dict)}")
+            # Update from the current file state to show accurate remaining count
+            current_dict = self.pass1_auto_controller.get_auto_processed_dict(self.book_to_process)
+            self.ui.update_remaining(len(current_dict))
             print(self.word_in_text)
             print(self.sentence_data)
             return True
         except StopIteration:
+            # Update from the current file state when no more items
+            current_dict = self.pass1_auto_controller.get_auto_processed_dict(self.book_to_process)
+            self.ui.update_remaining(len(current_dict))
             self.ui.clear_all_fields()
             self.ui.update_message("No more words to process.")
-            self.ui.update_remaining(f"{len(self.auto_processed_dict)}")
             return False
 
     def load_into_gui(self):
@@ -118,28 +125,39 @@ class Pass1AddController(SandhiOK, SnackBarMixin):
         # Create the DpdHeadword object using the imported function
         new_word = make_dpd_headword_from_dict(field_data)
 
-        # Set fields not derived directly from the input dict
-        new_word.id = self.db.get_next_id()
-        new_word.origin = "pass1"
+        # Track if this is a new word or an update for logging purposes
+        already_in_db = bool(new_word.id)
 
-        # add to additions
-        if self.username_manager.is_not_primary():
-            self.additions_manager.add_additions(new_word, comment)
+        # Check if this is an existing word loaded from history (has an ID)
+        if already_in_db:
+            # Update existing word - keep the same ID
+            new_word.origin = "pass1"
+            committed, message = self.db.update_word_in_db(new_word)
+        else:
+            # Create new word - assign new ID
+            new_word.id = self.db.get_next_id()
+            new_word.origin = "pass1"
 
-        # add to db
-        committed, message = self.db.add_word_to_db(new_word)
+            # add to additions
+            if self.username_manager.is_not_primary():
+                self.additions_manager.add_additions(new_word, comment)
+
+            # add to db
+            committed, message = self.db.add_word_to_db(new_word)
 
         if committed:
             # open in browser
             request_dpd_server(new_word.id)
 
-            # update the log (this now automatically updates the appbar)
-            self.daily_log.increment("pass1")
+            # Only increment daily log for new words, not re-edited words from history
+            if not already_in_db:
+                self.daily_log.increment("pass1")
 
             # Add to history
             self.ui.history_manager.add_item(
                 new_word.id, new_word.lemma_1
             )  # Use ui's history_manager
+            self.ui._update_history_dropdown()
 
             self.remove_word_and_save_json()
             self.ui.clear_all_fields()
@@ -149,7 +167,7 @@ class Pass1AddController(SandhiOK, SnackBarMixin):
             if is_next_item:
                 self.load_into_gui()
                 self.ui.update_message(
-                    f"{self.ui.dpd_fields.fields['lemma_1'].value} added to db"
+                    f"{self.ui.dpd_fields.fields['lemma_1'].value} loaded"
                 )
             else:
                 self.ui.clear_all_fields()
@@ -159,15 +177,15 @@ class Pass1AddController(SandhiOK, SnackBarMixin):
             )
 
     def remove_word_and_save_json(self):
-        try:
-            del self.auto_processed_dict[self.word_in_text]
-            dump(
-                self.auto_processed_dict,
-                self.auto_processed_filepath.open("w"),
-                ensure_ascii=False,
-                indent=4,
+        # Only remove from auto-processed dict if word_in_text exists
+        # (i.e., when processing from a book, not when loading from history)
+        if hasattr(self, "word_in_text") and self.word_in_text:
+            self.pass1_auto_controller.remove_word(
+                self.book_to_process, self.word_in_text
             )
+            # Update the auto_processed_dict to reflect the removal
+            self.auto_processed_dict = self.pass1_auto_controller.get_auto_processed_dict(
+                self.book_to_process
+            )
+            self.ui.update_remaining(len(self.auto_processed_dict))
             self.ui.update_message(f"{self.word_in_text} deleted")
-        except KeyError as e:
-            self.ui.clear_all_fields()
-            self.ui.update_message(f"{e}")

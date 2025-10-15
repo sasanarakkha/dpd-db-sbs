@@ -1,8 +1,15 @@
 import flet as ft
 
 from db.inflections.generate_inflection_tables import InflectionsManager
-from gui2.toolkit import ToolKit
 from gui2.pass1_auto_controller import Pass1AutoController
+from gui2.toolkit import ToolKit
+
+LABEL_WIDTH = 250
+COLUMN_WIDTH: int = 700
+BUTTON_WIDTH = 250
+LABEL_COLOUR = ft.Colors.GREY_500
+HIGHLIGHT_COLOUR = ft.Colors.BLUE_200
+TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=10)
 
 
 class Pass1AutoView(ft.Column):
@@ -18,14 +25,11 @@ class Pass1AutoView(ft.Column):
             spacing=5,
         )
         self.page: ft.Page = page
+        self.toolkit: ToolKit = toolkit
         self.controller = Pass1AutoController(
             self,
             toolkit,
         )
-
-        # Define constants
-        LABEL_WIDTH: int = 150
-        COLUMN_WIDTH: int = 700
 
         # Define controls
         self.message_field = ft.Text(
@@ -39,92 +43,114 @@ class Pass1AutoView(ft.Column):
             for item in self.controller.pass1_books_list
         ]
         self.books_dropdown = ft.Dropdown(
+            label="Book",
+            label_style=TEXT_FIELD_LABEL_STYLE,
             autofocus=True,
             options=self.book_options,
             width=300,
             text_size=14,
             border_color=ft.Colors.BLUE_200,
+            border_radius=20,
         )
         self.ai_model_options = [
             ft.dropdown.Option(
                 key=f"{provider}|{model_name}", text=f"{provider}: {model_name}"
             )
-            for provider, model_name in toolkit.ai_manager.DEFAULT_MODELS
+            for provider, model_name, wait_time in toolkit.ai_manager.DEFAULT_MODELS
         ]
         self.ai_model_dropdown = ft.Dropdown(
+            label="AI Model",
+            label_style=TEXT_FIELD_LABEL_STYLE,
+            autofocus=True,
             options=self.ai_model_options,
             width=300,
-            menu_width=500,
-            expand=True,
             text_size=14,
             border_color=ft.Colors.BLUE_200,
-            hint_text="Select AI Model",
+            border_radius=20,
+            menu_width=700,
         )
         self.auto_processed_count_field = ft.TextField(
             "",
-            expand=True,
+            label="Counter",
+            label_style=TEXT_FIELD_LABEL_STYLE,
+            width=200,
+            color=HIGHLIGHT_COLOUR,
+            border_radius=20,
+        )
+        self.gd_switch = ft.Switch(
+            label="GD",
+            value=True,
+            on_change=self.handle_gd_toggle,
         )
         self.word_in_text_field = ft.TextField(
             "",
-            width=COLUMN_WIDTH,
             expand=True,
+            label="Word in text",
+            label_style=TEXT_FIELD_LABEL_STYLE,
+            color=HIGHLIGHT_COLOUR,
+            border_radius=20,
         )
         self.ai_results_field = ft.TextField(
             "",
             width=COLUMN_WIDTH,
             multiline=True,
             expand=True,
+            label="Results",
+            label_style=TEXT_FIELD_LABEL_STYLE,
+            color=HIGHLIGHT_COLOUR,
+            border_radius=20,
         )
 
         self.controls.extend(
             [
-                ft.Row(
-                    controls=[
-                        ft.Text("", width=LABEL_WIDTH),
-                        self.message_field,
-                    ],
-                ),
-                ft.Row(
-                    controls=[
-                        ft.Text("book", width=LABEL_WIDTH),
-                        self.books_dropdown,
-                        ft.ElevatedButton(
-                            "AutoProcess Book",
-                            on_click=self.handle_book_click,
-                        ),
-                        self.ai_model_dropdown,
-                        ft.ElevatedButton(
-                            "Stop",
-                            on_click=self.handle_stop_click,
-                        ),
-                        ft.ElevatedButton(
-                            "Clear",
-                            on_click=self.handle_clear_click,
-                        ),
-                        ft.ElevatedButton(
-                            "Update inflections",
-                            on_click=self.handle_update_inflections_click,
-                        ),
-                    ],
-                ),
-                ft.Row(
-                    controls=[
-                        ft.Text("auto processed", width=LABEL_WIDTH),
-                        self.auto_processed_count_field,
-                    ],
-                ),
-                ft.Row(
-                    controls=[
-                        ft.Text("word in text", width=LABEL_WIDTH),
-                        self.word_in_text_field,
-                    ],
-                ),
-                ft.Row(
-                    controls=[
-                        ft.Text("ai results", width=LABEL_WIDTH),
-                        self.ai_results_field,
-                    ]
-                ),
+                ft.Container(
+                    ft.Column(
+                        controls=[
+                            ft.Row(
+                                controls=[
+                                    self.books_dropdown,
+                                    ft.ElevatedButton(
+                                        "AutoProcess Book",
+                                        on_click=self.handle_book_click,
+                                    ),
+                                    self.ai_model_dropdown,
+                                    ft.ElevatedButton(
+                                        "Stop",
+                                        on_click=self.handle_stop_click,
+                                    ),
+                                    ft.ElevatedButton(
+                                        "Clear",
+                                        on_click=self.handle_clear_click,
+                                    ),
+                                    ft.ElevatedButton(
+                                        "Update inflections",
+                                        on_click=self.handle_update_inflections_click,
+                                    ),
+                                    self.gd_switch,
+                                ],
+                            ),
+                            ft.Row(
+                                controls=[
+                                    self.word_in_text_field,
+                                    self.auto_processed_count_field,
+                                ],
+                            ),
+                            ft.Row(
+                                controls=[
+                                    self.message_field,
+                                ],
+                            ),
+                            ft.Divider(),
+                            ft.Row(
+                                controls=[
+                                    self.ai_results_field,
+                                ]
+                            ),
+                        ]
+                    ),
+                    border_radius=20,
+                    padding=ft.Padding(0, 10, 0, 0),
+                )
             ]
         )
 
@@ -144,6 +170,9 @@ class Pass1AutoView(ft.Column):
         inflections_manager.run()
         self.controller.db.make_inflections_lists()
         self.update_message("inflections updated")
+
+    def handle_gd_toggle(self, e):
+        self.controller.gd_toggle = self.gd_switch.value
 
     def update_message(self, message: str):
         self.message_field.value = message

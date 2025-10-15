@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 """Export DPD to PDF using Typst and Jinja templates."""
 
@@ -6,7 +7,6 @@ import re
 
 # import subprocess
 import typst
-
 from jinja2 import Environment, FileSystemLoader
 
 from db.db_helpers import get_db_session
@@ -62,8 +62,9 @@ class GlobalVars:
     date = year_month_day_dash()
 
     # colours
-    colour1: str = "#00A4CC"
-    colour2: str = "#65DBFF"
+    colour1: str = "#1a8bdb"  # --primary-text
+    gray: str = "#404040"  # --gray-dark
+    gray_small: str = "#808080"  # --gray
 
 
 def make_layout(g: GlobalVars):

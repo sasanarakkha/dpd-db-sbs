@@ -12,12 +12,12 @@ from tools.printer import printer as pr
 from tools.tsv_read_write import read_tsv_as_dict, read_tsv_as_dict_with_different_key
 
 
-class ProgData:
+class GlobalVars:
     pth = ProjectPaths()
     db_session = get_db_session(pth.dpd_db_path)
 
 
-def add_help(g: ProgData):
+def add_help(g: GlobalVars):
     print("[green]adding help")
 
     # first remove old abbreviations from the table
@@ -68,7 +68,7 @@ def add_help(g: ProgData):
     g.db_session.commit()
 
 
-def add_abbreviations(g: ProgData):
+def add_abbreviations(g: GlobalVars):
     """Add abbreviations to lookup"""
     print("[green]adding abbreviations")
 
@@ -123,7 +123,7 @@ def add_abbreviations(g: ProgData):
 def main():
     pr.tic()
     print("[bright_yellow]adding help and abbreviations to lookup")
-    g = ProgData()
+    g = GlobalVars()
     add_help(g)
     add_abbreviations(g)
     pr.toc()

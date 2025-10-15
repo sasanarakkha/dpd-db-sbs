@@ -2,35 +2,27 @@
 
 import json
 import re
+from typing import List, Optional
 
-from typing import List
-from typing import Optional
+from sqlalchemy import DateTime, ForeignKey, and_, case, null
+from sqlalchemy import Column, Integer
 
-from sqlalchemy import and_
-from sqlalchemy import case
-from sqlalchemy import Column
-from sqlalchemy import DateTime
-from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import null
 from sqlalchemy.ext.hybrid import hybrid_property
-
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    foreign,
+    mapped_column,
+    object_session,
+    relationship,
+)
 from sqlalchemy.orm import declared_attr
-from sqlalchemy.orm import foreign
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import object_session
-from sqlalchemy.orm import relationship
+
 from sqlalchemy.sql import func
 
 from tools.link_generator import generate_link
-
 from tools.pali_sort_key import pali_sort_key
-from tools.pos import CONJUGATIONS
-from tools.pos import DECLENSIONS
-from tools.pos import EXCLUDE_FROM_FREQ
-from tools.sinhala_tools import si_grammar, pos_si, pos_si_full, translit_ro_to_si
+from tools.pos import CONJUGATIONS, DECLENSIONS, EXCLUDE_FROM_FREQ
 from tools.clean_machine import clean_machine
 
 from tools.sbs_table_functions import SBS_table_tools, paragraphs_are_similar
@@ -639,9 +631,6 @@ class DpdHeadword(Base):
     # russian
     ru = relationship("Russian", uselist=False)
 
-    # sinhala
-    si = relationship("Sinhala", uselist=False)
-
     # inflection templates
     it: Mapped[InflectionTemplates] = relationship()
 
@@ -690,12 +679,14 @@ class DpdHeadword(Base):
 
     @property
     def meaning_combo(self) -> str:
+        """`meaning_1` if it exists, else `meaning_2`, plus `literal meaning` if it exists."""
         from tools.meaning_construction import make_meaning_combo
 
         return make_meaning_combo(self)
 
     @property
     def meaning_combo_html(self) -> str:
+        """`meaning_1` in bold tags if it exists, else `meaning_1`, plus `literal meaning` if it exists."""
         from tools.meaning_construction import make_meaning_combo_html
 
         return make_meaning_combo_html(self)
@@ -720,17 +711,27 @@ class DpdHeadword(Base):
 
     @property
     def degree_of_completion_html(self) -> str:
+        """How complete is a word's information?
+        ✔ complete, meaning_1 and example.
+        ◑ semi-complete, meaning_1 and no example.
+        ✘ incomplete, meaning_2 and no example.
+        Styled in gray html tags.
+        """
         from tools.degree_of_completion import degree_of_completion
 
         return degree_of_completion(self)
 
     @property
     def degree_of_completion(self) -> str:
+        """How complete is a word's information?
+        ✔ complete, meaning_1 and example.
+        ◑ semi-complete, meaning_1 and no example.
+        ✘ incomplete, meaning_2 and no example.
+        Styled in plain text.
+        """
         from tools.degree_of_completion import degree_of_completion
 
         return degree_of_completion(self, html=False)
-
-    # sinhala
 
     @property
     def lemma_trad(self) -> str:
@@ -739,34 +740,10 @@ class DpdHeadword(Base):
         return make_lemma_trad(self)
 
     @property
-    def lemma_si(self) -> str:
-        from tools.lemma_traditional import make_lemma_trad_si
+    def lemma_trad_clean(self) -> str:
+        from tools.lemma_traditional import make_lemma_trad_clean
 
-        return make_lemma_trad_si(self)
-
-    @property
-    def plus_case_si(self) -> str:
-        return si_grammar(self.plus_case)
-
-    @property
-    def pos_si(self) -> str:
-        return pos_si(self.pos)
-
-    @property
-    def pos_si_full(self) -> str:
-        return pos_si_full(self.pos)
-
-    @property
-    def meaning_si(self) -> str:
-        return self.si.meaning_si if self.si else ""
-
-    @property
-    def construction_summary_si(self) -> str:
-        from tools.meaning_construction import summarize_construction
-
-        construction = summarize_construction(self)
-        construction = construction.replace("*", "ṇ")
-        return translit_ro_to_si(construction)
+        return make_lemma_trad_clean(self)
 
     # root
 
