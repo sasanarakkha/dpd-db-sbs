@@ -115,8 +115,6 @@ def filtering_words():
                 or_(
                     SBS.sbs_source_1.like(f"%{variable}%"),
                     SBS.sbs_source_2.like(f"%{variable}%"),
-                    SBS.sbs_source_3.like(f"%{variable}%"),
-                    SBS.sbs_source_4.like(f"%{variable}%")
                 )
             ),
         )
