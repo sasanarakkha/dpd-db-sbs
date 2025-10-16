@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,700;1,8..60,400;1,8..60,700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,700;1,8..60,400;1,8..60,700&display=swap");
 
-.dark-mode {
+html.dark-mode body {
     background-color: var(--dark);
     color: var(--light);
 }
@@ -9,7 +9,7 @@
 body {
     background-color: var(--light);
     color: var(--dark);
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
     font-size: 1em;
     transition: 1s;
     scroll-behavior: smooth;
@@ -19,10 +19,9 @@ body {
     flex-direction: column;
 }
 
-body.dark-mode #header-image {
-    content: url('/static/dpd-logo-dark.svg');
+html.dark-mode #header-image {
+    content: url("/static/dpd-logo-dark.svg");
 }
-
 .tabs {
     display: flex;
     flex-direction: column;
@@ -47,7 +46,7 @@ body.dark-mode #header-image {
     outline: none;
     cursor: pointer;
     transition: 0.3s;
-    font-size: .8em;
+    font-size: 0.8em;
     border-radius: 1px 7px 0 0;
 }
 
@@ -61,14 +60,12 @@ body.dark-mode #header-image {
     color: var(--dark);
 }
 
-
 .tab-content {
     display: none;
     padding: 0px;
     border-radius: 0 7px 7px 7px;
     flex: 1;
     overflow: hidden;
-    display: flex;
     flex-direction: column;
     height: 100%;
 }
@@ -78,12 +75,17 @@ body.dark-mode #header-image {
     flex-direction: column;
 }
 
-/* NEW CSS for top controls container */
 .top-controls {
-    display: flex; /* Use flexbox for layout */
+    display: flex;
     justify-content: space-between; /* Push tab buttons left, switcher right */
     align-items: flex-end; /* To this - aligns items to the bottom */
-    padding: 5px 10px; /* Add some padding */
+    padding: 5px 10px;
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .header-pane {
@@ -99,7 +101,7 @@ body.dark-mode #header-image {
     gap: 5px;
 }
 
-.header-pane>* {
+.header-pane > * {
     flex-shrink: 0;
     min-width: 0;
     max-width: 100%;
@@ -150,7 +152,7 @@ a {
     border: 2px solid var(--gray-transparent);
     box-shadow: none;
     color: var(--dark);
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
     font-size: 130%;
     height: 30px;
     margin: 5px;
@@ -230,7 +232,7 @@ a {
 }
 
 .tooltip {
-    right: .3rem;
+    right: 0.3rem;
     top: 1.8rem;
     position: absolute;
     background-color: var(--primary);
@@ -252,7 +254,6 @@ a {
     overflow: hidden;
     margin-top: 5px;
     margin-bottom: 5px;
-
 }
 
 .history-pane {
@@ -271,7 +272,6 @@ a {
 .dark-mode .history-pane {
     border-color: var(--gray-transparent);
 }
-
 
 .history-pane h3 {
     text-align: left;
@@ -324,7 +324,6 @@ p.message {
     text-align: center;
     line-height: 150%;
     padding: 1%;
-
 }
 
 .summary-results b {
@@ -403,7 +402,6 @@ p.message {
     border-color: var(--gray-transparent);
 }
 
-
 .settings-pane h3 {
     text-align: left;
 }
@@ -422,7 +420,7 @@ p.message {
     padding: 10px;
     position: relative;
     text-align: center;
-    transition: .2s;
+    transition: 0.2s;
     white-space: normal;
     word-break: break-word;
 }
@@ -446,15 +444,46 @@ p.message {
     color: var(--primary-alt);
 }
 
+.email-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    width: 32px;
+    height: 32px;
+    margin: 0 2px;
+    border-radius: 4px;
+    text-decoration: none;
+    color: var(--text-color);
+    background-color: transparent;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.email-button:hover {
+    border-color: var(--primary);
+}
+
 .language-switcher {
     position: relative;
-    display: inline-block;
-    margin: 0; /* Removed margin */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    width: 32px;
+    height: 32px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.language-switcher:hover {
+    border-color: var(--primary);
 }
 
 .language-icon {
     cursor: pointer;
-    font-size: 1.0em; /* Slightly smaller size */
+    font-size: 1em; /* Slightly smaller size */
     color: var(--dark);
     transition: color 0.3s;
     vertical-align: baseline; /* Align icon baseline with text baseline */
@@ -527,7 +556,7 @@ p.message {
 }
 
 .bd-search-options {
-    font-size: .8em;
+    font-size: 0.8em;
     margin: 0px;
     padding: 5px;
     vertical-align: middle;
@@ -549,11 +578,11 @@ p.message {
     user-select: none;
 }
 
-.bd-search-options input[type="radio"]:checked+label {
+.bd-search-options input[type="radio"]:checked + label {
     border: 2px solid var(--primary);
 }
 
-.bd-search-options input[type="radio"]+label {
+.bd-search-options input[type="radio"] + label {
     border: 2px solid var(--gray-transparent);
 }
 
@@ -566,7 +595,7 @@ p.message {
     margin-right: 10px;
     padding: 5px 10px;
     user-select: none;
-    transition: .2s;
+    transition: 0.2s;
     box-shadow: var(--shadow-default);
 }
 
@@ -578,7 +607,6 @@ p.message {
 .bd-search-options button:active {
     filter: brightness(70%);
 }
-
 
 .dark-mode .bd-search-options button {
     color: var(--dark);
@@ -594,7 +622,6 @@ label {
     height: calc(100vh - 250px);
     overflow-y: auto;
 }
-
 
 .scrolling-pane {
     border-radius: 7px;
@@ -692,14 +719,12 @@ label {
 }
 
 .hi {
-    color: var (--primary);
+    color: var(--primary);
     text-transform: underline;
 }
-
 .dark-mode .hi {
     color: var(--primary);
 }
-
 
 @media (max-width: 750px) {
     body {
@@ -732,7 +757,7 @@ label {
         gap: 5px;
     }
 
-    .header-pane>* {
+    .header-pane > * {
         max-width: 100%;
         box-sizing: border-box;
         margin: 2px 0;
@@ -784,7 +809,6 @@ label {
         margin: 5px;
         box-sizing: border-box;
     }
-
 
     .history-pane h3 {
         text-align: center;
@@ -890,4 +914,9 @@ label {
         margin-left: auto;
         margin-right: auto;
     }
+}
+
+/* Sandhi toggle - hide apostrophes when class is applied */
+.hide-apostrophes .apostrophe {
+    display: none;
 }

@@ -1,4 +1,4 @@
-from db.models import DpdRoot, Lookup
+from db.models import DpdHeadword, DpdRoot, Lookup
 from tools.tools_for_ru_exporter import (
     make_ru_meaning,
     ru_make_grammar_line,
@@ -8,14 +8,13 @@ from tools.tools_for_ru_exporter import (
 from tools.configger import config_test
 from tools.date_and_time import year_month_day_dash
 from tools.degree_of_completion_ru import rus_degree_of_completion
-from tools.meaning_construction import summarize_construction, make_meaning_combo_html
 
 
 class HeadwordData:
-    def __init__(self, i, fc, fi, fs):
-        self.meaning = make_meaning_combo_html(i)
+    def __init__(self, i: DpdHeadword, fc, fi, fs):
+        self.meaning = i.meaning_combo_html
         self.ru_meaning = make_ru_meaning(i)
-        self.summary = summarize_construction(i)
+        self.summary = i.construction_summary
         self.rus_complete = rus_degree_of_completion(i)
         self.ru_grammar = ru_make_grammar_line(i)
         self.ru_pos = ru_replace_abbreviations(i.pos, "gram")

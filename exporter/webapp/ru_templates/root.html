@@ -3,25 +3,26 @@
 <h3 id="{{ d.r.root_ }}">корень: {{d.r.root}}</h3>
 <div class='dpd summary'>
     <p>
-        корень. 
+        корень.
         <b>{{d.r.root_clean}}</b>
         <sup>
             {{d.r.root_has_verb}}
         </sup>
-        {{d.r.root_group}} 
-        {{d.r.root_sign}} 
-        ({{d.r.root_ru_meaning}}) 
+        {{d.r.root_group}}
+        {{d.r.root_sign}}
+        ({{d.r.root_ru_meaning}})
         {{count}}
-    </p> 
+    </p>
 </div>
 
 <!-- root buttons -->
 
-<div class="button_box">
+<div class="button-box">
     <a class="button" href="#" data-target="root_info_{{d.r.root_}}">инфо корня</a>
     <a class="button" href="#" data-target="root_matrix_{{d.r.root_}}">матрица корня</a>
     {% for fr in d.frs: %}
-        <a class="button" href="#" data-target="family_root_{{d.r.root_}}_{{fr.root_family_}}">{{fr.root_family}}</a>
+    <a class="button" href="#"
+        data-target="family_root_{{d.r.root_}}_{{fr.root_family_}}">{{fr.root_family}}</a>
     {% endfor %}
 </div>
 
@@ -30,7 +31,9 @@
 <div id="root_info_{{d.r.root_}}" class="dpd content hidden">
     {{d.root_info_ru|safe}}
     <p class="footer">
-        Заметили ошибку? <a class="link" href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.r.link}}&entry.326955045=Инфо+корня&entry.1433863141={{d.app_name}}+{{d.date}}" target="_blank">Сообщите здесь</a>.
+        Заметили ошибку? <a class="link"
+            href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.r.root_link}}&entry.326955045=Инфо+корня&entry.1433863141={{d.app_name}}+{{d.date}}"
+            target="_blank">Пожалуйста сообщите</a>.
     </p>
 </div>
 
@@ -49,13 +52,17 @@
         <sup>
             {{d.r.root_has_verb}}
         </sup>
-        {{d.r.root_group}} 
-        {{d.r.root_sign}} 
+        {{d.r.root_group}}
+        {{d.r.root_sign}}
         ({{d.r.root_ru_meaning}})
     </p>
     {{d.root_matrix_ru|safe}}
     <p class="footer">
-        Заметили ошибку? <a class="link" href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.r.link}}&entry.326955045=Матрица+корня&entry.1433863141={{d.app_name}}+{{d.date}}" target="_blank">Сообщите здесь</a>.
+        Заметили ошибку?
+        <a class="link"
+            href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.r.root_link}}&entry.326955045=Матрица+корня&entry.1433863141={{d.app_name}}+{{d.date}}"
+            target="_blank">
+            Пожалуйста сообщите.
         </a>
     </p>
 </div>
@@ -63,13 +70,18 @@
 <!-- root families -->
 
 {% for fr in d.frs: %}
-    <div 
-    id="family_root_{{d.r.root_}}_{{fr.root_family_}}" 
+<div
+    id="family_root_{{d.r.root_}}_{{fr.root_family_}}"
     class="dpd hidden">
-        {{fr.html_ru|safe}}
-        <p class='footer'>
-            Заметили ошибку? <a class="link" href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.r.link}}&entry.326955045=Семья+корня&entry.1433863141={{d.app_name}}+{{d.date}}" target="_blank">Сообщите здесь
+    {{fr.html_ru|safe}}
+    <p class='footer'>
+        Заметили ошибку?
+        <a
+            class="link"
+            href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.r.root_link}}:%20{{fr.root_family_link}}&entry.326955045=Семья+корня&entry.1433863141={{d.app_name}}+{{d.date}}"
+            target="_blank">
+            Пожалуйста сообщите
         </a>.
-        </p>
-    </div>
+    </p>
+</div>
 {% endfor %}

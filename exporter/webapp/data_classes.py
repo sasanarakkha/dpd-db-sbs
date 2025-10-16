@@ -1,19 +1,16 @@
-from db.models import DpdRoot, Lookup
+from db.models import DpdHeadword, DpdRoot, Lookup
 from tools.configger import config_test
 from tools.date_and_time import year_month_day_dash
-from tools.degree_of_completion import degree_of_completion
 from tools.meaning_construction import (
     make_grammar_line,
-    make_meaning_combo_html,
-    summarize_construction,
 )
 
 
 class HeadwordData:
-    def __init__(self, i, fc, fi, fs):
-        self.meaning = make_meaning_combo_html(i)
-        self.summary = summarize_construction(i)
-        self.complete = degree_of_completion(i)
+    def __init__(self, i: DpdHeadword, fc, fi, fs):
+        self.meaning = i.meaning_combo_html
+        self.summary = i.construction_summary
+        self.complete = i.degree_of_completion_html
         self.grammar = make_grammar_line(i)
         self.i = self.convert_newlines(i)
         self.fc = fc
