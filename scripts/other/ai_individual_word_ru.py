@@ -32,10 +32,12 @@ date = year_month_day_hour_minute_dash()
 
 
 # models openai
-# model="gpt-4o"
-# model="gpt-4o-mini"
-# model="gpt-4o-2024-08-06"
-# hight_model="gpt-4o-2024-08-06"
+# model="gpt-5"
+# model="gpt-5-mini"
+# model="gpt-4.1"
+model="gpt-4o-mini" #cheapest
+# model="gpt-4.1-mini"
+# hight_model=""
 
 # models deepseek
 # model = "deepseek-reasoner"
@@ -71,7 +73,7 @@ def translate_with_ai(dpspth, id_to_check, mode, provider, synonyms=False):
     translation_example = pos_example_map.get(pos, "")
 
     if provider == "openai":
-        model = "gpt-4o-2024-08-06" 
+        model = "gpt-4o-mini" 
     elif provider == "deepseek":
         model = "deepseek-chat"
     grammar_orig = grammar
@@ -119,8 +121,8 @@ def write_suggestions_to_csv(file_name, lemma_1, grammar_orig, grammar, original
 if __name__ == "__main__":
 
     # Configuration
-    provider = "deepseek"
-    # provider = "openai"
+    # provider = "deepseek"
+    provider = "openai"
 
     print("Translationg word the help of AI")
 

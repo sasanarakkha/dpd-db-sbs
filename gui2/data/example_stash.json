@@ -10,8 +10,13 @@
         "example": "taṃ sabbaṃ saṅghabhedakkhandhake (cūḷava. 343) āgatam'eva. pañcavatthuyācanā pana kiñ'c'āpi tatth'eva āgamissati. atha kho idhā'pi āgatattā yadettha vattabbaṃ, taṃ vatvāva gamissāma."
     },
     "stash": {
-        "source": "UDa30",
-        "sutta": "lokasuttavaṇṇanā",
-        "example": "pariḷāhehī'ti paridāhehi. pariḍayhamāne'ti indhanaṃ viya agginā samantato ḍayhamāne."
+        "source": "MN116",
+        "sutta": "isigilisuttaṃ",
+        "example": "bhūtapubbaṃ, bhikkhave, pañca paccekabuddhasatāni imasmiṃ isigilismiṃ pabbate ciranivāsino ahesuṃ. te imaṃ pabbataṃ pavisantā dissanti, paviṭṭhā na dissanti."
+    },
+    "dps_shared": {
+        "source": "SN10.8",
+        "sutta": "sudattasuttaṃ",
+        "example": "buddho kira loke uppanno"
     }
 }

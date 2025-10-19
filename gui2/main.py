@@ -18,6 +18,7 @@ class App:
         from gui2.pass2_add_view import Pass2AddView
         from gui2.pass2_auto_view import Pass2AutoView
         from gui2.pass2_pre_view import Pass2PreProcessView
+        from gui2.dps_view import DpsView
         from gui2.tests_tab_view import TestsTabView
 
         self.page = page
@@ -56,6 +57,7 @@ class App:
         )
         self.pass2_auto_view: Pass2AutoView = Pass2AutoView(self.page, self.toolkit)
         self.pass2_add_view: Pass2AddView = Pass2AddView(self.page, self.toolkit)
+        self.dps_view: DpsView = DpsView(self.page, self.toolkit)
         self.tests_tab_view: TestsTabView = TestsTabView(self.page, self.toolkit)
         self.sandhi_view = SandhiFindReplaceView(self.page, self.toolkit)
         self.filter_tab_view = FilterTabView(self.page, self.toolkit)
@@ -117,6 +119,10 @@ class App:
                 ft.Tab(
                     text="Pass2Add",
                     content=self.pass2_add_view,
+                ),
+                ft.Tab(
+                    text="DPS",
+                    content=self.dps_view,
                 ),
                 ft.Tab(
                     text="'",

@@ -35,7 +35,7 @@ class DPSPaths:
         self.discourses_vocab_dir = base_dir.joinpath(Path("shared_data/discourses/vocab/"))
         self.discourses_output_dir = base_dir.joinpath(Path("shared_data/discourses/"))
 
-        self.dps_internal_tests_path = base_dir.joinpath(Path("shared_data/sbs_csvs/dps_internal_tests.tsv"))
+        self.internal_tests_path = base_dir.joinpath(Path("db_tests/dps_internal_tests.tsv"))
 
         # backup_tsv folder
         self.for_compare_dir = base_dir.joinpath(Path("db/backup_tsv/for_compare/")) 
@@ -70,6 +70,9 @@ class DPSPaths:
         # /gui/stash
         self.dps_stash_path = base_dir.joinpath(Path("gui/stash/dps_stash.json"))
         self.dps_save_state_path = base_dir.joinpath(Path("gui/stash/dps_gui_state"))
+
+        # /gui2
+        self.history_json_path: Path = base_dir.joinpath(Path("gui2/data/dps_history.json"))
 
         # .. external
         self.sbs_anki_style_dir = base_dir.joinpath(Path("../sasanarakkha/study-tools/anki-style/"))

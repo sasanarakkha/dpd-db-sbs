@@ -344,7 +344,7 @@ def translate_with_ai(dpspth, meaning_in, lemma_1, grammar, pos, notes, suggesti
     translation_example = pos_example_map.get(pos, "")
 
     if provider == "openai":
-        model = "gpt-4o-2024-08-06" 
+        model = "gpt-4o-mini" 
     elif provider == "deepseek":
         model = "deepseek-chat"
     grammar_orig = grammar

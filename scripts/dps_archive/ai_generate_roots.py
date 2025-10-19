@@ -21,8 +21,8 @@ db_session = get_db_session(pth.dpd_db_path)
 
 # model="gpt-4o"
 # model="gpt-4o-mini"
-model="gpt-4o-2024-08-06"
-hight_model="gpt-4o-2024-08-06"
+model="gpt-4o-mini"
+hight_model="gpt-4o-mini"
 
 api_key = load_openai_config()
 client = OpenAI(api_key=api_key)

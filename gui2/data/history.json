@@ -1,5 +1,17 @@
 [
     {
+        "id": 48512,
+        "lemma_1": "buddha 2"
+    },
+    {
+        "id": 12353,
+        "lemma_1": "ārakkhādhikaraṇaṃ"
+    },
+    {
+        "id": 48511,
+        "lemma_1": "buddha 1"
+    },
+    {
         "id": 83842,
         "lemma_1": "pādapaṃsu"
     },
@@ -66,17 +78,5 @@
     {
         "id": 85363,
         "lemma_1": "ganthika"
-    },
-    {
-        "id": 85379,
-        "lemma_1": "paharaṇa 3"
-    },
-    {
-        "id": 17330,
-        "lemma_1": "ūnodara"
-    },
-    {
-        "id": 85451,
-        "lemma_1": "milāyana"
     }
 ]

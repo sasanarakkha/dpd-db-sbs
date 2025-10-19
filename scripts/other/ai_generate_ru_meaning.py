@@ -40,10 +40,12 @@ date = year_month_day_hour_minute_dash()
 provider = "openai"
 
 # models openai
-model="gpt-4.1"
-# model="gpt-4o-mini"
-# model="gpt-4o-2024-08-06"
-# hight_model="gpt-4o-2024-08-06"
+# model="gpt-5"
+# model="gpt-5-mini"
+# model="gpt-4.1"
+model="gpt-4o-mini" #cheapest
+# model="gpt-4.1-mini"
+# hight_model=""
 
 # models deepseek
 # model = "deepseek-reasoner"
@@ -329,14 +331,14 @@ if __name__ == "__main__":
 
     print("Translationg with the help of AI")
 
-    limit: int = 10000
+    limit: int = 1
 
     # remove_irrelevant(limit)
 
-    # translation_generate("meaning", limit)
+    translation_generate("meaning", limit)
 
     # translation_generate("note", limit)
 
-    make_json("meaning", limit)
+    # make_json("meaning", limit)
 
     # make_json("note", limit)
