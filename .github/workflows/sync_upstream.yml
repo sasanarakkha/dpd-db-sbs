@@ -30,6 +30,9 @@ jobs:
           git fetch --depth=1 upstream main
           git fetch --depth=1 origin as_upstream
 
+      - name: Unstage workflow files
+        run: git restore --staged .github/workflows/*
+
       - name: Push Upstream Main to Origin Main
         run: |
           git push --force \
