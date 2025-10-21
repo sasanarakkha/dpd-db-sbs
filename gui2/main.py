@@ -6,6 +6,7 @@ import flet as ft
 
 from gui2.sandhi_find_replace_view import SandhiFindReplaceView
 from gui2.toolkit import ToolKit
+from tools.ai_related import print_ai_config
 from tools.fast_api_utils import start_dpd_server
 
 
@@ -65,6 +66,7 @@ class App:
         self.build_ui()
 
         self.toolkit.username_manager.get_username()
+
 
     def on_keyboard(self, e: ft.KeyboardEvent) -> None:
         """Handles global keyboard events."""
@@ -162,6 +164,9 @@ def main(page: ft.Page) -> None:
     App(page)
     print(f"App initialized in {time.time() - start_time:.2f}s")
 
+    # Print AI configuration
+    print_ai_config()
+
     if enable_profiling:
         profiler.disable()
         profiler.dump_stats(str(profile_file))
@@ -169,4 +174,5 @@ def main(page: ft.Page) -> None:
 
 
 if __name__ == "__main__":
-    ft.app(target=main)
+    # Run with increased font scaling for better visibility
+    ft.app(target=main, view=ft.AppView.FLET_APP, assets_dir="assets")

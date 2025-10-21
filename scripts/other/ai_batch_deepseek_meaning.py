@@ -18,11 +18,7 @@ from tools.date_and_time import year_month_day_hour_minute_dash
 
 from tools.ai_related import (
     load_translation_examples,
-    replace_abbreviations,
-    get_ai_client,
-    # These are not directly used in batch_processing, but their logic is integrated
-    # generate_messages_for_meaning,
-    # generate_messages_for_notes
+    replace_abbreviations
 )
 
 from tools.ai_llm_factory import LLMFactory

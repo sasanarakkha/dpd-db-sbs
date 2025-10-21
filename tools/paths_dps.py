@@ -73,6 +73,8 @@ class DPSPaths:
 
         # /gui2
         self.history_json_path: Path = base_dir.joinpath(Path("gui2/data/dps_history.json"))
+        self.example_stash_json_path: Path = base_dir.joinpath(Path("gui2/data/dps_example_stash.json"))
+
 
         # .. external
         self.sbs_anki_style_dir = base_dir.joinpath(Path("../sasanarakkha/study-tools/anki-style/"))

@@ -1,5 +1,45 @@
 [
     {
+        "id": 38814,
+        "lemma_1": "nesādajāti"
+    },
+    {
+        "id": 70353,
+        "lemma_1": "venajāti"
+    },
+    {
+        "id": 25836,
+        "lemma_1": "caṇḍālajāti"
+    },
+    {
+        "id": 35881,
+        "lemma_1": "nassarati"
+    },
+    {
+        "id": 38892,
+        "lemma_1": "nokappeti"
+    },
+    {
+        "id": 27555,
+        "lemma_1": "chahākārehi"
+    },
+    {
+        "id": 68180,
+        "lemma_1": "vinidhāya"
+    },
+    {
+        "id": 26111,
+        "lemma_1": "catūhākārehi"
+    },
+    {
+        "id": 30941,
+        "lemma_1": "tīhākārehi"
+    },
+    {
+        "id": 25617,
+        "lemma_1": "ghāyita"
+    },
+    {
         "id": 48512,
         "lemma_1": "buddha 2"
     },
@@ -38,45 +78,5 @@
     {
         "id": 85879,
         "lemma_1": "āgantukavatta"
-    },
-    {
-        "id": 83876,
-        "lemma_1": "āgantukavattakathā"
-    },
-    {
-        "id": 83893,
-        "lemma_1": "bhattaggavattakathā"
-    },
-    {
-        "id": 84953,
-        "lemma_1": "haṃsavatī"
-    },
-    {
-        "id": 24250,
-        "lemma_1": "gadrabha"
-    },
-    {
-        "id": 84840,
-        "lemma_1": "patiṭṭhita 4"
-    },
-    {
-        "id": 85130,
-        "lemma_1": "bhāraka"
-    },
-    {
-        "id": 56486,
-        "lemma_1": "sakkhali 2"
-    },
-    {
-        "id": 85323,
-        "lemma_1": "pariggāhaka 2"
-    },
-    {
-        "id": 85298,
-        "lemma_1": "aparajjha"
-    },
-    {
-        "id": 85363,
-        "lemma_1": "ganthika"
     }
 ]

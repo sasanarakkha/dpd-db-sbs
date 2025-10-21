@@ -21,7 +21,9 @@ from tools.ai_related import (
     replace_abbreviations,
     get_ai_client,
     generate_messages_for_meaning,
-    generate_messages_for_notes
+    generate_messages_for_notes,
+    load_ai_config,
+    print_ai_config
 )
 
 from tools.paths_dps import DPSPaths    
@@ -35,21 +37,7 @@ dpspth = DPSPaths()
 db_session = get_db_session(pth.dpd_db_path)
 date = year_month_day_hour_minute_dash()
 
-# Configuration
-# provider = "deepseek"
-provider = "openai"
-
-# models openai
-# model="gpt-5"
-# model="gpt-5-mini"
-# model="gpt-4.1"
-model="gpt-4o-mini" #cheapest
-# model="gpt-4.1-mini"
-# hight_model=""
-
-# models deepseek
-# model = "deepseek-reasoner"
-# model ="deepseek-chat"
+api_key, provider, model = load_ai_config()
 
 
 def remove_irrelevant(limit: int):
@@ -226,8 +214,9 @@ def translate(lemma_1, grammar, pos, meaning, sentence, notes, mode):
         raise ValueError(f"Invalid mode: {mode}")
 
     # Get appropriate client and handle response
-    client = get_ai_client(provider)
-    suggestion, error_string = handle_ai_response(client, messages, model, provider)
+    client = get_ai_client()
+    print_ai_config()
+    suggestion, error_string = handle_ai_response(client, messages)
     if error_string:
         print(error_string)
     elif suggestion:
@@ -331,14 +320,14 @@ if __name__ == "__main__":
 
     print("Translationg with the help of AI")
 
-    limit: int = 1
+    limit: int = 1000000
 
     # remove_irrelevant(limit)
 
-    translation_generate("meaning", limit)
+    # translation_generate("meaning", limit)
 
     # translation_generate("note", limit)
 
-    # make_json("meaning", limit)
+    make_json("meaning", limit)
 
     # make_json("note", limit)

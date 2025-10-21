@@ -61,7 +61,7 @@ class EditView(ft.Column, PopUpMixin):
             width=BUTTON_WIDTH,
             border_radius=20,
             text_style=ft.TextStyle(color=ft.Colors.BLUE_200),
-            text_size=14,
+            text_size=17,
         )
 
         self._top_section = ft.Container(

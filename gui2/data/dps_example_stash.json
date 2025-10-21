@@ -1,0 +1,12 @@
+{
+    "dps_shared": {
+        "source": "VIN2.5.1.2",
+        "sutta": "omasavādasikkhāpadaṃ",
+        "example": "jāti nāma dve jātiyo, hīnā ca jāti ukkaṭṭhā ca jāti. hīnā nāma jāti, caṇḍālajāti, venajāti, nesādajāti, rathakārajāti, pukkusajāti. esā hīnā nāma jāti."
+    },
+    "dps_last": {
+        "source": "VIN2.5.1.2",
+        "sutta": "omasavādasikkhāpadaṃ",
+        "example": "hīnā nāma jāti, caṇḍālajāti, venajāti, nesādajāti, rathakārajāti, pukkusajāti. esā hīnā nāma jāti. ukkaṭṭhā nāma jāti, khattiyajāti, brāhmaṇajāti."
+    }
+}

@@ -17,6 +17,7 @@ from tools.ai_related import (
     replace_abbreviations,
     handle_ai_response,
     get_ai_client,
+    print_ai_config,
     generate_messages_for_meaning,
     generate_messages_for_notes,
     generate_messages_for_english_meaning
@@ -29,19 +30,6 @@ pth = ProjectPaths()
 dpspth = DPSPaths()
 db_session = get_db_session(pth.dpd_db_path)
 date = year_month_day_hour_minute_dash()
-
-
-# models openai
-# model="gpt-5"
-# model="gpt-5-mini"
-# model="gpt-4.1"
-model="gpt-4o-mini" #cheapest
-# model="gpt-4.1-mini"
-# hight_model=""
-
-# models deepseek
-# model = "deepseek-reasoner"
-# model ="deepseek-chat"
 
 
 def fetch_id(db_session, id_to_check: int) -> Optional[DpdHeadword]:
@@ -58,7 +46,7 @@ def fetch_id(db_session, id_to_check: int) -> Optional[DpdHeadword]:
 
 
 # ai related
-def translate_with_ai(dpspth, id_to_check, mode, provider, synonyms=False):
+def translate_with_ai(dpspth, id_to_check, mode, synonyms=False):
     # Get the content of window "meaning_in"
     pali_word = fetch_id(db_session, id_to_check)
     if pali_word:
@@ -72,10 +60,6 @@ def translate_with_ai(dpspth, id_to_check, mode, provider, synonyms=False):
     pos_example_map = load_translation_examples(dpspth)
     translation_example = pos_example_map.get(pos, "")
 
-    if provider == "openai":
-        model = "gpt-4o-mini" 
-    elif provider == "deepseek":
-        model = "deepseek-chat"
     grammar_orig = grammar
     grammar = replace_abbreviations(grammar)
 
@@ -91,8 +75,9 @@ def translate_with_ai(dpspth, id_to_check, mode, provider, synonyms=False):
 
 
     # Get appropriate client and handle response
-    client = get_ai_client(provider)
-    suggestion, error_string = handle_ai_response(client, messages, model, provider)
+    client = get_ai_client()
+    print_ai_config()
+    suggestion, error_string = handle_ai_response(client, messages)
 
     if error_string:
         print(error_string)
@@ -120,25 +105,21 @@ def write_suggestions_to_csv(file_name, lemma_1, grammar_orig, grammar, original
 
 if __name__ == "__main__":
 
-    # Configuration
-    # provider = "deepseek"
-    provider = "openai"
-
     print("Translationg word the help of AI")
 
     id_to_check = input("please provide id")
 
     #! for russian meaning
-    translate_with_ai(dpspth, id_to_check, "meaning", provider)
+    translate_with_ai(dpspth, id_to_check, "meaning")
 
     #! for russian synonyms
-    # translate_with_ai(dpspth, id_to_check, "meaning", provider, True)
+    # translate_with_ai(dpspth, id_to_check, "meaning", True)
 
     #! for russian notes
-    # translate_with_ai(dpspth, id_to_check, "note", provider)
+    # translate_with_ai(dpspth, id_to_check, "note")
 
     #! for english meaning
-    # translate_with_ai(dpspth, id_to_check, "english", provider)
+    # translate_with_ai(dpspth, id_to_check, "english")
 
 
 

@@ -23,7 +23,7 @@ LOGIC_OPTIONS: list[str] = [
 LABEL_WIDTH = 100
 COLUMN_WIDTH = 300
 LABEL_COLOUR = ft.Colors.GREY_500
-TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=10)
+TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=15)
 LIGHT_BLUE = ft.Colors.BLUE_200
 
 
@@ -134,7 +134,7 @@ class TestsTabView(ft.Column):
                     width=LABEL_WIDTH,
                     text_align=ft.TextAlign.RIGHT,
                     color=LABEL_COLOUR,
-                    size=12,
+                    size=15,
                 ),
                 "search_column": ft.Dropdown(
                     width=COLUMN_WIDTH,
@@ -144,13 +144,13 @@ class TestsTabView(ft.Column):
                     enable_filter=True,
                     enable_search=True,
                     menu_height=300,
-                    text_style=ft.TextStyle(size=12),
+                    text_style=ft.TextStyle(size=15),
                 ),
                 "search_sign": ft.Dropdown(
                     width=COLUMN_WIDTH,
                     options=[ft.dropdown.Option(logic) for logic in LOGIC_OPTIONS],
                     label_style=TEXT_FIELD_LABEL_STYLE,
-                    text_style=ft.TextStyle(size=12),
+                    text_style=ft.TextStyle(size=15),
                     editable=True,
                     enable_filter=True,
                     enable_search=True,
@@ -158,7 +158,7 @@ class TestsTabView(ft.Column):
                 "search_string": ft.TextField(
                     width=COLUMN_WIDTH,
                     label_style=TEXT_FIELD_LABEL_STYLE,
-                    text_size=12,
+                    text_size=15,
                 ),
             }
             self.search_criteria_elements.append(elements)
@@ -172,7 +172,7 @@ class TestsTabView(ft.Column):
             enable_filter=True,
             enable_search=True,
             menu_height=300,
-            text_style=ft.TextStyle(size=12),
+            text_style=ft.TextStyle(size=15),
         )
         self.display_2_input = ft.Dropdown(
             width=COLUMN_WIDTH,
@@ -182,7 +182,7 @@ class TestsTabView(ft.Column):
             enable_filter=True,
             enable_search=True,
             menu_height=300,
-            text_style=ft.TextStyle(size=12),
+            text_style=ft.TextStyle(size=15),
         )
         self.display_3_input = ft.Dropdown(
             width=COLUMN_WIDTH,
@@ -192,12 +192,12 @@ class TestsTabView(ft.Column):
             enable_filter=True,
             enable_search=True,
             menu_height=300,
-            text_style=ft.TextStyle(size=12),
+            text_style=ft.TextStyle(size=15),
         )
         self.iterations_input = ft.TextField(
             width=100,
             label_style=TEXT_FIELD_LABEL_STYLE,
-            text_style=ft.TextStyle(size=12),
+            text_style=ft.TextStyle(size=15),
         )
 
         # Error & Exceptions
@@ -210,14 +210,14 @@ class TestsTabView(ft.Column):
             enable_filter=True,
             enable_search=True,
             menu_height=300,
-            text_style=ft.TextStyle(size=12),
+            text_style=ft.TextStyle(size=15),
         )
         self.exceptions_textfield = ft.TextField(
             label="Exceptions",
             width=300,
             label_style=TEXT_FIELD_LABEL_STYLE,
             read_only=True,
-            text_size=12,
+            text_size=15,
         )
 
         self.test_add_exception_dropdown = ft.Dropdown(
@@ -229,7 +229,7 @@ class TestsTabView(ft.Column):
             enable_filter=True,
             enable_search=True,
             menu_height=200,
-            text_style=ft.TextStyle(size=12),
+            text_style=ft.TextStyle(size=15),
         )
         self.test_add_exception_button = ft.ElevatedButton(
             "Add 1",
@@ -245,7 +245,7 @@ class TestsTabView(ft.Column):
             label="Notes",
             width=920,
             label_style=TEXT_FIELD_LABEL_STYLE,
-            text_size=12,
+            text_size=15,
         )
 
         # Navigation Buttons (Two Sets)
@@ -288,7 +288,7 @@ class TestsTabView(ft.Column):
             label="DB Browser Query",
             width=COLUMN_WIDTH,
             label_style=TEXT_FIELD_LABEL_STYLE,
-            text_size=12,
+            text_size=15,
         )
         self.test_db_query_copy_button = ft.IconButton(
             icon=ft.Icons.COPY,
@@ -357,7 +357,7 @@ class TestsTabView(ft.Column):
                             width=LABEL_WIDTH,
                             text_align=ft.TextAlign.RIGHT,
                             color=LABEL_COLOUR,
-                            size=12,
+                            size=15,
                         ),
                         self.display_1_input,
                         self.display_2_input,

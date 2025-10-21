@@ -35,7 +35,7 @@ class Pass1AutoView(ft.Column):
             autofocus=True,
             options=self.book_options,
             width=300,
-            text_size=14,
+            text_size=17,
             border_color=ft.Colors.BLUE_200,
         )
         self.auto_processed_count_field = ft.TextField(

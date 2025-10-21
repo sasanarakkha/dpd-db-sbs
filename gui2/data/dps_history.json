@@ -1,22 +1,102 @@
 [
     {
-        "id": 48511,
-        "lemma_1": "buddha 1"
+        "id": 38814,
+        "lemma_1": "nesādajāti"
     },
     {
-        "id": 34554,
-        "lemma_1": "dhanatthika"
+        "id": 70353,
+        "lemma_1": "venajāti"
     },
     {
-        "id": 1442,
-        "lemma_1": "ajjhohata"
+        "id": 25836,
+        "lemma_1": "caṇḍālajāti"
     },
     {
-        "id": 48512,
-        "lemma_1": "buddha 2"
+        "id": 71324,
+        "lemma_1": "hīna 1"
     },
     {
-        "id": 1234,
-        "lemma_1": "ajjattanī"
+        "id": 35881,
+        "lemma_1": "nassarati"
+    },
+    {
+        "id": 38892,
+        "lemma_1": "nokappeti"
+    },
+    {
+        "id": 27555,
+        "lemma_1": "chahākārehi"
+    },
+    {
+        "id": 68180,
+        "lemma_1": "vinidhāya"
+    },
+    {
+        "id": 26111,
+        "lemma_1": "catūhākārehi"
+    },
+    {
+        "id": 69220,
+        "lemma_1": "visaṃvādanā"
+    },
+    {
+        "id": 65612,
+        "lemma_1": "vacī 2"
+    },
+    {
+        "id": 61425,
+        "lemma_1": "sahasā 2"
+    },
+    {
+        "id": 78446,
+        "lemma_1": "ravā"
+    },
+    {
+        "id": 78445,
+        "lemma_1": "davā"
+    },
+    {
+        "id": 42736,
+        "lemma_1": "pamuṭṭha"
+    },
+    {
+        "id": 57809,
+        "lemma_1": "sattahākārehi"
+    },
+    {
+        "id": 23421,
+        "lemma_1": "khanti 2"
+    },
+    {
+        "id": 39920,
+        "lemma_1": "pañcahākārehi"
+    },
+    {
+        "id": 60228,
+        "lemma_1": "sampajānamusā"
+    },
+    {
+        "id": 30941,
+        "lemma_1": "tīhākārehi"
+    },
+    {
+        "id": 47748,
+        "lemma_1": "phuṭṭha 1"
+    },
+    {
+        "id": 62414,
+        "lemma_1": "sāyita 1"
+    },
+    {
+        "id": 28513,
+        "lemma_1": "jivhā"
+    },
+    {
+        "id": 25617,
+        "lemma_1": "ghāyita"
+    },
+    {
+        "id": 25594,
+        "lemma_1": "ghāna"
     }
 ]

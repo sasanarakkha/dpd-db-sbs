@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 import flet as ft
 from gui2.dps_example_field import DpsExampleField
+from gui2.dps_meaning_field import DpsMeaningField
 
 common_params = {
     "border_color": ft.Colors.BLUE_200,
     "border_radius": 20,
-    "text_size": 14,
+    "text_size": 17,
     "expand": True,
 }
 
@@ -18,10 +19,10 @@ dps_field_mapping = {
     "dps_dpd_id": {"control": ft.TextField, "params": create_params({"disabled": False})},
     "dps_lemma_1": {"control": ft.TextField, "params": create_params({"disabled": False})},
     "dps_grammar": {"control": ft.TextField, "params": create_params({"disabled": False})},
-    "dps_meaning": {"control": ft.TextField, "params": create_params({"multiline": True, "min_lines": 2, "disabled": True})},
+    "dps_meaning": {"control": ft.TextField, "params": create_params({"multiline": True, "min_lines": 2, "disabled": False})},
     "dps_ru_online_suggestion": {"control": ft.TextField, "params": create_params({"multiline": True, "min_lines": 3})},
-    "dps_ru_meaning": {"control": ft.TextField, "params": create_params({"multiline": True, "min_lines": 2, "tooltip": "type Russian meaning"})},
-    "dps_ru_meaning_lit": {"control": ft.TextField, "params": create_params({"tooltip": "type Russian literal meaning"})},
+    "dps_ru_meaning": {"control": DpsMeaningField, "params": create_params({"multiline": True, "min_lines": 2, "tooltip": "type Russian meaning"})},
+    "dps_ru_meaning_lit": {"control": DpsMeaningField, "params": create_params({"tooltip": "type Russian literal meaning"})},
     "dps_ru_cognate": {"control": ft.TextField, "params": create_params({"tooltip": "Russian word which close sounding"})},
     "dps_sbs_meaning": {"control": ft.TextField, "params": create_params({"multiline": True, "min_lines": 2, "tooltip": "type meaning in SBS PER"})},
     "dps_root": {"control": ft.TextField, "params": create_params({"disabled": False})},
@@ -29,16 +30,16 @@ dps_field_mapping = {
     "dps_constr_or_comp_constr": {"control": ft.TextField, "params": create_params({"disabled": False})},
     "dps_synonym": {"control": ft.TextField, "params": create_params({"disabled": False})},
     "dps_synonym_antonym": {"control": ft.TextField, "params": create_params({"disabled": False})},
-    "dps_notes": {"control": ft.TextField, "params": create_params({"multiline": True, "min_lines": 3, "disabled": True})},
+    "dps_notes": {"control": ft.TextField, "params": create_params({"multiline": True, "min_lines": 3, "disabled": False})},
     "dps_notes_online_suggestion": {"control": ft.TextField, "params": create_params({"multiline": True, "min_lines": 2})},
     "dps_ru_notes": {"control": ft.TextField, "params": create_params({"multiline": True, "min_lines": 2})},
     "dps_sbs_notes": {"control": ft.TextField, "params": create_params({"multiline": True, "min_lines": 2})},
     "dps_source_1": {"control": ft.TextField, "params": create_params({"disabled": False})},
     "dps_sutta_1": {"control": ft.TextField, "params": create_params({"disabled": False})},
-    "dps_example_1": {"control": ft.TextField, "params": create_params({"multiline": True, "min_lines": 5, "disabled": True})},
+    "dps_example_1": {"control": DpsExampleField, "params": create_params({"multiline": True, "min_lines": 5, "disabled": False})},
     "dps_source_2": {"control": ft.TextField, "params": create_params({"disabled": False})},
     "dps_sutta_2": {"control": ft.TextField, "params": create_params({"disabled": False})},
-    "dps_example_2": {"control": ft.TextField, "params": create_params({"multiline": True, "min_lines": 5, "disabled": True})},
+    "dps_example_2": {"control": DpsExampleField, "params": create_params({"multiline": True, "min_lines": 5, "disabled": False})},
     "dps_sbs_source_1": {"control": ft.TextField, "params": create_params({"tooltip": "Sutta code using DPR system"})},
     "dps_sbs_sutta_1": {"control": ft.TextField, "params": create_params({"tooltip": "Sutta name"})},
     "dps_sbs_example_1": {"control": DpsExampleField, "params": create_params({"multiline": True, "min_lines": 4})},
@@ -63,7 +64,7 @@ dps_field_mapping = {
     "dps_class_source": {"control": ft.TextField, "params": create_params({})},
     "dps_class_sutta": {"control": ft.TextField, "params": create_params({})},
     "dps_class_example": {"control": DpsExampleField, "params": create_params({"multiline": True, "min_lines": 4})},
-    "dps_class_example_translation": {"control": DpsExampleField, "params": create_params({"multiline": True, "min_lines": 4})},
+    "dps_class_example_translation": {"control": ft.TextField, "params": create_params({})},
     "dps_discourses_source": {"control": ft.TextField, "params": create_params({})},
     "dps_discourses_sutta": {"control": ft.TextField, "params": create_params({})},
     "dps_discourses_example": {"control": DpsExampleField, "params": create_params({"multiline": True, "min_lines": 4})},

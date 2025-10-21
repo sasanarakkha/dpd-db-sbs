@@ -13,16 +13,18 @@ from timeout_decorator import timeout, TimeoutError as TimeoutDecoratorError
 from tools.configger import config_test_option, config_read, config_update
 from tools.paths_dps import DPSPaths    
 from tools.paths import ProjectPaths
+from tools.printer import printer as pr
 
 
 dpspth = DPSPaths()
 pth = ProjectPaths()
 
 
-def get_ai_client(provider: str):
+
+def get_ai_client():
     """Initialize and return an AI client for specified provider."""
     try:
-        api_key = load_ai_config(provider)
+        api_key, provider, model = load_ai_config()
         if provider == "deepseek":
             return Deepseek(api_key=api_key)
         elif provider == "openai":
@@ -33,19 +35,30 @@ def get_ai_client(provider: str):
         return None
 
 
-def load_ai_config(provider: str):
+def print_ai_config():
+    """Load model and provider from config and print them."""
+    provider = str(config_read("models", "provider"))
+    model = config_read("models", f"{provider}")
+    pr.info(f"DPS uses {provider} model {model}")
+
+
+def load_ai_config():
     """Load API key for specified provider from config or prompt user."""
+
+    provider = str(config_read("models", "provider"))
     
     if not config_test_option("apis", provider):
-        ai_key = Prompt.ask(f"[yellow]Enter your {provider} API key (or ENTER for None)")
-        if ai_key:
-            config_update("apis", provider, ai_key)
+        api_key = Prompt.ask(f"[yellow]Enter your {provider} API key (or ENTER for None)")
+        if api_key:
+            config_update("apis", provider, api_key)
         else:
             raise ValueError(f"{provider} API key is required")
     else:
-        ai_key = config_read("apis", provider)
+        api_key = config_read("apis", provider)
 
-    return ai_key
+    model = config_read("models", f"{provider}")
+
+    return api_key, provider, model
 
 
 def load_translation_examples(dpspth):
@@ -62,9 +75,11 @@ def load_translation_examples(dpspth):
 
 
 @timeout(10, timeout_exception=TimeoutDecoratorError)  # Setting a 10-second timeout
-def handle_ai_response(client, messages, model, provider: str):
+def handle_ai_response(client, messages):
     if client is None:
         return None, "client is not initialized."
+    
+    api_key, provider, model = load_ai_config()
         
     error_string = ""
     try:

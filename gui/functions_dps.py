@@ -335,7 +335,7 @@ def dps_example_load(pth: ProjectPaths, window, example_attr: str) -> None:
 
 
 # ai related
-def translate_with_ai(dpspth, meaning_in, lemma_1, grammar, pos, notes, suggestion_field, error_field, window, values, mode, main_sentence, provider, ex_1="", ex_2="", ex_3="", ex_4="", number="0", synonyms=False):
+def translate_with_ai(dpspth, meaning_in, lemma_1, grammar, pos, notes, suggestion_field, error_field, window, values, mode, main_sentence, ex_1="", ex_2="", ex_3="", ex_4="", number="0", synonyms=False):
     window[error_field].update("")
     # Get the content of window "meaning_in"
     meaning = values[meaning_in]
@@ -343,10 +343,6 @@ def translate_with_ai(dpspth, meaning_in, lemma_1, grammar, pos, notes, suggesti
     pos_example_map = load_translation_examples(dpspth)
     translation_example = pos_example_map.get(pos, "")
 
-    if provider == "openai":
-        model = "gpt-4o-mini" 
-    elif provider == "deepseek":
-        model = "deepseek-chat"
     grammar_orig = grammar
     grammar = replace_abbreviations(grammar)
 
@@ -366,8 +362,8 @@ def translate_with_ai(dpspth, meaning_in, lemma_1, grammar, pos, notes, suggesti
 
 
     # Get appropriate client and handle response
-    client = get_ai_client(provider)
-    suggestion, error_string = handle_ai_response(client, messages, model, provider)
+    client = get_ai_client()
+    suggestion, error_string = handle_ai_response(client, messages)
 
     if error_string:
         window[error_field].update(error_string)

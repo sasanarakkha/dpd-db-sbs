@@ -38,7 +38,7 @@ class Pass1AddView(ft.Column, PopUpMixin):
             autofocus=True,
             options=self.book_options,
             width=300,
-            text_size=14,
+            text_size=17,
             border_color=HIGHLIGHT_COLOUR,
         )
         self.word_in_text = ft.TextField(

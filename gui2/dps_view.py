@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 import copy
+import csv
+from pathlib import Path
 
 import flet as ft
 
 from db.models import DpdHeadword, Russian, SBS
+from gui2.dpd_fields_functions import clean_lemma_1
 from gui2.dps_fields import DpsFields
+from gui2.dps_example_field import DpsExampleField
 from gui2.history import HistoryManager
 from gui2.mixins import PopUpMixin
 from gui2.toolkit import ToolKit
@@ -37,7 +41,7 @@ class DpsView(ft.Column, PopUpMixin):
         self.dpspth = DPSPaths()
         
         # Initialize DPS-specific history manager
-        self.dps_history_manager = HistoryManager(self.toolkit, max_size=20)
+        self.dps_history_manager = HistoryManager(self.toolkit, max_size=25)
         # Override the history path to be DPS-specific
         self.dps_history_manager._history_path = self.dpspth.history_json_path
         # Reload history from the correct file after setting the path
@@ -55,6 +59,9 @@ class DpsView(ft.Column, PopUpMixin):
         self.ru_word: Russian | None = None
         self.sbs_word: SBS | None = None
         self.tests_passed: bool = False
+        
+        # Load translation examples from CSV file
+        self._formatted_translation_hint = self._load_translation_examples()
 
         self._message_field = ft.TextField(
             "",
@@ -64,10 +71,10 @@ class DpsView(ft.Column, PopUpMixin):
             color=ft.Colors.BLUE_200,
             expand_loose=True,
             expand=True,
-            hint_style=ft.TextStyle(color=LABEL_COLOUR, size=10),
+            hint_style=ft.TextStyle(color=LABEL_COLOUR, size=15),
             hint_text="Messages",
             read_only=True,
-            text_size=14,
+            text_size=17,
             width=700,
         )
 
@@ -78,10 +85,10 @@ class DpsView(ft.Column, PopUpMixin):
             border_radius=20,
             expand_loose=True,
             expand=True,
-            hint_style=ft.TextStyle(color=LABEL_COLOUR, size=10),
+            hint_style=ft.TextStyle(color=LABEL_COLOUR, size=15),
             hint_text="Enter ID or Lemma",
             on_submit=self._click_edit_headword,
-            text_size=14,
+            text_size=17,
             width=400,
         )
 
@@ -92,8 +99,19 @@ class DpsView(ft.Column, PopUpMixin):
             expand=True,
             expand_loose=True,
             border_radius=20,
-            text_size=14,
+            text_size=17,
             on_change=self._handle_history_selection,
+        )
+
+        # Create hint button for translation examples
+        self._translation_hint_button = ft.IconButton(
+            icon=ft.Icons.INFO,
+            icon_size=16,
+            tooltip=self._formatted_translation_hint,
+            style=ft.ButtonStyle(
+                padding=ft.padding.all(4),
+                overlay_color=ft.Colors.TRANSPARENT
+            )
         )
 
         self._top_section = ft.Container(
@@ -102,6 +120,7 @@ class DpsView(ft.Column, PopUpMixin):
                     ft.Row(
                         controls=[
                             self._enter_id_or_lemma_field,
+                            self._translation_hint_button,
                             self._history_dropdown,
                         ],
                         spacing=10,
@@ -158,12 +177,38 @@ class DpsView(ft.Column, PopUpMixin):
         ]
 
 
+    def _load_translation_examples(self) -> str:
+        """Load and format translation examples from CSV file for tooltip display."""
+        try:
+            csv_path = self.dpspth.translation_example_path
+            if not csv_path.exists():
+                return "Translation examples file not found."
+            
+            formatted_lines = []
+            with open(csv_path, 'r', encoding='utf-8') as file:
+                # The file is TSV format with tabs
+                reader = csv.DictReader(file, delimiter='\t')
+                for row in reader:
+                    pos = row.get('pos', '').strip()
+                    examples = row.get('examples', '').strip()
+                    if pos and examples:
+                        formatted_lines.append(f"{pos}: {examples}")
+            
+            if formatted_lines:
+                return "\n".join(formatted_lines)
+            else:
+                return "No translation examples found in file."
+                
+        except Exception as e:
+            return f"Error loading translation examples: {str(e)}"
+
     def update_message(self, message: str) -> None:
         self._message_field.value = message
         self.page.update()
 
 
     def _click_edit_headword(self, e: ft.ControlEvent) -> None:
+        self.dps_fields.clear_all_fields()
         if self._enter_id_or_lemma_field.value:
             id_or_lemma = self._enter_id_or_lemma_field.value.strip()
         if not id_or_lemma:
@@ -182,6 +227,7 @@ class DpsView(ft.Column, PopUpMixin):
         self.tests_passed = False  # Reset test state when loading new word
 
         self.dps_fields.populate_dps_tab(headword, self.ru_word, self.sbs_word)
+        self.add_headword_to_dps_examples()  # Populate word_to_find fields with stem
         self.update_message(f"Loaded {headword.lemma_1}")
 
 
@@ -216,6 +262,20 @@ class DpsView(ft.Column, PopUpMixin):
         self.dps_fields.add_to_ui(middle_section)
         return middle_section
 
+
+    def add_headword_to_dps_examples(self) -> None:
+        """Add headword to all DPS example fields - EXACT same as Pass2Add"""
+        lemma_1_field = self.dps_fields.fields.get("dps_lemma_1")
+        if lemma_1_field and lemma_1_field.value:
+            lemma_value = str(lemma_1_field.value)  # Ensure string type
+            lemma_clean = clean_lemma_1(lemma_value)  # Same cleaning function
+            stem = lemma_clean[:-1]  # Same stem logic
+            
+            # Update all DPS example fields
+            for field_name, field in self.dps_fields.fields.items():
+                if isinstance(field, DpsExampleField) and hasattr(field, 'word_to_find_field'):
+                    field.word_to_find_field.value = stem
+                    field.word_to_find_field.update()  # Force UI update
 
     def _click_clear_all(self, e: ft.ControlEvent) -> None:
         self.dps_fields.clear_all_fields()
@@ -270,6 +330,8 @@ class DpsView(ft.Column, PopUpMixin):
             if self.headword:
                 self.dps_history_manager.add_item(self.headword.id, self.headword.lemma_1)
                 request_dpd_server(str(self.headword.id))
+                self.dps_fields.clear_all_fields()
+                self._enter_id_or_lemma_field.value = ""  # Clear the ID/Lemma input field
                 
         except Exception as ex:
             self._db.db_session.rollback()
@@ -304,22 +366,82 @@ class DpsView(ft.Column, PopUpMixin):
             sbs_word = SBS(id=headword_id)
             self._db.db_session.add(sbs_word)
         
+        # Get current values from database before updating
+        current_sbs = self._db.fetch_sbs(headword_id)
+        old_vib_example = current_sbs.vib_example if current_sbs else ""
+        old_pat_example = current_sbs.pat_example if current_sbs else ""
+        old_sbs_patimokkha = current_sbs.sbs_patimokkha if current_sbs else ""
+        
+        # Special handling for class_example_translation - bulk update all matching records
+        class_example_translation_field = self.dps_fields.fields.get("dps_class_example_translation")
+        if class_example_translation_field and class_example_translation_field.value is not None:
+            new_value = str(class_example_translation_field.value) if class_example_translation_field.value else ""
+            
+            # Get current value from database
+            current_value = current_sbs.class_example_translation if current_sbs else ""
+            
+            # If values are different
+            if current_value != new_value:
+                # Case 1: Current value exists and new value exists - bulk update all matching records
+                if current_value and new_value:
+                    matching_records = self._db.db_session.query(SBS).filter(
+                        SBS.class_example_translation == current_value
+                    ).all()
+                    
+                    # Update all matching records
+                    for record in matching_records:
+                        record.class_example_translation = new_value
+                # Case 2: Current value is empty but new value exists - update only current record
+                elif not current_value and new_value and current_sbs:
+                    current_sbs.class_example_translation = new_value
+                # Case 3: Current value exists but new value is empty - update only current record
+                elif current_value and not new_value and current_sbs:
+                    current_sbs.class_example_translation = new_value
+        
         # SBS field prefixes to process
         sbs_prefixes = ["sbs_", "dhp_", "pat_", "vib_", "class_", "discourses_"]
         
-        # Update SBS fields
+        # Track new values for vib_example and pat_example
+        new_vib_example = ""
+        new_pat_example = ""
+        
+        # Update SBS fields (excluding class_example_translation which was handled above)
         for field_name, field in self.dps_fields.fields.items():
             if field_name.startswith("dps_"):
+                # Skip class_example_translation as it's already handled
+                if field_name == "dps_class_example_translation":
+                    continue
+                    
                 # Check if this is an SBS-related field
                 for prefix in sbs_prefixes:
                     if field_name.startswith(f"dps_{prefix}"):
                         sbs_field_name = field_name.replace("dps_", "")
                         if hasattr(sbs_word, sbs_field_name):
-                            setattr(sbs_word, sbs_field_name, field.value or "")
+                            field_value = field.value or ""
+                            setattr(sbs_word, sbs_field_name, field_value)
+                            
+                            # Track vib_example and pat_example values for auto-population logic
+                            if sbs_field_name == "vib_example":
+                                new_vib_example = field_value
+                            elif sbs_field_name == "pat_example":
+                                new_pat_example = field_value
+                                
                         else:
                             print(f"ERROR: SBS field {sbs_field_name} not found in model")
                             self.update_message(f"ERROR: SBS field {sbs_field_name} not found in model")
                         break
+        
+        # Auto-populate sbs_patimokkha logic
+        if not old_sbs_patimokkha:  # Only if sbs_patimokkha is currently empty
+            # Check if vib_example changed from empty to non-empty
+            if not old_vib_example and new_vib_example:
+                sbs_word.sbs_patimokkha = "vib"
+                # print(f"DEBUG: Auto-populated sbs_patimokkha to 'vib' because vib_example was added")
+            
+            # Check if pat_example changed from empty to non-empty
+            elif not old_pat_example and new_pat_example:
+                sbs_word.sbs_patimokkha = "pat"
+                # print(f"DEBUG: Auto-populated sbs_patimokkha to 'pat' because pat_example was added")
 
 
     def _get_current_field_values(self) -> dict[str, str]:

@@ -5,8 +5,10 @@ from gui2.dps_field_mapping import dps_field_mapping
 from gui2.dps_example_field import DpsExampleField
 from gui2.dps_example_stash_manager import DpsExampleStashManager
 from gui2.dps_ai_service import translate_with_ai_from_gui
+from gui2.dps_meaning_field import DpsMeaningField
 from gui2.toolkit import ToolKit
 from tools.meaning_construction import make_meaning_combo
+from tools.ru_spelling import RuSpellChecker
 from typing import Any
 
 class DpsFields:
@@ -15,9 +17,11 @@ class DpsFields:
         self.view: DpsView = view
         self.db_session = db_session
         self.toolkit = toolkit
-        self.fields: dict[str, ft.TextField | ft.Checkbox | ft.Dropdown | DpsExampleField] = {}
+        self.fields: dict[str, ft.TextField | ft.Checkbox | ft.Dropdown | DpsExampleField | DpsMeaningField] = {}
         # Create shared stash manager for all DPS example fields
         self.shared_stash_manager = DpsExampleStashManager(self.toolkit)
+        # Initialize spell checker for Russian fields
+        self.russian_spellchecker = RuSpellChecker()
         self._build_fields()
 
     def _build_fields(self):
@@ -44,6 +48,24 @@ class DpsFields:
                         setattr(text_field, key, value)
                 
                 self.fields[field_name] = example_field
+            
+            # Special handling for DpsMeaningField
+            elif control_type == DpsMeaningField:
+                # Create DpsMeaningField with Russian spell checker
+                meaning_field = DpsMeaningField(
+                    ui=self.view,
+                    field_name=field_name,
+                    dps_fields=self,
+                    spellchecker=self.russian_spellchecker,
+                )
+                
+                # Apply parameters to the internal meaning field
+                for key, value in params.items():
+                    if hasattr(meaning_field.meaning_field, key):
+                        setattr(meaning_field.meaning_field, key, value)
+                
+                self.fields[field_name] = meaning_field
+            
             else:
                 # Standard Flet controls
                 self.fields[field_name] = control_type(**params)
@@ -62,6 +84,8 @@ class DpsFields:
             field.value = str(value) if value is not None else None
         elif isinstance(field, DpsExampleField):
             field.text_field.value = str(value)
+        elif isinstance(field, DpsMeaningField):
+            field.value = str(value)
         elif isinstance(field, (ft.TextField, ft.Text)):
             field.value = str(value)
         else:
@@ -83,7 +107,7 @@ class DpsFields:
             label = ft.Text(
                 label_text,
                 color=ft.Colors.GREY_500,
-                size=12,
+                size=15,
                 width=150,
                 selectable=True,
             )
@@ -242,4 +266,20 @@ class DpsFields:
             elif isinstance(field, DpsExampleField):
                 field.value = ""
                 field.error_text = None
+                # Clear additional fields within DpsExampleField
+                if hasattr(field, 'word_to_find_field'):
+                    field.word_to_find_field.value = ""
+                    field.word_to_find_field.error_text = None
+                if hasattr(field, 'book_dropdown'):
+                    field.book_dropdown.value = None
+                if hasattr(field, 'bold_field'):
+                    field.bold_field.value = ""
+                if hasattr(field, 'counter_field'):
+                    field.counter_field.value = ""
+            elif isinstance(field, DpsMeaningField):
+                field.value = ""
+                field.error_text = None
+                # Clear the "Add spelling" field
+                if hasattr(field, 'add_to_dict_field'):
+                    field.add_to_dict_field.value = ""
         self.view.page.update()

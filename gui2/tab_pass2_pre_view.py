@@ -40,7 +40,7 @@ class Pass2PreProcessView(ft.Column):
         self.books_dropdown = ft.Dropdown(
             options=self.book_options,
             width=200,
-            text_size=14,
+            text_size=17,
             border_color=ft.Colors.BLUE_200,
         )
         self.preprocessed_count_field = ft.Text(
@@ -59,26 +59,26 @@ class Pass2PreProcessView(ft.Column):
             expand=True,
             color=ft.Colors.BLUE_200,
             selectable=True,
-            size=14,
+            size=17,
         )
         self.headword_lemma_1_field = ft.Text(
             "",
             width=500,
             selectable=True,
-            size=14,
+            size=17,
         )
         self.headword_pos_field = ft.Text(
             "",
             width=120,
             selectable=True,
-            size=14,
+            size=17,
         )
         self.headword_meaning_field = ft.Text(
             "",
             width=COLUMN_WIDTH,
             expand=True,
             selectable=True,
-            size=14,
+            size=17,
         )
         self.examples_field = ft.Container(
             content=None,

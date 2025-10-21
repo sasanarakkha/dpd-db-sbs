@@ -3,11 +3,8 @@
 
 from gui2.dps_ai_cli_wrapper import run_ai_via_subprocess
 
-# Default AI provider
-DEFAULT_PROVIDER = "openai"
 
-
-def translate_with_ai_from_gui(dps_fields, mode: str, synonyms: bool = False, provider: str = DEFAULT_PROVIDER):
+def translate_with_ai_from_gui(dps_fields, mode: str, synonyms: bool = False):
     """
     Uses subprocess to run AI translation in separate process to avoid signal conflicts.
     
@@ -32,7 +29,7 @@ def translate_with_ai_from_gui(dps_fields, mode: str, synonyms: bool = False, pr
             return f"Error: Invalid headword ID: {headword_id_field.value}"
         
         # Use subprocess to run AI in separate process (avoids signal errors)
-        result = run_ai_via_subprocess(headword_id, mode, synonyms, provider)
+        result = run_ai_via_subprocess(headword_id, mode, synonyms)
         
         # Check if result contains error
         if "Error:" in result or "Timeout" in result:

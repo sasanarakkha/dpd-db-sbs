@@ -427,18 +427,18 @@ class DpsTestManager(PopUpMixin):
             self._handle_next_failure(e)  # Always behave like 'Next'
 
     def _handle_open_test_file(self, e: ft.ControlEvent) -> None:
-        """Opens the DPS test file in LibreOffice Calc."""
+        """Opens the DPS test file in VSCode."""
         if self.ui:
             if self.tests_path.exists():
                 self.ui.update_message(f"Opening test file: {self.tests_path}")
                 try:
-                    subprocess.Popen(["libreoffice", "--calc", str(self.tests_path)])
+                    subprocess.Popen(["code", str(self.tests_path)])
                     self._handle_popup_close(e)  # Close popup after attempting to open
                 except FileNotFoundError:
-                    self.ui.update_message("Error: 'libreoffice' command not found.")
+                    self.ui.update_message("Error: 'code' command not found.")
                 except Exception as sub_err:
                     self.ui.update_message(
-                        f"Error opening file with LibreOffice: {sub_err}"
+                        f"Error opening file with VSCode: {sub_err}"
                     )
             else:
                 self.ui.update_message(

@@ -6,7 +6,7 @@ import sys
 import os
 
 
-def run_ai_via_subprocess(headword_id: int, mode: str, synonyms: bool = False, provider: str = "openai") -> str:
+def run_ai_via_subprocess(headword_id: int, mode: str, synonyms: bool = False) -> str:
     """
     Run AI translation via subprocess to avoid signal conflicts.
     
@@ -68,11 +68,6 @@ if pali_word:
     pos_example_map = load_translation_examples(dpspth)
     translation_example = pos_example_map.get(pos, "")
 
-    if "{provider}" == "openai":
-        # model = "gpt-4.1-mini"
-        model = "gpt-4.1" 
-    elif "{provider}" == "deepseek":
-        model = "deepseek-chat"
     grammar_orig = grammar
     grammar = replace_abbreviations(grammar)
 
@@ -83,8 +78,8 @@ if pali_word:
         messages = generate_messages_for_notes(lemma_1, grammar, notes)
 
     # Get AI client and handle response
-    client = get_ai_client("{provider}")
-    suggestion, error_string = handle_ai_response(client, messages, model, "{provider}")
+    client = get_ai_client()
+    suggestion, error_string = handle_ai_response(client, messages)
 
     if error_string:
         print(f"AI Error: {{error_string}}")

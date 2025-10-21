@@ -166,16 +166,16 @@ class DpsExampleField(ft.Column):
                 "",
                 width=240,
                 label="bold",
-                label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=10),
+                label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=15),
                 expand=True,
                 dense=True,
-                text_size=12,
+                text_size=15,
                 on_submit=self.click_bold_example,
                 on_blur=self._handle_last_control_blur,
             )
             self.counter_field = ft.Text(
                 "",
-                size=12,
+                size=15,
                 width=40,
                 expand=False,
             )
@@ -187,9 +187,9 @@ class DpsExampleField(ft.Column):
             self.book_dropdown = ft.Dropdown(
                 options=self.book_options,
                 width=300,
-                text_size=14,
+                text_size=17,
                 label="book",
-                label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=10),
+                label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=15),
                 editable=True,
                 enable_filter=True,
                 border_color=ft.Colors.GREY_800,
@@ -202,7 +202,7 @@ class DpsExampleField(ft.Column):
                 "",
                 width=300,
                 label="word to find",
-                label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=10),
+                label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=15),
                 on_submit=self._click_search_dialog_ok,
                 border_radius=20,
             )
@@ -321,19 +321,23 @@ class DpsExampleField(ft.Column):
         if self._search_row.visible:
             self._toggle_tools_visibility(None)
 
-        source, sutta, example = self.get_fields()
+        fields_dict = self.get_fields()
 
         # Save current example to stash
-        if example.value:
-            self.stash_manager.last_example = (
-                source.value or "",
-                sutta.value or "",
-                example.value,
-            )
+        example_field = fields_dict.get("example")
+        if example_field and hasattr(example_field, 'value') and example_field.value:
+            # Create dictionary with field values
+            stash_dict: dict[str, str] = {}
+            for field_name, field in fields_dict.items():
+                if field and hasattr(field, 'value') and field.value:
+                    stash_dict[field_name] = field.value
+            
+            if stash_dict:
+                self.stash_manager.last_example = stash_dict
 
         # handle hyphenations and apostrophes
-        if "'" in example.value or "-" in example.value:
-            self._handle_hyphens_and_apostrophes(example.value)
+        if example_field and hasattr(example_field, 'value') and example_field.value and ("'" in example_field.value or "-" in example_field.value):
+            self._handle_hyphens_and_apostrophes(example_field.value)
 
     def _handle_hyphens_and_apostrophes(self, text):
         text_list: list[str] = split_pali_sentence_into_words(text)
@@ -435,11 +439,12 @@ class DpsExampleField(ft.Column):
         self.choose_example_dialog.open = False
         self.page.update()
 
-    def get_fields(self):
-        """Return fields for the current example field"""
+    def get_fields(self) -> dict[str, ft.TextField | None]:
+        """Return all relevant fields for the current example field as a dictionary."""
         # Extract example type and index from field name
         # e.g., "dps_sbs_example_1" -> type="sbs", index="1"
         # e.g., "dps_dhp_example" -> type="dhp", index=None
+        # e.g., "dps_example_1" -> type="dpd", index="1"
         parts = self.field_name.split("_")
         
         # Handle different field name structures
@@ -451,26 +456,49 @@ class DpsExampleField(ft.Column):
             # 3-part field names: "dps_dhp_example", "dps_pat_example", etc.
             example_type = parts[1]  # "dhp", "pat", "vib", etc.
             index = None  # No index for single examples
+            
+            # Special case for DPD examples: "dps_example_1", "dps_example_2"
+            if example_type == "example" and parts[2] in ["1", "2"]:
+                example_type = "dpd"
+                index = parts[2]  # "1" or "2"
         else:
             # Fallback for unexpected field names
             example_type = "sbs"  # default
             index = "1"  # default
 
+        fields_dict: dict[str, ft.TextField | None] = {}
+
         # Construct field names based on type and index
         if index:
-            # Indexed examples (SBS examples 1 and 2)
-            source_field_name = f"dps_{example_type}_source_{index}"
-            sutta_field_name = f"dps_{example_type}_sutta_{index}"
+            # Indexed examples (SBS examples 1 and 2, DPD examples 1 and 2)
+            # Special handling for DPD examples - they use different field naming convention
+            if example_type == "dpd":
+                source_field_name = f"dps_source_{index}"
+                sutta_field_name = f"dps_sutta_{index}"
+            else:
+                source_field_name = f"dps_{example_type}_source_{index}"
+                sutta_field_name = f"dps_{example_type}_sutta_{index}"
+            
+            # Add SBS-specific fields for SBS examples
+            if example_type == "sbs":
+                fields_dict["chant_pali"] = self.dps_fields.fields.get(f"dps_sbs_chant_pali_{index}")
+                fields_dict["chant_eng"] = self.dps_fields.fields.get(f"dps_sbs_chant_eng_{index}")
+                fields_dict["chapter"] = self.dps_fields.fields.get(f"dps_sbs_chapter_{index}")
         else:
             # Non-indexed examples (DHP, PAT, VIB, CLASS, DISCOURSES)
             source_field_name = f"dps_{example_type}_source"
             sutta_field_name = f"dps_{example_type}_sutta"
+            
+            # Add class-specific field for class examples
+            if example_type == "class":
+                fields_dict["translation"] = self.dps_fields.fields.get("dps_class_example_translation")
 
-        source = self.dps_fields.fields.get(source_field_name)
-        sutta = self.dps_fields.fields.get(sutta_field_name)
-        example = self.dps_fields.fields.get(self.field_name)
+        # Add core fields
+        fields_dict["source"] = self.dps_fields.fields.get(source_field_name)
+        fields_dict["sutta"] = self.dps_fields.fields.get(sutta_field_name)
+        fields_dict["example"] = self.dps_fields.fields.get(self.field_name)
 
-        return source, sutta, example
+        return fields_dict
 
     def click_choose_example_ok(self, e: ft.ControlEvent):
         self.choose_example_dialog.open = False
@@ -478,12 +506,29 @@ class DpsExampleField(ft.Column):
 
         # add back into page
         cst_example = self.cst_examples[int(self.example_index)]
-        source, sutta, example = self.get_fields()
-        source.value = cst_example.source
-        sutta.value = cst_example.sutta
-        example.value = clean_example(
-            cst_example.example, self.sandhi_dict, self.hyphenation_dict
-        )
+        fields_dict = self.get_fields()
+        
+        source_field = fields_dict.get("source")
+        sutta_field = fields_dict.get("sutta")
+        example_field = fields_dict.get("example")
+        
+        if source_field:
+            source_field.value = cst_example.source
+        if sutta_field:
+            sutta_field.value = cst_example.sutta
+        if example_field:
+            example_field.value = clean_example(
+                cst_example.example, self.sandhi_dict, self.hyphenation_dict
+            )
+        
+        # Automatically populate word_to_find_field with stem (Pass2Add style)
+        searched_word = self.word_to_find_field.value
+        if searched_word and len(searched_word) > 1:  # Ensure word has at least 2 characters
+            stem = searched_word[:-1]  # Remove last character - exact same logic as Pass2Add
+            self.word_to_find_field.value = stem
+            self.word_to_find_field.update()  # Force immediate UI update
+            self.word_to_find_field.focus()  # Focus on the field for quick editing
+        
         self.page.update()
 
     def click_bold_example(self, e: ft.ControlEvent):
@@ -500,11 +545,15 @@ class DpsExampleField(ft.Column):
 
     def click_swap_example(self, e: ft.ControlEvent):
         # For DPS, we'll implement swap between sbs_example_1 and sbs_example_2
-        # This can be extended for other example types if needed
+        # and between dps_example_1 and dps_example_2
         if "sbs_example_1" in self.field_name:
             self._swap_examples("sbs", "1", "2")
         elif "sbs_example_2" in self.field_name:
             self._swap_examples("sbs", "2", "1")
+        elif "dps_example_1" in self.field_name:
+            self._swap_examples("dpd", "1", "2")
+        elif "dps_example_2" in self.field_name:
+            self._swap_examples("dpd", "2", "1")
         # Add similar logic for other example types if needed
 
     def _swap_examples(self, example_type: str, from_index: str, to_index: str):
@@ -517,7 +566,13 @@ class DpsExampleField(ft.Column):
         sutta_to = self.dps_fields.fields.get(f"dps_{example_type}_sutta_{to_index}")
         example_to = self.dps_fields.fields.get(f"dps_{example_type}_example_{to_index}")
 
-        if source_from and source_to and sutta_from and sutta_to and example_from and example_to:
+        # Check if all fields exist and have value attribute
+        if (source_from and source_to and sutta_from and sutta_to and 
+            example_from and example_to and
+            hasattr(source_from, 'value') and hasattr(source_to, 'value') and
+            hasattr(sutta_from, 'value') and hasattr(sutta_to, 'value') and
+            hasattr(example_from, 'value') and hasattr(example_to, 'value')):
+            
             # Swap values
             source_x = source_from.value
             sutta_x = sutta_from.value
@@ -534,13 +589,12 @@ class DpsExampleField(ft.Column):
             self.page.update()
 
     def click_delete_example(self, e: ft.ControlEvent):
-        source, sutta, example = self.get_fields()
-        if source:
-            source.value = ""
-        if sutta:
-            sutta.value = ""
-        if example:
-            example.value = ""
+        fields_dict = self.get_fields()
+        
+        # Clear all fields in the dictionary
+        for field in fields_dict.values():
+            if field:
+                field.value = ""
 
         # For SBS examples, also clear the additional chant and chapter fields
         parts = self.field_name.split("_")
@@ -563,25 +617,30 @@ class DpsExampleField(ft.Column):
         self.page.update()
 
     def _click_stash_example(self, e: ft.ControlEvent):
-        """Stashes the current source, sutta, and example values."""
-        source, sutta, example = self.get_fields()
-        self.stash_manager.stash_shared_example(
-            source.value or "", sutta.value or "", example.value or ""
-        )
-        self.ui.update_message("Stashed current example data")
+        """Stashes all relevant fields for the current example."""
+        fields_dict = self.get_fields()
+        
+        # Create dictionary with field values
+        stash_dict: dict[str, str] = {}
+        for field_name, field in fields_dict.items():
+            if field and field.value:
+                stash_dict[field_name] = field.value
+        
+        if stash_dict:
+            self.stash_manager.stash_shared_example(stash_dict)
+            self.ui.update_message("Stashed current example data")
+        else:
+            self.ui.update_message("No data to stash")
 
     def _click_reload_example(self, e: ft.ControlEvent):
-        """Reloads stashed data into the source, sutta, and example fields."""
+        """Reloads stashed data into all relevant fields."""
         stashed_data = self.stash_manager.reload_shared_example()
         if stashed_data:
-            source_val, sutta_val, example_val = stashed_data
-            source, sutta, example = self.get_fields()
-            if source:
-                source.value = source_val
-            if sutta:
-                sutta.value = sutta_val
-            if example:
-                example.value = example_val
+            fields_dict = self.get_fields()
+            for field_name, field in fields_dict.items():
+                if field and field_name in stashed_data:
+                    field.value = stashed_data[field_name]
+            
             self.page.update()
             self.ui.update_message("Reloaded stashed example data")
         else:
@@ -590,13 +649,11 @@ class DpsExampleField(ft.Column):
     def _click_last_example(self, e: ft.ControlEvent):
         """Loads the last saved example from stash."""
         if last_example := self.stash_manager.last_example:
-            source, sutta, example = self.get_fields()
-            if source:
-                source.value = last_example[0]
-            if sutta:
-                sutta.value = last_example[1]
-            if example:
-                example.value = last_example[2]
+            fields_dict = self.get_fields()
+            for field_name, field in fields_dict.items():
+                if field and field_name in last_example:
+                    field.value = last_example[field_name]
+            
             self.page.update()
 
     def clean_text(self, e: ft.ControlEvent):
