@@ -10,7 +10,7 @@ from sqlalchemy.orm import joinedload
 from rich.console import Console
 
 # Assuming Ru model is correctly imported from db.models
-from db.models import DpdHeadword, Russian
+from db.models import DpdHeadword
 from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
 from db.db_helpers import get_db_session

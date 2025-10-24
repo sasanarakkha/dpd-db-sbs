@@ -8,6 +8,7 @@ from gui2.dps_ai_service import translate_with_ai_from_gui
 from gui2.dps_meaning_field import DpsMeaningField
 from gui2.toolkit import ToolKit
 from tools.meaning_construction import make_meaning_combo
+from tools.tsv_read_write import read_tsv_dot_dict
 from tools.ru_spelling import RuSpellChecker
 from typing import Any
 
@@ -18,17 +19,34 @@ class DpsFields:
         self.db_session = db_session
         self.toolkit = toolkit
         self.fields: dict[str, ft.TextField | ft.Checkbox | ft.Dropdown | DpsExampleField | DpsMeaningField] = {}
+        self.field_rows: dict[str, ft.Row] = {}
         # Create shared stash manager for all DPS example fields
         self.shared_stash_manager = DpsExampleStashManager(self.toolkit)
         # Initialize spell checker for Russian fields
         self.russian_spellchecker = RuSpellChecker()
+        self._sbs_index_data = []
+        self._sbs_chant_options = []
+        self._load_sbs_index()
         self._build_fields()
+
+    def _load_sbs_index(self):
+        """Load SBS index data for chant dropdowns."""
+        try:
+            self._sbs_index_data = read_tsv_dot_dict(self.view.dpspth.sbs_index_path)
+            pali_chants = sorted([i.pali_chant for i in self._sbs_index_data if i.pali_chant])
+            self._sbs_chant_options = [ft.dropdown.Option(key=chant, text=chant) for chant in pali_chants]
+        except Exception as e:
+            print(f"Error loading SBS index: {e}")
 
     def _build_fields(self):
         # Using a mapping to create fields
         for field_name, properties in dps_field_mapping.items():
             control_type = properties.get("control", ft.TextField)
             params = properties.get("params", {})
+
+            if field_name in ["dps_sbs_chant_pali_1", "dps_sbs_chant_pali_2"]:
+                control_type = ft.Dropdown
+                params["options"] = self._sbs_chant_options
             
             # Special handling for DpsExampleField
             if control_type == DpsExampleField:
@@ -68,6 +86,11 @@ class DpsFields:
             
             else:
                 # Standard Flet controls
+                if control_type == ft.Dropdown:
+                    params["on_change"] = self._handle_sbs_chant_change
+                    params["editable"] = True
+                    params["enable_filter"] = True
+
                 self.fields[field_name] = control_type(**params)
 
     def _set_field_value(self, field: Any, value: object) -> None:
@@ -116,7 +139,7 @@ class DpsFields:
             controls = [label, field_control]
             
             # Add AI button for Russian meaning suggestion
-            if field_name == "dps_ru_online_suggestion":
+            if field_name == "dps_suggestion":
                 ai_button = ft.ElevatedButton(
                     "AI",
                     on_click=lambda e, mode="meaning": self._handle_ai_click(e, mode),
@@ -133,9 +156,17 @@ class DpsFields:
                     tooltip="Generate list of Synonyms using AI"
                 )
                 controls.append(synonym_button)
+                copy_split_button = ft.ElevatedButton(
+                    "Copy",
+                    on_click=self._handle_copy_split_click,
+                    width=80,
+                    height=30,
+                    tooltip="Copy and split content from suggestion to meaning fields"
+                )
+                controls.append(copy_split_button)
             
             # Add AI button for notes suggestion
-            elif field_name == "dps_notes_online_suggestion":
+            elif field_name == "dps_notes_suggestion":
                 ai_button = ft.ElevatedButton(
                     "AI",
                     on_click=lambda e, mode="note": self._handle_ai_click(e, mode),
@@ -144,6 +175,14 @@ class DpsFields:
                     tooltip="Generate Russian notes translation using AI"
                 )
                 controls.append(ai_button)
+                copy_notes_button = ft.ElevatedButton(
+                    "Copy",
+                    on_click=self._handle_copy_notes_click,
+                    width=80,
+                    height=30,
+                    tooltip="Copy content from suggestion to ru_notes field"
+                )
+                controls.append(copy_notes_button)
 
             row = ft.Row(
                 controls=controls,
@@ -151,6 +190,7 @@ class DpsFields:
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,
             )
             parent_control.controls.append(row)
+            self.field_rows[field_name] = row
 
     def populate_dps_tab(self, headword: DpdHeadword, ru_word: Russian | None, sbs_word: SBS | None):
         """Populate DPS tab with data from the database models."""
@@ -159,11 +199,11 @@ class DpsFields:
                 self._set_field_value(self.fields[key], value)
 
         # Populate DPD info
-        _update_field("dps_dpd_id", headword.id)
+        _update_field("dps_id", headword.id)
         _update_field("dps_lemma_1", headword.lemma_1)
 
         if ru_word and ru_word.ru_meaning_raw:
-            _update_field("dps_ru_online_suggestion", ru_word.ru_meaning_raw)
+            _update_field("dps_suggestion", ru_word.ru_meaning_raw)
 
         # Copy dpd values for tests
         _update_field("dps_pos", headword.pos)
@@ -209,14 +249,18 @@ class DpsFields:
             _update_field("dps_root", root_text)
 
         # Other combined fields
-        _update_field("dps_base_or_comp", headword.root_base or headword.compound_type)
-        _update_field("dps_constr_or_comp_constr", headword.compound_construction or headword.construction)
+        if headword.compound_type:
+            _update_field("dps_constriction", headword.compound_construction)
+        else:
+            _update_field("dps_constriction", headword.construction)
+        
         syn_ant = []
         if headword.synonym: 
-            syn_ant.append(f"(syn) {headword.synonym}")
+            syn_ant.append(f"(syn): {headword.synonym}")
         if headword.antonym: 
             syn_ant.append(f"(ant): {headword.antonym}")
         _update_field("dps_synonym_antonym", " ".join(syn_ant))
+
         _update_field("dps_notes", headword.notes)
         _update_field("dps_source_1", headword.source_1)
         _update_field("dps_sutta_1", headword.sutta_1)
@@ -240,10 +284,10 @@ class DpsFields:
         if result and not result.startswith("Error:"):
             # Update the appropriate field based on mode
             if mode == "meaning":
-                    target_field = self.fields["dps_ru_online_suggestion"]
+                    target_field = self.fields["dps_suggestion"]
                     self._set_field_value(target_field, result)
             elif mode == "note":
-                    target_field = self.fields["dps_notes_online_suggestion"]
+                    target_field = self.fields["dps_notes_suggestion"]
                     self._set_field_value(target_field, result)
             
             self.view.update_message(f"AI {mode} translation completed")
@@ -253,6 +297,92 @@ class DpsFields:
         
         self.view.page.update()
 
+
+    def _handle_copy_split_click(self, e: ft.ControlEvent):
+        """Handle Copy & Split button click - split Russian suggestion into meaning and literal meaning"""
+        # Get the content to be split and copied
+        suggestion_field = self.fields["dps_suggestion"]
+        content = str(suggestion_field.value) if suggestion_field.value is not None else ""
+        
+        if not content:
+            self.view.update_message("Russian suggestion field is empty")
+            return
+        
+        # Split content based on delimiters
+        delimiters = ['досл.', 'букв.', '|', 'буквально', 'дословно', 'лит.']
+        
+        for delimiter in delimiters:
+            if delimiter in content:
+                parts = content.split(delimiter, 1)
+                before_delimiter = parts[0].rstrip('; ').strip()
+                after_delimiter = parts[1].strip() if len(parts) > 1 else ""
+                
+                # Update the target fields
+                meaning_field = self.fields["dps_ru_meaning"]
+                lit_meaning_field = self.fields["dps_ru_meaning_lit"]
+                
+                # Update the GUI for meaning_key and lit_meaning_key
+                self._set_field_value(meaning_field, before_delimiter)
+                self._set_field_value(lit_meaning_field, after_delimiter)
+                self.view.update_message("Content copied and split successfully")
+                return
+        
+        # If none of the delimiters are found, just update the meaning field
+        meaning_field = self.fields["dps_ru_meaning"]
+        self._set_field_value(meaning_field, content)
+        self.view.update_message("Content copied (no delimiter found)")
+        return
+
+    def _handle_copy_notes_click(self, e: ft.ControlEvent):
+        """Handle Copy button click for notes - copy suggestion to ru_notes field."""
+        # Get the content to be copied
+        suggestion_field = self.fields["dps_notes_suggestion"]
+        content = str(suggestion_field.value) if suggestion_field.value is not None else ""
+        
+        if not content:
+            self.view.update_message("Notes suggestion field is empty")
+            return
+        
+        # Update the target field
+        ru_notes_field = self.fields["dps_ru_notes"]
+        self._set_field_value(ru_notes_field, content)
+        self.view.update_message("Content copied to Russian Notes")
+
+    def _handle_sbs_chant_change(self, e: ft.ControlEvent):
+        """Update chant_eng and chapter when a pali_chant is selected."""
+        selected_chant = e.control.value
+        field_name = next((name for name, ctrl in self.fields.items() if ctrl == e.control), None)
+
+        if not selected_chant or not field_name:
+            return
+
+        # Determine the index (1 or 2) from the field name
+        index = field_name.split('_')[-1]
+
+        # Find the corresponding data
+        for item in self._sbs_index_data:
+            if item.pali_chant == selected_chant:
+                eng_chant_field = self.fields.get(f"dps_sbs_chant_eng_{index}")
+                chapter_field = self.fields.get(f"dps_sbs_chapter_{index}")
+
+                if eng_chant_field: 
+                    self._set_field_value(eng_chant_field, item.english_chant)
+                if chapter_field: 
+                    self._set_field_value(chapter_field, item.chapter)
+                self.view.page.update()
+                return
+
+    def filter_fields(self, visible_fields: list[str] | None) -> None:
+        """
+        Filters the visibility of fields in the UI.
+        If visible_fields is None, all fields are shown.
+        Otherwise, only fields in the list are shown.
+        """
+        for field_name, row in self.field_rows.items():
+            if visible_fields is None:
+                row.visible = True
+            else:
+                row.visible = field_name in visible_fields
 
     def clear_all_fields(self):
         for field in self.fields.values():

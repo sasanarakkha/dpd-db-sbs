@@ -680,10 +680,10 @@ def get_next_ids_dps(db_session, window):
 def get_next_word_ru(db_session):
     def filter_words():
         return db_session.query(DpdHeadword).join(Russian).join(SBS).filter(
-            # DpdHeadword.meaning_1 != "",
-            # DpdHeadword.example_1 != "",
-            SBS.sbs_patimokkha == "vib_",
-            # Russian.ru_meaning == "",
+            DpdHeadword.meaning_1 != "",
+            DpdHeadword.example_1 != "",
+            Russian.ru_meaning == "",
+            Russian.ru_meaning_raw != "",
         )
 
     # Query the database using the helper function

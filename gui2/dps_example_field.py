@@ -15,6 +15,8 @@ from tools.cst_source_sutta_example import (
 )
 from tools.hyphenations import HyphenationFileManager, HyphenationsDict
 from tools.sandhi_contraction import SandhiContractionDict, SandhiContractionManager
+from tools.tsv_read_write import read_tsv_dict
+from difflib import SequenceMatcher
 
 book_codes: dict[str, str] = {
     # vinaya
@@ -146,6 +148,8 @@ class DpsExampleField(ft.Column):
         self.simple_mode = simple_mode
         # Use passed stash manager or create new one if not provided
         self.stash_manager = stash_manager or DpsExampleStashManager(self.ui.toolkit)
+        # Initialize archive index as instance variable
+        self.archived_example_index = 0
         super().__init__(
             expand=True,
         )
@@ -239,6 +243,10 @@ class DpsExampleField(ft.Column):
                     ft.ElevatedButton(
                         "Last",
                         on_click=self._click_last_example,
+                    ),
+                    ft.ElevatedButton(
+                        "Arch",
+                        on_click=self._click_arch_example,
                     ),
                 ],
                 spacing=0,
@@ -656,6 +664,71 @@ class DpsExampleField(ft.Column):
             
             self.page.update()
 
+    def _click_arch_example(self, e: ft.ControlEvent):
+        """Loads an example from the archive."""
+        current_id = self.ui.headword.id if self.ui.headword else ""
+        if not current_id:
+            self.ui.update_message("No headword loaded")
+            return
+            
+        ex_1 = self.dps_fields.fields["dps_sbs_example_1"].value
+        ex_2 = self.dps_fields.fields["dps_sbs_example_2"].value
+        ex_3 = self.dps_fields.fields["dps_dhp_example"].value
+        ex_4 = self.dps_fields.fields["dps_pat_example"].value
+        ex_5 = self.dps_fields.fields["dps_vib_example"].value
+        ex_6 = self.dps_fields.fields["dps_class_example"].value
+        ex_7 = self.dps_fields.fields["dps_discourses_example"].value
+
+        new_index = self._handle_archive_example(
+            current_id, ex_1, ex_2, ex_3, ex_4, ex_5, ex_6, ex_7,
+            self.archived_example_index
+        )
+        
+        self.archived_example_index = new_index
+        self.page.update()
+
+    def paragraphs_are_similar(self, paragraph1, paragraph2, threshold):
+        """Check if two paragraphs are similar based on a similarity threshold."""
+        matcher = SequenceMatcher(None, paragraph1, paragraph2)
+        return matcher.ratio() >= threshold
+
+    def _handle_archive_example(self, current_id, ex_1, ex_2, ex_3, ex_4, ex_5, ex_6, ex_7, index):
+        """Handle archive example logic."""
+        word_data = read_tsv_dict(self.ui.dpspth.sbs_archive)
+        input_examples = {ex_1, ex_2, ex_3, ex_4, ex_5, ex_6, ex_7}
+        total_examples = 4  # Check all 4 examples from archive
+        
+        for row in word_data:
+            if row.get("id") == str(current_id):
+                sbs_examples = [
+                    row.get("sbs_example_1"),
+                    row.get("sbs_example_2"),
+                    row.get("sbs_example_3"),
+                    row.get("sbs_example_4"),
+                ]
+                
+                sbs_sources = [row.get("sbs_source_1", ""), row.get("sbs_source_2", ""), row.get("sbs_source_3", ""), row.get("sbs_source_4", "")]
+                sbs_suttas = [row.get("sbs_sutta_1", ""), row.get("sbs_sutta_2", ""), row.get("sbs_sutta_3", ""), row.get("sbs_sutta_4", "")]
+
+                for i in range(total_examples):
+                    example_index = (index + i) % total_examples
+                    sbs_example = sbs_examples[example_index]
+                    
+                    if sbs_example and all(
+                        not self.paragraphs_are_similar(sbs_example, input_ex, 0.9)
+                        for input_ex in input_examples if input_ex
+                    ):
+                        self.dps_fields.fields["dps_extra_source"].value = sbs_sources[example_index]
+                        self.dps_fields.fields["dps_extra_sutta"].value = sbs_suttas[example_index]
+                        self.dps_fields.fields["dps_extra_example"].value = sbs_example
+                        
+                        return (example_index + 1) % total_examples
+                        
+                self.ui.update_message("No unique examples")
+                return index
+                
+        self.ui.update_message("ID not found")
+        return index
     def clean_text(self, e: ft.ControlEvent):
         self.text_field.value = (
             e.control.value.replace(" ...", "…")

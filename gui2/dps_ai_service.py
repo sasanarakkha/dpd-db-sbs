@@ -19,7 +19,7 @@ def translate_with_ai_from_gui(dps_fields, mode: str, synonyms: bool = False):
     """
     try:
         # Get headword ID from GUI field
-        headword_id_field = dps_fields.fields.get("dps_dpd_id")
+        headword_id_field = dps_fields.fields.get("dps_id")
         if not headword_id_field or not headword_id_field.value:
             return "Error: No headword ID found in GUI"
         

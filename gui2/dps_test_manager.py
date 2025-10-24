@@ -183,7 +183,7 @@ class DpsTestManager(PopUpMixin):
         test_results = {}
 
         # Get headword ID for exception checking
-        headword_id_str = values.get("dps_dpd_id", "")
+        headword_id_str = values.get("dps_id", "")
         try:
             headword_id = int(headword_id_str) if headword_id_str else 0
         except ValueError:
@@ -277,7 +277,7 @@ class DpsTestManager(PopUpMixin):
                 field.error_text = None
         
         # Get headword ID for exception management
-        headword_id_str = values.get("dps_dpd_id", "")
+        headword_id_str = values.get("dps_id", "")
         try:
             self.current_headword_id = int(headword_id_str) if headword_id_str else None
         except ValueError:

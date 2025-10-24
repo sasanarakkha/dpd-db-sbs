@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 import copy
 import csv
-from pathlib import Path
 
 import flet as ft
 
 from db.models import DpdHeadword, Russian, SBS
+from sqlalchemy import or_
 from gui2.dpd_fields_functions import clean_lemma_1
 from gui2.dps_fields import DpsFields
+from gui2.dps_fields_lists import VIB_FIELDS
 from gui2.dps_example_field import DpsExampleField
 from gui2.history import HistoryManager
 from gui2.mixins import PopUpMixin
@@ -114,6 +115,39 @@ class DpsView(ft.Column, PopUpMixin):
             )
         )
 
+        self._next_ru_button = ft.ElevatedButton(
+            "Next Ru",
+            on_click=self._click_next_ru,
+            tooltip="Find next word with raw Russian meaning to be edited",
+            width=150,
+        )
+
+        self._next_note_button = ft.ElevatedButton(
+            "Next Note",
+            on_click=self._click_next_note,
+            tooltip="Find next word with Russian note to be edited",
+            width=150,
+        )
+
+        self._clear_button = ft.ElevatedButton(
+            "Clear All",
+            on_click=self._click_clear_all,
+            tooltip="Clear all fields",
+            width=150,
+        )
+
+        # --- Field Filter Radio Buttons ---
+        self._filter_radios = ft.RadioGroup(
+            content=ft.Row(
+                [
+                    ft.Radio(value="all", label="All"),
+                    ft.Radio(value="vib", label="Vib"),
+                ]
+            ),
+            value="all",  # Default selection
+            on_change=self._handle_filter_change,
+        )
+
         self._top_section = ft.Container(
             content=ft.Column(
                 controls=[
@@ -121,12 +155,15 @@ class DpsView(ft.Column, PopUpMixin):
                         controls=[
                             self._enter_id_or_lemma_field,
                             self._translation_hint_button,
+                            self._next_ru_button,
+                            self._next_note_button,
+                            self._clear_button,
                             self._history_dropdown,
                         ],
                         spacing=10,
                         alignment=ft.MainAxisAlignment.START,
                     ),
-                    ft.Row([self._message_field]),
+                    ft.Row([self._message_field, self._filter_radios]),
                 ],
             ),
             border=ft.Border(
@@ -155,11 +192,6 @@ class DpsView(ft.Column, PopUpMixin):
                             ft.ElevatedButton(
                                 "Update DB",
                                 on_click=self._click_update_db,
-                                width=BUTTON_WIDTH,
-                            ),
-                            ft.ElevatedButton(
-                                "Clear",
-                                on_click=self._click_clear_all,
                                 width=BUTTON_WIDTH,
                             ),
                         ],
@@ -207,11 +239,22 @@ class DpsView(ft.Column, PopUpMixin):
         self.page.update()
 
 
+    def _handle_filter_change(self, e: ft.ControlEvent) -> None:
+        """Handles changes in the field filter RadioGroup."""
+        filter_type = e.control.value
+        visible_fields = None  # Default to all
+
+        if filter_type == "vib":
+            visible_fields = VIB_FIELDS
+
+        self.dps_fields.filter_fields(visible_fields)
+        self.page.update()
+
+
     def _click_edit_headword(self, e: ft.ControlEvent) -> None:
         self.dps_fields.clear_all_fields()
-        if self._enter_id_or_lemma_field.value:
-            id_or_lemma = self._enter_id_or_lemma_field.value.strip()
-        if not id_or_lemma:
+        id_or_lemma = (self._enter_id_or_lemma_field.value or "").strip()
+        if not id_or_lemma:  # Check if the field was empty
             self.update_message("Enter an ID or Lemma.")
             return
 
@@ -229,6 +272,70 @@ class DpsView(ft.Column, PopUpMixin):
         self.dps_fields.populate_dps_tab(headword, self.ru_word, self.sbs_word)
         self.add_headword_to_dps_examples()  # Populate word_to_find fields with stem
         self.update_message(f"Loaded {headword.lemma_1}")
+
+    def _click_next_ru(self, e: ft.ControlEvent) -> None:
+        """Find and load the next headword needing Russian meaning review."""
+        self.update_message("Searching for next 'Ru' word...")
+        word_id, count = self._get_next_word_ru()
+
+        if word_id:
+            self._enter_id_or_lemma_field.value = str(word_id)
+            self._click_edit_headword(e)
+            self.update_message(f"Loaded next 'Ru' word. {count} left.")
+        else:
+            self.update_message("No more 'Ru' words to process.")
+
+    def _click_next_note(self, e: ft.ControlEvent) -> None:
+        """Find and load the next headword needing Russian note review."""
+        self.update_message("Searching for next 'Note' word...")
+        word_id, count = self._get_next_note_ru()
+
+        if word_id:
+            self._enter_id_or_lemma_field.value = str(word_id)
+            self._click_edit_headword(e)
+            self.update_message(f"Loaded next 'Note' word. {count} left.")
+        else:
+            self.update_message("No more 'Note' words to process.")
+
+    def _get_next_word_ru(self) -> tuple[int | None, int]:
+        """Fetch the ID of the next word needing Russian meaning processing."""
+        query = self._db.db_session.query(DpdHeadword).join(Russian).join(SBS).filter(
+            DpdHeadword.meaning_1 != "",
+            DpdHeadword.example_1 != "",
+            Russian.ru_meaning == "",
+            SBS.sbs_patimokkha == "vib",
+            # Russian.ru_meaning_raw != "",
+        )
+        
+        count = query.count()
+        word = query.first()
+        
+        if word:
+            return word.id, count
+        return None, 0
+
+    def _get_next_note_ru(self) -> tuple[int | None, int]:
+        """Fetch the ID of the next word needing Russian note processing."""
+        query = self._db.db_session.query(DpdHeadword).join(Russian).join(SBS).filter(
+            Russian.ru_notes.like("%ИИ%"),
+            or_(
+                SBS.sbs_index.isnot(None),
+                SBS.sbs_category != '',
+                SBS.sbs_index.isnot(None),
+                SBS.sbs_patimokkha != '',
+            )
+        )
+
+        # Count before filtering on sbs_index
+        count = query.count()
+        
+        # Further filter in Python for integer field
+        for word in query.all():
+            if word.sbs and word.sbs.sbs_index is not None and word.sbs.sbs_index != 0:
+                return word.id, count
+        
+        # Fallback if no word with a non-zero sbs_index is found
+        return None, 0
 
 
     def _update_history_dropdown(self) -> None:
@@ -281,6 +388,7 @@ class DpsView(ft.Column, PopUpMixin):
         self.dps_fields.clear_all_fields()
         self._enter_id_or_lemma_field.value = ""  # Clear the ID/Lemma input field
         self.tests_passed = False  # Reset test state when clearing fields
+        self._filter_radios.value = "all"  # Reset filter to 'all'
         self.update_message("Fields cleared.")
 
 
@@ -304,7 +412,7 @@ class DpsView(ft.Column, PopUpMixin):
         self.update_message("Updating DB...")
         
         # Get current headword ID
-        dpd_id_field = self.dps_fields.fields.get("dps_dpd_id")
+        dpd_id_field = self.dps_fields.fields.get("dps_id")
         if not dpd_id_field or not dpd_id_field.value:
             self.update_message("Error: No headword ID found")
             return
@@ -352,7 +460,7 @@ class DpsView(ft.Column, PopUpMixin):
                 ru_field_name = field_name.replace("dps_", "")
                 if hasattr(ru_word, ru_field_name):
                     setattr(ru_word, ru_field_name, field.value or "")
-                    print(f"DEBUG: Updated Russian field {ru_field_name} = {field.value}")
+                    # print(f"DEBUG: Updated Russian field {ru_field_name} = {field.value}")
                 else:
                     print(f"ERROR: Russian field {ru_field_name} not found in model")
                     self.update_message(f"ERROR: Russian field {ru_field_name} not found in model")

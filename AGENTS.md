@@ -57,7 +57,7 @@
 - On a weekly basis, or anytime the database model changes, check that the database model in @db/models.py matches the docs in @docs/technical/dpd_headwords_table.md
 
 ## GitHub
-- Unless otherwise specified the repository in question is https://github.com/digitalpalidictionary/dpd-db.
+- Unless otherwise specified the repository in question is https://github.com/sasanarakkha/dpd-db-sbs.
 
 ### Solve
 - "Solve" means read the specified GitHub issue using get_issue and offer solutions. Don't think about it, don't ask questions, just read it.

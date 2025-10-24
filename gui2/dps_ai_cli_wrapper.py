@@ -102,9 +102,9 @@ else:
         )
         
         # Debug: Print full output for troubleshooting
-        print(f"DEBUG - Subprocess return code: {result.returncode}")
-        print(f"DEBUG - Subprocess stdout: {result.stdout}")
-        print(f"DEBUG - Subprocess stderr: {result.stderr}")
+        # print(f"DEBUG - Subprocess return code: {result.returncode}")
+        # print(f"DEBUG - Subprocess stdout: {result.stdout}")
+        # print(f"DEBUG - Subprocess stderr: {result.stderr}")
         
         if result.returncode == 0:
             # Success - return the output
