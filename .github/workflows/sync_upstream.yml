@@ -11,6 +11,7 @@ jobs:
     # Grant permissions to write to contents
     permissions:
       contents: write
+      workflows: write
       actions: write
     steps:
 
