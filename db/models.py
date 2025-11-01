@@ -1288,7 +1288,7 @@ class SBS(Base):
     __tablename__ = "sbs"
 
     id: Mapped[int] = mapped_column(ForeignKey("dpd_headwords.id"), primary_key=True)
-    sbs_class_anki: Mapped[int] = mapped_column(default="")
+
     sbs_class: Mapped[int] = mapped_column(default="")
 
     #TODO remove after checking
@@ -1329,6 +1329,7 @@ class SBS(Base):
     class_example: Mapped[str] = mapped_column(default="")
     class_example_translation: Mapped[str] = mapped_column(default="")
     class_extra: Mapped[str] = mapped_column(default="")
+    class_anki: Mapped[int] = mapped_column(default="")
 
     discourses_source: Mapped[str] = mapped_column(default="")
     discourses_sutta: Mapped[str] = mapped_column(default="")
@@ -1487,7 +1488,7 @@ class SBS(Base):
     @property
     def sbs_class_link(self):
         class_link_map = SBS_table_tools().load_class_link_map()
-        return class_link_map.get(self.sbs_class_anki, "")
+        return class_link_map.get(self.class_anki, "")
 
     @property
     def sbs_sutta_link(self):
