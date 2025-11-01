@@ -48,7 +48,7 @@ id,pali,pos,meaning
 17831,ekova,sandhi,alone
 18260,okantati,pr,cuts off; carves off; saws off
 18440,ocaraka 1,adj,lowlife; mean; rough
-19163,kakaca,masc,saw
+19163,kakaca 1,masc,saw
 19846,kathaṃsu,sandhi,how?
 20423,kara 1,adj,doing; making
 20957,kāma 1,adj,wishing (to); wanting (to); would be delighted (to)
@@ -133,7 +133,7 @@ id,pali,pos,meaning
 42308,panāhaṃ,sandhi,but I; then I; and I
 42335,panetaṃ,sandhi,and this; but this
 42972,paramatapassī,adj,highly ascetic; supremely austere
-44058,pariyosāna 1,nt,end; finish; conclusion; culmination
+44058,pariyosāna 1,nt,end; finish; conclusion; culmination (of)
 45061,paharati,pr,strikes; beats; gives a blow (to)
 45426,pātita,pp,dropped; felled; slain; killed
 46763,punareva,sandhi,just again

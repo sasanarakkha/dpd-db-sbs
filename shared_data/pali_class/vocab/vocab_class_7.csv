@@ -26,7 +26,7 @@ id,pali,pos,meaning
 11152,āgaccheyya,opt,could come; would come along; could approach; would arrive
 11156,āgata 3,pp,come (from); arrived (from); returned (from)
 11910,āpas,masc,water; liquid
-12803,āsaya 2,masc,home (of); dwelling (of); abode (of)
+12804,āsaya 3,masc,nest (of); lair (of)
 13687,idha 2,ind,here; in this regard; in this case
 14956,udapāna,masc,well; (comm) pond; pool
 15560,upaṭṭhāpeti 2,pr,establishes; sets up; causes to be present; makes sure one has
@@ -38,9 +38,9 @@ id,pali,pos,meaning
 18180,evaṃrūpa,adj,of such form; like this
 18208,evaṃvedana,adj,having such feeling; having this kind of sensation
 18775,obhāsati 1.1,pr,speaks coarsely (to); speaks suggestively (to); talks rudely (to); talks dirty (to)
-18876,orenaddhamāsaṃ,ind,within less than a fortnight
+18876,orenaddhamāsaṃ,ind,sooner than a fortnight; within less than half a month
 20551,kareyya 2,opt,would make; could make
-21727,kinti,sandhi,how then?; what then?; in what way?
+21727,kinti 1,sandhi,how then?; what then?; in what way?
 21930,kissa 1,pron,for who?; for what reason?; why?
 21957,kiṃ 2,ind,how?; what?
 22353,kupita,pp,indignant; angry; annoyed; outraged; offended
@@ -52,7 +52,7 @@ id,pali,pos,meaning
 24431,gamanāya,nt,to go (to); for going to see; for visiting
 24711,gahetvā 5,abs,having arrested; having taken prisoner
 24726,gāthā 1,fem,verse; poem; stanza
-24853,gāha 2.2,masc,hiding place
+24853,gāha 2.2,masc,hideaway; lair
 27056,cetasā,masc,with mind; by mind; with thought; with intention
 27264,cha 2.1,card,six (6)
 27315,chaḍḍita,pp,thrown away; discarded; abandoned; disposed of
@@ -69,6 +69,7 @@ id,pali,pos,meaning
 31576,thūla 2,adj,gross; coarse
 32650,disā 1,fem,direction; cardinal point
 33101,duṭṭhulla 2,adj,(of speech) rude; obscene; vulgar; coarse
+34631,dhamma 1.06,masc,matter; thing; phenomena
 35372,nakkhatta 1,nt,constellation; zodiac; celestial object
 35540,natthi 1,pr,is not; it is not; there is not; there is no; there is nothing
 35710,nappaṭikaṅkhati,pr,does not anticipate; does not expect; does not await; does not personally wish (for)
@@ -77,7 +78,7 @@ id,pali,pos,meaning
 36361,nānvāgameti,pr,does not follow around; does not return (to); does not revive; does not relive
 38885,no 1.3,ind,then; now; indeed
 39376,paccaya 2,masc,cause (for); reason (for); supporting condition (for); requirement (for)
-40353,paṭighāta 1,masc,warding off; repelling; driving off; keeping at bay
+40353,paṭighāta 1,masc,warding off; repelling; driving off; keeping at bay (of)
 42281,pana,ind,moreover; and so; but; or; however
 42491,pabbajjā 1,fem,(vinaya) novice ordination; renunciation; becoming a monastic
 42544,pabbājeti 1,pr,banishes (from); exiles (from); drives away (from)

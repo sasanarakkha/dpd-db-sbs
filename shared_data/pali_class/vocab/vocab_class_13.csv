@@ -9,7 +9,7 @@ id,pali,pos,meaning
 6387,aparimāṇa 1,adj,measureless; boundless
 7301,abbhācikkhi,aor,misrepresented; slandered; falsely accused
 7710,abhiṇhaṃ,ind,continuously; repeatedly; regularly; often
-7849,abhinipphādeti,pr,produces; comes up with
+7849,abhinipphādeti,pr,makes (someone) produce (a robe); makes come up with
 7919,abhinivissa,ger,attaching; clinging; adhering; sticking; doubling down
 8419,abhūtena,ind,falsely; untruthfully
 9388,asatā 1,ind,falsely; unjustly; unreasonably; under a false pretext
@@ -118,7 +118,7 @@ id,pali,pos,meaning
 59663,samādhiyati,pr,is calmed (for); becomes collected (for); becomes composed (for); becomes stable (for)
 59846,samitatta,nt,calmness; peacefulness; fact of tranquility (of)
 60162,sameti 1.1,pr,calms down; settles; stills; makes subside
-60634,sambhava 1,masc,birth; origin; source (of)
+60634,sambhava 1.1,masc,birth; origin; source (of)
 61203,sallaviddha,adj,pierced by an arrow
 61425,sahasā 2,ind,rashly; in haste
 61925,saṃvijjamāna,prp,existing (in); being found (in)
@@ -137,4 +137,4 @@ id,pali,pos,meaning
 70769,haññati 2,pr,is hurt; is killed; is destroyed
 71388,huraṃ 1,ind,there; in another world
 77098,care 2.1,opt,should go (among); should walk (in)
-77794,yato tato,idiom,because … therefore; since ... thereby
+77794,yato tato,idiom,because… therefore; since… thereby

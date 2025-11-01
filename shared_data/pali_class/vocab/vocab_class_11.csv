@@ -69,7 +69,7 @@ id,pali,pos,meaning
 18050,essati,fut,will go (to); will come (to); will reach
 18220,ehipassika,adj,open to inspection; inviting to come and see for oneself; verifiable
 18411,ogha 2,masc,(of defilements) deluge; inundation; torrent
-18688,opanayika,adj,pragmatic; applicable; relevant
+18688,opanayika,adj,progressing onward; forward-leading; pragmatic
 19153,oḷārika 1,adj,coarse; gross; substantial; physical; material
 19735,kattar 1,masc,creator; maker
 19956,kanta 1.1,pp,charming (to); pleasant (to); desirable; agreeable (to)
@@ -196,7 +196,7 @@ id,pali,pos,meaning
 67701,viññāṇagata,adj,related to consciousness; concerning awareness; connected with sentience; kind of consciousness
 67799,viññuppasattha,adj,praised by the wise
 67801,viññū 2,masc,wise person; sage; knowledgable man; intelligent person
-68710,vimutta 1,pp,freed (from); liberated (from); emancipated (from)
+68710,vimutta 1,pp,freed; liberated; released; emancipated (from)
 68817,viraja,adj,pure; stainless; untainted
 68818,virajjati 1,pr,becomes detached (from); loses interest (in); becomes dispassionate (towards); gets bored (with)
 70111,vusita 1,pp,fulfilled; completed; finished
@@ -205,4 +205,4 @@ id,pali,pos,meaning
 70315,veditabba 1,ptp,can be known (by); should be understood (by)
 71324,hīna 1,pp,low; inferior; deficient
 71380,huta 2,pp,offered
-77757,yāni tāni,idiom,whoever … they; whichever … those
+77757,yāni tāni,idiom,whoever… they; whichever… those

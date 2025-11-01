@@ -79,7 +79,7 @@ id,pali,pos,meaning
 34038,devatā,fem,deity; god
 34459,dve 1,card,two (2)
 34626,dhamma 1.01,masc,nature; character
-34631,dhamma 1.06,masc,matter; thing; phenomena
+34632,dhamma 1.07,masc,truth; reality; principle; truth behind the teaching
 35842,nara,masc,man; person
 35994,nahāru,masc,tendon; sinew
 36907,niggayhavādī,adj,who reproves; who rebukes; who blames
@@ -88,7 +88,7 @@ id,pali,pos,meaning
 37299,nidhi 1,masc,treasure; trove; hoard
 38204,nisīdati,pr,sits (on); sits down (in)
 39272,pacālaka 1,adj,swinging; swaying; shaking; nodding
-39992,paññavant,adj,wise; intelligent; discerning; insightful; percipient
+39992,paññavant 1,adj,wise; intelligent; discerning; insightful; percipient
 40071,paññāya 2,fem,by wisdom; with intelligence; by understanding; with insight
 41608,paṇḍita 2,masc,sage; intelligent person; wise man; smart person
 42477,pabbajita 2,pp,ordained (from); renounced (from)

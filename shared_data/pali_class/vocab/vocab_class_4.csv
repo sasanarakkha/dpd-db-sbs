@@ -1,7 +1,7 @@
 id,pali,pos,meaning
 468,agacchi,aor,went; travelled (to)
 648,aggi,masc,fire
-840,aṅgulimāla,masc,name of an arahant monk
+840,aṅgulimāla 1,masc,name of an arahant monk
 1849,aṭṭhāsi 1,aor,stood; stayed; remained
 2736,atthi 1.1,pr,there is; there exists
 2788,atha kho 1,idiom,then; and then; after that
@@ -37,7 +37,7 @@ id,pali,pos,meaning
 20791,kassaka,masc,farmer; ploughman
 21294,kāraka 2,masc,builder
 22623,kusala 4,nt,good; benefit; merit; good deed; doing good
-23381,khattiya 2,masc,man of the ruling caste; high caste man; nobleman
+23381,khattiya 2,masc,man of the warrior caste; high caste man; nobleman
 23437,khandha 1,masc,mass; heap; pile; volume; aggregation
 24615,gaha 2,nt,house
 24621,gahakāraka,masc,house builder; mason; carpenter
@@ -100,4 +100,4 @@ id,pali,pos,meaning
 71494,hotha,imp,may you all be!; you all must be!; I pray you all may be!
 71496,hontu,imp,may they be!; they must be!
 71499,homa 2.2,pr,we are
-77100,chindati 5,pr,cuts across; breasts; fords
+77100,chindati 4,pr,cuts across; breasts; fords

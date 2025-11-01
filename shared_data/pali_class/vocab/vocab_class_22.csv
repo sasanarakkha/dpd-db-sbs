@@ -50,7 +50,7 @@ id,pali,pos,meaning
 17749,ekāsana 3,nt,one sitting; one time
 17933,ettaka,adj,so much; this much; so long
 17955,etha,imp,come you all!
-18062,evañca,sandhi,and thus; and like this; but like this
+18062,evañca,sandhi,and thus; if like this; but like this
 18095,evamidaṃ,sandhi,thus this
 18857,orima,adj,nearest; closest (shore)
 19649,katamanussaranta,prp,remembering what was done
@@ -79,7 +79,7 @@ id,pali,pos,meaning
 31453,thala 1,nt,dry land; firm ground; terra firma
 31691,dakkhi,aor,saw
 31736,dakkhuṃ,aor,they saw
-31737,dacchaṃ,fut,I will see; I will know
+31737,dacchaṃ,fut,I myself will see; I will know for myself
 31739,dajjā,opt,would give; should give
 31968,dameti,pr,makes tame; masters; control
 32863,dukkara 1,adj,difficult to do; hard to achieve
@@ -106,7 +106,7 @@ id,pali,pos,meaning
 45806,pārima,adj,(of shore) furthest; most distant
 45863,pāleti,pr,protects; guards; takes care of; preserves
 46056,piṇḍapātamatta,masc,mere alms food
-46964,puratthima,adj,eastern
+46964,puratthima 1,adj,eastern
 47272,peta 2,masc,departed; deceased; dead
 47431,poṇa 1,adj,sloping (to); inclining down (to); leading (to)
 47732,phāsuvihāra,masc,comfortable existence; easy living; living in comfort
