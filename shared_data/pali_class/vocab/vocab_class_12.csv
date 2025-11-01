@@ -23,14 +23,13 @@ id,pali,pos,meaning
 10000,assaratana,nt,horse treasure; one of the seven treasures of a universal ruler
 11023,ākāra 1.2,masc,aspect; facet; detail; property; quality; attribute
 11588,ādiyati 1,pr,takes; grasps
-13077,āvikaroti 2,pr,(vinaya) discloses; divulges; openly reveals; confesses
+13076,āvikaroti 1,pr,explains; clarifies
 13585,itthiratana,nt,woman treasure; consort of a universal ruler; one of the seven treasures of a universal ruler
 13825,imehi 1,pron,by these; with these
 16351,upādāya 2,ind,derived (from); dependent (on); based (on)
 17376,eka 1,card,one (1)
 17638,ekarasa,adj,having one taste; with a single flavour
 17803,eke 1,adj,some; some people
-18135,evaṃ 2,ind,yes!; that is right!; correct!
 18155,evaṃdiṭṭhī,adj,of such view; who holds the theory that; of the opinion that; who thinks that
 18200,evaṃvādī,adj,of such view; who hold the view that; having a theory that
 19154,oḷārika 2,adj,(of food) solid; heavy; substantial
@@ -61,17 +60,16 @@ id,pali,pos,meaning
 29724,tathūpama,adj,comparable in the same way; similar to that; like this
 30028,tamenaṃ,sandhi,that one; him; her; that thing; that person
 30071,tayo 1,card,three (3)
+30072,tayo 2,card,three (3) (object)
 30153,tasmiṃ 1,pron,in that; in that person
 30174,tassassu,sandhi,of that there would be
 30211,taṃ kiṃ maññatha,idiom,what do you think?; how do you feel about?
-30430,ti 1,card,three (3)
 30500,tiṭṭhamāna,prp,standing; remaining
 30565,tiṇṇaṃ,card,of three
 30872,tisso,card,three (3)
 30908,tiṃsaṃ,card,thirty (30)
 32001,dasa 1.1,card,ten (10)
 32035,dasama 1,ordin,tenth (10th)
-32668,dissati 1,pr,is seen; is observed; is manifest
 32674,disvā,abs,having seen; having understood; having found out
 32689,divasaṃ,ind,by day; during the day; for a day
 33061,duccarita 2,nt,misconduct; misbehaviour; bad behaviour (by)

@@ -78,7 +78,6 @@ id,pali,pos,meaning
 34001,deseti 1,pr,preach (to); teaches (to); explains (to)
 34038,devatā,fem,deity; god
 34459,dve 1,card,two (2)
-34626,dhamma 1.01,masc,nature; character
 34632,dhamma 1.07,masc,truth; reality; principle; truth behind the teaching
 35842,nara,masc,man; person
 35994,nahāru,masc,tendon; sinew
@@ -157,7 +156,6 @@ id,pali,pos,meaning
 57015,saṅghapitar,masc,father of the community; community elder
 57376,saññatta 1.2,pp,instructed; informed
 57641,satimant 1,adj,mindful; fully present; attentive
-57676,satta 2.1,masc,being; living being; creature
 57880,satthar 1,masc,master; teacher
 57901,satthārā,masc,by the teacher; with the master
 57946,sadā,ind,always; ever; all the time
@@ -173,7 +171,6 @@ id,pali,pos,meaning
 64312,sumedha 1,adj,wise; sage
 64642,suve,ind,tomorrow
 64953,seyyathāpi,sandhi,just like; as if; imagine if
-65710,vajja 2.1,nt,fault (of); error (of); mistake (of)
 65715,vajjadassī,adj,who sees fault
 66665,vā 1,ind,or; either or
 67107,vikappa 1.1,masc,alteration (to); improvement (to); distinction (regarding)

@@ -64,7 +64,6 @@ id,pali,pos,meaning
 29033,ṭhāna 02,nt,reason; grounds; basis; cause
 29054,ṭhānametaṃ vijjati,idiom,it is possible that; it is plausible that
 29560,tato 2,pron,(comparative) than that; more than that
-30072,tayo 2,card,three (3) (object)
 30149,tasmātiha,sandhi,therefore here; therefore in this regard
 30262,tādisikā,adj,of that kind; of such character; of such quality; like that
 30507,tiṇa 1,nt,grass; straw
@@ -81,7 +80,7 @@ id,pali,pos,meaning
 39203,paggaha 3,masc,donation; handout; give-away
 39432,paccavekkhitabba,ptp,should be considered; should be reviewed; should be contemplated; should be reflected (on)
 39967,paññatta 2,pp,(of a rule) formulated; prescribed; decreed; declared
-40050,paññāpeti 3,pr,is evident
+40052,paññāpeti 5,pr,(of a rule) formulates; prescribes; decrees; declares
 40233,paṭikūlasaññā,fem,perception of repulsiveness (of); concept of unpleasantness (of)
 40234,paṭikūlasaññāparicita,adj,fortified by the perception of repulsiveness (towards)
 40343,paṭigha 1,masc,aversion; repulsion; resistance; irritation; conflict

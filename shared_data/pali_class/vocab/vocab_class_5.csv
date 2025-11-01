@@ -14,7 +14,6 @@ id,pali,pos,meaning
 6389,aparimita,pp,immeasurable; limitless
 8087,abhiramati,pr,enjoys; delights (in); takes pleasure (in)
 8212,abhisamaya,masc,complete comprehension (of); total understanding (of); completely getting (of); breakthrough (to)
-8701,amhākaṃ 3,pron,our; of us
 8705,amhesu,pron,in us; among us
 8757,ayaṃ,pron,this; this person; this thing
 9019,ariyasacca,nt,truth of the Buddha; noble truth
@@ -63,6 +62,7 @@ id,pali,pos,meaning
 24609,gavesī 1,adj,seeking; searching for; looking for
 24765,gāmaṇi,masc,chief; chieftain; headman; leader
 25973,catunnaṃ 2,card,of four
+28483,jināti 1,pr,conquers; overcomes; defeats
 28813,jhāyati 1.2,pr,meditates; contemplates
 28910,ñāti,masc,family; relative; kinsman
 29171,ḍeti,pr,flies; flies up
@@ -176,3 +176,4 @@ id,pali,pos,meaning
 71212,hi 1,ind,indeed; certainly; truly; definitely
 71224,hita 3,nt,welfare (of); good (of); benefit (of); blessing
 71489,hotu 1,imp,may it be (for)!
+76104,amhākaṃ 4,pron,(royal plural) my

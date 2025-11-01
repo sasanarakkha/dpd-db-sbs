@@ -17,7 +17,6 @@ id,pali,pos,meaning
 24654,gahapati,masc,householder; landowner
 26837,cīvaracetāpanna,nt,robe-fund; account for robe-cloth
 27111,ceteti 2,pr,intends; wills (to)
-28483,jināti 1,pr,conquers; overcomes; defeats
 28484,jināti 2,pr,surpasses; beats; wins (over)
 28726,jotipāla 1,masc,name of a Brahman royal advisor
 29089,ṭhita 3,pp,remained; stayed; was
@@ -48,6 +47,7 @@ id,pali,pos,meaning
 44772,passasi 1.1,pr,you see; do you see?
 45428,pātimokkha 2,masc,(vinaya) precepts for Buddhist monastics
 45663,pāpuṇāti 1,pr,reaches; arrives (at); comes (to)
+46409,pītisukha 1,nt,delight and ease; joy and happiness
 46448,puggala,masc,person; individual
 46484,pucchati,pr,asks; enquires; questions (somebody about)
 46624,putta 1,masc,son; child
@@ -81,4 +81,3 @@ id,pali,pos,meaning
 68557,vibhaṅga 1,masc,analysis; classification; breakdown
 69606,vivekaja,adj,born from seclusion; (or) born from discrimination; (comm) secluded from the defilements
 69661,viharati 1,pr,lives (in); dwells (in); stays (in)
-75647,pītisukha 2,adj,having delight and ease; with joy and happiness

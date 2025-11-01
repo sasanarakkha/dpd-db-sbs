@@ -13,16 +13,18 @@ id,pali,pos,meaning
 1077,acchidda 1,pp,unbroken; flawless; without cracks
 1160,ajāta 1,pp,unborn; uncreated; unproduced
 2415,atītānāgatapaccuppanna,adj,"in the past, the future and the present"
+2476,attadīpa,adj,self-reliant; independent
 2491,attani 2,masc,when self; when oneself
 2492,attaniya,adj,one's own; belonging to oneself; fit to be a self
+2545,attasaraṇa,adj,one's own refuge; helping oneself
 2863,adassāvī,adj,who has no regard (for)
 3037,addhuva,adj,not stable; not enduring; not eternal
 3038,addhuvato,ind,as unstable; as unenduring; as not eternal
 3152,adhigata 1,pp,got; acquired; attained; achieved
-3200,adhiṭṭhahi 1,aor,fixed attention (on)
 3404,adhunā,ind,recently; now; presently; at this time
 3406,adhunāgata,adj,recently come (to); newly arrived (to)
 3475,anaṅgaṇa,adj,spotless; blemish free
+3511,anaññasaraṇa,adj,with no other refuge; independent of others
 3539,anatimānī,adj,who is not conceited; who is not arrogant; who is humble
 3550,anattato,ind,as impersonal; as not oneself; as non-subjective
 4132,aniccato,ind,as impermanent; as unstable; as transient; as unreliable
@@ -95,6 +97,7 @@ id,pali,pos,meaning
 28854,ñāṇa 2,nt,knowing (of); understanding (of); insight (into)
 29025,ṭhassati,fut,will stand; will stay; will remain; will last
 29088,ṭhita 2,pp,stationary; stable; stabilised; motionless; immovable
+29587,tattha 2,ind,in that regard; in that case; regarding that matter
 30166,tassa 4,ind,therefore; thus; so; because of that; regarding that
 30268,tāni 1,pron,they; those; those things
 30318,tāreti,pr,saves; helps across; rescues (somebody from)
@@ -103,7 +106,9 @@ id,pali,pos,meaning
 32888,dukkhato 2,ind,as suffering; as pain; as discomfort
 33002,dukkhita 1,pp,afflicted (with); suffering (from)
 33917,dūre 2,ind,away (from); far away (from); distant (from)
+34734,dhammadīpa,adj,with Dhamma as one's place of safety; with Dhamma as one's solid ground
 34848,dhammaladdha,adj,justly acquired; honestly gained; legally obtained; legitimately acquired
+34875,dhammasaraṇa,adj,taking refuge in the Dhamma; relying on the Dhamma; finding support in the teaching
 34970,dhammika 2,adj,righteous; just; moral
 35231,dhuva 1,adj,stable; enduring; permanent; eternal; everlasting; epithet of Nibbāna
 35286,dheyya 1,nt,realm (of); sphere (of); power (of); influence (of)
@@ -152,7 +157,7 @@ id,pali,pos,meaning
 53754,yadeva,sandhi,any; whichever
 53801,yampi,sandhi,whatever indeed
 53846,yassa 2,pron,of whoever; of whichever; whose
-53973,yāni,pron,whichever (things)
+53955,yāna 1,nt,carriage; wagon; vehicle
 53977,yānīkata,adj,mastered; familiarized
 54062,yiṭṭha 1,pp,given (as a gift); offered
 55180,rūpagata 1,adj,related to matter; connected with materiality; kind of matter
@@ -202,7 +207,8 @@ id,pali,pos,meaning
 70111,vusita 1,pp,fulfilled; completed; finished
 70115,vusitabrahmacariya,adj,fulfilled the holy life; completed the spiritual journey; epithet of an arahant
 70245,vedanāgata,adj,related to felt experience; connected with feeling; concerning sensation; kind of feeling
-70315,veditabba 1,ptp,can be known (by); should be understood (by)
+70316,veditabba 2,ptp,to be experienced (by)
 71324,hīna 1,pp,low; inferior; deficient
 71380,huta 2,pp,offered
+75652,adhiṭṭhahi 2,aor,resolved; determined (to be)
 77757,yāni tāni,idiom,whoever… they; whichever… those

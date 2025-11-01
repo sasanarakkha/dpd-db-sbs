@@ -63,6 +63,7 @@ id,pali,pos,meaning
 31575,thūla 1,adj,massive; large
 31709,dakkhiṇā 1,fem,gift; donation
 32290,dāni,ind,now; immediately
+32668,dissati 1,pr,is seen; is observed; is manifest
 32669,dissati 2,pr,seems
 32757,dīgharattaṃ,ind,for a long time
 33087,duṭṭha 1,pp,wicked; evil; bad; corrupt
@@ -102,6 +103,7 @@ id,pali,pos,meaning
 52286,mānasa 2,nt,mind; heart; mentality; intention
 53049,musā 2,ind,falsely; untruthfully
 53198,metta 1,adj,friendly; benevolent; kind
+53579,yathāakusalaṃ,ind,so unskilfully; so wrongly
 53641,yathābālaṃ,ind,so foolishly; so stupidly
 53665,yathāmūḷhaṃ,ind,so misguidedly; so stupidly; so foolishly
 55134,ruppanta,prp,being hurt; being oppressed; suffering
@@ -113,7 +115,7 @@ id,pali,pos,meaning
 59336,samanugāhiyamāna,prp,being closely questioned (by); being interrogated (by); being pressed (by)
 59362,samanubhāsiyamāna,prp,being admonished; being sternly advised (by someone about something)
 59376,samanuyuñjiyamāna,prp,being cross-questioned; being cross-examined (by someone about something)
-59525,samaṃ 2,ind,in a similar manner; similarly likewise
+59524,samaṃ 1,ind,evenly; equally
 59555,samācāra,masc,conduct; behaviour; activity
 59663,samādhiyati,pr,is calmed (for); becomes collected (for); becomes composed (for); becomes stable (for)
 59846,samitatta,nt,calmness; peacefulness; fact of tranquility (of)

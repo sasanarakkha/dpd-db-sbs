@@ -55,7 +55,6 @@ id,pali,pos,meaning
 15971,upari 1,ind,above; overhead
 16015,uparujjhati,pr,is stopped; is ended; is finished
 16124,upasampajja 1,ger,reaching; attaining; arriving at
-16558,uppajjeyya,opt,would become available (for); would accrue (to); could crop up (for)
 17282,ūna 2,nt,shortage (of); deficiency (of); lack (of); want (of); need (for)
 17384,ekaka 1,adj,alone; solitary
 17460,ekato 1,ind,on one side
@@ -64,15 +63,12 @@ id,pali,pos,meaning
 17901,etādisa,adj,of this kind; of this type; such as this
 17945,ettha 1,ind,here; in this place; in this case; in this regard
 18048,eso,pron,this; this thing; this person; he; it
-18053,eva 3,ind,even; too; as well
 18254,oka 1.1,masc,home; abode
 18788,obhāsetvā,abs,having lit up; having illuminated
-19064,ovadita,pp,advised; instructed; taught; admonished
-19087,ovāda 1,masc,advice; instruction; encouragement; exhortation
 19133,ohāretvā,abs,having shaved; having shaved off
 19560,kaṇha 1,adj,dark; black
 19790,katvāna 1,abs,having done
-20503,karitvā 2,abs,having made
+20502,karitvā 1,abs,having done; having performed
 21488,kāsāya 1,adj,organic brown; colour of Buddhist monks' robes
 22620,kusala 1,adj,healthy; beneficial; useful; good; wholesome; karmically profitable
 22868,kesamassu,nt,hair and beard
@@ -183,6 +179,7 @@ id,pali,pos,meaning
 55077,ruci,fem,preference; choice; liking; approval
 57267,sañcaritta,nt,matchmaking; carrying proposals
 57567,sata 1.1,pp,mindful; present; attentive
+57616,sati 1.2,fem,mindfulness; presence; recollection; awareness
 58376,sandassetvā,abs,having instructed; having explained
 58840,sabbattha 1,ind,everywhere; every place
 58878,sabbanimitta,nt,all objects; all signs; all mental images
@@ -216,4 +213,5 @@ id,pali,pos,meaning
 70534,vehāsaṃ,ind,in the air; in the sky
 70655,voharati 1,pr,speaks; communicates; gives expression; uses language
 71238,hitvā,abs,having left; having left behind; having abandoned
+77897,asammosa 2,masc,maintenance; non-disappearance; non-dispersal
 78692,kappeti 5,pr,"(of a posture, sitting or lying down) adopts; takes up; assumes; uses; sits (on); lies down (in)"

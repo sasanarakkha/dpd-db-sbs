@@ -106,7 +106,6 @@ id,pali,pos,meaning
 34379,dvi,card,two (2)
 34391,dvija 1,adj,twice born; born from an egg; oviparous
 34490,dveme,sandhi,these two
-34635,dhamma 1.10,adj,of such nature; liable (to); prone (to); destined (for)
 35104,dhārayati 1,pr,holds; keeps; carries
 35158,dhī,ind,shame on you!; woe on him!; damn you!
 35564,nadita,pp,roared; made a bold assertion
@@ -144,6 +143,7 @@ id,pali,pos,meaning
 51454,maraṇadhammomhi,sandhi,I am liable to die; I am subject to death; death is part of my intrinsic nature
 52851,muñcati 2,pr,gets angry (with)
 52892,muṇḍaka 2,masc,shaveling; skinhead; baldy
+53164,me 2,pron,by me
 53633,yathāpi,sandhi,just like; just as
 53845,yassa 1,pron,to whom; for whom; for whoever; for whatever; for whichever
 53847,yassa 3,sandhi,whoever to him

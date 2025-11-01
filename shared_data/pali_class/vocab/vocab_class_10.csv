@@ -8,9 +8,9 @@ id,pali,pos,meaning
 1508,aññatara 2,pron,one (of); either one (of)
 1524,aññatitthiya,adj,who belongs to another sect; who follows another religion
 2433,atta 1.1,masc,self; soul; spirit; essence
+2598,attha 1.2,masc,benefit; profit; good; welfare
 2625,atthaṅgata 1,pp,(of the sun) set; gone down
 2630,atthaṅgate sūriye,idiom,after sunset
-2718,atthaṃ,ind,for the sake (of); for the purpose (of); for the benefit (of)
 2790,atha ca pana,idiom,and yet; but still
 2795,atha 2,ind,but; rather; even
 2889,adinna 1.1,nt,which is not given; something not offered
@@ -88,6 +88,7 @@ id,pali,pos,meaning
 26291,caraṃ,prp,walking; travelling
 26360,cavamāna,prp,falling away; dying
 27906,janā,masc,men; people; population
+28150,jāgara,adj,awake; alert; lucid
 28154,jāgaranta,prp,awake; staying awake; alert; watchful; lucid
 28297,jānato passato,idiom,when knowing and seeing; for one who knows and sees
 28304,jānanta,prp,knowing; being aware (of)
@@ -96,6 +97,7 @@ id,pali,pos,meaning
 29709,tathārūpa 1,adj,such; such kind; of such quality; so formed
 30165,tassa 3,pron,when he; when it
 30258,tādisa,adj,such; like that (of); of such character; of such quality; kind (of)
+30430,ti 1,card,three (3)
 30495,tiṭṭhanta 1,prp,standing (in); standing still
 30501,tiṭṭhaṃ,prp,standing; staying still
 30730,tiyojanaparamaṃ,ind,for three yojanas at the most; not more than sixty kilometres
@@ -150,6 +152,7 @@ id,pali,pos,meaning
 57113,sace,ind,if
 57617,sati 2.1,prp,when is; when exists
 57673,sato,prp,when being; when is; when are
+57676,satta 2.1,masc,being; living being; creature
 58152,santa 1.1,prp,existing; being; there is
 58464,sandhāvissaṃ,aor,I wandered; I transmigrated
 59128,samagga 1,adj,unified; united; in concord; harmonious; in agreement

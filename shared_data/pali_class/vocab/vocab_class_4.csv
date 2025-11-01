@@ -18,6 +18,7 @@ id,pali,pos,meaning
 9719,asi 2.1,pr,you are
 10921,ahu 1.1,aor,was
 10964,ahosiṃ,aor,I was
+11557,āditta,pp,blazing; burning; on fire
 11836,āpajjati 2,pr,arouses; exhibits; produces; brings into being
 12086,āmantesi,aor,addressed; said (to); advised
 12243,āyasmā,masc,venerable
@@ -50,6 +51,7 @@ id,pali,pos,meaning
 32428,diṭṭha 1.1,pp,seen; found; visible
 34211,dosa 1.1,masc,aversion; ill-will; hate; hatred
 34513,dhaja 1,masc,flag; banner
+34626,dhamma 1.01,masc,nature; character
 37679,nibbindati 1,pr,is dis-enchanted (with); is disinterested (in); is disillusioned (by); loses interest (in); is dispassionate (towards)
 38218,nisīdi 1,aor,sat (on); sat down (in)
 39192,paggaṇhāti 2,pr,holds out; raises up
@@ -78,9 +80,8 @@ id,pali,pos,meaning
 55973,loka 2,masc,world; plane of existence
 56270,saka 1,adj,one's own; my own
 56554,sagga 1.1,adj,heavenly
-56770,saṅkhāra 3,masc,mental formation; mental activity; thought processes; fourth of the five aggregates
 57122,sacca 2,nt,truth; epithet of Nibbāna
-57616,sati 1.2,fem,mindfulness; presence; recollection; awareness
+57615,sati 1.1,fem,memory; remembering; recollection; keeping in mind
 58259,santi 2.1,pr,they are; there are; they exist
 59623,samādhi 1,masc,perfect peace of mind; stability of mind; stillness of mind; mental composure
 59985,samudaya 1,masc,source; origination; appearance (of)
