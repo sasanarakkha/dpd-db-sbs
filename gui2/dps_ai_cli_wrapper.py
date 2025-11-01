@@ -58,7 +58,7 @@ def fetch_id(db_session, id_to_check):
 pali_word = fetch_id(db_session, {headword_id})
 if pali_word:
     lemma_1 = pali_word.lemma_1
-    meaning = pali_word.meaning_1
+    meaning = pali_word.meaning_combo
     pos = pali_word.pos
     grammar = pali_word.grammar
     sentence = pali_word.example_1

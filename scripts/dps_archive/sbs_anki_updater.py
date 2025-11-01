@@ -280,8 +280,8 @@ def update_note_values(deck, note, i):
     if i.sbs:
         if "sbs_meaning" in note:
             note["sbs_meaning"] = str(i.sbs.sbs_meaning)
-        if "sbs_class_anki" in note:
-            note["sbs_class_anki"] = str(i.sbs.sbs_class_anki)
+        if "class_anki" in note:
+            note["class_anki"] = str(i.sbs.class_anki)
         if "sbs_category" in note:
             note["sbs_category"] = str(i.sbs.sbs_category)
         if "sbs_class" in note:

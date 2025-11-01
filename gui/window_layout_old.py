@@ -192,9 +192,9 @@ def window_layout(dpspth, db_session, username):
     window["dps_sbs_chant_pali_2"].bind("<Key>", "-key")
     window["dps_sbs_chant_pali_2"].bind("<FocusOut>", "-focus_out")
 
-    window["dps_sbs_class_anki"].bind("<Return>", "-enter")
-    window["dps_sbs_class_anki"].bind("<Key>", "-key")
-    window["dps_sbs_class_anki"].bind("<FocusOut>", "-focus_out")
+    window["dps_class_anki"].bind("<Return>", "-enter")
+    window["dps_class_anki"].bind("<Key>", "-key")
+    window["dps_class_anki"].bind("<FocusOut>", "-focus_out")
 
     window["dps_sbs_category"].bind("<Return>", "-enter")
     window["dps_sbs_category"].bind("<Key>", "-key")

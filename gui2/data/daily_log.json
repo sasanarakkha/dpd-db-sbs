@@ -840,5 +840,35 @@
         "pass2_add": 0,
         "pass2_pre": 0,
         "pass2_update": 2
+    },
+    "2025-10-25": {
+        "pass1": 0,
+        "pass2_add": 2,
+        "pass2_pre": 0,
+        "pass2_update": 7
+    },
+    "2025-10-26": {
+        "pass1": 0,
+        "pass2_add": 1,
+        "pass2_pre": 0,
+        "pass2_update": 3
+    },
+    "2025-10-27": {
+        "pass1": 0,
+        "pass2_add": 0,
+        "pass2_pre": 0,
+        "pass2_update": 3
+    },
+    "2025-10-30": {
+        "pass1": 0,
+        "pass2_add": 0,
+        "pass2_pre": 0,
+        "pass2_update": 3
+    },
+    "2025-10-31": {
+        "pass1": 0,
+        "pass2_add": 0,
+        "pass2_pre": 0,
+        "pass2_update": 1
     }
 }

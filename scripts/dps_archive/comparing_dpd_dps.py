@@ -20,9 +20,9 @@ with open(csv_file) as f, \
     for file in out_files:
         name = basename(file.name)[:-4]
         if name.startswith('meaning'):
-            headings = ['id', 'lemma_1', 'sbs_index', 'sbs_class_anki', 'sbs_category', 'meaning_1', 'meaning_lit']
+            headings = ['id', 'lemma_1', 'sbs_index', 'class_anki', 'sbs_category', 'meaning_1', 'meaning_lit']
         else:
-            headings = ['id', 'lemma_1', 'sbs_class_anki', 'sbs_index', 'sbs_category',  name]
+            headings = ['id', 'lemma_1', 'class_anki', 'sbs_index', 'sbs_category',  name]
         dict_writers[name] = csv.DictWriter(file, headings)
         dict_writers[name].writeheader()
 

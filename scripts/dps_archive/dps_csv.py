@@ -54,7 +54,7 @@ def get_header():
         "pali_1",
         "pali_2",
         "fin",
-        "sbs_class_anki",
+        "class_anki",
         "sbs_category",
         "sbs_class",
         "pos",
@@ -188,7 +188,7 @@ def pali_row(dpspth, i: DpdHeadword, output="anki") -> List[str]:
 
     fields.extend(
         [
-            i.sbs.sbs_class_anki if i.sbs else None,
+            i.sbs.class_anki if i.sbs else None,
             i.sbs.sbs_category if i.sbs else None,
             i.sbs.sbs_class if i.sbs else None,
             i.pos,

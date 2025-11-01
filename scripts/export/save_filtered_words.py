@@ -30,7 +30,7 @@ def save_filtered_words():
     dpd_db = (
         db_session.query(DpdHeadword)
         .outerjoin(SBS, DpdHeadword.id == SBS.id)
-        .filter(SBS.sbs_class_anki == attribute)
+        .filter(SBS.class_anki == attribute)
         .all()
     )
 
@@ -59,7 +59,7 @@ def save_filtered_words():
             "id",
             "lemma_1",
             "meaning_1",
-            "sbs_class_anki",
+            "class_anki",
             "class_source",
             "class_sutta",
             "class_example",
@@ -80,7 +80,7 @@ def save_filtered_words():
                     "id": word.id,
                     "lemma_1": word.lemma_1,
                     "meaning_1": word.meaning_1,
-                    "sbs_class_anki": word.sbs.sbs_class_anki,
+                    "class_anki": word.sbs.class_anki,
                     "class_source": word.sbs.class_source,
                     "class_sutta": word.sbs.class_sutta,
                     "class_example": word.sbs.class_example,

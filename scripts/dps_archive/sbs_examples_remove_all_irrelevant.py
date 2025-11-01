@@ -21,7 +21,7 @@ def main():
             if i.sbs:
                 # Check for the absence of specified fields
                 should_delete = not any([
-                    i.sbs.sbs_class_anki,
+                    i.sbs.class_anki,
                     i.sbs.sbs_patimokkha,
                     i.sbs.sbs_index,
                     i.sbs.sbs_category,

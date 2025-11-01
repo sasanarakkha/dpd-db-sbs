@@ -293,7 +293,7 @@ def sbs_related_sign(i: DpdHeadword):
     if i.sbs:
         if i.sbs.sbs_category:
             html += "A "
-        if i.sbs.sbs_class_anki:
+        if i.sbs.class_anki:
             html += "C "
         if i.sbs.sbs_patimokkha == "pat":
             html += "P "

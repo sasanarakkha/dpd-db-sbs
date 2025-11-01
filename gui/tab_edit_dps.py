@@ -797,10 +797,10 @@ def make_tab_edit_dps(dpspth, sg):
                 "", key="dps_sbs_source_3_error", size=(50, 1), text_color="red")
         ],
         [
-            sg.Text("sbs_class_anki", size=(15, 1)),
+            sg.Text("class_anki", size=(15, 1)),
             CompletionCombo(
                 anki_class_list,
-                key="dps_sbs_class_anki",
+                key="dps_class_anki",
                 default_value="",
                 size=(3, 1),
                 enable_events=True,

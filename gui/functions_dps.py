@@ -91,7 +91,7 @@ def display_dps_summary(values, window, sg, original_values):
     "dps_vib_source", "dps_vib_sutta", "dps_vib_example",
     "dps_class_source", "dps_class_sutta", "dps_class_example",
     "dps_discourses_source", "dps_discourses_sutta", "dps_discourses_example", 
-    "dps_sbs_class_anki", "dps_sbs_class", "dps_sbs_category", "dps_sbs_patimokkha"]
+    "dps_class_anki", "dps_sbs_class", "dps_sbs_category", "dps_sbs_patimokkha"]
 
     summary = []
     excluded_fields = ["dps_grammar", "dps_meaning", "dps_root", "dps_base_or_comp", "dps_constr_or_comp_constr", "dps_synonym_antonym", "dps_notes"]

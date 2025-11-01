@@ -288,7 +288,7 @@ def update_note_values(note, i):
 
     if i.sbs:
         note["sbs_meaning"] = str(i.sbs.sbs_meaning)
-        note["sbs_class_anki"] = str(i.sbs.sbs_class_anki)
+        note["class_anki"] = str(i.sbs.class_anki)
         note["sbs_category"] = str(i.sbs.sbs_category)
         note["sbs_class"] = str(i.sbs.sbs_class)
         note["sbs_patimokkha"] = str(i.sbs.sbs_patimokkha)

@@ -4,8 +4,8 @@
 <div class="dpd summary">
     <p>
         {% if d.i.sbs %}
-            {% if d.i.sbs.sbs_class_anki %}
-            <a href="{{d.i.sbs.sbs_class_link}}" target="_blank"><i>(cl.{{d.i.sbs.sbs_class_anki}}{% if d.i.sbs.class_extra %}*{% endif %})</i></a>
+            {% if d.i.sbs.class_anki %}
+            <a href="{{d.i.sbs.sbs_class_link}}" target="_blank"><i>(cl.{{d.i.sbs.class_anki}}{% if d.i.sbs.class_extra %}*{% endif %})</i></a>
             <span class="gray"> | </span>
             {% endif %}
             {% if d.i.sbs.sbs_category %}
@@ -404,8 +404,13 @@
             <p>
                 {{d.i.sbs.class_example|safe}}
             </p>
+        {% endif %}
+        {% if d.i.sbs.class_anki %}
+            <p><span class="gray">{{d.i.sbs.class_example_translation}}</span></p>
             <p class="sutta">
-                (cl.{{d.i.sbs.sbs_class_anki}}) 
+                (cl.{{d.i.sbs.class_anki}})
+        {% endif %}
+        {% if d.i.sbs.needs_class_example %} 
                 {% if d.make_link and d.i.sbs.class_source_link %}
                 <a class="sutta_link" href="{{d.i.sbs.class_source_link}}" target="_blank">
                     {{d.i.sbs.class_source}}</a>

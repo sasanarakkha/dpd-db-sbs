@@ -500,6 +500,8 @@ class DpsExampleField(ft.Column):
             # Add class-specific field for class examples
             if example_type == "class":
                 fields_dict["translation"] = self.dps_fields.fields.get("dps_class_example_translation")
+                fields_dict["extra"] = self.dps_fields.fields.get("dps_class_extra")
+                fields_dict["anki"] = self.dps_fields.fields.get("dps_class_anki")
 
         # Add core fields
         fields_dict["source"] = self.dps_fields.fields.get(source_field_name)

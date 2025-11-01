@@ -73,7 +73,7 @@ def save_words_to_csv(sbs_class: int, filename: str) -> int:
 
     words = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.sbs)).join(SBS).filter(
         SBS.sbs_class <= sbs_class,
-        SBS.sbs_class_anki <= sbs_class
+        SBS.class_anki <= sbs_class
     ).all()
 
     words_saved = 0
@@ -110,7 +110,7 @@ def save_words_for_class_to_csv(sbs_class: int, filename: str):
     
 
     words = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.sbs)).join(SBS).filter(
-        SBS.sbs_class_anki == sbs_class
+        SBS.class_anki == sbs_class
     ).all()
 
     print(f"total words for class {sbs_class}: {len(words)}")

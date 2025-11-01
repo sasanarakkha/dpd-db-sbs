@@ -151,7 +151,7 @@ def save_filtered_words():
     ]
 
     # Sort the filtered words by sbs_class
-    # filtered_words = sorted(filtered_words, key=lambda word: str(word.sbs.sbs_class_anki))
+    # filtered_words = sorted(filtered_words, key=lambda word: str(word.sbs.class_anki))
 
     # Check if the CSV exists, and create a backup with a timestamp if it does
     if os.path.exists(dpspth.temp_csv_path):

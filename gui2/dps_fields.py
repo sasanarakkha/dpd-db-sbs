@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import flet as ft
+import copy
 from db.models import DpdHeadword, Russian, SBS
 from gui2.dps_field_mapping import dps_field_mapping
 from gui2.dps_example_field import DpsExampleField
@@ -42,7 +43,7 @@ class DpsFields:
         # Using a mapping to create fields
         for field_name, properties in dps_field_mapping.items():
             control_type = properties.get("control", ft.TextField)
-            params = properties.get("params", {})
+            params = copy.deepcopy(properties.get("params", {}))
 
             if field_name in ["dps_sbs_chant_pali_1", "dps_sbs_chant_pali_2"]:
                 control_type = ft.Dropdown
@@ -87,10 +88,11 @@ class DpsFields:
             else:
                 # Standard Flet controls
                 if control_type == ft.Dropdown:
-                    params["on_change"] = self._handle_sbs_chant_change
+                    if field_name in ["dps_sbs_chant_pali_1", "dps_sbs_chant_pali_2"]:
+                        params["on_change"] = self._handle_sbs_chant_change
                     params["editable"] = True
                     params["enable_filter"] = True
-
+                    
                 self.fields[field_name] = control_type(**params)
 
     def _set_field_value(self, field: Any, value: object) -> None:
@@ -385,14 +387,14 @@ class DpsFields:
                 row.visible = field_name in visible_fields
 
     def clear_all_fields(self):
-        for field in self.fields.values():
+        for field_name, field in self.fields.items():
             if isinstance(field, (ft.TextField, ft.Text)):
                 field.value = ""
                 field.error_text = None
             elif isinstance(field, ft.Checkbox):
                 field.value = False
             elif isinstance(field, ft.Dropdown):
-                field.value = None
+                field.value = None  # For all dropdowns, None is the correct way to clear
             elif isinstance(field, DpsExampleField):
                 field.value = ""
                 field.error_text = None

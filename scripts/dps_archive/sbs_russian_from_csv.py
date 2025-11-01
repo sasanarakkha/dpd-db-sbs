@@ -159,7 +159,7 @@ def _csv_row_to_sbs(x: Dict[str, str], id, __db_session__) -> SBS:
 
     return SBS(
         id=id,
-        sbs_class_anki=x["sbs_class_anki"],
+        class_anki=x["class_anki"],
         sbs_class=x["sbs_class"],
         sbs_meaning=x["sbs_meaning"],
         sbs_notes=x["sbs_notes"],

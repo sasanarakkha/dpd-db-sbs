@@ -711,7 +711,7 @@ def get_next_note_ru(db_session):
         return db_session.query(DpdHeadword).join(Russian).join(SBS).filter(
             Russian.ru_notes.like("%ИИ%"),
             or_(
-                    SBS.sbs_class_anki != '',
+                    SBS.class_anki != '',
                     SBS.sbs_category != '',
                     SBS.sbs_index != '',
                     SBS.sbs_patimokkha != '',

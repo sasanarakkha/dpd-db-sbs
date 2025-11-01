@@ -26,8 +26,8 @@ console = Console()
 def main():
     console.print("Saving words based on specified criteria")
 
-    # First CSV: sbs_class_anki from 1 to 29
-    save_words_to_csv(between(SBS.sbs_class_anki, 1, 30), 'sbs_class.csv')
+    # First CSV: class_anki from 1 to 29
+    save_words_to_csv(between(SBS.class_anki, 1, 30), 'sbs_class.csv')
 
     # Second CSV: Non-empty sbs_index
     save_words_to_csv(SBS.sbs_index != '', 'per.csv')

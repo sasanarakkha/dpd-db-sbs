@@ -108,7 +108,7 @@ def sbs_per(df, sbs_ped_link):
     # Change the value of 'ru_meaning' and 'ru_meaning_lit' columns to an empty string
     df['ru_meaning'] = ""
 
-    # Select the rows where 'sbs_class_anki' is not empty and 'root' is not empty
+    # Select the rows where 'class_anki' is not empty and 'root' is not empty
     filtered_df = df[(df['sbs_index'] != "")]
 
     # Select the columns to keep in the DataFrame
@@ -260,7 +260,7 @@ def dps(df, dps_link):
         ), axis=1)
 
     # Select the columns to keep in the DataFrame
-    columns_to_keep = ['id', 'pali_1', 'sbs_class_anki', 'sbs_category', 'sbs_class', 
+    columns_to_keep = ['id', 'pali_1', 'class_anki', 'sbs_category', 'sbs_class', 
     'grammar', 'neg', 'verb', 'trans', 'plus_case', 'meaning_1', 'meaning_lit', 'ru_meaning', 
     'ru_meaning_lit', 'sbs_meaning', 'sanskrit', 'sanskrit_root', 
     'sanskrit_root_meaning', 'sanskrit_root_class', 'root', 'root_has_verb', 
@@ -408,8 +408,8 @@ def classes(df, sbs_ped_link):
     # Print starting message in green color
     console.print("[bold green]making classes.csvs.")
 
-    # Filter DataFrame with 'sbs_class_anki' not empty
-    # df = df[df['sbs_class_anki'] != ""]
+    # Filter DataFrame with 'class_anki' not empty
+    # df = df[df['class_anki'] != ""]
 
     # Create a mask for rows where 'ru_meaning_lit' is not an empty string
     mask = df['ru_meaning_lit'].apply(lambda x: x != "")
@@ -431,11 +431,11 @@ def classes(df, sbs_ped_link):
         f"""{sbs_ped_link}={row['pali_1']}&entry.1433863141=Vocab-{current_date}">Fix it here</a>"""
     ), axis=1)
 
-    # Get unique values in 'sbs_class_anki' column
-    unique_sbs_class_values = df[df['sbs_class_anki'] != ""]["sbs_class_anki"].unique()
+    # Get unique values in 'class_anki' column
+    unique_sbs_class_values = df[df['class_anki'] != ""]["class_anki"].unique()
 
     # Select the columns to keep in the DataFrame
-    columns_to_keep = ['id', 'pali_1', 'sbs_class_anki', 
+    columns_to_keep = ['id', 'pali_1', 'class_anki', 
         'grammar', 'neg', 'verb', 'trans', 'plus_case', 'meaning_1', 'meaning_lit', 
         'ru_meaning', 'sanskrit', 'sanskrit_root', 
         'sanskrit_root_meaning', 'sanskrit_root_class', 'root', 'root_has_verb', 
@@ -450,10 +450,10 @@ def classes(df, sbs_ped_link):
         'antonym', 'synonym', 'variant', 'commentary', 'notes', 'sbs_notes', 'link', 
         'sbs_audio', 'test', 'feedback']
 
-    # Loop through each unique value in 'sbs_class_anki' column
+    # Loop through each unique value in 'class_anki' column
     for sbs_class_value in unique_sbs_class_values:
-        # Filter the DataFrame for the current 'sbs_class_anki' value
-        filtered_df = df[df['sbs_class_anki'] == sbs_class_value]
+        # Filter the DataFrame for the current 'class_anki' value
+        filtered_df = df[df['class_anki'] == sbs_class_value]
         
         # Keep only the specified columns in the filtered DataFrame
         filtered_df = filtered_df[columns_to_keep]
@@ -465,8 +465,8 @@ def classes(df, sbs_ped_link):
             file_name)
         filtered_df.to_csv(full_file_path, sep="\t", index=False, header=True)  
 
-    # Select rows where 'sbs_class_anki' is not empty
-    all_class_df = df[df['sbs_class_anki'] != ""]
+    # Select rows where 'class_anki' is not empty
+    all_class_df = df[df['class_anki'] != ""]
 
     # Keep only the specified columns in the filtered DataFrame
     all_class_df = all_class_df[columns_to_keep]
@@ -482,15 +482,15 @@ def classes(df, sbs_ped_link):
     # Initialize an empty DataFrame to concatenate filtered DataFrames
     concatenated_df = pd.DataFrame()
 
-    # Loop through each unique value in 'sbs_class_anki' column
+    # Loop through each unique value in 'class_anki' column
     for sbs_class_value in unique_sbs_class_values:
         # Convert the 'sbs_class_value' to an integer
         sbs_class_value_int = int(sbs_class_value)
 
         # Check if the 'sbs_class_value' as an integer falls within the desired range
         if start_value <= sbs_class_value_int <= end_value:
-            # Filter the DataFrame for the current 'sbs_class_anki' value
-            filtered_df = df[df['sbs_class_anki'] == sbs_class_value]
+            # Filter the DataFrame for the current 'class_anki' value
+            filtered_df = df[df['class_anki'] == sbs_class_value]
 
             # Keep only the specified columns in the filtered DataFrame
             filtered_df = filtered_df[columns_to_keep]
@@ -510,18 +510,18 @@ def classes(df, sbs_ped_link):
     concatenated_df = pd.DataFrame()
     concatenated_ru_df = pd.DataFrame()
 
-    # Loop through each unique value in 'sbs_class_anki' column
+    # Loop through each unique value in 'class_anki' column
     for sbs_class_value in unique_sbs_class_values:
         # Convert the 'sbs_class_value' to an integer
         sbs_class_value_int = int(sbs_class_value)
 
         # Check if the 'sbs_class_value' as an integer falls within the desired range
         if start_value <= sbs_class_value_int <= end_value:
-            # Filter the DataFrame for the current 'sbs_class_anki' value
-            filtered_df = df[df['sbs_class_anki'] == sbs_class_value]
+            # Filter the DataFrame for the current 'class_anki' value
+            filtered_df = df[df['class_anki'] == sbs_class_value]
 
             # Filter the same for ru_meaning
-            filtered_ru_df = df_original[df_original['sbs_class_anki'] == sbs_class_value]
+            filtered_ru_df = df_original[df_original['class_anki'] == sbs_class_value]
 
             # Keep only the specified columns in the filtered DataFrame
             filtered_ru_df = filtered_ru_df[['id', 'ru_meaning']]
@@ -645,14 +645,14 @@ def root_phonetic_class(df, sbs_ped_link):
     df['ru_meaning'] = ""
     df['ru_meaning_lit'] = ""
 
-    # Select the rows where 'sbs_class_anki' is not empty and 'root' is not empty
-    root_df = df[(df['sbs_class_anki'] != "") & (df['root'] != "")]
+    # Select the rows where 'class_anki' is not empty and 'root' is not empty
+    root_df = df[(df['class_anki'] != "") & (df['root'] != "")]
 
-    # Select the rows where 'sbs_class_anki' is not empty and 'phonetic' is not empty
-    phonetic_df = df[(df['sbs_class_anki'] != "") & (df['phonetic'] != "")]
+    # Select the rows where 'class_anki' is not empty and 'phonetic' is not empty
+    phonetic_df = df[(df['class_anki'] != "") & (df['phonetic'] != "")]
 
     # Select the columns to keep in the filtered DataFrame
-    columns_to_keep = ['id', 'pali_1', 'sbs_class_anki',
+    columns_to_keep = ['id', 'pali_1', 'class_anki',
         'grammar', 'neg', 'verb', 'trans', 'plus_case', 'meaning_1', 'meaning_lit', 
         'ru_meaning', 'sanskrit', 'sanskrit_root', 
         'sanskrit_root_meaning', 'sanskrit_root_class', 'root', 'root_has_verb', 

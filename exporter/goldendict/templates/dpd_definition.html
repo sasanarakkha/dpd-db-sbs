@@ -1,9 +1,9 @@
 <div class="dpd">
     <p>
         % if show_sbs_data and i.sbs:
-            % if i.sbs.sbs_class_anki:
+            % if i.sbs.class_anki:
                 <a class="link" href="${i.sbs.sbs_class_link}">
-                    <i>(cl.${i.sbs.sbs_class_anki}${'*' if i.sbs.class_extra else ''})</i>
+                    <i>(cl.${i.sbs.class_anki}${'*' if i.sbs.class_extra else ''})</i>
                 </a>
                 <span class="gray"> | </span>
             % endif

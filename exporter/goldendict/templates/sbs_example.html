@@ -76,8 +76,13 @@
 
     % if i.sbs.needs_class_example:
     <p>${i.sbs.class_example}</p>
+    % endif
+    % if i.sbs.class_anki:
+    <p><span class="gray">${i.sbs.class_example_translation}</span></p>
     <p class="sutta">
-        cl.${i.sbs.sbs_class_anki} 
+        cl.${i.sbs.class_anki} 
+    % endif
+    % if i.sbs.needs_class_example:
         % if make_link and i.sbs.class_source_link:
         <a class="sutta_link" href="${i.sbs.class_source_link}">${i.sbs.class_source}</a>
         % else:

@@ -895,7 +895,7 @@ class AllowableCharacters:
 
         ("sbs_category", sbs_category_allowed),
         ("sbs_patimokkha", sbs_category_allowed),
-        ("sbs_class_anki", digits),
+        ("class_anki", digits),
         ("sbs_class", digits),
         
         ("sbs_source_1", sbs_source_allowed),

@@ -58,7 +58,7 @@ def update_sbs_from_tsv_with_filter(mode:str, csv_path: str, sbs_anki_class_filt
                         print(f"[yellow]No SBS entry found for ID {word_id}, creating a new one.")
                         # db_entry.sbs = SBS(id=word_id)
                     if mode == "class":
-                        if db_entry.sbs.sbs_class_anki == sbs_anki_class_filter:
+                        if db_entry.sbs.class_anki == sbs_anki_class_filter:
                             db_entry.sbs.class_source = tsv_row['class_source']
                             db_entry.sbs.class_example = tsv_row['class_example']
                             db_entry.sbs.class_example_translation = tsv_row['english_translation']
@@ -88,7 +88,7 @@ def update_sbs_from_tsv_with_filter(mode:str, csv_path: str, sbs_anki_class_filt
         # Check for IDs in DB with matching sbs_anki_class_filter but not in CSV
         if mode == "class":
             db_entries_with_filter = db_session.query(DpdHeadword).join(SBS).filter(
-                SBS.sbs_class_anki == sbs_anki_class_filter).all()
+                SBS.class_anki == sbs_anki_class_filter).all()
         elif mode == "suttas":
             db_entries_with_filter = db_session.query(DpdHeadword).join(SBS).filter(
                 SBS.sbs_category == sbs_category).filter(

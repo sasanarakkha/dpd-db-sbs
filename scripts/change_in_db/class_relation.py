@@ -24,7 +24,7 @@ db = (
     .outerjoin(SBS)
     .filter(
         or_(
-            SBS.sbs_class_anki != "",
+            SBS.class_anki != "",
             SBS.sbs_patimokkha != "",
             SBS.sbs_index != "",
             SBS.sbs_category != "",
@@ -44,15 +44,15 @@ def debug_print_sbs_class():
 
     # Iterate over all DpdHeadword instances and update their sbs_class
     for word in db:
-        # debug check all sbs_class_anki which has not sbs.sbs_class
+        # debug check all class_anki which has not sbs.sbs_class
         # if (
         #     word.sbs
-        #     and word.sbs.sbs_class_anki
+        #     and word.sbs.class_anki
         #     and not word.sbs.sbs_class
-        #     # and word.sbs.sbs_class_anki == 14
+        #     # and word.sbs.class_anki == 14
         # ):
         #     count += 1
-        #     print(f"{count} for {word.lemma_1} || {word.sbs.sbs_class_anki} || {word.grammar} || 'stem': {word.stem}")
+        #     print(f"{count} for {word.lemma_1} || {word.sbs.class_anki} || {word.grammar} || 'stem': {word.stem}")
 
         sbs_class: Optional[int]
         sbs_class = determine_sbs_class(word)
@@ -60,7 +60,7 @@ def debug_print_sbs_class():
             # debug check if have a new number but it is not the same as old
             if (
                 word.sbs
-                and word.sbs.sbs_class_anki
+                and word.sbs.class_anki
                 and word.sbs.sbs_class
                 and word.sbs.sbs_class != sbs_class
             ):
@@ -95,7 +95,7 @@ def debug_print_sbs_class():
                 # print(f"(del) for {word.lemma_1} new sbs_class: {sbs_class}")
 
                 # debug check if does not have a new number but have old
-                if word.sbs.sbs_class_anki:
+                if word.sbs.class_anki:
                     count += 1
                     print(
                         f"(removed) {count} for {word.lemma_1} || old sbs_class: {word.sbs.sbs_class} || new is {sbs_class}"

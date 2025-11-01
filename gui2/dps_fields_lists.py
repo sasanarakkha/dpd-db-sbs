@@ -48,13 +48,14 @@
 "dps_class_sutta"
 "dps_class_example"
 "dps_class_example_translation"
+"dps_class_extra"
 "dps_discourses_source"
 "dps_discourses_sutta"
 "dps_discourses_example"
 "dps_extra_source"
 "dps_extra_sutta"
 "dps_extra_example"
-"dps_sbs_class_anki"
+"dps_class_anki"
 "dps_sbs_class"
 "dps_sbs_category"
 "dps_sbs_patimokkha"
@@ -108,13 +109,14 @@ ALL_DPS = [
     "dps_class_sutta",
     "dps_class_example",
     "dps_class_example_translation",
+    "dps_class_extra",
+    "dps_class_anki",
     "dps_discourses_source",
     "dps_discourses_sutta",
     "dps_discourses_example",
     "dps_extra_source",
     "dps_extra_sutta",
     "dps_extra_example",
-    "dps_sbs_class_anki",
     "dps_sbs_class",
     "dps_sbs_category",
     "dps_sbs_patimokkha"
@@ -148,4 +150,36 @@ VIB_FIELDS = [
     "dps_vib_sutta",
     "dps_vib_example",
     "dps_sbs_patimokkha"
+]
+
+CLASS_FIELDS = [
+    "dps_id",
+    "dps_lemma_1",
+    "dps_grammar",
+    "dps_meaning",
+    "dps_suggestion",
+    "dps_ru_meaning",
+    "dps_ru_meaning_lit",
+    "dps_ru_cognate",
+    "dps_sbs_meaning",
+    "dps_root",
+    "dps_constriction",
+    "dps_synonym_antonym",
+    "dps_notes",
+    "dps_notes_suggestion",
+    "dps_ru_notes",
+    "dps_sbs_notes",
+    "dps_source_1",
+    "dps_sutta_1",
+    "dps_example_1",
+    "dps_source_2",
+    "dps_sutta_2",
+    "dps_example_2",
+    "dps_class_source",
+    "dps_class_sutta",
+    "dps_class_example",
+    "dps_class_example_translation",
+    "dps_class_extra",
+    "dps_class_anki",
+    "dps_sbs_class",
 ]

@@ -32,7 +32,7 @@ def main():
     ids_to_save = set()
 
     for i in db:
-        if i.sbs and (i.sbs.sbs_index or i.sbs.sbs_category or i.sbs.sbs_class_anki):
+        if i.sbs and (i.sbs.sbs_index or i.sbs.sbs_category or i.sbs.class_anki):
             examples = [
                 i.sbs.sbs_example_1,
                 i.sbs.sbs_example_2,

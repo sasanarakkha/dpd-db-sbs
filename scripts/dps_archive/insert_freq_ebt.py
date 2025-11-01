@@ -42,7 +42,7 @@ def process_dataframes(full_df, freq_df):
 
 def save_to_sqlite(merged_df, db_path):
     conn = sqlite3.connect(db_path)
-    merged_df.to_sql('_full_frequency', conn, if_exists='replace', index=False, dtype={'count': 'INTEGER', 'id': 'INTEGER', 'sbs_class_anki': 'INTEGER'})
+    merged_df.to_sql('_full_frequency', conn, if_exists='replace', index=False, dtype={'count': 'INTEGER', 'id': 'INTEGER', 'class_anki': 'INTEGER'})
     conn.close()
 
 
