@@ -4,14 +4,16 @@
 
 import csv
 import sys
+from typing import Iterator, List, Tuple
 from tools.duplicates import has_duplicate_values_in_column
-
+from db.models import DpdHeadword
 from sqlalchemy.orm.session import Session
 
 from db.db_helpers import get_db_session
 from db.models import DpdRoot, Russian, SBS
 from tools.printer import printer as pr
 from tools.paths import ProjectPaths
+from pathlib import Path
 from tools.paths_dps import DPSPaths
 
 
@@ -50,12 +52,9 @@ def main():
             pr.yes
 
     # Check that all IDs in russian_path and sbs_path exist in pali_word_path
-    pali_word_ids = set()
-    with open(pth.pali_word_path, "r", newline="") as f:
-        reader = csv.reader(f, delimiter="\t", quotechar='"')
-        id_col_idx = 0  # assuming first column is id
-        for row in reader:
-            pali_word_ids.add(row[id_col_idx])
+    db_session = get_db_session(pth.dpd_db_path)
+    pali_word_ids_query = db_session.query(DpdHeadword.id).all()
+    pali_word_ids = {str(id_tuple[0]) for id_tuple in pali_word_ids_query}
 
     # --- SBS: print missing, ask, remove if yes ---
     sbs_missing_rows = []
@@ -82,8 +81,7 @@ def main():
                 csvwriter = csv.writer(
                     f, delimiter="\t", quotechar='"', quoting=csv.QUOTE_ALL
                 )
-                column_names = [column.name for column in SBS.__mapper__.columns]
-                csvwriter.writerow(column_names)
+                csvwriter.writerow(sbs_columns)
                 for row in new_sbs_rows:
                     csvwriter.writerow(row)
             pr.green("Removed unused IDs from SBS TSV.")
@@ -97,6 +95,7 @@ def main():
     with open(dpspth.russian_path, "r", newline="") as f:
         reader = csv.reader(f, delimiter="\t", quotechar='"')
         ru_columns = next(reader)
+        russian_rows.append(ru_columns)
         for row in reader:
             if row[0] in pali_word_ids:
                 russian_rows.append(row)
@@ -110,15 +109,9 @@ def main():
         csvwriter = csv.writer(
             f, delimiter="\t", quotechar='"', quoting=csv.QUOTE_ALL
         )
-        column_names = [column.name for column in Russian.__mapper__.columns]
-        csvwriter.writerow(column_names)
-        for row in russian_rows:
-            csvwriter.writerow(row)
+        csvwriter.writerows(russian_rows)
 
-    if sbs_missing_rows or russian_missing_rows:
-        pr.green("Removed unused IDs, please run again.")
-        sys.exit(0)
-
+    # Re-read the cleaned data for processing
     db_session = get_db_session(pth.dpd_db_path)
 
     make_russian_table_data(dpspth, db_session)
@@ -133,19 +126,66 @@ def main():
     pr.toc()
 
 
+def get_tsv_files(original_path: Path, base_filename: str) -> List[Path]:
+    """Get list of TSV files to process, handling both split and single file formats."""
+
+    backup_dir = original_path.parent
+
+    # Check for split files (e.g., dpd_headwords_part_*.tsv)
+    split_pattern = f"{base_filename}_part_*.tsv"
+    split_files = sorted(backup_dir.glob(split_pattern))
+
+    if split_files:
+        pr.green(f"Found {len(split_files)} split {base_filename} files")
+        return split_files
+
+    # Fall back to single file format
+    single_file = backup_dir / f"{base_filename}.tsv"
+    if single_file.exists():
+        pr.green(f"Found single {base_filename} file")
+        return [single_file]
+
+    return []
+
+
+def read_tsv_files(file_paths: List[Path]) -> Iterator[Tuple[List[str], List[str]]]:
+    """Read TSV files and yield (columns, row) tuples.
+
+    Handles split files where only the first file has headers.
+    """
+    if not file_paths:
+        return
+
+    columns = None
+
+    for file_idx, file_path in enumerate(file_paths):
+        pr.green(f"Reading {file_path.name}")
+
+        with open(file_path, "r", newline="") as tsv_file:
+            csvreader = csv.reader(tsv_file, delimiter="\t", quotechar='"')
+
+            # Read headers from first file only
+            if file_idx == 0:
+                columns = next(csvreader)
+            else:
+                # Skip headers for subsequent files
+                next(csvreader)
+
+            # Yield all data rows
+            for row in csvreader:
+                if columns:
+                    yield columns, row
+
+
 def make_russian_table_data(dpspth: DPSPaths, db_session: Session):
     """Read TSV and return Russian table data."""
     pr.green("creating Russian table data")
     counter = 0
-    with open(dpspth.russian_path, "r", newline="") as tsvfile:
-        csvreader = csv.reader(tsvfile, delimiter="\t", quotechar='"')
-        columns = next(csvreader)
-        for row in csvreader:
-            data = {}
-            for col_name, value in zip(columns, row):
-                data[col_name] = value
-            db_session.add(Russian(**data))
-            counter += 1
+    russian_files = get_tsv_files(dpspth.russian_path, "russian")
+    for columns, row in read_tsv_files(russian_files):
+        data = dict(zip(columns, row))
+        db_session.add(Russian(**data))
+        counter += 1
     pr.yes(counter)
 
 
@@ -153,15 +193,11 @@ def make_sbs_table_data(dpspth: DPSPaths, db_session: Session):
     """Read TSV and return SBS table data."""
     pr.green("creating SBS table data")
     counter = 0
-    with open(dpspth.sbs_path, "r", newline="") as tsvfile:
-        csvreader = csv.reader(tsvfile, delimiter="\t", quotechar='"')
-        columns = next(csvreader)
-        for row in csvreader:
-            data = {}
-            for col_name, value in zip(columns, row):
-                data[col_name] = value
-            db_session.add(SBS(**data))
-            counter += 1
+    sbs_files = get_tsv_files(dpspth.sbs_path, "sbs")
+    for columns, row in read_tsv_files(sbs_files):
+        data = dict(zip(columns, row))
+        db_session.add(SBS(**data))
+        counter += 1
     pr.yes(counter)
 
 
@@ -174,26 +210,19 @@ def make_ru_root_table_data(dpspth: DPSPaths, db_session: Session):
     # Keep track of roots found in the TSV file
     roots_in_tsv = set()
 
-    with open(dpspth.ru_root_path, "r", newline="") as tsvfile:
-        csvreader = csv.reader(tsvfile, delimiter="\t", quotechar='"')
-        columns = next(csvreader)
-        for row in csvreader:
-            data = {}
-            for col_name, value in zip(columns, row):
-                data[col_name] = value
-            
-            roots_in_tsv.add(data["root"])
-            
-            existing_record = (
-                db_session.query(DpdRoot).filter_by(root=data["root"]).first()
-            )
-            if existing_record:
-                for key, value in data.items():
-                    setattr(existing_record, key, value)
-                updated_counter += 1
-            else:
-                pr.red(f"Root '{data['root']}' from TSV not found in DpdRoot table.")
-                not_found_in_db_counter += 1
+    ru_root_files = get_tsv_files(dpspth.ru_root_path, "ru_roots")
+    for columns, row in read_tsv_files(ru_root_files):
+        data = dict(zip(columns, row))
+        roots_in_tsv.add(data["root"])
+        
+        existing_record = db_session.query(DpdRoot).filter_by(root=data["root"]).first()
+        if existing_record:
+            for key, value in data.items():
+                setattr(existing_record, key, value)
+            updated_counter += 1
+        else:
+            pr.red(f"Root '{data['root']}' from TSV not found in DpdRoot table.")
+            not_found_in_db_counter += 1
 
     # Check for roots in DB not present in TSV
     all_db_roots = db_session.query(DpdRoot.root).all()

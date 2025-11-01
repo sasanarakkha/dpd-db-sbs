@@ -7,12 +7,14 @@ import pandas as pd
 from datetime import datetime
 from pathlib import Path
 from tools.paths_dps import DPSPaths
+from tools.paths import ProjectPaths
 
 from tools.printer import Printer as pr
 
 from rich.console import Console
 
 dpspth = DPSPaths()
+pth = ProjectPaths()
 
 project_dir: Path = Path.cwd()  # e.g., /Users/deva/Documents/dpd-db
 deva_dir: Path = project_dir.parent.parent  # e.g., /Users/deva
@@ -134,29 +136,32 @@ def make_grammar_csvs(excel_file_dir):
     # Now you can access each DataFrame using its sheet name as a key
     # For example, dfs['Sheet1'] will give you the DataFrame for 'Sheet1', and so on.
 
-    # TODO  add here or anywhere exporter from abbreviations.csv directley and remove it from grammar.xlsx
-
-    # abr_dir = "../exporter/assets/abbreviations.csv"
-
-    # if os.path.exists(abr_dir):
-    #     console.print("[bold green]extracting abbreviations.csv for exporter.")
-    #     # Save the DataFrame to a CSV file after dropping unnecessary columns
-    #     trimmed_df = dfs['abbr'].drop(columns=['id', 'type', 'pattern', 'feedback'])
-    #     trimmed_df.to_csv(abr_dir, sep="\t", index=False, header=True)
-
-    #     # Printing the number of rows in the trimmed DataFrame
-    #     row_count = len(trimmed_df)
-    #     print("Number of rows:", row_count)
-    # else:
-    #     console.print("[bold red]abbreviations.csv does not exist.")
-
     console.print("[bold green]extracting df_sum_abbr for class.")
 
-    # Filter the DataFrame to include only rows where 'type' column is not null
-    filtered_df = dfs['abbr'][dfs['abbr']['type'].notna()]
-
+    # Load abbreviations from TSV, filter out those with capital letters, and add id/pattern columns
+    abr_dir = pth.abbreviations_tsv_path
+    
+    # Load abbreviations from TSV, filter out capital letters, and add id/pattern columns
+    df_abbr = pd.read_csv(abr_dir, sep='\t')
+    df_abbr = df_abbr[df_abbr['abbrev'].notna() & ~df_abbr['abbrev'].str.contains('[A-Z]')]
+    df_abbr['id'] = range(101, 101 + len(df_abbr))
+    df_abbr['pattern'] = 'abbreviation'
+    
+    # Add feedback and test columns to match other dataframes
+    second_column_name = df_abbr.columns[1] if len(df_abbr.columns) > 1 else df_abbr.columns[0]
+    df_abbr['feedback'] = df_abbr.apply(lambda row: (
+        f"""Spot a mistake? <a class="link" href="https://docs.google.com/forms/d/1Z8Jjt0-E0HNX7ygABIzAcrChG23M3IOyoZGQ-EDRzXY/viewform?usp=pp_url&entry.438735500"""
+        f"""={row[second_column_name]}"""
+        f"""&entry.957833742=Anki Deck Grammar">Fix it here</a>"""
+    ), axis=1)
+    df_abbr['test'] = current_date
+    
+    # Reorder columns to put 'id' first, then 'abbrev', then the rest
+    columns = ['id', 'abbrev'] + [col for col in df_abbr.columns if col not in ['id', 'abbrev']]
+    df_abbr = df_abbr[columns]
+    
     # Concatenate df_abbr_class, df_alph, df_samasa, df_upasagga into df_sum_abbr
-    df_abbr_class = filtered_df.drop(columns=['ru-meaning', 'ru-abbrev', 'type'])
+    df_abbr_class = df_abbr.drop(columns=['ru_meaning', 'ru_abbrev'])
     df_upasagga_filtered = dfs['upasagga'][dfs['upasagga']['example'].notna()]
     df_sum_abbr = pd.concat([df_abbr_class, dfs['alph'], dfs['samasa'], df_upasagga_filtered, dfs['roots']])
 

@@ -60,6 +60,7 @@ class DPSPaths:
         self.ai_for_batch_api_dir = base_dir.joinpath(Path("temp/ai_for_batch_api/"))
         self.ai_from_batch_api_dir = base_dir.joinpath(Path("temp/ai_from_batch_api/"))
         self.total_words_path = base_dir.joinpath(Path("temp/total_words.tsv"))
+        self.total_words_meaning = base_dir.joinpath(Path("temp/total_words_meaning.txt"))
         self.total_roots_path = base_dir.joinpath(Path("temp/total_roots.tsv"))
         self.sbs_class_vocab_dir = base_dir.joinpath(Path("temp/vocab/"))
         self.for_compare_csv_dir = base_dir.joinpath(Path("temp/for_compare/")) 

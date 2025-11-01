@@ -142,7 +142,7 @@ def common_roots(db_session, dpspth):
         feedback = f"""{sbs_ped_link}={root_clean}&entry.1433863141=common-roots-{current_date}">Fix it here.</a>"""
 
         row = [
-            root_obj.root,
+            root_obj.root_clean,
             root_obj.root_group,
             root_obj.root_sign,
             root_obj.root_meaning,
@@ -289,31 +289,34 @@ def get_paritta_source(i: DpdHeadword, chant_names: List[str]):
     return None, None, None
 
 
-def get_example_for_class(sbs: SBS):
-        """Gets the first available (source, sutta, example) set based on priority."""
-        if not sbs:
-            return None, None, None
+def get_example_for_class(sbs: SBS, i:DpdHeadword):
+    """Gets the first available (source, sutta, example) set based on priority."""
 
-        sources_priority = [
-            ("class_source", "class_sutta", "class_example"),
-            ("sbs_source_1", "sbs_sutta_1", "sbs_example_1"),
-            ("sbs_source_2", "sbs_sutta_2", "sbs_example_2"),
-            ("dhp_source", "dhp_sutta", "dhp_example"),
-            ("pat_source", "pat_sutta", "pat_example"),
-            ("vib_source", "vib_sutta", "vib_example"),
-            ("discourses_source", "discourses_sutta", "discourses_example"),
-        ]
+    sources_priority = [
+        ("class_source", "class_sutta", "class_example"),
+        ("sbs_source_1", "sbs_sutta_1", "sbs_example_1"),
+        ("sbs_source_2", "sbs_sutta_2", "sbs_example_2"),
+        ("dhp_source", "dhp_sutta", "dhp_example"),
+        ("pat_source", "pat_sutta", "pat_example"),
+        ("vib_source", "vib_sutta", "vib_example"),
+        ("discourses_source", "discourses_sutta", "discourses_example"),
+    ]
 
-        for src_attr, sut_attr, ex_attr in sources_priority:
+    for src_attr, sut_attr, ex_attr in sources_priority:
+        example_val = getattr(sbs, ex_attr, None)
+        if example_val: # Prioritize if example field is non-empty
             source_val = getattr(sbs, src_attr, None)
-            if source_val: # Prioritize if source field is non-empty
-                sutta_val = getattr(sbs, sut_attr, None)
-                example_val = getattr(sbs, ex_attr, None)
-                return (
-                    source_val.replace("\n", "<br>") if source_val else None,
-                    sutta_val.replace("\n", "<br>") if sutta_val else None,
-                    example_val.replace("\n", "<br>") if example_val else None,
-                )
+            sutta_val = getattr(sbs, sut_attr, None)
+            return (
+                source_val.replace("\n", "<br>") if source_val else None,
+                sutta_val.replace("\n", "<br>") if sutta_val else None,
+                example_val.replace("\n", "<br>") if example_val else None,
+            )
+    if i.source_1:
+        return i.source_1, i.sutta_1, i.example_1
+    elif i.source_2:
+        return i.source_2, i.sutta_2, i.example_2
+    else:
         return None, None, None
 
 
@@ -346,6 +349,10 @@ def get_unique_example_2(sbs: SBS):
 
             if current_example_cleaned and class_example_cleaned:
                 if not paragraphs_are_similar(class_example_cleaned, current_example_cleaned, 0.7):
+                    if class_example_cleaned in current_example_cleaned:
+                        continue
+                    elif current_example_cleaned in class_example_cleaned:
+                        continue
                     return (
                         current_source.replace("\n", "<br>") if current_source else None,
                         current_sutta.replace("\n", "<br>") if current_sutta else None,
@@ -646,7 +653,7 @@ def dps(dpspth, dpd_db):
         return bool(
             i.sbs
             and (
-                i.sbs.sbs_class_anki
+                i.sbs.class_anki
                 or i.sbs.sbs_category
                 or i.sbs.sbs_patimokkha
                 or i.sbs.sbs_index
@@ -705,7 +712,7 @@ def dps(dpspth, dpd_db):
     ]
 
     def dps_row(i: DpdHeadword) -> List[str]:
-        source, sutta, example = get_example_for_class(i.sbs)
+        source, sutta, example = get_example_for_class(i.sbs, i)
         if i.source_1:
             source = i.source_1.replace("\n", "<br>")
         if i.sutta_1:
@@ -788,12 +795,12 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
 
 
     def _is_needed(i: DpdHeadword):
-        return bool(i.sbs and i.sbs.sbs_class_anki)
+        return bool(i.sbs and i.sbs.class_anki)
 
     columns_names = [
         "id",
         "pali",
-        "sbs_class_anki",
+        "class_anki",
         "grammar",
         "neg",
         "verb",
@@ -837,12 +844,12 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
     ]
 
     def classes_row(i: DpdHeadword) -> List[str]:
-        source, sutta, example = get_example_for_class(i.sbs)
+        source, sutta, example = get_example_for_class(i.sbs, i)
 
         fields = [
             i.id,
             i.lemma_1,
-            i.sbs.sbs_class_anki if i.sbs else None,
+            i.sbs.class_anki if i.sbs else None,
             *get_grammar_and_meaning(i),
             "",
             i.sanskrit,
@@ -881,7 +888,7 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
                 (
                     classes_row(i)
                     for i in dpd_db
-                    if _is_needed(i) and i.sbs.sbs_class_anki == sbs_class_value
+                    if _is_needed(i) and i.sbs.class_anki == sbs_class_value
                 )
             )
     # Corrected path for individual class files within the 'classes' subdirectory
@@ -898,7 +905,7 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
         rows = (
             classes_row(i)
             for i in dpd_db
-            if _is_needed(i) and i.sbs.sbs_class_anki == sbs_class_value
+            if _is_needed(i) and i.sbs.class_anki == sbs_class_value
         )
         all_classes += rows
     all_classes_list = list(all_classes)
@@ -929,7 +936,7 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
         rows = (
             ru_classes_row(i)
             for i in dpd_db
-            if _is_needed(i) and i.sbs.sbs_class_anki == sbs_class_value and i.ru
+            if _is_needed(i) and i.sbs.class_anki == sbs_class_value and i.ru
         )
         ru_all_classes += rows
     ru_all_classes_list = list(ru_all_classes)
@@ -1096,15 +1103,15 @@ def root_phonetic_class(dpspth, dpd_db, unique_sbs_class_values):
     console.print("[yellow]making root and phonetic  csvs")
 
     def root_is_needed(i: DpdHeadword):
-        return bool(i.sbs and i.sbs.sbs_class_anki and i.rt)
+        return bool(i.sbs and i.sbs.class_anki and i.rt)
 
     def phonetic_is_needed(i: DpdHeadword):
-        return bool(i.sbs and i.sbs.sbs_class_anki and i.phonetic)
+        return bool(i.sbs and i.sbs.class_anki and i.phonetic)
 
     columns_names = [
         "id",
         "pali",
-        "sbs_class_anki",
+        "class_anki",
         "grammar",
         "neg",
         "verb",
@@ -1149,12 +1156,12 @@ def root_phonetic_class(dpspth, dpd_db, unique_sbs_class_values):
     ]
 
     def root_phonetic_row(i: DpdHeadword) -> List[str]:
-        source, sutta, example = get_example_for_class(i.sbs)
+        source, sutta, example = get_example_for_class(i.sbs, i)
         source_2, sutta_2, example_2 = get_unique_example_2(i.sbs)
         fields = [
             i.id,
             i.lemma_1,
-            i.sbs.sbs_class_anki if i.sbs else None,
+            i.sbs.class_anki if i.sbs else None,
             *get_grammar_and_meaning(i),
             "",
             i.sanskrit,
@@ -1190,7 +1197,7 @@ def root_phonetic_class(dpspth, dpd_db, unique_sbs_class_values):
         rows = (
             root_phonetic_row(i)
             for i in dpd_db
-            if root_is_needed(i) and i.sbs.sbs_class_anki == sbs_class_value
+            if root_is_needed(i) and i.sbs.class_anki == sbs_class_value
         )
         rows_total += rows
     rows_total_list = list(rows_total)
@@ -1210,7 +1217,7 @@ def root_phonetic_class(dpspth, dpd_db, unique_sbs_class_values):
         rows = (
             root_phonetic_row(i)
             for i in dpd_db
-            if phonetic_is_needed(i) and i.sbs.sbs_class_anki == sbs_class_value
+            if phonetic_is_needed(i) and i.sbs.class_anki == sbs_class_value
         )
         rows_total += rows
     rows_total_list = list(rows_total)
@@ -1374,7 +1381,7 @@ def native(dpspth, dpd_db):
         return bool(
             i.sbs
             and (
-                i.sbs.sbs_class_anki
+                i.sbs.class_anki
                 or i.sbs.sbs_category
                 or i.sbs.sbs_patimokkha
                 or i.sbs.sbs_index
@@ -1425,8 +1432,8 @@ def main():
 
     # make list of sbs classes
     unique_sbs_class_values = (
-        db_session.query(SBS.sbs_class_anki)
-        .filter(SBS.sbs_class_anki != "")
+        db_session.query(SBS.class_anki)
+        .filter(SBS.class_anki != "")
         .distinct()
         .all()
     )

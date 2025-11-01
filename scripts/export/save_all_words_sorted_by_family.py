@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Filter all words with into csv and sort them by root frequence
+Filter all words into csv and sort them by root frequence
 also filter all roots
 """
 

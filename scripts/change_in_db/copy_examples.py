@@ -44,6 +44,7 @@ def update_column_for_some_criteria(source_value, column_to_update, value_to_upd
 
     rows_to_update = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.sbs)).outerjoin(SBS).filter(
             and_(
+                DpdHeadword.meaning_1 != "",
                 not_(DpdHeadword.id.in_(ids_to_exclude)),
                 or_(
                     DpdHeadword.source_1 == source_value,
@@ -147,7 +148,7 @@ def update_column_for_some_criteria(source_value, column_to_update, value_to_upd
 
 
 # !To use the functions:
-source_value = "VIN2.5.1.8"
+source_value = "VIN2.5.2.7"
 column_to_update = "sbs_patimokkha"
 value_to_update = "vib"
 modifier_column_to_copy = "vib"
