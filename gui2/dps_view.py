@@ -8,7 +8,7 @@ from db.models import DpdHeadword, Russian, SBS
 from sqlalchemy import or_
 from gui2.dpd_fields_functions import clean_lemma_1
 from gui2.dps_fields import DpsFields
-from gui2.dps_fields_lists import VIB_FIELDS
+from gui2.dps_fields_lists import VIB_FIELDS, CLASS_FIELDS
 from gui2.dps_example_field import DpsExampleField
 from gui2.history import HistoryManager
 from gui2.mixins import PopUpMixin
@@ -115,6 +115,26 @@ class DpsView(ft.Column, PopUpMixin):
             )
         )
 
+        types_of_comp = """
+            acc - dutiyā
+            instr - tatiyā
+            dat - catutthā
+            abl - pañcamī
+            gen - chaṭṭhī
+            loc - sattamī
+            """
+
+        # Create hint button for types_of_comp
+        self._types_of_comp_button = ft.IconButton(
+            icon=ft.Icons.INFO,
+            icon_size=16,
+            tooltip=types_of_comp,
+            style=ft.ButtonStyle(
+                padding=ft.padding.all(4),
+                overlay_color=ft.Colors.TRANSPARENT
+            )
+        )
+
         self._next_ru_button = ft.ElevatedButton(
             "Next Ru",
             on_click=self._click_next_ru,
@@ -142,6 +162,7 @@ class DpsView(ft.Column, PopUpMixin):
                 [
                     ft.Radio(value="all", label="All"),
                     ft.Radio(value="vib", label="Vib"),
+                    ft.Radio(value="class", label="Class"),
                 ]
             ),
             value="all",  # Default selection
@@ -155,6 +176,7 @@ class DpsView(ft.Column, PopUpMixin):
                         controls=[
                             self._enter_id_or_lemma_field,
                             self._translation_hint_button,
+                            self._types_of_comp_button,
                             self._next_ru_button,
                             self._next_note_button,
                             self._clear_button,
@@ -246,13 +268,14 @@ class DpsView(ft.Column, PopUpMixin):
 
         if filter_type == "vib":
             visible_fields = VIB_FIELDS
+        elif filter_type == "class":
+            visible_fields = CLASS_FIELDS
 
         self.dps_fields.filter_fields(visible_fields)
         self.page.update()
 
 
-    def _click_edit_headword(self, e: ft.ControlEvent) -> None:
-        self.dps_fields.clear_all_fields()
+    def _click_edit_headword(self, _e: ft.ControlEvent) -> None:
         id_or_lemma = (self._enter_id_or_lemma_field.value or "").strip()
         if not id_or_lemma:  # Check if the field was empty
             self.update_message("Enter an ID or Lemma.")
@@ -384,15 +407,26 @@ class DpsView(ft.Column, PopUpMixin):
                     field.word_to_find_field.value = stem
                     field.word_to_find_field.update()  # Force UI update
 
-    def _click_clear_all(self, e: ft.ControlEvent) -> None:
-        self.dps_fields.clear_all_fields()
-        self._enter_id_or_lemma_field.value = ""  # Clear the ID/Lemma input field
-        self.tests_passed = False  # Reset test state when clearing fields
-        self._filter_radios.value = "all"  # Reset filter to 'all'
+    def _click_clear_all(self, _e: ft.ControlEvent | None = None) -> None:
+        """Clear all fields by rebuilding the middle section."""
+        # Rebuild middle section to ensure a clean state for all controls
+        self._middle_section = self._build_middle_section()
+
+        # Update view controls with the new middle section
+        self.controls = [self._top_section, self._middle_section, self._bottom_section]
+
+        # Re-apply the current filter to the newly created fields
+        current_filter = self._filter_radios.value
+        if current_filter != "all":
+            if self._filter_radios.uid:
+                self._handle_filter_change(ft.ControlEvent(target=self._filter_radios.uid, name="change", data=current_filter, control=self._filter_radios, page=self.page))
+        # Clear relevant top-section fields and reset state
+        self._enter_id_or_lemma_field.value = ""
+        self.tests_passed = False
         self.update_message("Fields cleared.")
+        self.page.update()
 
-
-    def _click_run_tests(self, e: ft.ControlEvent) -> None:
+    def _click_run_tests(self, _e: ft.ControlEvent) -> None:
         """Run tests on current field values - using enhanced DPS test manager"""
         self.update_message("Loading tests...")
         
@@ -438,8 +472,12 @@ class DpsView(ft.Column, PopUpMixin):
             if self.headword:
                 self.dps_history_manager.add_item(self.headword.id, self.headword.lemma_1)
                 request_dpd_server(str(self.headword.id))
-                self.dps_fields.clear_all_fields()
-                self._enter_id_or_lemma_field.value = ""  # Clear the ID/Lemma input field
+                
+                self._update_history_dropdown()
+                self.page.update()
+                
+                self.page.set_clipboard(self.headword.lemma_1)  # Copy headword to clipboard               
+                self._click_clear_all(e)  # Clear all fields after successful update
                 
         except Exception as ex:
             self._db.db_session.rollback()
@@ -454,13 +492,14 @@ class DpsView(ft.Column, PopUpMixin):
             ru_word = Russian(id=headword_id)
             self._db.db_session.add(ru_word)
         
+        values = self._get_current_field_values()
+
         # Update Russian fields
-        for field_name, field in self.dps_fields.fields.items():
+        for field_name in self.dps_fields.fields:
             if field_name.startswith("dps_ru_"):
                 ru_field_name = field_name.replace("dps_", "")
                 if hasattr(ru_word, ru_field_name):
-                    setattr(ru_word, ru_field_name, field.value or "")
-                    # print(f"DEBUG: Updated Russian field {ru_field_name} = {field.value}")
+                    setattr(ru_word, ru_field_name, values.get(field_name, ""))
                 else:
                     print(f"ERROR: Russian field {ru_field_name} not found in model")
                     self.update_message(f"ERROR: Russian field {ru_field_name} not found in model")
@@ -474,6 +513,8 @@ class DpsView(ft.Column, PopUpMixin):
             sbs_word = SBS(id=headword_id)
             self._db.db_session.add(sbs_word)
         
+        values = self._get_current_field_values()
+
         # Get current values from database before updating
         current_sbs = self._db.fetch_sbs(headword_id)
         old_vib_example = current_sbs.vib_example if current_sbs else ""
@@ -482,8 +523,8 @@ class DpsView(ft.Column, PopUpMixin):
         
         # Special handling for class_example_translation - bulk update all matching records
         class_example_translation_field = self.dps_fields.fields.get("dps_class_example_translation")
-        if class_example_translation_field and class_example_translation_field.value is not None:
-            new_value = str(class_example_translation_field.value) if class_example_translation_field.value else ""
+        if class_example_translation_field:
+            new_value = values.get("dps_class_example_translation", "")
             
             # Get current value from database
             current_value = current_sbs.class_example_translation if current_sbs else ""
@@ -514,20 +555,20 @@ class DpsView(ft.Column, PopUpMixin):
         new_pat_example = ""
         
         # Update SBS fields (excluding class_example_translation which was handled above)
-        for field_name, field in self.dps_fields.fields.items():
+        for field_name in self.dps_fields.fields:
             if field_name.startswith("dps_"):
                 # Skip class_example_translation as it's already handled
                 if field_name == "dps_class_example_translation":
                     continue
-                    
+
                 # Check if this is an SBS-related field
                 for prefix in sbs_prefixes:
                     if field_name.startswith(f"dps_{prefix}"):
                         sbs_field_name = field_name.replace("dps_", "")
                         if hasattr(sbs_word, sbs_field_name):
-                            field_value = field.value or ""
+                            field_value = values.get(field_name, "")
                             setattr(sbs_word, sbs_field_name, field_value)
-                            
+
                             # Track vib_example and pat_example values for auto-population logic
                             if sbs_field_name == "vib_example":
                                 new_vib_example = field_value
@@ -555,11 +596,8 @@ class DpsView(ft.Column, PopUpMixin):
     def _get_current_field_values(self) -> dict[str, str]:
         """Get current values from all DPS fields"""
         values = {}
-        for field_name, field in self.dps_fields.fields.items():
-            if hasattr(field, "value"):
-                values[field_name] = field.value or ""
-            elif isinstance(field, ft.Checkbox):
-                values[field_name] = "True" if field.value else "False"
-            else:
-                values[field_name] = ""
+        for field_name, field_control in self.dps_fields.fields.items():
+            # Use .value for TextFields, Dropdowns, etc. and handle None
+            values[field_name] = field_control.value or ""
+
         return values

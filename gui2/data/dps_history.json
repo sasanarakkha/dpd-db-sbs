@@ -1,5 +1,29 @@
 [
     {
+        "id": 29660,
+        "lemma_1": "tathā"
+    },
+    {
+        "id": 34626,
+        "lemma_1": "dhamma 1.01"
+    },
+    {
+        "id": 11557,
+        "lemma_1": "āditta"
+    },
+    {
+        "id": 75647,
+        "lemma_1": "pītisukha 2"
+    },
+    {
+        "id": 46409,
+        "lemma_1": "pītisukha 1"
+    },
+    {
+        "id": 28483,
+        "lemma_1": "jināti 1"
+    },
+    {
         "id": 38293,
         "lemma_1": "nissaya 2"
     },
@@ -74,29 +98,5 @@
     {
         "id": 59524,
         "lemma_1": "samaṃ 1"
-    },
-    {
-        "id": 59525,
-        "lemma_1": "samaṃ 2"
-    },
-    {
-        "id": 13076,
-        "lemma_1": "āvikaroti 1"
-    },
-    {
-        "id": 13077,
-        "lemma_1": "āvikaroti 2"
-    },
-    {
-        "id": 18135,
-        "lemma_1": "evaṃ 2"
-    },
-    {
-        "id": 62423,
-        "lemma_1": "sāra 2"
-    },
-    {
-        "id": 62422,
-        "lemma_1": "sāra 1"
     }
 ]
