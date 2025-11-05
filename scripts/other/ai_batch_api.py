@@ -217,13 +217,13 @@ def update_ru_meaning_raw(ids_and_contents: dict[str, str]) -> None:
 
 if __name__ == "__main__":
 
-    file_name_in = "meaning-2025-10-20-15-00"
+    file_name_in = "meaning-2025-11-05-18-35"
 
     # upload_and_create_batch(file_name_in)
 
     # check_batch_list()
 
-    specific_batch_id = "batch_68f78347af4c8190bffc9f5031ba06f0"
+    specific_batch_id = "batch_690b2902f9b08190b946bcaeeb0a0bab"
 
     # print_batch_info(specific_batch_id)
 
