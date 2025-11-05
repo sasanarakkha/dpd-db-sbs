@@ -5,9 +5,10 @@ from pathlib import Path
 import flet as ft
 
 from gui2.sandhi_find_replace_view import SandhiFindReplaceView
+from gui2.sandhi_view import SandhiView
 from gui2.toolkit import ToolKit
-from tools.ai_related import print_ai_config
 from tools.fast_api_utils import start_dpd_server
+from tools.ai_related import print_ai_config
 
 
 class App:
@@ -19,8 +20,10 @@ class App:
         from gui2.pass2_add_view import Pass2AddView
         from gui2.pass2_auto_view import Pass2AutoView
         from gui2.pass2_pre_view import Pass2PreProcessView
-        from gui2.dps_view import DpsView
+        from gui2.bold_search_view import BoldSearchView
         from gui2.tests_tab_view import TestsTabView
+        from gui2.translations_view import TranslationsView
+        from gui2.dps_view import DpsView
 
         self.page = page
 
@@ -58,15 +61,18 @@ class App:
         )
         self.pass2_auto_view: Pass2AutoView = Pass2AutoView(self.page, self.toolkit)
         self.pass2_add_view: Pass2AddView = Pass2AddView(self.page, self.toolkit)
-        self.dps_view: DpsView = DpsView(self.page, self.toolkit)
         self.tests_tab_view: TestsTabView = TestsTabView(self.page, self.toolkit)
         self.sandhi_view = SandhiFindReplaceView(self.page, self.toolkit)
+        self.sandhi_view2 = SandhiView(self.page, self.toolkit)
         self.filter_tab_view = FilterTabView(self.page, self.toolkit)
+        self.translations_view = TranslationsView(self.page, self.toolkit)
+        self.bold_search_view = BoldSearchView(self.page, self.toolkit)
+        self.dps_view: DpsView = DpsView(self.page, self.toolkit)
+
 
         self.build_ui()
 
         self.toolkit.username_manager.get_username()
-
 
     def on_keyboard(self, e: ft.KeyboardEvent) -> None:
         """Handles global keyboard events."""
@@ -103,6 +109,10 @@ class App:
                     content=self.global_view,
                 ),
                 ft.Tab(
+                    text="Transl",
+                    content=self.translations_view,
+                ),
+                ft.Tab(
                     text="Pass1Auto",
                     content=self.pass1_auto_view,
                 ),
@@ -131,12 +141,20 @@ class App:
                     content=self.sandhi_view,
                 ),
                 ft.Tab(
+                    text="Sandhi",
+                    content=self.sandhi_view2,
+                ),
+                ft.Tab(
                     text="DB",
                     content=self.filter_tab_view,
                 ),
                 ft.Tab(
                     text="Tests",
                     content=self.tests_tab_view,
+                ),
+                ft.Tab(
+                    text="Bold Search",
+                    content=self.bold_search_view,
                 ),
             ],
             expand=True,
@@ -174,5 +192,4 @@ def main(page: ft.Page) -> None:
 
 
 if __name__ == "__main__":
-    # Run with increased font scaling for better visibility
-    ft.app(target=main, view=ft.AppView.FLET_APP, assets_dir="assets")
+    ft.app(target=main)

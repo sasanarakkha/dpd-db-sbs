@@ -18,9 +18,13 @@ class ToolKit:
         from gui2.pass2_exceptions import Pass2ExceptionsFileManager
         from gui2.pass2_pre_new_word_manager import Pass2NewWordManager
         from gui2.paths import Gui2Paths
+        from gui2.sandhi_files_manager import SandhiFileManager
+        from gui2.spelling import SpellingMistakesFileManager
         from gui2.test_manager import GuiTestManager
         from gui2.user import UsernameManager
+        from gui2.variants import VariantReadingFileManager
         from tools.ai_manager import AIManager
+        from tools.bold_definitions_search import BoldDefinitionsSearchManager
         from tools.hyphenations import HyphenationFileManager
         from tools.sandhi_contraction import SandhiContractionManager
         from tools.wordfinder_manager import WordFinderManager
@@ -33,6 +37,7 @@ class ToolKit:
         self.db_test_manager: DbTestManager = DbTestManager()
         self.test_manager: GuiTestManager = GuiTestManager(self)
         self.sandhi_manager: SandhiContractionManager = SandhiContractionManager()
+
         self.hyphenation_manager: HyphenationFileManager = HyphenationFileManager()
         self.history_manager: HistoryManager = HistoryManager(self)
         self.ai_manager: AIManager = AIManager()
@@ -50,6 +55,13 @@ class ToolKit:
         self.ai_search_popup: AiSearchPopup = AiSearchPopup(self)
         self.wordfinder_manager: WordFinderManager = WordFinderManager()
         self.wordfinder_popup: WordFinderPopup = WordFinderPopup(self)
+        self.bold_definitions_search_manager: BoldDefinitionsSearchManager = BoldDefinitionsSearchManager()
+        self.variants: VariantReadingFileManager = VariantReadingFileManager()
+        self.spelling_mistakes: SpellingMistakesFileManager = (
+            SpellingMistakesFileManager()
+        )
+
+        self.sandhi_files_manager: SandhiFileManager = SandhiFileManager(self)
 
         # Initialize DB parts needed early
         self.db_manager.pre_initialize_gui_data()

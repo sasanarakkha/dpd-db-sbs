@@ -16,6 +16,7 @@ uv run python tools/version.py
 uv run python db/inflections/create_inflection_templates.py
 uv run python db/inflections/generate_inflection_tables.py
 
+uv run python scripts/build/root_has_verb_updater.py
 uv run python scripts/build/sanskrit_root_families_updater.py
 
 uv run python db/families/family_root.py
@@ -49,7 +50,6 @@ uv run python scripts/build/ebt_counter.py
 go run go_modules/frequency/main.go
 
 uv run python db/epd/epd_to_lookup.py
-uv run python db/rpd/rpd_to_lookup.py
 
 uv run python scripts/build/dealbreakers.py
 status=$?

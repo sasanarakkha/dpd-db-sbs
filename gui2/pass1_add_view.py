@@ -13,7 +13,7 @@ LABEL_WIDTH = 250
 BUTTON_WIDTH = 250
 LABEL_COLOUR = ft.Colors.GREY_500
 HIGHLIGHT_COLOUR = ft.Colors.BLUE_200
-TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=15)
+TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=10)
 
 
 class Pass1AddView(ft.Column, PopUpMixin):
@@ -62,7 +62,7 @@ class Pass1AddView(ft.Column, PopUpMixin):
             autofocus=True,
             options=self.book_options,
             width=300,
-            text_size=17,
+            text_size=14,
             border_color=HIGHLIGHT_COLOUR,
             border_radius=20,
         )
@@ -88,8 +88,22 @@ class Pass1AddView(ft.Column, PopUpMixin):
             expand=True,
             expand_loose=True,
             border_radius=20,
-            text_size=17,
+            text_size=14,
             on_change=self._handle_history_selection,
+        )
+
+        self.clone_from_field = ft.TextField(
+            label="Clone from ID or Lemma",
+            label_style=TEXT_FIELD_LABEL_STYLE,
+            width=LABEL_WIDTH,
+            expand=True,
+            border_radius=20,
+            on_submit=self._click_clone_headword,
+        )
+        self.clone_button = ft.ElevatedButton(
+            "Clone",
+            on_click=self._click_clone_headword,
+            width=BUTTON_WIDTH,
         )
 
         # Create the top section Column
@@ -121,6 +135,8 @@ class Pass1AddView(ft.Column, PopUpMixin):
                         controls=[
                             self.word_in_text,
                             self.remaining_to_process,
+                            self.clone_from_field,
+                            self.clone_button,
                         ],
                     ),
                     ft.Row(
@@ -248,7 +264,7 @@ class Pass1AddView(ft.Column, PopUpMixin):
     def handle_sandhi_ok_click(self, e: ft.ControlEvent):
         current_word = self.word_in_text.value
         if current_word:
-            self.controller.update_sandhi_checked(current_word)
+            self.toolkit.sandhi_files_manager.add_sandhi_to_checked_csv(current_word)
             self.update_message(f"{current_word} added to sandhi checked")
 
     def handle_add_to_variants_click(self, e: ft.ControlEvent):
@@ -436,3 +452,52 @@ class Pass1AddView(ft.Column, PopUpMixin):
             finally:
                 self._history_dropdown.value = None  # Reset dropdown selection
                 self.page.update()
+
+    def _click_clone_headword(self, e: ft.ControlEvent) -> None:
+        """Fetches a headword and adds its data to empty fields in the current view,
+        only for fields relevant to Pass1AddView, excluding example fields."""
+        id_or_lemma = (self.clone_from_field.value or "").strip()
+
+        if not id_or_lemma:
+            self.update_message("Enter an ID or Lemma to clone from.")
+            return
+
+        headword_to_clone = self.db.get_headword_by_id_or_lemma(id_or_lemma)
+
+        if not headword_to_clone:
+            self.update_message(f"Headword '{id_or_lemma}' not found for cloning.")
+            return
+
+        cloned_count = 0
+        for field_name, ui_field in self.dpd_fields.fields.items():
+            # Skip the 'id' field
+            if field_name == "id":
+                continue
+            # Skip example fields
+            if field_name.startswith("example"):
+                continue
+
+            # Explicitly check if the field_name is in PASS1_FIELDS
+            if field_name in PASS1_FIELDS:
+                # Special handling for meaning_1 field
+                if field_name == "meaning_2":
+                    if not ui_field.value:
+                        if headword_to_clone.meaning_1:
+                            ui_field.value = headword_to_clone.meaning_1
+                            cloned_count += 1
+                        elif headword_to_clone.meaning_2:
+                            ui_field.value = headword_to_clone.meaning_2
+                            cloned_count += 1
+
+                # Standard handling for other fields
+                elif hasattr(headword_to_clone, field_name):
+                    if not ui_field.value:
+                        db_value = getattr(headword_to_clone, field_name)
+                        if db_value is not None:
+                            ui_field.value = db_value
+                            cloned_count += 1
+
+        self.update_message(
+            f"Cloned {cloned_count} fields from {headword_to_clone.lemma_1}."
+        )
+        self.page.update()

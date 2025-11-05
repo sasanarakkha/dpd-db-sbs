@@ -11,8 +11,6 @@ from db.models import (
     FamilyRoot,
     FamilyWord,
     InflectionTemplates,
-    Russian,
-    SBS,
     Lookup,
 )
 from gui2.dpd_fields_functions import clean_lemma_1
@@ -417,16 +415,6 @@ class DatabaseManager:
             return self.get_headword_by_id(int(user_input))
 
     # --- DB FUNCTIONS ---
-
-    def fetch_ru(self, id: int) -> Russian | None:
-        """Fetch Russian word from db."""
-        return self.db_session.query(Russian).filter(
-            Russian.id == id).first()
-
-    def fetch_sbs(self, id: int) -> SBS | None:
-        """Fetch SBS word from db."""
-        return self.db_session.query(SBS).filter(
-            SBS.id == id).first()
 
     def add_word_to_db(self, new_word):
         try:

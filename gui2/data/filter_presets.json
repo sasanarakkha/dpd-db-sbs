@@ -2,20 +2,16 @@
     "root family": {
         "data_filters": [
             [
-                "root_key",
-                "√kit 1"
+                "root_key"
             ],
             [
-                "family_root",
-                "√kit"
+                "family_root"
             ]
         ],
         "display_filters": [
             "lemma_1",
             "pos",
-            "meaning_1",
             "meaning_lit",
-            "meaning_2",
             "root_key",
             "family_root"
         ],
@@ -24,7 +20,8 @@
     "family compound": {
         "data_filters": [
             [
-                "family_compound"
+                "family_compound",
+                ""
             ]
         ],
         "display_filters": [
@@ -56,7 +53,7 @@
         "data_filters": [
             [
                 "lemma_1",
-                "yott"
+                ""
             ]
         ],
         "display_filters": [
@@ -73,7 +70,7 @@
         "data_filters": [
             [
                 "meaning_2",
-                "resentment"
+                ""
             ]
         ],
         "display_filters": [
@@ -89,7 +86,8 @@
     "meaning_1": {
         "data_filters": [
             [
-                "meaning_1"
+                "meaning_1",
+                ""
             ]
         ],
         "display_filters": [
@@ -106,7 +104,7 @@
         "data_filters": [
             [
                 "lemma_1",
-                "dhanaccheda"
+                ""
             ]
         ],
         "display_filters": [
@@ -115,6 +113,53 @@
             "meaning_1",
             "meaning_lit",
             "meaning_2"
+        ],
+        "limit": 0
+    },
+    "source_1 -": {
+        "data_filters": [
+            [
+                "source_1",
+                "^-$"
+            ],
+            [
+                "family_compound",
+                "."
+            ]
+        ],
+        "display_filters": [
+            "lemma_1",
+            "family_compound"
+        ],
+        "limit": 0
+    },
+    "family word": {
+        "data_filters": [
+            [
+                "lemma_1",
+                "^haṃsa"
+            ]
+        ],
+        "display_filters": [
+            "lemma_1",
+            "meaning_1",
+            "family_word"
+        ],
+        "limit": 0
+    },
+    "family set": {
+        "data_filters": [
+            [
+                "family_set",
+                "stages of"
+            ]
+        ],
+        "display_filters": [
+            "id",
+            "lemma_1",
+            "pos",
+            "meaning_1",
+            "family_set"
         ],
         "limit": 0
     }

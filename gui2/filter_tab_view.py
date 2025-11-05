@@ -121,7 +121,7 @@ class FilterTabView(ft.Column):
         data_filters_section = ft.Row(
             [
                 ft.Container(
-                    ft.Text("Data Filters", size=17, color=LABEL_COLOUR),
+                    ft.Text("Data Filters", size=14, color=LABEL_COLOUR),
                     width=150,
                 ),
                 data_filters_controls,
@@ -134,7 +134,7 @@ class FilterTabView(ft.Column):
         display_filters_section = ft.Row(
             [
                 ft.Container(
-                    ft.Text("Display Filters", size=17, color=LABEL_COLOUR),
+                    ft.Text("Display Filters", size=14, color=LABEL_COLOUR),
                     width=150,
                 ),
                 display_filters_controls,
@@ -147,7 +147,7 @@ class FilterTabView(ft.Column):
         limit_section = ft.Row(
             [
                 ft.Container(
-                    ft.Text("Results Limit", size=17, color=LABEL_COLOUR),
+                    ft.Text("Results Limit", size=14, color=LABEL_COLOUR),
                     width=150,
                 ),
                 limit_controls,
@@ -171,7 +171,7 @@ class FilterTabView(ft.Column):
         buttons_section = ft.Row(
             [
                 ft.Container(
-                    ft.Text("Filters", size=17, color=LABEL_COLOUR),
+                    ft.Text("Filters", size=14, color=LABEL_COLOUR),
                     width=150,
                 ),
                 apply_button,
@@ -184,7 +184,7 @@ class FilterTabView(ft.Column):
         preset_section = ft.Row(
             [
                 ft.Container(
-                    ft.Text("Presets", size=17, color=LABEL_COLOUR),
+                    ft.Text("Presets", size=14, color=LABEL_COLOUR),
                     width=150,
                 ),
                 preset_controls,
@@ -196,6 +196,8 @@ class FilterTabView(ft.Column):
         # Assemble all sections
         self.controls.extend(
             [
+                preset_section,
+                ft.Divider(),
                 data_filters_section,
                 ft.Divider(),
                 display_filters_section,
@@ -203,8 +205,6 @@ class FilterTabView(ft.Column):
                 limit_section,
                 ft.Divider(),
                 buttons_section,
-                ft.Divider(),
-                preset_section,
                 ft.Divider(),
                 self.filter_component_container,
             ]
@@ -221,7 +221,7 @@ class FilterTabView(ft.Column):
             on_submit=self._apply_filters_clicked,
         )
         initial_regex_input.hint_text = "enter regex"
-        initial_regex_input.hint_style = ft.TextStyle(color=LABEL_COLOUR, size=15)
+        initial_regex_input.hint_style = ft.TextStyle(color=LABEL_COLOUR, size=10)
 
         self.column_dropdowns.append(initial_dropdown)
         self.regex_inputs.append(initial_regex_input)
@@ -261,7 +261,7 @@ class FilterTabView(ft.Column):
             on_submit=self._apply_filters_clicked,
         )
         new_regex_input.hint_text = "enter regex"
-        new_regex_input.hint_style = ft.TextStyle(color=LABEL_COLOUR, size=15)
+        new_regex_input.hint_style = ft.TextStyle(color=LABEL_COLOUR, size=10)
 
         self.column_dropdowns.append(new_dropdown)
         self.regex_inputs.append(new_regex_input)
@@ -354,7 +354,7 @@ class FilterTabView(ft.Column):
             # Add blue rounded buttons for each selected option
             for option in selected_options:
                 button = ft.Container(
-                    content=ft.Text(option, size=17, color=ft.Colors.WHITE),
+                    content=ft.Text(option, size=14, color=ft.Colors.WHITE),
                     bgcolor=ft.Colors.BLUE_700,
                     border_radius=20,
                     padding=ft.Padding(10, 2, 10, 2),
@@ -363,7 +363,7 @@ class FilterTabView(ft.Column):
 
             # If no options selected, show a placeholder
             if not selected_options:
-                placeholder = ft.Text("Select columns...", size=17)
+                placeholder = ft.Text("Select columns...", size=14)
                 self.selected_columns_container.controls.append(placeholder)
 
         self.page.update()
@@ -376,7 +376,7 @@ class FilterTabView(ft.Column):
             on_submit=self._apply_filters_clicked,
         )
         self.limit_input.hint_text = "0 for all results"
-        self.limit_input.hint_style = ft.TextStyle(color=LABEL_COLOUR, size=15)
+        self.limit_input.hint_style = ft.TextStyle(color=LABEL_COLOUR, size=10)
         self.limit_input.width = 200
         self.limit_input.value = "50"
         return ft.Row([self.limit_input])
@@ -442,12 +442,23 @@ class FilterTabView(ft.Column):
             except ValueError:
                 limit = 0
 
+        # Determine sort column - always use the first selected display filter
+        sort_column = "id"  # Default to first database column
+        if display_filters:
+            sort_column = display_filters[0]  # First selected column
+        else:
+            # If no display filters selected, use the first column from the database schema
+            sort_column = (
+                self.dpd_headword_columns[0] if self.dpd_headword_columns else "id"
+            )
+
         new_filter_component = FilterComponent(
             page=self.page,
             toolkit=self.toolkit,
             data_filters=data_filters,
             display_filters=display_filters,
             limit=limit,
+            sort_column=sort_column,
         )
 
         self.filter_component_container.content = new_filter_component

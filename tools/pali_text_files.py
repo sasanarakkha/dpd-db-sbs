@@ -160,9 +160,9 @@ cst_texts: dict[str, list[str]] = {
     ],
     "knt": [
         "s0501t.nrf.txt",
-        "s0518t.nrf.txt",
+        # "s0518t.nrf.txt", # doesn't exist
         "s0519t.tik.txt",
-        "s0520t.nrf.txt",
+        # "s0520t.nrf.txt", # doesn't exist
     ],
     "abht": [
         "abh01t.tik.txt",
@@ -7692,7 +7692,7 @@ sc_texts: dict[str, list[str]] = {
     "anna": [],
 }
 
-bjt_texts: dict[str, [list[str]]] = {
+bjt_texts: dict[str, list[str]] = {
     "vin1": [
         "vp-prj.json",
         "vp-prj-2-3.json",

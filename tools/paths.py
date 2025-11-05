@@ -118,6 +118,9 @@ class ProjectPaths:
         self.dpd_deconstructor_goldendict_dir = (
             base_dir / "exporter/share/dpd-deconstructor/"
         )
+        self.dpd_deconstructor_goldendict_dir2 = (
+            base_dir / "exporter/share/dpd-deconstructor2/"
+        )
         self.dpd_epub_path = base_dir / "exporter/share/dpd-kindle.epub"
         self.dpd_goldendict_dir = base_dir / "exporter/share/dpd/"
         self.dpd_goldendict_zip_path = base_dir / "exporter/share/dpd-goldendict.zip"
@@ -207,6 +210,7 @@ class ProjectPaths:
         self.sbs_example_templ_path = (
             base_dir / "exporter/goldendict/templates/sbs_example.html"
         )
+
 
         # FIXME delete these and whatever uses them
         # exporter/jinja templates

@@ -8,6 +8,7 @@ from db.models import DpdHeadword, Russian, SBS
 from sqlalchemy import or_
 from gui2.dpd_fields_functions import clean_lemma_1
 from gui2.dps_fields import DpsFields
+from gui2.dps_db_helpers import fetch_ru, fetch_sbs
 from gui2.dps_fields_lists import VIB_FIELDS, CLASS_FIELDS
 from gui2.dps_example_field import DpsExampleField
 from gui2.history import HistoryManager
@@ -288,8 +289,8 @@ class DpsView(ft.Column, PopUpMixin):
 
         self.headword = headword
         self.headword_original = copy.deepcopy(headword)
-        self.ru_word = self._db.fetch_ru(headword.id)
-        self.sbs_word = self._db.fetch_sbs(headword.id)
+        self.ru_word = fetch_ru(self._db.db_session, headword.id)
+        self.sbs_word = fetch_sbs(self._db.db_session, headword.id)
         self.tests_passed = False  # Reset test state when loading new word
 
         self.dps_fields.populate_dps_tab(headword, self.ru_word, self.sbs_word)
@@ -487,7 +488,7 @@ class DpsView(ft.Column, PopUpMixin):
     def _update_russian_table(self, headword_id: int) -> None:
         """Update Russian table with fields starting with dps_ru_*"""
         # Get or create Russian record
-        ru_word = self._db.fetch_ru(headword_id)
+        ru_word = fetch_ru(self._db.db_session, headword_id)
         if not ru_word:
             ru_word = Russian(id=headword_id)
             self._db.db_session.add(ru_word)
@@ -508,7 +509,7 @@ class DpsView(ft.Column, PopUpMixin):
     def _update_sbs_table(self, headword_id: int) -> None:
         """Update SBS table with fields starting with specified prefixes"""
         # Get or create SBS record
-        sbs_word = self._db.fetch_sbs(headword_id)
+        sbs_word = fetch_sbs(self._db.db_session, headword_id)
         if not sbs_word:
             sbs_word = SBS(id=headword_id)
             self._db.db_session.add(sbs_word)
@@ -516,7 +517,7 @@ class DpsView(ft.Column, PopUpMixin):
         values = self._get_current_field_values()
 
         # Get current values from database before updating
-        current_sbs = self._db.fetch_sbs(headword_id)
+        current_sbs = fetch_sbs(self._db.db_session, headword_id)
         old_vib_example = current_sbs.vib_example if current_sbs else ""
         old_pat_example = current_sbs.pat_example if current_sbs else ""
         old_sbs_patimokkha = current_sbs.sbs_patimokkha if current_sbs else ""

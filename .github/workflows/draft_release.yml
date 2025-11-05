@@ -80,6 +80,9 @@ jobs:
     - name: Create Inflection Tables
       run: uv run python db/inflections/generate_inflection_tables.py
 
+    - name: Update Root Has Verb values
+      run: uv run python scripts/build/root_has_verb_updater.py
+
     - name: Update Sanskrit Family Roots
       run: uv run python scripts/build/sanskrit_root_families_updater.py
 
@@ -195,7 +198,8 @@ jobs:
     # ----------------------------------------
     
     - name: Sync all submodules with Upstream
-      if: steps.uposatha_check.outputs.is_uposatha == 'True'
+      # if: steps.uposatha_check.outputs.is_uposatha == 'True'
+      if: false
       run: |
         for submodule in resources/fdg_dpd resources/bw2 resources/sc-data resources/tpr_downloads; do
           echo "Syncing $submodule..."
@@ -226,7 +230,8 @@ jobs:
     # ----------------------------------------
 
     - name: Update All Submodules
-      if: steps.uposatha_check.outputs.is_uposatha == 'True'
+      # if: steps.uposatha_check.outputs.is_uposatha == 'True'
+      if: false
       shell: bash
       run: |
         declare -A submodules=(
@@ -254,6 +259,12 @@ jobs:
           git checkout $branch
           git pull origin $branch
           
+          # Run sutta central exporter
+          if [ "$path" = "resources/sc-data" ]; then
+            echo "Running Sutta Central exporter..."
+            uv run python "$GITHUB_WORKSPACE/exporter/sutta_central/sutta_central_exporter.py"
+          fi
+
           echo "=== POST-EXPORT STATUS ==="
           git status --short
           git add .
@@ -272,7 +283,12 @@ jobs:
               git config --global user.name "GitHub Actions"
               git config --global user.email "actions@github.com"
               
-              COMMIT_MSG="DPD $(date +'%B') release"
+              if [ "$path" = "resources/sc-data" ]; then
+                COMMIT_MSG="DPD $(date +'%Y-%m-%d') update"
+              else
+                COMMIT_MSG="DPD $(date +'%B') release"
+              fi
+
               if git commit -m "$COMMIT_MSG"; then
                 echo "Commit successful for $name."
                 echo "=== PRE-PUSH STATUS for $name ==="

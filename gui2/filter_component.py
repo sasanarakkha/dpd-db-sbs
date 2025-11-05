@@ -16,7 +16,7 @@ class DpdDatatable(ft.DataTable):
         super().__init__(
             columns=columns,
             rows=rows,
-            data_text_style=ft.TextStyle(size=15, color=ft.Colors.GREY_300),
+            data_text_style=ft.TextStyle(size=12, color=ft.Colors.GREY_300),
             border=ft.border.all(2, ft.Colors.BLACK),
             horizontal_lines=ft.border.BorderSide(1, ft.Colors.GREY_300),
             vertical_lines=ft.border.BorderSide(1, ft.Colors.GREY_300),
@@ -24,7 +24,7 @@ class DpdDatatable(ft.DataTable):
             column_spacing=20,
             horizontal_margin=10,
             heading_text_style=ft.TextStyle(
-                color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD, size=15
+                color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD, size=12
             ),
             heading_row_height=30,
             data_row_min_height=30,
@@ -52,7 +52,7 @@ class CellTextField(ft.TextField):
             border=ft.InputBorder.NONE,
             text_align=ft.TextAlign.LEFT,
             text_style=ft.TextStyle(
-                size=15,
+                size=12,
                 color=ft.Colors.GREY_300,
             ),
         )
@@ -68,6 +68,7 @@ class FilterComponent(ft.Column):
         data_filters: list[tuple[str, str]] | None = None,
         display_filters: list[str] | None = None,
         limit: int | None = None,
+        sort_column: str | None = None,
     ) -> None:
         super().__init__(expand=True, spacing=5, controls=[])
         self.page: ft.Page = page
@@ -79,6 +80,7 @@ class FilterComponent(ft.Column):
         self.display_filters = display_filters
         self.data_filters = data_filters
         self.limit = limit
+        self.sort_column = sort_column or "lemma_1"
         self._just_saved: bool = False
 
         # UI Controls
@@ -174,8 +176,9 @@ class FilterComponent(ft.Column):
 
             # Refresh the database session to ensure we have the latest connection
             self.toolkit.db_manager.new_db_session()
+            sort_column_attr = getattr(DpdHeadword, self.sort_column, DpdHeadword.id)
             query = self.toolkit.db_manager.db_session.query(DpdHeadword).order_by(
-                DpdHeadword.lemma_1
+                sort_column_attr
             )
             for filter_info in active_filters:
                 column_name = filter_info["column"]

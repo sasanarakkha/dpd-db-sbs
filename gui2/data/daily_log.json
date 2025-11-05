@@ -809,66 +809,138 @@
         "pass1": 0,
         "pass2_add": 7,
         "pass2_pre": 0,
-        "pass2_update": 64
+        "pass2_update": 75
+    },
+    "2025-10-15": {
+        "pass1": 64,
+        "pass2_add": 13,
+        "pass2_pre": 0,
+        "pass2_update": 115
+    },
+    "2025-10-16": {
+        "pass1": 18,
+        "pass2_add": 8,
+        "pass2_pre": 0,
+        "pass2_update": 53
+    },
+    "2025-10-17": {
+        "pass1": 1,
+        "pass2_add": 67,
+        "pass2_pre": 0,
+        "pass2_update": 4
+    },
+    "2025-10-18": {
+        "pass1": 0,
+        "pass2_add": 43,
+        "pass2_pre": 0,
+        "pass2_update": 68
     },
     "2025-10-19": {
-        "pass1": 0,
-        "pass2_add": 0,
+        "pass1": 12,
+        "pass2_add": 18,
         "pass2_pre": 0,
-        "pass2_update": 3
+        "pass2_update": 61
+    },
+    "2025-10-20": {
+        "pass1": 32,
+        "pass2_add": 19,
+        "pass2_pre": 0,
+        "pass2_update": 8
     },
     "2025-10-21": {
-        "pass1": 0,
-        "pass2_add": 0,
+        "pass1": 85,
+        "pass2_add": 7,
         "pass2_pre": 0,
-        "pass2_update": 10
+        "pass2_update": 1
     },
     "2025-10-22": {
-        "pass1": 0,
-        "pass2_add": 1,
+        "pass1": 165,
+        "pass2_add": 12,
         "pass2_pre": 0,
-        "pass2_update": 10
+        "pass2_update": 1
     },
     "2025-10-23": {
-        "pass1": 0,
-        "pass2_add": 1,
+        "pass1": 114,
+        "pass2_add": 9,
         "pass2_pre": 0,
-        "pass2_update": 24
+        "pass2_update": 16
     },
     "2025-10-24": {
-        "pass1": 0,
-        "pass2_add": 0,
+        "pass1": 163,
+        "pass2_add": 28,
         "pass2_pre": 0,
-        "pass2_update": 2
+        "pass2_update": 5
     },
     "2025-10-25": {
-        "pass1": 0,
+        "pass1": 119,
         "pass2_add": 2,
         "pass2_pre": 0,
-        "pass2_update": 7
+        "pass2_update": 3
     },
     "2025-10-26": {
         "pass1": 0,
-        "pass2_add": 1,
+        "pass2_add": 6,
         "pass2_pre": 0,
-        "pass2_update": 3
+        "pass2_update": 141
     },
     "2025-10-27": {
-        "pass1": 0,
-        "pass2_add": 0,
+        "pass1": 24,
+        "pass2_add": 12,
         "pass2_pre": 0,
-        "pass2_update": 3
+        "pass2_update": 61
+    },
+    "2025-10-28": {
+        "pass1": 9,
+        "pass2_add": 31,
+        "pass2_pre": 0,
+        "pass2_update": 65
+    },
+    "2025-10-29": {
+        "pass1": 68,
+        "pass2_add": 16,
+        "pass2_pre": 0,
+        "pass2_update": 104
     },
     "2025-10-30": {
-        "pass1": 0,
+        "pass1": 5,
+        "pass2_add": 9,
+        "pass2_pre": 77,
+        "pass2_update": 49
+    },
+    "2025-10-31": {
+        "pass1": 231,
         "pass2_add": 0,
+        "pass2_pre": 0,
+        "pass2_update": 22
+    },
+    "2025-11-01": {
+        "pass1": 294,
+        "pass2_add": 5,
         "pass2_pre": 0,
         "pass2_update": 3
     },
-    "2025-10-31": {
-        "pass1": 0,
+    "2025-11-02": {
+        "pass1": 197,
+        "pass2_add": 5,
+        "pass2_pre": 0,
+        "pass2_update": 101
+    },
+    "2025-11-03": {
+        "pass1": 70,
+        "pass2_add": 13,
+        "pass2_pre": 0,
+        "pass2_update": 69
+    },
+    "2025-11-04": {
+        "pass1": 81,
+        "pass2_add": 2,
+        "pass2_pre": 0,
+        "pass2_update": 14
+    },
+    "2025-11-05": {
+        "pass1": 17,
         "pass2_add": 0,
         "pass2_pre": 0,
-        "pass2_update": 1
+        "pass2_update": 11
     }
 }
