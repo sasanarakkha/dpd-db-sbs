@@ -1,5 +1,25 @@
 [
     {
+        "id": 57062,
+        "lemma_1": "saṅghāṭidhāraṇa"
+    },
+    {
+        "id": 57063,
+        "lemma_1": "saṅghāṭidhāraṇamatta"
+    },
+    {
+        "id": 74169,
+        "lemma_1": "kammavisuddhi"
+    },
+    {
+        "id": 87975,
+        "lemma_1": "bhinna 4"
+    },
+    {
+        "id": 87974,
+        "lemma_1": "āpanna 5"
+    },
+    {
         "id": 87973,
         "lemma_1": "pakāsetabba"
     },
@@ -58,25 +78,5 @@
     {
         "id": 87959,
         "lemma_1": "nissajji"
-    },
-    {
-        "id": 87958,
-        "lemma_1": "sampasārīyati"
-    },
-    {
-        "id": 87957,
-        "lemma_1": "vāmanta"
-    },
-    {
-        "id": 87877,
-        "lemma_1": "paccudeti"
-    },
-    {
-        "id": 81244,
-        "lemma_1": "patissaya"
-    },
-    {
-        "id": 87907,
-        "lemma_1": "adahanta"
     }
 ]

@@ -1,5 +1,93 @@
 [
     {
+        "id": 42159,
+        "lemma_1": "padīpa"
+    },
+    {
+        "id": 21165,
+        "lemma_1": "kāyadaḷhibahula"
+    },
+    {
+        "id": 66123,
+        "lemma_1": "vadati 2"
+    },
+    {
+        "id": 57566,
+        "lemma_1": "sat 2"
+    },
+    {
+        "id": 74576,
+        "lemma_1": "kilamatha 2"
+    },
+    {
+        "id": 21842,
+        "lemma_1": "kilamatha 1"
+    },
+    {
+        "id": 77903,
+        "lemma_1": "anattha 2"
+    },
+    {
+        "id": 3586,
+        "lemma_1": "anattha 1"
+    },
+    {
+        "id": 50480,
+        "lemma_1": "makkhī"
+    },
+    {
+        "id": 20301,
+        "lemma_1": "kammanta 1"
+    },
+    {
+        "id": 74638,
+        "lemma_1": "puṇṇaka 2"
+    },
+    {
+        "id": 46596,
+        "lemma_1": "puṇṇaka 1"
+    },
+    {
+        "id": 55154,
+        "lemma_1": "rūpa 4"
+    },
+    {
+        "id": 38884,
+        "lemma_1": "no 1.2"
+    },
+    {
+        "id": 74169,
+        "lemma_1": "kammavisuddhi"
+    },
+    {
+        "id": 23995,
+        "lemma_1": "khvetaṃ"
+    },
+    {
+        "id": 78698,
+        "lemma_1": "dvāra 3"
+    },
+    {
+        "id": 34348,
+        "lemma_1": "dvāra 1"
+    },
+    {
+        "id": 87975,
+        "lemma_1": "bhinna 4"
+    },
+    {
+        "id": 74157,
+        "lemma_1": "yoga 5"
+    },
+    {
+        "id": 21270,
+        "lemma_1": "kāyika 1"
+    },
+    {
+        "id": 87974,
+        "lemma_1": "āpanna 5"
+    },
+    {
         "id": 48511,
         "lemma_1": "buddha 1"
     },
@@ -10,93 +98,5 @@
     {
         "id": 34626,
         "lemma_1": "dhamma 1.01"
-    },
-    {
-        "id": 11557,
-        "lemma_1": "āditta"
-    },
-    {
-        "id": 75647,
-        "lemma_1": "pītisukha 2"
-    },
-    {
-        "id": 46409,
-        "lemma_1": "pītisukha 1"
-    },
-    {
-        "id": 28483,
-        "lemma_1": "jināti 1"
-    },
-    {
-        "id": 38293,
-        "lemma_1": "nissaya 2"
-    },
-    {
-        "id": 38292,
-        "lemma_1": "nissaya 1"
-    },
-    {
-        "id": 16494,
-        "lemma_1": "upeti 1"
-    },
-    {
-        "id": 16130,
-        "lemma_1": "upasampadā 2"
-    },
-    {
-        "id": 52955,
-        "lemma_1": "muditā"
-    },
-    {
-        "id": 51128,
-        "lemma_1": "manasikāra"
-    },
-    {
-        "id": 2296,
-        "lemma_1": "atirekadirattatirattaṃ"
-    },
-    {
-        "id": 56770,
-        "lemma_1": "saṅkhāra 3"
-    },
-    {
-        "id": 49768,
-        "lemma_1": "bhāsita 2"
-    },
-    {
-        "id": 30072,
-        "lemma_1": "tayo 2"
-    },
-    {
-        "id": 40052,
-        "lemma_1": "paññāpeti 5"
-    },
-    {
-        "id": 40049,
-        "lemma_1": "paññāpeti 2"
-    },
-    {
-        "id": 40050,
-        "lemma_1": "paññāpeti 3"
-    },
-    {
-        "id": 18053,
-        "lemma_1": "eva 3"
-    },
-    {
-        "id": 32668,
-        "lemma_1": "dissati 1"
-    },
-    {
-        "id": 45140,
-        "lemma_1": "pahīyati 1.1"
-    },
-    {
-        "id": 30430,
-        "lemma_1": "ti 1"
-    },
-    {
-        "id": 32669,
-        "lemma_1": "dissati 2"
     }
 ]

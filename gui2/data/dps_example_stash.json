@@ -1,16 +1,14 @@
 {
     "dps_shared": {
-        "translation": "As the Blessed One will explain [it] to us, so we will keep that in mind.",
-        "anki": "5",
-        "source": "AN6.61",
-        "sutta": "majjhesuttaṃ",
-        "example": "yathā no bhagavā byākarissati, tathā naṃ mayaṃ dhāressāma"
+        "translation": "…and this practice of self-mortification, which is painful, ignoble, [and] unbeneficial.",
+        "anki": "26",
+        "source": "SN56.11",
+        "sutta": "dhammacakkappavattanasuttaṃ",
+        "example": "yo c'āyaṃ attakilamath'ānuyogo dukkho anariyo anatthasañhito."
     },
     "dps_last": {
-        "translation": "As the Blessed One will explain [it] to us, so we will keep that in mind.",
-        "anki": "5",
-        "source": "AN6.61",
-        "sutta": "majjhesuttaṃ",
-        "example": "yathā no bhagavā byākarissati, tathā naṃ mayaṃ dhāressāma"
+        "source": "VIN1.2.8",
+        "sutta": "duṭṭhadosa sikkhāpada",
+        "example": "ye te bhikkhū tiracchānakathikā kāyadaḷhibahulā viharanti tesam'pi ekajjhaṃ sen'āsanaṃ paññapeti, imāya'p'ime āyasmanto ratiyā acchissantī'ti."
     }
 }
