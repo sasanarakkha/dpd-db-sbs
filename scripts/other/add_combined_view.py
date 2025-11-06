@@ -33,8 +33,6 @@ def main():
                 COALESCE(dpd_headwords.ebt_count, '') AS count,
                 COALESCE(sbs.sbs_class, '') AS class,
                 COALESCE(sbs.class_anki, '') AS anki,
-                COALESCE(sbs.sbs_category, '') AS categ,
-                COALESCE(sbs.sbs_patimokkha, '') AS pat,
                 COALESCE(sbs.sbs_index, '') AS PER,
                 COALESCE(dpd_headwords.lemma_1, '') AS lemma_1, 
                 COALESCE(dpd_headwords.lemma_2, '') AS lemma_2,  

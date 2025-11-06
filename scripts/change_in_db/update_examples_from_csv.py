@@ -1,4 +1,5 @@
-"""Update examples for class and discorses from csv"""
+"""Update examples for class from csv
+and with possibility to add something else (old sbs_category)"""
 
 import os
 import csv
@@ -16,7 +17,7 @@ pth = ProjectPaths()
 dpspth = DPSPaths()
 
 
-def update_sbs_from_tsv_with_filter(mode:str, csv_path: str, sbs_anki_class_filter: int, sbs_category: str):
+def update_sbs_from_tsv_with_filter(mode:str, csv_path: str, sbs_anki_class_filter: int):
     """
     Updates SBS table from a CSV file based on sbs_anki_class_filter.
 
@@ -28,7 +29,7 @@ def update_sbs_from_tsv_with_filter(mode:str, csv_path: str, sbs_anki_class_filt
     if mode == "class":
         console.print(f"[yellow]Updating SBS table from {csv_path} with sbs_anki_class_filter: {sbs_anki_class_filter}")
     elif mode == "suttas":
-        console.print(f"[yellow]Updating SBS table from {csv_path} with sbs_anki_class_filter: {sbs_category}")
+        console.print(f"[yellow]Updating SBS table from {csv_path} with sbs_anki_class_filter: ")
 
 
     try:
@@ -67,15 +68,16 @@ def update_sbs_from_tsv_with_filter(mode:str, csv_path: str, sbs_anki_class_filt
                         else:
                             filter_mismatch_ids_in_tsv.append(word_id)
                     elif mode == "suttas":
-                        if not db_entry.sbs.discourses_example:
-                            db_entry.sbs.discourses_source = tsv_row['sutta_number'].upper()
-                            db_entry.sbs.discourses_sutta = tsv_row['sutta_name']
-                            db_entry.sbs.discourses_example = tsv_row['class_example']
-                            updated_count += 1
-                        elif db_entry.sbs.sbs_category == sbs_category and db_entry.sbs.discourses_example:
-                            continue
-                        else:
-                            filter_mismatch_ids_in_tsv.append(word_id)
+                        print("something here to add")
+                        # if not db_entry.sbs.discourses_example:
+                        #     db_entry.sbs.discourses_source = tsv_row['sutta_number'].upper()
+                        #     db_entry.sbs.discourses_sutta = tsv_row['sutta_name']
+                        #     db_entry.sbs.discourses_example = tsv_row['class_example']
+                        #     updated_count += 1
+                        # elif db_entry.sbs.sbs_category == sbs_category and db_entry.sbs.discourses_example:
+                        #     continue
+                        # else:
+                        #     filter_mismatch_ids_in_tsv.append(word_id)
             except ValueError:
                 console.print(f"[red]Invalid ID format in CSV row {row_idx}: {tsv_row['id']}")
             except Exception as e:
@@ -90,9 +92,10 @@ def update_sbs_from_tsv_with_filter(mode:str, csv_path: str, sbs_anki_class_filt
             db_entries_with_filter = db_session.query(DpdHeadword).join(SBS).filter(
                 SBS.class_anki == sbs_anki_class_filter).all()
         elif mode == "suttas":
-            db_entries_with_filter = db_session.query(DpdHeadword).join(SBS).filter(
-                SBS.sbs_category == sbs_category).filter(
-                SBS.discourses_example == "").all()
+            print("something here to add")
+            # db_entries_with_filter = db_session.query(DpdHeadword).join(SBS).filter(
+            #     SBS.sbs_category == sbs_category).filter(
+            #     SBS.discourses_example == "").all()
 
         missing_from_tsv = [entry.id for entry in db_entries_with_filter if entry.id not in tsv_ids]
         if missing_from_tsv:
@@ -112,16 +115,17 @@ if __name__ == "__main__":
     # mode = "class"
     mode = "suttas"
     class_number = 29
-    category = "rest2"
+    # category = "rest2"
     
     if mode == "class":
         base_path = dpspth.pali_class_output_dir
         csv_path = os.path.join(base_path, "done", f"class_{class_number}_output done.csv")
     elif mode == "suttas":
-        base_path = dpspth.discourses_output_dir
-        csv_path = os.path.join(base_path, "done", f"{category} done.csv")
+        print("something here to add")
+        # base_path = dpspth.discourses_output_dir
+        # csv_path = os.path.join(base_path, "done", f"{category} done.csv")
 
     if not csv_path:
         console.print("[bold red]Please update 'csv_path' in the script with the actual path to your CSV file.")
     else:
-        update_sbs_from_tsv_with_filter(mode, csv_path, class_number, category)
+        update_sbs_from_tsv_with_filter(mode, csv_path, class_number)

@@ -72,8 +72,6 @@ dps_field_mapping = {
     "dps_extra_sutta": {"control": ft.TextField, "params": create_params({})},
     "dps_extra_example": {"control": DpsExampleField, "params": create_params({"multiline": True, "min_lines": 4})},
     "dps_sbs_class": {"control": ft.TextField, "params": create_params({"tooltip": "related to which class from the Pāli Course"})},
-    "dps_sbs_category": {"control": ft.TextField, "params": create_params({"tooltip": "which sutta from sutta anki deck"})},
-    "dps_sbs_patimokkha": {"control": ft.TextField, "params": create_params({"tooltip": "related to Bhikkhu Pātimokkha or Bhikkhu Vibhaṅga"})},
     
     # Hidden test-only fields (not displayed in GUI but available for testing)
     "dps_meaning_1": {"control": ft.TextField, "params": create_params({"disabled": True, "visible": False})},

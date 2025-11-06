@@ -1291,10 +1291,6 @@ class SBS(Base):
 
     sbs_class: Mapped[int] = mapped_column(default="")
 
-    #TODO remove after checking
-    sbs_category: Mapped[str] = mapped_column(default="")
-    sbs_patimokkha: Mapped[str] = mapped_column(default="")
-
     sbs_meaning: Mapped[str] = mapped_column(default="")
     sbs_notes: Mapped[str] = mapped_column(default="")
 
@@ -1489,16 +1485,6 @@ class SBS(Base):
     def sbs_class_link(self):
         class_link_map = SBS_table_tools().load_class_link_map()
         return class_link_map.get(self.class_anki, "")
-
-    @property
-    def sbs_sutta_link(self):
-        sutta_link_map = SBS_table_tools().load_sutta_link_map()
-        return sutta_link_map.get(self.sbs_category, "")
-
-    @property
-    def sbs_patimokkha_link(self):
-        patimokkha_link_map = SBS_table_tools().load_sutta_link_map()
-        return patimokkha_link_map.get(self.sbs_patimokkha, "")
 
     @property
     def sbs_source_link_1(self) -> str:

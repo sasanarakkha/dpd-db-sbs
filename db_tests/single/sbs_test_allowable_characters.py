@@ -768,11 +768,6 @@ class AllowableCharacters:
     # allowable characters for SBS fields
     # --------------------------------------------------
 
-    sbs_category_allowed = (
-        english_alphabet +
-        digits
-    )
-
     sbs_source_allowed = (
         english_capitals +
         source +
@@ -893,8 +888,6 @@ class AllowableCharacters:
     sbs_data = [
         ("sbs_meaning", meaning_1_allowed),
 
-        ("sbs_category", sbs_category_allowed),
-        ("sbs_patimokkha", sbs_category_allowed),
         ("class_anki", digits),
         ("sbs_class", digits),
         

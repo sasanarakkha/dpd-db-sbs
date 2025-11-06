@@ -37,6 +37,8 @@ def filtering_words():
 
     row_count =  0
 
+    db = db_session.query(DpdHeadword)
+
     #! for filling those which does not have Russian table and fill the conditions
 
     # db = db_session.query(DpdHeadword).outerjoin(
@@ -103,22 +105,22 @@ def filtering_words():
 
 
     #! for filling those which from sbs_category but does not have corresponding source
-    attribute = "mn107"
-    variable = attribute.upper()
+    # attribute = "mn107"
+    # variable = attribute.upper()
 
-    db = db_session.query(DpdHeadword).outerjoin(
-        SBS, DpdHeadword.id == SBS.id
-    ).filter(
-        and_(
-            SBS.sbs_category.like(f"%{attribute}%"),
-            not_(
-                or_(
-                    SBS.sbs_source_1.like(f"%{variable}%"),
-                    SBS.sbs_source_2.like(f"%{variable}%"),
-                )
-            ),
-        )
-    ).all()
+    # db = db_session.query(DpdHeadword).outerjoin(
+    #     SBS, DpdHeadword.id == SBS.id
+    # ).filter(
+    #     and_(
+    #         SBS.sbs_category.like(f"%{attribute}%"),
+    #         not_(
+    #             or_(
+    #                 SBS.sbs_source_1.like(f"%{variable}%"),
+    #                 SBS.sbs_source_2.like(f"%{variable}%"),
+    #             )
+    #         ),
+    #     )
+    # ).all()
 
     # Print the db
     print("Details of filtered words")
@@ -132,12 +134,12 @@ def filtering_words():
 
 
 def filter_and_save_txt(source_value):
-    # filtering words with sbs_patimokkha and comp
+    # filtering words with sbs.vib_example and comp
     db = db_session.query(DpdHeadword).outerjoin(
     SBS, DpdHeadword.id == SBS.id
         ).filter(
             and_(
-                SBS.sbs_patimokkha != "",
+                SBS.vib_example != "",
                 DpdHeadword.compound_type != "",
                 DpdHeadword.grammar.like('%, comp%'),
                 SBS.vib_source == source_value

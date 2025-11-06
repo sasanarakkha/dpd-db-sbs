@@ -25,9 +25,9 @@ db = (
     .filter(
         or_(
             SBS.class_anki != "",
-            SBS.sbs_patimokkha != "",
+            SBS.vib_example != "",
             SBS.sbs_index != "",
-            SBS.sbs_category != "",
+            SBS.discourses_example != "",
         )
     )
     .all()

@@ -115,8 +115,8 @@ if __name__ == "__main__":
 
     table_name = "SBS"
     # table_name = "Russian"
-    column_to_update = "sbs_patimokkha"
-    value_to_update = "vib"
+    column_to_update = "class_anki"
+    value_to_update = "1"
     id_to_add = "30377"
 
     console.print(f"[bold yellow]Adding new row to the table '{table_name}' for ID '{id_to_add}'...[/bold yellow]")

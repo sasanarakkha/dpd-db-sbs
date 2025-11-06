@@ -334,7 +334,6 @@ def pali_row(dpspth, i: DpdHeadword, output="anki") -> List[str]:
             i.sbs.sbs_chant_link_3 if i.sbs else None,
             i.sbs.sbs_chant_link_4 if i.sbs else None,
             i.sbs.sbs_class_link if i.sbs else None,
-            i.sbs.sbs_sutta_link if i.sbs else None,
         ]
     )
 

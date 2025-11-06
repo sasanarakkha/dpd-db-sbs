@@ -33,8 +33,8 @@ def main():
     save_words_to_csv(SBS.sbs_index != '', 'per.csv')
 
 
-    # Third CSV: Non-empty sbs_category
-    save_words_to_csv(SBS.sbs_category != '', 'advanced_suttas.csv')
+    # Third CSV: Non-empty discourses_example
+    save_words_to_csv(SBS.discourses_example != '', 'advanced_suttas.csv')
 
     db_session.close()
 

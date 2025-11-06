@@ -8,12 +8,6 @@
             <a href="{{d.i.sbs.sbs_class_link}}" target="_blank"><i>(cl.{{d.i.sbs.class_anki}}{% if d.i.sbs.class_extra %}*{% endif %})</i></a>
             <span class="gray"> | </span>
             {% endif %}
-            {% if d.i.sbs.sbs_category %}
-            <a href="{{d.i.sbs.sbs_sutta_link}}" target="_blank"><i>({{d.i.sbs.sbs_category}})</i></a> |
-            {% endif %}
-            {% if d.i.sbs.sbs_patimokkha %}
-            <a href="{{d.i.sbs.sbs_patimokkha_link}}" target="_blank"><i>({{d.i.sbs.sbs_patimokkha}})</i></a> |
-            {% endif %}
         {% endif %}
         {{d.i.pos}}. {% if d.i.plus_case %} ({{d.i.plus_case}}) {% endif %}
         {{d.meaning|safe}} {% if d.summary %} [{{d.summary}}] {% endif %}

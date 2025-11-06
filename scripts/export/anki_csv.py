@@ -654,8 +654,9 @@ def dps(dpspth, dpd_db):
             i.sbs
             and (
                 i.sbs.class_anki
-                or i.sbs.sbs_category
-                or i.sbs.sbs_patimokkha
+                or i.sbs.discourses_example
+                or i.sbs.vib_example
+                or i.sbs.pat_example
                 or i.sbs.sbs_index
             )
         )
@@ -976,17 +977,16 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
         console.print("[bold red] sbs_anki_style_dir not found")
 
 
-def suttas(dpspth, dpd_db, unique_sbs_category_values):
+def suttas(dpspth, dpd_db):
     """Returns a list of rows for suttas csv."""
     console.print("[yellow]making suttas csv")
 
     def _is_needed(i: DpdHeadword):
-        return bool(i.sbs and i.sbs.sbs_category)
+        return bool(i.sbs and i.sbs.discourses_example)
 
     columns_names = [
         "id",
         "pali",
-        "sbs_category",
         "grammar",
         "neg",
         "verb",
@@ -1031,7 +1031,6 @@ def suttas(dpspth, dpd_db, unique_sbs_category_values):
         fields = [
             i.id,
             i.lemma_1,
-            i.sbs.sbs_category if i.sbs else None,
             *get_grammar_and_meaning(i),
             "",
             i.sanskrit,
@@ -1054,25 +1053,7 @@ def suttas(dpspth, dpd_db, unique_sbs_category_values):
 
         return none_to_empty(fields)
 
-    # Save category one by one to csvs
-    for sbs_category_value in unique_sbs_category_values:
-        output_path = os.path.join(
-            dpspth.anki_csvs_dps_dir,
-            "pali_class",
-            "suttas",
-            f"{sbs_category_value}.csv",
-        )
-        with open(output_path, "w", newline="", encoding="utf-8") as f:
-            writer = csv.writer(f, delimiter="\t")
-            writer.writerows(
-                (
-                    suttas_row(i)
-                    for i in dpd_db
-                    if _is_needed(i) and i.sbs.sbs_category == sbs_category_value
-                )
-            )
-
-    # Save all sbs_category
+    # Save all suttas
     rows_total = (suttas_row(i) for i in dpd_db if _is_needed(i))
     rows_total_list = list(rows_total)
     output_path = os.path.join(
@@ -1382,8 +1363,8 @@ def native(dpspth, dpd_db):
             i.sbs
             and (
                 i.sbs.class_anki
-                or i.sbs.sbs_category
-                or i.sbs.sbs_patimokkha
+                or i.sbs.discourses_example
+                or i.sbs.vib_example
                 or i.sbs.sbs_index
             )
         )
@@ -1440,16 +1421,6 @@ def main():
     unique_sbs_class_values = [value[0] for value in unique_sbs_class_values]
     unique_sbs_class_values.sort()
 
-    # make list of sbs categories
-    unique_sbs_category_values = (
-        db_session.query(SBS.sbs_category)
-        .filter(SBS.sbs_category != "")
-        .distinct()
-        .all()
-    )
-    unique_sbs_category_values = [value[0] for value in unique_sbs_category_values]
-    unique_sbs_category_values.sort()
-
     dpd_db = sorted(dpd_db, key=lambda x: pali_sort_key(x.lemma_1))
     console.print("[green] db has been set up and sorted successfully")
 
@@ -1458,7 +1429,7 @@ def main():
     parittas(dpspth, dpd_db)
     dps(dpspth, dpd_db)
     classes(dpspth, dpd_db, unique_sbs_class_values)
-    suttas(dpspth, dpd_db, unique_sbs_category_values)
+    suttas(dpspth, dpd_db)
     root_phonetic_class(dpspth, dpd_db, unique_sbs_class_values)
     vibhanga(dpspth, dpd_db)
     native(dpspth, dpd_db)

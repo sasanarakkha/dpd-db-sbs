@@ -13,23 +13,31 @@ from db.db_helpers import get_db_session
 from tools.cst_sc_text_sets import make_cst_text_list_from_file
 
 from db.models import SBS, DpdHeadword
+from sqlalchemy import or_
 
 
 pth: ProjectPaths = ProjectPaths()
 dpspth = DPSPaths()
 db_session = get_db_session(pth.dpd_db_path)
 
-field_to_check = "sbs_patimokkha"
+field_to_check = ["vib_example", "pat_example"]
 
 
-def dps_make_no_field_inflections_set(db_session, field):
+def dps_make_no_field_inflections_set(db_session, fields):
     """
     Generate a set of all inflections in the DPD database where the specified SBS field is not empty.
     """
     
+    if isinstance(fields, str):
+        fields = [fields]
+
+    conditions = [
+        or_(getattr(SBS, field) != "", getattr(SBS, field).isnot(None))
+        for field in fields
+    ]
+
     inflections_db = db_session.query(DpdHeadword).join(SBS, DpdHeadword.id == SBS.id).filter(
-        getattr(SBS, field).isnot(None),  
-        getattr(SBS, field) != ""       
+        or_(*conditions)
     ).all()
 
     dps_filtered_inflections_set = set()
@@ -73,7 +81,7 @@ def dps_make_words_to_add_list_from_text_no_field(
         pth,
         dpspth,
         db_session,
-        field,
+        fields,
     ) -> list:
     """
     Generalized function to create words to add lists with various configurations.
@@ -86,7 +94,7 @@ def dps_make_words_to_add_list_from_text_no_field(
     - inflection_func: Function to generate the inflection set.
     - book: The book name (optional).
     - sutta_name: The sutta name (optional).
-    - dpspth: Path for DPS files (optional).
+    - dpspth: Path for DPS files.
     - source: Source identifier (optional).
     - field: Field name for inflections (optional).
     - output_filename_template: Template for the output file name.
@@ -105,7 +113,7 @@ def dps_make_words_to_add_list_from_text_no_field(
     variant_list = make_variant_list(pth)
     sandhi_ok_list = make_sandhi_ok_list(pth)
 
-    all_inflections_set = dps_make_no_field_inflections_set(db_session, field)
+    all_inflections_set = dps_make_no_field_inflections_set(db_session, fields)
 
     # Filter the text set
     text_set = set(cst_text_list) | set(sc_text_list)
@@ -120,7 +128,10 @@ def dps_make_words_to_add_list_from_text_no_field(
     print(f"words_to_add: {len(text_list)}")
 
     # Determine filename
-    output_filename=f"temp/text_{field}.tsv"
+    if isinstance(fields, list):
+        output_filename=f"temp/text_{'_'.join(fields)}.tsv"
+    else:
+        output_filename=f"temp/text_{fields}.tsv"
 
     # Save to a file
     with open(output_filename, "w") as f:

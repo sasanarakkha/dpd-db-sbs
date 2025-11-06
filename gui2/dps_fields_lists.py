@@ -57,8 +57,6 @@
 "dps_extra_example"
 "dps_class_anki"
 "dps_sbs_class"
-"dps_sbs_category"
-"dps_sbs_patimokkha"
 """
 
 ALL_DPS = [
@@ -118,8 +116,6 @@ ALL_DPS = [
     "dps_extra_sutta",
     "dps_extra_example",
     "dps_sbs_class",
-    "dps_sbs_category",
-    "dps_sbs_patimokkha"
 ]
 
 
@@ -149,7 +145,6 @@ VIB_FIELDS = [
     "dps_vib_source",
     "dps_vib_sutta",
     "dps_vib_example",
-    "dps_sbs_patimokkha"
 ]
 
 CLASS_FIELDS = [

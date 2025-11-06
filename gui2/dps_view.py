@@ -327,7 +327,7 @@ class DpsView(ft.Column, PopUpMixin):
             DpdHeadword.meaning_1 != "",
             DpdHeadword.example_1 != "",
             Russian.ru_meaning == "",
-            SBS.sbs_patimokkha == "vib",
+            SBS.vib_example != "",
             # Russian.ru_meaning_raw != "",
         )
         
@@ -344,9 +344,9 @@ class DpsView(ft.Column, PopUpMixin):
             Russian.ru_notes.like("%ИИ%"),
             or_(
                 SBS.sbs_index.isnot(None),
-                SBS.sbs_category != '',
+                SBS.discourses_example != '',
                 SBS.sbs_index.isnot(None),
-                SBS.sbs_patimokkha != '',
+                SBS.vib_example != '',
             )
         )
 
@@ -518,9 +518,6 @@ class DpsView(ft.Column, PopUpMixin):
 
         # Get current values from database before updating
         current_sbs = fetch_sbs(self._db.db_session, headword_id)
-        old_vib_example = current_sbs.vib_example if current_sbs else ""
-        old_pat_example = current_sbs.pat_example if current_sbs else ""
-        old_sbs_patimokkha = current_sbs.sbs_patimokkha if current_sbs else ""
         
         # Special handling for class_example_translation - bulk update all matching records
         class_example_translation_field = self.dps_fields.fields.get("dps_class_example_translation")
@@ -551,10 +548,6 @@ class DpsView(ft.Column, PopUpMixin):
         # SBS field prefixes to process
         sbs_prefixes = ["sbs_", "dhp_", "pat_", "vib_", "class_", "discourses_"]
         
-        # Track new values for vib_example and pat_example
-        new_vib_example = ""
-        new_pat_example = ""
-        
         # Update SBS fields (excluding class_example_translation which was handled above)
         for field_name in self.dps_fields.fields:
             if field_name.startswith("dps_"):
@@ -569,29 +562,11 @@ class DpsView(ft.Column, PopUpMixin):
                         if hasattr(sbs_word, sbs_field_name):
                             field_value = values.get(field_name, "")
                             setattr(sbs_word, sbs_field_name, field_value)
-
-                            # Track vib_example and pat_example values for auto-population logic
-                            if sbs_field_name == "vib_example":
-                                new_vib_example = field_value
-                            elif sbs_field_name == "pat_example":
-                                new_pat_example = field_value
                                 
                         else:
                             print(f"ERROR: SBS field {sbs_field_name} not found in model")
                             self.update_message(f"ERROR: SBS field {sbs_field_name} not found in model")
                         break
-        
-        # Auto-populate sbs_patimokkha logic
-        if not old_sbs_patimokkha:  # Only if sbs_patimokkha is currently empty
-            # Check if vib_example changed from empty to non-empty
-            if not old_vib_example and new_vib_example:
-                sbs_word.sbs_patimokkha = "vib"
-                # print(f"DEBUG: Auto-populated sbs_patimokkha to 'vib' because vib_example was added")
-            
-            # Check if pat_example changed from empty to non-empty
-            elif not old_pat_example and new_pat_example:
-                sbs_word.sbs_patimokkha = "pat"
-                # print(f"DEBUG: Auto-populated sbs_patimokkha to 'pat' because pat_example was added")
 
 
     def _get_current_field_values(self) -> dict[str, str]:

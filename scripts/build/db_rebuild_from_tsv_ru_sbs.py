@@ -183,7 +183,8 @@ def make_russian_table_data(dpspth: DPSPaths, db_session: Session):
     counter = 0
     russian_files = get_tsv_files(dpspth.russian_path, "russian")
     for columns, row in read_tsv_files(russian_files):
-        data = dict(zip(columns, row))
+        # Filter out empty keys that might come from empty column headers
+        data = {k: v for k, v in zip(columns, row) if k}
         db_session.add(Russian(**data))
         counter += 1
     pr.yes(counter)
@@ -195,7 +196,8 @@ def make_sbs_table_data(dpspth: DPSPaths, db_session: Session):
     counter = 0
     sbs_files = get_tsv_files(dpspth.sbs_path, "sbs")
     for columns, row in read_tsv_files(sbs_files):
-        data = dict(zip(columns, row))
+        # Filter out empty keys that might come from empty column headers
+        data = {k: v for k, v in zip(columns, row) if k}
         db_session.add(SBS(**data))
         counter += 1
     pr.yes(counter)

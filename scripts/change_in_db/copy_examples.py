@@ -66,13 +66,12 @@ def update_column_for_some_criteria(source_value, column_to_update, value_to_upd
     console.print(f"[bold bright_green]Total rows fit criteria sbs: {len(rows_to_update_sbs)} : ")
 
     for __word__ in rows_to_update_sbs:
-        # old_value = __word__.sbs.sbs_patimokkha
-        old_value = getattr(__word__.sbs, column_to_update)
-        if not old_value:
-            # __word__.sbs.sbs_patimokkha = "vib"
-            setattr(__word__.sbs, column_to_update, value_to_update)
+        old_value = getattr(__word__.sbs, column_to_update) if column_to_update else None
+        if not old_value or not column_to_update:
+            if column_to_update:
+                setattr(__word__.sbs, column_to_update, value_to_update)
 
-            console.print(f"[bold bright_yellow]{__word__.id} {__word__.lemma_1} {value_to_update}")
+                console.print(f"[bold bright_yellow]{__word__.id} {__word__.lemma_1} {value_to_update}")
 
             # Check for source_value in sbs_source fields
             for idx in range(1, 3):  # Assuming there are 2 positions
@@ -87,19 +86,18 @@ def update_column_for_some_criteria(source_value, column_to_update, value_to_upd
 
             count_changed_sbs += 1
         else:
-            console.print(f"[bright_yellow] already {old_value} for {__word__.id} {__word__.lemma_1} ")
+            console.print(f"[bright_yellow]already {old_value} for {__word__.id} {__word__.lemma_1} ")
             count_already_have += 1
 
     console.print(f"[bold bright_green]Total rows fit criteria dpd: {len(rows_to_update)} : ")
 
     for __word__ in rows_to_update:
-        # value_with_dash = f"{value_to_update}_"
         if not __word__.sbs:
             # If SBS row does not exist, create a new one
-            # __word__.sbs = SBS(id=__word__.id, sbs_patimokkha="vib_")
             __word__.sbs = SBS(id=__word__.id)
-            setattr(__word__.sbs, column_to_update, value_to_update)
-            console.print(f"[bold bright_yellow]Added {__word__.id} {__word__.lemma_1} {value_to_update}")
+            if column_to_update:
+                setattr(__word__.sbs, column_to_update, value_to_update)
+                console.print(f"[bold bright_yellow]Added {__word__.id} {__word__.lemma_1} {value_to_update}")
             count_added += 1
             # Check for source_value in source fields
             for idx in range(1, 3):  # Assuming there are 2 positions
@@ -112,13 +110,12 @@ def update_column_for_some_criteria(source_value, column_to_update, value_to_upd
                         print(f"{__word__.id} {dpd_value}")
                     break
         else:
-            # old_value = __word__.sbs.sbs_patimokkha
-            old_value = getattr(__word__.sbs, column_to_update)
-            if not old_value:
-                # __word__.sbs.sbs_patimokkha = "vib_"
-                setattr(__word__.sbs, column_to_update, value_to_update)
+            old_value = getattr(__word__.sbs, column_to_update) if column_to_update else None
+            if not old_value or not column_to_update:
+                if column_to_update:
+                    setattr(__word__.sbs, column_to_update, value_to_update)
 
-                console.print(f"[bold bright_yellow]{__word__.id} {__word__.lemma_1} {value_to_update}")
+                    console.print(f"[bold bright_yellow]{__word__.id} {__word__.lemma_1} {value_to_update}")
 
                 count_changed += 1
                 # Check for source_value in source fields
@@ -149,12 +146,8 @@ def update_column_for_some_criteria(source_value, column_to_update, value_to_upd
 
 # !To use the functions:
 source_value = "VIN2.5.2.7"
-column_to_update = "sbs_patimokkha"
+column_to_update = ""
 value_to_update = "vib"
 modifier_column_to_copy = "vib"
 
 update_column_for_some_criteria(source_value, column_to_update, value_to_update, modifier_column_to_copy)
-
-
-
-

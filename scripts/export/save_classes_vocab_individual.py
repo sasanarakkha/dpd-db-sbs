@@ -14,7 +14,7 @@ from tools.paths import ProjectPaths
 from rich.console import Console
 from tools.paths_dps import DPSPaths
 from sqlalchemy.orm import joinedload
-from tools.sbs_table_functions import sbs_category_list
+# from tools.sbs_table_functions import sbs_category_list
 
 
 pth = ProjectPaths()
@@ -43,17 +43,17 @@ def main():
 
         print(f"Total words saved to all CSVs: {total_words_saved}")
 
-    print("saving words for vocab pali class")
-    # save vocab
-    for sbs_class in range(1, 30):
-        filename = os.path.join(dpspth.pali_class_vocab_dir, f'vocab_class_{sbs_class}.csv')
-        save_words_for_class_to_csv(sbs_class, filename)
+    # print("saving words for vocab pali class")
+    # # save vocab
+    # for sbs_class in range(1, 30):
+    #     filename = os.path.join(dpspth.pali_class_vocab_dir, f'vocab_class_{sbs_class}.csv')
+    #     save_words_for_class_to_csv(sbs_class, filename)
 
-    print("saving words with examples for discources")
-    # Iterate through all values in sbs_category_list
-    for sutta in sbs_category_list:
-        filename = os.path.join(dpspth.discourses_vocab_dir, f'vocab_{sutta}.csv')
-        save_words_for_discources(sutta, filename)
+    # print("saving words with examples for discources")
+    # # Iterate through all values in sbs_category_list
+    # for sutta in sbs_category_list:
+    #     filename = os.path.join(dpspth.discourses_vocab_dir, f'vocab_{sutta}.csv')
+    #     save_words_for_discources(sutta, filename)
 
 
     # Close the session
@@ -137,34 +137,34 @@ def save_words_for_class_to_csv(sbs_class: int, filename: str):
 
 
 
-def save_words_for_discources(sutta, filename: str):
-    # Get all words that meet the conditions
+# def save_words_for_discources(sutta, filename: str):
+#     # Get all words that meet the conditions
     
 
-    words = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.sbs)).join(SBS).filter(
-        SBS.sbs_category == sutta,
-        SBS.discourses_source == ""
-    ).all()
+#     words = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.sbs)).join(SBS).filter(
+#         SBS.sbs_category == sutta,
+#         SBS.discourses_source == ""
+#     ).all()
 
-    print(f"total words for {sutta}: {len(words)}")
+#     print(f"total words for {sutta}: {len(words)}")
 
-    # Open the CSV file and write the headers
-    with open(filename, 'w', newline='') as csvfile:
-        fieldnames = [
-            'id', 'pali', 'pos', 'meaning'
-            ]
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
+#     # Open the CSV file and write the headers
+#     with open(filename, 'w', newline='') as csvfile:
+#         fieldnames = [
+#             'id', 'pali', 'pos', 'meaning'
+#             ]
+#         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+#         writer.writeheader()
 
-        # Write each word to the CSV file
-        for word in words:
+#         # Write each word to the CSV file
+#         for word in words:
 
-            writer.writerow({
-                'id': word.id,
-                'pali': word.lemma_1,
-                'pos': word.pos,
-                'meaning': word.meaning_1
-            })
+#             writer.writerow({
+#                 'id': word.id,
+#                 'pali': word.lemma_1,
+#                 'pos': word.pos,
+#                 'meaning': word.meaning_1
+#             })
 
 
 def save_csv_files_to_xlsx(filename: str, writer):
