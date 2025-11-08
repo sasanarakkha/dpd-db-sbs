@@ -1,5 +1,61 @@
 [
     {
+        "id": 57829,
+        "lemma_1": "sattāhātikkanta"
+    },
+    {
+        "id": 49749,
+        "lemma_1": "bhārukaccha"
+    },
+    {
+        "id": 50106,
+        "lemma_1": "bhuttapātarāsa"
+    },
+    {
+        "id": 6175,
+        "lemma_1": "apathavisaññī"
+    },
+    {
+        "id": 87976,
+        "lemma_1": "jāta 9"
+    },
+    {
+        "id": 87977,
+        "lemma_1": "ajāta 3"
+    },
+    {
+        "id": 2933,
+        "lemma_1": "aduṭṭhullāpattisaññī"
+    },
+    {
+        "id": 2932,
+        "lemma_1": "aduṭṭhullāpatti"
+    },
+    {
+        "id": 33111,
+        "lemma_1": "duṭṭhullāpattisaññī"
+    },
+    {
+        "id": 33110,
+        "lemma_1": "duṭṭhullāpatti"
+    },
+    {
+        "id": 12550,
+        "lemma_1": "ārocetabba"
+    },
+    {
+        "id": 8547,
+        "lemma_1": "amātugāma"
+    },
+    {
+        "id": 30746,
+        "lemma_1": "tiracchānagatamanussaviggaha"
+    },
+    {
+        "id": 30747,
+        "lemma_1": "tiracchānagatamanussaviggahitthi"
+    },
+    {
         "id": 57062,
         "lemma_1": "saṅghāṭidhāraṇa"
     },
@@ -22,61 +78,5 @@
     {
         "id": 87973,
         "lemma_1": "pakāsetabba"
-    },
-    {
-        "id": 87972,
-        "lemma_1": "yojiyati"
-    },
-    {
-        "id": 87971,
-        "lemma_1": "ayojiyamāna"
-    },
-    {
-        "id": 87970,
-        "lemma_1": "vippakiranta"
-    },
-    {
-        "id": 87969,
-        "lemma_1": "vaḷañjitvā"
-    },
-    {
-        "id": 87968,
-        "lemma_1": "vaḷañjituṃ"
-    },
-    {
-        "id": 87967,
-        "lemma_1": "anuvijjitvā"
-    },
-    {
-        "id": 87966,
-        "lemma_1": "pāpuṇāpeti"
-    },
-    {
-        "id": 87965,
-        "lemma_1": "pāpuṇāpetvā"
-    },
-    {
-        "id": 87964,
-        "lemma_1": "lehituṃ"
-    },
-    {
-        "id": 87963,
-        "lemma_1": "lehitvā"
-    },
-    {
-        "id": 87962,
-        "lemma_1": "appatiṭṭhahitvā"
-    },
-    {
-        "id": 87961,
-        "lemma_1": "āthapetuṃ"
-    },
-    {
-        "id": 87960,
-        "lemma_1": "āthapetvā"
-    },
-    {
-        "id": 87959,
-        "lemma_1": "nissajji"
     }
 ]

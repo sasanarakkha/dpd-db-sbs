@@ -1,14 +1,13 @@
 {
     "dps_shared": {
-        "translation": "…and this practice of self-mortification, which is painful, ignoble, [and] unbeneficial.",
-        "anki": "26",
-        "source": "SN56.11",
-        "sutta": "dhammacakkappavattanasuttaṃ",
-        "example": "yo c'āyaṃ attakilamath'ānuyogo dukkho anariyo anatthasañhito."
+        "source": "VIN2.5.1.2",
+        "sutta": "omasavādasikkhāpadaṃ",
+        "example": "ukkaṭṭho nāma akkoso, paṇḍito'si, byatto'si, medhāvī'si, bahussuto'si, dhammakathiko'si, n'atthi tuyhaṃ duggati, sugati'y'eva tuyhaṃ pāṭikaṅkhā'ti, eso ukkaṭṭho nāma akkoso."
     },
     "dps_last": {
-        "source": "VIN1.2.8",
-        "sutta": "duṭṭhadosa sikkhāpada",
-        "example": "ye te bhikkhū tiracchānakathikā kāyadaḷhibahulā viharanti tesam'pi ekajjhaṃ sen'āsanaṃ paññapeti, imāya'p'ime āyasmanto ratiyā acchissantī'ti."
+        "extra": "extra",
+        "source": "VIN2.5.1.2",
+        "sutta": "omasavādasikkhāpadaṃ",
+        "example": "ukkaṭṭho nāma akkoso, paṇḍito'si, byatto'si, medhāvī'si, bahussuto'si, dhammakathiko'si, n'atthi tuyhaṃ duggati, sugati'y'eva tuyhaṃ pāṭikaṅkhā'ti, eso ukkaṭṭho nāma akkoso."
     }
 }
