@@ -643,6 +643,8 @@ class Pass2AddView(ft.Column, PopUpMixin):
                 if word_data:
                     self.corrections_manager.save_processed_correction(word_data)
 
+            self.page.set_clipboard(word_to_save.lemma_1)
+            
             self._update_history_dropdown()
             self.page.update()
             self.clear_all_fields()

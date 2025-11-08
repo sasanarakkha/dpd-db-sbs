@@ -35,7 +35,8 @@ class DpsFields:
         try:
             self._sbs_index_data = read_tsv_dot_dict(self.view.dpspth.sbs_index_path)
             pali_chants = sorted([i.pali_chant for i in self._sbs_index_data if i.pali_chant])
-            self._sbs_chant_options = [ft.dropdown.Option(key=chant, text=chant) for chant in pali_chants]
+            # Add empty option at the beginning for clearing dropdowns
+            self._sbs_chant_options = [ft.dropdown.Option(key=" ", text=" ")] + [ft.dropdown.Option(key=chant, text=chant) for chant in pali_chants]
         except Exception as e:
             print(f"Error loading SBS index: {e}")
 
@@ -88,6 +89,16 @@ class DpsFields:
             else:
                 # Standard Flet controls
                 if control_type == ft.Dropdown:
+                    # Ensure all dropdowns have proper empty option handling
+                    if "options" not in params:
+                        # If no options are provided, add an empty option
+                        params["options"] = [ft.dropdown.Option(" ", " ")]
+                    
+                    # Check if this is a dropdown that should have an empty option
+                    if params["options"] and not any(opt.key == " " for opt in params["options"]):
+                        # If options exist but no empty option, add one at the beginning
+                        params["options"] = [ft.dropdown.Option(" ", " ")] + params["options"]
+                    
                     if field_name in ["dps_sbs_chant_pali_1", "dps_sbs_chant_pali_2"]:
                         params["on_change"] = self._handle_sbs_chant_change
                     params["editable"] = True
@@ -104,9 +115,13 @@ class DpsFields:
         if isinstance(field, ft.Checkbox):
             field.value = bool(value)
         elif isinstance(field, ft.Dropdown):
-            # Dropdown.value expects str | None in flet; allow direct assignment
-            # Coerce value to str when it's not None to satisfy type checkers
-            field.value = str(value) if value is not None else None
+            # Special handling for dropdowns to ensure proper option matching
+            if value is None:
+                # For None values, set to empty string to match the empty option
+                field.value = ""
+            else:
+                # Coerce value to str when it's not None to satisfy type checkers
+                field.value = str(value)
         elif isinstance(field, DpsExampleField):
             field.text_field.value = str(value)
         elif isinstance(field, DpsMeaningField):
@@ -361,7 +376,19 @@ class DpsFields:
         # Determine the index (1 or 2) from the field name
         index = field_name.split('_')[-1]
 
-        # Find the corresponding data
+        # If empty option is selected, clear the related fields
+        if selected_chant == " ":
+            eng_chant_field = self.fields.get(f"dps_sbs_chant_eng_{index}")
+            chapter_field = self.fields.get(f"dps_sbs_chapter_{index}")
+
+            if eng_chant_field: 
+                self._set_field_value(eng_chant_field, "")
+            if chapter_field: 
+                self._set_field_value(chapter_field, "")
+            self.view.page.update()
+            return
+
+        # Find the corresponding data for non-empty selections
         for item in self._sbs_index_data:
             if item.pali_chant == selected_chant:
                 eng_chant_field = self.fields.get(f"dps_sbs_chant_eng_{index}")

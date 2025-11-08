@@ -56,7 +56,6 @@
 "dps_extra_sutta"
 "dps_extra_example"
 "dps_class_anki"
-"dps_sbs_class"
 """
 
 ALL_DPS = [
@@ -115,7 +114,6 @@ ALL_DPS = [
     "dps_extra_source",
     "dps_extra_sutta",
     "dps_extra_example",
-    "dps_sbs_class",
 ]
 
 
@@ -176,5 +174,4 @@ CLASS_FIELDS = [
     "dps_class_example_translation",
     "dps_class_extra",
     "dps_class_anki",
-    "dps_sbs_class",
 ]

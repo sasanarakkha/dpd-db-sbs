@@ -434,8 +434,11 @@ class DpsView(ft.Column, PopUpMixin):
         # Get current field values
         values = self._get_current_field_values()
         
+        # Convert None values to empty strings for test compatibility
+        test_values = {k: (v if v is not None else "") for k, v in values.items()}
+        
         # Run DPS tests using enhanced test manager with interactive dialog
-        self.dps_test_manager.run_all_tests(self, values)
+        self.dps_test_manager.run_all_tests(self, test_values)
 
 
     def _click_update_db(self, e: ft.ControlEvent) -> None:
@@ -500,7 +503,9 @@ class DpsView(ft.Column, PopUpMixin):
             if field_name.startswith("dps_ru_"):
                 ru_field_name = field_name.replace("dps_", "")
                 if hasattr(ru_word, ru_field_name):
-                    setattr(ru_word, ru_field_name, values.get(field_name, ""))
+                    field_value = values.get(field_name)
+                    # Convert None to empty string for database fields
+                    setattr(ru_word, ru_field_name, field_value if field_value is not None else "")
                 else:
                     print(f"ERROR: Russian field {ru_field_name} not found in model")
                     self.update_message(f"ERROR: Russian field {ru_field_name} not found in model")
@@ -522,7 +527,9 @@ class DpsView(ft.Column, PopUpMixin):
         # Special handling for class_example_translation - bulk update all matching records
         class_example_translation_field = self.dps_fields.fields.get("dps_class_example_translation")
         if class_example_translation_field:
-            new_value = values.get("dps_class_example_translation", "")
+            new_value = values.get("dps_class_example_translation")
+            # Convert None to empty string for database fields
+            new_value = new_value if new_value is not None else ""
             
             # Get current value from database
             current_value = current_sbs.class_example_translation if current_sbs else ""
@@ -560,8 +567,9 @@ class DpsView(ft.Column, PopUpMixin):
                     if field_name.startswith(f"dps_{prefix}"):
                         sbs_field_name = field_name.replace("dps_", "")
                         if hasattr(sbs_word, sbs_field_name):
-                            field_value = values.get(field_name, "")
-                            setattr(sbs_word, sbs_field_name, field_value)
+                            field_value = values.get(field_name)
+                            # Convert None to empty string for database fields
+                            setattr(sbs_word, sbs_field_name, field_value if field_value is not None else "")
                                 
                         else:
                             print(f"ERROR: SBS field {sbs_field_name} not found in model")
@@ -569,11 +577,16 @@ class DpsView(ft.Column, PopUpMixin):
                         break
 
 
-    def _get_current_field_values(self) -> dict[str, str]:
+    def _get_current_field_values(self) -> dict[str, str | None]:
         """Get current values from all DPS fields"""
         values = {}
         for field_name, field_control in self.dps_fields.fields.items():
-            # Use .value for TextFields, Dropdowns, etc. and handle None
-            values[field_name] = field_control.value or ""
+            # Preserve None values for dropdowns, convert empty strings to None for text fields
+            if isinstance(field_control, ft.Dropdown):
+                # For dropdowns, preserve None values to allow clearing
+                values[field_name] = field_control.value
+            else:
+                # For other fields, convert empty strings to None
+                values[field_name] = field_control.value if field_control.value else None
 
         return values
