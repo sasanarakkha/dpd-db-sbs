@@ -289,7 +289,6 @@ def update_note_values(note, i):
     if i.sbs:
         note["sbs_meaning"] = str(i.sbs.sbs_meaning)
         note["class_anki"] = str(i.sbs.class_anki)
-        note["sbs_class"] = str(i.sbs.sbs_class)
         note["sbs_source_1"] = str(i.sbs.sbs_source_1)
         note["sbs_sutta_1"] = str(i.sbs.sbs_sutta_1).replace("\n", "<br>")
         note["sbs_example_1"] = str(i.sbs.sbs_example_1).replace("\n", "<br>")

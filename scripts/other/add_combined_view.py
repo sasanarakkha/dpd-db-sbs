@@ -31,7 +31,6 @@ def main():
             SELECT 
                 COALESCE(dpd_headwords.id, '') AS id,
                 COALESCE(dpd_headwords.ebt_count, '') AS count,
-                COALESCE(sbs.sbs_class, '') AS class,
                 COALESCE(sbs.class_anki, '') AS anki,
                 COALESCE(sbs.sbs_index, '') AS PER,
                 COALESCE(dpd_headwords.lemma_1, '') AS lemma_1, 

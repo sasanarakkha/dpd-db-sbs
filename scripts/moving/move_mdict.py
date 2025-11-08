@@ -20,7 +20,7 @@ if config_test("dictionary", "make_mdict", "yes"):
    script_dir = os.path.dirname(os.path.realpath(__file__))
    deva_dir = os.path.abspath(os.path.join(script_dir, '..', '..', '..', '..'))
 
-   sync_mdict_dir = os.path.join(deva_dir, 'Library', 'Mobile Documents', 'com~apple~CloudDocs', 'MDict ')
+   sync_mdict_dir = os.path.join(deva_dir, 'Library', 'Mobile Documents', 'com~apple~CloudDocs', 'Documents', 'MDict')
 
    share_dir = os.path.join(
       deva_dir, 
