@@ -6,6 +6,7 @@ import flet as ft
 from db.models import DpdHeadword
 from gui2.toolkit import ToolKit
 from gui2.ui_utils import show_global_snackbar
+from tools.spelling import CustomSpellChecker
 
 if TYPE_CHECKING:
     from db.models import DpdHeadword
@@ -16,7 +17,7 @@ class DpdDatatable(ft.DataTable):
         super().__init__(
             columns=columns,
             rows=rows,
-            data_text_style=ft.TextStyle(size=12, color=ft.Colors.GREY_300),
+            data_text_style=ft.TextStyle(size=15, color=ft.Colors.GREY_300),
             border=ft.border.all(2, ft.Colors.BLACK),
             horizontal_lines=ft.border.BorderSide(1, ft.Colors.GREY_300),
             vertical_lines=ft.border.BorderSide(1, ft.Colors.GREY_300),
@@ -24,7 +25,7 @@ class DpdDatatable(ft.DataTable):
             column_spacing=20,
             horizontal_margin=10,
             heading_text_style=ft.TextStyle(
-                color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD, size=12
+                color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD, size=15
             ),
             heading_row_height=30,
             data_row_min_height=30,
@@ -48,11 +49,13 @@ class CellTextField(ft.TextField):
         super().__init__(
             value=text,
             multiline=True,
-            border_radius=20,
-            border=ft.InputBorder.NONE,
+            border_radius=0,
+            border=ft.InputBorder.OUTLINE,
+            border_width=3,
+            border_color=ft.Colors.TRANSPARENT,
             text_align=ft.TextAlign.LEFT,
             text_style=ft.TextStyle(
-                size=12,
+                size=15,
                 color=ft.Colors.GREY_300,
             ),
         )
@@ -73,6 +76,7 @@ class FilterComponent(ft.Column):
         super().__init__(expand=True, spacing=5, controls=[])
         self.page: ft.Page = page
         self.toolkit: ToolKit = toolkit
+        self.spellchecker = CustomSpellChecker()
 
         # State management
         self.filtered_results: list["DpdHeadword"] = []
@@ -300,13 +304,21 @@ class FilterComponent(ft.Column):
 
                 text_field = CellTextField(text=value_str)
 
+                if col_name in ["meaning_1", "meaning_lit", "meaning_2"]:
+                    self._check_and_set_spell_border(text_field, value_str)
+
                 if col_name == "id":
                     text_field.read_only = True
                     text_field.multiline = False
                 else:
 
                     def make_on_change_handler(r, c):
-                        return lambda e: self._on_cell_change(e, r, c)
+                        def on_change_wrapper(e):
+                            self._on_cell_change(e, r, c)
+                            if c in ["meaning_1", "meaning_lit", "meaning_2"]:
+                                self._spell_check_cell(e)
+
+                        return on_change_wrapper
 
                     text_field.on_change = make_on_change_handler(row_index, col_name)
 
@@ -378,6 +390,24 @@ class FilterComponent(ft.Column):
             import traceback
 
             print(f"Full traceback: {traceback.format_exc()}")
+
+    def _check_and_set_spell_border(self, field: ft.TextField, value: str):
+        if not value:
+            field.border_color = ft.Colors.TRANSPARENT
+            return
+
+        clean_value = re.sub(r"<[^>]+>", "", value)
+        misspelled = self.spellchecker.check_sentence(clean_value)
+
+        if misspelled:
+            field.border_color = ft.Colors.RED
+        else:
+            field.border_color = ft.Colors.TRANSPARENT
+
+    def _spell_check_cell(self, e: ft.ControlEvent) -> None:
+        """Spell check cell content and update border."""
+        self._check_and_set_spell_border(e.control, e.control.value)
+        self.page.update()
 
     def _on_cell_change(
         self, e: ft.ControlEvent, row_index: int, col_name: str

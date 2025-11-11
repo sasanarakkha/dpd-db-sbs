@@ -11,6 +11,9 @@
         {% endif %}
         <span class="gray"> | </span>
         {% endif %}
+        {% if d.sbs.sbs_category %}
+        <a href="{{d.sbs.sbs_sutta_link}}" target="_blank"><i>({{d.sbs.sbs_category}})</i></a> |
+        {% endif %}
         {% endif %}
 
         {{d.i.pos}}.

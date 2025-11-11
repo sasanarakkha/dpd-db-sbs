@@ -85,10 +85,10 @@ class Pass2AddView(ft.Column, PopUpMixin):
             color=ft.Colors.BLUE_200,
             expand_loose=True,
             expand=True,
-            hint_style=ft.TextStyle(color=LABEL_COLOUR, size=10),
+            hint_style=ft.TextStyle(color=LABEL_COLOUR, size=15),
             hint_text="Messages",
             read_only=True,
-            text_size=14,
+            text_size=17,
             width=700,
         )
         self._pass2_auto_button = ft.ElevatedButton(
@@ -114,10 +114,10 @@ class Pass2AddView(ft.Column, PopUpMixin):
             border_radius=20,
             expand_loose=True,
             expand=True,
-            hint_style=ft.TextStyle(color=LABEL_COLOUR, size=10),
+            hint_style=ft.TextStyle(color=LABEL_COLOUR, size=15),
             hint_text="Enter ID or Lemma",
             on_submit=self._click_edit_headword,
-            text_size=14,
+            text_size=17,
             width=400,
         )
         self._clone_headword_button = ft.ElevatedButton(
@@ -143,7 +143,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
             expand=True,
             expand_loose=True,
             border_radius=20,
-            text_size=14,
+            text_size=17,
             on_change=self._handle_history_selection,
         )
 
@@ -687,7 +687,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
             modal=True,
             content=ft.Column(
                 controls=[
-                    ft.Text("Delete Confirmation", color=ft.Colors.RED_900, size=20),
+                    ft.Text("Delete Confirmation", color=ft.Colors.RED_900, size=25),
                     ft.Text("Are you sure you want to delete?"),
                     ft.Text(
                         str(self.headword.id),

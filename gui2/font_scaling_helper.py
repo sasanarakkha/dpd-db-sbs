@@ -1,6 +1,5 @@
 """Helper module to apply font scaling to common view files."""
 
-import os
 from pathlib import Path
 
 scale_factor: float = 1.5
@@ -46,7 +45,6 @@ def apply_font_scaling_to_gui2(scale_factor) -> None:
         gui2_dir / "pass2_auto_view.py",
         gui2_dir / "pass2_add_view.py",
         gui2_dir / "pass2_pre_view.py",
-        gui2_dir / "dps_view.py",
         gui2_dir / "tests_tab_view.py",
         gui2_dir / "filter_tab_view.py",
         # Tab view files
@@ -66,9 +64,6 @@ def apply_font_scaling_to_gui2(scale_factor) -> None:
         gui2_dir / "dpd_fields_functions.py",
         gui2_dir / "dpd_fields_meaning.py",
         gui2_dir / "dpd_fields_notes.py",
-        # DPS field files
-        gui2_dir / "dps_fields.py",
-        gui2_dir / "dps_example_field.py",
         # Popup and widget files
         gui2_dir / "wordfinder_popup.py",
         gui2_dir / "wordfinder_widget.py",
