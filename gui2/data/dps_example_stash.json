@@ -1,13 +1,16 @@
 {
     "dps_shared": {
-        "source": "VIN2.5.1.2",
-        "sutta": "omasavādasikkhāpadaṃ",
-        "example": "ukkaṭṭho nāma akkoso, paṇḍito'si, byatto'si, medhāvī'si, bahussuto'si, dhammakathiko'si, n'atthi tuyhaṃ duggati, sugati'y'eva tuyhaṃ pāṭikaṅkhā'ti, eso ukkaṭṭho nāma akkoso."
+        "translation": "If thought processes were yourself, monks, then thought processes would/could not lead to affliction, this could be obtained from (lit. in) mental processes, \"May my mental processes be like this, may my mental processes not be like this.\"",
+        "anki": "22",
+        "source": "SN22.59",
+        "sutta": "anattalakkhaṇasuttaṃ",
+        "example": "saṅkhārā ca h'idaṃ, bhikkhave, attā abhavissaṃsu, na'y'idaṃ saṅkhārā ābādhāya saṃvatteyyuṃ, labbhetha ca saṅkhāresu, evaṃ me saṅkhārā hontu, evaṃ me saṅkhārā mā ahesun'ti."
     },
     "dps_last": {
-        "extra": "extra",
-        "source": "VIN2.5.1.2",
-        "sutta": "omasavādasikkhāpadaṃ",
-        "example": "ukkaṭṭho nāma akkoso, paṇḍito'si, byatto'si, medhāvī'si, bahussuto'si, dhammakathiko'si, n'atthi tuyhaṃ duggati, sugati'y'eva tuyhaṃ pāṭikaṅkhā'ti, eso ukkaṭṭho nāma akkoso."
+        "translation": "If thought processes were yourself, monks, then thought processes would/could not lead to affliction, this could be obtained from (lit. in) mental processes, \"May my mental processes be like this, may my mental processes not be like this.\"",
+        "anki": "22",
+        "source": "SN22.59",
+        "sutta": "anattalakkhaṇasuttaṃ",
+        "example": "saṅkhārā ca h'idaṃ, bhikkhave, attā abhavissaṃsu, na'y'idaṃ saṅkhārā ābādhāya saṃvatteyyuṃ, labbhetha ca saṅkhāresu, evaṃ me saṅkhārā hontu, evaṃ me saṅkhārā mā ahesun'ti."
     }
 }

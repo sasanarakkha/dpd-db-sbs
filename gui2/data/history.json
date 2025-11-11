@@ -1,5 +1,17 @@
 [
     {
+        "id": 77954,
+        "lemma_1": "saddhānusārī 2"
+    },
+    {
+        "id": 58079,
+        "lemma_1": "saddhānusārī 1"
+    },
+    {
+        "id": 74135,
+        "lemma_1": "jīvitenūpapanna"
+    },
+    {
         "id": 57829,
         "lemma_1": "sattāhātikkanta"
     },
@@ -66,17 +78,5 @@
     {
         "id": 74169,
         "lemma_1": "kammavisuddhi"
-    },
-    {
-        "id": 87975,
-        "lemma_1": "bhinna 4"
-    },
-    {
-        "id": 87974,
-        "lemma_1": "āpanna 5"
-    },
-    {
-        "id": 87973,
-        "lemma_1": "pakāsetabba"
     }
 ]
