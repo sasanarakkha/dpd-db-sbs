@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This script is a wrapper for run_and_log.sh
-# It executes scripts/bash/make_dpd.sh or make_ru_dpd.sh with logging and rotation.
+# It executes scripts/bash/make_dpd.sh or make_ru_dpd.sh or copy_dpd_to_server with logging and rotation.
 
 # Determine the directory of this script
 PROJECT_ROOT="$HOME/Documents/dpd-db"
@@ -11,11 +11,13 @@ MASTER_SCRIPT="$HOME/.local/bin/run_and_log.sh"
 LOG_BASE_NAME="make_dpd"
 TARGET_SCRIPT_PATH="${PROJECT_ROOT}/scripts/bash/make_dpd.sh"
 TARGET_SCRIPT_PATH_RU="${PROJECT_ROOT}/scripts/bash/make_ru_dpd.sh"
+TARGET_SCRIPT_PATH_COPY="${PROJECT_ROOT}/scripts/bash/copy_dpd_to_server"
 
 
 # The command to run, including 'uv run bash'
 COMMAND_TO_EXECUTE=(bash -c "cd '${PROJECT_ROOT}' && uv run bash '${TARGET_SCRIPT_PATH}'")
 COMMAND_TO_EXECUTE_RU=(bash -c "cd '${PROJECT_ROOT}' && uv run bash '${TARGET_SCRIPT_PATH_RU}'")
+COMMAND_TO_EXECUTE_COPY=(bash -c "cd '${PROJECT_ROOT}' && uv run bash '${TARGET_SCRIPT_PATH_COPY}'")
 
 # Execute the master script
 
@@ -47,6 +49,23 @@ while true; do
     case $user_input in
         [Yy]* )
             bash "${MASTER_SCRIPT}" "${LOG_BASE_NAME}" "${COMMAND_TO_EXECUTE_RU[@]}"
+            break;;
+        * )
+            break;;
+    esac
+done
+
+while true; do
+    echo -ne "\033[1;34m copy to the server? \033[0m"
+    read -n 1 -s user_input
+    echo
+    if [[ $user_input == "q" ]]; then
+        echo -e "\n\033[1;31m Aborted by user.\033[0m"
+        exit 1
+    fi
+    case $user_input in
+        [Yy]* )
+            bash "${MASTER_SCRIPT}" "${LOG_BASE_NAME}" "${COMMAND_TO_EXECUTE_COPY[@]}"
             break;;
         * )
             break;;

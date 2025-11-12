@@ -4,6 +4,9 @@
 from pathlib import Path
 from datetime import date
 from zipfile import ZipFile
+from tools.printer import printer as pr
+
+pr.tic()
 
 today: date = date.today()
 
@@ -57,3 +60,5 @@ if dpd_mdict_src.exists():
     print("\033[1;32m mdict deconstructor and grammar and variants has been unpacked to share \033[0m")
 else:
     print(f"\033[1;31m {dpd_mdict_src} is missing. Cannot proceed with unpacking. \033[0m")
+
+pr.toc()

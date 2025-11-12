@@ -116,7 +116,7 @@ while true; do
 done
 
 while true; do
-    echo -ne "\033[1;34m need to create wordtree for all classes? \033[0m"
+    echo -ne "\033[1;34m need to update offline materials for classes? \033[0m"
     read -n 1 -s yn
     echo
     if [[ $yn == "q" ]]; then
@@ -125,8 +125,9 @@ while true; do
     fi
     case $yn in
         [Yy]* )
-            echo -e "\033[1;33m creating wordtree...\033[0m"
-            uv run bash scripts/bash/wordtree.sh
+            echo -e "\033[1;33m downloading and copying class materials...\033[0m"
+            uv run bash scripts/bash/download_pali_classes.sh
+            uv run python scripts/moving/unzip_classes_to_filesrv.py
             break;;
         * )
             break;;

@@ -11,7 +11,7 @@ if [ ! -e "dpd.db" ]; then
 fi
 
 uv run python tools/version.py
-# uv run scripts/build/config_uposatha_day.py
+uv run scripts/build/config_uposatha_day.py
 
 uv run python db/inflections/create_inflection_templates.py
 uv run python db/inflections/generate_inflection_tables.py

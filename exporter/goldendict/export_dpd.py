@@ -326,6 +326,7 @@ def _parse_batch_top_level(
     path: ProjectPaths,
     render_data: DpdHeadwordRenderData,
     show_sbs_data: bool,
+    show_ru_data: bool,
     dpd_data_results_list: ListProxy,
     rendered_sizes_results_list: ListProxy,
     show_grammar: bool,
@@ -343,7 +344,7 @@ def _parse_batch_top_level(
 
     res: List[Tuple[DictEntry, RenderedSizes]] = [
         render_pali_word_dpd_html(
-            i, full_render_data, show_sbs_data, show_grammar
+            i, full_render_data, show_sbs_data, show_ru_data, show_grammar
         )
         for i in batch
     ]
@@ -469,6 +470,7 @@ def generate_dpd_html(
                     paths,  # Pass paths separately
                     render_data,
                     show_sbs_data,
+                    show_ru_data,
                     dpd_data_results_list,
                     rendered_sizes_results_list,
                     show_grammar

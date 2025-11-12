@@ -5,6 +5,9 @@
 from pathlib import Path
 from datetime import date
 from zipfile import ZipFile
+from tools.printer import printer as pr
+
+pr.tic()
 
 today: date = date.today()
 
@@ -42,3 +45,5 @@ if dpd_mdict_src.exists():
     print("\033[1;32m dpd_mdict.zip has been unpacked to MDict folder, please Sync \033[0m")
 else:
     print(f"\033[1;31m {dpd_mdict_src} is missing. Cannot proceed with unpacking. \033[0m")
+
+pr.toc()

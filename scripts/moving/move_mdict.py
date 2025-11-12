@@ -6,6 +6,9 @@ from datetime import date
 import os
 from zipfile import ZipFile
 from tools.configger import config_test
+from tools.printer import printer as pr
+
+pr.tic()
 
 today = date.today()
 
@@ -45,3 +48,5 @@ if config_test("dictionary", "make_mdict", "yes"):
 
 else:
    print("moving is disabled in the config")
+
+pr.toc()

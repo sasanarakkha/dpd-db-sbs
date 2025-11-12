@@ -7,6 +7,9 @@ from datetime import date
 from zipfile import ZipFile
 
 import shutil
+from tools.printer import printer as pr
+
+pr.tic()
 
 today: date = date.today()
 
@@ -88,7 +91,7 @@ else:
    print(f"\033[1;31m {dpd_pdf_src} is missing. Cannot proceed with unziping. \033[0m")
 
 
-
+pr.toc()
 
 
 
