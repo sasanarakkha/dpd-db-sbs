@@ -28,30 +28,17 @@ gd_dir: Path = software_dir / "Golden Dictionary" / "Default"
 md_dir: Path = software_dir / "MDict" / "dpd"
 kd_dir: Path = software_dir / "Ebook Readers Dictionary"
 
-dpd_goldendict_src: Path = share_sbs_dir / "dpd"
 dpd_zip_src: Path = share_sbs_dir / "dpd.zip"
 dpd_mdict_src_mdx: Path = share_sbs_dir / "dpd-mdict.mdx"
 dpd_mdict_src_mdd: Path = share_sbs_dir / "dpd-mdict.mdd"
 
-# # dpd_goldendict copy folder to the specified directory
-# if dpd_goldendict_src.exists():
-#    # Copy the dpd folder to the Golden Dictionary directory
-#    # Remove existing destination folder if it exists to ensure a clean copy
-#    destination_path = gd_dir / dpd_goldendict_src.name
-#    if destination_path.exists():
-#       shutil.rmtree(destination_path)
-#    shutil.copytree(dpd_goldendict_src, destination_path)
-#    # Print completion message in green color
-#    print("\033[1;32m dpd folder has been copied to the server folder \033[0m")
-# else:
-#    print(f"\033[1;31m {dpd_goldendict_src} is missing. Cannot proceed with copying. \033[0m")
-
 # unzip dpd
 if dpd_zip_src.exists():
    # Unzip to the specified directory
+   destination_path = gd_dir / "dpd"
    with ZipFile(dpd_zip_src, 'r') as zipObj:
       # Extract all the contents of zip file in current directory
-      zipObj.extractall(gd_dir)
+      zipObj.extractall(destination_path)
    # Print completion message in green color
    print("\033[1;32m dpd_zip_src has been unpacked to the server folder \033[0m")
 else:
