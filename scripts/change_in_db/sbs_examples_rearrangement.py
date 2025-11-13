@@ -68,11 +68,52 @@ def dhp():
                         count += 1 # Increment once per record
                         break
 
-    db_session.commit()
+    # db_session.commit()
     db_session.close()
     print(f"dhp examples has been added to {count} records.")
     print(f"dhp examples has been added to existing {count_sbs} records.")
 
 
+def extra_example_rearrangement():
+    # Sanity check: Ensure DpdHeadword IDs are unique in the fetched list
+    # This is a safeguard in case the initial query somehow returns duplicates,
+    # which should not happen for primary keys but can be a symptom of deeper issues.
+    unique_db_list = []
+    seen_ids_for_dedup = set()
+    for item in db:
+        if item.id not in seen_ids_for_dedup:
+            seen_ids_for_dedup.add(item.id)
+            unique_db_list.append(item)
+
+    # Use the de-duplicated list for processing
+    processed_db_items = unique_db_list
+
+    count_copy = 0
+    count_clear = 0
+    with db_session.no_autoflush:
+        for i in processed_db_items:
+            if i.sbs and i.sbs.sbs_example_2:
+                # Copy from sbs_example_2 to extra_example if extra_example is empty
+                if not i.sbs.extra_example and not i.sbs.sbs_chapter_2:
+                    i.sbs.extra_source = getattr(i.sbs, 'sbs_source_2', '')
+                    i.sbs.extra_sutta = getattr(i.sbs, 'sbs_sutta_2', '')
+                    i.sbs.extra_example = getattr(i.sbs, 'sbs_example_2', '')
+                    count_copy += 1
+
+                # Clear sbs_example_2 fields if sbs_chapter_2 is empty
+                if not i.sbs.sbs_chapter_2:
+                    setattr(i.sbs, 'sbs_source_2', '')
+                    setattr(i.sbs, 'sbs_sutta_2', '')
+                    setattr(i.sbs, 'sbs_example_2', '')
+                    count_clear += 1
+
+    # db_session.commit()
+    db_session.close()
+    print(f"extra_example has been copied from sbs_example_2 in {count_copy} records.")
+    print(f"sbs_example_2 has been cleared in {count_clear} records.")
+
+
 if __name__ == "__main__":
-    dhp()
+    print("sbs_example_rearrangement")
+    # dhp()
+    # extra_example_rearrangement()

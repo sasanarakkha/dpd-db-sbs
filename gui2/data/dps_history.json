@@ -1,5 +1,57 @@
 [
     {
+        "id": 28449,
+        "lemma_1": "jiṇṇa 3"
+    },
+    {
+        "id": 28447,
+        "lemma_1": "jiṇṇa 1"
+    },
+    {
+        "id": 63509,
+        "lemma_1": "sukhallikā"
+    },
+    {
+        "id": 21067,
+        "lemma_1": "kāmasukhallikā"
+    },
+    {
+        "id": 60600,
+        "lemma_1": "sambojjhaṅga"
+    },
+    {
+        "id": 70516,
+        "lemma_1": "vevaṇṇiya 1"
+    },
+    {
+        "id": 50478,
+        "lemma_1": "makkhita"
+    },
+    {
+        "id": 64215,
+        "lemma_1": "subhaga"
+    },
+    {
+        "id": 24733,
+        "lemma_1": "gāthābhigīta"
+    },
+    {
+        "id": 10832,
+        "lemma_1": "aha 1.1"
+    },
+    {
+        "id": 45921,
+        "lemma_1": "pāva"
+    },
+    {
+        "id": 30165,
+        "lemma_1": "tassa 3"
+    },
+    {
+        "id": 4664,
+        "lemma_1": "anupadajjeyya 2"
+    },
+    {
         "id": 74149,
         "lemma_1": "idaṃ 3"
     },
@@ -46,57 +98,5 @@
     {
         "id": 78022,
         "lemma_1": "sappaṭigha 2"
-    },
-    {
-        "id": 58666,
-        "lemma_1": "sappaṭigha 1"
-    },
-    {
-        "id": 6813,
-        "lemma_1": "appaṭigha 2"
-    },
-    {
-        "id": 56633,
-        "lemma_1": "saṅkassara"
-    },
-    {
-        "id": 77954,
-        "lemma_1": "saddhānusārī 2"
-    },
-    {
-        "id": 58079,
-        "lemma_1": "saddhānusārī 1"
-    },
-    {
-        "id": 34959,
-        "lemma_1": "dhammānusārī 2"
-    },
-    {
-        "id": 34958,
-        "lemma_1": "dhammānusārī 1"
-    },
-    {
-        "id": 22946,
-        "lemma_1": "koci 2"
-    },
-    {
-        "id": 22945,
-        "lemma_1": "koci 1"
-    },
-    {
-        "id": 34020,
-        "lemma_1": "deva 3"
-    },
-    {
-        "id": 34021,
-        "lemma_1": "deva 4"
-    },
-    {
-        "id": 26759,
-        "lemma_1": "cira"
-    },
-    {
-        "id": 2,
-        "lemma_1": "a 2.1"
     }
 ]
