@@ -72,7 +72,7 @@ safe_copy_dir_contents() {
     # --times: preserve modification times
     # --no-perms, --no-owner, --no-group: avoid permission issues on network shares
     # The trailing slash on "${src_dir}/" ensures rsync copies the *contents* of the source directory.
-    if rsync -r --times --no-perms --no-owner --no-group "${src_dir}/" "$dest_dir/"; then
+    if rsync -r --times --no-perms --no-owner --no-group --exclude '.DS_Store' "${src_dir}/" "$dest_dir/"; then
         echo "Successfully copied contents of '$src_dir' to '$dest_dir'."
     else
         echo "Error: Failed to copy contents of '$src_dir' to '$dest_dir' using rsync. Check permissions and paths."

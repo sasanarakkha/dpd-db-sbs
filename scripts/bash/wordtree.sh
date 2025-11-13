@@ -43,12 +43,9 @@ find . -wholename './class13/*' | xargs rm -rf
 find . -wholename './class14/*' | xargs rm -rf
 
 
-cp -X -rf "$HOME/Documents/dps/word-frequency/pics-wordtree/wordtree" "$HOME/filesrv1/share1/Sharing between users/13 For Pāli class/"
+rsync -a --exclude '.DS_Store' "$HOME/Documents/dps/word-frequency/pics-wordtree/wordtree/" "$HOME/filesrv1/share1/Sharing between users/13 For Pāli class/wordtree/"
 
-cp -rf "$HOME/Documents/dps/word-frequency/pics-wordtree/wordtree" "$HOME/Documents/sasanarakkha/study-tools/pali-class/"
+rsync -a --exclude '.DS_Store' "$HOME/Documents/dps/word-frequency/pics-wordtree/wordtree/" "$HOME/Documents/sasanarakkha/study-tools/pali-class/wordtree/"
 
 
 echo "all pics-wordtree - done"
-
-
-
