@@ -1,5 +1,9 @@
 [
     {
+        "id": 38228,
+        "lemma_1": "nisedha 2"
+    },
+    {
         "id": 77954,
         "lemma_1": "saddhānusārī 2"
     },
@@ -74,9 +78,5 @@
     {
         "id": 57063,
         "lemma_1": "saṅghāṭidhāraṇamatta"
-    },
-    {
-        "id": 74169,
-        "lemma_1": "kammavisuddhi"
     }
 ]

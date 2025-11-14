@@ -1,5 +1,65 @@
 [
     {
+        "id": 32877,
+        "lemma_1": "dukkha 3"
+    },
+    {
+        "id": 53661,
+        "lemma_1": "yathābhūtaṃ"
+    },
+    {
+        "id": 39702,
+        "lemma_1": "pajānāti"
+    },
+    {
+        "id": 32878,
+        "lemma_1": "dukkha 4"
+    },
+    {
+        "id": 38486,
+        "lemma_1": "nivesana 2"
+    },
+    {
+        "id": 38485,
+        "lemma_1": "nivesana 1"
+    },
+    {
+        "id": 29061,
+        "lemma_1": "ṭhānaṃ"
+    },
+    {
+        "id": 29033,
+        "lemma_1": "ṭhāna 02"
+    },
+    {
+        "id": 37086,
+        "lemma_1": "nijjhāyati 2"
+    },
+    {
+        "id": 37085,
+        "lemma_1": "nijjhāyati 1"
+    },
+    {
+        "id": 29020,
+        "lemma_1": "ṭhapetvā 4"
+    },
+    {
+        "id": 29018,
+        "lemma_1": "ṭhapetvā 2"
+    },
+    {
+        "id": 32985,
+        "lemma_1": "dukkhaṃ"
+    },
+    {
+        "id": 53747,
+        "lemma_1": "yadi 1"
+    },
+    {
+        "id": 53748,
+        "lemma_1": "yadi 2"
+    },
+    {
         "id": 28449,
         "lemma_1": "jiṇṇa 3"
     },
@@ -38,65 +98,5 @@
     {
         "id": 10832,
         "lemma_1": "aha 1.1"
-    },
-    {
-        "id": 45921,
-        "lemma_1": "pāva"
-    },
-    {
-        "id": 30165,
-        "lemma_1": "tassa 3"
-    },
-    {
-        "id": 4664,
-        "lemma_1": "anupadajjeyya 2"
-    },
-    {
-        "id": 74149,
-        "lemma_1": "idaṃ 3"
-    },
-    {
-        "id": 74150,
-        "lemma_1": "nayidaṃ 2"
-    },
-    {
-        "id": 48189,
-        "lemma_1": "bahulī"
-    },
-    {
-        "id": 2718,
-        "lemma_1": "atthaṃ"
-    },
-    {
-        "id": 18875,
-        "lemma_1": "orenaddhamāsa"
-    },
-    {
-        "id": 62924,
-        "lemma_1": "sindhava 1"
-    },
-    {
-        "id": 3545,
-        "lemma_1": "anatta 2"
-    },
-    {
-        "id": 19083,
-        "lemma_1": "ovassāpeti"
-    },
-    {
-        "id": 57910,
-        "lemma_1": "satthuka"
-    },
-    {
-        "id": 2407,
-        "lemma_1": "atītasatthuka"
-    },
-    {
-        "id": 18062,
-        "lemma_1": "evañca"
-    },
-    {
-        "id": 78022,
-        "lemma_1": "sappaṭigha 2"
     }
 ]
