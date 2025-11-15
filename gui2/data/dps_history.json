@@ -1,5 +1,37 @@
 [
     {
+        "id": 79749,
+        "lemma_1": "ayana 2"
+    },
+    {
+        "id": 8732,
+        "lemma_1": "ayana 1"
+    },
+    {
+        "id": 52579,
+        "lemma_1": "micchāājīva 1"
+    },
+    {
+        "id": 19835,
+        "lemma_1": "kathaṃkathī"
+    },
+    {
+        "id": 37206,
+        "lemma_1": "nidānaṃ"
+    },
+    {
+        "id": 37192,
+        "lemma_1": "nidāna 1"
+    },
+    {
+        "id": 1573,
+        "lemma_1": "aññamañña"
+    },
+    {
+        "id": 60293,
+        "lemma_1": "sampanna 3"
+    },
+    {
         "id": 32877,
         "lemma_1": "dukkha 3"
     },
@@ -66,37 +98,5 @@
     {
         "id": 28447,
         "lemma_1": "jiṇṇa 1"
-    },
-    {
-        "id": 63509,
-        "lemma_1": "sukhallikā"
-    },
-    {
-        "id": 21067,
-        "lemma_1": "kāmasukhallikā"
-    },
-    {
-        "id": 60600,
-        "lemma_1": "sambojjhaṅga"
-    },
-    {
-        "id": 70516,
-        "lemma_1": "vevaṇṇiya 1"
-    },
-    {
-        "id": 50478,
-        "lemma_1": "makkhita"
-    },
-    {
-        "id": 64215,
-        "lemma_1": "subhaga"
-    },
-    {
-        "id": 24733,
-        "lemma_1": "gāthābhigīta"
-    },
-    {
-        "id": 10832,
-        "lemma_1": "aha 1.1"
     }
 ]

@@ -1,16 +1,12 @@
 {
     "dps_shared": {
-        "translation": "He knows clearly \"this is suffering\" as it truly is.",
-        "anki": "3",
-        "source": "MN39",
-        "sutta": "mahāassapurasuttaṃ",
-        "example": "so idaṃ dukkhan'ti yathābhūtaṃ pajānāti"
+        "source": "SN47.1",
+        "sutta": "ambapālisuttaṃ",
+        "example": "ek'āyano ayaṃ, bhikkhave, maggo sattānaṃ visuddhiyā sokaparidevānaṃ samatikkamāya dukkhadomanassānaṃ atthaṅ'gamāya ñāyassa adhigamāya nibbānassa sacchikiriyāya, yadidaṃ, cattāro satipaṭṭhānā."
     },
     "dps_last": {
-        "translation": "He knows clearly \"this is suffering\" as it truly is.",
-        "anki": "3",
-        "source": "MN39",
-        "sutta": "mahāassapurasuttaṃ",
-        "example": "so idaṃ dukkhan'ti yathābhūtaṃ pajānāti"
+        "source": "SN47.1",
+        "sutta": "ambapālisuttaṃ",
+        "example": "ek'āyano ayaṃ, bhikkhave, maggo sattānaṃ visuddhiyā sokaparidevānaṃ samatikkamāya dukkhadomanassānaṃ atthaṅ'gamāya ñāyassa adhigamāya nibbānassa sacchikiriyāya, yadidaṃ, cattāro satipaṭṭhānā."
     }
 }
