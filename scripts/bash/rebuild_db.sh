@@ -31,6 +31,23 @@ while true; do
 done
 
 while true; do
+    echo -ne "\033[1;36m Replace id in DPS backup files from additions_added.json?\033[0m"
+    read -n 1 -s yn
+    echo
+    if [[ $yn == "q" ]]; then
+        echo -e "\n\033[1;31m Aborted by user.\033[0m"
+        exit 1
+    fi
+    case $yn in
+        [Yy]* )
+            scripts/work_with_csv/additions_processor.py
+            break;;
+        * )
+            break;;
+    esac
+done
+
+while true; do
     echo -ne "\033[1;36m Rebuild db from db/backup_tsv?\033[0m"
     read -n 1 -s yn
     echo

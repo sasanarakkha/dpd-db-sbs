@@ -75,6 +75,7 @@ class DPSPaths:
         # /gui2
         self.history_json_path: Path = base_dir.joinpath(Path("gui2/data/dps_history.json"))
         self.example_stash_json_path: Path = base_dir.joinpath(Path("gui2/data/dps_example_stash.json"))
+        self.addition_processed: Path = base_dir.joinpath(Path("gui2/data/addition_processed.json"))
 
 
         # .. external
