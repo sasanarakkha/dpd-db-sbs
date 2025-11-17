@@ -67,6 +67,8 @@ class DPSPaths:
         self.dps_internal_tests_replaced_path = base_dir.joinpath(Path("temp/dps_internal_tests_replaced.tsv"))
         self.dps_test_1_path = base_dir.joinpath(Path("temp/dps_test_1.tsv"))
         self.dps_test_2_path = base_dir.joinpath(Path("temp/dps_test_2.tsv"))
+        self.ai_meaning_checked = base_dir.joinpath(Path("temp/ai_meaning_check/checked_russian_ids.json"))
+        self.ai_meaning_report_dir = base_dir.joinpath(Path("temp/ai_meaning_check/"))
 
         # /gui/stash
         self.dps_stash_path = base_dir.joinpath(Path("gui/stash/dps_stash.json"))
