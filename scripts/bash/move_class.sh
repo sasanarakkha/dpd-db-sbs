@@ -108,12 +108,14 @@ safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/phonetic_class.csv" "$TEMP_PUSH_DEST_DI
 safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/roots_class.csv" "$TEMP_PUSH_DEST_DIR/roots-pali-class.csv" "-X -f"
 safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/suttas_class.csv" "$TEMP_PUSH_DEST_DIR/suttas-advanced-pali-class.csv" "-X -f"
 safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/common_roots.csv" "$TEMP_PUSH_DEST_DIR/common-roots.csv" "-X -f"
+safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/ru_common_roots.csv" "$TEMP_PUSH_DEST_DIR/ru-common-roots.csv" "-X -f"
 
 
 # Copy grammar CSV files
 safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/grammar/cl_sum_abbr.csv" "$TEMP_PUSH_DEST_DIR/grammar-pali-class-abbr.csv" "-X -f"
 safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/grammar/cl_sum_gramm.csv" "$TEMP_PUSH_DEST_DIR/grammar-pali-class-gramm.csv" "-X -f"
 safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/grammar/cl_sum_sandhi.csv" "$TEMP_PUSH_DEST_DIR/grammar-pali-class-sandhi.csv" "-X -f"
+safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/grammar/ru_cl_sum_gramm.csv" "$TEMP_PUSH_DEST_DIR/ru-grammar-pali-class-gramm.csv" "-X -f"
 
 echo "CSV processing for Anki - done"
 echo "--- Script finished ---"

@@ -110,7 +110,8 @@ def make_grammar_csvs(excel_file_dir):
             # Convert the 'id' column to integers
             if 'id' in df.columns:
                 df['id'] = df['id'].fillna(0).astype(int)
-
+                # remove rows where id is 0 or empty
+                df = df[df['id'] != 0]
 
             # Convert the values in the '2nd column' to strings
             df.iloc[:, 1] = df.iloc[:, 1].astype(str)
@@ -165,6 +166,10 @@ def make_grammar_csvs(excel_file_dir):
     df_upasagga_filtered = dfs['upasagga'][dfs['upasagga']['example'].notna()]
     df_sum_abbr = pd.concat([df_abbr_class, dfs['alph'], dfs['samasa'], df_upasagga_filtered, dfs['roots']])
 
+    # Convert 'id' to integer, dropping rows where 'id' is NaN
+    df_sum_abbr.dropna(subset=['id'], inplace=True)
+    df_sum_abbr['id'] = df_sum_abbr['id'].astype(int)
+
     # Save df_sum_abbr to a CSV file
     sum_abbr_path = dpspth.anki_csvs_dps_dir / "pali_class" / "grammar" / "cl_sum_abbr.csv"
     df_sum_abbr.to_csv(sum_abbr_path, sep="\t", index=False)
@@ -188,6 +193,10 @@ def make_grammar_csvs(excel_file_dir):
         dfs['vuddhi']
     ])
 
+    # Convert 'id' to integer, dropping rows where 'id' is NaN
+    df_sum_sandhi.dropna(subset=['id'], inplace=True)
+    df_sum_sandhi['id'] = df_sum_sandhi['id'].astype(int)
+
     # Save df_sum_sandhi to a CSV file
     sum_sandhi_path = dpspth.anki_csvs_dps_dir / "pali_class" / "grammar" / "cl_sum_sandhi.csv"
     df_sum_sandhi.to_csv(sum_sandhi_path, sep="\t", index=False)
@@ -197,13 +206,35 @@ def make_grammar_csvs(excel_file_dir):
 
     console.print("[bold green]extracting cl_sum_gramm for class.")
 
-    # Concatenate all DataFrames except those in df_sum_abbr and df_sum_sandhi
-    dfs_to_concat = [
-        dfs[sheet_name] for sheet_name in excel_file.sheet_names 
-        if sheet_name not in ['abbr', 'alph', 'samasa', 'upasagga', 'roots', 'v_sandhi', 'c_sandhi', 
-            'm_sandhi', 'assim', 'mx_sandhi', 'change_s', 'irr_base', 'taddhita', 'kitaka', 'vuddhi']
+    # Define which sheets go into the main grammar file
+    sheets_for_gramm = [
+        sheet_name for sheet_name in excel_file.sheet_names
+        if sheet_name not in [
+            'abbr', 'alph', 'samasa', 'upasagga', 'roots', 'v_sandhi', 'c_sandhi',
+            'm_sandhi', 'assim', 'mx_sandhi', 'change_s', 'irr_base', 'taddhita',
+            'kitaka', 'vuddhi'
+        ]
     ]
-    df_sum_gramm = pd.concat(dfs_to_concat)
+
+    # --- Create and save ru_cl_sum_gramm.csv with 'id' and 'native' ---
+    native_dfs = []
+    for sheet_name in sheets_for_gramm:
+        if 'id' in dfs[sheet_name].columns and 'native' in dfs[sheet_name].columns:
+            native_dfs.append(dfs[sheet_name][['id', 'native']])
+    
+    if native_dfs:
+        df_sum_native = pd.concat(native_dfs, ignore_index=True)
+        ru_sum_gramm_path = dpspth.anki_csvs_dps_dir / "pali_class" / "grammar" / "ru_cl_sum_gramm.csv"
+        df_sum_native.to_csv(ru_sum_gramm_path, sep="\t", index=False)
+
+    # --- Create main cl_sum_gramm.csv with an empty 'native' column ---
+    df_sum_gramm = pd.concat([dfs[s] for s in sheets_for_gramm])
+    # Clear all values in the 'native' column
+    df_sum_gramm['native'] = ''
+
+    # Convert 'id' to integer, dropping rows where 'id' is NaN
+    df_sum_gramm.dropna(subset=['id'], inplace=True)
+    df_sum_gramm['id'] = df_sum_gramm['id'].astype(int)
 
     # Save df_sum_gramm to a CSV file
     sum_gramm_path = dpspth.anki_csvs_dps_dir / "pali_class" / "grammar" / "cl_sum_gramm.csv"

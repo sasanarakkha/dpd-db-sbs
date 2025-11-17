@@ -16,7 +16,7 @@ echo "--- download_grammar Script Started at $(date) ---"
 # mkdir -p "$HOME/Downloads"
 cd "$HOME/Downloads"
 
-grammar=("[grammar](https://docs.google.com/spreadsheets/d/1KV5LmebIQpNyNKl03Pmo_Ti-LNW3IYWB6uc7OfGRGPU/)")
+grammar=("[grammar](https://docs.google.com/spreadsheets/d/1-iNYm9R86162zFzLd9kraEqNP7DpAFczFMPTVttJSrs/edit?usp=sharing)")
 
 # Loop through the list of grammar and extract the title and URL
 for link in "${grammar[@]}"; do

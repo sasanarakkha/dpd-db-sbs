@@ -79,9 +79,11 @@ def common_roots(db_session, dpspth):
         "root_meaning",
         "main_verb",  
         "examples_or_words",
+        "native",
     ]
 
     rows = []
+    ru_rows = []
     for root_obj, _ in roots_db:
         root = root_obj.root
         exclude_pos = ["adj", "imperf", "perf", "opt", "fut", "cond", "ind"]
@@ -151,6 +153,13 @@ def common_roots(db_session, dpspth):
             feedback,
         ]
         rows.append([x if x is not None else "" for x in row])
+        
+        ru_row = [
+            root_obj.root_clean,
+            root_obj.root_ru_meaning
+        ]
+        ru_rows.append([x if x is not None else "" for x in ru_row])
+
 
     output_path = os.path.join(dpspth.anki_csvs_dps_dir, "pali_class", "common_roots.csv")
     with open(output_path, "w", newline="", encoding="utf-8") as f:
@@ -168,6 +177,13 @@ def common_roots(db_session, dpspth):
         console.print("[bold red] sbs_anki_style_dir not found")
 
     console.print(f"[bold green]{len(rows)}[/bold green] roots saved to {output_path}")
+
+    # Save ru_common_roots to csv file
+    ru_output_path = os.path.join(dpspth.anki_csvs_dps_dir, "pali_class", "ru_common_roots.csv")
+    with open(ru_output_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f, delimiter="\t")
+        writer.writerows(ru_rows)
+    console.print(f"[bold green]{len(ru_rows)}[/bold green] Russian root meanings saved to {ru_output_path}")
 
 
 def join(*args):
