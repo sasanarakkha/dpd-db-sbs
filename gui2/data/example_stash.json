@@ -5,13 +5,13 @@
         "example": "yo hi koci, mārisa, amanusso ... nāgo vā nāgī vā nāgapotako vā nāgapotikā vā nāgamah'āmatto vā nāgapārisajjo vā nāgapacāro vā paduṭṭhacitto bhikkhuṃ vā bhikkhuniṃ vā upāsakaṃ vā upāsikaṃ vā gacchantaṃ vā anugaccheyya, ṭhitaṃ vā upatiṭṭheyya, nisinnaṃ vā upanisīdeyya, nipannaṃ vā upanipajjeyya."
     },
     "last": {
-        "source": "VIN2.5.1.10",
-        "sutta": "pathavīkhaṇanasikkhāpadaṃ",
-        "example": "pathaviyā apathavisaññī khaṇati vā khaṇāpeti vā, bhindati vā bhedāpeti vā, dahati vā dahāpeti vā, anāpatti."
+        "source": "VIN2.7.3",
+        "sutta": "sekhiyakaṇḍaṃ, khambhakatavaggo",
+        "example": "samatitthikaṃ piṇḍapātaṃ paṭiggahessāmī'ti sikkhā karaṇīyā'ti."
     },
     "stash": {
-        "source": "AN4.61",
-        "sutta": "pattakammasuttaṃ",
-        "example": "sa kho so, gahapati, ariyasāvako uṭṭhānavīriy'ādhigatehi bhogehi bāhābalaparicitehi sed'āvakkhittehi dhammikehi dhammaladdhehi imāni cattāri pattakammāni kattā hoti."
+        "source": "VIN2.7.3",
+        "sutta": "sekhiyakaṇḍaṃ, khambhakatavaggo",
+        "example": "samatitthikaṃ piṇḍapātaṃ paṭiggahessāmī'ti sikkhā karaṇīyā'ti."
     }
 }

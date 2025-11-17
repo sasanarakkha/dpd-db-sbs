@@ -1,5 +1,21 @@
 [
     {
+        "id": 87980,
+        "lemma_1": "samatitthika"
+    },
+    {
+        "id": 87979,
+        "lemma_1": "titthika 2"
+    },
+    {
+        "id": 38265,
+        "lemma_1": "nissajjitabba"
+    },
+    {
+        "id": 87978,
+        "lemma_1": "nissajitabba"
+    },
+    {
         "id": 38228,
         "lemma_1": "nisedha 2"
     },
@@ -62,21 +78,5 @@
     {
         "id": 8547,
         "lemma_1": "amātugāma"
-    },
-    {
-        "id": 30746,
-        "lemma_1": "tiracchānagatamanussaviggaha"
-    },
-    {
-        "id": 30747,
-        "lemma_1": "tiracchānagatamanussaviggahitthi"
-    },
-    {
-        "id": 57062,
-        "lemma_1": "saṅghāṭidhāraṇa"
-    },
-    {
-        "id": 57063,
-        "lemma_1": "saṅghāṭidhāraṇamatta"
     }
 ]
