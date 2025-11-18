@@ -14,8 +14,6 @@ pth = ProjectPaths()
 dpspth = DPSPaths()
 db_session = get_db_session(pth.dpd_db_path)
 
-checked_id_pth = dpspth.ai_meaning_checked
-output_txt_folder = dpspth.ai_meaning_report_dir
 
 @dataclass
 class WordComparison:
@@ -49,10 +47,25 @@ class ComparisonResult:
 class RussianMeaningChecker:
     """Checks if Russian meanings match English meanings using AI"""
     
-    def __init__(self, db_path: str = "dpd.db"):
+    def __init__(self, db_path: str = "dpd.db", mode: str = "meaning"):
         self.db_path = db_path
+        self.mode = mode
         self.ai_manager = AIManager()
-        self.checked_ids_file = checked_id_pth
+        
+        # Use different checked IDs files for different modes
+        if mode == "meaning_raw":
+            self.checked_ids_file = dpspth.ai_meaning_raw_checked
+            self.output_txt_folder = dpspth.ai_meaning_raw_report_dir
+        elif mode == "notes":
+            self.checked_ids_file = dpspth.ai_notes_checked
+            self.output_txt_folder = dpspth.ai_notes_report_dir
+        elif mode == "notes_raw":
+            self.checked_ids_file = dpspth.ai_notes_raw_checked
+            self.output_txt_folder = dpspth.ai_notes_raw_report_dir
+        else:
+            self.checked_ids_file = dpspth.ai_meaning_checked
+            self.output_txt_folder = dpspth.ai_meaning_report_dir
+            
         self.checked_ids = self.load_checked_ids()
         
     def load_checked_ids(self) -> set[int]:
@@ -87,29 +100,99 @@ class RussianMeaningChecker:
         
         from db.models import DpdHeadword, Russian
         
-        # Query for entries with both meaning_1 and ru_meaning not empty, and not already checked
-        results = (
-            db_session.query(DpdHeadword, Russian)
-            .join(Russian, DpdHeadword.id == Russian.id)
-            .filter(
-                and_(
-                    DpdHeadword.meaning_1.isnot(None),
-                    DpdHeadword.meaning_1 != "",
-                    Russian.ru_meaning.isnot(None),
-                    Russian.ru_meaning != "",
-                    ~DpdHeadword.id.in_(list(self.checked_ids))  # Exclude already checked IDs
+        if self.mode == "meaning":
+            # Original mode: check meaning_1 vs ru_meaning
+            results = (
+                db_session.query(DpdHeadword, Russian)
+                .join(Russian, DpdHeadword.id == Russian.id)
+                .filter(
+                    and_(
+                        DpdHeadword.meaning_1.isnot(None),
+                        DpdHeadword.meaning_1 != "",
+                        Russian.ru_meaning.isnot(None),
+                        Russian.ru_meaning != "",
+                        ~DpdHeadword.id.in_(list(self.checked_ids))  # Exclude already checked IDs
+                    )
                 )
+                .all()
             )
-            .all()
-        )
+            russian_field = "ru_meaning"
+            
+        elif self.mode == "meaning_raw":
+            # Raw mode: check meaning_1 vs ru_meaning_raw
+            results = (
+                db_session.query(DpdHeadword, Russian)
+                .join(Russian, DpdHeadword.id == Russian.id)
+                .filter(
+                    and_(
+                        DpdHeadword.meaning_1.isnot(None),
+                        DpdHeadword.meaning_1 != "",
+                        Russian.ru_meaning == "",
+                        Russian.ru_meaning_raw.isnot(None),
+                        Russian.ru_meaning_raw != "",
+                        ~DpdHeadword.id.in_(list(self.checked_ids))  # Exclude already checked IDs
+                    )
+                )
+                .all()
+            )
+            russian_field = "ru_meaning_raw"
+            
+        elif self.mode == "notes":
+            # Notes mode: check notes vs ru_notes (excluding AI translations)
+            results = (
+                db_session.query(DpdHeadword, Russian)
+                .join(Russian, DpdHeadword.id == Russian.id)
+                .filter(
+                    and_(
+                        DpdHeadword.meaning_1.isnot(None),
+                        DpdHeadword.meaning_1 != "",
+                        DpdHeadword.notes.isnot(None),
+                        DpdHeadword.notes != "",
+                        Russian.ru_notes.isnot(None),
+                        Russian.ru_notes != "",
+                        ~DpdHeadword.id.in_(list(self.checked_ids)),  # Exclude already checked IDs
+                        ~Russian.ru_notes.contains("[пер. ИИ]")  # Exclude AI translations
+                    )
+                )
+                .all()
+            )
+            russian_field = "ru_notes"
+        elif self.mode == "notes_raw":
+            # Notes raw mode: check notes vs ru_notes (AI translations only)
+            results = (
+                db_session.query(DpdHeadword, Russian)
+                .join(Russian, DpdHeadword.id == Russian.id)
+                .filter(
+                    and_(
+                        DpdHeadword.meaning_1.isnot(None),
+                        DpdHeadword.meaning_1 != "",
+                        DpdHeadword.notes.isnot(None),
+                        DpdHeadword.notes != "",
+                        Russian.ru_notes.isnot(None),
+                        Russian.ru_notes != "",
+                        ~DpdHeadword.id.in_(list(self.checked_ids)),  # Exclude already checked IDs
+                        Russian.ru_notes.contains("[пер. ИИ]")  # Only AI translations
+                    )
+                )
+                .all()
+            )
+            russian_field = "ru_notes"
+        else:
+            raise ValueError(f"Unknown mode: {self.mode}")
         
         comparisons = []
         for headword, russian in results:
+            # For notes modes, use notes as the English content
+            if self.mode in ["notes", "notes_raw"]:
+                english_content = headword.notes
+            else:
+                english_content = headword.meaning_1
+                
             comparison = WordComparison(
                 headword_id=headword.id,
                 lemma_1=headword.lemma_1,
-                english_meaning=headword.meaning_1,
-                russian_meaning=russian.ru_meaning,
+                english_meaning=english_content,
+                russian_meaning=getattr(russian, russian_field),
                 grammar=replace_abbreviations(headword.grammar),
             )
             comparisons.append(comparison)
@@ -118,26 +201,9 @@ class RussianMeaningChecker:
     
     def get_total_count_with_session(self, db_session) -> int:
         """Get total count of words that need comparison using provided session"""
-        if db_session is None:
-            raise Exception("No db_session")
-        
-        from db.models import DpdHeadword, Russian
-        
-        count = (
-            db_session.query(DpdHeadword)
-            .join(Russian, DpdHeadword.id == Russian.id)
-            .filter(
-                and_(
-                    DpdHeadword.meaning_1.isnot(None),
-                    DpdHeadword.meaning_1 != "",
-                    Russian.ru_meaning.isnot(None),
-                    Russian.ru_meaning != "",
-                    ~DpdHeadword.id.in_(list(self.checked_ids))  # Exclude already checked IDs
-                )
-            )
-            .count()
-        )
-        return count
+        # Use the same query logic as get_words_for_comparison_with_session
+        comparisons = self.get_words_for_comparison_with_session(db_session)
+        return len(comparisons)
     
     def create_comparison_prompt(self, comparisons: List[WordComparison], batch_size: int = 10) -> str:
         """Create AI prompt for comparing meanings"""
@@ -274,7 +340,7 @@ Focus ONLY on whether English and Russian express the same concept."""
             
             return results
     
-    def compare_meanings_batch(self, comparisons: List[WordComparison], batch_size: int = 10) -> List[ComparisonResult]:
+    def compare_meanings_batch(self, comparisons: List[WordComparison], batch_size: int = 25) -> List[ComparisonResult]:
         """Compare meanings in batches using AI"""
         all_results = []
         
@@ -283,7 +349,7 @@ Focus ONLY on whether English and Russian express the same concept."""
             print(f"Processing batch {i//batch_size + 1}/{(len(comparisons) + batch_size - 1)//batch_size}")
             
             # Create prompt for this batch
-            prompt = self.create_comparison_prompt(batch, len(batch))
+            prompt = self.create_comparison_prompt(batch, batch_size)
             
             # Make AI request (use default models which includes working fallbacks)
             ai_response = self.ai_manager.request(prompt=prompt)
@@ -326,8 +392,21 @@ Focus ONLY on whether English and Russian express the same concept."""
                                 json.loads(json_content)
                                 print(f"✓ Extracted JSON from text wrapper pattern {pattern_idx + 1} for batch {i//batch_size + 1}")
                                 break
-                            except json.JSONDecodeError as e:
-                                # Check if it's just missing closing braces
+                            except json.JSONDecodeError as parse_error:
+                                # Enhanced debugging for specific JSON parsing errors
+                                error_msg = str(parse_error)
+                                line_col = parse_error.lineno, parse_error.colno
+                                char_pos = parse_error.pos if hasattr(parse_error, 'pos') else 0
+                                
+                                print(f"⚠ JSON parsing failed at line {line_col[0]}, column {line_col[1]}: {error_msg}")
+                                
+                                # Show the problematic area
+                                if char_pos > 0:
+                                    start = max(0, char_pos - 50)
+                                    end = min(len(json_content), char_pos + 50)
+                                    print(f"DEBUG: Problem area: ...{json_content[start:end]}...")
+                                
+                                # Check if it's just missing closing braces - enhanced detection
                                 if json_content.strip().endswith(']}'):
                                     # The JSON is missing the final closing brace
                                     fixed_json = json_content.rstrip() + '\n}'
@@ -339,42 +418,135 @@ Focus ONLY on whether English and Russian express the same concept."""
                                     except json.JSONDecodeError:
                                         pass
                                 
-                                # Try to extend incomplete JSON
-                                print(f"⚠ Pattern {pattern_idx + 1} extracted incomplete JSON, trying to extend...")
-                                
-                                # Use the original content after our successful extraction as fallback
-                                fallback_start = ai_response.content.find('{"comparisons":')
-                                if fallback_start != -1:
-                                    # Use enhanced brace matching to find complete JSON
-                                    brace_count = 0
-                                    in_string = False
-                                    escape_next = False
-                                    json_end = fallback_start
-                                    
-                                    for pos, char in enumerate(ai_response.content[fallback_start:], fallback_start):
-                                        if escape_next:
-                                            escape_next = False
-                                            continue
-                                        
-                                        if char == '\\' and in_string:
-                                            escape_next = True
-                                            continue
-                                        
-                                        if char == '"' and not escape_next:
-                                            in_string = not in_string
-                                        elif not in_string:
-                                            if char == '{':
-                                                brace_count += 1
-                                            elif char == '}':
-                                                brace_count -= 1
-                                                if brace_count == 0:
-                                                    json_end = pos + 1
-                                                    break
-                                    
-                                    if brace_count == 0:
-                                        json_content = ai_response.content[fallback_start:json_end]
-                                        print(f"✓ Found complete JSON by extending pattern {pattern_idx + 1} for batch {i//batch_size + 1}")
+                                # Additional check: if content ends with just ] (missing closing brace completely)
+                                elif json_content.strip().endswith(']'):
+                                    # The JSON is completely missing the final closing brace
+                                    fixed_json = json_content.rstrip() + '\n}'
+                                    try:
+                                        json.loads(fixed_json)
+                                        json_content = fixed_json
+                                        print(f"✓ Fixed completely missing closing brace for pattern {pattern_idx + 1} for batch {i//batch_size + 1}")
                                         break
+                                    except json.JSONDecodeError:
+                                        pass
+                                
+                                # Try to clean malformed strings within JSON content
+                                try:
+                                    import re
+                                    # Comprehensive string formatting fixes
+                                    cleaned_content = json_content
+                                    
+                                    # Fix unescaped quotes in all string fields
+                                    string_fields = ['reasoning', 'lemma', 'match_status', 'suggested_fix']
+                                    for field in string_fields:
+                                        pattern = rf'"{field}":\s*"([^"]*(?:\\.[^"]*)*)"'
+                                        def fix_string_field(match):
+                                            field_text = match.group(1)
+                                            # Escape any unescaped quotes and backslashes
+                                            field_text = field_text.replace('\\', '\\\\').replace('"', '\\"')
+                                            return f'"{field}": "{field_text}"'
+                                        
+                                        cleaned_content = re.sub(pattern, fix_string_field, cleaned_content)
+                                    
+                                    # Fix trailing commas before closing brackets/braces
+                                    cleaned_content = re.sub(r',\s*}', '}', cleaned_content)
+                                    cleaned_content = re.sub(r',\s*]', ']', cleaned_content)
+                                    
+                                    # Fix missing required fields by adding default values
+                                    # Add missing "lemma" fields
+                                    cleaned_content = re.sub(
+                                        r'("id":\s*\d+,\s*"match_status":\s*"[^"]*",\s*"confidence":\s*[\d.]+,\s*"reasoning":\s*"[^"]*",\s*"suggested_fix":\s*[^,\}]*)',
+                                        r'\1, "lemma": ""',
+                                        cleaned_content
+                                    )
+                                    
+                                    # Fix entries missing "lemma" field - look for entries that end with "suggested_fix": null or ""
+                                    # Pattern 1: Entries ending with "suggested_fix": null
+                                    cleaned_content = re.sub(
+                                        r'(\{"id":\s*\d+,\s*"match_status":\s*"[^"]*",\s*"confidence":\s*[\d.]+,\s*"reasoning":\s*"[^"]*",\s*"suggested_fix":\s*null)(\s*\})',
+                                        r'\1, "lemma": ""\2',
+                                        cleaned_content
+                                    )
+                                    
+                                    # Pattern 2: Entries ending with "suggested_fix": ""
+                                    cleaned_content = re.sub(
+                                        r'(\{"id":\s*\d+,\s*"match_status":\s*"[^"]*",\s*"confidence":\s*[\d.]+,\s*"reasoning":\s*"[^"]*",\s*"suggested_fix":\s*")(\})',
+                                        r'\1", "lemma": ""\2',
+                                        cleaned_content
+                                    )
+                                    
+                                    # Pattern 3: Fix missing commas before closing braces
+                                    cleaned_content = re.sub(
+                                        r'(\}\s*")(\{)',
+                                        r'\1,\2',
+                                        cleaned_content
+                                    )
+                                    
+                                    # Pattern 4: Ensure proper comma placement in arrays
+                                    cleaned_content = re.sub(
+                                        r'(\]\s*\})(\s*)(\{)',
+                                        r'\1,\3',
+                                        cleaned_content
+                                    )
+                                    
+                                    # Try to parse the cleaned content
+                                    json.loads(cleaned_content)
+                                    json_content = cleaned_content
+                                    print(f"✓ Fixed malformed strings and missing fields in JSON for pattern {pattern_idx + 1} for batch {i//batch_size + 1}")
+                                    break
+                                    
+                                except (json.JSONDecodeError, re.error):
+                                    pass
+                                
+                                # Final fallback: Try to completely reconstruct valid JSON
+                                try:
+                                    print(f"⚠ Attempting complete JSON reconstruction for pattern {pattern_idx + 1}")
+                                    
+                                    # Start fresh with the basic structure
+                                    reconstructed = '{"comparisons": ['
+                                    
+                                    # Try to find individual comparison objects in the content
+                                    import re
+                                    
+                                    # Look for individual comparison objects
+                                    comparison_pattern = r'\{"id":\s*\d+[^}]*\}'
+                                    matches = re.findall(comparison_pattern, potential_json, re.DOTALL)
+                                    
+                                    if matches:
+                                        valid_comparisons = []
+                                        for match in matches:
+                                            try:
+                                                # Try to fix the individual comparison object
+                                                fixed_match = match
+                                                
+                                                # Add missing lemma field if not present
+                                                if '"lemma"' not in fixed_match:
+                                                    # Insert lemma before the closing brace
+                                                    fixed_match = fixed_match.rstrip()[:-1] + ', "lemma": ""}'
+                                                
+                                                # Fix any trailing commas
+                                                fixed_match = re.sub(r',(\s*})', r'\1', fixed_match)
+                                                
+                                                # Validate individual object
+                                                json.loads(fixed_match)
+                                                valid_comparisons.append(fixed_match)
+                                                
+                                            except json.JSONDecodeError:
+                                                # Skip malformed individual objects
+                                                continue
+                                        
+                                        if valid_comparisons:
+                                            # Reconstruct the full JSON
+                                            reconstructed += ','.join(valid_comparisons) + ']}'
+                                            
+                                            # Try to parse the reconstructed JSON
+                                            json.loads(reconstructed)
+                                            json_content = reconstructed
+                                            print(f"✓ Successfully reconstructed valid JSON for pattern {pattern_idx + 1} for batch {i//batch_size + 1}")
+                                            break
+                                            
+                                except Exception as e:
+                                    print(f"⚠ JSON reconstruction failed: {e}")
                                 
                                 # If we couldn't fix or extend it, continue to next pattern
                                 continue
@@ -683,19 +855,92 @@ Focus ONLY on whether English and Russian express the same concept."""
         
         return all_results
     
-    def generate_report(self, results: List[ComparisonResult], output_txt_folder):
+    def clean_ru_meaning_raw_for_mismatches(self, results: List[ComparisonResult]):
+        """Clean ru_meaning_raw for mismatched entries"""
+        from db.models import Russian
+        
+        mismatches = [r for r in results if r.match_status == "MISMATCH"]
+        if not mismatches:
+            return
+            
+        print(f"Cleaning ru_meaning_raw for {len(mismatches)} mismatched entries...")
+        
+        try:
+            from db.db_helpers import get_db_session
+            from tools.paths import ProjectPaths
+            
+            pth = ProjectPaths()
+            clean_session = get_db_session(pth.dpd_db_path)
+            
+            for result in mismatches:
+                try:
+                    # Find the Russian record and clear ru_meaning_raw
+                    russian_record = clean_session.query(Russian).filter(Russian.id == result.headword_id).first()
+                    if russian_record:
+                        russian_record.ru_meaning_raw = ""
+                        clean_session.commit()
+                        print(f"✓ Cleared ru_meaning_raw for ID {result.headword_id}")
+                except Exception as e:
+                    print(f"⚠ Failed to clear ru_meaning_raw for ID {result.headword_id}: {e}")
+                    clean_session.rollback()
+            
+            clean_session.close()
+            print("✓ Completed cleaning ru_meaning_raw for mismatched entries")
+            
+        except Exception as e:
+            print(f"⚠ Failed to clean ru_meaning_raw: {e}")
+
+    def clean_ru_notes_for_mismatches(self, results: List[ComparisonResult]):
+        """Clean ru_notes for mismatched entries"""
+        from db.models import Russian
+        
+        mismatches = [r for r in results if r.match_status == "MISMATCH"]
+        if not mismatches:
+            return
+            
+        print(f"Cleaning ru_notes for {len(mismatches)} mismatched entries...")
+        
+        try:
+            from db.db_helpers import get_db_session
+            from tools.paths import ProjectPaths
+            
+            pth = ProjectPaths()
+            clean_session = get_db_session(pth.dpd_db_path)
+            
+            for result in mismatches:
+                try:
+                    # Find the Russian record and clear ru_notes
+                    russian_record = clean_session.query(Russian).filter(Russian.id == result.headword_id).first()
+                    if russian_record:
+                        russian_record.ru_notes = ""
+                        clean_session.commit()
+                        print(f"✓ Cleared ru_notes for ID {result.headword_id}")
+                except Exception as e:
+                    print(f"⚠ Failed to clear ru_notes for ID {result.headword_id}: {e}")
+                    clean_session.rollback()
+            
+            clean_session.close()
+            print("✓ Completed cleaning ru_notes for mismatched entries")
+            
+        except Exception as e:
+            print(f"⚠ Failed to clean ru_notes: {e}")
+    
+    def generate_report(self, results: List[ComparisonResult], output_txt_folder: str | None = None):
         """Generate a human-readable report of mismatches"""
         import datetime
         
+        # Use instance output folder if not provided
+        output_folder = output_txt_folder or self.output_txt_folder
+        
         # Create directory if it doesn't exist
-        os.makedirs(output_txt_folder, exist_ok=True)
+        os.makedirs(output_folder, exist_ok=True)
         
         # Generate timestamp-based filename
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        output_file = os.path.join(output_txt_folder, f"{timestamp}_mismatches.txt")
+        output_file = os.path.join(output_folder, f"{timestamp}_mismatches.txt")
         
         with open(output_file, 'w', encoding='utf-8') as f:
-            f.write("RUSSIAN MEANING MISMATCH ANALYSIS REPORT\n")
+            f.write(f"RUSSIAN {self.mode.upper()} MISMATCH ANALYSIS REPORT\n")
             f.write("="*50 + "\n\n")
             
             # Filter for problematic entries - ONLY COMPLETE MISMATCHES (no partial matches)
@@ -724,6 +969,12 @@ Focus ONLY on whether English and Russian express the same concept."""
         print(f"Total entries analyzed: {len(results)}")
         print(f"Total problematic entries requiring review: {len(mismatches)}")
         
+        # Special handling for raw mode
+        if self.mode == "meaning_raw" and mismatches:
+            self.clean_ru_meaning_raw_for_mismatches(results)
+        elif self.mode == "notes_raw" and mismatches:
+            self.clean_ru_notes_for_mismatches(results)
+        
         # Save checked IDs after analysis
         self.save_checked_ids()
     
@@ -751,14 +1002,14 @@ Focus ONLY on whether English and Russian express the same concept."""
             # Run comparison
             if use_batch:
                 print("Using batch processing...")
-                results = self.compare_meanings_batch(comparisons, batch_size=10)
+                results = self.compare_meanings_batch(comparisons, batch_size=25)
                 # IDs are now marked as checked within the batch method only on success
             else:
                 print("Using individual processing...")
                 results = self.compare_meanings_individual(comparisons)
             
             # Generate report
-            self.generate_report(results, globals()['output_txt_folder'])
+            self.generate_report(results)
             
             print(f"Analysis complete. Found {len([r for r in results if r.match_status == 'MISMATCH'])} problematic entries.")
             

@@ -47,9 +47,6 @@ class DPSPaths:
         
         self.text_to_add_path = base_dir.joinpath(Path("temp/text.txt"))
         self.temp_csv_backup_dir = base_dir.joinpath(Path("temp/backup_csv/")) 
-        self.ai_ru_suggestion_history_path = base_dir.joinpath(Path("temp/ai_ru_suggestion_history.csv"))
-        self.ai_ru_notes_suggestion_history_path = base_dir.joinpath(Path("temp/ai_ru_notes_suggestion_history.csv"))
-        self.ai_en_suggestion_history_path = base_dir.joinpath(Path("temp/ai_en_suggestion_history.csv"))
         self.temp_csv_path = base_dir.joinpath(Path("temp/temp.csv"))
         self.id_to_add_path = base_dir.joinpath(Path("temp/id_to_add.csv"))
         self.id_temp_list_path = base_dir.joinpath(Path("temp/id_temp_list.csv"))
@@ -57,8 +54,6 @@ class DPSPaths:
         self.ai_translated_dir = base_dir.joinpath(Path("temp/ai_translated"))
         self.sbs_example_corrections = base_dir.joinpath(Path("temp/sbs_example_corrections.tsv"))
         self.ru_apply_path = base_dir.joinpath(Path("temp/ru_apply.csv"))
-        self.ai_for_batch_api_dir = base_dir.joinpath(Path("temp/ai_for_batch_api/"))
-        self.ai_from_batch_api_dir = base_dir.joinpath(Path("temp/ai_from_batch_api/"))
         self.total_words_path = base_dir.joinpath(Path("temp/total_words.tsv"))
         self.total_words_meaning = base_dir.joinpath(Path("temp/total_words_meaning.txt"))
         self.total_roots_path = base_dir.joinpath(Path("temp/total_roots.tsv"))
@@ -67,8 +62,24 @@ class DPSPaths:
         self.dps_internal_tests_replaced_path = base_dir.joinpath(Path("temp/dps_internal_tests_replaced.tsv"))
         self.dps_test_1_path = base_dir.joinpath(Path("temp/dps_test_1.tsv"))
         self.dps_test_2_path = base_dir.joinpath(Path("temp/dps_test_2.tsv"))
-        self.ai_meaning_checked = base_dir.joinpath(Path("temp/ai_meaning_check/checked_russian_ids.json"))
+
+        # /temp/ ai-related
+        self.ai_ru_suggestion_history_path = base_dir.joinpath(Path("temp/ai_ru_suggestion_history.csv"))
+        self.ai_ru_notes_suggestion_history_path = base_dir.joinpath(Path("temp/ai_ru_notes_suggestion_history.csv"))
+        self.ai_en_suggestion_history_path = base_dir.joinpath(Path("temp/ai_en_suggestion_history.csv"))
+        
+        self.ai_for_batch_api_dir = base_dir.joinpath(Path("temp/ai_for_batch_api/"))
+        self.ai_from_batch_api_dir = base_dir.joinpath(Path("temp/ai_from_batch_api/"))
+
+        self.ai_meaning_checked = base_dir.joinpath(Path("temp/ai_meaning_check/checked_ids.json"))
+        self.ai_meaning_raw_checked = base_dir.joinpath(Path("temp/ai_meaning_raw_check/checked_ids.json"))
+        self.ai_notes_checked = base_dir.joinpath(Path("temp/ai_notes_check/checked_ids.json"))
+        self.ai_notes_raw_checked = base_dir.joinpath(Path("temp/ai_notes_raw_check/checked_ids.json"))
+
         self.ai_meaning_report_dir = base_dir.joinpath(Path("temp/ai_meaning_check/"))
+        self.ai_meaning_raw_report_dir = base_dir.joinpath(Path("temp/ai_meaning_raw_check/"))
+        self.ai_notes_report_dir = base_dir.joinpath(Path("temp/ai_notes_check/"))
+        self.ai_notes_raw_report_dir = base_dir.joinpath(Path("temp/ai_notes_raw_check/"))
 
         # /gui/stash
         self.dps_stash_path = base_dir.joinpath(Path("gui/stash/dps_stash.json"))

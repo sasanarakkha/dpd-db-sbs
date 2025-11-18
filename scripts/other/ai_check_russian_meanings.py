@@ -19,10 +19,12 @@ db_session = get_db_session(pth.dpd_db_path)
 
 def main():
     parser = argparse.ArgumentParser(description='Check Russian meaning mismatches using AI')
+    parser.add_argument('--mode', choices=['meaning', 'meaning_raw', 'notes', 'notes_raw'],
+                       default='meaning', help='Checking mode: meaning (default), meaning_raw, notes, or notes_raw')
     parser.add_argument('--batch', action='store_true', help='Use batch processing (default: True)')
     parser.add_argument('--individual', action='store_true', help='Use individual processing (slower but more precise)')
     parser.add_argument('--limit', type=int, help='Limit number of words to analyze (for testing)')
-    parser.add_argument('--output', type=str, default='temp/ai_meaning_check/mismatches.txt', help='Output report filename')
+    parser.add_argument('--output', type=str, help='Output report filename (auto-generated if not specified)')
     
     args = parser.parse_args()
     
@@ -33,14 +35,15 @@ def main():
     elif args.batch:
         use_batch = True
     
-    # Create checker and run analysis
-    checker = RussianMeaningChecker()
+    # Create checker with specified mode
+    checker = RussianMeaningChecker(mode=args.mode)
 
     total_count = checker.get_total_count_with_session(db_session)
     
     print("="*60)
-    print("RUSSIAN MEANING MISMATCH ANALYSIS")
+    print(f"RUSSIAN {args.mode.upper()} MISMATCH ANALYSIS")
     print("="*60)
+    print(f"Checking mode: {args.mode}")
     print(f"Processing mode: {'Batch' if use_batch else 'Individual'}")
     print(f"Total words which need check: {total_count}")
     if args.limit:
@@ -58,7 +61,14 @@ def main():
         print("\n" + "="*60)
         print("ANALYSIS COMPLETE!")
         print("="*60)
-        print(f"Check the report file: {args.output}")
+        
+        # Display appropriate message based on mode
+        if args.mode == "meaning_raw":
+            print("Note: For meaning_raw mode, mismatched entries had their meaning_raw cleared.")
+        elif args.mode == "notes":
+            print("Note: For notes mode, checking English notes vs Russian notes (excluding AI translations).")
+        elif args.mode == "notes_raw":
+            print("Note: For notes_raw mode, mismatched entries had their ru_notes cleared.")
         
     except KeyboardInterrupt:
         print("\nAnalysis interrupted by user.")
