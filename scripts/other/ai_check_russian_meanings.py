@@ -6,7 +6,7 @@ This script provides easy access to the RussianMeaningChecker tool.
 You can run this to analyze Russian translations against English meanings.
 """
 
-from tools.russian_meaning_checker import RussianMeaningChecker
+from tools.ai_meaning_checker import RussianMeaningChecker
 import argparse
 import sys
 
@@ -20,7 +20,7 @@ db_session = get_db_session(pth.dpd_db_path)
 def main():
     parser = argparse.ArgumentParser(description='Check Russian meaning mismatches using AI')
     parser.add_argument('--mode', choices=['meaning', 'meaning_raw', 'notes', 'notes_raw'],
-                       default='meaning', help='Checking mode: meaning (default), meaning_raw, notes, or notes_raw')
+                        default='meaning', help='Checking mode: meaning (default), meaning_raw, notes, or notes_raw')
     parser.add_argument('--batch', action='store_true', help='Use batch processing (default: True)')
     parser.add_argument('--individual', action='store_true', help='Use individual processing (slower but more precise)')
     parser.add_argument('--limit', type=int, help='Limit number of words to analyze (for testing)')
