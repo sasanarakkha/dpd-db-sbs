@@ -18,6 +18,7 @@ class ProjectPaths:
         # backup_tsv
         self.pali_root_path = base_dir / "db/backup_tsv/dpd_roots.tsv"
         self.pali_word_path = base_dir / "db/backup_tsv/dpd_headwords.tsv"
+        self.sutta_info_tsv_path = base_dir / "db/backup_tsv/sutta_info.tsv"
 
         # db/bold_definitions
         self.bold_definitions_json_path = (
@@ -170,6 +171,9 @@ class ProjectPaths:
         self.example_templ_path = (
             base_dir / "exporter/goldendict/templates/dpd_example.html"
         )
+        self.sbs_example_templ_path = (
+            base_dir / "exporter/goldendict/templates/sbs_example.html"
+        )
         self.family_compound_templ_path = (
             base_dir / "exporter/goldendict/templates/dpd_family_compound.html"
         )
@@ -207,10 +211,9 @@ class ProjectPaths:
         self.variant_templ_path = (
             base_dir / "exporter/goldendict/templates/dpd_variant_reading.html"
         )
-        self.sbs_example_templ_path = (
-            base_dir / "exporter/goldendict/templates/sbs_example.html"
+        self.sutta_info_templ_path = (
+            base_dir / "exporter/goldendict/templates/dpd_sutta_info.html"
         )
-
 
         # FIXME delete these and whatever uses them
         # exporter/jinja templates
