@@ -19,8 +19,8 @@ db_session = get_db_session(pth.dpd_db_path)
 
 def main():
     parser = argparse.ArgumentParser(description='Check Russian meaning mismatches using AI')
-    parser.add_argument('--mode', choices=['meaning', 'meaning_raw', 'notes', 'notes_raw'],
-                        default='meaning', help='Checking mode: meaning (default), meaning_raw, notes, or notes_raw')
+    parser.add_argument('--mode', choices=['meaning', 'meaning_raw', 'meaning_raw_list', 'notes', 'notes_raw'],
+                        default='meaning', help='Checking mode: meaning (default), meaning_raw, meaning_raw_list, notes, or notes_raw')
     parser.add_argument('--batch', action='store_true', help='Use batch processing (default: True)')
     parser.add_argument('--individual', action='store_true', help='Use individual processing (slower but more precise)')
     parser.add_argument('--limit', type=int, help='Limit number of words to analyze (for testing)')
@@ -65,6 +65,8 @@ def main():
         # Display appropriate message based on mode
         if args.mode == "meaning_raw":
             print("Note: For meaning_raw mode, mismatched entries had their meaning_raw cleared.")
+        elif args.mode == "meaning_raw_list":
+            print("Note: For meaning_raw_list mode, processing only IDs from ai_processed_ids_json file.")
         elif args.mode == "notes":
             print("Note: For notes mode, checking English notes vs Russian notes (excluding AI translations).")
         elif args.mode == "notes_raw":

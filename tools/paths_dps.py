@@ -70,6 +70,7 @@ class DPSPaths:
         
         self.ai_for_batch_api_dir = base_dir.joinpath(Path("temp/ai_for_batch_api/"))
         self.ai_from_batch_api_dir = base_dir.joinpath(Path("temp/ai_from_batch_api/"))
+        self.ai_processed_ids_json = base_dir.joinpath(Path("temp/ai_from_batch_api/processed_ids.json"))
 
         self.ai_meaning_checked = base_dir.joinpath(Path("temp/ai_meaning_check/checked_ids.json"))
         self.ai_meaning_raw_checked = base_dir.joinpath(Path("temp/ai_meaning_raw_check/checked_ids.json"))

@@ -47,6 +47,10 @@ class RussianMeaningChecker:
         if mode == "meaning_raw":
             self.checked_ids_file = dpspth.ai_meaning_raw_checked
             self.output_txt_folder = dpspth.ai_meaning_raw_report_dir
+        elif mode == "meaning_raw_list":
+            self.checked_ids_file = dpspth.ai_meaning_raw_checked
+            self.output_txt_folder = dpspth.ai_meaning_raw_report_dir
+            self.list_ids_file = dpspth.ai_processed_ids_json
         elif mode == "notes":
             self.checked_ids_file = dpspth.ai_notes_checked
             self.output_txt_folder = dpspth.ai_notes_report_dir
@@ -79,6 +83,18 @@ class RussianMeaningChecker:
                 json.dump(list(self.checked_ids), f, indent=2)
         except Exception as e:
             print(f"Warning: Could not save checked IDs: {e}")
+    
+    def load_list_ids(self) -> set[int]:
+        """Load IDs from the ai_processed_ids_json file for meaning_raw_list mode"""
+        try:
+            import json
+            if hasattr(self, 'list_ids_file') and os.path.exists(self.list_ids_file):
+                with open(self.list_ids_file, 'r', encoding='utf-8') as f:
+                    return set(json.load(f))
+            else:
+                return set()
+        except (json.JSONDecodeError, FileNotFoundError, AttributeError):
+            return set()
     
     def mark_as_checked(self, headword_id: int):
         """Mark a word as checked"""
@@ -122,6 +138,30 @@ class RussianMeaningChecker:
                         Russian.ru_meaning_raw.isnot(None),
                         Russian.ru_meaning_raw != "",
                         ~DpdHeadword.id.in_(list(self.checked_ids))  # Exclude already checked IDs
+                    )
+                )
+                .all()
+            )
+            russian_field = "ru_meaning_raw"
+            
+        elif self.mode == "meaning_raw_list":
+            # List mode: check meaning_1 vs ru_meaning_raw for IDs in the list file only
+            list_ids = self.load_list_ids()
+            if not list_ids:
+                print("Warning: No IDs found in ai_processed_ids_json file. Exiting.")
+                return []
+                
+            results = (
+                db_session.query(DpdHeadword, Russian)
+                .join(Russian, DpdHeadword.id == Russian.id)
+                .filter(
+                    and_(
+                        DpdHeadword.meaning_1.isnot(None),
+                        DpdHeadword.meaning_1 != "",
+                        Russian.ru_meaning == "",
+                        Russian.ru_meaning_raw.isnot(None),
+                        Russian.ru_meaning_raw != "",
+                        DpdHeadword.id.in_(list(list_ids))  # Only IDs from the list file
                     )
                 )
                 .all()
@@ -319,7 +359,7 @@ class RussianMeaningChecker:
         print(f"Total problematic entries requiring review: {len(mismatches)}")
         
         # Special handling for raw mode
-        if self.mode == "meaning_raw" and mismatches:
+        if self.mode in ["meaning_raw", "meaning_raw_list"] and mismatches:
             self.clean_ru_meaning_raw_for_mismatches(results)
         elif self.mode == "notes_raw" and mismatches:
             self.clean_ru_notes_for_mismatches(results)

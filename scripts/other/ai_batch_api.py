@@ -10,7 +10,7 @@ from tools.ai_related import get_ai_client, print_ai_config
 from db.db_helpers import get_db_session
 from db.models import Russian
 from tools.paths import ProjectPaths
-from tools.paths_dps import DPSPaths  
+from tools.paths_dps import DPSPaths
 
 dpspth = DPSPaths()
 pth = ProjectPaths()
@@ -195,6 +195,19 @@ def save_batch_results(batch_id: str, file_name: str) -> dict[str, str]:
     return _openai_save_batch_results(client, batch_id, file_name)
 
 
+def save_processed_ids(ids_and_contents: dict[str, str]) -> None:
+    """Extract IDs from ids_and_contents and save to ai_processed_ids_json file."""
+    ids = list(ids_and_contents.keys())
+    
+    try:
+        with open(dpspth.ai_processed_ids_json, 'w', encoding='utf-8') as f:
+            json.dump(ids, f, ensure_ascii=False, indent=2)
+        print(f"Processed IDs saved to {dpspth.ai_processed_ids_json}")
+        print(f"Total IDs saved: {len(ids)}")
+    except Exception as e:
+        print(f"Error saving processed IDs: {e}")
+
+
 def update_ru_meaning_raw(ids_and_contents: dict[str, str]) -> None:
     print("Updating ru_meaning in db")
     updated_count: int = 0
@@ -213,6 +226,9 @@ def update_ru_meaning_raw(ids_and_contents: dict[str, str]) -> None:
     db_session.commit()
     print(f"Total updated records: {updated_count}")
     print(f"Total added records: {added_count}")
+    
+    # Save processed IDs after successful database commit
+    save_processed_ids(ids_and_contents)
 
 
 if __name__ == "__main__":

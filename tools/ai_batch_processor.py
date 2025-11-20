@@ -129,53 +129,160 @@ Focus ONLY on whether English and Russian express the same concept."""
         # Clean up the response content first
         ai_response_content = ai_response_content.strip()
         
-        # First, try direct JSON parsing - simplest case
+        # Method 1: Try direct JSON parsing
         try:
             import json
             # Try to parse the entire response as JSON
             data = json.loads(ai_response_content)
             if "comparisons" in data:
+                print("✓ Successfully parsed pure JSON response")
                 return ai_response_content
         except json.JSONDecodeError:
-            pass  # Not pure JSON, continue with pattern matching
+            pass  # Not pure JSON, continue with other methods
         
-        # Simplified patterns - handle most common cases first
+        # Method 2: Simple brace matching - find first { and last }
+        try:
+            first_brace = ai_response_content.find('{')
+            last_brace = ai_response_content.rfind('}')
+            
+            if first_brace != -1 and last_brace != -1 and last_brace > first_brace:
+                potential_json = ai_response_content[first_brace:last_brace+1]
+                
+                # Check if it contains "comparisons" and is valid JSON
+                if '"comparisons"' in potential_json:
+                    try:
+                        json.loads(potential_json)
+                        print("✓ Successfully extracted JSON using brace matching")
+                        return potential_json
+                    except json.JSONDecodeError:
+                        pass  # Try next method
+        except Exception:
+            pass  # Continue to next method
+        
+        # Method 3: Comprehensive patterns matching (UPDATED for markdown code blocks)
         json_patterns = [
-            # Handle ```json blocks first (greedy matching)
-            r'```json\s*(\{.*?\})\s*```',
-            # Handle ``` blocks (greedy matching)
-            r'```\s*(\{.*?\})\s*```',
-            # Handle direct JSON starting with { and ending with }
-            r'(\{.*?"comparisons".*?\})',
-            # Handle JSON with comparisons array
+            # Pattern 1: ```json code blocks with multi-line JSON content
+            r'```json\s*(\{[\s\S]*?\})\s*```',
+            # Pattern 2: Generic ``` code blocks with JSON content
+            r'```\s*(\{[\s\S]*?\})\s*```',
+            # Pattern 3: Direct JSON starting with { and containing "comparisons"
             r'(\{[\s\S]*?"comparisons"[\s\S]*?\})',
+            # Pattern 4: More flexible - look for complete comparisons arrays
+            r'(\{[\s\S]*?"comparisons"\s*:\s*\[[\s\S]*?\][\s\S]*?\})',
+            # Pattern 5: Find any JSON-like object containing comparisons
+            r'(\{[\s\S]*?comparisons[\s\S]*?\})',
+            # Pattern 6: Simple extraction - find first { and last } containing comparisons
+            r'(\{[^}]*comparisons[^}]*\})',
+            # Pattern 7: Ultra-flexible - capture from { to last } if it contains comparisons
+            r'(\{[^{]*?comparisons[^{]*?\})',
         ]
         
-        # Try pattern matching first
         for pattern_idx, pattern in enumerate(json_patterns):
             match = re.search(pattern, ai_response_content, re.DOTALL)
             if match:
                 potential_json = match.group(1)
                 
-                # Validate that the extracted JSON is complete by checking for balanced braces
-                if potential_json.strip().startswith('{'):
-                    # If the pattern starts with {, then we got the whole object
-                    json_content = potential_json
-                else:
-                    # We need to add the braces back
-                    json_content = '{' + potential_json + '}'
+                # Clean the extracted content - remove markdown artifacts
+                potential_json = potential_json.strip()
                 
                 # Additional validation: ensure we have a complete JSON object
                 try:
                     # Quick validation to see if it's parseable
-                    json.loads(json_content)
-                    return json_content  # Success - return the JSON
+                    json.loads(potential_json)
+                    print(f"✓ Pattern {pattern_idx + 1} successfully extracted JSON")
+                    return potential_json  # Success - return the JSON
                 except json.JSONDecodeError:
                     # Try to clean and fix the JSON
-                    cleaned_content = self.clean_json_content(json_content)
+                    cleaned_content = self.clean_json_content(potential_json)
                     if cleaned_content:
+                        print(f"✓ Pattern {pattern_idx + 1} extracted and cleaned JSON")
                         return cleaned_content
                     continue
+        
+        # Method 4: Enhanced brace matching with string handling
+        try:
+            # Find the start of JSON object - look for the first {
+            start_pos = -1
+            in_string = False
+            escape_next = False
+            
+            for pos, char in enumerate(ai_response_content):
+                if escape_next:
+                    escape_next = False
+                    continue
+                
+                if char == '\\' and in_string:
+                    escape_next = True
+                    continue
+                    
+                if char == '"' and not escape_next:
+                    in_string = not in_string
+                elif not in_string and char == '{':
+                    start_pos = pos
+                    break
+            
+            if start_pos == -1:
+                return None
+            
+            # Find the matching closing brace for the JSON object
+            brace_count = 0
+            in_string = False
+            escape_next = False
+            json_end = -1
+            
+            for pos, char in enumerate(ai_response_content[start_pos:], start_pos):
+                if escape_next:
+                    escape_next = False
+                    continue
+                
+                if char == '\\' and in_string:
+                    escape_next = True
+                    continue
+                    
+                if char == '"' and not escape_next:
+                    in_string = not in_string
+                elif not in_string:
+                    if char == '{':
+                        brace_count += 1
+                    elif char == '}':
+                        brace_count -= 1
+                        if brace_count == 0:
+                            json_end = pos + 1
+                            break
+            
+            if json_end > start_pos:
+                potential_json = ai_response_content[start_pos:json_end]
+                
+                # Validate it's actually JSON and contains comparisons
+                if '"comparisons"' in potential_json:
+                    try:
+                        json.loads(potential_json)
+                        print("✓ Successfully extracted JSON using enhanced brace matching")
+                        return potential_json
+                    except json.JSONDecodeError:
+                        pass
+                        
+        except Exception as e:
+            print(f"⚠ Enhanced brace matching failed: {e}")
+        
+        # Method 5: Final comprehensive fallback - any JSON-like content with comparisons
+        try:
+            # Look for any content that starts with { and contains comparisons
+            json_match = re.search(r'(\{.*?comparisons.*?\})', ai_response_content, re.DOTALL)
+            if json_match:
+                potential_json = json_match.group(1)
+                
+                # Try to fix and validate
+                cleaned_json = self.clean_json_content(potential_json)
+                if cleaned_json:
+                    try:
+                        json.loads(cleaned_json)
+                        print("✓ Successfully extracted JSON using final fallback method")
+                        return cleaned_json
+                    except json.JSONDecodeError:
+                        pass
+        except Exception as e:
+            print(f"⚠ Final fallback method failed: {e}")
         
         return None
     
@@ -184,8 +291,19 @@ Focus ONLY on whether English and Russian express the same concept."""
         try:
             import re
             
+            # Remove markdown code block artifacts
+            cleaned_content = json_content.strip()
+            if cleaned_content.startswith('```json'):
+                cleaned_content = cleaned_content[7:].strip()
+            if cleaned_content.endswith('```'):
+                cleaned_content = cleaned_content[:-3].strip()
+            if cleaned_content.startswith('```'):
+                cleaned_content = cleaned_content[3:].strip()
+                if cleaned_content.endswith('```'):
+                    cleaned_content = cleaned_content[:-3].strip()
+            
             # Fix malformed fields like "observable": "" (malformed fields)
-            cleaned_content = re.sub(r'"[^"]*":\s*"\s*"\s*"\s*([,}])', r'""\1', json_content)
+            cleaned_content = re.sub(r'"[^"]*":\s*"\s*"\s*"\s*([,}])', r'""\1', cleaned_content)
             
             # Fix unescaped quotes in reasoning fields specifically (this is the main issue)
             cleaned_content = re.sub(
@@ -302,10 +420,8 @@ Focus ONLY on whether English and Russian express the same concept."""
                             for comp in batch:
                                 self.mark_as_checked_safe(checked_ids, comp.headword_id)
                             
-                            print(f"Batch {i//batch_size + 1} completed: {len(batch_results)} results")
+                            print(f"✓ Batch {i//batch_size + 1} completed: {len(batch_results)} results")
                         else:
-                            # Got incomplete JSON results - only track the ones we successfully processed
-                            print(f"⚠ Got only {len(batch_results)} results from batch, unprocessed words will be picked up in next run...")
                             
                             comparison_objects = self.process_batch_results(batch_results, len(batch))
                             all_results.extend(comparison_objects)
@@ -316,7 +432,7 @@ Focus ONLY on whether English and Russian express the same concept."""
                                 if headword_id:
                                     self.mark_as_checked_safe(checked_ids, headword_id)
                             
-                            print(f"Batch {i//batch_size + 1} completed: {len(batch_results)} results (next batch will handle remaining)")
+                            print(f"✓ Batch {i//batch_size + 1} completed: {len(batch_results)} / {len(batch)}")
                     else:
                         # No JSON found
                         print(f"⚠ No valid JSON found for batch {i//batch_size + 1}")
