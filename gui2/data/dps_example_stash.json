@@ -1,12 +1,12 @@
 {
     "dps_shared": {
-        "source": "SN47.4",
-        "sutta": "sālasuttaṃ",
-        "example": "te'pi kāye kāy'ānupassino viharanti ātāpino sampajānā ekodibhūtā vippasannacittā samāhitā ek'aggacittā, kāyassa pariññāya"
+        "source": "VIN2.5.2.10",
+        "sutta": "sappāṇakasikkhāpadaṃ",
+        "example": "sappāṇake appāṇakasaññī tiṇaṃ vā mattikaṃ vā siñcati vā siñcāpeti vā, anāpatti. appāṇake sappāṇakasaññī, āpatti dukkaṭassa. appāṇake vematiko, āpatti dukkaṭassa."
     },
     "dps_last": {
-        "source": "SN47.1",
-        "sutta": "ambapālisuttaṃ",
-        "example": "ek'āyano ayaṃ, bhikkhave, maggo sattānaṃ visuddhiyā sokaparidevānaṃ samatikkamāya dukkhadomanassānaṃ atthaṅ'gamāya ñāyassa adhigamāya nibbānassa sacchikiriyāya, yadidaṃ, cattāro satipaṭṭhānā."
+        "source": "VIN2.5.2.10",
+        "sutta": "sappāṇakasikkhāpadaṃ",
+        "example": "sappāṇake appāṇakasaññī tiṇaṃ vā mattikaṃ vā siñcati vā siñcāpeti vā, anāpatti. appāṇake sappāṇakasaññī, āpatti dukkaṭassa. appāṇake vematiko, āpatti dukkaṭassa."
     }
 }

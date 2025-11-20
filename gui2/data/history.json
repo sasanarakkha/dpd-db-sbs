@@ -1,5 +1,57 @@
 [
     {
+        "id": 7081,
+        "lemma_1": "appāṇakasaññī"
+    },
+    {
+        "id": 58699,
+        "lemma_1": "sappāṇakasaññī"
+    },
+    {
+        "id": 13424,
+        "lemma_1": "iṭṭhakiṭṭhakāya"
+    },
+    {
+        "id": 40175,
+        "lemma_1": "paṭāṇi"
+    },
+    {
+        "id": 42087,
+        "lemma_1": "padarasañcita"
+    },
+    {
+        "id": 73156,
+        "lemma_1": "aparibhoga 2"
+    },
+    {
+        "id": 63270,
+        "lemma_1": "sīsaghaṭṭa"
+    },
+    {
+        "id": 10793,
+        "lemma_1": "avehāsakuṭi"
+    },
+    {
+        "id": 3112,
+        "lemma_1": "adhikaraṇakāraka"
+    },
+    {
+        "id": 49501,
+        "lemma_1": "bhassakāraka"
+    },
+    {
+        "id": 69574,
+        "lemma_1": "vivādakāraka"
+    },
+    {
+        "id": 20590,
+        "lemma_1": "kalahakāraka"
+    },
+    {
+        "id": 49253,
+        "lemma_1": "bhaṇḍanakāraka"
+    },
+    {
         "id": 87980,
         "lemma_1": "samatitthika"
     },
@@ -26,57 +78,5 @@
     {
         "id": 58079,
         "lemma_1": "saddhānusārī 1"
-    },
-    {
-        "id": 74135,
-        "lemma_1": "jīvitenūpapanna"
-    },
-    {
-        "id": 57829,
-        "lemma_1": "sattāhātikkanta"
-    },
-    {
-        "id": 49749,
-        "lemma_1": "bhārukaccha"
-    },
-    {
-        "id": 50106,
-        "lemma_1": "bhuttapātarāsa"
-    },
-    {
-        "id": 6175,
-        "lemma_1": "apathavisaññī"
-    },
-    {
-        "id": 87976,
-        "lemma_1": "jāta 9"
-    },
-    {
-        "id": 87977,
-        "lemma_1": "ajāta 3"
-    },
-    {
-        "id": 2933,
-        "lemma_1": "aduṭṭhullāpattisaññī"
-    },
-    {
-        "id": 2932,
-        "lemma_1": "aduṭṭhullāpatti"
-    },
-    {
-        "id": 33111,
-        "lemma_1": "duṭṭhullāpattisaññī"
-    },
-    {
-        "id": 33110,
-        "lemma_1": "duṭṭhullāpatti"
-    },
-    {
-        "id": 12550,
-        "lemma_1": "ārocetabba"
-    },
-    {
-        "id": 8547,
-        "lemma_1": "amātugāma"
     }
 ]
