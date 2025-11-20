@@ -26,6 +26,7 @@ from tools.pos import CONJUGATIONS, DECLENSIONS, EXCLUDE_FROM_FREQ
 from tools.clean_machine import clean_machine
 
 from tools.sbs_table_functions import SBS_table_tools, paragraphs_are_similar
+from tools.configger import config_read
 
 
 class Base(DeclarativeBase):
@@ -601,6 +602,7 @@ class SuttaInfo(Base):
 
     @property
     def tbw(self) -> str | None:
+        link_url = config_read("dictionary", "link_url")
         if self.sc_code:
             if self.book_code in [
             "DN",
@@ -616,9 +618,9 @@ class SuttaInfo(Base):
             "THI",
         ]:
                 if self.sc_book_code == "iti":
-                    return "https://thebuddhaswords.net/it/it.html"
+                    return f"{link_url}it/it.html"
                 else:
-                    return f"https://thebuddhaswords.net/{self.sc_book_code.lower()}/{self.sc_code.lower()}.html"
+                    return f"{link_url}{self.sc_book_code.lower()}/{self.sc_code.lower()}.html"
             else:
                 return None
         else:

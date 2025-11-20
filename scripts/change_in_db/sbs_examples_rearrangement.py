@@ -113,7 +113,42 @@ def extra_example_rearrangement():
     print(f"sbs_example_2 has been cleared in {count_clear} records.")
 
 
+def moving_sutta_names():
+    """Move sutta names from meaning_2 to ru.meaning_ru for records where
+    meaning_2 is not empty and family_set starts with 'suttas of'"""
+    # Sanity check: Ensure DpdHeadword IDs are unique in the fetched list
+    unique_db_list = []
+    seen_ids_for_dedup = set()
+    for item in db:
+        if item.id not in seen_ids_for_dedup:
+            seen_ids_for_dedup.add(item.id)
+            unique_db_list.append(item)
+    
+    # Use the de-duplicated list for processing
+    processed_db_items = unique_db_list
+    
+    count = 0
+    with db_session.no_autoflush:
+        for i in processed_db_items:
+            # Filter: meaning_2 is not empty AND family_set starts with "suttas of"
+            if i.meaning_2 and i.family_set.startswith("suttas of"):
+                # Ensure Russian record exists
+                if not i.ru:
+                    new_russian = Russian(id=i.id)
+                    i.ru = new_russian
+                    db_session.add(new_russian)
+                
+                # Copy meaning_2 to ru.meaning_ru
+                i.ru.ru_meaning = i.meaning_2
+                count += 1
+
+    # db_session.commit()
+    db_session.close()
+    print(f"Copied meaning_2 to ru.meaning_ru for {count} records.")
+
+
 if __name__ == "__main__":
     print("sbs_example_rearrangement")
     # dhp()
     # extra_example_rearrangement()
+    # moving_sutta_names()

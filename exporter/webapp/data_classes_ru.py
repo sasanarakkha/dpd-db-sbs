@@ -27,6 +27,7 @@ class HeadwordData:
         self.fc = fc
         self.fi = fi
         self.fs = fs
+        self.su = i.su
         self.app_name = "dpdict.net"
         self.date = year_month_day_dash()
         self.inflections_html_ru = ru_replace_abbreviations(

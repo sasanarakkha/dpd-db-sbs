@@ -18,11 +18,11 @@ def main():
     config_update("regenerate", "freq_maps", "no")
 
     config_update("dictionary", "make_mdict", "no")
-    config_update("dictionary", "make_link", "yes")
+    config_update("dictionary", "make_link", "no")
     config_update("dictionary", "link_url", "http://filesrv1:8083/")
     config_update("dictionary", "show_id", "no")
     config_update("dictionary", "show_sbs_data", "no")
-    config_update("dictionary", "show_ru_data", "yes")
+    config_update("dictionary", "show_ru_data", "no")
     config_update("dictionary", "show_grammar", "no")
 
     config_update("exporter", "make_dpd", "yes")

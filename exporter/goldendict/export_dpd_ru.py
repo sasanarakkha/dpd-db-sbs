@@ -1,32 +1,31 @@
 """Compile HTML data for DpdHeadword."""
 
+from multiprocessing import Manager, Process
+from multiprocessing.managers import ListProxy
+from typing import List, Set, Tuple, TypedDict
+
 import psutil
-
-from sqlalchemy.sql import func
-
 
 # from css_html_js_minify import css_minify, js_minify
 from mako.template import Template
 from minify_html import minify
-from multiprocessing.managers import ListProxy
-from multiprocessing import Process, Manager
-from typing import List, Set, TypedDict, Tuple
-
 from sqlalchemy.orm.session import Session
 from sqlalchemy.orm import joinedload
 
+from sqlalchemy.sql import func
 
+from db.models import (
+    DpdHeadword,
+    DpdRoot,
+    FamilyCompound,
+    FamilyIdiom,
+    FamilyRoot,
+    FamilySet,
+    FamilyWord,
+    SuttaInfo,
+    Russian
+)
 from exporter.goldendict.helpers import TODAY
-
-from db.models import DpdHeadword
-from db.models import DpdRoot
-from db.models import FamilyCompound
-from db.models import FamilyIdiom
-from db.models import FamilyRoot
-from db.models import FamilySet
-from db.models import FamilyWord
-from db.models import Russian
-
 from tools.configger import config_test
 from tools.css_manager import CSSManager
 from tools.date_and_time import year_month_day_dash
@@ -46,8 +45,13 @@ from tools.pos import CONJUGATIONS, DECLENSIONS, INDECLINABLES
 from tools.printer import printer as pr
 from tools.sandhi_contraction import SandhiContractionDict
 from tools.superscripter import superscripter_uni
-from tools.utils import RenderedSizes, default_rendered_sizes, list_into_batches
-from tools.utils import sum_rendered_sizes, squash_whitespaces
+from tools.utils import (
+    RenderedSizes,
+    default_rendered_sizes,
+    list_into_batches,
+    squash_whitespaces,
+    sum_rendered_sizes,
+)
 
 from tools.paths_ru import RuPaths
 from tools.tools_for_ru_exporter import (
@@ -69,6 +73,7 @@ class DpdHeadwordTemplates:
             filename=str(paths.dpd_definition_templ_path)
         )
         self.button_box_templ = Template(filename=str(paths.button_box_templ_path))
+        self.sutta_info_templ = Template(filename=str(paths.sutta_info_templ_path))
         self.grammar_templ = Template(filename=str(paths.grammar_templ_path))
         self.example_templ = Template(filename=str(paths.example_templ_path))
         self.sbs_example_templ = Template(filename=str(paths.sbs_example_templ_path))
@@ -99,6 +104,7 @@ class DpdHeadwordDbParts(TypedDict):
     family_compounds: List[FamilyCompound]
     family_idioms: List[FamilyIdiom]
     family_set: List[FamilySet]
+    sutta_info: SuttaInfo
 
 
 class DpdHeadwordRenderDataBase(TypedDict):
@@ -129,6 +135,7 @@ def render_pali_word_dpd_html(
     fi: List[FamilyIdiom] = db_parts["family_idioms"]
     fs: List[FamilySet] = db_parts["family_set"]
     date: str = year_month_day_dash()
+    su: SuttaInfo = db_parts["sutta_info"]
 
     tt = rd["word_templates"]
     pth = rd["pth"]
@@ -145,8 +152,6 @@ def render_pali_word_dpd_html(
         i.compound_construction = i.compound_construction.replace("\n", "<br>")
     if i.commentary:
         i.commentary = i.commentary.replace("\n", "<br>")
-    if i.link:
-        i.link = i.link.replace("\n", "<br>")
     if i.sutta_1:
         i.sutta_1 = i.sutta_1.replace("\n", "<br>")
     if i.sutta_2:
@@ -183,6 +188,19 @@ def render_pali_word_dpd_html(
     )
     html += button_box
     size_dict["dpd_button_box"] += len(button_box)
+
+    if i.needs_sutta_info_button:
+        try:
+            sutta_info = render_sutta_info_templ(
+                pth,
+                i,
+                su,
+                tt.sutta_info_templ,
+            )
+            html += sutta_info
+        except Exception as e:
+            pr.red(i.lemma_1)
+            pr.red(f"{e}")
 
     if i.needs_grammar_button:
         grammar = render_grammar_templ(
@@ -253,14 +271,17 @@ def render_pali_word_dpd_html(
     size_dict["dpd_header"] += len(header)
     html = squash_whitespaces(header) + minify(html)
 
+    # lots of synonyms
     synonyms: List[str] = i.inflections_list_all  # include api ca eva iti
     synonyms = add_niggahitas(synonyms)
+
     for synonym in synonyms:
         if synonym in sandhi_contractions:
             contractions = sandhi_contractions[synonym]
             for contraction in contractions:
                 if "'" in contraction:
                     synonyms.append(contraction)
+
     synonyms += i.inflections_sinhala_list
     synonyms += i.inflections_devanagari_list
     synonyms += i.inflections_thai_list
@@ -272,6 +293,9 @@ def render_pali_word_dpd_html(
             ru_set_list.append(set_ru_dict[english_word])
     synonyms += ru_set_list
     synonyms += [str(i.id)]
+
+    if i.needs_sutta_info_button:
+        synonyms += i.su.sutta_codes_list
 
     size_dict["dpd_synonyms"] += len(str(synonyms))
 
@@ -295,17 +319,18 @@ def _parse_batch_top_level(
     """Helper function for multiprocessing, now at top level."""
     # Create templates locally in child process
     word_templates = DpdHeadwordTemplates(path)
-    
+
     # Reconstruct full render data with local templates
     full_render_data: DpdHeadwordRenderData = {
         **render_data,
         "pth": path,
-        "word_templates": word_templates
+        "word_templates": word_templates,
     }
 
     res: List[Tuple[DictEntry, RenderedSizes]] = [
         render_pali_word_dpd_html(
-            i, full_render_data
+            i,
+            full_render_data,
         )
         for i in batch
     ]
@@ -401,6 +426,7 @@ def generate_dpd_html(
                 family_compounds=get_family_compounds(pw),
                 family_idioms=get_family_idioms(pw),
                 family_set=get_family_set(pw),
+                sutta_info=pw.su,
             )
 
         dpd_db_data = [_add_parts(i.tuple()) for i in dpd_db]
@@ -431,7 +457,7 @@ def generate_dpd_html(
                     render_data,
                     dpd_data_results_list,
                     rendered_sizes_results_list
-                )
+                ),
             )
             p.start()
             processes.append(p)
@@ -520,6 +546,13 @@ def render_button_box_templ(
     button_html = '<a class="button" href="#" data-target="{target}">{name}</a>'
 
     # grammar_button
+    if i.needs_sutta_info_button:
+        sutta_info_button = button_html.format(
+            target=f"ru_sutta_info_{i.lemma_1_}", name="сутта"
+        )
+    else:
+        sutta_info_button = ""
+
     if i.needs_grammar_button:
         grammar_button = button_html.format(
             target=f"ru_grammar_{i.lemma_1_}", name="грамматика"
@@ -624,6 +657,7 @@ def render_button_box_templ(
 
     return str(
         button_box_templ.render(
+            sutta_info_button=sutta_info_button,
             grammar_button=grammar_button,
             example_button=example_button,
             examples_button=examples_button,
@@ -636,6 +670,22 @@ def render_button_box_templ(
             set_family_button=set_family_button,
             frequency_button=frequency_button,
             feedback_button=feedback_button,
+        )
+    )
+
+
+def render_sutta_info_templ(
+    __pth__: RuPaths,
+    i: DpdHeadword,
+    su: SuttaInfo,
+    sutta_info_templ: Template,
+) -> str:
+    """html table of sutta information"""
+    return str(
+        sutta_info_templ.render(
+            i=i,
+            su=su,
+            today=TODAY,
         )
     )
 

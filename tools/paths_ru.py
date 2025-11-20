@@ -223,6 +223,9 @@ class RuPaths:
             base_dir
             / "exporter/goldendict/ru_components/templates/dpd_variant_reading.html"
         )
+        self.sutta_info_templ_path = (
+            base_dir / "exporter/goldendict/ru_components/templates/dpd_sutta_info.html"
+        )
 
         # exporter/goldendict/templates - root
         self.root_button_templ_path = (
