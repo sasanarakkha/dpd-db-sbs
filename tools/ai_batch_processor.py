@@ -1,9 +1,22 @@
+"""
+AI Batch Processor - Handles batch processing of AI meaning comparisons.
+
+This module provides the BatchProcessor class for comparing English and Russian meanings
+using AI models. It processes comparisons in batches for efficiency and delegates JSON
+parsing to the JSONParser class.
+
+Main components:
+- WordComparison: Data class for word entries to compare
+- ComparisonResult: Data class for AI comparison results
+- BatchProcessor: Main class for batch processing AI comparisons
+"""
+
 from typing import List, Optional
 import json
-import re
 from dataclasses import dataclass
 
 from tools.ai_manager import AIManager
+from tools.ai_json_parser import JSONParser
 
 
 @dataclass
@@ -13,7 +26,8 @@ class WordComparison:
     lemma_1: str
     english_meaning: str
     russian_meaning: str
-    grammar: str
+    russian_meaning_alt: Optional[str] = None  # For literal meaning modes - holds ru_meaning
+    grammar: str = ""
 
 
 @dataclass
@@ -32,6 +46,7 @@ class BatchProcessor:
     
     def __init__(self):
         self.ai_manager = AIManager()
+        self.json_parser = JSONParser()
     
     def mark_as_checked_safe(self, checked_ids: set[int], headword_id: int) -> bool:
         """Safely mark an ID as checked"""
@@ -59,10 +74,65 @@ class BatchProcessor:
         
         return headword_id
     
-    def create_comparison_prompt(self, comparisons: List[WordComparison], batch_size: int = 10) -> str:
+    def create_comparison_prompt(self, comparisons: List[WordComparison], batch_size: int = 10, mode: str = "meaning") -> str:
         """Create AI prompt for comparing meanings"""
         
-        prompt = """You are an expert in English-Russian translation comparison. Focus ONLY on comparing the English and Russian MEANINGS, considering grammatical information.
+        # Check if this is literal meaning mode based on mode parameter
+        has_lit_mode = mode in ["meaning_lit", "meaning_lit_list"]
+        
+        # Check if this is Russian grammar checking mode (meaning_ru_raw)
+        is_ru_raw_mode = (mode == "meaning_ru_raw")
+        
+        if is_ru_raw_mode:
+            # Russian grammar-only checking mode - NO English meaning comparison
+            prompt = """You are an expert Russian language grammarian. Your task is to check ONLY Russian grammar and language correctness.
+
+🎯 TASK: Identify Russian language errors in the given Russian text.
+
+FOCUS ONLY ON:
+1. TYPOS in Russian text
+2. CASE ENDING ERRORS - do they match the given grammar details?
+3. GRAMMAR CORRECTNESS - proper Russian grammar rules
+4. SPELLING MISTAKES
+5. PUNCTUATION ERRORS
+
+GRAMMAR CHECKING RULES:
+- Check if nouns have correct case endings based on grammar
+- Verify adjective-noun agreement in case, number, gender
+- Check preposition + case combinations
+- Verify verb conjugations and aspects
+- Look for common Russian typos and misspellings
+
+EXAMPLES OF MISMATCHES (flag these):
+- "книга читаю" → MISMATCH (wrong case ending - should be "книгу читаю")
+- "в хороший дому" → MISMATCH (wrong preposition case - should be "в хорошем доме")
+- "они идёт" → MISMATCH (verb conjugation error - should be "они идут")
+
+EXAMPLES OF MATCHES (don't flag these):
+- "книга читается" ✓ (correct grammar)
+- "в красивом саду" ✓ (correct case endings)
+- "мы читаем книги" ✓ (correct grammar)
+
+FORMAT YOUR RESPONSE AS JSON:
+{
+    "comparisons": [
+        {
+            "id": [headword_id],
+            "lemma": "[lemma_1]",
+            "match_status": "MATCH|PARTIAL_MATCH|MISMATCH",
+            "confidence": [0.0-1.0],
+            "reasoning": "[detailed grammar explanation]",
+            "suggested_fix": "[corrected Russian text if needed]"
+        }
+    ]
+}
+
+Here are the Russian texts to analyze for grammar only:
+
+"""
+        else:
+            # Standard English-Russian meaning comparison mode
+            prompt = """You are an expert in English-Russian translation comparison. Focus ONLY on comparing the English and Russian MEANINGS, considering grammatical information.
 
 🎯 TASK: Identify ONLY extreme cases where Russian translations are COMPLETELY WRONG or have OPPOSITE MEANING.
 
@@ -88,8 +158,22 @@ EXAMPLES OF TRUE MISMATCHES (only flag these):
 - "north" vs "юг" (north vs south - OPPOSITE)
 - "hot" vs "холодный" (hot vs cold - OPPOSITE)
 
-KEY RULE: If English and Russian express the same concept (even with different wording), it's a MATCH.
+"""
+            if has_lit_mode:
+                prompt += """🔥 LITERAL MEANING CHECK ADDITIONAL RULES:
+If Literal Russian Meaning is TOO SIMILAR to Russian Regular Meaning, flag as MISMATCH.
+Literal meanings should be DISTINCT from regular meanings, not just word-for-word duplicates.
+For example: "good" vs "хороший" (literal) and "хороший" (regular) = MISMATCH (too similar)
 
+"""
+            prompt += """KEY RULES:
+- If English and Russian express the same concept (even with different wording), it's a MATCH
+"""
+            if has_lit_mode:
+                prompt += """
+- Also ensure that Russian meaning is actually different from regular Russian meanings
+"""
+            prompt += """
 FORMAT YOUR RESPONSE AS JSON:
 {
     "comparisons": [
@@ -104,265 +188,52 @@ FORMAT YOUR RESPONSE AS JSON:
     ]
 }
 
-Here are the word comparisons to analyze (focus ONLY on English vs Russian meanings):
+Here are the word comparisons to analyze:
 
 """
         
-        # Add simplified word data - focus on core meanings only
+        # Add word data
         for i, comp in enumerate(comparisons[:batch_size]):
-            # Simplified format - focus on core meanings only
-            prompt += f"{i+1}. ID: {comp.headword_id}\n"
-            prompt += f"Pali Lemma: {comp.lemma_1}\n"
-            prompt += f"Grammar: {comp.grammar}\n" 
-            prompt += f"English: {comp.english_meaning}\n"
-            prompt += f"Russian: {comp.russian_meaning}\n"
+            if is_ru_raw_mode:
+                prompt += f"{i+1}. ID: {comp.headword_id}\n"
+                prompt += f"Grammar Details: {comp.grammar}\n"
+                prompt += f"Russian Text: {comp.russian_meaning}\n\n"
+            else:
+                prompt += f"{i+1}. ID: {comp.headword_id}\n"
+                prompt += f"Pali Lemma: {comp.lemma_1}\n"
+                prompt += f"Grammar: {comp.grammar}\n"
+                if has_lit_mode:
+                    prompt += "Literal "
+                prompt += f"English: {comp.english_meaning}\n"
+                if has_lit_mode:
+                    prompt += "Literal "
+                prompt += f"Russian: {comp.russian_meaning}\n"
+                
+                # Add alternative Russian meaning for literal modes
+                if comp.russian_meaning_alt:
+                    prompt += f"Regular Russian: {comp.russian_meaning_alt}\n"
+                
+                prompt += "\n"
         
-        prompt += """🚨 BE EXTREMELY CONSERVATIVE 🚨
-ONLY flag as MISMATCH if English and Russian meanings are completely opposite or nonsensical.
-Focus ONLY on whether English and Russian express the same concept."""
-        
+        if is_ru_raw_mode:
+            prompt += """🚨 GRAMMAR CHECKING FOCUS 🚨
+ONLY flag as MISMATCH if:
+1. Russian text contains typos or spelling mistakes
+2. Case endings don't match the grammar details provided
+3. Grammar rules are violated (wrong prepositions, verb forms, etc.)
+4. Text is grammatically incorrect in Russian
+"""
+        else:
+            prompt += """🚨 BE EXTREMELY CONSERVATIVE 🚨
+ONLY flag as MISMATCH if:
+1. English and Russian meanings are completely opposite or nonsensical, Focus ONLY on whether English and Russian express the same concept.
+"""
+            if has_lit_mode:
+                prompt += """OR
+2. For literal meanings: if Literal Russian is too similar to Russian Regular meaning
+"""
+        print(prompt) # debug
         return prompt
-    
-    def extract_json_from_response(self, ai_response_content: str) -> Optional[str]:
-        """Extract JSON from AI response using multiple methods"""
-        
-        # Clean up the response content first
-        ai_response_content = ai_response_content.strip()
-        
-        # Method 1: Try direct JSON parsing
-        try:
-            import json
-            # Try to parse the entire response as JSON
-            data = json.loads(ai_response_content)
-            if "comparisons" in data:
-                print("✓ Successfully parsed pure JSON response")
-                return ai_response_content
-        except json.JSONDecodeError:
-            pass  # Not pure JSON, continue with other methods
-        
-        # Method 2: Simple brace matching - find first { and last }
-        try:
-            first_brace = ai_response_content.find('{')
-            last_brace = ai_response_content.rfind('}')
-            
-            if first_brace != -1 and last_brace != -1 and last_brace > first_brace:
-                potential_json = ai_response_content[first_brace:last_brace+1]
-                
-                # Check if it contains "comparisons" and is valid JSON
-                if '"comparisons"' in potential_json:
-                    try:
-                        json.loads(potential_json)
-                        print("✓ Successfully extracted JSON using brace matching")
-                        return potential_json
-                    except json.JSONDecodeError:
-                        pass  # Try next method
-        except Exception:
-            pass  # Continue to next method
-        
-        # Method 3: Comprehensive patterns matching (UPDATED for markdown code blocks)
-        json_patterns = [
-            # Pattern 1: ```json code blocks with multi-line JSON content
-            r'```json\s*(\{[\s\S]*?\})\s*```',
-            # Pattern 2: Generic ``` code blocks with JSON content
-            r'```\s*(\{[\s\S]*?\})\s*```',
-            # Pattern 3: Direct JSON starting with { and containing "comparisons"
-            r'(\{[\s\S]*?"comparisons"[\s\S]*?\})',
-            # Pattern 4: More flexible - look for complete comparisons arrays
-            r'(\{[\s\S]*?"comparisons"\s*:\s*\[[\s\S]*?\][\s\S]*?\})',
-            # Pattern 5: Find any JSON-like object containing comparisons
-            r'(\{[\s\S]*?comparisons[\s\S]*?\})',
-            # Pattern 6: Simple extraction - find first { and last } containing comparisons
-            r'(\{[^}]*comparisons[^}]*\})',
-            # Pattern 7: Ultra-flexible - capture from { to last } if it contains comparisons
-            r'(\{[^{]*?comparisons[^{]*?\})',
-        ]
-        
-        for pattern_idx, pattern in enumerate(json_patterns):
-            match = re.search(pattern, ai_response_content, re.DOTALL)
-            if match:
-                potential_json = match.group(1)
-                
-                # Clean the extracted content - remove markdown artifacts
-                potential_json = potential_json.strip()
-                
-                # Additional validation: ensure we have a complete JSON object
-                try:
-                    # Quick validation to see if it's parseable
-                    json.loads(potential_json)
-                    print(f"✓ Pattern {pattern_idx + 1} successfully extracted JSON")
-                    return potential_json  # Success - return the JSON
-                except json.JSONDecodeError:
-                    # Try to clean and fix the JSON
-                    cleaned_content = self.clean_json_content(potential_json)
-                    if cleaned_content:
-                        print(f"✓ Pattern {pattern_idx + 1} extracted and cleaned JSON")
-                        return cleaned_content
-                    continue
-        
-        # Method 4: Enhanced brace matching with string handling
-        try:
-            # Find the start of JSON object - look for the first {
-            start_pos = -1
-            in_string = False
-            escape_next = False
-            
-            for pos, char in enumerate(ai_response_content):
-                if escape_next:
-                    escape_next = False
-                    continue
-                
-                if char == '\\' and in_string:
-                    escape_next = True
-                    continue
-                    
-                if char == '"' and not escape_next:
-                    in_string = not in_string
-                elif not in_string and char == '{':
-                    start_pos = pos
-                    break
-            
-            if start_pos == -1:
-                return None
-            
-            # Find the matching closing brace for the JSON object
-            brace_count = 0
-            in_string = False
-            escape_next = False
-            json_end = -1
-            
-            for pos, char in enumerate(ai_response_content[start_pos:], start_pos):
-                if escape_next:
-                    escape_next = False
-                    continue
-                
-                if char == '\\' and in_string:
-                    escape_next = True
-                    continue
-                    
-                if char == '"' and not escape_next:
-                    in_string = not in_string
-                elif not in_string:
-                    if char == '{':
-                        brace_count += 1
-                    elif char == '}':
-                        brace_count -= 1
-                        if brace_count == 0:
-                            json_end = pos + 1
-                            break
-            
-            if json_end > start_pos:
-                potential_json = ai_response_content[start_pos:json_end]
-                
-                # Validate it's actually JSON and contains comparisons
-                if '"comparisons"' in potential_json:
-                    try:
-                        json.loads(potential_json)
-                        print("✓ Successfully extracted JSON using enhanced brace matching")
-                        return potential_json
-                    except json.JSONDecodeError:
-                        pass
-                        
-        except Exception as e:
-            print(f"⚠ Enhanced brace matching failed: {e}")
-        
-        # Method 5: Final comprehensive fallback - any JSON-like content with comparisons
-        try:
-            # Look for any content that starts with { and contains comparisons
-            json_match = re.search(r'(\{.*?comparisons.*?\})', ai_response_content, re.DOTALL)
-            if json_match:
-                potential_json = json_match.group(1)
-                
-                # Try to fix and validate
-                cleaned_json = self.clean_json_content(potential_json)
-                if cleaned_json:
-                    try:
-                        json.loads(cleaned_json)
-                        print("✓ Successfully extracted JSON using final fallback method")
-                        return cleaned_json
-                    except json.JSONDecodeError:
-                        pass
-        except Exception as e:
-            print(f"⚠ Final fallback method failed: {e}")
-        
-        return None
-    
-    def clean_json_content(self, json_content: str) -> Optional[str]:
-        """Clean malformed JSON content"""
-        try:
-            import re
-            
-            # Remove markdown code block artifacts
-            cleaned_content = json_content.strip()
-            if cleaned_content.startswith('```json'):
-                cleaned_content = cleaned_content[7:].strip()
-            if cleaned_content.endswith('```'):
-                cleaned_content = cleaned_content[:-3].strip()
-            if cleaned_content.startswith('```'):
-                cleaned_content = cleaned_content[3:].strip()
-                if cleaned_content.endswith('```'):
-                    cleaned_content = cleaned_content[:-3].strip()
-            
-            # Fix malformed fields like "observable": "" (malformed fields)
-            cleaned_content = re.sub(r'"[^"]*":\s*"\s*"\s*"\s*([,}])', r'""\1', cleaned_content)
-            
-            # Fix unescaped quotes in reasoning fields specifically (this is the main issue)
-            cleaned_content = re.sub(
-                r'(reasoning.*?:.*?)"([^"]*?)("|\'|–|-)([^"]*?)("|\'|")',
-                r'\1"\2\4\5',
-                cleaned_content
-            )
-            
-            # Fix unescaped quotes in all string fields
-            string_fields = ['reasoning', 'lemma', 'match_status', 'suggested_fix']
-            for field in string_fields:
-                pattern = rf'"{field}":\s*"([^"]*(?:\\.[^"]*)*)"'
-                def fix_string_field(match):
-                    field_text = match.group(1)
-                    field_text = field_text.replace('\\', '\\\\').replace('"', '\\"')
-                    return f'"{field}": "{field_text}"'
-                
-                cleaned_content = re.sub(pattern, fix_string_field, cleaned_content)
-            
-            # Fix trailing commas before closing brackets/braces
-            cleaned_content = re.sub(r',\s*}', '}', cleaned_content)
-            cleaned_content = re.sub(r',\s*]', ']', cleaned_content)
-            
-            # Fix missing required fields by adding default values
-            cleaned_content = re.sub(
-                r'("id":\s*\d+,\s*"match_status":\s*"[^"]*",\s*"confidence":\s*[\d.]+,\s*"reasoning":\s*"[^"]*",\s*"suggested_fix":\s*[^,\}]*)',
-                r'\1, "lemma": ""',
-                cleaned_content
-            )
-            
-            # Fix entries missing "lemma" field
-            cleaned_content = re.sub(
-                r'(\{"id":\s*\d+,\s*"match_status":\s*"[^"]*",\s*"confidence":\s*[\d.]+,\s*"reasoning":\s*"[^"]*",\s*"suggested_fix":\s*null)(\s*\})',
-                r'\1, "lemma": ""\2',
-                cleaned_content
-            )
-            
-            cleaned_content = re.sub(
-                r'(\{"id":\s*\d+,\s*"match_status":\s*"[^"]*",\s*"confidence":\s*[\d.]+,\s*"reasoning":\s*"[^"]*",\s*"suggested_fix":\s*")(\})',
-                r'\1", "lemma": ""\2',
-                cleaned_content
-            )
-            
-            # Fix missing commas before closing braces
-            cleaned_content = re.sub(r'(\}\s*")(\{)', r'\1,\2', cleaned_content)
-            
-            # Ensure proper comma placement in arrays
-            cleaned_content = re.sub(r'(\]\s*\})(\s*)(\{)', r'\1,\3', cleaned_content)
-            
-            # Fix brackets around numeric values
-            cleaned_content = re.sub(r'"id":\s*\[(\d+)\]', r'"id": \1', cleaned_content)
-            cleaned_content = re.sub(r'"confidence":\s*\[([0-9.]+)\]', r'"confidence": \1', cleaned_content)
-            
-            # Try to parse the cleaned content
-            json.loads(cleaned_content)
-            return cleaned_content
-            
-        except (json.JSONDecodeError, re.error):
-            return None
     
     def process_batch_results(self, batch_results: List[dict], batch_size: int) -> List[ComparisonResult]:
         """Process batch results into ComparisonResult objects"""
@@ -386,81 +257,122 @@ Focus ONLY on whether English and Russian express the same concept."""
         
         return comparison_objects
     
-    def compare_meanings_batch(self, comparisons: List[WordComparison], checked_ids: set[int], batch_size: int = 25) -> List[ComparisonResult]:
-        """Compare meanings in batches using AI"""
-        all_results = []
+    def compare_meanings_batch(self, comparisons: List[WordComparison], checked_ids: set[int], batch_size: int = 50, mode: str = "meaning") -> List[ComparisonResult]:
+        """Compare meanings in batches using AI with simple interrupt handling"""
+        import signal
         
-        for i in range(0, len(comparisons), batch_size):
-            batch = comparisons[i:i+batch_size]
-            print(f"Processing batch {i//batch_size + 1}/{(len(comparisons) + batch_size - 1)//batch_size}")
-            
-            # Create prompt for this batch
-            prompt = self.create_comparison_prompt(batch, batch_size)
-            
-            # Make AI request (use default models which includes working fallbacks)
-            ai_response = self.ai_manager.request(prompt=prompt)
-            
-            if ai_response.content is not None:
-                # Try to parse response as JSON first
-                try:
-                    # Extract JSON from response
-                    json_content = self.extract_json_from_response(ai_response.content)
+        # Simple flag to track interruption
+        interrupted = False
+        
+        def interrupt_handler(sig, frame):
+            nonlocal interrupted
+            print("\n⚠ INTERRUPT DETECTED - Will stop after current batch...")
+            interrupted = True
+        
+        # Set up interrupt handler
+        signal.signal(signal.SIGINT, interrupt_handler)
+        
+        all_results = []
+        total_batches = (len(comparisons) + batch_size - 1) // batch_size
+        
+        try:
+            for i in range(0, len(comparisons), batch_size):
+                # Check for interruption
+                if interrupted:
+                    print("⏹ Processing stopped by user request")
+                    break
                     
-                    if json_content:
-                        # Parse the JSON content
-                        data = json.loads(json_content)
-                        batch_results = data.get("comparisons", [])
-                        
-                        if len(batch_results) == len(batch):
-                            # Perfect! Got results for all words in batch
-                            comparison_objects = self.process_batch_results(batch_results, len(batch))
-                            all_results.extend(comparison_objects)
+                batch = comparisons[i:i+batch_size]
+                batch_num = i//batch_size + 1
+                print(f"Processing batch {batch_num}/{total_batches} ({len(batch)} words)")
+                
+                try:
+                    # Create prompt for this batch
+                    prompt = self.create_comparison_prompt(batch, batch_size, mode)
+                    
+                    # Make AI request (use default models which includes working fallbacks)
+                    ai_response = self.ai_manager.request(prompt=prompt)
+                    
+                    if ai_response.content is not None:
+                        # Try to parse response as JSON first
+                        try:
+                            # Extract JSON from response using JSONParser
+                            json_content = self.json_parser.extract_json_from_response(ai_response.content)
                             
-                            # Mark all as checked since they were successfully processed
-                            for comp in batch:
-                                self.mark_as_checked_safe(checked_ids, comp.headword_id)
+                            if json_content:
+                                # Parse the JSON content
+                                data = json.loads(json_content)
+                                batch_results = data.get("comparisons", [])
+                                
+                                if len(batch_results) == len(batch):
+                                    # Perfect! Got results for all words in batch
+                                    comparison_objects = self.process_batch_results(batch_results, len(batch))
+                                    all_results.extend(comparison_objects)
+                                    
+                                    # Mark all as checked since they were successfully processed
+                                    for comp in batch:
+                                        self.mark_as_checked_safe(checked_ids, comp.headword_id)
+                                    
+                                    print(f"✓ Batch {batch_num} completed: {len(batch_results)} results")
+                                else:
+                                    comparison_objects = self.process_batch_results(batch_results, len(batch))
+                                    all_results.extend(comparison_objects)
+                                    
+                                    # Mark as checked only the ones we got results for
+                                    for result_dict in batch_results:
+                                        headword_id = self.extract_headword_id(result_dict)
+                                        if headword_id:
+                                            self.mark_as_checked_safe(checked_ids, headword_id)
+                                    
+                                    print(f"✓ Batch {batch_num} completed: {len(batch_results)} / {len(batch)}")
+                            else:
+                                # No JSON found
+                                print(f"⚠ No valid JSON found for batch {batch_num}")
+                                # Debug: Print the content for analysis
+                                print("\n=== DEBUG: Enhanced Brace Matching Failed ===")
+                                print(f"Response length: {len(ai_response.content)}")
+                                print(f"First 1000 chars: {ai_response.content[:1000]}")
+                                print(".........")
+                                print(f"Last 500 chars: {ai_response.content[-500:]}")
+                                print("=== DEBUG: End Enhanced Brace Matching Debug ===\n")
+                                
+                        except (json.JSONDecodeError, KeyError, ValueError) as e:
+                            print(f"⚠ JSON processing failed for batch {batch_num}: {e}")
+                            # Debug: Print the content for analysis
+                            print("\n=== DEBUG: Enhanced Brace Matching Failed ===")
+                            print(f"Response length: {len(ai_response.content)}")
+                            print(f"First 1000 chars: {ai_response.content[:1000]}")
+                            print(".........")
+                            print(f"Last 500 chars: {ai_response.content[-500:]}")
+                            print("=== DEBUG: End Enhanced Brace Matching Debug ===\n")
+                            continue
                             
-                            print(f"✓ Batch {i//batch_size + 1} completed: {len(batch_results)} results")
-                        else:
-                            
-                            comparison_objects = self.process_batch_results(batch_results, len(batch))
-                            all_results.extend(comparison_objects)
-                            
-                            # Mark as checked only the ones we got results for
-                            for result_dict in batch_results:
-                                headword_id = self.extract_headword_id(result_dict)
-                                if headword_id:
-                                    self.mark_as_checked_safe(checked_ids, headword_id)
-                            
-                            print(f"✓ Batch {i//batch_size + 1} completed: {len(batch_results)} / {len(batch)}")
                     else:
-                        # No JSON found
-                        print(f"⚠ No valid JSON found for batch {i//batch_size + 1}")
-                        # Debug: Print the content for analysis
-                        print("\n=== DEBUG: Enhanced Brace Matching Failed ===")
-                        print(f"Response length: {len(ai_response.content)}")
-                        print(f"First 1000 chars: {ai_response.content[:1000]}")
-                        print(".........")
-                        print(f"Last 500 chars: {ai_response.content[-500:]}")
-                        print("=== DEBUG: End Enhanced Brace Matching Debug ===\n")
+                        # AI request failed - just show the error
+                        print(f"❌ AI request failed for batch {batch_num}: {ai_response.status_message}")
+                        continue
                         
-                except (json.JSONDecodeError, KeyError, ValueError) as e:
-                    print(f"⚠ JSON processing failed for batch {i//batch_size + 1}: {e}")
-                    # Debug: Print the content for analysis
-                    print("\n=== DEBUG: Enhanced Brace Matching Failed ===")
-                    print(f"Response length: {len(ai_response.content)}")
-                    print(f"First 1000 chars: {ai_response.content[:1000]}")
-                    print(".........")
-                    print(f"Last 500 chars: {ai_response.content[-500:]}")
-                    print("=== DEBUG: End Enhanced Brace Matching Debug ===\n")
+                except Exception as e:
+                    print(f"⚠ Unexpected error in batch {batch_num}: {e}")
+                    print("Continuing with next batch...")
                     continue
                     
+        finally:
+            # Reset signal handler
+            signal.signal(signal.SIGINT, signal.SIG_DFL)
+            print("\n📊 BATCH PROCESSING SUMMARY:")
+            print(f"   ✅ Successfully processed: {len(all_results)} words")
+            if i < len(comparisons):
+                print(f"   📋 Processed batches: {i//batch_size + 1}")
             else:
-                print(f"AI request failed for batch {i//batch_size + 1}: {ai_response.status_message}")
+                print(f"   📋 Total batches: {total_batches}")
+            print("   💾 Progress saved (checked IDs tracked)")
+            if interrupted:
+                print(f"   ⏹ Stopped early at batch {batch_num}")
         
         return all_results
     
-    def compare_meanings_individual(self, comparisons: List[WordComparison], checked_ids: set[int]) -> List[ComparisonResult]:
+    def compare_meanings_individual(self, comparisons: List[WordComparison], checked_ids: set[int], mode: str = "meaning") -> List[ComparisonResult]:
         """Compare meanings individually using AI (more precise but slower)"""
         all_results = []
         
@@ -468,7 +380,7 @@ Focus ONLY on whether English and Russian express the same concept."""
             print(f"Processing {i+1}/{len(comparisons)}: {comp.lemma_1}")
             
             # Create prompt for single comparison
-            prompt = self.create_comparison_prompt([comp], 1)
+            prompt = self.create_comparison_prompt([comp], 1, mode)
             
             # Make AI request (use default models which includes working fallbacks)
             ai_response = self.ai_manager.request(prompt=prompt)
@@ -493,7 +405,6 @@ Focus ONLY on whether English and Russian express the same concept."""
     
     def parse_ai_response(self, response_content: str, word_comparison: Optional[WordComparison] = None) -> List[ComparisonResult]:
         """Parse AI response into ComparisonResult objects"""
-        import json
         import re
         
         # Clean up the response content

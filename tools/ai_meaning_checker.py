@@ -1,3 +1,16 @@
+"""
+Russian Meaning Checker - Validates Russian translations against English meanings using AI.
+
+This module provides the RussianMeaningChecker class for analyzing and validating
+Russian translations in the DPD database. It supports multiple checking modes:
+- meaning: Regular meanings (meaning_1 vs ru_meaning)
+- meaning_raw: AI-generated raw meanings (meaning_1 vs ru_meaning_raw)
+- meaning_lit: Literal meanings (meaning_lit vs ru_meaning_lit)
+- notes: Notes translations (notes vs ru_notes)
+
+The checker uses AI models to identify mismatches and generates detailed reports.
+"""
+
 from sqlalchemy import and_
 from typing import List, Optional
 import os
@@ -16,13 +29,14 @@ db_session = get_db_session(pth.dpd_db_path)
 
 
 # Extension of WordComparison with additional functionality
-def create_word_comparison(headword_id: int, lemma_1: str, english_meaning: str, russian_meaning: str, grammar: str) -> WordComparison:
+def create_word_comparison(headword_id: int, lemma_1: str, english_meaning: str, russian_meaning: str, grammar: str, russian_meaning_alt: str | None = None) -> WordComparison:
     """Create a WordComparison with all required fields"""
     return WordComparison(
         headword_id=headword_id,
         lemma_1=lemma_1,
         english_meaning=english_meaning,
         russian_meaning=russian_meaning,
+        russian_meaning_alt=russian_meaning_alt,
         grammar=grammar
     )
 
@@ -47,9 +61,19 @@ class RussianMeaningChecker:
         if mode == "meaning_raw":
             self.checked_ids_file = dpspth.ai_meaning_raw_checked
             self.output_txt_folder = dpspth.ai_meaning_raw_report_dir
+        elif mode == "meaning_ru_raw":
+            self.checked_ids_file = dpspth.ai_meaning_ru_raw_checked
+            self.output_txt_folder = dpspth.ai_meaning_ru_raw_report_dir
         elif mode == "meaning_raw_list":
             self.checked_ids_file = dpspth.ai_meaning_raw_checked
             self.output_txt_folder = dpspth.ai_meaning_raw_report_dir
+            self.list_ids_file = dpspth.ai_processed_ids_json
+        elif mode == "meaning_lit":
+            self.checked_ids_file = dpspth.ai_meaning_lit_checked
+            self.output_txt_folder = dpspth.ai_meaning_lit_report_dir
+        elif mode == "meaning_lit_list":
+            self.checked_ids_file = dpspth.ai_meaning_lit_checked
+            self.output_txt_folder = dpspth.ai_meaning_lit_report_dir
             self.list_ids_file = dpspth.ai_processed_ids_json
         elif mode == "notes":
             self.checked_ids_file = dpspth.ai_notes_checked
@@ -108,7 +132,7 @@ class RussianMeaningChecker:
         from db.models import DpdHeadword, Russian
         
         if self.mode == "meaning":
-            # Original mode: check meaning_1 vs ru_meaning
+            # Original mode: check ru_meaning
             results = (
                 db_session.query(DpdHeadword, Russian)
                 .join(Russian, DpdHeadword.id == Russian.id)
@@ -125,8 +149,8 @@ class RussianMeaningChecker:
             )
             russian_field = "ru_meaning"
             
-        elif self.mode == "meaning_raw":
-            # Raw mode: check meaning_1 vs ru_meaning_raw
+        elif self.mode == "meaning_raw" or self.mode == "meaning_ru_raw":
+            # Raw modes: check ru_meaning_raw
             results = (
                 db_session.query(DpdHeadword, Russian)
                 .join(Russian, DpdHeadword.id == Russian.id)
@@ -145,7 +169,7 @@ class RussianMeaningChecker:
             russian_field = "ru_meaning_raw"
             
         elif self.mode == "meaning_raw_list":
-            # List mode: check meaning_1 vs ru_meaning_raw for IDs in the list file only
+            # List mode: check ru_meaning_raw for IDs in the list file only
             list_ids = self.load_list_ids()
             if not list_ids:
                 print("Warning: No IDs found in ai_processed_ids_json file. Exiting.")
@@ -161,7 +185,8 @@ class RussianMeaningChecker:
                         Russian.ru_meaning == "",
                         Russian.ru_meaning_raw.isnot(None),
                         Russian.ru_meaning_raw != "",
-                        DpdHeadword.id.in_(list(list_ids))  # Only IDs from the list file
+                        DpdHeadword.id.in_(list(list_ids)),  # Only IDs from the list file
+                        ~DpdHeadword.id.in_(list(self.checked_ids))  # Exclude already checked IDs
                     )
                 )
                 .all()
@@ -169,7 +194,7 @@ class RussianMeaningChecker:
             russian_field = "ru_meaning_raw"
             
         elif self.mode == "notes":
-            # Notes mode: check notes vs ru_notes (excluding AI translations)
+            # Notes mode: check ru_notes (excluding AI translations)
             results = (
                 db_session.query(DpdHeadword, Russian)
                 .join(Russian, DpdHeadword.id == Russian.id)
@@ -189,7 +214,7 @@ class RussianMeaningChecker:
             )
             russian_field = "ru_notes"
         elif self.mode == "notes_raw":
-            # Notes raw mode: check notes vs ru_notes (AI translations only)
+            # Notes raw mode: check ru_notes (AI translations only)
             results = (
                 db_session.query(DpdHeadword, Russian)
                 .join(Russian, DpdHeadword.id == Russian.id)
@@ -208,6 +233,51 @@ class RussianMeaningChecker:
                 .all()
             )
             russian_field = "ru_notes"
+        elif self.mode == "meaning_lit":
+            # Literal meaning mode: check ru_meaning_lit
+            results = (
+                db_session.query(DpdHeadword, Russian)
+                .join(Russian, DpdHeadword.id == Russian.id)
+                .filter(
+                    and_(
+                        DpdHeadword.meaning_lit.isnot(None),
+                        DpdHeadword.meaning_lit != "",
+                        Russian.ru_meaning.isnot(None),
+                        Russian.ru_meaning != "",
+                        Russian.ru_meaning_lit.isnot(None),
+                        Russian.ru_meaning_lit != "",
+                        ~DpdHeadword.id.in_(list(self.checked_ids))  # Exclude already checked IDs
+                    )
+                )
+                .all()
+            )
+            russian_field = "ru_meaning_lit"
+            
+        elif self.mode == "meaning_lit_list":
+            # List mode: check ru_meaning_lit for IDs in the list file only
+            list_ids = self.load_list_ids()
+            if not list_ids:
+                print("Warning: No IDs found in ai_processed_ids_json file. Exiting.")
+                return []
+                
+            results = (
+                db_session.query(DpdHeadword, Russian)
+                .join(Russian, DpdHeadword.id == Russian.id)
+                .filter(
+                    and_(
+                        DpdHeadword.meaning_lit.isnot(None),
+                        DpdHeadword.meaning_lit != "",
+                        Russian.ru_meaning.isnot(None),
+                        Russian.ru_meaning != "",
+                        Russian.ru_meaning_lit.isnot(None),
+                        Russian.ru_meaning_lit != "",
+                        DpdHeadword.id.in_(list(list_ids)),  # Only IDs from the list file
+                        ~DpdHeadword.id.in_(list(self.checked_ids))  # Exclude already checked IDs
+                    )
+                )
+                .all()
+            )
+            russian_field = "ru_meaning_lit"
         else:
             raise ValueError(f"Unknown mode: {self.mode}")
         
@@ -216,6 +286,9 @@ class RussianMeaningChecker:
             # For notes modes, use notes as the English content
             if self.mode in ["notes", "notes_raw"]:
                 english_content = headword.notes
+            # For literal meaning modes, use meaning_lit as the English content
+            elif self.mode in ["meaning_lit", "meaning_lit_list"]:
+                english_content = headword.meaning_lit
             else:
                 english_content = headword.meaning_1
                 
@@ -224,6 +297,7 @@ class RussianMeaningChecker:
                 lemma_1=headword.lemma_1,
                 english_meaning=english_content,
                 russian_meaning=getattr(russian, russian_field),
+                russian_meaning_alt=russian.ru_meaning if self.mode in ["meaning_lit", "meaning_lit_list"] else None,
                 grammar=replace_abbreviations(headword.grammar),
             )
             comparisons.append(comparison)
@@ -236,13 +310,13 @@ class RussianMeaningChecker:
         comparisons = self.get_words_for_comparison_with_session(db_session)
         return len(comparisons)
     
-    def compare_meanings_batch(self, comparisons: List[WordComparison], batch_size: int = 25) -> List[ComparisonResult]:
+    def compare_meanings_batch(self, comparisons: List[WordComparison], batch_size: int = 50) -> List[ComparisonResult]:
         """Compare meanings in batches using AI - delegates to BatchProcessor"""
-        return self.batch_processor.compare_meanings_batch(comparisons, self.checked_ids, batch_size)
+        return self.batch_processor.compare_meanings_batch(comparisons, self.checked_ids, batch_size, self.mode)
     
     def compare_meanings_individual(self, comparisons: List[WordComparison]) -> List[ComparisonResult]:
         """Compare meanings individually using AI - delegates to BatchProcessor"""
-        return self.batch_processor.compare_meanings_individual(comparisons, self.checked_ids)
+        return self.batch_processor.compare_meanings_individual(comparisons, self.checked_ids, self.mode)
     
     def clean_ru_meaning_raw_for_mismatches(self, results: List[ComparisonResult]):
         """Clean ru_meaning_raw for mismatched entries"""
@@ -358,11 +432,13 @@ class RussianMeaningChecker:
         print(f"Total entries analyzed: {len(results)}")
         print(f"Total problematic entries requiring review: {len(mismatches)}")
         
-        # Special handling for raw mode
+        # Special handling for raw mode - only clean database fields for raw modes
         if self.mode in ["meaning_raw", "meaning_raw_list"] and mismatches:
             self.clean_ru_meaning_raw_for_mismatches(results)
         elif self.mode == "notes_raw" and mismatches:
             self.clean_ru_notes_for_mismatches(results)
+        # Note: meaning_lit and meaning_lit_list modes don't clean database fields, only report
+        # Note: meaning_ru_raw mode also doesn't clean database fields - keeps Russian meanings for review
         
         # Save checked IDs after analysis
         self.save_checked_ids()
@@ -391,7 +467,7 @@ class RussianMeaningChecker:
             # Run comparison
             if use_batch:
                 print("Using batch processing...")
-                results = self.compare_meanings_batch(comparisons, batch_size=25)
+                results = self.compare_meanings_batch(comparisons, batch_size=50)
                 # IDs are now marked as checked within the batch method only on success
             else:
                 print("Using individual processing...")

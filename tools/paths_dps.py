@@ -74,11 +74,15 @@ class DPSPaths:
 
         self.ai_meaning_checked = base_dir.joinpath(Path("temp/ai_meaning_check/checked_ids.json"))
         self.ai_meaning_raw_checked = base_dir.joinpath(Path("temp/ai_meaning_raw_check/checked_ids.json"))
+        self.ai_meaning_ru_raw_checked = base_dir.joinpath(Path("temp/ai_meaning_ru_raw_check/checked_ids.json"))
+        self.ai_meaning_lit_checked = base_dir.joinpath(Path("temp/ai_meaning_lit_check/checked_ids.json"))
         self.ai_notes_checked = base_dir.joinpath(Path("temp/ai_notes_check/checked_ids.json"))
         self.ai_notes_raw_checked = base_dir.joinpath(Path("temp/ai_notes_raw_check/checked_ids.json"))
 
         self.ai_meaning_report_dir = base_dir.joinpath(Path("temp/ai_meaning_check/"))
         self.ai_meaning_raw_report_dir = base_dir.joinpath(Path("temp/ai_meaning_raw_check/"))
+        self.ai_meaning_ru_raw_report_dir = base_dir.joinpath(Path("temp/ai_meaning_ru_raw_check/"))
+        self.ai_meaning_lit_report_dir = base_dir.joinpath(Path("temp/ai_meaning_lit_check/"))
         self.ai_notes_report_dir = base_dir.joinpath(Path("temp/ai_notes_check/"))
         self.ai_notes_raw_report_dir = base_dir.joinpath(Path("temp/ai_notes_raw_check/"))
 

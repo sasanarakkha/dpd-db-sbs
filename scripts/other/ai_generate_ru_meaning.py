@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""making ai generated translation into Russian and saving to db or saving promts in json format"""
+"""making ai generated translation into Russian and saving to db or saving prompts in json format"""
 
 import os
 import json
@@ -22,6 +22,7 @@ from tools.ai_related import (
     get_ai_client,
     generate_messages_for_meaning,
     generate_messages_for_notes,
+    generate_messages_for_meaning_lit,
     load_ai_config,
     print_ai_config
 )
@@ -143,9 +144,19 @@ def filter_words_for_translation(mode, limit: int) -> List[DpdHeadword]:
         #             ~DpdHeadword.id.in_(exclude_ids)
         #         )
         #     ).order_by(DpdHeadword.ebt_count.desc()).all()
+    
+    if mode == "lit":
 
-        total_row_count = len(db)
-        db = db[:limit]
+        #! filter for lit meaning
+        db = db_session.query(DpdHeadword).outerjoin(
+        Russian, DpdHeadword.id == Russian.id
+            ).filter(
+                and_(
+                    DpdHeadword.meaning_lit != '',
+                    Russian.ru_meaning != '',
+                    Russian.ru_meaning_lit == ''
+                )
+            ).order_by(DpdHeadword.ebt_count.desc()).all()
 
     if mode == "note":
 
@@ -167,11 +178,10 @@ def filter_words_for_translation(mode, limit: int) -> List[DpdHeadword]:
                     )
             ).order_by(DpdHeadword.ebt_count.desc()).all()
 
-        total_row_count = len(db)
-        db = db[:limit]
+    total_row_count = len(db)
+    db = db[:limit]
 
-
-    print(f"Rows filtered for the proccess: {len(db)} / {total_row_count}")
+    print(f"Rows filtered for the process: {len(db)} / {total_row_count}")
 
     return db
 
@@ -186,7 +196,9 @@ def create_translation_prompt(word: DpdHeadword, mode) -> Dict:
 
     if mode == "meaning":
         messages = generate_messages_for_meaning(word.lemma_1, grammar, meaning, example, translation_example)
-    if mode == "note":
+    elif mode == "lit":
+        messages = generate_messages_for_meaning_lit(word.lemma_1, grammar, word.meaning_lit, word.ru.ru_meaning if word.ru else "")
+    elif mode == "note":
         messages = generate_messages_for_notes(word.lemma_1, grammar, word.notes)
 
     return {
@@ -208,6 +220,10 @@ def translate(lemma_1, grammar, pos, meaning, sentence, notes, mode):
     if mode == "meaning":
         messages = generate_messages_for_meaning(lemma_1, grammar, meaning, sentence, translation_example)
 
+    elif mode == "lit":
+        # For lit mode, we need the ru_meaning to check if translation is already present
+        messages = generate_messages_for_meaning_lit(lemma_1, grammar, meaning, sentence)
+
     elif mode == "note":
         messages = generate_messages_for_notes(lemma_1, grammar, notes)
     else:
@@ -224,6 +240,9 @@ def translate(lemma_1, grammar, pos, meaning, sentence, notes, mode):
         suggestion_str = suggestion.get("content", "") if suggestion else ""
 
         if mode == "meaning":
+            return suggestion_str
+
+        elif mode == "lit":
             return suggestion_str
 
         elif mode == "note":
@@ -278,6 +297,13 @@ def translation_generate(mode, limit: int):
                 with open(f'{dpspth.ai_translated_dir}/{model}.tsv', 'a', encoding='utf-8') as file:
                     file.write(f"{word.id}\t{word.lemma_1}\t{ru_meaning_raw}\n")
             
+            elif mode == "lit":
+                existing_russian = db_session.query(Russian).filter(Russian.id == word.id).first()
+                if existing_russian:
+                    existing_russian.ru_meaning_lit = ru_meaning_raw
+                    db_session.commit()
+                    print(f"{word.id}, {word.ebt_count} {word.lemma_1} {ru_meaning_raw}")
+
             if mode == "note":
                 word.ru.ru_notes = ru_meaning_raw
 
@@ -331,3 +357,5 @@ if __name__ == "__main__":
     make_json("meaning", limit)
 
     # make_json("note", limit)
+
+    # make_json("lit", limit)

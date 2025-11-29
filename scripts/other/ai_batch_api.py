@@ -149,12 +149,12 @@ def cancel_batch(batch_id: str) -> None:
 
 
 
-def save_batch_results(batch_id: str, file_name: str) -> dict[str, str]:
+def save_batch_results(batch_id: str, file_name: str, skip_empty: bool = True) -> dict[str, str]:
     client = get_ai_client()
     if client is None or client.__class__.__module__.split('.')[0] != "openai":
         print("Batch API is only supported for OpenAI client.")
         return {}
-    def _openai_save_batch_results(client, batch_id: str, file_name: str) -> dict[str, str]:
+    def _openai_save_batch_results(client, batch_id: str, file_name: str, skip_empty: bool = True) -> dict[str, str]:
         try:
             batch_info = client.batches.retrieve(batch_id=batch_id)
             if batch_info.output_file_id:
@@ -162,93 +162,197 @@ def save_batch_results(batch_id: str, file_name: str) -> dict[str, str]:
                 file_response = client.files.content(file_id=output_file_id)
                 response_lines = file_response.text.splitlines()
                 ids_and_contents: dict[str, str] = {}
-                file_path: str = os.path.join(dpspth.ai_from_batch_api_dir, f"{file_name}.jsonl")
+                file_path: str = os.path.join(dpspth.ai_for_batch_api_dir, f"{file_name}.jsonl")
+                
+                # Statistics tracking
+                total_lines = len(response_lines)
+                processed_count = 0
+                skipped_empty_count = 0
+                error_count = 0
+                missing_id_count = 0
+                
                 with open(file_path, 'a', encoding='utf-8') as f:
-                    for line in response_lines:
+                    for line_num, line in enumerate(response_lines, 1):
                         try:
                             decoded_response = json.loads(line)
                             custom_id = decoded_response.get('custom_id', '')
-                            id = custom_id.split('-')[1] if '-' in custom_id else custom_id
-                            translated_text = (
-                                decoded_response.get('response', {})
-                                .get('body', {})
-                                .get('choices', [{}])[0]
-                                .get('message', {})
-                                .get('content', None)
-                            )
-                            if translated_text and id:
-                                ids_and_contents[id] = translated_text
-                                json.dump({"id": id, "translated_text": translated_text}, f, ensure_ascii=False)
-                                f.write('\n')
+                            
+                            # Extract ID from custom_id
+                            if custom_id:
+                                id = custom_id.split('-')[1] if '-' in custom_id else custom_id
                             else:
-                                print(f"Missing content or id in line: {line}")
+                                missing_id_count += 1
+                                print(f"⚠ Line {line_num}: Missing custom_id in response")
+                                continue
+                            
+                            # Extract content from the response
+                            response_data = decoded_response.get('response', {})
+                            
+                            # Check for HTTP errors
+                            if response_data.get('status_code', 200) != 200:
+                                error_count += 1
+                                error_msg = response_data.get('body', {}).get('error', {}).get('message', 'Unknown error')
+                                print(f"❌ Line {line_num} - HTTP {response_data.get('status_code', 'unknown')}: {error_msg}")
+                                continue
+                            
+                            # Extract content from the message
+                            choices = response_data.get('body', {}).get('choices', [])
+                            if not choices:
+                                error_count += 1
+                                print(f"❌ Line {line_num} - No choices in response")
+                                continue
+                                
+                            message = choices[0].get('message', {})
+                            translated_text = message.get('content', None)
+                            
+                            # Check for empty or None content
+                            if not translated_text or (skip_empty and translated_text == ""):
+                                if not skip_empty:
+                                    # If not skipping empty content, try to get error info
+                                    if 'error' in response_data:
+                                        error_count += 1
+                                        error_msg = response_data.get('error', {}).get('message', 'Unknown error')
+                                        print(f"❌ Line {line_num} - Error: {error_msg}")
+                                    else:
+                                        # Check for other response status indicators
+                                        if 'status_code' in response_data and response_data['status_code'] != 200:
+                                            error_count += 1
+                                            print(f"❌ Line {line_num} - Status: {response_data.get('status_code', 'unknown')}")
+                                    continue
+                                else:
+                                    skipped_empty_count += 1
+                                    if translated_text == "":
+                                        print(f"⚠ Line {line_num} - Empty content (status: {response_data.get('status_code', 'unknown')}, finish_reason: {message.get('finish_reason', 'unknown')})")
+                                    else:
+                                        print(f"⚠ Line {line_num} - No content returned for ID: {id}")
+                                    continue
+                            
+                            # Valid content found
+                            ids_and_contents[id] = translated_text
+                            json.dump({"id": id, "translated_text": translated_text}, f, ensure_ascii=False)
+                            f.write('\n')
+                            processed_count += 1
+                            
                         except json.JSONDecodeError as e:
-                            print(f"Error decoding line: {e}, Line: {line}")
-                print(f"Translated texts saved to {file_path}")
+                            error_count += 1
+                            print(f"❌ Line {line_num} - JSON decode error: {e}")
+                            print(f"   Problematic line: {line[:100]}{'...' if len(line) > 100 else ''}")
+                        except KeyError as e:
+                            error_count += 1
+                            print(f"❌ Line {line_num} - Missing key: {e}")
+                        except Exception as e:
+                            error_count += 1
+                            print(f"❌ Line {line_num} - Unexpected error: {e}")
+                
+                # Print summary
+                print(f"\n📊 Processing Summary for batch {batch_id}:")
+                print(f"   ✅ Successfully processed: {processed_count}")
+                print(f"   ⚠️  Skipped (empty content): {skipped_empty_count}")
+                print(f"   ❌ Errors: {error_count}")
+                print(f"   🔍 Missing IDs: {missing_id_count}")
+                print(f"   📄 Total lines processed: {total_lines}")
+                
+                if processed_count > 0:
+                    print(f"✅ Successfully saved {processed_count} translations to {file_path}")
+                else:
+                    print(f"⚠️  No valid translations found to save")
+                    
                 return ids_and_contents
             else:
                 print("No output file is available for this batch.")
                 return {}
         except Exception as e:
-            print(f"An error occurred while downloading batch {batch_id} output file: {e}")
+            print(f"❌ An error occurred while downloading batch {batch_id} output file: {e}")
             return {}
-    return _openai_save_batch_results(client, batch_id, file_name)
+    return _openai_save_batch_results(client, batch_id, file_name, skip_empty)
 
 
 def save_processed_ids(ids_and_contents: dict[str, str]) -> None:
-    """Extract IDs from ids_and_contents and save to ai_processed_ids_json file."""
+    """Extract IDs from ids_and_contents and save to ai_processed_ids_json file.
+    
+    Always starts fresh by completely rewriting the file content.
+    """
     ids = list(ids_and_contents.keys())
     
     try:
+        # First, remove the existing file to ensure a completely fresh start
+        if dpspth.ai_processed_ids_json.exists():
+            dpspth.ai_processed_ids_json.unlink()
+            print(f"Removed existing processed IDs file: {dpspth.ai_processed_ids_json}")
+        
+        # Create new file with fresh content
         with open(dpspth.ai_processed_ids_json, 'w', encoding='utf-8') as f:
             json.dump(ids, f, ensure_ascii=False, indent=2)
-        print(f"Processed IDs saved to {dpspth.ai_processed_ids_json}")
+        print(f"Fresh processed IDs saved to {dpspth.ai_processed_ids_json}")
         print(f"Total IDs saved: {len(ids)}")
     except Exception as e:
         print(f"Error saving processed IDs: {e}")
 
 
-def update_ru_meaning_raw(ids_and_contents: dict[str, str]) -> None:
+def update_russian_table(ids_and_contents: dict[str, str], file_name_in: str) -> None:
     print("Updating ru_meaning in db")
     updated_count: int = 0
     added_count: int = 0
+    
+    # Determine which field to update based on file prefix
+    field_to_update = "ru_meaning_lit" if file_name_in.startswith("lit") else "ru_meaning_raw"
+    field_name = "ru_meaning_lit" if field_to_update == "ru_meaning_lit" else "ru_meaning_raw"
+    print(f"Updating {field_name} based on file prefix: {file_name_in}")
+    
+    skipped_count: int = 0
+    
     for id, content in ids_and_contents.items():
         content = content.replace("\n", "")
         existing_russian = db_session.query(Russian).filter(Russian.id == id).first()
         if existing_russian:
-            existing_russian.ru_meaning_raw = content
-            updated_count += 1
-            db_session.commit()
+            current_value = getattr(existing_russian, field_to_update)
+            if not current_value:  # Only update if field is empty
+                setattr(existing_russian, field_to_update, content)
+                updated_count += 1
+                db_session.commit()
+            else:
+                skipped_count += 1
         else:
-            new_russian = Russian(id=id, ru_meaning_raw=content)
+            # Create new Russian record with the appropriate field set
+            russian_data = {"id": id, field_to_update: content}
+            new_russian = Russian(**russian_data)
             added_count += 1
             db_session.add(new_russian)
     db_session.commit()
     print(f"Total updated records: {updated_count}")
     print(f"Total added records: {added_count}")
+    if skipped_count > 0:
+        print(f"Total skipped records (field not empty): {skipped_count}")
     
     # Save processed IDs after successful database commit
     save_processed_ids(ids_and_contents)
 
 
 if __name__ == "__main__":
+    # Example usage for processing batch results
+    file_name_in = "lit-2025-11-21-14-14"
+    specific_batch_id = "batch_6920037871d08190ba5b4d2e43fd286f"
 
-    file_name_in = "meaning-2025-11-05-18-35"
-
+    #! Step 1: Upload and create batch
     # upload_and_create_batch(file_name_in)
 
-    # check_batch_list()
-
-    specific_batch_id = "batch_690b2902f9b08190b946bcaeeb0a0bab"
-
-    # print_batch_info(specific_batch_id)
-
-    ids_and_contents = save_batch_results(specific_batch_id, file_name_in)
-    update_ru_meaning_raw(ids_and_contents)
-
-    # cancel_batch(specific_batch_id)
-
+    #! Step 2: Check batch status
     # check_batch_status(specific_batch_id)
+
+    #! Step 3: Download and update results
+    ids_and_contents = save_batch_results(specific_batch_id, file_name_in, skip_empty=True)
+    if ids_and_contents:
+        update_russian_table(ids_and_contents, file_name_in)
+    else:
+        print("⚠️ No valid results to update database")
+
+    # Alternative: Download with empty responses included (not recommended)
+    # ids_and_contents = save_batch_results(specific_batch_id, file_name_in, skip_empty=False)
+    
+    # Other useful commands:
+    # check_batch_list()
+    # print_batch_info(specific_batch_id)
+    # cancel_batch(specific_batch_id)
 
 
 

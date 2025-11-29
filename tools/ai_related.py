@@ -233,3 +233,34 @@ def generate_messages_for_english_meaning(lemma_1, grammar, sentence):
         {"role": "system", "content": system_content},
         {"role": "user", "content": user_content}
     ]
+def generate_messages_for_meaning_lit(lemma_1, grammar, meaning_lit, ru_meaning=""):
+    """Generate messages for literal meaning translation with duplication check."""
+    
+    system_content = (
+        "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules."
+    )
+    
+    user_content = f"""
+        Translate the English literal definition of the Pali term into Russian, following these rules:
+
+        - Translate all bracketed text (e.g., "(of weather)" → "(о погоде)").
+        - Match the grammatical structure of the Pali term (noun, verb, etc.).
+        - Use lowercase unless it's a proper noun.
+        - Retain clarifications if any (e.g., "(of trap) laid down" → "(о капкане) установленный").
+        - Translate idioms to Russian equivalents.
+        - Ensure no English remains untranslated, including within brackets.
+        - Output only the translation of the literal Definition, without labels like "Перевод" etc, without any comments, without translation of the Grammar and in one line.
+
+        **IMPORTANT**: If the literal translation is already contained in the existing Russian meaning, return only an empty string "" without any translation or comments.
+
+        **Pali Term**: {lemma_1}
+        **Grammar**: {grammar}
+        **Literal Definition**: {meaning_lit}
+        **Existing Russian Meaning**: {ru_meaning}
+    """
+
+    # print(user_content)
+    return [
+        {"role": "system", "content": system_content},
+        {"role": "user", "content": user_content}
+    ]

@@ -23,11 +23,13 @@ class AIManager:
     # Ordered list of (provider, model, delay_seconds) tuples as fallback defaults
     DEFAULT_MODELS: list[tuple[str, str, int]] = [
         # ("gemini", "gemini-2.5-pro", 12),
-        ("gemini", "gemini-2.5-flash", 6),
-        ("openrouter", "qwen/qwen3-235b-a22b:free", 5),
-        ("openrouter", "meituan/longcat-flash-chat:free", 5),
-        ("openrouter", "google/gemma-3-27b-it:free", 5),
-        ("openrouter", "meta-llama/llama-3.3-70b-instruct:free", 5),
+        ("gemini", "gemini-2.5-flash", 8),
+        ("openrouter", "qwen/qwen3-235b-a22b:free", 8),
+        ("openrouter", "meituan/longcat-flash-chat:free", 8),
+        # ("openrouter", "google/gemma-3-27b-it:free", 8),
+        ("openrouter", "meta-llama/llama-3.3-70b-instruct:free", 8),
+        # ("openai", "gpt-4o-mini", 6),
+        # ("openai", "gpt-4.1", 12),
     ]
 
     # Grounded models for internet searches
@@ -41,6 +43,7 @@ class AIManager:
         from tools.ai_deepseek_manager import DeepseekManager
         from tools.ai_gemini_manager import GeminiManager
         from tools.ai_open_router import OpenRouterManager
+        from tools.ai_openai_manager import OpenAIManager
 
         if config_read("apis", "openrouter"):
             self.providers["openrouter"] = OpenRouterManager()
@@ -59,6 +62,12 @@ class AIManager:
             pr.info("gemini initialized")
         else:
             pr.warning("Gemini API key not found, manager not initialized.")
+
+        if config_read("apis", "openai"):
+            self.providers["openai"] = OpenAIManager()
+            pr.info("openai initialized")
+        else:
+            pr.warning("OpenAI API key not found, manager not initialized.")
 
         self.last_request_time: float = 0
         self.min_delay_seconds: float = 5
@@ -193,10 +202,22 @@ if __name__ == "__main__":
         prompt=prompt,
         prompt_sys=sys_prompt,
         provider_preference="openrouter",
-        model="meta-llama/llama-4-maverick:free",
+        model="qwen/qwen3-235b-a22b:free",
     )
     pr.info(f"Status: {open_router_response.status_message}")
     pr.info(f"Content: {open_router_response.content}")
+
+    # -----------------------------------------
+
+    pr.info("\n--- Testing OpenAI ---")
+    openai_response = ai_manager.request(
+        prompt=prompt,
+        prompt_sys=sys_prompt,
+        provider_preference="openai",
+        model="gpt-4o-mini",
+    )
+    pr.info(f"Content: {openai_response.content}")
+    pr.info(f"Status: {openai_response.status_message}")
 
     # -----------------------------------------
 
