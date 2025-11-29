@@ -1,12 +1,12 @@
 {
     "dps_shared": {
-        "source": "VIN2.5.2.10",
-        "sutta": "sappāṇakasikkhāpadaṃ",
-        "example": "sappāṇake appāṇakasaññī tiṇaṃ vā mattikaṃ vā siñcati vā siñcāpeti vā, anāpatti. appāṇake sappāṇakasaññī, āpatti dukkaṭassa. appāṇake vematiko, āpatti dukkaṭassa."
+        "source": "VIN2.5.2.4",
+        "sutta": "paṭhamasenāsanasikkhāpadaṃ",
+        "example": "puggalike puggalikasaññī aññassa puggalike, āpatti dukkaṭassa. attano puggalike anāpatti."
     },
     "dps_last": {
-        "source": "VIN2.5.2.10",
-        "sutta": "sappāṇakasikkhāpadaṃ",
-        "example": "sappāṇake appāṇakasaññī tiṇaṃ vā mattikaṃ vā siñcati vā siñcāpeti vā, anāpatti. appāṇake sappāṇakasaññī, āpatti dukkaṭassa. appāṇake vematiko, āpatti dukkaṭassa."
+        "source": "VIN2.5.2.4",
+        "sutta": "paṭhamasenāsanasikkhāpadaṃ",
+        "example": "puggalike puggalikasaññī aññassa puggalike, āpatti dukkaṭassa. attano puggalike anāpatti."
     }
 }

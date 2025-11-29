@@ -1,5 +1,17 @@
 [
     {
+        "id": 77848,
+        "lemma_1": "āpucchanta"
+    },
+    {
+        "id": 46473,
+        "lemma_1": "puggalika"
+    },
+    {
+        "id": 78174,
+        "lemma_1": "pakatiyā"
+    },
+    {
         "id": 7081,
         "lemma_1": "appāṇakasaññī"
     },
@@ -66,17 +78,5 @@
     {
         "id": 87978,
         "lemma_1": "nissajitabba"
-    },
-    {
-        "id": 38228,
-        "lemma_1": "nisedha 2"
-    },
-    {
-        "id": 77954,
-        "lemma_1": "saddhānusārī 2"
-    },
-    {
-        "id": 58079,
-        "lemma_1": "saddhānusārī 1"
     }
 ]
