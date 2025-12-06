@@ -1,4 +1,4 @@
-<h3>грамматика: {{d.headword}}</h3>
+<h3 id="grammar: {{ d.headword }}">грамматика: {{d.headword}}</h3>
 <div class='dpd'>
     <table class='grammar_dict'>
         <thead>
@@ -14,7 +14,7 @@
             {% if item[2] == "indeclinable" %}
             <tr>
                 <td>
-                    <b>{{item[1]}}</b>
+                    {{item[1]}}
                 </td>
                 <td>
                     {{item[2]}}
@@ -24,10 +24,10 @@
                 </td>
             </tr>
             {% else %}
-            
+
             <tr>
                 <td>
-                    <b>{{item[1]}}</b>
+                    {{item[1]}}
                 </td>
                 <td>
                     {{item[2]}}
@@ -40,8 +40,12 @@
                 </td>
             </tr>
             {% endif %}
-            {%  endfor %}
-        
+            {% endfor %}
+
         </tbody>
     </table>
+    <p class="footer">
+        For more information, please <a class='link'
+            href='https://digitalpalidictionary.github.io/features/grammardict/' target='_blank'>read the docs</a>.
+    </p>
 </div>

@@ -20,7 +20,6 @@ def main():
     config_update("deconstructor", "use_premade", "yes")
 
     config_update("dictionary", "make_mdict", "yes")
-    config_update("dictionary", "make_link", "no")
     config_update("dictionary", "link_url", "https://find.dhamma.gift/bw/")
     config_update("dictionary", "show_id", "no")
     config_update("dictionary", "show_sbs_data", "no")

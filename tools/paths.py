@@ -28,6 +28,11 @@ class ProjectPaths:
             base_dir / "db/bold_definitions/bold_definitions.tsv"
         )
 
+        # db/suttas
+        self.dv_catalogue_suttas_tsv_path = (
+            base_dir / "db/suttas/dv_catalogue_suttas.tsv"
+        )
+
         # exporter/kindle/
         self.epub_dir = base_dir / "exporter/kindle/epub/"
         self.kindlegen_path = base_dir / "exporter/kindle/kindlegen"
@@ -132,6 +137,8 @@ class ProjectPaths:
         self.share_dir = base_dir / "exporter/share"
         self.release_notes_md_path = base_dir / "exporter/share/release_notes.md"
         self.change_log_md_path = base_dir / "exporter/share/change_log.md"
+        self.dpd_txt_path = base_dir / "exporter/share/dpd.txt"
+        self.dpd_txt_zip_path = base_dir / "exporter/share/dpd-txt.zip"
 
         # exporter/share/mdict
         self.dpd_deconstructor_mdd_path = (
@@ -386,6 +393,46 @@ class ProjectPaths:
 
         # exporter/webapp
         self.webapp_css_path = base_dir / "exporter/webapp/static/dpd.css"
+        self.webapp_templates_dir = base_dir / "exporter/webapp/templates"
+        self.webapp_ru_templates_dir = base_dir / "exporter/webapp/ru_templates"
+        self.webapp_sbs_templates_dir = base_dir / "exporter/webapp/sbs_templates"
+        self.webapp_static_dir = base_dir / "exporter/webapp/static"
+        self.webapp_js_path = base_dir / "exporter/webapp/static/dpd.js"
+        self.webapp_home_simple_css_path = (
+            base_dir / "exporter/webapp/static/home_simple.css"
+        )
+        self.webapp_home_css_path = base_dir / "exporter/webapp/static/home.css"
+        self.webapp_bold_definitions_js_path = (
+            base_dir / "exporter/webapp/static/bold_definitions.js"
+        )
+        self.webapp_logo_svg_path = base_dir / "exporter/webapp/static/dpd-logo.svg"
+        self.webapp_logo_dark_svg_path = (
+            base_dir / "exporter/webapp/static/dpd-logo-dark.svg"
+        )
+        self.webapp_app_js_path = base_dir / "exporter/webapp/static/app.js"
+        self.webapp_switch_css_path = base_dir / "exporter/webapp/static/switch.css"
+
+        # webapp template names as constants
+        self.template_dpd_summary = "dpd_summary.html"
+        self.template_dpd_headword = "dpd_headword.html"
+        self.template_root_summary = "root_summary.html"
+        self.template_root = "root.html"
+        self.template_abbreviations_summary = "abbreviations_summary.html"
+        self.template_abbreviations = "abbreviations.html"
+        self.template_deconstructor_summary = "deconstructor_summary.html"
+        self.template_deconstructor = "deconstructor.html"
+        self.template_grammar_summary = "grammar_summary.html"
+        self.template_grammar = "grammar.html"
+        self.template_help_summary = "help_summary.html"
+        self.template_help = "help.html"
+        self.template_epd_summary = "epd_summary.html"
+        self.template_epd = "epd.html"
+        self.template_rpd_summary = "rpd_summary.html"
+        self.template_rpd = "rpd.html"
+        self.template_variant_summary = "variant_summary.html"
+        self.template_variant = "variant.html"
+        self.template_spelling_summary = "spelling_summary.html"
+        self.template_spelling = "spelling.html"
 
         # identity/
         self.dpd_css_path = base_dir / "identity/css/dpd.css"
@@ -488,6 +535,13 @@ class ProjectPaths:
 
         # resources/other_pali_texts
         self.other_pali_texts_dir = base_dir / "resources/other_pali_texts"
+
+        # resources/tipitaka_translation_data
+        self.tipitaka_translation_dir = base_dir / "resources/tipitaka_translation_data"
+        self.tipitaka_translation_db_path = (
+            base_dir
+            / "resources/tipitaka_translation_data/tipitaka-translation-data.db"
+        )
 
         # resources/tpr
         self.tpr_beta_path = (

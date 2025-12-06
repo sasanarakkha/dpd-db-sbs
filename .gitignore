@@ -25,6 +25,11 @@ db/sinhala/dpd sinhala 1.2.xlsx
 definitions/
 dpd.db-journal
 dpd/
+dps.ods
+dps/backup
+dps/csvs
+dps/exporter_ru/share/
+dps/tools/config.py
 exporter/goldendict/javascript/family_compound_json.js
 exporter/goldendict/javascript/family_idiom_json.js
 exporter/goldendict/javascript/family_root_json.js
@@ -191,3 +196,9 @@ gha-creds-*.json
 gui2/!todo.md
 docs_site
 gui2/build/
+scripts/find/most_common_missing_words_old.tsv
+scripts/find/most_common_missing_words.tsv
+db/suttas/code/*
+db/suttas/Untitled Document
+db/suttas/todo.md
+resources/tipitaka_translation_data/tipitaka-translation-data.db.zip

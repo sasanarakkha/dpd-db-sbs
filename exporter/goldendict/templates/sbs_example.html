@@ -4,12 +4,7 @@
         % if i.sbs.sbs_example_1:
             <p>${i.sbs.sbs_example_1}</p>
             <p class="sutta">
-                % if make_link and i.sbs.sbs_source_link_1:
-                <a class="sutta_link" href="${i.sbs.sbs_source_link_1}">${i.sbs.sbs_source_1}</a>
-                % else:
-                ${i.sbs.sbs_source_1}
-                % endif
-                ${i.sbs.sbs_sutta_1}
+                ${i.sbs.sbs_source_1} ${i.sbs.sbs_sutta_1}
             </p>
             % if i.sbs.sbs_chapter_1:
                 <p class="sutta">
@@ -22,12 +17,7 @@
         % if i.sbs.sbs_example_2:
             <p>${i.sbs.sbs_example_2}</p>
             <p class="sutta">
-                % if make_link and i.sbs.sbs_source_link_2:
-                <a class="sutta_link" href="${i.sbs.sbs_source_link_2}">${i.sbs.sbs_source_2}</a>
-                % else:
-                ${i.sbs.sbs_source_2}
-                % endif
-                ${i.sbs.sbs_sutta_2}
+                ${i.sbs.sbs_source_2} ${i.sbs.sbs_sutta_2}
             </p>
             % if i.sbs.sbs_chapter_2:
                 <p class="sutta">
@@ -41,36 +31,21 @@
     % if i.sbs.needs_dhp_example:
         <p>${i.sbs.dhp_example}</p>
         <p class="sutta">
-            % if make_link and i.sbs.dhp_source_link:
-            <a class="sutta_link" href="${i.sbs.dhp_source_link}">${i.sbs.dhp_source}</a>
-            % else:
-            ${i.sbs.dhp_source}
-            % endif
-            ${i.sbs.dhp_sutta}
+            ${i.sbs.dhp_source} ${i.sbs.dhp_sutta}
         </p>
     % endif
 
     % if i.sbs.needs_pat_example:
         <p>${i.sbs.pat_example}</p>
         <p class="sutta">
-            % if make_link and i.sbs.pat_source_link:
-            <a class="sutta_link" href="${i.sbs.pat_source_link}">${i.sbs.pat_source}</a>
-            % else:
-            ${i.sbs.pat_source}
-            % endif
-            ${i.sbs.pat_sutta}
+            ${i.sbs.pat_source} ${i.sbs.pat_sutta}
         </p>
     % endif
 
     % if i.sbs.needs_vib_example:
         <p>${i.sbs.vib_example}</p>
         <p class="sutta">
-            % if make_link and i.sbs.vib_source_link:
-            <a class="sutta_link" href="${i.sbs.vib_source_link}">${i.sbs.vib_source}</a>
-            % else:
-            ${i.sbs.vib_source}
-            % endif
-            ${i.sbs.vib_sutta}
+            ${i.sbs.vib_source} ${i.sbs.vib_sutta}
         </p>
     % endif
 
@@ -83,24 +58,14 @@
         cl.${i.sbs.class_anki} 
     % endif
     % if i.sbs.needs_class_example:
-        % if make_link and i.sbs.class_source_link:
-        <a class="sutta_link" href="${i.sbs.class_source_link}">${i.sbs.class_source}</a>
-        % else:
-        ${i.sbs.class_source}
-        % endif
-        ${i.sbs.class_sutta}
+        ${i.sbs.class_source} ${i.sbs.class_sutta}
     </p>
     % endif
 
     % if i.sbs.needs_discourses_example:
         <p>${i.sbs.discourses_example}</p>
         <p class="sutta">
-            % if make_link and i.sbs.discourses_source_link:
-            <a class="sutta_link" href="${i.sbs.discourses_source_link}">${i.sbs.discourses_source}</a>
-            % else:
-            ${i.sbs.discourses_source}
-            % endif
-            ${i.sbs.discourses_sutta}
+            ${i.sbs.discourses_source} ${i.sbs.discourses_sutta}
         </p>
     % endif
 

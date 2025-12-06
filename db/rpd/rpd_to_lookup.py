@@ -20,7 +20,7 @@ from tools.tools_for_ru_exporter import (
 )
 
 
-class ProgData:
+class GlobalVars:
     pr.tic()
     pr.title("generating rpd data for lookup table")
     pr.green("making global data")
@@ -38,14 +38,11 @@ class ProgData:
 
     pos_exclude_list = ["abbrev", "cs", "letter", "root", "suffix", "ve"]
     rpd_data_dict: dict[str, list[tuple[str, str, str]]] = {}
-    if config_test("dictionary", "make_link", "yes"):
-        make_link = True
-    else:
-        make_link = False
+
     pr.yes("")
 
 
-def compile_headwords_data(g: ProgData):
+def compile_headwords_data(g: GlobalVars):
     """Compile meanings and sutta names in DpdHeadword."""
     pr.green_title("compiling headwords data")
 
@@ -62,24 +59,11 @@ def compile_headwords_data(g: ProgData):
                 else:
                     g.rpd_data_dict[meaning] = [rpd_data]
 
-        # Generate links for suttas
-        # TODO make links for ru names of suttas as well as in goldendict exporter
-        # if (
-        #     i.meaning_2 and
-        #     (
-        #         i.family_set.startswith("suttas of")
-        #         or i.family_set == "bhikkhupātimokkha rules"
-        #         or i.family_set == "chapters of the Saṃyutta Nikāya"
-        #     )
-        # ):
-        #     combined_numbers = extract_sutta_numbers(i.meaning_2)
-        #     update_rpd_sutta(g, combined_numbers, i)
-
         if counter % 10000 == 0:
             pr.counter(counter, g.dpd_db_length, i.lemma_1)
 
 
-def compile_roots_data(g: ProgData):
+def compile_roots_data(g: GlobalVars):
     """Compile root meanings in DpdRoot."""
     pr.green("compiling roots data")
 
@@ -135,66 +119,7 @@ def make_meaning_plus_case(i: DpdHeadword):
         return i.ru.ru_meaning
 
 
-def extract_sutta_numbers(meaning_2) -> list[str]:
-    """Extract sutta number from i.meaning_2"""
-
-    unified_pattern = r"\(([A-Z]+)\s?([\d\.]+)(-\d+)?\)|([A-Z]+)[\s]?([\d\.]+)(-\d+)?"
-    match = re.finditer(unified_pattern, meaning_2)
-    combined_numbers = []
-
-    for m in match:
-        prefix = m.group(1) if m.group(1) else m.group(3)
-        number = m.group(2) if m.group(2) else m.group(4)
-        combined_number_without_space = (
-            f"{prefix}{number}" if prefix and number else None
-        )
-        combined_number_with_space = f"{prefix} {number}" if prefix and number else None
-
-        if "." in number:
-            combined_number_with_colon_with_space = (
-                f"{prefix} {number.replace('.', ':')}" if prefix and number else None
-            )
-            combined_number_with_colon_without_space = (
-                f"{prefix}{number.replace('.', ':')}" if prefix and number else None
-            )
-        else:
-            combined_number_with_colon_with_space = None
-            combined_number_with_colon_without_space = None
-
-        combined_numbers.extend(
-            [
-                combined_number_without_space,
-                combined_number_with_space,
-                combined_number_with_colon_with_space,
-                combined_number_with_colon_without_space,
-            ]
-        )
-
-    return combined_numbers
-
-
-def update_rpd_sutta(g: ProgData, combined_numbers, i: DpdHeadword):
-    """Use Sutta number as key in EPD"""
-
-    for combined_number in combined_numbers:
-        if combined_number:
-            number_link = i.source_link_sutta
-
-            if g.make_link and number_link:
-                anchor_link = f'<a class="link" href="{number_link}">link</a>'
-                data_3 = f"{i.meaning_2} {anchor_link}"
-            else:
-                data_3 = f"{i.meaning_2}"
-
-            rpd_data = (i.lemma_clean, "sutta", data_3)
-
-            if combined_number in g.rpd_data_dict.keys():
-                g.rpd_data_dict[combined_number].append(rpd_data)
-            else:
-                g.rpd_data_dict[combined_number] = [rpd_data]
-
-
-def add_to_lookup_table(g: ProgData):
+def add_to_lookup_table(g: GlobalVars):
     """Add EPD data to lookup table."""
 
     pr.green_title("saving to Lookup table")
@@ -235,11 +160,10 @@ def add_to_lookup_table(g: ProgData):
 
 
 def main():
-    g = ProgData()
+    g = GlobalVars()
     compile_headwords_data(g)
     compile_roots_data(g)
     add_to_lookup_table(g)
-
     pr.toc()
 
 

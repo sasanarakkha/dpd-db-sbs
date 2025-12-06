@@ -83,4 +83,7 @@ word family	All words comprised of the same component word	семья слова
 family	"<br>- Root family: All words which are formed from the same prefix + root combination
 <br>- Compound family: All words comprised of the same component word"	семья	"Семья корней: Все слова, образованные от той же комбинации префикса и корня.
 Семья составных слов: Все слова, составленные из одного и того же компонента слова."
-Help	Click on any heading or abbrevaiation to get contextual help. 	помощь	Чтобы увидеть подробное описание пожалуйста кликните на любое заглавие или сокращение. 
+Help	Click on any heading or abbrevaiation to get contextual help. 	помощь	Чтобы увидеть подробное описание пожалуйста кликните на любое заглавие или сокращение.
+Lemma	The dictionary form of the word, the headword. 	Пали	Словарная форма слова, заглавное слово.
+Traditional	The lemma as found in classical Pāḷi grammars. 	традиционно	Лемма, встречающаяся в классических палийских грамматиках.
+IPA	The phonetic pronounciation of the word using the International Phonetic Alphabet. 	МФА	Фонетическое произношение слова с использованием Международного фонетического алфавита.

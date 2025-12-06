@@ -5,15 +5,15 @@ from sqlalchemy import inspect
 
 from db.db_helpers import create_tables, get_db_session
 from db.models import SuttaInfo
+from db.suttas.dv_catalogue_suttas import update_dv_fields_in_db
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
-
 
 def download_tsv_from_sheets(pth: ProjectPaths):
     pr.green("downloading tsv from google sheets")
     try:
         url = "https://docs.google.com/spreadsheets/d/1sR8NT204STTwOoDrr9GBjhXVYEn0qqZTxgjoLKMmaaE/export?format=tsv"
-        response = requests.get(url)
+        response = requests.get(url, timeout=10)
         pr.yes("ok")
     except Exception:
         pr.no("failed")
@@ -71,7 +71,7 @@ def update_sutta_info_table(pth: ProjectPaths):
 
                 if not dpd_sutta_key:
                     continue
-                
+
                 if dpd_sutta_key in seen_dpd_suttas:
                     duplicates.append(dpd_sutta_key)
                     continue
@@ -94,8 +94,8 @@ def update_sutta_info_table(pth: ProjectPaths):
                 for col in ["cst_m_page", "cst_v_page", "cst_p_page", "cst_t_page"]:
                     if col in filtered_data and filtered_data[col]:
                         value = filtered_data[col]
-                        if '.' in value:
-                            book, page = value.split('.', 1)
+                        if "." in value:
+                            book, page = value.split(".", 1)
                             filtered_data[col] = f"{book}.{page.ljust(4, '0')}"
 
                 suttas_to_add.append(filtered_data)
@@ -130,6 +130,7 @@ def main():
     pth = ProjectPaths()
     download_tsv_from_sheets(pth)
     update_sutta_info_table(pth)
+    update_dv_fields_in_db(pth)
     pr.toc()
 
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 """Export DPD for GoldenDict and MDict."""
 
@@ -9,7 +10,6 @@ from typing import List
 from sqlalchemy.orm import Session
 
 from db.db_helpers import get_db_session
-
 from exporter.goldendict.export_dpd import generate_dpd_html
 from exporter.goldendict.export_epd import generate_epd_html
 from exporter.goldendict.export_help import generate_help_html
@@ -48,9 +48,6 @@ class GlobalVars:
         self.make_mdict: bool = False
         if config_test("dictionary", "make_mdict", "yes"):
             self.make_mdict: bool = True
-        self.make_link: bool = False
-        if config_test("dictionary", "make_link", "yes"):
-            self.make_link: bool = True
         self.show_sbs_data: bool = False
         self.show_ru_data: bool = False
         self.show_grammar: bool = False
@@ -85,7 +82,6 @@ def main():
         g.sandhi_contractions,
         g.cf_set,
         g.idioms_set,
-        g.make_link,
         g.show_sbs_data,
         g.show_ru_data,
         g.show_grammar,
@@ -182,6 +178,7 @@ def prepare_export_to_goldendict_mdict(g: GlobalVars) -> None:
         dict_info,
         dict_var,
         g.dict_data,
+        # include_slob=True,
     )
 
     if g.make_mdict and g.data_limit == 0:

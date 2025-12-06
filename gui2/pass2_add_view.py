@@ -402,7 +402,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
         if headword_id is not None:
             self.clear_all_fields()
             headword = self._db.get_headword_by_id(int(headword_id))
-            self.update_message(f"{count} pass2auto remaining")
+            self.update_message(f"{headword.lemma_1}. {count} pass2auto remaining")
 
             if headword is not None:
                 self.headword = headword
@@ -642,9 +642,9 @@ class Pass2AddView(ft.Column, PopUpMixin):
                 word_data = self.dpd_fields.get_current_values()
                 if word_data:
                     self.corrections_manager.save_processed_correction(word_data)
-
-            self.page.set_clipboard(word_to_save.lemma_1)
             
+            self.page.set_clipboard(word_to_save.lemma_1)
+
             self._update_history_dropdown()
             self.page.update()
             self.clear_all_fields()

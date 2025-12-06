@@ -20,7 +20,6 @@ from sqlalchemy.orm import declared_attr
 
 from sqlalchemy.sql import func
 
-from tools.link_generator import generate_link
 from tools.pali_sort_key import pali_sort_key
 from tools.pos import CONJUGATIONS, DECLENSIONS, EXCLUDE_FROM_FREQ
 from tools.clean_machine import clean_machine
@@ -561,40 +560,67 @@ class SuttaInfo(Base):
     dpr_code: Mapped[str] = mapped_column(default="")
     dpr_link: Mapped[str] = mapped_column(default="")
 
+    dv_pts: Mapped[str] = mapped_column(default="")
+    dv_main_theme: Mapped[str] = mapped_column(default="")
+    dv_subtopic: Mapped[str] = mapped_column(default="")
+    dv_summary: Mapped[str] = mapped_column(default="")
+    dv_similes: Mapped[str] = mapped_column(default="")
+    dv_key_excerpt1: Mapped[str] = mapped_column(default="")
+    dv_key_excerpt2: Mapped[str] = mapped_column(default="")
+    dv_stage: Mapped[str] = mapped_column(default="")
+    dv_training: Mapped[str] = mapped_column(default="")
+    dv_aspect: Mapped[str] = mapped_column(default="")
+    dv_teacher: Mapped[str] = mapped_column(default="")
+    dv_audience: Mapped[str] = mapped_column(default="")
+    dv_method: Mapped[str] = mapped_column(default="")
+    dv_length: Mapped[str] = mapped_column(default="")
+    dv_prominence: Mapped[str] = mapped_column(default="")
+    dv_nikayas_parallels: Mapped[str] = mapped_column(default="")
+    dv_āgamas_parallels: Mapped[str] = mapped_column(default="")
+    dv_taisho_parallels: Mapped[str] = mapped_column(default="")
+    dv_sanskrit_parallels: Mapped[str] = mapped_column(default="")
+    dv_vinaya_parallels: Mapped[str] = mapped_column(default="")
+    dv_others_parallels: Mapped[str] = mapped_column(default="")
+    dv_partial_parallels_nā: Mapped[str] = mapped_column(default="")
+    dv_partial_parallels_all: Mapped[str] = mapped_column(default="")
+    dv_suggested_suttas: Mapped[str] = mapped_column(default="")
+
     @property
     def sc_card_link(self) -> str:
         return f"https://suttacentral.net/{self.sc_code}"
 
     @property
-    def sc_pali_link(self) -> str:
+    def sc_pali_link(self) -> str | None:
         if self.sc_code:
             return f"https://suttacentral.net/{self.sc_code}/pli/ms"
-        else: 
+        else:
             return None
 
     @property
-    def sc_eng_link(self) -> str:
+    def sc_eng_link(self) -> str | None:
         if self.sc_code:
             return f"https://suttacentral.net/{self.sc_code}/en/sujato"
         else:
             return None
 
     @property
-    def sc_book_code(self) -> str:
+    def sc_book_code(self) -> str | None:
         if self.sc_code:
             return re.sub(r"\d+\.*-*\d*", "", self.sc_code)
         else:
             return None
 
     @property
-    def sc_github(self) -> str:
+    def sc_github(self) -> str | None:
         if self.sc_code:
-            return f"https://github.com/suttacentral/sc-data/blob/main/{self.sc_file_path}"
+            return (
+                f"https://github.com/suttacentral/sc-data/blob/main/{self.sc_file_path}"
+            )
         else:
             return None
 
     @property
-    def dhamma_gift(self) -> str:
+    def dhamma_gift(self) -> str | None:
         if self.sc_code:
             return f"https://find.dhamma.gift/read/?q={self.sc_code}"
         else:
@@ -605,29 +631,56 @@ class SuttaInfo(Base):
         link_url = config_read("dictionary", "link_url")
         if self.sc_code:
             if self.book_code in [
-            "DN",
-            "MN",
-            "SN",
-            "AN",
-            "KHP",
-            "DHP",
-            "UD",
-            "ITI",
-            "SNP",
-            "TH",
-            "THI",
-        ]:
-                if self.sc_book_code == "iti":
-                    return f"{link_url}it/it.html"
-                else:
-                    return f"{link_url}{self.sc_book_code.lower()}/{self.sc_code.lower()}.html"
+                "DN",
+                "MN",
+                "SN",
+                "AN",
+                "KHP",
+                "DHP",
+                "UD",
+                "ITI",
+                "SNP",
+                "TH",
+                "THI",
+            ]:
+                if self.sc_book_code:
+                    if self.sc_book_code == "iti":
+                        return f"{link_url}it/it.html"
+                    else:
+                        return f"{link_url}{self.sc_book_code.lower()}/{self.sc_code.lower()}.html"
             else:
                 return None
         else:
             return None
 
     @property
-    def sc_voice_link(self)-> str | None:
+    def tbw_legacy(self) -> str | None:
+        if self.sc_code:
+            if self.book_code in [
+                "DN",
+                "MN",
+                "SN",
+                "AN",
+                "KHP",
+                "DHP",
+                "UD",
+                "ITI",
+                "SNP",
+                "TH",
+                "THI",
+            ]:
+                if self.sc_book_code:
+                    if self.sc_book_code == "iti":
+                        return "https://find.dhamma.gift/bw/it/it.html"
+                    else:
+                        return f"https://find.dhamma.gift/bw/{self.sc_book_code.lower()}/{self.sc_code.lower()}.html"
+            else:
+                return None
+        else:
+            return None
+
+    @property
+    def sc_voice_link(self) -> str | None:
         if self.sc_code:
             return f"https://www.sc-voice.net/#/sutta/{self.sc_code.lower()}/en/sujato"
         else:
@@ -665,6 +718,54 @@ class SuttaInfo(Base):
         from tools.sutta_codes import make_list_of_sutta_codes
 
         return make_list_of_sutta_codes(self)
+
+    @property
+    def dv_exists(self) -> bool:
+        if (
+            self.dv_pts
+            or self.dv_main_theme
+            or self.dv_subtopic
+            or self.dv_stage
+            or self.dv_training
+            or self.dv_aspect
+            or self.dv_teacher
+            or self.dv_audience
+            or self.dv_method
+            or self.dv_length
+            or self.dv_prominence
+            or self.dv_nikayas_parallels
+            or self.dv_āgamas_parallels
+            or self.dv_taisho_parallels
+            or self.dv_sanskrit_parallels
+            or self.dv_vinaya_parallels
+            or self.dv_others_parallels
+            or self.dv_partial_parallels_nā
+            or self.dv_partial_parallels_all
+            or self.dv_summary
+            or self.dv_key_excerpt1
+            or self.dv_key_excerpt2
+            or self.dv_similes
+            or self.dv_suggested_suttas
+        ):
+            return True
+        else:
+            return False
+
+    @property
+    def dv_parallels_exists(self) -> bool:
+        if (
+            self.dv_nikayas_parallels
+            or self.dv_āgamas_parallels
+            or self.dv_taisho_parallels
+            or self.dv_sanskrit_parallels
+            or self.dv_vinaya_parallels
+            or self.dv_others_parallels
+            or self.dv_partial_parallels_nā
+            or self.dv_partial_parallels_all
+        ):
+            return True
+        else:
+            return False
 
     def __repr__(self) -> str:
         return f"SuttaInfo: {self.dpd_code} {self.dpd_sutta}"
@@ -987,43 +1088,6 @@ class DpdHeadword(Base):
             return []
 
     @property
-    def source_link_1(self) -> str:
-        return generate_link(self.source_1) if self.source_1 else ""
-
-    @property
-    def source_link_2(self) -> str:
-        return generate_link(self.source_2) if self.source_2 else ""
-
-    @property
-    def source_link_sutta(self) -> str:
-        if self.meaning_2:
-            if (
-                self.family_set.startswith("suttas of")
-                or self.family_set == "bhikkhupātimokkha rules"
-                or self.family_set == "chapters of the Saṃyutta Nikāya"
-            ):
-                unified_pattern = (
-                    r"\(([A-Z]+)\s?([\d\.]+)(-\d+)?\)|([A-Z]+)[\s]?([\d\.]+)(-\d+)?"
-                )
-                match = re.finditer(unified_pattern, self.meaning_2)
-
-                for m in match:
-                    prefix = m.group(1) if m.group(1) else m.group(3)
-                    number = m.group(2) if m.group(2) else m.group(4)
-
-                    combined_number = f"{prefix}{number}" if prefix and number else None
-
-                    if combined_number:
-                        link = generate_link(combined_number)
-
-                        if link:
-                            return link
-
-            return ""
-        else:
-            return ""
-
-    @property
     def sanskrit_clean(self) -> str:
         sanskrit_clean = re.sub(r"\[.+\]", "", self.sanskrit)
         return sanskrit_clean.strip()
@@ -1128,8 +1192,16 @@ class DpdHeadword(Base):
         )
 
     @property
+    def compound_construction_txt(self) -> str:
+        return self.compound_construction.replace("<b>", "").replace("</b>", "")
+
+    @property
     def phonetic_typst(self) -> str:
         return self.phonetic.replace("\n", r"\ ")
+
+    @property
+    def phonetic_txt(self) -> str:
+        return self.phonetic.replace("\n", r", ")
 
     @property
     def commentary_typst(self) -> str:
@@ -1151,6 +1223,17 @@ class DpdHeadword(Base):
         )
 
     @property
+    def notes_txt(self) -> str:
+        notes_clean = (
+            self.notes.replace("\n", r" ")
+            .replace("<b>", "")
+            .replace("</b>", "")
+            .replace("<i>", "")
+            .replace("</i>", "")
+        )
+        return re.sub(r"\.$", "", notes_clean)
+
+    @property
     def cognate_typst(self) -> str:
         return self.cognate.replace("*", "\\*")
 
@@ -1160,6 +1243,10 @@ class DpdHeadword(Base):
         for website in self.link.split("\n"):
             link_string += f"""#link("{website}")\\n"""
         return link_string
+
+    @property
+    def link_txt(self) -> str:
+        return ", ".join(self.link.split("\n"))
 
     @property
     def link_list(self) -> list[str]:
@@ -1640,34 +1727,6 @@ class SBS(Base):
     def sbs_class_link(self):
         class_link_map = SBS_table_tools().load_class_link_map()
         return class_link_map.get(self.class_anki, "")
-
-    @property
-    def sbs_source_link_1(self) -> str:
-        return generate_link(self.sbs_source_1) if self.sbs_source_1 else ""
-
-    @property
-    def sbs_source_link_2(self) -> str:
-        return generate_link(self.sbs_source_2) if self.sbs_source_2 else ""
-
-    @property
-    def dhp_source_link(self) -> str:
-        return generate_link(self.dhp_source) if self.dhp_source else ""
-
-    @property
-    def pat_source_link(self) -> str:
-        return generate_link(self.pat_source) if self.pat_source else ""
-
-    @property
-    def vib_source_link(self) -> str:
-        return generate_link(self.vib_source) if self.vib_source else ""
-
-    @property
-    def class_source_link(self) -> str:
-        return generate_link(self.class_source) if self.class_source else ""
-
-    @property
-    def discourses_source_link(self) -> str:
-        return generate_link(self.discourses_source) if self.discourses_source else ""
 
     def __repr__(self) -> str:
         return f"SBS: {self.id} {self.sbs_chant_pali_1} {self.sbs_class}"

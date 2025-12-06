@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 """Export DPD for GoldenDict and MDict."""
 
@@ -32,7 +33,7 @@ from tools.sandhi_contraction import SandhiContractionManager
 from tools.utils import RenderedSizes, sum_rendered_sizes
 
 
-class ProgData:
+class GlobalVars:
     def __init__(self) -> None:
         self.pth = ProjectPaths()
         self.rupth = RuPaths()
@@ -50,9 +51,6 @@ class ProgData:
         self.make_mdict: bool = False
         if config_test("dictionary", "make_mdict", "yes"):
             self.make_mdict: bool = True
-        self.make_link: bool = False
-        if config_test("dictionary", "make_link", "yes"):
-            self.make_link: bool = True
 
         self.paths = self.rupth
 
@@ -66,7 +64,7 @@ def main():
         pr.toc()
         return
 
-    g = ProgData()
+    g = GlobalVars()
 
     dpd_data_list, sizes = generate_dpd_html(
         g.db_session,
@@ -74,7 +72,6 @@ def main():
         g.sandhi_contractions,
         g.cf_set,
         g.idioms_set,
-        g.make_link,
         g.data_limit,
     )
     g.rendered_sizes.append(sizes)
@@ -91,7 +88,7 @@ def main():
         g.rendered_sizes.append(sizes)
 
         epd_data_list, sizes = generate_epd_html(
-            g.db_session, g.pth, g.rupth, g.make_link)
+            g.db_session, g.pth, g.rupth)
         g.rendered_sizes.append(sizes)
 
         help_data_list, sizes = generate_help_html(
@@ -121,7 +118,7 @@ def main():
     pr.toc()
 
 
-def prepare_export_to_goldendict_mdict(g: ProgData) -> None:
+def prepare_export_to_goldendict_mdict(g: GlobalVars) -> None:
     """Prepare info and variables for export."""
 
     description = """
@@ -132,7 +129,7 @@ def prepare_export_to_goldendict_mdict(g: ProgData) -> None:
     сайт Пали Словаря</a></p>
     и оригинальный сайт <a href=\"https://digitalpalidictionary.github.io\">
     Digital Pāḷi Dictionary</a></p>
-"""
+    """
 
     dict_info = DictInfo(
         bookname="Электронный Словарь Пали",
@@ -193,7 +190,7 @@ def write_size_dict(pth: ProjectPaths, size_dict):
     pr.yes("ok")
 
 
-def write_limited_datalist(g: ProgData):
+def write_limited_datalist(g: GlobalVars):
     """A limited dataset for troubleshooting purposes"""
 
     limited_data = [item for item in g.dict_data if item.word.startswith("ab")]

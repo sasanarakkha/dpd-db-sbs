@@ -1,5 +1,6 @@
-from contextlib import contextmanager
+# -*- coding: utf-8 -*-
 import re
+from contextlib import contextmanager
 
 import uvicorn
 from fastapi import FastAPI, Request
@@ -22,14 +23,13 @@ from exporter.webapp.toolkit_ru import make_dpd_html_ru
 
 from tools.css_manager import CSSManager
 from tools.paths import ProjectPaths
+from tools.pali_text_files import cst_texts
 from tools.translit_ru import auto_translit_to_roman
 
+pth: ProjectPaths = ProjectPaths()
 app = FastAPI()
 app.add_middleware(GZipMiddleware, minimum_size=500)
-app.mount("/static", StaticFiles(directory="exporter/webapp/static"), name="static")
-# app.mount("/sbs/static", StaticFiles(directory="exporter/webapp/static"), name="sbs_static") 
-
-pth: ProjectPaths = ProjectPaths()
+app.mount("/static", StaticFiles(directory=str(pth.webapp_static_dir)), name="static")
 
 # Create session factory for database connections
 SessionLocal = sessionmaker(
@@ -56,21 +56,21 @@ with get_db() as db_session:
     bd_count = db_session.query(BoldDefinition).count()
 
 # Set up templates
-templates_ru = Jinja2Templates(directory="exporter/webapp/ru_templates")
-templates_sbs = Jinja2Templates(directory="exporter/webapp/sbs_templates")
+templates_ru = Jinja2Templates(directory=str(pth.webapp_ru_templates_dir))
+templates_sbs = Jinja2Templates(directory=str(pth.webapp_sbs_templates_dir))
 
 # Update CSS
 css_manager = CSSManager()
 css_manager.update_webapp_css()
 
 # Global CSS and JS
-with open("exporter/webapp/static/dpd.css") as f:
+with open(pth.webapp_css_path) as f:
     dpd_css = f.read()
 
-with open("exporter/webapp/static/dpd.js") as f:
+with open(pth.webapp_js_path) as f:
     dpd_js = f.read()
 
-with open("exporter/webapp/static/home_simple.css") as f:
+with open(pth.webapp_home_simple_css_path) as f:
     home_simple_css = f.read()
 
 
@@ -83,7 +83,13 @@ def home_page_ru(request: Request, response_class=HTMLResponse):
     """Russian home page"""
 
     return templates_ru.TemplateResponse(
-        "home.html", {"request": request, "dpd_results": "", "bd_count": bd_count}
+        "home.html",
+        {
+            "request": request,
+            "dpd_results": "",
+            "bd_count": bd_count,
+            "book_options": list(cst_texts.keys()),
+        },
     )
 
 
@@ -92,7 +98,13 @@ def home_page_sbs(request: Request, response_class=HTMLResponse):
     """SBS home page."""
 
     return templates_sbs.TemplateResponse(
-        "home.html", {"request": request, "dpd_results": "", "bd_count": bd_count}
+        "home.html",
+        {
+            "request": request,
+            "dpd_results": "",
+            "bd_count": bd_count,
+            "book_options": list(cst_texts.keys()),
+        },
     )
 
 
@@ -101,7 +113,13 @@ def bold_definitions_page(request: Request, response_class=HTMLResponse):
     """Bold definitions landing page"""
 
     return templates_ru.TemplateResponse(
-        "home.html", {"request": request, "dpd_results": "", "bd_count": bd_count}
+        "home.html",
+        {
+            "request": request,
+            "dpd_results": "",
+            "bd_count": bd_count,
+            "book_options": list(cst_texts.keys()),
+        },
     )
 
 
@@ -125,51 +143,9 @@ def db_search_html_sbs(request: Request, q: str):
             "request": request,
             "q": q,
             "dpd_results": dpd_html,
+            "book_options": list(cst_texts.keys()),
         },
     )
-
-
-@app.get("/search_html", response_class=HTMLResponse)
-def db_search_html_ru(request: Request, q: str):
-    """Returns a JSON with Russian HTML."""
-
-    q_roman = auto_translit_to_roman(q)
-
-    dpd_html, summary_html = make_dpd_html_ru(
-        q_roman,
-        pth,
-        templates_ru,
-        roots_count_dict,
-        headwords_clean_set_ru,
-        ascii_to_unicode_dict,
-    )
-    return templates_ru.TemplateResponse(
-        "home.html",
-        {
-            "request": request,
-            "q": q,
-            "dpd_results": dpd_html,
-        },
-    )
-
-
-@app.get("/sbs/search_json", response_class=JSONResponse)
-def db_search_json_sbs(request: Request, q: str):
-    """Main search route for SBS website."""
-
-    q_roman = auto_translit_to_roman(q)
-
-    dpd_html, summary_html = make_dpd_html(
-        q_roman,
-        pth,
-        templates_sbs,
-        roots_count_dict,
-        headwords_clean_set,
-        ascii_to_unicode_dict,
-    )
-    response_data = {"summary_html": summary_html, "dpd_html": dpd_html}
-    headers = {"Accept-Encoding": "gzip"}
-    return JSONResponse(content=response_data, headers=headers)
 
 
 @app.get("/search_json", response_class=JSONResponse)
@@ -191,34 +167,23 @@ def db_search_json_ru(request: Request, q: str):
     return JSONResponse(content=response_data, headers=headers)
 
 
-@app.get("/sbs/gd", response_class=HTMLResponse)
-def db_search_gd_sbs(request: Request, search: str):
-    """Returns pure HTML for SBS GoldenDict and MDict."""
+@app.get("/sbs/search_json", response_class=JSONResponse)
+def db_search_json_sbs(request: Request, q: str):
+    """Main search route for SBS website."""
 
-    search_roman = auto_translit_to_roman(search)
+    q_roman = auto_translit_to_roman(q)
 
     dpd_html, summary_html = make_dpd_html(
-        search_roman,
+        q_roman,
         pth,
         templates_sbs,
         roots_count_dict,
         headwords_clean_set,
         ascii_to_unicode_dict,
     )
-    global dpd_css, dpd_js, home_simple_css
-
-    return templates_sbs.TemplateResponse(
-        "home_simple.html",
-        {
-            "request": request,
-            "search": search,
-            "dpd_results": dpd_html,
-            "summary": summary_html,
-            "dpd_css": dpd_css,
-            "dpd_js": dpd_js,
-            "home_simple_css": home_simple_css,
-        },
-    )
+    response_data = {"summary_html": summary_html, "dpd_html": dpd_html}
+    headers = {"Accept-Encoding": "gzip"}
+    return JSONResponse(content=response_data, headers=headers)
 
 
 @app.get("/gd", response_class=HTMLResponse)
@@ -251,6 +216,36 @@ def db_search_gd_ru(request: Request, search: str):
     )
 
 
+@app.get("/sbs/gd", response_class=HTMLResponse)
+def db_search_gd_sbs(request: Request, search: str):
+    """Returns pure HTML for SBS GoldenDict and MDict."""
+
+    search_roman = auto_translit_to_roman(search)
+
+    dpd_html, summary_html = make_dpd_html(
+        search_roman,
+        pth,
+        templates_sbs,
+        roots_count_dict,
+        headwords_clean_set,
+        ascii_to_unicode_dict,
+    )
+    global dpd_css, dpd_js, home_simple_css
+
+    return templates_sbs.TemplateResponse(
+        "home_simple.html",
+        {
+            "request": request,
+            "search": search,
+            "dpd_results": dpd_html,
+            "summary": summary_html,
+            "dpd_css": dpd_css,
+            "dpd_js": dpd_js,
+            "home_simple_css": home_simple_css,
+        },
+    )
+
+
 @app.get("/bd_search", response_class=HTMLResponse)
 def db_search_bd(
     request: Request,
@@ -268,7 +263,7 @@ def db_search_bd(
     if results:
         message = f"<b>{len(results)}</b> результатов найдено"
     else:
-        message = "<b>0</b> результатов найдено - расширьте поиск или попробуйте опцию нечеткого поиска"
+        message = "<b>0</b> результатов найдено - расширьте поиск или попробуйте опцию нечёткого поиска"
 
     # highlight search_2
     if q2:
@@ -320,7 +315,7 @@ if __name__ == "__main__":
         host="127.1.1.1",
         port=8080,
         reload=True,
-        reload_dirs="exporter/webapp/",
+        reload_dirs=str(pth.webapp_static_dir.parent),
     )
 
 # Run on local machine with reload on changes

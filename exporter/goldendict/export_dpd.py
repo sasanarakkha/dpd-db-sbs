@@ -99,7 +99,6 @@ class DpdHeadwordRenderDataBase(TypedDict):
     sandhi_contractions: SandhiContractionDict
     cf_set: Set[str]
     idioms_set: Set[str]
-    make_link: bool
     show_id: bool
     show_sbs_data: bool
     show_ru_data: bool
@@ -195,7 +194,6 @@ def render_pali_word_dpd_html(
         pth,
         i,
         tt.dpd_definition_templ,
-        rd["make_link"],
         rd["show_id"],
         rd["show_sbs_data"],
         rd["show_ru_data"],
@@ -242,13 +240,13 @@ def render_pali_word_dpd_html(
         size_dict["dpd_grammar"] += len(grammar)
 
     if i.needs_example_button or i.needs_examples_button:
-        example = render_example_templ(pth, i, tt.example_templ, rd["make_link"])
+        example = render_example_templ(pth, i, tt.example_templ)
         html += example
         size_dict["dpd_example"] += len(example)
 
     if show_sbs_data and i.sbs and i.sbs.needs_sbs_example_button:
         sbs_example = render_sbs_example_templ(
-            pth, i, tt.sbs_example_templ, rd["make_link"]
+            pth, i, tt.sbs_example_templ
         )
         html += sbs_example
         size_dict["sbs_example"] += len(sbs_example)
@@ -388,7 +386,6 @@ def generate_dpd_html(
     sandhi_contractions: SandhiContractionDict,
     cf_set: Set[str],
     idioms_set: set[str],
-    make_link=False,
     show_sbs_data=False,
     show_ru_data=False,
     show_grammar=False,
@@ -485,7 +482,6 @@ def generate_dpd_html(
             "sandhi_contractions": sandhi_contractions,
             "cf_set": cf_set,
             "idioms_set": idioms_set,
-            "make_link": make_link,
             "show_id": show_id,
             "show_sbs_data": show_sbs_data,
             "show_ru_data": show_ru_data,
@@ -528,7 +524,6 @@ def render_dpd_definition_templ(
     __pth__: ProjectPaths,
     i: DpdHeadword,
     dpd_definition_templ: Template,
-    make_link=False,
     show_id=False,
     show_sbs_data=False,
     show_ru_data=False,
@@ -548,7 +543,6 @@ def render_dpd_definition_templ(
     return str(
         dpd_definition_templ.render(
             i=i,
-            make_link=make_link,
             complete=complete,
             show_id=show_id,
             show_sbs_data=show_sbs_data,
@@ -763,22 +757,20 @@ def render_example_templ(
     __pth__: ProjectPaths,
     i: DpdHeadword,
     example_templ: Template,
-    make_link=False,
 ) -> str:
     """render sutta examples html"""
 
-    return str(example_templ.render(i=i, make_link=make_link, today=TODAY))
+    return str(example_templ.render(i=i, today=TODAY))
 
 
 def render_sbs_example_templ(
     __pth__: ProjectPaths,
     i: DpdHeadword,
     sbs_example_templ: Template,
-    make_link=False,
 ) -> str:
     """render sbs examples html"""
 
-    return str(sbs_example_templ.render(i=i, make_link=make_link))
+    return str(sbs_example_templ.render(i=i, today=TODAY))
 
 
 def render_inflection_templ(

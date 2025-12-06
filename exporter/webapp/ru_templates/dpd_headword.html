@@ -20,30 +20,22 @@
 <div class="button-box">
 
     {% if d.i.needs_sutta_info_button %}
-    <a class="button" name="sutta-info-button" href="#" data-target="sutta_info_{{d.i.lemma_1_}}">
+    <a class="button" name="sutta-info-button" href="#"
+        data-target="sutta_info_{{d.i.lemma_1_}}">
         сутта</a>
 
     {% endif %}
 
     {% if d.i.needs_grammar_button %}
-    <a
-        class="button"
-        name="grammar-button"
-        href="#"
+    <a class="button" name="grammar-button" href="#"
         data-target="grammar_{{d.i.lemma_1_}}">
         грамматика</a>
     {% endif %} {% if d.i.needs_example_button %}
-    <a
-        class="button"
-        name="example-button"
-        href="#"
+    <a class="button" name="example-button" href="#"
         data-target="example_{{d.i.lemma_1_}}">
         пример</a>
     {% endif %} {% if d.i.needs_examples_button %}
-    <a
-        class="button"
-        name="example-button"
-        href="#"
+    <a class="button" name="example-button" href="#"
         data-target="examples_{{d.i.lemma_1_}}">
         примеры</a>
     {% endif %} {% if d.i.needs_conjugation_button %}
@@ -85,7 +77,8 @@
 <!-- sutta info -->
 
 {% if d.i.needs_sutta_info_button %}
-<div id="sutta_info_{{d.i.lemma_1_}}" name="sutta-info-div" class="dpd content hidden">
+<div id="sutta_info_{{d.i.lemma_1_}}" name="sutta-info-div"
+    class="dpd content hidden">
     <table class="sutta-info">
 
         <!-- CST -->
@@ -93,7 +86,7 @@
         {% if d.su.cst_code %}
         <tr>
             <th class="heading top" colspan="2">
-                Chaṭṭha Saṅgāyana Типитака
+                Chaṭṭha Saṅgāyana Типитака (CST)
             </th>
         </tr>
         {% endif %}
@@ -187,12 +180,100 @@
         </tr>
         <tr>
             <th>
-                Github
+                GitHub
             </th>
             <td>
-                <a href="https://github.com/VipassanaTech/tipitaka-xml/tree/main/{{ d.su.cst_file }}" target="_blank">{{
+                <a
+                    href="https://github.com/VipassanaTech/tipitaka-xml/tree/main/{{ d.su.cst_file }}"
+                    target="_blank">{{
                     d.su.cst_file }}</a>
 
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.cst_code %}
+        <tr>
+            <th class="heading" colspan="2">
+                Сайты с CST
+            </th>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dpr_link %}
+        <tr>
+            <th>
+                Digital Pali Reader
+            </th>
+            <td>
+                <a href="{{ d.su.dpr_link }}" target="_blank">{{ d.su.dpr_link
+                    }}</a>
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.cst_code %}
+        <tr>
+            <th>
+                TipitakaPali.org
+            </th>
+            <td>
+                <a href="{{ d.su.tpp_org }}" target="_blank">{{ d.su.tpp_org
+                    }}</a>
+            </td>
+        </tr>
+        {% endif %}
+
+        <!-- page numbers -->
+
+        {% if d.su.cst_m_page %}
+        <tr>
+            <th class="heading" colspan="2">
+                Номера страниц в печатных изданиях CST
+            </th>
+        </tr>
+        {% endif %}
+
+        {% if d.su.cst_m_page %}
+        <tr>
+            <th>
+                Мьянма
+            </th>
+            <td>
+                {{ d.su.cst_m_page }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.cst_t_page %}
+        <tr>
+            <th>
+                Тайланд
+            </th>
+            <td>
+                {{ d.su.cst_t_page }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.cst_v_page %}
+        <tr>
+            <th>
+                VRI
+            </th>
+            <td>
+                {{ d.su.cst_v_page }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.cst_p_page %}
+        <tr>
+            <th>
+                PTS
+            </th>
+            <td>
+                {{ d.su.cst_p_page }}
             </td>
         </tr>
         {% endif %}
@@ -315,14 +396,37 @@
         <!-- websites -->
         <tr>
             <th class="heading" colspan="2">
-                Веб-сайты
+                Веб-сайты с системой Sutta Central
             </th>
         </tr>
 
         {% if d.su.sc_code %}
         <tr>
             <th>
-                Dhamma.gift (SC)
+                The Buddha's Words
+            </th>
+            <td>
+                <a href="{{ d.su.tbw }}" target="_blank">{{ d.su.tbw }}</a>
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.sc_code %}
+        <tr>
+            <th>
+                TBW Legacy
+            </th>
+            <td>
+                <a href="{{ d.su.tbw_legacy }}" target="_blank">{{
+                    d.su.tbw_legacy }}</a>
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.sc_code %}
+        <tr>
+            <th>
+                Dhamma.gift
             </th>
             <td>
                 <a href="{{ d.su.dhamma_gift }}" target="_blank">{{
@@ -334,102 +438,345 @@
         {% if d.su.sc_code %}
         <tr>
             <th>
-                The Buddha's Words (SC)
+                SC Voice
             </th>
             <td>
-                <a href="{{ d.su.tbw }}" target="_blank">{{ d.su.tbw }}</a>
-            </td>
-        </tr>
-        {% endif %}
-
-        {% if d.su.sc_code %}
-        <tr>
-            <th>
-                SC Voice (SC)
-            </th>
-            <td>
-                <a href="{{ d.su.sc_voice_link }}" target="_blank">{{ d.su.sc_voice_link }}</a>
+                <a href="{{ d.su.sc_voice_link }}" target="_blank">{{
+                    d.su.sc_voice_link }}</a>
             </td>
         </tr>
         {% endif %}
 
         {% if d.su.cst_code %}
         <tr>
-            <th>
-                TipitakaPali.org (CST)
+            <th class="heading" colspan="2">
+                Buddha Jayanti Tipiṭaka
             </th>
-            <td>
-                <a href="{{ d.su.tpp_org }}" target="_blank">{{ d.su.tpp_org
-                    }}</a>
-            </td>
         </tr>
-        {% endif %}
-
-        {% if d.su.dpr_link %}
         <tr>
             <th>
-                Digital Pali Reader (CST)
+                Продолжнние скоро
             </th>
             <td>
-                <a href="{{ d.su.dpr_link }}" target="_blank">{{ d.su.dpr_link
-                    }}</a>
+                ...
             </td>
         </tr>
         {% endif %}
 
-        <!-- page numbers -->
+        <!-- <tr>
+        <th>
+            Access to Insight
+        </th>
+        <td>
+            ...
+        </td>
+    </tr>
 
-        {% if d.su.cst_m_page %}
+    <tr>
+        <th>
+            Dhammatalks.org
+        </th>
+        <td>
+            ...
+        </td>
+    </tr>
+
+    <tr>
+        <th>
+            Tipitaka.sl
+        </th>
+        <td>
+            ...
+        </td>
+    </tr> -->
+
+        <!-- DV catalogue -->
+
+        {% if d.su.dv_exists %}
         <tr>
             <th class="heading" colspan="2">
-                Печатные издания
+                Дхамма Виная: Каталог Сутт
             </th>
         </tr>
         {% endif %}
 
-        {% if d.su.cst_m_page %}
-        <tr>
-            <th>
-                Бирманское издание
-            </th>
-            <td>
-                {{ d.su.cst_m_page }}
-            </td>
-        </tr>
-        {% endif %}
-
-        {% if d.su.cst_t_page %}
-        <tr>
-            <th>
-                Тайское издание
-            </th>
-            <td>
-                {{ d.su.cst_t_page }}
-            </td>
-        </tr>
-        {% endif %}
-
-        {% if d.su.cst_v_page %}
-        <tr>
-            <th>
-                VRI
-            </th>
-            <td>
-                {{ d.su.cst_v_page }}
-            </td>
-        </tr>
-        {% endif %}
-
-        {% if d.su.cst_p_page %}
+        {% if d.su.dv_pts %}
         <tr>
             <th>
                 PTS
             </th>
             <td>
-                {{ d.su.cst_p_page }}
+                {{ d.su.dv_pts }}
             </td>
         </tr>
         {% endif %}
+
+        {% if d.su.dv_main_theme %}
+        <tr>
+            <th>
+                Основная Тема
+            </th>
+            <td>
+                {{ d.su.dv_main_theme }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dv_subtopic %}
+        <tr>
+            <th>
+                Особенная Тема
+            </th>
+            <td>
+                {{ d.su.dv_subtopic }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dv_summary %}
+        <tr>
+            <th>
+                Сводка
+            </th>
+            <td>
+                {{ d.su.dv_summary }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dv_key_excerpt1 %}
+        <tr>
+            <th>
+                Основные выдержки 1
+            </th>
+            <td>
+                {{ d.su.dv_key_excerpt1 }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dv_key_excerpt2 %}
+        <tr>
+            <th>
+                Основные выдержки 2
+            </th>
+            <td>
+                {{ d.su.dv_key_excerpt2 }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dv_similes %}
+        <tr>
+            <th>
+                Примеры
+            </th>
+            <td>
+                {{ d.su.dv_similes }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dv_stage %}
+        <tr>
+            <th>
+                Стадия
+            </th>
+            <td>
+                {{ d.su.dv_stage }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dv_training %}
+        <tr>
+            <th>
+                Тренировка
+            </th>
+            <td>
+                {{ d.su.dv_training }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dv_aspect %}
+        <tr>
+            <th>
+                Тип Учения
+            </th>
+            <td>
+                {{ d.su.dv_aspect }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dv_teacher %}
+        <tr>
+            <th>
+                Учитель
+            </th>
+            <td>
+                {{ d.su.dv_teacher }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dv_audience %}
+        <tr>
+            <th>
+                Публика
+            </th>
+            <td>
+                {{ d.su.dv_audience }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dv_method %}
+        <tr>
+            <th>
+                Метод Учения
+            </th>
+            <td>
+                {{ d.su.dv_method }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dv_length %}
+        <tr>
+            <th>
+                Длинна
+            </th>
+            <td>
+                {{ d.su.dv_length }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dv_prominence %}
+        <tr>
+            <th>
+                Особенность
+            </th>
+            <td>
+                {{ d.su.dv_prominence }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dv_suggested_suttas %}
+        <tr>
+            <th>
+                Рекомендация
+            </th>
+            <td>
+                {{ d.su.dv_suggested_suttas }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dv_exists %}
+        <tr>
+            <th>
+                GitHub
+            </th>
+            <td>
+                <a
+                    href="https://github.com/dhammavinaya-tools/dhamma-vinaya-catalogue"
+                    target="_blank">
+                    https://github.com/dhammavinaya-tools/dhamma-vinaya-catalogue
+                </a>
+            </td>
+        </tr>
+        {% endif %}
+
+        <!-- DV parallel texts -->
+
+        {% if d.su.dv_parallels_exists %}
+        <tr>
+            <th class="heading" colspan="2">
+                Паралелли
+            </th>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dv_nikayas_parallels %}
+        <tr>
+            <th>
+                Никаи
+            </th>
+            <td>
+                {{ d.su.dv_nikayas_parallels }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dv_āgamas_parallels %}
+        <tr>
+            <th>
+                Агамы
+            </th>
+            <td>
+                {{ d.su.dv_āgamas_parallels }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dv_taisho_parallels %}
+        <tr>
+            <th>
+                Taisho
+            </th>
+            <td>
+                {{ d.su.dv_taisho_parallels }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dv_sanskrit_parallels %}
+        <tr>
+            <th>
+                Санскрит
+            </th>
+            <td>
+                {{ d.su.dv_sanskrit_parallels }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dv_vinaya_parallels %}
+        <tr>
+            <th>
+                Виная
+            </th>
+            <td>
+                {{ d.su.dv_vinaya_parallels }}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dv_others_parallels %}
+        <tr>
+            <th>
+                Другое
+            </th>
+            <td>
+                {{ d.su.dv_others_parallels }}
+            </td>
+        </tr>
+        {% endif %}
+
+        <!-- {% if d.su.dv_partial_parallels_all %}
+        <tr>
+            <th>
+                Частичные Паралелли
+            </th>
+            <td>
+                {{ d.su.dv_partial_parallels_all }}
+            </td>
+        </tr>
+        {% endif %} -->
 
     </table>
 
@@ -469,8 +816,10 @@
             <th>МФА</th>
             <td>/{{d.i.lemma_ipa}}/</td>
         </tr>
-        <th>English</th>
-        <td>{{d.meaning|safe}}</td>
+        <tr>
+            <th>English</th>
+            <td>{{d.meaning|safe}}</td>
+        </tr>
         <tr>
             <th>Грамматика</th>
             <td>{{d.ru_grammar}}</td>
@@ -481,7 +830,8 @@
             <th>Семья корня</th>
             <td>{{d.i.family_root}}</td>
         </tr>
-        {% endif %} {% if d.i.root_key %}
+        {% endif %}
+        {% if d.i.root_key %}
         <tr>
             <th>Корень</th>
             <td>
@@ -489,57 +839,68 @@
                 {{d.i.root_sign}} ({{d.i.rt.root_ru_meaning}})
             </td>
         </tr>
-        {% endif %} {% if d.i.rt.root_in_comps %}
+        {% endif %}
+        {% if d.i.rt.root_in_comps %}
         <tr>
             <th>√ в сандхи</th>
             <td>{{d.i.rt.root_in_comps}}</td>
         </tr>
-        {% endif %} {% if d.ru_root_base %}
+        {% endif %}
+        {% if d.ru_root_base %}
         <tr>
             <th>Основа</th>
             <td>{{d.ru_root_base}}</td>
         </tr>
-        {% endif %} {% if d.i.construction %}
+        {% endif %}
+        {% if d.i.construction %}
         <tr>
             <th>Образование</th>
             <td>{{d.i.construction|safe}}</td>
         </tr>
-        {% endif %} {% if d.i.derivative %}
+        {% endif %}
+        {% if d.i.derivative %}
         <tr>
             <th>Производное</th>
             <td>{{d.i.derivative}} ({{d.i.suffix}})</td>
         </tr>
-        {% endif %} {% if d.ru_phonetic %}
+        {% endif %}
+        {% if d.ru_phonetic %}
         <tr>
             <th>Фонетика</th>
             <td>{{d.ru_phonetic|safe}}</td>
         </tr>
-        {% endif %} {% if d.i.compound_type and "?" not in d.i.compound_type %}
+        {% endif %}
+        {% if d.i.compound_type and "?" not in d.i.compound_type %}
         <tr>
             <th>Составное</th>
             <td>{{d.i.compound_type}} ({{d.i.compound_construction|safe}})</td>
         </tr>
-        {% endif %} {% if d.i.antonym %}
+        {% endif %}
+        {% if d.i.antonym %}
         <tr>
             <th>Антоним</th>
             <td>{{d.i.antonym}}</td>
         </tr>
-        {% endif %} {% if d.i.synonym %}
+        {% endif %}
+        {% if d.i.synonym %}
         <tr>
             <th>Синоним</th>
             <td>{{d.i.synonym}}</td>
         </tr>
-        {% endif %} {% if d.i.variant %}
+        {% endif %}
+        {% if d.i.variant %}
         <tr>
             <th>Вариант</th>
             <td>{{d.i.variant}}</td>
         </tr>
-        {% endif %} {% if d.i.commentary and d.i.commentary !="-" %}
+        {% endif %}
+        {% if d.i.commentary and d.i.commentary !="-" %}
         <tr>
             <th>Комментарий</th>
             <td>{{d.i.commentary|safe}}</td>
         </tr>
-        {% endif %} {% if d.i.ru.ru_notes %}
+        {% endif %}
+        {% if d.i.ru.ru_notes %}
         <tr>
             <th>Заметки</th>
             <td>{{d.i.ru.ru_notes|safe}}</td>
@@ -555,12 +916,14 @@
             <th>Notes</th>
             <td>{{d.i.notes|safe}}</td>
         </tr>
-        {% endif %} {% if d.i.cognate %}
+        {% endif %}
+        {% if d.i.cognate %}
         <tr>
             <th>English Cognate</th>
             <td>{{d.i.cognate}}</td>
         </tr>
-        {% endif %} {% if d.i.link %}
+        {% endif %}
+        {% if d.i.link %}
         <tr>
             <th>Ссылка</th>
             <td>
@@ -571,19 +934,22 @@
                 {% endfor %}
             </td>
         </tr>
-        {% endif %} {% if d.i.non_ia %}
+        {% endif %}
+        {% if d.i.non_ia %}
         <tr>
             <th>Не Индоевроп</th>
             <td>{{d.i.non_ia}}</td>
         </tr>
-        {% endif %} {% if d.i.sanskrit %}
+        {% endif %}
+        {% if d.i.sanskrit %}
         <tr>
             <th>Санскрит</th>
             <td>
                 <i> {{d.i.sanskrit}} </i>
             </td>
         </tr>
-        {% endif %} {% if d.i.rt.sanskrit_root %}
+        {% endif %}
+        {% if d.i.rt.sanskrit_root %}
         <tr>
             <th>Санск. Корень</th>
             <td>
@@ -618,22 +984,22 @@
         id="examples_{{d.i.lemma_1_}}"
         name="example-div"
         class="dpd content hidden">
-        {% endif %} {% if d.i.example_1 and d.i.meaning_1 %}
-        <p>{{d.i.example_1|safe}}</p>
+        {% endif %}
+
+        {% if d.i.example_1 and d.i.meaning_1 %}
+        <p>
+            {{d.i.example_1|safe}}
+        </p>
         <p class="sutta">
-            {% if d.make_link and d.i.source_link_1 %}
-            <a class="sutta_link" href="{{d.i.source_link_1}}" target="_blank">
-                {{d.i.source_1}}</a>
-            {% else %} {{d.i.source_1}} {% endif %} {{d.i.sutta_1|safe}}
+            {{d.i.source_1}} {{d.i.sutta_1|safe}}
         </p>
 
         {% if d.i.example_2 and d.i.meaning_1 %}
-        <p>{{d.i.example_2|safe}}</p>
+        <p>
+            {{d.i.example_2|safe}}
+        </p>
         <p class="sutta">
-            {% if d.make_link and d.i.source_link_2 %}
-            <a class="sutta_link" href="{{d.i.source_link_2}}" target="_blank">
-                {{d.i.source_2}}</a>
-            {% else %} {{d.i.source_2}} {% endif %} {{d.i.sutta_2|safe}}
+            {{d.i.source_2}} {{d.i.sutta_2|safe}}
         </p>
         {% endif %}
 

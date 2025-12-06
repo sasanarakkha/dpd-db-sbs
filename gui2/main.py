@@ -8,7 +8,6 @@ from gui2.sandhi_find_replace_view import SandhiFindReplaceView
 from gui2.sandhi_view import SandhiView
 from gui2.toolkit import ToolKit
 from tools.fast_api_utils import start_dpd_server
-from tools.ai_related import print_ai_config
 
 
 class App:
@@ -68,7 +67,6 @@ class App:
         self.translations_view = TranslationsView(self.page, self.toolkit)
         self.bold_search_view = BoldSearchView(self.page, self.toolkit)
         self.dps_view: DpsView = DpsView(self.page, self.toolkit)
-
 
         self.build_ui()
 
@@ -181,9 +179,6 @@ def main(page: ft.Page) -> None:
     start_time = time.time()
     App(page)
     print(f"App initialized in {time.time() - start_time:.2f}s")
-
-    # Print AI configuration
-    print_ai_config()
 
     if enable_profiling:
         profiler.disable()

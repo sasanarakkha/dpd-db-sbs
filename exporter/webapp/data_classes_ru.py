@@ -5,7 +5,6 @@ from tools.tools_for_ru_exporter import (
     ru_replace_abbreviations,
     ru_replace_abbreviations_list,
 )
-from tools.configger import config_test
 from tools.date_and_time import year_month_day_dash
 from tools.degree_of_completion_ru import rus_degree_of_completion
 
@@ -33,10 +32,6 @@ class HeadwordData:
         self.inflections_html_ru = ru_replace_abbreviations(
             i.inflections_html, "inflect"
         )
-        if config_test("dictionary", "make_link", "yes"):
-            self.make_link = True
-        else:
-            self.make_link = False
 
     @staticmethod
     def convert_newlines(obj):
@@ -117,10 +112,6 @@ class AbbreviationsData:
         self.explanation = data["explanation"]
         self.ru_meaning = data.get("ru_meaning", "")
         self.ru_abbrev = data.get("ru_abbrev", "")
-        if config_test("dictionary", "show_ru_data", "yes"):
-            self.show_ru_data = True
-        else:
-            self.show_ru_data = False
 
 
 class EpdData:

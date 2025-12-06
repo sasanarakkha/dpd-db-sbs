@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from contextlib import contextmanager
 import re
+from contextlib import contextmanager
 
 import uvicorn
 from fastapi import FastAPI, Request
@@ -20,13 +20,14 @@ from exporter.webapp.preloads import (
 from exporter.webapp.toolkit import make_dpd_html
 from tools.css_manager import CSSManager
 from tools.paths import ProjectPaths
+from tools.pali_text_files import cst_texts
+# from tools.tipitaka_db import search_all_cst_texts, search_book
 from tools.translit import auto_translit_to_roman
 
+pth: ProjectPaths = ProjectPaths()
 app = FastAPI()
 app.add_middleware(GZipMiddleware, minimum_size=500)
-app.mount("/static", StaticFiles(directory="exporter/webapp/static"), name="static")
-
-pth: ProjectPaths = ProjectPaths()
+app.mount("/static", StaticFiles(directory=str(pth.webapp_static_dir)), name="static")
 
 # Create session factory for database connections
 SessionLocal = sessionmaker(
@@ -52,20 +53,20 @@ with get_db() as db_session:
     bd_count = db_session.query(BoldDefinition).count()
 
 # Set up templates
-templates = Jinja2Templates(directory="exporter/webapp/templates")
+templates = Jinja2Templates(directory=str(pth.webapp_templates_dir))
 
 # Update CSS
 css_manager = CSSManager()
 css_manager.update_webapp_css()
 
 # Global CSS and JS
-with open("exporter/webapp/static/dpd.css") as f:
+with open(pth.webapp_css_path) as f:
     dpd_css = f.read()
 
-with open("exporter/webapp/static/dpd.js") as f:
+with open(pth.webapp_js_path) as f:
     dpd_js = f.read()
 
-with open("exporter/webapp/static/home_simple.css") as f:
+with open(pth.webapp_home_simple_css_path) as f:
     home_simple_css = f.read()
 
 
@@ -78,7 +79,13 @@ def home_page(request: Request, response_class=HTMLResponse):
     """Home page."""
 
     return templates.TemplateResponse(
-        "home.html", {"request": request, "dpd_results": "", "bd_count": bd_count}
+        "home.html",
+        {
+            "request": request,
+            "dpd_results": "",
+            "bd_count": bd_count,
+            "book_options": list(cst_texts.keys()),
+        },
     )
 
 
@@ -87,7 +94,13 @@ def bold_definitions_page(request: Request, response_class=HTMLResponse):
     """Bold definitions landing page"""
 
     return templates.TemplateResponse(
-        "home.html", {"request": request, "dpd_results": "", "bd_count": bd_count}
+        "home.html",
+        {
+            "request": request,
+            "dpd_results": "",
+            "bd_count": bd_count,
+            "book_options": list(cst_texts.keys()),
+        },
     )
 
 
@@ -111,6 +124,7 @@ def db_search_html(request: Request, q: str):
             "request": request,
             "q": q,
             "dpd_results": dpd_html,
+            "book_options": list(cst_texts.keys()),
         },
     )
 
@@ -215,6 +229,44 @@ def db_search_bd(
     )
 
 
+# @app.get("/tt_search", response_class=JSONResponse)
+# def tt_search(request: Request, q: str, book: str, lang: str):
+#     """Search Tipiṭaka Translations."""
+#     
+#     # Limit results
+#     limit = 100
+#     
+#     # Determine search column
+#     search_column = "pali_text" if lang == "Pāḷi" else "english_translation"
+#     
+#     # Perform search
+#     if book == "all":
+#         results = search_all_cst_texts(q, search_column=search_column)
+#     else:
+#         results = search_book(book, q, search_column=search_column)
+#     
+#     total_count = len(results)
+#     results = results[:limit]
+#     
+#     # Generate JSON
+#     response_data = {
+#         "total": total_count,
+#         "results": []
+#     }
+#     
+#     if results:
+#         for i, (pali_text, eng_trans, table_name, book_name) in enumerate(results, 1):
+#             response_data["results"].append({
+#                 "id": i,
+#                 "pali": pali_text,
+#                 "eng": eng_trans,
+#                 "book": book_name,
+#                 "table": table_name
+#             })
+#             
+#     return JSONResponse(content=response_data)
+
+
 def update_history(
     search_1: str, search_2: str, option: str
 ) -> list[tuple[str, str, str]]:
@@ -233,7 +285,7 @@ if __name__ == "__main__":
         host="127.1.1.1",
         port=8080,
         reload=True,
-        reload_dirs="exporter/webapp/",
+        reload_dirs=str(pth.webapp_static_dir.parent),
     )
 
 # Run on local machine with reload on changes
