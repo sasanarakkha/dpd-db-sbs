@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
+
 """
 Processes additions from additions_added.json and updates TSV files by replacing id_add with id values.
 Filters out already processed IDs to avoid duplicates and tracks processed additions.
 """
 
 import json
-import csv
 from pathlib import Path
-from typing import Dict, List, Set
+from typing import Dict, Set
 from gui2.paths import Gui2Paths
 from tools.paths_dps import DPSPaths
 
@@ -136,8 +136,7 @@ def process_additions() -> None:
     print(f"Already processed {len(processed_ids)} additions")
     
     # Filter out already processed IDs
-    new_id_mapping = {id_add: id_val for id_add, id_val in id_mapping.items() 
-                     if id_add not in processed_ids}
+    new_id_mapping = {id_add: id_val for id_add, id_val in id_mapping.items() if id_add not in processed_ids}
     
     if not new_id_mapping:
         print("No new additions to process")
@@ -156,7 +155,7 @@ def process_additions() -> None:
     print("Updating processed IDs file...")
     save_processed_ids(pthdps.addition_processed, set(new_id_mapping.keys()))
     
-    print(f"Processing complete!")
+    print("Processing complete!")
     print(f"- SBS replacements: {sbs_replacements}")
     print(f"- Russian replacements: {russian_replacements}")
     print(f"- Total new additions processed: {len(new_id_mapping)}")
