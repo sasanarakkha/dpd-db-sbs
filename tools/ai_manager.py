@@ -30,6 +30,8 @@ class AIManager:
         ("openrouter", "meta-llama/llama-3.3-70b-instruct:free", 8),
         # ("openai", "gpt-4o-mini", 6),
         # ("openai", "gpt-4.1", 12),
+        # cat from openrouter
+        # opencode
     ]
 
     # Grounded models for internet searches

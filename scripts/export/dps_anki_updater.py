@@ -453,7 +453,7 @@ def deck_selector(i):
             or i.sbs.dhp_example
             or i.sbs.pat_example
             or i.sbs.vib_example
-            or i.sbs.class_example
+            or i.sbs.class_anki
             or i.sbs.discourses_example
         )
     ):
