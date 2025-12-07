@@ -629,6 +629,8 @@ class SuttaInfo(Base):
     @property
     def tbw(self) -> str | None:
         link_url = config_read("dictionary", "link_url")
+        if not link_url:
+            link_url = "https://www.thebuddhaswords.net/"
         if self.sc_code:
             if self.book_code in [
                 "DN",

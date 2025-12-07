@@ -26,18 +26,16 @@ cp /home/django/dpd-db-sbs/start-uvicorn-fastapi.sh .
 echo "=== Killing old main_ru:app process ==="
 pkill -f "main_ru:app" || echo "No matching process found"
 
-echo "Waiting 30 seconds to ensure shutdown…"
-sleep 30
+echo "Waiting 10 seconds to ensure shutdown…"
+sleep 10
 
 echo "=== Rotating directories ==="
-if [ -d "/home/django/dpd-db-sbs" ]; then
-    mv /home/django/dpd-db-sbs /home/django/dpd-db-sbs-old
-fi
+mv /home/django/dpd-db-sbs /home/django/dpd-db-sbs-old
 mv ~/dpd-db-sbs-new /home/django/dpd-db-sbs
 
 echo "=== Starting new server ==="
 cd /home/django/dpd-db-sbs
-./start-uvicorn-fastapi.sh &
+./start-uvicorn-fastapi.sh
 
 echo "Waiting 10 seconds for server to start…"
 sleep 10
