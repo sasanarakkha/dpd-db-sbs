@@ -182,6 +182,9 @@ jobs:
     - name: Export Kindle & ePub
       run: uv run python exporter/kindle/kindle_exporter_ru.py
 
+    - name: Cleanup Kindle Intermediate Files
+      run: rm -rf exporter/kindle/ru_components/epub/
+
     - name: Export Variants
       run: uv run exporter/variants/variants_exporter.py
     
@@ -189,9 +192,18 @@ jobs:
       run: |
         free -h  # Check available memory
         df -h    # Check disk space
-           
+
     - name: Zip GoldenDict & Mdict
       run: uv run python scripts/rus_exporter/ru_zip_goldendict_mdict.py
+
+    - name: Cleanup GoldenDict & MDict Intermediate Files
+      run: |
+        rm -rf exporter/share/ru-dpd/
+        rm -rf exporter/share/ru-dpd-grammar/
+        rm -rf exporter/share/ru-dpd-deconstructor/
+        rm -rf exporter/share/dpd-variants/
+        rm -f exporter/share/*.mdx
+        rm -f exporter/share/*.mdd
 
     - name: Tarball DB
       run: uv run python scripts/build/tarball_db.py
@@ -215,6 +227,12 @@ jobs:
 
     - name: Zip GoldenDict & Mdict for DPD + RUS
       run: uv run python scripts/rus_exporter/zip_dpd_rus.py
+
+    - name: Cleanup DPD + RUS Intermediate Files
+      run: |
+        rm -rf exporter/share/dpd/
+        rm -f exporter/share/*.mdx
+        rm -f exporter/share/*.mdd
 
     - name: Config for DPD + SBS
       run: uv run python scripts/rus_exporter/config_github_release_dpd_sbs.py
