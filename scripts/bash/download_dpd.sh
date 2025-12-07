@@ -40,14 +40,14 @@ for link in "${DPD_links[@]}"; do
     echo "Downloading $link..."
     curl -q -# -L -O "$link"
 done
-for link in "${DPD_SBS_links[@]}"; do
-    echo "Downloading $link..."
-    curl -q -# -L -O "$link"
-done
-for link in "${DPD_RU_links[@]}"; do
-    echo "Downloading $link..."
-    curl -q -# -L -O "$link"
-done
+# for link in "${DPD_SBS_links[@]}"; do
+#     echo "Downloading $link..."
+#     curl -q -# -L -O "$link"
+# done
+# for link in "${DPD_RU_links[@]}"; do
+#     echo "Downloading $link..."
+#     curl -q -# -L -O "$link"
+# done
 
 # print success message
 echo -e "\033[0;32mAll files downloaded successfully.\033[0m"
