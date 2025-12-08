@@ -36,7 +36,6 @@ from tools.sbs_table_functions import SBS_table_tools, paragraphs_are_similar
 from tools.clean_machine import clean_machine
 
 
-
 current_date = datetime.date.today().strftime("%m-%d")
 
 console = Console()
@@ -56,7 +55,7 @@ def common_roots(db_session, dpspth):
     root_counts = (
         db_session.query(
             DpdHeadword.root_key.label("root"),
-            func.count(DpdHeadword.id).label("root_count")
+            func.count(DpdHeadword.id).label("root_count"),
         )
         .group_by(DpdHeadword.root_key)
         .subquery()
@@ -77,10 +76,20 @@ def common_roots(db_session, dpspth):
         "root_group",
         "root_sign",
         "root_meaning",
-        "main_verb",  
+        "main_verb",
         "examples_or_words",
         "native",
+        "feedback",
     ]
+
+    # Filter for unique root_clean
+    seen_roots = set()
+    roots_db_unique = []
+    for root_obj, count in roots_db:
+        if root_obj.root_clean not in seen_roots:
+            seen_roots.add(root_obj.root_clean)
+            roots_db_unique.append((root_obj, count))
+    roots_db = roots_db_unique
 
     rows = []
     ru_rows = []
@@ -115,9 +124,14 @@ def common_roots(db_session, dpspth):
             .all()
         )
 
-        
         exclude_lemma = [
-            "paṭhamaṃ", "thera", "ṭhita", "ṭha", "ṭhā", "añña", "aññā", 
+            "paṭhamaṃ",
+            "thera",
+            "ṭhita",
+            "ṭha",
+            "ṭhā",
+            "añña",
+            "aññā",
         ]
         unique_lemma_clean = set()
         unique_stems = set()
@@ -150,25 +164,26 @@ def common_roots(db_session, dpspth):
             root_obj.root_meaning,
             main_verb,
             examples,
+            "",
             feedback,
         ]
         rows.append([x if x is not None else "" for x in row])
-        
-        ru_row = [
-            root_obj.root_clean,
-            root_obj.root_ru_meaning
-        ]
+
+        ru_row = [root_obj.root_clean, root_obj.root_ru_meaning]
         ru_rows.append([x if x is not None else "" for x in ru_row])
 
-
-    output_path = os.path.join(dpspth.anki_csvs_dps_dir, "pali_class", "common_roots.csv")
+    output_path = os.path.join(
+        dpspth.anki_csvs_dps_dir, "pali_class", "common_roots.csv"
+    )
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(rows)
 
     # Save the list of field names to a text file
     if dpspth.sbs_anki_style_dir:
-        with open(f"{dpspth.sbs_anki_style_dir}/field-list-common-roots.txt", "w") as file:
+        with open(
+            f"{dpspth.sbs_anki_style_dir}/field-list-common-roots.txt", "w"
+        ) as file:
             file.write("\n".join(columns_names))
         console.print(
             f"[green] names of the SBS columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the txt"
@@ -176,14 +191,20 @@ def common_roots(db_session, dpspth):
     else:
         console.print("[bold red] sbs_anki_style_dir not found")
 
-    console.print(f"[bold green]{len(rows)}[/bold green] roots saved to {output_path}")
+    console.print(
+        f"[bold green]{len(rows)}[/bold green] roots saved to common_roots.csv"
+    )
 
     # Save ru_common_roots to csv file
-    ru_output_path = os.path.join(dpspth.anki_csvs_dps_dir, "pali_class", "ru_common_roots.csv")
+    ru_output_path = os.path.join(
+        dpspth.anki_csvs_dps_dir, "pali_class", "ru_common_roots.csv"
+    )
     with open(ru_output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(ru_rows)
-    console.print(f"[bold green]{len(ru_rows)}[/bold green] Russian root meanings saved to {ru_output_path}")
+    console.print(
+        f"[bold green]{len(ru_rows)}[/bold green] Russian root meanings saved to ru_common_roots.csv"
+    )
 
 
 def join(*args):
@@ -305,7 +326,7 @@ def get_paritta_source(i: DpdHeadword, chant_names: List[str]):
     return None, None, None
 
 
-def get_example_for_class(sbs: SBS, i:DpdHeadword):
+def get_example_for_class(sbs: SBS, i: DpdHeadword):
     """Gets the first available (source, sutta, example) set based on priority."""
 
     sources_priority = [
@@ -320,7 +341,7 @@ def get_example_for_class(sbs: SBS, i:DpdHeadword):
 
     for src_attr, sut_attr, ex_attr in sources_priority:
         example_val = getattr(sbs, ex_attr, None)
-        if example_val: # Prioritize if example field is non-empty
+        if example_val:  # Prioritize if example field is non-empty
             source_val = getattr(sbs, src_attr, None)
             sutta_val = getattr(sbs, sut_attr, None)
             return (
@@ -364,15 +385,21 @@ def get_unique_example_2(sbs: SBS):
             current_example_cleaned = clean_machine(current_example)
 
             if current_example_cleaned and class_example_cleaned:
-                if not paragraphs_are_similar(class_example_cleaned, current_example_cleaned, 0.7):
+                if not paragraphs_are_similar(
+                    class_example_cleaned, current_example_cleaned, 0.7
+                ):
                     if class_example_cleaned in current_example_cleaned:
                         continue
                     elif current_example_cleaned in class_example_cleaned:
                         continue
                     return (
-                        current_source.replace("\n", "<br>") if current_source else None,
+                        current_source.replace("\n", "<br>")
+                        if current_source
+                        else None,
                         current_sutta.replace("\n", "<br>") if current_sutta else None,
-                        current_example.replace("\n", "<br>") if current_example else None,
+                        current_example.replace("\n", "<br>")
+                        if current_example
+                        else None,
                     )
 
     return None, None, None
@@ -810,7 +837,6 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
     output_dir = os.path.join(dpspth.anki_csvs_dps_dir, "pali_class", "classes")
     os.makedirs(output_dir, exist_ok=True)
 
-
     def _is_needed(i: DpdHeadword):
         return bool(i.sbs and i.sbs.class_anki)
 
@@ -875,14 +901,16 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
             source,
             sutta,
             example,
-            i.sbs.class_example_translation if i.sbs else None, 
+            i.sbs.class_example_translation if i.sbs else None,
             i.sbs.class_extra if i.sbs else None,
             i.antonym,
             i.synonym,
             i.variant,
             i.commentary.replace("\n", "<br>") if i.commentary else None,
             i.notes.replace("\n", "<br>") if i.notes else None,
-            i.sbs.sbs_notes.replace("\n", "<br>") if i.sbs and i.sbs.sbs_notes else None,
+            i.sbs.sbs_notes.replace("\n", "<br>")
+            if i.sbs and i.sbs.sbs_notes
+            else None,
             i.link.replace("\n", "<br>") if i.link else None,
             SBS_table_tools().generate_sbs_audio(i.lemma_clean),
             current_date,
@@ -1060,7 +1088,9 @@ def suttas(dpspth, dpd_db):
             i.variant,
             i.commentary.replace("\n", "<br>") if i.commentary else None,
             i.notes.replace("\n", "<br>") if i.notes else None,
-            i.sbs.sbs_notes.replace("\n", "<br>") if i.sbs and i.sbs.sbs_notes else None,
+            i.sbs.sbs_notes.replace("\n", "<br>")
+            if i.sbs and i.sbs.sbs_notes
+            else None,
             i.link.replace("\n", "<br>") if i.link else None,
             SBS_table_tools().generate_sbs_audio(i.lemma_clean),
             current_date,
@@ -1329,10 +1359,11 @@ def vibhanga(dpspth, dpd_db):
         Sorts strings in human order (natural sort).
         E.g., "file1.txt", "file2.txt", "file10.txt"
         """
+
         def atoi(text_chunk):
             return int(text_chunk) if text_chunk.isdigit() else text_chunk.lower()
-        return [atoi(c) for c in re.split(r'(\d+)', text_to_sort)]
 
+        return [atoi(c) for c in re.split(r"(\d+)", text_to_sort)]
 
     def clean_html_tags(text):
         if text:
@@ -1429,10 +1460,7 @@ def main():
 
     # make list of sbs classes
     unique_sbs_class_values = (
-        db_session.query(SBS.class_anki)
-        .filter(SBS.class_anki != "")
-        .distinct()
-        .all()
+        db_session.query(SBS.class_anki).filter(SBS.class_anki != "").distinct().all()
     )
     unique_sbs_class_values = [value[0] for value in unique_sbs_class_values]
     unique_sbs_class_values.sort()
