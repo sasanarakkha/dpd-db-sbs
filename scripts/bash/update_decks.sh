@@ -26,8 +26,6 @@ while true; do
 done
 
 
-# cd "$HOME/Documents/dps/utilities"
-
 while true; do
     echo -ne "\033[1;34m need to push vocab for classes? \033[0m"
     read -n 1 -s yn

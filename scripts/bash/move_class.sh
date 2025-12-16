@@ -10,7 +10,7 @@ set -o pipefail
 # move all class materials on the server and GitHub
 
 DOWNLOADS_DIR="$HOME/Downloads"
-ANKI_CSVS_SRC_BASE_DIR="$HOME/Documents/dpd-db/anki_csvs"
+ANKI_CSVS_SRC_BASE_DIR="$HOME/Documents/dpd-db/temp/anki_csvs"
 PALI_CLASS_CSVS_SRC_DIR="$ANKI_CSVS_SRC_BASE_DIR/pali_class"
 TEMP_PUSH_DEST_DIR="$HOME/Documents/sasanarakkha/study-tools/temp-push"
 FILESRV_BASE_DEST_DIR="$HOME/filesrv1/share1/Sharing between users/13 For Pāli class/Anki Decks"

@@ -172,9 +172,7 @@ def common_roots(db_session, dpspth):
         ru_row = [root_obj.root_clean, root_obj.root_ru_meaning]
         ru_rows.append([x if x is not None else "" for x in ru_row])
 
-    output_path = os.path.join(
-        dpspth.anki_csvs_dps_dir, "pali_class", "common_roots.csv"
-    )
+    output_path = os.path.join(dpspth.anki_csvs_dir, "pali_class", "common_roots.csv")
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(rows)
@@ -197,7 +195,7 @@ def common_roots(db_session, dpspth):
 
     # Save ru_common_roots to csv file
     ru_output_path = os.path.join(
-        dpspth.anki_csvs_dps_dir, "pali_class", "ru_common_roots.csv"
+        dpspth.anki_csvs_dir, "pali_class", "ru_common_roots.csv"
     )
     with open(ru_output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
@@ -475,7 +473,7 @@ def dhp(dpspth, dpd_db):
     sorted_rows = sorted(rows_list, key=lambda x: int(re.findall(r"\d+", x[26])[0]))
 
     # Save anki_dhp to csv file
-    output_path = os.path.join(dpspth.anki_csvs_dps_dir, "anki_dhp.csv")
+    output_path = os.path.join(dpspth.anki_csvs_dir, "anki_dhp.csv")
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(sorted_rows)
@@ -584,7 +582,7 @@ def sbs_per(dpspth, dpd_db):
     rows_list = list(rows)
 
     # Save anki_sbs to csv file
-    output_path = os.path.join(dpspth.anki_csvs_dps_dir, "anki_sbs.csv")
+    output_path = os.path.join(dpspth.anki_csvs_dir, "anki_sbs.csv")
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(rows_list)
@@ -671,7 +669,7 @@ def parittas(dpspth, dpd_db):
     sorted_rows = sorted(rows_list, key=lambda x: x[11])
 
     # Save anki_sbs to csv file
-    output_path = os.path.join(dpspth.anki_csvs_dps_dir, "anki_parittas.csv")
+    output_path = os.path.join(dpspth.anki_csvs_dir, "anki_parittas.csv")
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(sorted_rows)
@@ -812,7 +810,7 @@ def dps(dpspth, dpd_db):
     rows_list = list(rows)
 
     # Save anki_sbs to csv file
-    output_path = os.path.join(dpspth.anki_csvs_dps_dir, "anki_dps.csv")
+    output_path = os.path.join(dpspth.anki_csvs_dir, "anki_dps.csv")
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(rows_list)
@@ -834,7 +832,7 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
     console.print("[yellow]making classes csv")
 
     # Ensure the output directory exists
-    output_dir = os.path.join(dpspth.anki_csvs_dps_dir, "pali_class", "classes")
+    output_dir = os.path.join(dpspth.anki_csvs_dir, "pali_class", "classes")
     os.makedirs(output_dir, exist_ok=True)
 
     def _is_needed(i: DpdHeadword):
@@ -922,7 +920,7 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
     # Save clases one by one to csvs
     for sbs_class_value in unique_sbs_class_values:
         output_path = os.path.join(
-            dpspth.anki_csvs_dps_dir,
+            dpspth.anki_csvs_dir,
             "pali_class",
             "classes",
             f"class_{sbs_class_value}.csv",
@@ -954,7 +952,7 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
         )
         all_classes += rows
     all_classes_list = list(all_classes)
-    output_path = os.path.join(dpspth.anki_csvs_dps_dir, "pali_class", "class_all.csv")
+    output_path = os.path.join(dpspth.anki_csvs_dir, "pali_class", "class_all.csv")
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(all_classes_list)
@@ -985,7 +983,7 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
         )
         ru_all_classes += rows
     ru_all_classes_list = list(ru_all_classes)
-    output_path = os.path.join(dpspth.anki_csvs_dps_dir, "pali_class", "class_ru.csv")
+    output_path = os.path.join(dpspth.anki_csvs_dir, "pali_class", "class_ru.csv")
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(ru_all_classes_list)
@@ -1102,9 +1100,7 @@ def suttas(dpspth, dpd_db):
     # Save all suttas
     rows_total = (suttas_row(i) for i in dpd_db if _is_needed(i))
     rows_total_list = list(rows_total)
-    output_path = os.path.join(
-        dpspth.anki_csvs_dps_dir, "pali_class", "suttas_class.csv"
-    )
+    output_path = os.path.join(dpspth.anki_csvs_dir, "pali_class", "suttas_class.csv")
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(rows_total_list)
@@ -1228,9 +1224,7 @@ def root_phonetic_class(dpspth, dpd_db, unique_sbs_class_values):
         )
         rows_total += rows
     rows_total_list = list(rows_total)
-    output_path = os.path.join(
-        dpspth.anki_csvs_dps_dir, "pali_class", "roots_class.csv"
-    )
+    output_path = os.path.join(dpspth.anki_csvs_dir, "pali_class", "roots_class.csv")
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(rows_total_list)
@@ -1249,9 +1243,7 @@ def root_phonetic_class(dpspth, dpd_db, unique_sbs_class_values):
         rows_total += rows
     rows_total_list = list(rows_total)
     # sorted_rows = sorted(rows_total_list, key=lambda x: x[2]) # Sort rows based on class number
-    output_path = os.path.join(
-        dpspth.anki_csvs_dps_dir, "pali_class", "phonetic_class.csv"
-    )
+    output_path = os.path.join(dpspth.anki_csvs_dir, "pali_class", "phonetic_class.csv")
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(rows_total_list)
@@ -1379,7 +1371,7 @@ def vibhanga(dpspth, dpd_db):
     )
 
     # Write sorted rows to CSV
-    file_path = os.path.join(dpspth.anki_csvs_dps_dir, "anki_vibhanga.csv")
+    file_path = os.path.join(dpspth.anki_csvs_dir, "anki_vibhanga.csv")
     with open(file_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(sorted_rows_total_list)
@@ -1434,7 +1426,7 @@ def native(dpspth, dpd_db):
     rows = (ru_row(i) for i in dpd_db if _is_needed(i) and i.ru)
     ru_all_sbs += rows
     ru_all_sbs_list = list(ru_all_sbs)
-    output_path = os.path.join(dpspth.anki_csvs_dps_dir, "sbs_rus.csv")
+    output_path = os.path.join(dpspth.anki_csvs_dir, "sbs_rus.csv")
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(ru_all_sbs_list)

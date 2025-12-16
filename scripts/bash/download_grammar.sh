@@ -37,17 +37,14 @@ for link in "${grammar[@]}"; do
     # Validate that the downloaded file is a Zip archive (Excel files are Zips)
     # This prevents processing HTML login pages as Excel files
     file_info=$(file "$title.xlsx")
-    if [[ "$file_info" != *"Zip archive data"* ]]; then
+    if [[ "$file_info" != *"Zip archive data"* ]] && [[ "$file_info" != *"Microsoft Excel 2007+"* ]]; then
         echo "\033[0;31mError: Downloaded file is not a valid Excel file.\033[0m"
         echo "It appears to be: $file_info"
         echo "This usually means the Google Sheet is invalid or not public."
         echo "Please ensure the Sheet is shared as 'Anyone with the link can view'."
         echo "URL: $url"
-        # Optional: Print first few lines if it's text to show the error
-        head -n 5 "$title.xlsx"
+        # Print first few lines if it's text to show the error
+        # head -n 5 "$title.xlsx"
         exit 1
     fi
 done
-
-
-

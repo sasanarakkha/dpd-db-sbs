@@ -9,7 +9,7 @@ set -o pipefail
 
 # move all decks on the server and GitHub
 
-ANKI_CSVS_SRC_DIR="$HOME/Documents/dpd-db/anki_csvs"
+ANKI_CSVS_SRC_DIR="$HOME/Documents/dpd-db/temp/anki_csvs"
 DOWNLOADS_SRC_DIR="$HOME/Downloads"
 FILESRV_DEST_BASE_DIR="$HOME/filesrv1/share1/Sharing between users/1 For Everyone/Software/Anki (learning tool)"
 FILESRV_PAT_DIR="$HOME/filesrv1/share1/Sharing between users/16 For Pātimokkha Class/offline"

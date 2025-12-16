@@ -154,7 +154,7 @@ def fromsource(dpspth, dpd_db, source_to_check, header):
     rows = [header]  # Add the header as the first row
     rows.extend(pali_row(i) for i in dpd_db if _needed(i))
 
-    output_path = os.path.join(dpspth.anki_csvs_dps_dir, f"anki_{source_to_check}.csv")
+    output_path = os.path.join(dpspth.anki_csvs_dir, f"anki_{source_to_check}.csv")
 
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
@@ -173,7 +173,7 @@ def fromid(dpspth, dpd_db, docx_filename, header):
     rows = [header]  # Add the header as the first row
     rows.extend(pali_row(i) for i in dpd_db if _is_needed(i))
 
-    output_path = os.path.join(dpspth.anki_csvs_dps_dir, "anki_id_list.csv")
+    output_path = os.path.join(dpspth.anki_csvs_dir, "anki_id_list.csv")
 
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
