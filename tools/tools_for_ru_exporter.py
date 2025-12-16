@@ -6,7 +6,6 @@
 5. assume corresponding ru names for sets from the tsv
 """
 
-
 import re
 import csv
 from rich import print
@@ -129,24 +128,81 @@ def ru_replace_abbreviations(value, kind="meaning"):
 
     # Load abbreviations dictionary and precompile patterns if not already done
     if abbreviations_dict is None or compiled_patterns is None:
-        abbreviations_dict = load_abbreviations_dict(pth.abbreviations_tsv_path)
+        abbreviations_dict = load_abbreviations_dict(rupth.abbreviations_tsv_path)
         compiled_patterns = {
-            abbr: re.compile(rf'\b\+?{re.escape(abbr)}\b') for abbr in abbreviations_dict
+            abbr: re.compile(rf"\b\+?{re.escape(abbr)}\b")
+            for abbr in abbreviations_dict
         }
 
     # Perform basic replacements based on the kind
     if kind == "meaning":
-        value = value.replace(' or ', ' или ').replace(', from', ', от').replace(' of ', ' от ').replace('letter', 'буква').replace('form', 'форма').replace('normally', 'обычно').replace('root', 'корень')
+        value = (
+            value.replace(" or ", " или ")
+            .replace(", from", ", от")
+            .replace(" of ", " от ")
+            .replace("letter", "буква")
+            .replace("form", "форма")
+            .replace("normally", "обычно")
+            .replace("root", "корень")
+        )
     elif kind == "inflect":
-        value = value.replace(' is ', ' это ').replace('conjugation', 'класс спряжения').replace('declension', 'класс склонения').replace('like ', 'как ').replace('reflexive', 'возвратный').replace('irregular', 'неправильный')
+        value = (
+            value.replace(" is ", " это ")
+            .replace("conjugation", "класс спряжения")
+            .replace("declension", "класс склонения")
+            .replace("like ", "как ")
+            .replace("reflexive", "возвратный")
+            .replace("irregular", "неправильный")
+        )
     elif kind == "root":
-        value = value.replace('Pāḷi Root', 'Корень Пали').replace('Sanskrit Root', 'Корень Санскр.').replace('Bases', 'Основы').replace('Base', 'Основа').replace('in Compounds', 'в Составе').replace('Notes', 'Заметки').replace('adverbs', 'наречия').replace('verbs', 'глаголы').replace('participles', 'причастия').replace('nouns', 'существительные').replace('adjectives', 'прилагательные')
+        value = (
+            value.replace("Pāḷi Root", "Корень Пали")
+            .replace("Sanskrit Root", "Корень Санскр.")
+            .replace("Bases", "Основы")
+            .replace("Base", "Основа")
+            .replace("in Compounds", "в Составе")
+            .replace("Notes", "Заметки")
+            .replace("adverbs", "наречия")
+            .replace("verbs", "глаголы")
+            .replace("participles", "причастия")
+            .replace("nouns", "существительные")
+            .replace("adjectives", "прилагательные")
+        )
     elif kind == "gram":
-        value = value.replace('word', 'слово').replace('letter', 'буква').replace('indeclinable', 'несклоняемое').replace('of', 'от').replace('root', 'корень')
+        value = (
+            value.replace("word", "слово")
+            .replace("letter", "буква")
+            .replace("indeclinable", "несклоняемое")
+            .replace("of", "от")
+            .replace("root", "корень")
+        )
     elif kind == "base":
-        value = value.replace('pass,', 'страд,').replace('pass)', 'страд)').replace('caus', 'понудит').replace('irreg', 'неправ').replace('desid', 'дезид').replace('deno', 'отымённ').replace('intens', 'усил')
+        value = (
+            value.replace("pass,", "страд,")
+            .replace("pass)", "страд)")
+            .replace("caus", "понудит")
+            .replace("irreg", "неправ")
+            .replace("desid", "дезид")
+            .replace("deno", "отымённ")
+            .replace("intens", "усил")
+        )
     elif kind == "phonetic":
-        value = value.replace('metathesis', 'метатеза').replace('with metrically', 'с метрически').replace('lengthened', 'удлиненным').replace('doubled', 'удвоенным').replace('shortened', 'укороченным').replace('Kacc', 'Качч').replace('contraction', 'сокращение').replace('expansion', 'расширение').replace('under the influence of', 'под влиянием').replace('before', 'перед').replace('nasalization', 'назализация').replace('a vowel', 'гласным').replace('a consonant', 'согласным').replace('aphesis', 'афезис')
+        value = (
+            value.replace("metathesis", "метатеза")
+            .replace("with metrically", "с метрически")
+            .replace("lengthened", "удлиненным")
+            .replace("doubled", "удвоенным")
+            .replace("shortened", "укороченным")
+            .replace("Kacc", "Качч")
+            .replace("contraction", "сокращение")
+            .replace("expansion", "расширение")
+            .replace("under the influence of", "под влиянием")
+            .replace("before", "перед")
+            .replace("nasalization", "назализация")
+            .replace("a vowel", "гласным")
+            .replace("a consonant", "согласным")
+            .replace("aphesis", "афезис")
+        )
 
     # Replace abbreviations using precompiled patterns
     for abbr, pattern in compiled_patterns.items():
@@ -163,7 +219,7 @@ def ru_replace_abbreviations_list(grammar):
     for value in grammar:
         ru_value = ru_replace_abbreviations(value, "no")
         ru_grammar.append(ru_value)
-        
+
     return ru_grammar
 
 
@@ -172,34 +228,45 @@ def load_abbreviations_dict(tsv_file_path):
     global abbreviations_dict, compiled_patterns
     if abbreviations_dict is None:
         abbreviations_dict = {}
-        with open(tsv_file_path, 'r', encoding='utf-8') as file:
-            reader = csv.reader(file, delimiter='\t')
+        with open(tsv_file_path, "r", encoding="utf-8") as file:
+            reader = csv.reader(file, delimiter="\t")
             for row in reader:
-                if len(row) >= 6 and row[5]:  # Check if the row has a Russian equivalent
+                if (
+                    len(row) >= 6 and row[5]
+                ):  # Check if the row has a Russian equivalent
                     abbreviations_dict[row[0]] = row[5]
         # Sort abbreviations by length (longer first) to avoid partial matches
-        abbreviations_dict = dict(sorted(abbreviations_dict.items(), key=lambda x: len(x[0]), reverse=True))
+        abbreviations_dict = dict(
+            sorted(abbreviations_dict.items(), key=lambda x: len(x[0]), reverse=True)
+        )
 
     # Precompile regex patterns
     if compiled_patterns is None:
         compiled_patterns = {
-            abbr: re.compile(rf'\b\+?{re.escape(abbr)}\b') for abbr in abbreviations_dict
+            abbr: re.compile(rf"\b\+?{re.escape(abbr)}\b")
+            for abbr in abbreviations_dict
         }
 
     return abbreviations_dict
 
 
-
-def replace_english(value, kind = "freq"):
+def replace_english(value, kind="freq"):
     # Perform basic replacements
     if kind == "freq":
-        value = value.replace('There are no matches of', 'Нет совпадений со словом').replace('in any corpus.', 'ни в одной из версий текста').replace('Frequency of', 'График частоты совпадений слова').replace('and its', 'и его форм').replace('declensions', 'склонений').replace('conjugations', 'спряжений')
+        value = (
+            value.replace("There are no matches of", "Нет совпадений со словом")
+            .replace("in any corpus.", "ни в одной из версий текста")
+            .replace("Frequency of", "График частоты совпадений слова")
+            .replace("and its", "и его форм")
+            .replace("declensions", "склонений")
+            .replace("conjugations", "спряжений")
+        )
     return value
 
 
 def ru_make_grammar_line(i: DpdHeadword) -> str:
     """Compile grammar line and replace values with ru"""
-    
+
     grammar = ru_replace_abbreviations(i.grammar)
     if i.neg:
         grammar += f", {ru_replace_abbreviations(i.neg)}"
@@ -212,30 +279,30 @@ def ru_make_grammar_line(i: DpdHeadword) -> str:
     return grammar
 
 
-def get_first_synonym(synonyms_str: str, delimiter: str = ';') -> str:
+def get_first_synonym(synonyms_str: str, delimiter: str = ";") -> str:
     """Extract the first synonym from a string of synonyms separated by a delimiter."""
     synonyms = synonyms_str.split(delimiter)
-    return synonyms[0] if synonyms else ''
+    return synonyms[0] if synonyms else ""
 
 
 def make_short_meaning(i: DpdHeadword) -> str:
-	"""Extract first synonim from meaning_1 or meaning_2."""
-	if i.meaning_1:
-		meaning: str = i.meaning_1
-		first_synonym = get_first_synonym(meaning)
-		return first_synonym
-	elif i.meaning_2:
-		meaning: str = i.meaning_2
-		first_synonym = get_first_synonym(meaning)
-		return first_synonym
-	else:
-		return ""
+    """Extract first synonim from meaning_1 or meaning_2."""
+    if i.meaning_1:
+        meaning: str = i.meaning_1
+        first_synonym = get_first_synonym(meaning)
+        return first_synonym
+    elif i.meaning_2:
+        meaning: str = i.meaning_2
+        first_synonym = get_first_synonym(meaning)
+        return first_synonym
+    else:
+        return ""
 
 
 def read_set_ru_from_tsv():
     set_ru_dict = {}
-    with open(rupth.sets_ru_path, 'r', newline='') as file:
-        reader = csv.reader(file, delimiter='\t')
+    with open(rupth.sets_ru_path, "r", newline="") as file:
+        reader = csv.reader(file, delimiter="\t")
         for row in reader:
             set_name, set_ru = row
             set_ru_dict[set_name] = set_ru
@@ -244,8 +311,8 @@ def read_set_ru_from_tsv():
 
 def write_set_to_tsv(fs):
     # Write unique sets to a TSV file
-    with open('unique_sets.tsv', 'w', newline='') as file:
-        writer = csv.writer(file, delimiter='\t')
+    with open("unique_sets.tsv", "w", newline="") as file:
+        writer = csv.writer(file, delimiter="\t")
         for set_name in fs:
             writer.writerow([set_name])
 
@@ -282,9 +349,8 @@ gdict_ru_info = {
     "bookname": "Пали Словарь",
     "author": "Bodhirasa, переведено Devamitta",
     "description": "",
-    "website": "https://digitalpalidictionary.github.io/rus", 
-    }
-
+    "website": "https://digitalpalidictionary.github.io/rus",
+}
 
 
 def sbs_related_sign(i: DpdHeadword):

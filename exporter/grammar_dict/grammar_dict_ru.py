@@ -19,7 +19,7 @@ from tools.printer import printer as pr
 
 from tools.tools_for_ru_exporter import (
     ru_replace_abbreviations,
-    load_abbreviations_dict
+    load_abbreviations_dict,
 )
 
 
@@ -155,7 +155,7 @@ def generate_html_from_lookup(g: ProgData):
     print_counter = 0
 
     # Preload abbreviations dictionary and patterns
-    load_abbreviations_dict(g.pth.abbreviations_tsv_path)
+    load_abbreviations_dict(g.rupth.abbreviations_tsv_path)
 
     for inflected_word, html_content in html_dict.items():
         # Split carefully to preserve the header part
@@ -177,7 +177,9 @@ def generate_html_from_lookup(g: ProgData):
         modified_body = "<tr>".join(processed_rows)
 
         # Reassemble the full HTML
-        html_dict[inflected_word] = f"{header_part}<tbody>{modified_body}</tbody>{footer_part}"
+        html_dict[inflected_word] = (
+            f"{header_part}<tbody>{modified_body}</tbody>{footer_part}"
+        )
 
         print_counter += 1
         if print_counter % 10000 == 0:

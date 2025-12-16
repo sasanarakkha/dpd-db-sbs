@@ -11,6 +11,98 @@ class DPSPaths:
             # The current working directory of the shell.
             base_dir = Path(os.path.abspath("."))
 
+        # exporter/sbs_templates
+        self.button_box_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/dpd_button_box.html"
+        )
+        self.dpd_definition_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/dpd_definition.html"
+        )
+        self.dpd_header_plain_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/dpd_header_plain.html"
+        )
+        self.dpd_header_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/dpd_header.html"
+        )
+        self.example_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/dpd_example.html"
+        )
+        self.sbs_example_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/sbs_example.html"
+        )
+        self.family_compound_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/dpd_family_compound.html"
+        )
+        self.family_idiom_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/dpd_family_idiom.html"
+        )
+        self.family_root_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/dpd_family_root.html"
+        )
+        self.family_set_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/dpd_family_set.html"
+        )
+        self.family_word_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/dpd_family_word.html"
+        )
+        self.feedback_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/dpd_feedback.html"
+        )
+        self.frequency_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/dpd_frequency.html"
+        )
+        self.grammar_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/dpd_grammar.html"
+        )
+        self.inflection_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/dpd_inflection.html"
+        )
+        self.root_header_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/root_header.html"
+        )
+        self.spelling_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/dpd_spelling_mistake.html"
+        )
+        self.templates_dir = base_dir / "exporter/sbs_templates"
+        self.variant_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/dpd_variant_reading.html"
+        )
+        self.sutta_info_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/dpd_sutta_info.html"
+        )
+
+        # exporter/goldendict/sbs_templates - root
+        self.root_button_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/root_buttons.html"
+        )
+        self.root_definition_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/root_definition.html"
+        )
+        self.root_families_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/root_families.html"
+        )
+        self.root_info_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/root_info.html"
+        )
+        self.root_matrix_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/root_matrix.html"
+        )
+
+        # exporter/goldendict/sbs_templates - other
+        self.abbrev_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/help_abbrev.html"
+        )
+        self.epd_templ_path = base_dir / "exporter/goldendict/sbs_templates/epd.html"
+        self.help_templ_path = (
+            base_dir / "exporter/goldendict/sbs_templates/help_help.html"
+        )
+
+        # shared_data/help_ru/
+        self.abbreviations_tsv_path = base_dir / "shared_data/help_ru/abbreviations.tsv"
+        self.bibliography_tsv_path = base_dir / "shared_data/help_ru/bibliography.tsv"
+        self.help_tsv_path = base_dir / "shared_data/help_ru/help.tsv"
+        self.thanks_tsv_path = base_dir / "shared_data/help_ru/thanks.tsv"
+
         # shared_data
         self.sbs_index_path = base_dir.joinpath(
             Path("shared_data/sbs_csvs/sbs_index.csv")

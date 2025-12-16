@@ -11,10 +11,14 @@ class RuPaths:
             # The current working directory of the shell.
             base_dir = Path(os.path.abspath("."))
 
+        # shared_data/help_ru/
+        self.abbreviations_tsv_path = base_dir / "shared_data/help_ru/abbreviations.tsv"
+        self.bibliography_tsv_path = base_dir / "shared_data/help_ru/bibliography.tsv"
+        self.help_tsv_path = base_dir / "shared_data/help_ru/help.tsv"
+        self.thanks_tsv_path = base_dir / "shared_data/help_ru/thanks.tsv"
+
         # /tsvs/
-        self.sets_ru_path = (
-            base_dir / "shared_data/rus/sets_ru.tsv"
-        )
+        self.sets_ru_path = base_dir / "shared_data/rus/sets_ru.tsv"
 
         # exporter/kindle/
         self.epub_dir = base_dir / "exporter/kindle/ru_components/epub/"
@@ -88,8 +92,7 @@ class RuPaths:
             / "exporter/goldendict/ru_components/javascript/family_root_template.js"
         )
         self.family_set_json = (
-            base_dir
-            / "exporter/goldendict/ru_components/javascript/family_set_json.js"
+            base_dir / "exporter/goldendict/ru_components/javascript/family_set_json.js"
         )
         self.family_set_template_js = (
             base_dir
@@ -147,18 +150,15 @@ class RuPaths:
             base_dir / "exporter/deconstructor/deconstructor_header.html"
         )
         self.deconstructor_templ_path = (
-            base_dir
-            / "exporter/goldendict/ru_components/templates/deconstructor.html"
+            base_dir / "exporter/goldendict/ru_components/templates/deconstructor.html"
         )
 
         # exporter/templates
         self.button_box_templ_path = (
-            base_dir
-            / "exporter/goldendict/ru_components/templates/dpd_button_box.html"
+            base_dir / "exporter/goldendict/ru_components/templates/dpd_button_box.html"
         )
         self.dpd_definition_templ_path = (
-            base_dir
-            / "exporter/goldendict/ru_components/templates/dpd_definition.html"
+            base_dir / "exporter/goldendict/ru_components/templates/dpd_definition.html"
         )
         self.dpd_header_plain_templ_path = (
             base_dir
@@ -183,20 +183,17 @@ class RuPaths:
             / "exporter/goldendict/ru_components/templates/dpd_family_root.html"
         )
         self.family_set_templ_path = (
-            base_dir
-            / "exporter/goldendict/ru_components/templates/dpd_family_set.html"
+            base_dir / "exporter/goldendict/ru_components/templates/dpd_family_set.html"
         )
         self.family_word_templ_path = (
             base_dir
             / "exporter/goldendict/ru_components/templates/dpd_family_word.html"
         )
         self.feedback_templ_path = (
-            base_dir
-            / "exporter/goldendict/ru_components/templates/dpd_feedback.html"
+            base_dir / "exporter/goldendict/ru_components/templates/dpd_feedback.html"
         )
         self.frequency_templ_path = (
-            base_dir
-            / "exporter/goldendict/ru_components/templates/dpd_frequency.html"
+            base_dir / "exporter/goldendict/ru_components/templates/dpd_frequency.html"
         )
         self.grammar_dict_header_templ_path = (
             base_dir / "exporter/goldendict/templates/grammar_dict_header.html"
@@ -205,8 +202,7 @@ class RuPaths:
             base_dir / "exporter/goldendict/ru_components/templates/dpd_grammar.html"
         )
         self.inflection_templ_path = (
-            base_dir
-            / "exporter/goldendict/ru_components/templates/dpd_inflection.html"
+            base_dir / "exporter/goldendict/ru_components/templates/dpd_inflection.html"
         )
         self.root_header_templ_path = (
             base_dir / "exporter/goldendict/ru_components/templates/root_header.html"
@@ -229,16 +225,14 @@ class RuPaths:
 
         # exporter/goldendict/templates - root
         self.root_button_templ_path = (
-            base_dir
-            / "exporter/goldendict/ru_components/templates/root_buttons.html"
+            base_dir / "exporter/goldendict/ru_components/templates/root_buttons.html"
         )
         self.root_definition_templ_path = (
             base_dir
             / "exporter/goldendict/ru_components/templates/root_definition.html"
         )
         self.root_families_templ_path = (
-            base_dir
-            / "exporter/goldendict/ru_components/templates/root_families.html"
+            base_dir / "exporter/goldendict/ru_components/templates/root_families.html"
         )
         self.root_info_templ_path = (
             base_dir / "exporter/goldendict/ru_components/templates/root_info.html"
@@ -263,7 +257,6 @@ class RuPaths:
             base_dir / "resources/tpr_downloads/release_zips/dpd_with_rus.zip"
         )
 
-
         # identity/
         self.dpd_css_path = base_dir / "identity/css/dpd.css"
         self.dpd_variables_css_path = base_dir / "identity/css/dpd-variables.css"
@@ -279,18 +272,22 @@ class RuPaths:
         self.fonts_dir = base_dir / "identity/fonts"
 
         # resources/fdg_dpd
-        self.fdg_dpd_ebts_js_ru_path = base_dir / "resources/fdg_dpd/assets/standalone-dpd/ru/dpd_ebts.js"
+        self.fdg_dpd_ebts_js_ru_path = (
+            base_dir / "resources/fdg_dpd/assets/standalone-dpd/ru/dpd_ebts.js"
+        )
 
         # ru_docs
         self.mk_docs_yaml = base_dir / "mkdocs_ru.yaml"
         self.docs_css_path = base_dir / "docs_rus/stylesheets/extra.css"
-        self.docs_css_variables_path = base_dir / "docs_rus/stylesheets/dpd-variables.css"
+        self.docs_css_variables_path = (
+            base_dir / "docs_rus/stylesheets/dpd-variables.css"
+        )
         self.docs_dir = base_dir / "docs_rus/"
         self.docs_bibliography_md_path = base_dir / "docs_rus/bibliography.md"
         self.docs_abbreviations_md_path = base_dir / "docs_rus/abbreviations.md"
         self.docs_changelog_md_path = base_dir / "docs_rus/changelog.md"
         self.docs_thanks_md_path = base_dir / "docs_rus/thanks.md"
-        
+
         if create_dirs:
             self.create_dirs()
 

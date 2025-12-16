@@ -41,7 +41,7 @@ done
 
 uv run python exporter/grammar_dict/grammar_dict.py
 
-uv run python exporter/goldendict/main.py
+uv run python exporter/goldendict/main_sbs.py
 uv run python exporter/deconstructor/deconstructor_exporter.py
 
 uv run python exporter/tpr/tpr_exporter.py

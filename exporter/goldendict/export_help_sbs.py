@@ -7,13 +7,13 @@ from mako.template import Template
 from minify_html import minify
 from sqlalchemy.orm import Session
 
-from tools.paths_ru import RuPaths
 from tools.css_manager import CSSManager
 from tools.goldendict_exporter import DictEntry
-from tools.paths import ProjectPaths
+from tools.paths_dps import DPSPaths
 from tools.printer import printer as pr
 from tools.tsv_read_write import read_tsv_dict, read_tsv_dot_dict
-from tools.utils import RenderedSizes, default_rendered_sizes, squash_whitespaces
+from tools.utils import squash_whitespaces
+from tools.utils_sbs import RenderedSizes, default_rendered_sizes
 
 
 class Abbreviation:
@@ -49,8 +49,7 @@ class Help:
 
 def generate_help_html(
     __db_session__: Session,
-    pth: ProjectPaths,
-    rupth: RuPaths,
+    pth: DPSPaths,
     show_ru_data=False,
 ) -> Tuple[List[DictEntry], RenderedSizes]:
     """generating html of all help files used in the dictionary"""
@@ -63,7 +62,7 @@ def generate_help_html(
     # 3. thank yous
     # 4. bibliography
 
-    header_templ = Template(filename=str(rupth.dpd_header_plain_templ_path))
+    header_templ = Template(filename=str(pth.dpd_header_plain_templ_path))
     header = str(header_templ.render())
 
     # Add Variables and fonts
@@ -72,19 +71,19 @@ def generate_help_html(
 
     help_data_list: List[DictEntry] = []
 
-    abbrev = add_abbrev_html(rupth, header)
+    abbrev = add_abbrev_html(pth, header, show_ru_data)
     help_data_list.extend(abbrev)
     size_dict["help"] += len(str(abbrev))
 
-    help_html = add_help_html(rupth, header)
+    help_html = add_help_html(pth, header, show_ru_data)
     help_data_list.extend(help_html)
     size_dict["help"] += len(str(help_html))
 
-    bibliography = add_bibliography(rupth, header)
+    bibliography = add_bibliography(pth, header)
     help_data_list.extend(bibliography)
     size_dict["help"] += len(str(bibliography))
 
-    thanks = add_thanks(rupth, header)
+    thanks = add_thanks(pth, header)
     help_data_list.extend(thanks)
     size_dict["help"] += len(str(thanks))
 
@@ -92,17 +91,14 @@ def generate_help_html(
     return help_data_list, size_dict
 
 
-def add_abbrev_html(
-    rupth: RuPaths,
-    header: str,
-) -> List[DictEntry]:
+def add_abbrev_html(pth: DPSPaths, header: str, show_ru_data=False) -> List[DictEntry]:
     help_data_list = []
 
-    file_path = rupth.abbreviations_tsv_path
+    file_path = pth.abbreviations_tsv_path
     rows = read_tsv_dict(file_path)
 
     rows2 = []
-    with open(rupth.abbreviations_tsv_path) as f:
+    with open(pth.abbreviations_tsv_path) as f:
         reader = csv.DictReader(f, delimiter="\t")
         for row in reader:
             rows2.append(row)
@@ -125,15 +121,12 @@ def add_abbrev_html(
     for i in items:
         html = ""
         html += "<body>"
-        html += render_abbrev_templ(rupth, i)
+        html += render_abbrev_templ(pth, i, show_ru_data)
         html += "</body></html>"
 
         html = squash_whitespaces(header) + minify(html)
 
-        if i.ru_abbrev:
-            word = i.ru_abbrev
-        else:
-            word = i.abbrev
+        word = i.abbrev
 
         res = DictEntry(
             word=word,
@@ -148,16 +141,17 @@ def add_abbrev_html(
 
 
 def add_help_html(
-    rupth: RuPaths,
+    pth: DPSPaths,
     header: str,
+    show_ru_data=False,
 ) -> List[DictEntry]:
     help_data_list = []
 
-    file_path = rupth.help_tsv_path
+    file_path = pth.help_tsv_path
     rows = read_tsv_dict(file_path)
 
     rows2 = []
-    with open(rupth.help_tsv_path) as f:
+    with open(pth.help_tsv_path) as f:
         reader = csv.DictReader(f, delimiter="\t")
         for row in reader:
             rows2.append(row)
@@ -177,12 +171,12 @@ def add_help_html(
     for i in items:
         html = ""
         html += "<body>"
-        html += render_help_templ(rupth, i)
+        html += render_help_templ(pth, i, show_ru_data)
         html += "</body></html>"
 
         html = squash_whitespaces(header) + minify(html)
 
-        word = i.ru_help
+        word = i.help
 
         res = DictEntry(
             word=word,
@@ -196,10 +190,10 @@ def add_help_html(
     return help_data_list
 
 
-def add_bibliography(rupth: RuPaths, header: str) -> List[DictEntry]:
+def add_bibliography(pth: DPSPaths, header: str) -> List[DictEntry]:
     help_data_list = []
 
-    file_path = rupth.bibliography_tsv_path
+    file_path = pth.bibliography_tsv_path
     bibliography_dict = read_tsv_dot_dict(file_path)
 
     html = ""
@@ -258,10 +252,10 @@ def add_bibliography(rupth: RuPaths, header: str) -> List[DictEntry]:
     return help_data_list
 
 
-def add_thanks(rupth: RuPaths, header: str) -> List[DictEntry]:
+def add_thanks(pth: DPSPaths, header: str) -> List[DictEntry]:
     help_data_list = []
 
-    file_path = rupth.thanks_tsv_path
+    file_path = pth.thanks_tsv_path
     thanks = read_tsv_dot_dict(file_path)
 
     html = ""
@@ -311,22 +305,24 @@ def add_thanks(rupth: RuPaths, header: str) -> List[DictEntry]:
 
 
 def render_abbrev_templ(
-    rupth: RuPaths,
+    pth: DPSPaths,
     i: Abbreviation,
+    show_ru_data=False,
 ) -> str:
     """render html of abbreviations"""
 
-    abbrev_templ = Template(filename=str(rupth.abbrev_templ_path))
+    abbrev_templ = Template(filename=str(pth.abbrev_templ_path))
 
-    return str(abbrev_templ.render(i=i))
+    return str(abbrev_templ.render(i=i, show_ru_data=show_ru_data))
 
 
 def render_help_templ(
-    rupth: RuPaths,
+    pth: DPSPaths,
     i: Help,
+    show_ru_data=False,
 ) -> str:
     """render html of help"""
 
-    help_templ = Template(filename=str(rupth.help_templ_path))
+    help_templ = Template(filename=str(pth.help_templ_path))
 
-    return str(help_templ.render(i=i))
+    return str(help_templ.render(i=i, show_ru_data=show_ru_data))

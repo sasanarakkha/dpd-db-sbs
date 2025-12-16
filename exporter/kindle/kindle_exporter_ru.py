@@ -6,6 +6,9 @@ The word set is limited to
 - words in deconstructed compounds."""
 
 import subprocess
+import platform
+import shutil
+
 from pathlib import Path
 
 from datetime import datetime
@@ -42,10 +45,7 @@ from tools.tools_for_ru_exporter import (
 )
 
 
-def render_xhtml(
-    pth: ProjectPaths,
-    rupth: RuPaths
-):
+def render_xhtml(pth: ProjectPaths, rupth: RuPaths):
     pr.green("querying dpd db")
     db_session = get_db_session(pth.dpd_db_path)
     dpd_db = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.ru)).all()
@@ -97,11 +97,19 @@ def render_xhtml(
 
     # words in deconstructor in cst_text_set & sc_text_set
     pr.green("querying lookup for deconstructor")
-    deconstructor_db = (
-        db_session.query(Lookup)
-        .filter(Lookup.deconstructor != "", Lookup.lookup_key.in_(combined_text_set))
-        .all()
-    )
+    # Process in chunks to avoid SQLite's "too many SQL variables" error
+    chunk_size = 900  # Leave some buffer under SQLite's 999 limit
+    deconstructor_db = []
+
+    combined_text_list = list(combined_text_set)
+    for i in range(0, len(combined_text_list), chunk_size):
+        chunk = combined_text_list[i : i + chunk_size]
+        chunk_result = (
+            db_session.query(Lookup)
+            .filter(Lookup.deconstructor != "", Lookup.lookup_key.in_(chunk))
+            .all()
+        )
+        deconstructor_db.extend(chunk_result)
     words_in_deconstructor_set = make_words_in_deconstructions(db_session)
     pr.yes(len(words_in_deconstructor_set))
 
@@ -181,9 +189,7 @@ def render_xhtml(
         entries = "".join(entries)
 
         xhtml = render_ebook_letter_templ(rupth, letter, entries)
-        output_path = rupth.epub_text_dir.joinpath(
-            f"{counter}_{ascii_letter}.xhtml"
-        )
+        output_path = rupth.epub_text_dir.joinpath(f"{counter}_{ascii_letter}.xhtml")
 
         with open(output_path, "w") as f:
             f.write(xhtml)
@@ -323,13 +329,13 @@ def render_ebook_letter_templ(pth: RuPaths, letter: str, entries: str) -> str:
     return str(ebook_letter_templ.render(letter=letter, entries=entries))
 
 
-def save_abbreviations_xhtml_page(pth: ProjectPaths, rupth: RuPaths, id_counter):
+def save_abbreviations_xhtml_page(rupth: RuPaths, id_counter):
     """Render xhtml of all DPD abbreviations and save as a page."""
 
     pr.green("saving abbrev xhtml")
     abbreviations_list = []
 
-    file_path = pth.abbreviations_tsv_path
+    file_path = rupth.abbreviations_tsv_path
     abbreviations_list = read_tsv_dict(file_path)
 
     abbreviation_entries = []
@@ -413,19 +419,43 @@ def zip_epub(pth: RuPaths):
 
 
 def make_mobi(pth: RuPaths):
-    """Run kindlegen to convert epub to mobi."""
+    """Convert epub to mobi using available tool."""
     pr.green_title("converting epub to mobi")
 
-    process = subprocess.Popen(
-        [str(pth.kindlegen_path), str(pth.dpd_epub_path)],
-        stdout=subprocess.PIPE,
-        text=True,
-    )
+    system = platform.system()
+    epub_path = str(pth.dpd_epub_path)
+    mobi_path = epub_path.replace(".epub", ".mobi")
 
-    if process.stdout is not None:
-        for line in process.stdout:
-            print(line, end="")
-    process.wait()
+    if system == "Darwin":
+        # Try Calibre
+        # brew install --cask calibre
+        if shutil.which("ebook-convert"):
+            process = subprocess.Popen(
+                ["ebook-convert", epub_path, mobi_path],
+                stdout=subprocess.PIPE,
+                text=True,
+            )
+            if process.stdout is not None:
+                for line in process.stdout:
+                    print(line, end="")
+            process.wait()
+            pr.yes("Converted with Calibre")
+            return
+        else:
+            pr.red("No compatible MOBI converter found on macOS.")
+            return
+    else:
+        # Default: try kindlegen
+        process = subprocess.Popen(
+            [str(pth.kindlegen_path), epub_path],
+            stdout=subprocess.PIPE,
+            text=True,
+        )
+        if process.stdout is not None:
+            for line in process.stdout:
+                print(line, end="")
+        process.wait()
+        pr.yes("Converted with kindlegen")
 
 
 def html_friendly(text: str):
@@ -445,7 +475,7 @@ def main():
         pth = ProjectPaths()
         rupth = RuPaths()
         id_counter = render_xhtml(pth, rupth)
-        save_abbreviations_xhtml_page(pth, rupth, id_counter)
+        save_abbreviations_xhtml_page(rupth, id_counter)
         save_title_page_xhtml(rupth)
         zip_epub(rupth)
         make_mobi(rupth)

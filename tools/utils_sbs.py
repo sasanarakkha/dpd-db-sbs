@@ -7,6 +7,7 @@ class RenderedSizes(TypedDict):
     dpd_button_box: int
     dpd_grammar: int
     dpd_example: int
+    sbs_example: int
     dpd_inflection_table: int
     dpd_family_root: int
     dpd_family_word: int
@@ -43,6 +44,7 @@ def default_rendered_sizes() -> RenderedSizes:
         dpd_button_box=0,
         dpd_grammar=0,
         dpd_example=0,
+        sbs_example=0,
         dpd_inflection_table=0,
         dpd_family_root=0,
         dpd_family_word=0,
@@ -74,31 +76,3 @@ def sum_rendered_sizes(sizes: List[RenderedSizes]) -> RenderedSizes:
         for k, v in i.items():
             res[k] += v
     return res
-
-
-def list_into_batches(input_list: List, num_batches: int) -> List[List]:
-    """Splits a list into a number of lists.
-
-    When the division has remainder, this results in num + 1 batches, where the
-    last batch has a small number of items, i.e. the remainder of the integer
-    division.
-    """
-
-    batch_size = len(input_list) // num_batches
-
-    if batch_size == 0:
-        return [input_list]
-
-    return [
-        input_list[i : i + batch_size] for i in range(0, len(input_list), batch_size)
-    ]
-
-
-def squash_whitespaces(string: str) -> str:
-    """
-    Delete whitespace and newline chars from both sides of an every line of string
-    """
-    result = []
-    for i in string.split("\n"):
-        result.append(i.strip())
-    return "".join(result)
