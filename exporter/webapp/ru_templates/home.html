@@ -35,12 +35,12 @@
             <button class="tab-link" data-tab="bold-def-tab">
                 CST Выделенное Определение
             </button>
+            <button class="tab-link" data-tab="tt-tab">
+                Переводы Типитаки
+            </button>
         </div>
         <div class="header-controls">
-            <a
-                href="https://forms.gle/gJ7ouhJriYREPm1s8"
-                target="_blank"
-                title="Подписаться на обновления"
+            <a href="https://forms.gle/gJ7ouhJriYREPm1s8" target="_blank" title="Подписаться на обновления"
                 class="email-button">
                 📧
             </a>
@@ -52,12 +52,10 @@
                     </span>
                 </span>
                 <div class="dropdown" style="display: none">
-                    <a href="#" class="dropdown-item"
-                        onclick="changeLanguage('en')">
+                    <a href="#" class="dropdown-item" onclick="changeLanguage('en')">
                         English
                     </a>
-                    <a href="#" class="dropdown-item"
-                        onclick="changeLanguage('ru')">
+                    <a href="#" class="dropdown-item" onclick="changeLanguage('ru')">
                         Русский
                     </a>
                 </div>
@@ -67,25 +65,13 @@
     <div id="dpd-tab" class="tab-content active">
         <div class="header-pane">
             <div class="logo-title">
-                <img
-                    src="static/dpd-logo.svg"
-                    alt="dpd logo"
-                    id="header-image"
-                    class="header-image" />
+                <img src="static/dpd-logo.svg" alt="dpd logo" id="header-image" class="header-image" />
                 <h2 class="title" id="title-clear">Электронный Словарь Пали</h2>
             </div>
             <form id="search-form">
-                <input
-                    class="search-box"
-                    type="text"
-                    name="search"
-                    id="search-box"
-                    value="{{ search }}"
-                    autocomplete="off"
-                    inputmode="text"
-                    autocapitalize="off" />
-                <button class="search-button"
-                    id="search-button">поиск</button>
+                <input class="search-box" type="text" name="search" id="search-box" value="{{ search }}"
+                    autocomplete="off" inputmode="text" autocapitalize="off" />
+                <button class="search-button" id="search-button">поиск</button>
                 <button class="help small-button" id="search-help-button">
                     ?
                     <span class="tooltip velthuis">
@@ -118,8 +104,7 @@
         <div class="main-pane" id="main-pane">
             <div class="history-pane" id="history-pane">
                 <h3>История</h3>
-                <button id="clear-history-button"
-                    class="clear-history-button">
+                <button id="clear-history-button" class="clear-history-button">
                     x
                 </button>
                 <div class="history-list-pane" id="history-list-pane"></div>
@@ -132,10 +117,8 @@
             <div class="settings-pane">
                 <h3>Настройки</h3>
                 <p>
-                    <button class="small-button"
-                        id="font-size-down">-</button>
-                    <button class="small-button"
-                        id="font-size-up">+</button>
+                    <button class="small-button" id="font-size-down">-</button>
+                    <button class="small-button" id="font-size-up">+</button>
                     размер шрифта
                     <span id="font-size-display"></span>
                 </p>
@@ -183,8 +166,7 @@
                 </p>
                 <p>
                     <label class="switch">
-                        <input type="checkbox" id="summary-toggle"
-                            checked />
+                        <input type="checkbox" id="summary-toggle" checked />
                         <span class="slider round"></span>
                     </label>
                     краткая информация скрыта / раскрыта
@@ -200,24 +182,14 @@
         </div>
         <div class="footer-pane">
             Для подробной информации пожалуйста
-            <a
-                href="https://devamitta.github.io/dpd.rus/webapp/"
-                target="_blank">
+            <a href="https://devamitta.github.io/dpd.rus/webapp/" target="_blank">
                 ознакомьтесь с документацией
             </a>
             &nbsp;|&nbsp;
-            <a
-                href="https://github.com/digitalpalidictionary/dpd-db"
-                target="_blank"
-                title="Сообщить об ошибках и предложениях на GitHub"
-                class="footer-link github-link">
-                <svg
-                    class="footer-icon github-icon"
-                    role="img"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    style="height: 1em; vertical-align: middle">
+            <a href="https://github.com/digitalpalidictionary/dpd-db" target="_blank"
+                title="Сообщить об ошибках и предложениях на GitHub" class="footer-link github-link">
+                <svg class="footer-icon github-icon" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor" style="height: 1em; vertical-align: middle">
                     <title>GitHub Issues</title>
                     <path
                         d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297 24 5.67 18.627.297 12 .297z" />
@@ -239,31 +211,16 @@
             <div class="bd-search-pane">
                 <h4>Поиск определения термина</h4>
                 <form id="bd-search-form-1">
-                    <input
-                        class="search-box bd-search-box"
-                        type="text"
-                        name="bd-search-1"
-                        id="bd-search-box-1"
-                        value="{{ search }}"
-                        autocomplete="off"
-                        inputmode="text"
-                        autocapitalize="off" />
+                    <input class="search-box bd-search-box" type="text" name="bd-search-1" id="bd-search-box-1"
+                        value="{{ search }}" autocomplete="off" inputmode="text" autocapitalize="off" />
                 </form>
                 <h4>которое содержит</h4>
                 <form id="bd-search-form-2">
-                    <input
-                        class="search-box bd-search-box"
-                        type="text"
-                        name="bd-search-2"
-                        id="bd-search-box-2"
-                        value="{{ search }}"
-                        autocomplete="off"
-                        inputmode="text"
-                        autocapitalize="off" />
+                    <input class="search-box bd-search-box" type="text" name="bd-search-2" id="bd-search-box-2"
+                        value="{{ search }}" autocomplete="off" inputmode="text" autocapitalize="off" />
                 </form>
                 <h4>внутри.</h4>
-                <button class="search-button"
-                    id="bd-search-button">поиск</button>
+                <button class="search-button" id="bd-search-button">поиск</button>
                 <button class="help small-button" id="search-help-button">
                     ?
                     <span class="tooltip velthuis">
@@ -293,44 +250,90 @@
                 </button>
             </div>
             <div class="bd-search-options">
-                <input type="radio" id="option1" name="option"
-                    value="starts_with" />
+                <input type="radio" id="option1" name="option" value="starts_with" />
                 <label for="option1">начинается с</label>
-                <input
-                    type="radio"
-                    id="option2"
-                    name="option"
-                    value="regex"
-                    checked />
+                <input type="radio" id="option2" name="option" value="regex" checked />
                 <label for="option2">обычный/rx</label>
-                <input type="radio" id="option3" name="option"
-                    value="fuzzy" />
+                <input type="radio" id="option3" name="option" value="fuzzy" />
                 <label for="option3">нечеткий</label>
-                <button type="button"
-                    class="bd-search-option-clear">отчистить</button>
+                <button type="button" class="bd-search-option-clear">отчистить</button>
             </div>
         </div>
         <div class="scrolling-pane" id="bd-results">{{ bd_results|safe
             }}</div>
         <div class="footer-pane">
             Для подробной информации пожалуйста смотрите
-            <a
-                href="https://devamitta.github.io/dpd.rus/webapp/"
-                target="_blank">
+            <a href="https://devamitta.github.io/dpd.rus/webapp/" target="_blank">
                 DPD веб-страницу
             </a>
             . Используется версия текста
-            <a href="https://github.com/VipassanaTech/tipitaka-xml"
-                target="_blank">
+            <a href="https://github.com/VipassanaTech/tipitaka-xml" target="_blank">
                 Института Исследования Випассаны
             </a>
             texts
         </div>
     </div>
 
+    <div id="tt-tab" class="tab-content">
+        <div class="header-pane bd-header-pane">
+            <div class="logo-title">
+                <h2 class="title" id="tt-title-clear">Tipiṭaka Translations</h2>
+            </div>
+            <p class="centered-text">
+                Search for Pāḷi text or English translations in the Chaṭṭha Saṅgāyana Tipiṭaka
+            </p>
+            <div class="bd-search-pane">
+                <form id="tt-search-form">
+                    <div class="tt-search-row">
+                        <label class="tt-label">Search for</label>
+                        <input class="search-box tt-search-box" type="text" id="tt-search-box" autocomplete="off"
+                            inputmode="text" autocapitalize="off" placeholder="use plain text or regex" />
+                        <label class="tt-label">in</label>
+                        <select id="tt-lang-select" class="tt-select">
+                            <option value="Pāḷi">Pāḷi texts</option>
+                            <option value="English">English translations</option>
+                        </select>
+                        <label class="tt-label">in</label>
+                        <select id="tt-book-select" class="tt-select">
+                            <option value="all">all books</option>
+                            {% for book in book_options %}
+                            <option value="{{ book }}">{{ book }}</option>
+                            {% endfor %}
+                        </select>
+                        <button class="search-button" id="tt-search-button">search</button>
+                    </div>
+                    <div class="tt-search-row">
+                        <label class="tt-label">Only show results</label>
+                        <select id="tt-filter-mode" class="tt-select">
+                            <option value="with">with</option>
+                            <option value="without">without</option>
+                        </select>
+                        <input class="search-box tt-search-box" type="text" id="tt-filter-box" autocomplete="off"
+                            placeholder="use plain text or regex" />
+                        <label class="tt-label">in them.</label>
+                        <button type="button" class="search-button" id="tt-clear-button"
+                            style="margin-left: auto;">clear</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="scrolling-pane" id="tt-results"></div>
+        <div class="footer-pane">
+            This page uses the database from <a href="https://tipitaka.paauksociety.org/index.php" target="_blank">Pa
+                Auk Society Tipiṭaka Translations</a>.
+            Pāḷī texts are from
+            <a href="https://github.com/VipassanaTech/tipitaka-xml" target="_blank">
+                Vipassana Research Institute
+            </a>
+            and English translations are generated using Deepseek.
+        </div>
+    </div>
+
     <script src="static/app.js" defer></script>
     <script src="static/home.js"></script>
     <script src="static/bold_definitions.js"></script>
+    <script src="static/tipitaka_translations.js"></script>
     <script src="static/dpd.js"></script>
 </body>
+
 </html>

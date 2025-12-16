@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <p class="message">Начните с <b>двойного щелчка</b> по любому слову в списке ниже:</p>
         <p class="message">atthi kāmarāgapariyuṭṭhitena peace kar gacchatīti Root ✓</p>
         `;
-    }
+  }
 
   if (dpdResults.innerHTML.trim() === "") {
     dpdResults.innerHTML = startMessage;

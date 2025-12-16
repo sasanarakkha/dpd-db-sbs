@@ -20,23 +20,19 @@
 <div class="button-box">
 
     {% if d.i.needs_sutta_info_button %}
-    <a class="button" name="sutta-info-button" href="#"
-        data-target="sutta_info_{{d.i.lemma_1_}}">
+    <a class="button" name="sutta-info-button" href="#" data-target="sutta_info_{{d.i.lemma_1_}}">
         сутта</a>
 
     {% endif %}
 
     {% if d.i.needs_grammar_button %}
-    <a class="button" name="grammar-button" href="#"
-        data-target="grammar_{{d.i.lemma_1_}}">
+    <a class="button" name="grammar-button" href="#" data-target="grammar_{{d.i.lemma_1_}}">
         грамматика</a>
     {% endif %} {% if d.i.needs_example_button %}
-    <a class="button" name="example-button" href="#"
-        data-target="example_{{d.i.lemma_1_}}">
+    <a class="button" name="example-button" href="#" data-target="example_{{d.i.lemma_1_}}">
         пример</a>
     {% endif %} {% if d.i.needs_examples_button %}
-    <a class="button" name="example-button" href="#"
-        data-target="examples_{{d.i.lemma_1_}}">
+    <a class="button" name="example-button" href="#" data-target="examples_{{d.i.lemma_1_}}">
         примеры</a>
     {% endif %} {% if d.i.needs_conjugation_button %}
     <a class="button" href="#" data-target="conjugation_{{d.i.lemma_1_}}">
@@ -77,8 +73,7 @@
 <!-- sutta info -->
 
 {% if d.i.needs_sutta_info_button %}
-<div id="sutta_info_{{d.i.lemma_1_}}" name="sutta-info-div"
-    class="dpd content hidden">
+<div id="sutta_info_{{d.i.lemma_1_}}" name="sutta-info-div" class="dpd content hidden">
     <table class="sutta-info">
 
         <!-- CST -->
@@ -183,9 +178,7 @@
                 GitHub
             </th>
             <td>
-                <a
-                    href="https://github.com/VipassanaTech/tipitaka-xml/tree/main/{{ d.su.cst_file }}"
-                    target="_blank">{{
+                <a href="https://github.com/VipassanaTech/tipitaka-xml/tree/main/{{ d.su.cst_file }}" target="_blank">{{
                     d.su.cst_file }}</a>
 
             </td>
@@ -362,11 +355,7 @@
             <td>
                 {% if d.su.sc_code %}
                 <a href="{{ d.su.sc_card_link }}" target="_blank">Карточка сутты</a>,
-                {% endif %}
-                {% if d.su.sc_code %}
                 <a href="{{ d.su.sc_pali_link }}" target="_blank">Текст на Пали</a>,
-                {% endif %}
-                {% if d.su.sc_code %}
                 <a href="{{ d.su.sc_eng_link }}" target="_blank">Перевод на английский</a>
                 {% endif %}
             </td>
@@ -438,6 +427,18 @@
         {% if d.su.sc_code %}
         <tr>
             <th>
+                SC Express
+            </th>
+            <td>
+                <a href="{{ d.su.sc_express_link }}" target="_blank">{{
+                    d.su.sc_express_link }}</a>
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.sc_code %}
+        <tr>
+            <th>
                 SC Voice
             </th>
             <td>
@@ -452,14 +453,6 @@
             <th class="heading" colspan="2">
                 Buddha Jayanti Tipiṭaka
             </th>
-        </tr>
-        <tr>
-            <th>
-                Продолжнние скоро
-            </th>
-            <td>
-                ...
-            </td>
         </tr>
         {% endif %}
 
@@ -682,9 +675,7 @@
                 GitHub
             </th>
             <td>
-                <a
-                    href="https://github.com/dhammavinaya-tools/dhamma-vinaya-catalogue"
-                    target="_blank">
+                <a href="https://github.com/dhammavinaya-tools/dhamma-vinaya-catalogue" target="_blank">
                     https://github.com/dhammavinaya-tools/dhamma-vinaya-catalogue
                 </a>
             </td>
@@ -795,10 +786,7 @@
 <!-- grammar -->
 
 {% if d.i.needs_grammar_button %}
-<div
-    id="grammar_{{d.i.lemma_1_}}"
-    name="grammar-div"
-    class="dpd content hidden">
+<div id="grammar_{{d.i.lemma_1_}}" name="grammar-div" class="dpd content hidden">
     <table class="grammar">
         <tr>
             <th>Лемма</th>
@@ -963,8 +951,7 @@
     </table>
     <p class="footer">
         Заметили ошибку?
-        <a
-            class="link"
+        <a class="link"
             href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Грамматика&entry.1433863141={{d.app_name}}+{{d.date}}"
             target="_blank">
             Исправьте здесь.</a>
@@ -975,15 +962,9 @@
 <!-- examples -->
 
 {% if d.i.needs_example_button %}
-<div
-    id="example_{{d.i.lemma_1_}}"
-    name="example-div"
-    class="dpd content hidden">
+<div id="example_{{d.i.lemma_1_}}" name="example-div" class="dpd content hidden">
     {% elif d.i.needs_examples_button %}
-    <div
-        id="examples_{{d.i.lemma_1_}}"
-        name="example-div"
-        class="dpd content hidden">
+    <div id="examples_{{d.i.lemma_1_}}" name="example-div" class="dpd content hidden">
         {% endif %}
 
         {% if d.i.example_1 and d.i.meaning_1 %}
@@ -1005,8 +986,7 @@
 
         <p class="footer">
             Пожалуйста, подскажите более подходящий
-            <a
-                class="link"
+            <a class="link"
                 href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Примеры&entry.1433863141={{d.app_name}}+{{d.date}}"
                 target="_blank">
                 пример.</a>
@@ -1028,8 +1008,7 @@
 
         <p>
             {% endif %} Ошибка в таблице склонений? Что-то упущено?
-            <a
-                class="link"
+            <a class="link"
                 href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{ d.i.id }}%20{{ d.i.lemma_link }}&entry.1433863141={{ d.app_name }}+{{ d.date }}"
                 target="_blank">
                 Пожалуйста сообщите.</a>
@@ -1053,8 +1032,7 @@
             {% endif %} Did you spot a mistake in the conjugation table?
             Something
             missing?
-            <a
-                class="link"
+            <a class="link"
                 href="https://docs.google.com/forms/d/e/1FAIpQLSdAL2PzavyrtXgGmtNrZAMyh3hV6g3fU0chxhWFxunQEZtH0g/viewform?usp=pp_url&entry.438735500={{ d.i.id }}%20{{ d.i.lemma_link }}&entry.1433863141={{ d.app_name }}+{{ d.date }}"
                 target="_blank">
                 Report it here.</a>
@@ -1069,8 +1047,7 @@
         {{d.i.fr.html_ru|safe}}
         <p class="footer">
             Заметили ошибку?
-            <a
-                class="link"
+            <a class="link"
                 href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Семья+корня&entry.1433863141={{d.app_name}}+{{d.date}}"
                 target="_blank">
                 Пожалуйста сообщите.</a>.
@@ -1090,8 +1067,7 @@
         {{d.i.fw.html_ru|safe}}
         <p class="footer">
             Заметили ошибку?
-            <a
-                class="link"
+            <a class="link"
                 href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Семья+слова&entry.1433863141={{d.app_name}}+{{d.date}}"
                 target="_blank">
                 Пожалуйста сообщите</a>.
@@ -1111,8 +1087,7 @@
         </p>
         <p class="footer">
             Заметили ошибку?
-            <a
-                class="link"
+            <a class="link"
                 href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Семья+составного&entry.1433863141={{d.app_name}}+{{d.date}}"
                 target="_blank">
                 Пожалуйста сообщите</a>.
@@ -1136,9 +1111,7 @@
         {% for f in d.fc %} {% if loop.index == 0 %}
         <p class="heading underlined overlined">{% else %}</p>
 
-        <p
-            id="{{d.i.lemma_1_}}cf_{{f.compound_family}}"
-            class="heading underlined overlined">
+        <p id="{{d.i.lemma_1_}}cf_{{f.compound_family}}" class="heading underlined overlined">
             {% endif %} {% if f.count == 1 %}
             <b>{{f.count}}</b>
             составное содержащее
@@ -1157,8 +1130,7 @@
         </p>
         <p class="footer">
             Заметили ошибку?
-            <a
-                class="link"
+            <a class="link"
                 href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Семья+составных&entry.1433863141={{d.app_name}}+{{d.date}}"
                 target="_blank">
                 Пожалуйста сообщите</a>.
@@ -1187,8 +1159,7 @@
         {{f.html_ru|safe}} {% endfor %}
         <p class="footer">
             Пожалуйста, добавьте больше идиом
-            <a
-                class="link"
+            <a class="link"
                 href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Идиомы&entry.1433863141={{d.app_name}}+{{d.date}}"
                 target="_blank">
                 тут</a>.
@@ -1209,8 +1180,7 @@
         {{f.html_ru|safe}} {% endfor %}
         <p class="footer">
             Заметили ошибку?
-            <a
-                class="link"
+            <a class="link"
                 href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Группы&entry.1433863141={{d.app_name}}+{{d.date}}"
                 target="_blank">
                 Пожалуйста сообщите</a>.
@@ -1223,7 +1193,7 @@
     {% if d.i.needs_sets_button %}
     <div id="family_sets_{{d.i.lemma_1_}}" class="dpd content hidden">
         <p id="{{d.i.lemma_1_}}sets_top" class="heading">
-            перейти к: 
+            перейти к:
             {# Step 1: Build a set to set_ru mapping using a dictionary #}
             {% set set_ru_mapping = {} %}
             {% for f in d.fs %}
@@ -1242,8 +1212,7 @@
         {% for f in d.fs %} {% if loop.index0 == 0 %}
         <p class="heading underlined overlined">{% else %}</p>
 
-        <p id="{{d.i.lemma_1_}}sets_{{f.set}}"
-            class="heading underlined overlined">
+        <p id="{{d.i.lemma_1_}}sets_{{f.set}}" class="heading underlined overlined">
             {% endif %}
             <b>{{d.i.lemma_clean}}</b>
             входит в группу
@@ -1259,8 +1228,7 @@
         </p>
         <p class="footer">
             Заметили ошибку?
-            <a
-                class="link"
+            <a class="link"
                 href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Группа&entry.1433863141={{d.app_name}}+{{d.date}}"
                 target="_blank">
                 Пожалуйста сообщите</a>.
@@ -1293,8 +1261,10 @@
 
         {% else %}
         <p class="heading underlined">
-            {% if d.i.needs_declension_button %} График частоты совпадений слова <b>{{d.i.lemma_1}}</b> и его склонения {% elif
-            d.i.needs_conjugation_button %} График частоты совпадений слова <b>{{d.i.lemma_1}}</b> и его спряжений {% else %} График частоты совпадений слова <b>{{d.i.lemma_1}}</b> {%
+            {% if d.i.needs_declension_button %} График частоты совпадений слова <b>{{d.i.lemma_1}}</b> и его склонения
+            {% elif
+            d.i.needs_conjugation_button %} График частоты совпадений слова <b>{{d.i.lemma_1}}</b> и его спряжений {%
+            else %} График частоты совпадений слова <b>{{d.i.lemma_1}}</b> {%
             endif
             %} {{d.i.freq_html|safe}} {% endif %}
         </p>
@@ -1302,16 +1272,12 @@
         <p>
             Для подробного объяснения того, как рассчитывается этот график частоты слов, его точности и неточности,
             обратитесь, пожалуйста, к
-            <a
-                class="link"
-                href="https://devamitta.github.io/dpd.rus/features/frequency/"
-                target="_blank">
+            <a class="link" href="https://devamitta.github.io/dpd.rus/features/frequency/" target="_blank">
                 этой веб-странице </a>.
         </p>
         <p class="footer">
             Что-то не на месте?
-            <a
-                class="link"
+            <a class="link"
                 href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Частота&entry.1433863141={{d.app_name}}+{{d.date}}"
                 target="_blank">
                 Пожалуйста сообщите.
@@ -1331,28 +1297,23 @@
                 target="_blank">DPD</a> - <b>Электронный Словарь Пали (от Дост. Бодхираса).</b>
         </p>
         <p>
-            <a
-                class="link"
+            <a class="link"
                 href="https://docs.google.com/forms/d/e/1FAIpQLSfResxEUiRCyFITWPkzoQ2HhHEvUS5fyg68Rl28hFH6vhHlaA/viewform?usp=pp_url&amp;entry.1433863141={{d.app_name}}+{{d.date}}"
                 target="_blank">Добавить отсутствующее слово</a><span>. Пожалуйста, используйте эту
             </span>
-            <a
-                class="link"
+            <a class="link"
                 href="https://docs.google.com/forms/d/e/1FAIpQLSfResxEUiRCyFITWPkzoQ2HhHEvUS5fyg68Rl28hFH6vhHlaA/viewform?usp=pp_url&amp;entry.1433863141={{d.app_name}}+{{d.date}}"
                 target="_blank">
                 онлайн-форму</a>
             для добавления отсутствующих слов, особенно из Винаи, комментариев и других поздних текстов.
             Если вы предпочитаете работать в автономном режиме, вот
-            <a
-                class="link"
-                download="true"
+            <a class="link" download="true"
                 href="https://github.com/digitalpalidictionary/dpd-db/raw/main/misc/DPD%20Add%20Words.xlsx"
                 target="_blank">
                 таблица для загрузки</a><span>, заполните и отправьте. </span>
         </p>
         <p>
-            <a
-                class="link"
+            <a class="link"
                 href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.1433863141={{d.app_name}}+{{d.date}}"
                 target="_blank">
                 Заметили ошибку?
@@ -1363,20 +1324,16 @@
             </span>
         </p>
         <p>
-            <a
-                class="link"
-                href="https://devamitta.github.io/dpd.rus/"
-                target="_blank">
+            <a class="link" href="https://devamitta.github.io/dpd.rus/" target="_blank">
                 Читать документацию
             </a>
             <span>
-                . Узнайте как установить и настроить словарь на разные платформы, как умело использовать весь функционал словаря и как обновить, чтобы иметь самую свежую версию.
+                . Узнайте как установить и настроить словарь на разные платформы, как умело использовать весь функционал
+                словаря и как обновить, чтобы иметь самую свежую версию.
             </span>
         </p>
         <p>
-            <a
-                class="link"
-                href="mailto:devamitta@sasanarakkha.org">
+            <a class="link" href="mailto:devamitta@sasanarakkha.org">
                 Помощь проекту
             </a>
             <span>

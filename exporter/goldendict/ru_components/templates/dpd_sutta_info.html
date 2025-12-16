@@ -102,7 +102,8 @@
                 GitHub
             </th>
             <td>
-                <a href="https://github.com/VipassanaTech/tipitaka-xml/tree/main/${ su.cst_file }" target="_blank">${ su.cst_file }</a>
+                <a href="https://github.com/VipassanaTech/tipitaka-xml/tree/main/${ su.cst_file }" target="_blank">${
+                    su.cst_file }</a>
 
             </td>
         </tr>
@@ -276,11 +277,7 @@
             <td>
                 % if su.sc_code:
                 <a href="${ su.sc_card_link }" target="_blank">Карточка Сутты</a>,
-                % endif
-                % if su.sc_code:
                 <a href="${ su.sc_pali_link }" target="_blank">Текст на пали</a></i>,
-                % endif
-                % if su.sc_code:
                 <a href="${ su.sc_eng_link }" target="_blank">Перевод на английский</a></i><br>
                 % endif
             </td>
@@ -344,6 +341,17 @@
             <td>
                 <a href="${ su.dhamma_gift }" target="_blank">${ su.dhamma_gift
                     }</a>
+            </td>
+        </tr>
+        % endif
+
+        % if su.sc_code:
+        <tr>
+            <th>
+                SC Voice
+            </th>
+            <td>
+                <a href="${ su.sc_express_link}" target="_blank">SC Express</a>
             </td>
         </tr>
         % endif

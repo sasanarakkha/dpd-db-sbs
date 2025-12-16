@@ -586,8 +586,11 @@ class SuttaInfo(Base):
     dv_suggested_suttas: Mapped[str] = mapped_column(default="")
 
     @property
-    def sc_card_link(self) -> str:
-        return f"https://suttacentral.net/{self.sc_code}"
+    def sc_card_link(self) -> str | None:
+        if self.sc_code:
+            return f"https://suttacentral.net/{self.sc_code}"
+        else:
+            return None
 
     @property
     def sc_pali_link(self) -> str | None:
@@ -620,6 +623,13 @@ class SuttaInfo(Base):
             return None
 
     @property
+    def sc_express_link(self) -> str | None:
+        if self.sc_code:
+            return f"https://suttacentral.express/{self.sc_code.lower()}/en/sujato"
+        else:
+            return None
+
+    @property
     def dhamma_gift(self) -> str | None:
         if self.sc_code:
             return f"https://find.dhamma.gift/read/?q={self.sc_code}"
@@ -645,11 +655,10 @@ class SuttaInfo(Base):
                 "TH",
                 "THI",
             ]:
-                if self.sc_book_code:
-                    if self.sc_book_code == "iti":
-                        return f"{link_url}it/it.html"
-                    else:
-                        return f"{link_url}{self.sc_book_code.lower()}/{self.sc_code.lower()}.html"
+                if self.sc_book_code == "iti":
+                    return f"{link_url}it/it.html"
+                else:
+                    return f"{link_url}{self.sc_book_code.lower()}/{self.sc_code.lower()}.html"
             else:
                 return None
         else:
@@ -671,11 +680,10 @@ class SuttaInfo(Base):
                 "TH",
                 "THI",
             ]:
-                if self.sc_book_code:
-                    if self.sc_book_code == "iti":
-                        return "https://find.dhamma.gift/bw/it/it.html"
-                    else:
-                        return f"https://find.dhamma.gift/bw/{self.sc_book_code.lower()}/{self.sc_code.lower()}.html"
+                if self.sc_book_code == "iti":
+                    return "https://find.dhamma.gift/bw/it/it.html"
+                else:
+                    return f"https://find.dhamma.gift/bw/{self.sc_book_code.lower()}/{self.sc_code.lower()}.html"
             else:
                 return None
         else:

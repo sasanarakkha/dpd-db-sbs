@@ -35,6 +35,9 @@
             <button class="tab-link" data-tab="bold-def-tab">
                 CST Bold Definitions
             </button>
+            <button class="tab-link" data-tab="tt-tab">
+                Tipiṭaka Translations
+            </button>
         </div>
         <div class="header-controls">
             <a href="https://forms.gle/gJ7ouhJriYREPm1s8" target="_blank" title="Get email updates"
@@ -272,9 +275,66 @@
         </div>
     </div>
 
+    <div id="tt-tab" class="tab-content">
+        <div class="header-pane bd-header-pane">
+            <div class="logo-title">
+                <h2 class="title" id="tt-title-clear">Tipiṭaka Translations</h2>
+            </div>
+            <p class="centered-text">
+                Search for Pāḷi text or English translations in the Chaṭṭha Saṅgāyana Tipiṭaka
+            </p>
+            <div class="bd-search-pane">
+                <form id="tt-search-form">
+                    <div class="tt-search-row">
+                        <label class="tt-label">Search for</label>
+                        <input class="search-box tt-search-box" type="text" id="tt-search-box" autocomplete="off"
+                            inputmode="text" autocapitalize="off" placeholder="use plain text or regex" />
+                        <label class="tt-label">in</label>
+                        <select id="tt-lang-select" class="tt-select">
+                            <option value="Pāḷi">Pāḷi texts</option>
+                            <option value="English">English translations</option>
+                        </select>
+                        <label class="tt-label">in</label>
+                        <select id="tt-book-select" class="tt-select">
+                            <option value="all">all books</option>
+                            {% for book in book_options %}
+                            <option value="{{ book }}">{{ book }}</option>
+                            {% endfor %}
+                        </select>
+                        <button class="search-button" id="tt-search-button">search</button>
+                    </div>
+                    <div class="tt-search-row">
+                        <label class="tt-label">Only show results</label>
+                        <select id="tt-filter-mode" class="tt-select">
+                            <option value="with">with</option>
+                            <option value="without">without</option>
+                        </select>
+                        <input class="search-box tt-search-box" type="text" id="tt-filter-box" autocomplete="off"
+                            placeholder="use plain text or regex" />
+                        <label class="tt-label">in them.</label>
+                        <button type="button" class="search-button" id="tt-clear-button"
+                            style="margin-left: auto;">clear</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="scrolling-pane" id="tt-results"></div>
+        <div class="footer-pane">
+            This page uses the database from <a href="https://tipitaka.paauksociety.org/index.php" target="_blank">Pa
+                Auk Society Tipiṭaka Translations</a>.
+            Pāḷī texts are from
+            <a href="https://github.com/VipassanaTech/tipitaka-xml" target="_blank">
+                Vipassana Research Institute
+            </a>
+            and English translations are generated using Deepseek.
+        </div>
+    </div>
+
     <script src="static/app.js" defer></script>
     <script src="static/home.js"></script>
     <script src="static/bold_definitions.js"></script>
+    <script src="static/tipitaka_translations.js"></script>
     <script src="static/dpd.js"></script>
 </body>
+
 </html>
