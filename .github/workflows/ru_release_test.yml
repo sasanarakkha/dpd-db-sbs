@@ -123,6 +123,21 @@ jobs:
     - name: Add Idioms
       run: uv run python db/families/family_idiom.py
 
+    - name: Add Root Families Ru
+      run: uv run python db/families/family_root_ru.py
+
+    - name: Add Word Families Ru
+      run: uv run db/families/family_word_ru.py
+
+    - name: Add Compound Families Ru
+      run: uv run python db/families/family_compound_ru.py
+
+    - name: Add Sets Ru
+      run: uv run python db/families/family_set_ru.py
+
+    - name: Add Idioms Ru
+      run: uv run python db/families/family_idiom_ru.py
+
     - name: Families to JSON
       run: uv run python scripts/build/families_to_json.py
 

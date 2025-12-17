@@ -10,13 +10,6 @@ from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 from tools.superscripter import superscripter_uni
-from tools.degree_of_completion_ru import rus_degree_of_completion
-from tools.tools_for_ru_exporter import (
-    make_short_ru_meaning,
-    ru_replace_abbreviations,
-)
-
-from sqlalchemy.orm import joinedload
 
 
 def main():
@@ -36,7 +29,7 @@ def main():
     pth = ProjectPaths()
     db_session = get_db_session(pth.dpd_db_path)
 
-    wf_db = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.ru)).filter(DpdHeadword.family_word != "").all()
+    wf_db = db_session.query(DpdHeadword).filter(DpdHeadword.family_word != "").all()
 
     wf_db: list[DpdHeadword] = sorted(wf_db, key=lambda x: pali_sort_key(x.lemma_1))
 
@@ -74,10 +67,8 @@ def make_word_fam_dict(wf_db: list[DpdHeadword]):
             wf_dict[wf] = {
                 "headwords": [i.lemma_1],
                 "html": "",
-                "html_ru": "",
                 "anki": [],
                 "data": [],
-                "data_ru": [],
             }
 
     pr.yes(len(wf_dict))
@@ -104,23 +95,6 @@ def compile_wf_html(wf_db: list[DpdHeadword], wf_dict):
 
             wf_dict[wf]["html"] = html_string
 
-            # rus
-            if not wf_dict[wf]["html_ru"]:
-                ru_html_string = "<table class='family'>"
-            else:
-                ru_html_string = wf_dict[wf]["html_ru"]
-
-            ru_meaning = make_short_ru_meaning(i, i.ru)
-            pos = ru_replace_abbreviations(i.pos)
-            ru_html_string += "<tr>"
-            ru_html_string += f"<th>{superscripter_uni(i.lemma_1)}</th>"
-            ru_html_string += f"<td><b>{pos}</b></td>"
-            ru_html_string += f"<td>{ru_meaning}</td>"
-            ru_html_string += f"<td>{rus_degree_of_completion(i)}</td>"
-            ru_html_string += "</tr>"
-
-            wf_dict[wf]["html_ru"] = ru_html_string
-
             # anki data
             construction = i.construction_clean if i.meaning_1 else ""
             wf_dict[wf]["anki"] += [(i.lemma_1, i.pos, i.meaning_combo, construction)]
@@ -130,14 +104,8 @@ def compile_wf_html(wf_db: list[DpdHeadword], wf_dict):
                 (i.lemma_1, i.pos, i.meaning_combo, i.degree_of_completion)
             )
 
-            # rus data
-            wf_dict[wf]["data_ru"].append(
-                (i.lemma_1, pos, ru_meaning, rus_degree_of_completion(i, html=False))
-            )
-
     for i in wf_dict:
         wf_dict[i]["html"] += "</table>"
-        wf_dict[i]["html_ru"] += "</table>"
 
     pr.yes(len(wf_dict))
     return wf_dict
@@ -156,11 +124,9 @@ def add_wf_to_db(db_session, wf_dict):
         wf_data = FamilyWord(
             word_family=wf,
             html=wf_dict[wf]["html"],
-            html_ru=wf_dict[wf]["html_ru"],
             count=len(wf_dict[wf]["headwords"]),
         )
         wf_data.data_pack(wf_dict[wf]["data"])
-        wf_data.data_ru_pack(wf_dict[wf]["data_ru"])
         add_to_db.append(wf_data)
 
     db_session.execute(FamilyWord.__table__.delete())  # type: ignore

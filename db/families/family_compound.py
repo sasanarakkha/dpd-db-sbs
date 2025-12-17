@@ -9,18 +9,10 @@ from db.db_helpers import get_db_session
 from db.models import DbInfo, DpdHeadword, FamilyCompound
 from scripts.build.anki_updater import family_updater
 from tools.configger import config_test
-from tools.degree_of_completion_ru import rus_degree_of_completion
 from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 from tools.superscripter import superscripter_uni
-
-from tools.tools_for_ru_exporter import (
-    make_short_ru_meaning,
-    ru_replace_abbreviations,
-)
-
-from sqlalchemy.orm import joinedload
 
 
 def main():
@@ -41,7 +33,7 @@ def main():
     db_session = get_db_session(pth.dpd_db_path)
 
     dpd_db = (
-        db_session.query(DpdHeadword).options(joinedload(DpdHeadword.ru)).filter(DpdHeadword.family_compound != "").all()
+        db_session.query(DpdHeadword).filter(DpdHeadword.family_compound != "").all()
     )
 
     dpd_db = sorted(dpd_db, key=lambda x: pali_sort_key(x.lemma_1))
@@ -89,8 +81,6 @@ def create_comp_fam_dict(dpd_db: list[DpdHeadword]):
                         "headwords": [i.lemma_1],
                         "html": "",
                         "data": [],
-                        "html_ru": "",
-                        "data_ru": [],
                         "anki": [],
                     }
 
@@ -121,23 +111,6 @@ def compile_cf_html(dpd_db: list[DpdHeadword], cf_dict):
 
                     cf_dict[cf]["html"] = html_string
 
-                    # rus
-                    if not cf_dict[cf]["html_ru"]:
-                        ru_html_string = "<table class='family'>"
-                    else:
-                        ru_html_string = cf_dict[cf]["html_ru"]
-
-                    ru_meaning = make_short_ru_meaning(i, i.ru)
-                    pos = ru_replace_abbreviations(i.pos)
-                    ru_html_string += "<tr>"
-                    ru_html_string += f"<th>{superscripter_uni(i.lemma_1)}</th>"
-                    ru_html_string += f"<td><b>{pos}</b></td>"
-                    ru_html_string += f"<td>{ru_meaning}</td>"
-                    ru_html_string += f"<td>{rus_degree_of_completion(i)}</td>"
-                    ru_html_string += "</tr>"
-
-                    cf_dict[cf]["html_ru"] = ru_html_string
-
                     # data
                     if i.meaning_1:
                         cf_dict[cf]["data"].append(
@@ -149,17 +122,6 @@ def compile_cf_html(dpd_db: list[DpdHeadword], cf_dict):
                             )
                         )
 
-                        # rus data
-                        cf_dict[cf]["data_ru"].append(
-                            (
-                                i.lemma_1,
-                                pos,
-                                ru_meaning,
-                                rus_degree_of_completion(i, html=False),
-                            )
-                        )
-
-
                     # anki data
                     if i.meaning_1:
                         construction = i.construction_clean if i.meaning_1 else ""
@@ -169,7 +131,7 @@ def compile_cf_html(dpd_db: list[DpdHeadword], cf_dict):
 
     for i in cf_dict:
         cf_dict[i]["html"] += "</table>"
-        cf_dict[i]["html_ru"] += "</table>"
+
     pr.yes(len(cf_dict))
     return cf_dict
 
@@ -183,11 +145,9 @@ def add_cf_to_db(db_session, cf_dict):
         cf_data = FamilyCompound(
             compound_family=cf,
             html=cf_dict[cf]["html"],
-            html_ru=cf_dict[cf]["html_ru"],
             count=len(cf_dict[cf]["headwords"]),
         )
         cf_data.data_pack(cf_dict[cf]["data"])
-        cf_data.data_ru_pack(cf_dict[cf]["data_ru"])
         add_to_db.append(cf_data)
 
     db_session.execute(FamilyCompound.__table__.delete())  # type: ignore

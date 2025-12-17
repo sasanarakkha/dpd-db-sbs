@@ -24,6 +24,13 @@ uv run python db/families/family_word.py
 uv run python db/families/family_compound.py
 uv run python db/families/family_set.py
 uv run python db/families/family_idiom.py
+
+uv run python db/families/family_root_ru.py
+uv run python db/families/family_word_ru.py
+uv run python db/families/family_compound_ru.py
+uv run python db/families/family_set_ru.py
+uv run python db/families/family_idiom_ru.py
+
 uv run python scripts/build/families_to_json.py
 
 uv run python scripts/build/anki_updater.py

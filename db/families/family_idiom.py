@@ -13,16 +13,6 @@ from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 from tools.superscripter import superscripter_uni
 
-from tools.degree_of_completion_ru import rus_degree_of_completion
-
-from tools.tools_for_ru_exporter import (
-    make_short_ru_meaning,
-    ru_replace_abbreviations,
-)
-
-from sqlalchemy.orm import joinedload
-
-
 
 def main():
     pr.tic()
@@ -41,7 +31,7 @@ def main():
     pth = ProjectPaths()
     db_session = get_db_session(pth.dpd_db_path)
 
-    dpd_db = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.ru)).filter(DpdHeadword.family_idioms != "").all()
+    dpd_db = db_session.query(DpdHeadword).filter(DpdHeadword.family_idioms != "").all()
     dpd_db = sorted(dpd_db, key=lambda x: pali_sort_key(x.lemma_1))
 
     sync_idiom_numbers_with_family_compound(db_session)
@@ -100,9 +90,7 @@ def create_idioms_dict(dpd_db):
                     idioms_dict[word] = {
                         "headwords": [i.lemma_1],
                         "html": "",
-                        "html_ru": "",
                         "data": [],
-                        "data_ru": [],
                         "count": 0,
                     }
 
@@ -135,23 +123,6 @@ def compile_idioms_html(dpd_db: list[DpdHeadword], idioms_dict):
 
                     idioms_dict[word]["html"] = html_string
 
-                    # rus
-                    if not idioms_dict[word]["html_ru"]:
-                        ru_html_string = "<table class='family'>"
-                    else:
-                        ru_html_string = idioms_dict[word]["html_ru"]
-
-                    ru_meaning = make_short_ru_meaning(i, i.ru)
-                    pos = ru_replace_abbreviations(i.pos)
-                    ru_html_string += "<tr>"
-                    ru_html_string += f"<th>{superscripter_uni(i.lemma_1)}</th>"
-                    ru_html_string += f"<td><b>{pos}</b></td>"
-                    ru_html_string += f"<td>{ru_meaning}</td>"
-                    ru_html_string += f"<td>{rus_degree_of_completion(i)}</td>"
-                    ru_html_string += "</tr>"
-
-                    idioms_dict[word]["html_ru"] = ru_html_string
-
                     # data
                     idioms_dict[word]["data"].append(
                         (
@@ -162,22 +133,12 @@ def compile_idioms_html(dpd_db: list[DpdHeadword], idioms_dict):
                         )
                     )
 
-                    # rus data
-                    idioms_dict[word]["data_ru"].append(
-                        (
-                            i.lemma_1,
-                            pos,
-                            ru_meaning,
-                            rus_degree_of_completion(i, html=False),
-                        )
-                    )
-
                     # count
                     idioms_dict[word]["count"] += 1
 
     for i in idioms_dict:
         idioms_dict[i]["html"] += "</table>"
-        idioms_dict[i]["html_ru"] += "</table>"
+
     pr.yes(len(idioms_dict))
     return idioms_dict
 
@@ -192,11 +153,9 @@ def add_idioms_to_db(db_session, idioms_dict):
             idiom_data = FamilyIdiom(
                 idiom=idiom,
                 html=idioms_dict[idiom]["html"],
-                html_ru=idioms_dict[idiom]["html_ru"],
                 count=idioms_dict[idiom]["count"],
             )
             idiom_data.data_pack(idioms_dict[idiom]["data"])
-            idiom_data.data_ru_pack(idioms_dict[idiom]["data_ru"])
             add_to_db.append(idiom_data)
 
     db_session.execute(FamilyIdiom.__table__.delete())  # type: ignore

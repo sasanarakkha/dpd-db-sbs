@@ -2,7 +2,7 @@ import re
 from tools.printer import printer as pr
 
 
-def generate_root_info_html(db_session, roots_db, bases_dict, show_ru_data=False):
+def generate_root_info_html(db_session, roots_db, bases_dict):
     """Create an html table of all info specific to a pali root."""
     pr.green_title("compiling root info")
 
@@ -20,9 +20,6 @@ def generate_root_info_html(db_session, roots_db, bases_dict, show_ru_data=False
         html_string += f"<sup>{i.root_has_verb}</sup>"
         html_string += f"{i.root_group} {root_group_pali} + {i.root_sign}"
         html_string += f" ({i.root_meaning})</td></tr>"
-
-        if show_ru_data:
-            html_string += f"<tr><th><a class='link' href='https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500=${i.root_link}&entry.326955045=Инфо+корня&entry.1433863141=GoldenDict' target='_blank'>Русский:</a></th><td>{i.root_ru_meaning}</td></tr>"
 
         if re.findall(",", bases):
             html_string += f"<tr><th>Bases:</th><td>{bases}</td></tr>"

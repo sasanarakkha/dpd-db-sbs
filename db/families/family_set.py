@@ -9,14 +9,6 @@ from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 from tools.superscripter import superscripter_uni
-from tools.degree_of_completion_ru import rus_degree_of_completion
-from tools.tools_for_ru_exporter import (
-    make_short_ru_meaning,
-    ru_replace_abbreviations,
-    populate_set_ru_and_check_errors,
-)
-
-from sqlalchemy.orm import joinedload
 
 
 def main():
@@ -36,7 +28,7 @@ def main():
     pth = ProjectPaths()
     db_session = get_db_session(pth.dpd_db_path)
 
-    sets_db = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.ru)).filter(DpdHeadword.family_set != "").all()
+    sets_db = db_session.query(DpdHeadword).filter(DpdHeadword.family_set != "").all()
     sets_db = sorted(sets_db, key=lambda x: pali_sort_key(x.lemma_1))
 
     sets_dict = make_sets_dict(sets_db)
@@ -70,10 +62,7 @@ def make_sets_dict(sets_db):
                     sets_dict[fs] = {
                         "headwords": [i.lemma_1],
                         "html": "",
-                        "html_ru": "",
-                        "set_ru": "",
                         "data": [],
-                        "data_ru": [],
                     }
 
     pr.yes(len(sets_dict))
@@ -82,8 +71,6 @@ def make_sets_dict(sets_db):
 
 def compile_sf_html(sets_db: list[DpdHeadword], sets_dict):
     pr.green("compiling html")
-
-    populate_set_ru_and_check_errors(sets_dict)
 
     for __counter__, i in enumerate(sets_db):
         for sf in i.family_set_list:
@@ -103,23 +90,6 @@ def compile_sf_html(sets_db: list[DpdHeadword], sets_dict):
 
                     sets_dict[sf]["html"] = html_string
 
-                    # rus
-                    if not sets_dict[sf]["html_ru"]:
-                        ru_html_string = "<table class='family'>"
-                    else:
-                        ru_html_string = sets_dict[sf]["html_ru"]
-
-                    ru_meaning = make_short_ru_meaning(i, i.ru)
-                    pos = ru_replace_abbreviations(i.pos)
-                    ru_html_string += "<tr>"
-                    ru_html_string += f"<th>{superscripter_uni(i.lemma_1)}</th>"
-                    ru_html_string += f"<td><b>{pos}</b></td>"
-                    ru_html_string += f"<td>{ru_meaning}</td>"
-                    ru_html_string += f"<td>{rus_degree_of_completion(i)}</td>"
-                    ru_html_string += "</tr>"
-
-                    sets_dict[sf]["html_ru"] = ru_html_string
-
                     # data
                     sets_dict[sf]["data"].append(
                         (
@@ -132,7 +102,6 @@ def compile_sf_html(sets_db: list[DpdHeadword], sets_dict):
 
     for i in sets_dict:
         sets_dict[i]["html"] += "</table>"
-        sets_dict[i]["html_ru"] += "</table>"
 
     pr.yes(len(sets_dict))
     return sets_dict
@@ -150,12 +119,9 @@ def add_sf_to_db(db_session, sets_dict):
         sf_data = FamilySet(
             set=sf,
             html=sets_dict[sf]["html"],
-            html_ru=sets_dict[sf]["html_ru"],
-            set_ru=sets_dict[sf]["set_ru"],
             count=count,
         )
         sf_data.data_pack(sets_dict[sf]["data"])
-        sf_data.data_ru_pack(sets_dict[sf]["data_ru"])
 
         add_to_db.append(sf_data)
 
@@ -174,7 +140,7 @@ def add_sf_to_db(db_session, sets_dict):
 def print_errors_list(errors_list):
     if errors_list != []:
         pr.red("ERROR: less than 3 names in set: ")
-        for error in errors_list:
+        for error in sorted(errors_list):
             pr.red(f"{error}")
 
 
