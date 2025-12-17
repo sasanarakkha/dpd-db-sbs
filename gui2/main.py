@@ -7,7 +7,7 @@ import flet as ft
 from gui2.sandhi_find_replace_view import SandhiFindReplaceView
 from gui2.sandhi_view import SandhiView
 from gui2.toolkit import ToolKit
-from tools.fast_api_utils import start_dpd_server
+from tools.fast_api_utils_dps import start_dpd_server
 
 
 class App:

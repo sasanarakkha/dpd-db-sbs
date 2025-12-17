@@ -15,7 +15,7 @@ from gui2.history import HistoryManager
 from gui2.mixins import PopUpMixin
 from gui2.toolkit import ToolKit
 from tools.paths_dps import DPSPaths
-from tools.fast_api_utils import request_dpd_server
+from tools.fast_api_utils_dps import request_dpd_server
 
 LABEL_WIDTH = 250
 BUTTON_WIDTH = 250
@@ -41,17 +41,20 @@ class DpsView(ft.Column, PopUpMixin):
 
         self._db = self.toolkit.db_manager
         self.dpspth = DPSPaths()
-        
+
         # Initialize DPS-specific history manager
         self.dps_history_manager = HistoryManager(self.toolkit, max_size=25)
         # Override the history path to be DPS-specific
         self.dps_history_manager._history_path = self.dpspth.history_json_path
         # Reload history from the correct file after setting the path
         self.dps_history_manager._load()
-        self.dps_history_manager.register_refresh_callback(self._update_history_dropdown)
+        self.dps_history_manager.register_refresh_callback(
+            self._update_history_dropdown
+        )
 
         # Initialize DPS test manager
         from gui2.dps_test_manager import DpsTestManager
+
         self.dps_test_manager = DpsTestManager(self._db)  # type: ignore
         # Don't load tests here - load them when Test button is clicked
 
@@ -61,7 +64,7 @@ class DpsView(ft.Column, PopUpMixin):
         self.ru_word: Russian | None = None
         self.sbs_word: SBS | None = None
         self.tests_passed: bool = False
-        
+
         # Load translation examples from CSV file
         self._formatted_translation_hint = self._load_translation_examples()
 
@@ -111,9 +114,8 @@ class DpsView(ft.Column, PopUpMixin):
             icon_size=16,
             tooltip=self._formatted_translation_hint,
             style=ft.ButtonStyle(
-                padding=ft.padding.all(4),
-                overlay_color=ft.Colors.TRANSPARENT
-            )
+                padding=ft.padding.all(4), overlay_color=ft.Colors.TRANSPARENT
+            ),
         )
 
         types_of_comp = """
@@ -131,9 +133,8 @@ class DpsView(ft.Column, PopUpMixin):
             icon_size=16,
             tooltip=types_of_comp,
             style=ft.ButtonStyle(
-                padding=ft.padding.all(4),
-                overlay_color=ft.Colors.TRANSPARENT
-            )
+                padding=ft.padding.all(4), overlay_color=ft.Colors.TRANSPARENT
+            ),
         )
 
         self._next_ru_button = ft.ElevatedButton(
@@ -231,36 +232,34 @@ class DpsView(ft.Column, PopUpMixin):
             self._bottom_section,
         ]
 
-
     def _load_translation_examples(self) -> str:
         """Load and format translation examples from CSV file for tooltip display."""
         try:
             csv_path = self.dpspth.translation_example_path
             if not csv_path.exists():
                 return "Translation examples file not found."
-            
+
             formatted_lines = []
-            with open(csv_path, 'r', encoding='utf-8') as file:
+            with open(csv_path, "r", encoding="utf-8") as file:
                 # The file is TSV format with tabs
-                reader = csv.DictReader(file, delimiter='\t')
+                reader = csv.DictReader(file, delimiter="\t")
                 for row in reader:
-                    pos = row.get('pos', '').strip()
-                    examples = row.get('examples', '').strip()
+                    pos = row.get("pos", "").strip()
+                    examples = row.get("examples", "").strip()
                     if pos and examples:
                         formatted_lines.append(f"{pos}: {examples}")
-            
+
             if formatted_lines:
                 return "\n".join(formatted_lines)
             else:
                 return "No translation examples found in file."
-                
+
         except Exception as e:
             return f"Error loading translation examples: {str(e)}"
 
     def update_message(self, message: str) -> None:
         self._message_field.value = message
         self.page.update()
-
 
     def _handle_filter_change(self, e: ft.ControlEvent) -> None:
         """Handles changes in the field filter RadioGroup."""
@@ -274,7 +273,6 @@ class DpsView(ft.Column, PopUpMixin):
 
         self.dps_fields.filter_fields(visible_fields)
         self.page.update()
-
 
     def _click_edit_headword(self, _e: ft.ControlEvent) -> None:
         id_or_lemma = (self._enter_id_or_lemma_field.value or "").strip()
@@ -323,57 +321,66 @@ class DpsView(ft.Column, PopUpMixin):
 
     def _get_next_word_ru(self) -> tuple[int | None, int]:
         """Fetch the ID of the next word needing Russian meaning processing."""
-        query = self._db.db_session.query(DpdHeadword).join(Russian).join(SBS).filter(
-            DpdHeadword.meaning_1 != "",
-            DpdHeadword.example_1 != "",
-            Russian.ru_meaning == "",
-            SBS.vib_example != "",
-            # Russian.ru_meaning_raw != "",
+        query = (
+            self._db.db_session.query(DpdHeadword)
+            .join(Russian)
+            .join(SBS)
+            .filter(
+                DpdHeadword.meaning_1 != "",
+                DpdHeadword.example_1 != "",
+                Russian.ru_meaning == "",
+                SBS.vib_example != "",
+                # Russian.ru_meaning_raw != "",
+            )
         )
-        
+
         count = query.count()
         word = query.first()
-        
+
         if word:
             return word.id, count
         return None, 0
 
     def _get_next_note_ru(self) -> tuple[int | None, int]:
         """Fetch the ID of the next word needing Russian note processing."""
-        query = self._db.db_session.query(DpdHeadword).join(Russian).join(SBS).filter(
-            Russian.ru_notes.like("%ИИ%"),
-            or_(
-                SBS.sbs_index.isnot(None),
-                SBS.discourses_example != '',
-                SBS.sbs_index.isnot(None),
-                SBS.vib_example != '',
+        query = (
+            self._db.db_session.query(DpdHeadword)
+            .join(Russian)
+            .join(SBS)
+            .filter(
+                Russian.ru_notes.like("%ИИ%"),
+                or_(
+                    SBS.sbs_index.isnot(None),
+                    SBS.discourses_example != "",
+                    SBS.sbs_index.isnot(None),
+                    SBS.vib_example != "",
+                ),
             )
         )
 
         # Count before filtering on sbs_index
         count = query.count()
-        
+
         # Further filter in Python for integer field
         for word in query.all():
             if word.sbs and word.sbs.sbs_index is not None and word.sbs.sbs_index != 0:
                 return word.id, count
-        
+
         # Fallback if no word with a non-zero sbs_index is found
         return None, 0
-
 
     def _update_history_dropdown(self) -> None:
         """Populate history dropdown with DPS history"""
         history = self.dps_history_manager.get_history()
         options = []
         for item in history:
-            options.append(ft.dropdown.Option(
-                key=str(item["id"]),
-                text=f"{item['id']}: {item['lemma_1']}"
-            ))
+            options.append(
+                ft.dropdown.Option(
+                    key=str(item["id"]), text=f"{item['id']}: {item['lemma_1']}"
+                )
+            )
         self._history_dropdown.options = options
         # Remove self._history_dropdown.update() - let page update handle it
-
 
     def _handle_history_selection(self, e: ft.ControlEvent) -> None:
         """Load selected headword from DPS history"""
@@ -381,7 +388,6 @@ class DpsView(ft.Column, PopUpMixin):
         if selected_id:
             self._enter_id_or_lemma_field.value = selected_id
             self._click_edit_headword(e)  # Reuse existing load logic
-
 
     def _build_middle_section(self) -> ft.Column:
         self.dps_fields = DpsFields(self, self._db, self.toolkit)
@@ -393,7 +399,6 @@ class DpsView(ft.Column, PopUpMixin):
         self.dps_fields.add_to_ui(middle_section)
         return middle_section
 
-
     def add_headword_to_dps_examples(self) -> None:
         """Add headword to all DPS example fields - EXACT same as Pass2Add"""
         lemma_1_field = self.dps_fields.fields.get("dps_lemma_1")
@@ -401,10 +406,12 @@ class DpsView(ft.Column, PopUpMixin):
             lemma_value = str(lemma_1_field.value)  # Ensure string type
             lemma_clean = clean_lemma_1(lemma_value)  # Same cleaning function
             stem = lemma_clean[:-1]  # Same stem logic
-            
+
             # Update all DPS example fields
             for field_name, field in self.dps_fields.fields.items():
-                if isinstance(field, DpsExampleField) and hasattr(field, 'word_to_find_field'):
+                if isinstance(field, DpsExampleField) and hasattr(
+                    field, "word_to_find_field"
+                ):
                     field.word_to_find_field.value = stem
                     field.word_to_find_field.update()  # Force UI update
 
@@ -420,7 +427,15 @@ class DpsView(ft.Column, PopUpMixin):
         current_filter = self._filter_radios.value
         if current_filter != "all":
             if self._filter_radios.uid:
-                self._handle_filter_change(ft.ControlEvent(target=self._filter_radios.uid, name="change", data=current_filter, control=self._filter_radios, page=self.page))
+                self._handle_filter_change(
+                    ft.ControlEvent(
+                        target=self._filter_radios.uid,
+                        name="change",
+                        data=current_filter,
+                        control=self._filter_radios,
+                        page=self.page,
+                    )
+                )
         # Clear relevant top-section fields and reset state
         self._enter_id_or_lemma_field.value = ""
         self.tests_passed = False
@@ -430,63 +445,65 @@ class DpsView(ft.Column, PopUpMixin):
     def _click_run_tests(self, _e: ft.ControlEvent) -> None:
         """Run tests on current field values - using enhanced DPS test manager"""
         self.update_message("Loading tests...")
-        
+
         # Get current field values
         values = self._get_current_field_values()
-        
+
         # Convert None values to empty strings for test compatibility
         test_values = {k: (v if v is not None else "") for k, v in values.items()}
-        
+
         # Run DPS tests using enhanced test manager with interactive dialog
         self.dps_test_manager.run_all_tests(self, test_values)
-
 
     def _click_update_db(self, e: ft.ControlEvent) -> None:
         # Check if tests have been run and passed
         if not self.tests_passed:
             self.update_message("tests first")
             return
-        
+
         self.update_message("Updating DB...")
-        
+
         # Get current headword ID
         dpd_id_field = self.dps_fields.fields.get("dps_id")
         if not dpd_id_field or not dpd_id_field.value:
             self.update_message("Error: No headword ID found")
             return
-        
+
         try:
             headword_id = int(dpd_id_field.value)
         except ValueError:
             self.update_message("Error: Invalid headword ID")
             return
-        
+
         # Update Russian table
         self._update_russian_table(headword_id)
-        
+
         # Update SBS table
         self._update_sbs_table(headword_id)
-        
+
         # Commit changes
         try:
             self._db.db_session.commit()
             self.update_message("SBS and Russian tables updated")
-            
+
             # Add to DPS history after successful DB update
             if self.headword:
-                self.dps_history_manager.add_item(self.headword.id, self.headword.lemma_1)
+                self.dps_history_manager.add_item(
+                    self.headword.id, self.headword.lemma_1
+                )
                 request_dpd_server(str(self.headword.id))
-                
+
                 self._update_history_dropdown()
                 self.page.update()
-                
-                self.page.set_clipboard(self.headword.lemma_1)  # Copy headword to clipboard               
+
+                self.page.set_clipboard(
+                    self.headword.lemma_1
+                )  # Copy headword to clipboard
                 self._click_clear_all(e)  # Clear all fields after successful update
-                
+
         except Exception as ex:
             self._db.db_session.rollback()
             self.update_message(f"Error updating DB: {str(ex)}")
-
 
     def _update_russian_table(self, headword_id: int) -> None:
         """Update Russian table with fields starting with dps_ru_*"""
@@ -495,7 +512,7 @@ class DpsView(ft.Column, PopUpMixin):
         if not ru_word:
             ru_word = Russian(id=headword_id)
             self._db.db_session.add(ru_word)
-        
+
         values = self._get_current_field_values()
 
         # Update Russian fields
@@ -505,11 +522,16 @@ class DpsView(ft.Column, PopUpMixin):
                 if hasattr(ru_word, ru_field_name):
                     field_value = values.get(field_name)
                     # Convert None to empty string for database fields
-                    setattr(ru_word, ru_field_name, field_value if field_value is not None else "")
+                    setattr(
+                        ru_word,
+                        ru_field_name,
+                        field_value if field_value is not None else "",
+                    )
                 else:
                     print(f"ERROR: Russian field {ru_field_name} not found in model")
-                    self.update_message(f"ERROR: Russian field {ru_field_name} not found in model")
-
+                    self.update_message(
+                        f"ERROR: Russian field {ru_field_name} not found in model"
+                    )
 
     def _update_sbs_table(self, headword_id: int) -> None:
         """Update SBS table with fields starting with specified prefixes"""
@@ -518,30 +540,34 @@ class DpsView(ft.Column, PopUpMixin):
         if not sbs_word:
             sbs_word = SBS(id=headword_id)
             self._db.db_session.add(sbs_word)
-        
+
         values = self._get_current_field_values()
 
         # Get current values from database before updating
         current_sbs = fetch_sbs(self._db.db_session, headword_id)
-        
+
         # Special handling for class_example_translation - bulk update all matching records
-        class_example_translation_field = self.dps_fields.fields.get("dps_class_example_translation")
+        class_example_translation_field = self.dps_fields.fields.get(
+            "dps_class_example_translation"
+        )
         if class_example_translation_field:
             new_value = values.get("dps_class_example_translation")
             # Convert None to empty string for database fields
             new_value = new_value if new_value is not None else ""
-            
+
             # Get current value from database
             current_value = current_sbs.class_example_translation if current_sbs else ""
-            
+
             # If values are different
             if current_value != new_value:
                 # Case 1: Current value exists and new value exists - bulk update all matching records
                 if current_value and new_value:
-                    matching_records = self._db.db_session.query(SBS).filter(
-                        SBS.class_example_translation == current_value
-                    ).all()
-                    
+                    matching_records = (
+                        self._db.db_session.query(SBS)
+                        .filter(SBS.class_example_translation == current_value)
+                        .all()
+                    )
+
                     # Update all matching records
                     for record in matching_records:
                         record.class_example_translation = new_value
@@ -551,10 +577,10 @@ class DpsView(ft.Column, PopUpMixin):
                 # Case 3: Current value exists but new value is empty - update only current record
                 elif current_value and not new_value and current_sbs:
                     current_sbs.class_example_translation = new_value
-        
+
         # SBS field prefixes to process
         sbs_prefixes = ["sbs_", "dhp_", "pat_", "vib_", "class_", "discourses_"]
-        
+
         # Update SBS fields (excluding class_example_translation which was handled above)
         for field_name in self.dps_fields.fields:
             if field_name.startswith("dps_"):
@@ -569,13 +595,20 @@ class DpsView(ft.Column, PopUpMixin):
                         if hasattr(sbs_word, sbs_field_name):
                             field_value = values.get(field_name)
                             # Convert None to empty string for database fields
-                            setattr(sbs_word, sbs_field_name, field_value if field_value is not None else "")
-                                
-                        else:
-                            print(f"ERROR: SBS field {sbs_field_name} not found in model")
-                            self.update_message(f"ERROR: SBS field {sbs_field_name} not found in model")
-                        break
+                            setattr(
+                                sbs_word,
+                                sbs_field_name,
+                                field_value if field_value is not None else "",
+                            )
 
+                        else:
+                            print(
+                                f"ERROR: SBS field {sbs_field_name} not found in model"
+                            )
+                            self.update_message(
+                                f"ERROR: SBS field {sbs_field_name} not found in model"
+                            )
+                        break
 
     def _get_current_field_values(self) -> dict[str, str | None]:
         """Get current values from all DPS fields"""
@@ -587,6 +620,8 @@ class DpsView(ft.Column, PopUpMixin):
                 values[field_name] = field_control.value
             else:
                 # For other fields, convert empty strings to None
-                values[field_name] = field_control.value if field_control.value else None
+                values[field_name] = (
+                    field_control.value if field_control.value else None
+                )
 
         return values

@@ -21,7 +21,7 @@ from gui2.pass2_auto_control import Pass2AutoController
 from gui2.pass2_auto_file_manager import Pass2AutoFileManager
 from gui2.pass2_pre_new_word_manager import Pass2NewWordManager
 from gui2.toolkit import ToolKit
-from tools.fast_api_utils import request_dpd_server
+from tools.fast_api_utils_dps import request_dpd_server
 from tools.hyphenations import HyphenationFileManager, HyphenationsDict
 from tools.sandhi_contraction import SandhiContractionDict, SandhiContractionManager
 
@@ -642,7 +642,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
                 word_data = self.dpd_fields.get_current_values()
                 if word_data:
                     self.corrections_manager.save_processed_correction(word_data)
-            
+
             self.page.set_clipboard(word_to_save.lemma_1)
 
             self._update_history_dropdown()
