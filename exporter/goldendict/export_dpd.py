@@ -10,8 +10,6 @@ import psutil
 from mako.template import Template
 from minify_html import minify
 from sqlalchemy.orm.session import Session
-from sqlalchemy.orm import joinedload
-
 from sqlalchemy.sql import func
 
 from db.models import (
@@ -49,10 +47,6 @@ from tools.utils import (
     sum_rendered_sizes,
 )
 
-from tools.tools_for_ru_exporter import read_set_ru_from_tsv
-from tools.degree_of_completion_ru import rus_degree_of_completion
-
-
 
 class DpdHeadwordTemplates:
     def __init__(self, paths: ProjectPaths):
@@ -65,7 +59,6 @@ class DpdHeadwordTemplates:
         self.sutta_info_templ = Template(filename=str(paths.sutta_info_templ_path))
         self.grammar_templ = Template(filename=str(paths.grammar_templ_path))
         self.example_templ = Template(filename=str(paths.example_templ_path))
-        self.sbs_example_templ = Template(filename=str(paths.sbs_example_templ_path))
         self.inflection_templ = Template(filename=str(paths.inflection_templ_path))
         self.family_root_templ = Template(filename=str(paths.family_root_templ_path))
         self.family_word_templ = Template(filename=str(paths.family_word_templ_path))
@@ -100,9 +93,6 @@ class DpdHeadwordRenderDataBase(TypedDict):
     cf_set: Set[str]
     idioms_set: Set[str]
     show_id: bool
-    show_sbs_data: bool
-    show_ru_data: bool
-    show_grammar: bool
 
 
 class DpdHeadwordRenderData(DpdHeadwordRenderDataBase):
@@ -113,9 +103,6 @@ class DpdHeadwordRenderData(DpdHeadwordRenderDataBase):
 def render_pali_word_dpd_html(
     db_parts: DpdHeadwordDbParts,
     render_data: DpdHeadwordRenderData,
-    show_sbs_data=False,
-    show_ru_data=False,
-    show_grammar=False,
 ) -> Tuple[DictEntry, RenderedSizes]:
     rd = render_data
     size_dict = default_rendered_sizes()
@@ -155,37 +142,6 @@ def render_pali_word_dpd_html(
         i.example_2 = i.example_2.replace("\n", "<br>")
     if i.notes:
         i.notes = i.notes.replace("\n", "<br>")
-    if show_ru_data and i.ru:
-        i.ru.ru_notes = i.ru.ru_notes.replace("\n, ", "<br>")
-    if show_sbs_data and i.sbs:
-        if i.sbs.sbs_sutta_1:
-            i.sbs.sbs_sutta_1 = i.sbs.sbs_sutta_1.replace("\n", "<br>")
-        if i.sbs.sbs_sutta_2:
-            i.sbs.sbs_sutta_2 = i.sbs.sbs_sutta_2.replace("\n", "<br>")
-        if i.sbs.sbs_example_1:
-            i.sbs.sbs_example_1 = i.sbs.sbs_example_1.replace("\n", "<br>")
-        if i.sbs.sbs_example_2:
-            i.sbs.sbs_example_2 = i.sbs.sbs_example_2.replace("\n", "<br>")
-        if i.sbs.dhp_example:
-            i.sbs.dhp_example = i.sbs.dhp_example.replace("\n", "<br>")
-        if i.sbs.dhp_source:
-            i.sbs.dhp_source = i.sbs.dhp_source.replace("\n", "<br>")
-        if i.sbs.pat_example:
-            i.sbs.pat_example = i.sbs.pat_example.replace("\n", "<br>")
-        if i.sbs.pat_source:
-            i.sbs.pat_source = i.sbs.pat_source.replace("\n", "<br>")
-        if i.sbs.vib_example:
-            i.sbs.vib_example = i.sbs.vib_example.replace("\n", "<br>")
-        if i.sbs.vib_source:
-            i.sbs.vib_source = i.sbs.vib_source.replace("\n", "<br>")
-        if i.sbs.class_example:
-            i.sbs.class_example = i.sbs.class_example.replace("\n", "<br>")
-        if i.sbs.class_source:
-            i.sbs.class_source = i.sbs.class_source.replace("\n", "<br>")
-        if i.sbs.discourses_example:
-            i.sbs.discourses_example = i.sbs.discourses_example.replace("\n", "<br>")
-        if i.sbs.discourses_source:
-            i.sbs.discourses_source = i.sbs.discourses_source.replace("\n", "<br>")
 
     html: str = ""
     html += "<body>"
@@ -195,8 +151,6 @@ def render_pali_word_dpd_html(
         i,
         tt.dpd_definition_templ,
         rd["show_id"],
-        rd["show_sbs_data"],
-        rd["show_ru_data"],
     )
     html += summary
     size_dict["dpd_summary"] += len(summary)
@@ -207,8 +161,6 @@ def render_pali_word_dpd_html(
         rd["cf_set"],
         rd["idioms_set"],
         tt.button_box_templ,
-        rd["show_sbs_data"],
-        rd["show_grammar"],
     )
     html += button_box
     size_dict["dpd_button_box"] += len(button_box)
@@ -226,15 +178,12 @@ def render_pali_word_dpd_html(
             pr.red(i.lemma_1)
             pr.red(f"{e}")
 
-    if i.needs_grammar_button or show_grammar:
+    if i.needs_grammar_button:
         grammar = render_grammar_templ(
             pth,
             i,
             rt,
             tt.grammar_templ,
-            rd["show_sbs_data"],
-            rd["show_ru_data"],
-            rd["show_grammar"],
         )
         html += grammar
         size_dict["dpd_grammar"] += len(grammar)
@@ -243,13 +192,6 @@ def render_pali_word_dpd_html(
         example = render_example_templ(pth, i, tt.example_templ)
         html += example
         size_dict["dpd_example"] += len(example)
-
-    if show_sbs_data and i.sbs and i.sbs.needs_sbs_example_button:
-        sbs_example = render_sbs_example_templ(
-            pth, i, tt.sbs_example_templ
-        )
-        html += sbs_example
-        size_dict["sbs_example"] += len(sbs_example)
 
     if i.needs_conjugation_button or i.needs_declension_button:
         inflection_table = render_inflection_templ(pth, i, tt.inflection_templ)
@@ -319,13 +261,6 @@ def render_pali_word_dpd_html(
     synonyms += i.inflections_devanagari_list
     synonyms += i.inflections_thai_list
     synonyms += i.family_set_list
-    if show_ru_data:
-        set_ru_dict = read_set_ru_from_tsv()
-        ru_set_list = []
-        for english_word in i.family_set_list:
-            if english_word in set_ru_dict:
-                ru_set_list.append(set_ru_dict[english_word])
-        synonyms += ru_set_list
     synonyms += [str(i.id)]
 
     if i.needs_sutta_info_button:
@@ -347,11 +282,8 @@ def _parse_batch_top_level(
     batch: List[DpdHeadwordDbParts],
     path: ProjectPaths,
     render_data: DpdHeadwordRenderData,
-    show_sbs_data: bool,
-    show_ru_data: bool,
     dpd_data_results_list: ListProxy,
     rendered_sizes_results_list: ListProxy,
-    show_grammar: bool,
 ):
     """Helper function for multiprocessing, now at top level."""
     # Create templates locally in child process
@@ -368,9 +300,6 @@ def _parse_batch_top_level(
         render_pali_word_dpd_html(
             i,
             full_render_data,
-            show_sbs_data,
-            show_ru_data,
-            show_grammar
         )
         for i in batch
     ]
@@ -386,9 +315,6 @@ def generate_dpd_html(
     sandhi_contractions: SandhiContractionDict,
     cf_set: Set[str],
     idioms_set: set[str],
-    show_sbs_data=False,
-    show_ru_data=False,
-    show_grammar=False,
     data_limit: int = 0,
 ) -> Tuple[List[DictEntry], RenderedSizes]:
     pr.green_title("generating dpd html")
@@ -436,11 +362,6 @@ def generate_dpd_html(
                 FamilyRoot, DpdHeadword.root_family_key == FamilyRoot.root_family_key
             )
             .outerjoin(FamilyWord, DpdHeadword.family_word == FamilyWord.word_family)
-            .options(
-                joinedload(DpdHeadword.rt),
-                joinedload(DpdHeadword.ru),
-                joinedload(DpdHeadword.sbs),
-            )
             .order_by(DpdHeadword.lemma_1)
         )
 
@@ -483,9 +404,6 @@ def generate_dpd_html(
             "cf_set": cf_set,
             "idioms_set": idioms_set,
             "show_id": show_id,
-            "show_sbs_data": show_sbs_data,
-            "show_ru_data": show_ru_data,
-            "show_grammar": show_grammar,
         }
 
         for batch in batches:
@@ -495,11 +413,8 @@ def generate_dpd_html(
                     batch,
                     paths,  # Pass paths separately
                     render_data,
-                    show_sbs_data,
-                    show_ru_data,
                     dpd_data_results_list,
                     rendered_sizes_results_list,
-                    show_grammar
                 ),
             )
             p.start()
@@ -525,8 +440,6 @@ def render_dpd_definition_templ(
     i: DpdHeadword,
     dpd_definition_templ: Template,
     show_id=False,
-    show_sbs_data=False,
-    show_ru_data=False,
 ) -> str:
     """render the definition of a word's most relevant information:
     1. pos
@@ -535,17 +448,10 @@ def render_dpd_definition_templ(
     4. summary
     5. degree of completion"""
 
-    if show_ru_data and i.ru:
-        complete = rus_degree_of_completion(i)
-    else:
-        complete = i.degree_of_completion
-
     return str(
         dpd_definition_templ.render(
             i=i,
-            complete=complete,
             show_id=show_id,
-            show_sbs_data=show_sbs_data,
         )
     )
 
@@ -556,8 +462,6 @@ def render_button_box_templ(
     cf_set: Set[str],
     idioms_set: Set[str],
     button_box_templ: Template,
-    show_sbs_data=False,
-    show_grammar=False
 ) -> str:
     """render buttons for each section of the dictionary"""
 
@@ -571,7 +475,7 @@ def render_button_box_templ(
     else:
         sutta_info_button = ""
 
-    if i.needs_grammar_button or show_grammar:
+    if i.needs_grammar_button:
         grammar_button = button_html.format(
             target=f"grammar_{i.lemma_1_}", name="grammar"
         )
@@ -593,18 +497,6 @@ def render_button_box_templ(
         )
     else:
         examples_button = ""
-
-    # sbs_example_button
-    if (
-        show_sbs_data
-        and i.sbs
-        and i.sbs.needs_sbs_example_button
-    ):
-        sbs_example_button = button_html.format(
-            target=f"sbs_example_{i.lemma_1_}", name="SBS"
-        )
-    else:
-        sbs_example_button = ""
 
     # conjugation_button
     if i.needs_conjugation_button:
@@ -691,7 +583,6 @@ def render_button_box_templ(
             grammar_button=grammar_button,
             example_button=example_button,
             examples_button=examples_button,
-            sbs_example_button=sbs_example_button,
             conjugation_button=conjugation_button,
             declension_button=declension_button,
             root_family_button=root_family_button,
@@ -726,13 +617,10 @@ def render_grammar_templ(
     i: DpdHeadword,
     rt: DpdRoot,
     grammar_templ: Template,
-    show_sbs_data=False,
-    show_ru_data=False,
-    show_grammar=False,
 ) -> str:
     """html table of grammatical information"""
 
-    if (i.meaning_1 is not None and i.meaning_1) or show_grammar:
+    if i.meaning_1 is not None and i.meaning_1:
         if i.construction is not None and i.construction:
             i.construction = i.construction.replace("\n", "<br>")
         else:
@@ -744,8 +632,6 @@ def render_grammar_templ(
         grammar_templ.render(
             i=i,
             rt=rt,
-            show_sbs_data=show_sbs_data,
-            show_ru_data=show_ru_data,
             grammar=grammar,
             meaning=i.meaning_combo_html,
             today=TODAY,
@@ -761,16 +647,6 @@ def render_example_templ(
     """render sutta examples html"""
 
     return str(example_templ.render(i=i, today=TODAY))
-
-
-def render_sbs_example_templ(
-    __pth__: ProjectPaths,
-    i: DpdHeadword,
-    sbs_example_templ: Template,
-) -> str:
-    """render sbs examples html"""
-
-    return str(sbs_example_templ.render(i=i, today=TODAY))
 
 
 def render_inflection_templ(

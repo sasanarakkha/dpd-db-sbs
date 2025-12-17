@@ -1,5 +1,13 @@
 [
     {
+        "id": 40548,
+        "lemma_1": "paṭipadā 1"
+    },
+    {
+        "id": 2362,
+        "lemma_1": "ativijjha"
+    },
+    {
         "id": 88130,
         "lemma_1": "saddasaññaka"
     },
@@ -70,13 +78,5 @@
     {
         "id": 88107,
         "lemma_1": "lokādhipati"
-    },
-    {
-        "id": 88111,
-        "lemma_1": "viññāpetuṃ 1"
-    },
-    {
-        "id": 88113,
-        "lemma_1": "sambhuñjati 3"
     }
 ]

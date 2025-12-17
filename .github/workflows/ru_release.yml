@@ -91,7 +91,7 @@ jobs:
       run: uv run python scripts/build/db_rebuild_from_tsv_ru_sbs.py
 
     - name: Run initial setup script
-      run: uv run bash scripts/bash/initial_setup_run_once.sh
+      run: uv run python scripts/bash/initial_setup_run_once.py
     
     - name: Create version
       run: uv run python tools/version_ru.py
@@ -176,6 +176,9 @@ jobs:
 
     - name: Lookup Help and Abbreviations
       run: uv run python db/lookup/help_abbrev_add_to_lookup.py
+
+    - name: Lookup Help and Abbreviations Ru
+      run: uv run python db/lookup/help_abbrev_add_to_lookup_ru.py
 
     - name: Add Frequency
       run: |
@@ -275,7 +278,7 @@ jobs:
       run: uv run python scripts/rus_exporter/config_github_release_dpd_rus.py
 
     - name: Run TPR Exporter
-      run: uv run python exporter/tpr/tpr_exporter.py
+      run: uv run python exporter/tpr/tpr_exporter_ru.py
 
     # ----------------------------------------
     # Update Submodules

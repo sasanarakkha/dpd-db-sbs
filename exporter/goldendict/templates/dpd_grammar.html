@@ -17,31 +17,6 @@
             <td>/${i.lemma_ipa}/</td>
         </tr>
 
-        % if show_ru_data and i.ru:
-            % if i.ru.ru_meaning:
-            <tr>
-                <th><a class="link" href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500=${i.lemma_link}&entry.326955045=Перевод&entry.1433863141=GoldenDict+${today}" target="_blank">Русский</a></th>
-                <td>${i.ru.ru_meaning}
-                    % if i.ru.ru_meaning_lit:
-                    ; досл. ${i.ru.ru_meaning_lit}
-                    % endif
-                </td>
-            </tr>
-            % elif i.ru.ru_meaning_raw:
-            <tr>
-                <th><a class="link" href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500=${i.lemma_link}&entry.326955045=Перевод&entry.1433863141=GoldenDict+${today}" target="_blank">Перевод ИИ</a></th>
-                <td>${i.ru.ru_meaning_raw}
-                </td>
-            </tr>
-            % endif
-        % endif
-        % if show_sbs_data and i.sbs and i.sbs.sbs_meaning:
-            <tr>
-                <th>SBS</th>
-                <td>${i.sbs.sbs_meaning}</td>
-            </tr>
-        % endif
-
         <tr>
             <th>Grammar</th>
             <td>${grammar}</td>
@@ -137,20 +112,6 @@
             <th>Notes</th>
             <td>${i.notes}</td>
         </tr>
-        % endif
-
-        % if show_sbs_data and i.sbs and i.sbs.sbs_notes:
-            <tr>
-                <th>SBS Notes</th>
-                <td>${i.sbs.sbs_notes}</td>
-            </tr>
-        % endif
-        % if show_ru_data and i.ru and i.ru.ru_notes and i.needs_ru_notes:
-            <tr>
-                <th><a class="link" href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500=${i.lemma_link}&entry.326955045=Перевод&entry.1433863141=GoldenDict+${today}" target="_blank">Заметки</a>
-                </th>
-                <td>${i.ru.ru_notes}</td>
-            </tr>
         % endif
 
         % if i.cognate:

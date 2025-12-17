@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-import re
 from contextlib import contextmanager
 
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, Response, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import sessionmaker
+import sqlite3
+import re
 
 from db.db_helpers import get_db_session
 from db.models import BoldDefinition
@@ -23,10 +24,13 @@ from exporter.webapp.toolkit_ru import make_dpd_html_ru
 
 from tools.css_manager import CSSManager
 from tools.paths import ProjectPaths
+from tools.paths_ru import RuPaths
 from tools.pali_text_files import cst_texts
+from tools.tipitaka_db import search_all_cst_texts, search_book
 from tools.translit_ru import auto_translit_to_roman
 
 pth: ProjectPaths = ProjectPaths()
+rupth: RuPaths = RuPaths()
 app = FastAPI()
 app.add_middleware(GZipMiddleware, minimum_size=500)
 app.mount("/static", StaticFiles(directory=str(pth.webapp_static_dir)), name="static")
@@ -56,8 +60,8 @@ with get_db() as db_session:
     bd_count = db_session.query(BoldDefinition).count()
 
 # Set up templates
-templates_ru = Jinja2Templates(directory=str(pth.webapp_ru_templates_dir))
-templates_sbs = Jinja2Templates(directory=str(pth.webapp_sbs_templates_dir))
+templates_ru = Jinja2Templates(directory=str(rupth.webapp_ru_templates_dir))
+templates_sbs = Jinja2Templates(directory=str(rupth.webapp_sbs_templates_dir))
 
 # Update CSS
 css_manager = CSSManager()
@@ -157,6 +161,7 @@ def db_search_json_ru(request: Request, q: str):
     dpd_html, summary_html = make_dpd_html_ru(
         q_roman,
         pth,
+        rupth,
         templates_ru,
         roots_count_dict,
         headwords_clean_set_ru,
@@ -195,6 +200,7 @@ def db_search_gd_ru(request: Request, search: str):
     dpd_html, summary_html = make_dpd_html_ru(
         search_roman,
         pth,
+        rupth,
         templates_ru,
         roots_count_dict,
         headwords_clean_set_ru,
@@ -295,6 +301,79 @@ def db_search_bd(
             "history": history_list,
         },
     )
+
+
+@app.get("/tt_search", response_class=JSONResponse)
+def tt_search(request: Request, q: str, book: str, lang: str):
+    """Search Tipiṭaka Translations."""
+
+    # Limit results
+    limit = 100
+
+    # Determine search column
+    search_column = "pali_text" if lang == "Pāḷi" else "english_translation"
+
+    # Perform search
+    if book == "all":
+        results = search_all_cst_texts(q, search_column=search_column)
+    else:
+        results = search_book(book, q, search_column=search_column)
+
+    total_count = len(results)
+    results = results[:limit]
+
+    # Generate JSON
+    response_data = {"total": total_count, "results": []}
+
+    if results:
+        for i, (pali_text, eng_trans, table_name, book_name) in enumerate(results, 1):
+            response_data["results"].append(
+                {
+                    "id": i,
+                    "pali": pali_text,
+                    "eng": eng_trans,
+                    "book": book_name,
+                    "table": table_name,
+                }
+            )
+
+    return JSONResponse(content=response_data)
+
+
+@app.get("/audio/{headword}", response_class=Response)
+def get_audio(headword: str, gender: str = "male"):
+    """Serve audio file for a headword."""
+
+    conn = sqlite3.connect(pth.dpd_audio_db_path)
+    cursor = conn.cursor()
+
+    # Try requested gender, fallback to other if not available?
+    # User said: "return male by default, but female if requested"
+    # I'll stick to strict request: return what is requested.
+    # But usually fallback is good. I'll just query both and logic it.
+
+    # Strip digits from headword for audio lookup
+    # "hara 1.2" -> "hara", "udakasuddhika 2" -> "udakasuddhika"
+    cleaned_headword = re.sub(r" \d.*$", "", headword)
+
+    cursor.execute(
+        "SELECT female1, male1 FROM dpd_audio WHERE lemma_clean = ?",
+        (cleaned_headword,),
+    )
+    result = cursor.fetchone()
+    conn.close()
+
+    if result:
+        female1, male1 = result
+        if gender == "female":
+            audio_data = female1 if female1 else male1
+        else:
+            audio_data = male1 if male1 else female1
+
+        if audio_data:
+            return Response(content=audio_data, media_type="audio/mpeg")
+
+    return Response(status_code=404)
 
 
 def update_history(

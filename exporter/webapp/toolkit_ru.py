@@ -25,11 +25,13 @@ from tools.exporter_functions import (
 )
 from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
+from tools.paths_ru import RuPaths
 
 
 def make_dpd_html_ru(
     q: str,
     pth: ProjectPaths,
+    rupth: RuPaths,
     templates,
     roots_count_dict,
     headwords_clean_set,
@@ -43,7 +45,7 @@ def make_dpd_html_ru(
                     dpd_html = ""
                     summary_html = ""
                     q = q.replace("'", "").replace("ṁ", "ṃ").strip()
-                    q = q.casefold()                        
+                    q = q.casefold()
 
                     lookup_results = (
                         db_session.query(Lookup)
@@ -146,10 +148,10 @@ def make_dpd_html_ru(
                             if lookup_result.rpd:
                                 d = RpdData(lookup_result)
                                 summary_html += templates.get_template(
-                                    pth.template_rpd_summary
+                                    rupth.template_rpd_summary
                                 ).render(d=d)
                                 dpd_html += templates.get_template(
-                                    pth.template_rpd
+                                    rupth.template_rpd
                                 ).render(d=d)
 
                             # variant
@@ -345,9 +347,9 @@ def make_dpd_html_ru(
                 if lookup_result.rpd:
                     d = RpdData(lookup_result)
                     summary_html += templates.get_template(
-                        pth.template_rpd_summary
+                        rupth.template_rpd_summary
                     ).render(d=d)
-                    dpd_html += templates.get_template(pth.template_rpd).render(d=d)
+                    dpd_html += templates.get_template(rupth.template_rpd).render(d=d)
 
         # the two cases below search directly in the DpdHeadwords table
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 """Export simplified DPD data for integration with Tipitaka Pali Reader (TPR)."""
 
@@ -21,20 +22,14 @@ from tools.configger import config_read, config_test
 from tools.headwords_clean_set import make_clean_headwords_set
 from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
-from tools.paths_ru import RuPaths
 from tools.printer import printer as pr
 from tools.tsv_read_write import read_tsv
 from tools.uposatha_day import UposathaManger
-
-from tools.tools_for_ru_exporter import (
-    make_ru_meaning_simpl,
-)
 
 
 class GlobalVars:
     def __init__(self) -> None:
         self.pth = ProjectPaths()
-        self.rupth = RuPaths()
         self.db_session: Session = get_db_session(self.pth.dpd_db_path)
         self.dpd_db = self.make_dpd_db()
 
@@ -47,12 +42,6 @@ class GlobalVars:
         self.tpr_df: pd.DataFrame
         self.i2h_df: pd.DataFrame
         self.deconstructor_df: pd.DataFrame
-
-        self.show_ru_data: bool = False
-        if config_test(
-            "dictionary", "show_ru_data", "yes"
-        ):
-            self.show_ru_data: bool = True
 
     def make_dpd_db(self):
         dpd_db = self.db_session.query(DpdHeadword).all()
@@ -69,7 +58,10 @@ def generate_tpr_data(g: GlobalVars):
     for counter, i in enumerate(g.dpd_db):
         # headword
         html_string = render_dpd_definition_templ(
-            g.pth, i, dpd_definition_templ, False, False
+            g.pth,
+            i,
+            dpd_definition_templ,
+            False,
         )
         html_string = html_string.replace("\n", "").replace("    ", "")
         html_string = re.sub("""<span class\\='g.+span>""", "", html_string)
@@ -97,12 +89,6 @@ def generate_tpr_data(g: GlobalVars):
             html_string += """<tr><th valign="top">IPA</th>"""
             html_string += f"""<td>/{i.lemma_ipa}/</td></tr>"""
 
-            if g.show_ru_data and i.ru:
-                ru_meaning = make_ru_meaning_simpl(i)
-                if ru_meaning:
-                    html_string += """<tr><th valign="top">Русский</th>"""
-                    html_string += f"""<td>{ru_meaning}</td></tr>"""
-            
             # grammar
             html_string += """<tr><th valign="top">Grammar</th>"""
             html_string += f"""<td>{i.grammar}"""
@@ -178,19 +164,10 @@ def generate_tpr_data(g: GlobalVars):
                 html_string += """<tr><th valign="top">Notes</th>"""
                 html_string += f"""<td>{notes_no_formatting}</td></tr>"""
 
-            if g.show_ru_data and i.ru and i.ru.ru_notes and i.needs_ru_notes:
-                ru_notes_no_formatting = i.ru.ru_notes.replace("\n", "<br>")
-                html_string += """<tr><th valign="top">Заметки</th>"""
-                html_string += f"""<td>{ru_notes_no_formatting}</td></tr>"""
-
             if i.cognate:
                 html_string += """<tr><th valign="top">Cognate</th>"""
                 html_string += f"""<td>{i.cognate}</td></tr>"""
 
-            if g.show_ru_data and i.ru and i.ru.ru_cognate:
-                html_string += """<tr><th valign="top">Родствен.</th>"""
-                html_string += f"""<td>{i.ru.ru_cognate}</td></tr>"""
-            
             if i.link:
                 html_string += """<tr><th valign="top">Link</th>"""
                 html_string += """<td>"""
@@ -214,7 +191,7 @@ def generate_tpr_data(g: GlobalVars):
                     html_string += f"""<td>{i.rt.sanskrit_root} {i.rt.sanskrit_root_class} ({sk_root_meaning}"""
                     html_string += """)</td></tr>"""
 
-            html_string += f"""<tr><td colspan="2"><a href="https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.438735500={i.lemma_link}&entry.1433863141=TPR%20{TODAY}" target="_blank">Submit a correction</a></td></tr>"""
+            html_string += f"""<tr><td colspan="2"><a href="https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.438735500={{ i.id }}%20{i.lemma_link}&entry.1433863141=TPR%20{TODAY}" target="_blank">Submit a correction</a></td></tr>"""
             html_string += """</table>"""
             html_string += """</details></div>"""
 
@@ -245,9 +222,6 @@ def generate_tpr_data(g: GlobalVars):
         html_string += f"""<b>{r.root_clean}</b> """
         html_string += f"""{r.root_group} {r.root_sign} ({r.root_meaning}"""
 
-        if g.show_ru_data and r.root_ru_meaning:
-            html_string += f""" - {r.root_ru_meaning}"""
-        
         html_string += """)"""
 
         try:
@@ -496,9 +470,7 @@ def copy_zip_to_tpr_downloads(g: GlobalVars):
         month_str = TODAY.strftime("%B")
         year = TODAY.year
 
-        if g.show_ru_data:
-            version = "dpd_with_rus"
-        elif UposathaManger.uposatha_today():
+        if UposathaManger.uposatha_today():
             version = "release"
         else:
             version = "beta"
@@ -548,24 +520,6 @@ def copy_zip_to_tpr_downloads(g: GlobalVars):
             }
 
             download_list[27] = dpd_beta_info
-
-
-        if version == "dpd_with_rus":
-            output_file = g.rupth.tpr_with_rus_path
-            _zip_it_up(file_path, file_name, output_file)
-            filesize = _file_size(output_file)
-
-            dpd_with_rus_info = {
-                "name": "DPD with Russian",
-                "release_date": f"{day}.{month}.{year}",
-                "type": "dictionary",
-                "category": "Other Beta",
-                "url": "https://github.com/bksubhuti/tpr_downloads/raw/master/release_zips/dpd_with_rus.zip",
-                "filename": "dpd.sql",
-                "size": f"{filesize} MB",
-            }
-
-            download_list[28] = dpd_with_rus_info
 
         with open(g.pth.tpr_download_list_path, "w") as f:
             f.write(json.dumps(download_list, indent=4, ensure_ascii=False))

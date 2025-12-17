@@ -22,7 +22,6 @@ def generate_root_html(
     db_session: Session,
     pth: ProjectPaths,
     roots_count_dict: Dict[str, int],
-    show_ru_data=False,
 ) -> Tuple[List[DictEntry], RenderedSizes]:
     """compile html components for each pali root"""
 
@@ -58,7 +57,6 @@ def generate_root_html(
             pth,
             r,
             roots_count_dict,
-            show_ru_data
         )
         html += definition
         size_dict["root_definition"] += len(definition)
@@ -137,7 +135,6 @@ def render_root_definition_templ(
     pth: ProjectPaths,
     r: DpdRoot,
     roots_count_dict,
-    show_ru_data=False,
 ):
     """render html of main root info"""
 
@@ -153,7 +150,6 @@ def render_root_definition_templ(
             r=r,
             count=count,
             today=TODAY,
-            show_ru_data=show_ru_data
         )
     )
 

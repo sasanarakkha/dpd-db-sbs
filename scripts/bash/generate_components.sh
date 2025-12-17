@@ -55,6 +55,7 @@ uv run python db/lookup/spelling_mistakes.py
 
 uv run python db/lookup/transliterate_lookup_table.py
 uv run python db/lookup/help_abbrev_add_to_lookup.py
+uv run python db/lookup/help_abbrev_add_to_lookup_ru.py
 
 uv run python scripts/build/ebt_counter.py
 go run go_modules/frequency/main.go

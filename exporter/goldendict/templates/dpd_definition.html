@@ -1,31 +1,19 @@
 <div class="dpd">
     <p>
-        % if show_sbs_data and i.sbs:
-        % if i.sbs.class_anki:
-        <a class="link" href="${i.sbs.sbs_class_link}">
-            <i>(cl.${i.sbs.class_anki}${'*' if i.sbs.class_extra else ''})</i>
-        </a>
-        <span class="gray"> | </span>
-        % endif
-        % endif
-        ${i.pos}.
-
+        ${i.pos}. 
+        
         % if i.plus_case:
-        (${i.plus_case})
+        (${i.plus_case}) 
         % endif
-
-        % if i.su and i.su.tbw:
-        <a class="link" href="${i.su.tbw}">${i.meaning_combo_html}</a>
-        % else:
-        ${i.meaning_combo_html}
-        % endif
-
+        
+        ${i.meaning_combo_html} 
+        
         % if i.construction_summary:
-        [${i.construction_summary}]
+        [${i.construction_summary}] 
         % endif
-
-        ${complete}
-
+        
+        ${i.degree_of_completion_html} 
+        
         % if show_id:
         <span class="gray">${i.id}</span>
         % endif

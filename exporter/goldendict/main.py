@@ -48,19 +48,6 @@ class GlobalVars:
         self.make_mdict: bool = False
         if config_test("dictionary", "make_mdict", "yes"):
             self.make_mdict: bool = True
-        self.show_sbs_data: bool = False
-        self.show_ru_data: bool = False
-        self.show_grammar: bool = False
-
-
-        if config_test("dictionary", "show_sbs_data", "yes"):
-            self.show_sbs_data: bool = True
-
-        if config_test("dictionary", "show_ru_data", "yes"):
-            self.show_ru_data: bool = True
-
-        if config_test("dictionary", "show_grammar", "yes"):
-            self.show_grammar: bool = True
 
         self.paths = self.pth
 
@@ -82,26 +69,23 @@ def main():
         g.sandhi_contractions,
         g.cf_set,
         g.idioms_set,
-        g.show_sbs_data,
-        g.show_ru_data,
-        g.show_grammar,
         g.data_limit,
     )
     g.rendered_sizes.append(sizes)
 
     if g.data_limit == 0:
         root_data_list, sizes = generate_root_html(
-            g.db_session, g.pth, g.roots_count_dict, g.show_ru_data
+            g.db_session, g.pth, g.roots_count_dict
         )
         g.rendered_sizes.append(sizes)
 
         variant_spelling_data_list, sizes = generate_variant_spelling_html(g.pth)
         g.rendered_sizes.append(sizes)
 
-        epd_data_list, sizes = generate_epd_html(g.db_session, g.pth, g.show_ru_data)
+        epd_data_list, sizes = generate_epd_html(g.db_session, g.pth)
         g.rendered_sizes.append(sizes)
 
-        help_data_list, sizes = generate_help_html(g.db_session, g.pth, g.show_ru_data)
+        help_data_list, sizes = generate_help_html(g.db_session, g.pth)
         g.rendered_sizes.append(sizes)
 
         g.db_session.close()

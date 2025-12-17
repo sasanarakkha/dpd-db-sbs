@@ -4,7 +4,6 @@ import re
 
 from mako.template import Template
 from minify_html import minify
-from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import Session
 from typing import List, Tuple
 
@@ -17,14 +16,11 @@ from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 from tools.utils import RenderedSizes, default_rendered_sizes, squash_whitespaces
 from tools.goldendict_exporter import DictEntry
-from tools.tools_for_ru_exporter import ru_replace_abbreviations
-
 
 
 def generate_epd_html(
     db_session: Session,
     pth: ProjectPaths,
-    show_ru_data=False,
 ) -> Tuple[List[DictEntry], RenderedSizes]:
     """generate html for english to pali dictionary"""
 
@@ -32,7 +28,7 @@ def generate_epd_html(
 
     pr.green("generating epd html")
 
-    dpd_db: list[DpdHeadword] = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.ru)).all()
+    dpd_db: list[DpdHeadword] = db_session.query(DpdHeadword).all()
     dpd_db = sorted(dpd_db, key=lambda x: pali_sort_key(x.lemma_1))
 
     roots_db: list[DpdRoot] = db_session.query(DpdRoot).all()
@@ -90,45 +86,6 @@ def generate_epd_html(
                 if meaning not in epd.keys() and i.plus_case:
                     epd_string = f"<b class='epd'>{i.lemma_clean}</b> {i.pos}. {i.meaning_1} ({i.plus_case})"
                     epd.update({meaning: epd_string})
-        # generate ru-pali
-        if (
-            show_ru_data
-            and i.ru
-            and i.ru.ru_meaning
-            and i.pos not in pos_exclude_list
-        ):
-            i.ru.ru_meaning = re.sub(r"\?\?", "", i.ru.ru_meaning)
-
-            # remove all space brackets
-            ru_meanings_clean = re.sub(r" \(.+?\)", "", i.ru.ru_meaning)
-            # remove all brackets space
-            ru_meanings_clean = re.sub(r"\(.+?\) ", "", ru_meanings_clean)
-            # remove space at start and fin
-            ru_meanings_clean = re.sub(r"(^ | $)", "", ru_meanings_clean)
-            # remove double spaces
-            ru_meanings_clean = re.sub(r"  ", " ", ru_meanings_clean)
-            # remove space around ;
-            ru_meanings_clean = re.sub(r" ;|; ", ";", ru_meanings_clean)
-            # remove т.д.
-            ru_meanings_clean = re.sub(r"т\.д\. ", "", ru_meanings_clean)
-            # remove !
-            ru_meanings_clean = re.sub(r"!", "", ru_meanings_clean)
-            # remove ?
-            ru_meanings_clean = re.sub(r"\\?", "", ru_meanings_clean)
-            ru_meanings_list = ru_meanings_clean.split(";")
-
-            pos: str = ru_replace_abbreviations(i.pos)
-
-            for ru_meaning in ru_meanings_list:
-                if ru_meaning in epd.keys():
-                    epd_string = f"{epd[ru_meaning]}<br><b class='epd'>{i.lemma_clean}</b> {pos}. {i.ru.ru_meaning}"
-                    epd[ru_meaning] = epd_string
-
-                if ru_meaning not in epd.keys():
-                    epd_string = (
-                        f"<b class='epd'>{i.lemma_clean}</b> {pos}. {i.ru.ru_meaning}"
-                    )
-                    epd.update({ru_meaning: epd_string})
 
     for counter, i in enumerate(roots_db):
         root_meanings_list: list = i.root_meaning.split(", ")
@@ -141,19 +98,6 @@ def generate_epd_html(
             if root_meaning not in epd.keys():
                 epd_string = f"<b class='epd'>{i.root}</b> root. {i.root_meaning}"
                 epd.update({root_meaning: epd_string})
-        if show_ru_data:
-            root_ru_meanings_list: list = i.root_ru_meaning.split(", ")
-
-            for root_ru_meaning in root_ru_meanings_list:
-                if root_ru_meaning in epd.keys():
-                    epd_string = f"{epd[root_ru_meaning]}<br><b class='epd'>{i.root}</b> корень. {i.root_ru_meaning}"
-                    epd[root_ru_meaning] = epd_string
-
-                if root_ru_meaning not in epd.keys():
-                    epd_string = (
-                        f"<b class='epd'>{i.root}</b> корень. {i.root_ru_meaning}"
-                    )
-                    epd.update({root_ru_meaning: epd_string})
 
     epd_data_list: List[DictEntry] = []
 

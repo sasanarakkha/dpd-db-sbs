@@ -33,6 +33,9 @@ class ProjectPaths:
             base_dir / "db/suttas/dv_catalogue_suttas.tsv"
         )
 
+        # resources/dpd_audio
+        self.dpd_audio_db_path = base_dir / "resources/dpd_audio/db/dpd_audio.db"
+
         # exporter/kindle/
         self.epub_dir = base_dir / "exporter/kindle/epub/"
         self.kindlegen_path = base_dir / "exporter/kindle/kindlegen"
@@ -177,9 +180,6 @@ class ProjectPaths:
         )
         self.example_templ_path = (
             base_dir / "exporter/goldendict/templates/dpd_example.html"
-        )
-        self.sbs_example_templ_path = (
-            base_dir / "exporter/goldendict/templates/sbs_example.html"
         )
         self.family_compound_templ_path = (
             base_dir / "exporter/goldendict/templates/dpd_family_compound.html"
@@ -394,8 +394,6 @@ class ProjectPaths:
         # exporter/webapp
         self.webapp_css_path = base_dir / "exporter/webapp/static/dpd.css"
         self.webapp_templates_dir = base_dir / "exporter/webapp/templates"
-        self.webapp_ru_templates_dir = base_dir / "exporter/webapp/ru_templates"
-        self.webapp_sbs_templates_dir = base_dir / "exporter/webapp/sbs_templates"
         self.webapp_static_dir = base_dir / "exporter/webapp/static"
         self.webapp_js_path = base_dir / "exporter/webapp/static/dpd.js"
         self.webapp_home_simple_css_path = (
@@ -427,8 +425,6 @@ class ProjectPaths:
         self.template_help = "help.html"
         self.template_epd_summary = "epd_summary.html"
         self.template_epd = "epd.html"
-        self.template_rpd_summary = "rpd_summary.html"
-        self.template_rpd = "rpd.html"
         self.template_variant_summary = "variant_summary.html"
         self.template_variant = "variant.html"
         self.template_spelling_summary = "spelling_summary.html"
