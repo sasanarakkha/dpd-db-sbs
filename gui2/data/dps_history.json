@@ -1,5 +1,77 @@
 [
     {
+        "id": 2728,
+        "lemma_1": "atthāya hitāya sukhāya"
+    },
+    {
+        "id": 66174,
+        "lemma_1": "vadhukā"
+    },
+    {
+        "id": 64790,
+        "lemma_1": "sekkha"
+    },
+    {
+        "id": 64800,
+        "lemma_1": "sekha 1"
+    },
+    {
+        "id": 64712,
+        "lemma_1": "sūju"
+    },
+    {
+        "id": 55792,
+        "lemma_1": "lāseti"
+    },
+    {
+        "id": 55612,
+        "lemma_1": "lapita"
+    },
+    {
+        "id": 54447,
+        "lemma_1": "rajopatha"
+    },
+    {
+        "id": 54211,
+        "lemma_1": "yoga 1"
+    },
+    {
+        "id": 54091,
+        "lemma_1": "yugaṃ samāgamā"
+    },
+    {
+        "id": 51632,
+        "lemma_1": "mahā 2"
+    },
+    {
+        "id": 43607,
+        "lemma_1": "parinetvā"
+    },
+    {
+        "id": 40175,
+        "lemma_1": "paṭāṇi"
+    },
+    {
+        "id": 38049,
+        "lemma_1": "nirāsa"
+    },
+    {
+        "id": 34311,
+        "lemma_1": "dvayaṃdvayasamāpatti"
+    },
+    {
+        "id": 32412,
+        "lemma_1": "dāha 2"
+    },
+    {
+        "id": 32151,
+        "lemma_1": "dassu"
+    },
+    {
+        "id": 29013,
+        "lemma_1": "ṭhapeti 5"
+    },
+    {
         "id": 20063,
         "lemma_1": "kappa 1.6"
     },
@@ -26,77 +98,5 @@
     {
         "id": 17469,
         "lemma_1": "ekatta 1"
-    },
-    {
-        "id": 17132,
-        "lemma_1": "ussaṅkhapāda"
-    },
-    {
-        "id": 17131,
-        "lemma_1": "ussaṅkha"
-    },
-    {
-        "id": 16342,
-        "lemma_1": "upādāniya"
-    },
-    {
-        "id": 14779,
-        "lemma_1": "uttānīkamma"
-    },
-    {
-        "id": 15061,
-        "lemma_1": "udujita"
-    },
-    {
-        "id": 15064,
-        "lemma_1": "udumbarakhādikaṃ"
-    },
-    {
-        "id": 15340,
-        "lemma_1": "upakāri"
-    },
-    {
-        "id": 15876,
-        "lemma_1": "upapanna 2"
-    },
-    {
-        "id": 16380,
-        "lemma_1": "upāyāsa 1"
-    },
-    {
-        "id": 1194,
-        "lemma_1": "ajina 1"
-    },
-    {
-        "id": 1185,
-        "lemma_1": "ajigucchanīya"
-    },
-    {
-        "id": 7067,
-        "lemma_1": "appahīna"
-    },
-    {
-        "id": 77848,
-        "lemma_1": "āpucchanta"
-    },
-    {
-        "id": 70583,
-        "lemma_1": "vocarita"
-    },
-    {
-        "id": 70106,
-        "lemma_1": "vuyhati"
-    },
-    {
-        "id": 68605,
-        "lemma_1": "vibhavataṇhā"
-    },
-    {
-        "id": 65415,
-        "lemma_1": "sovaggika"
-    },
-    {
-        "id": 65390,
-        "lemma_1": "soracca"
     }
 ]
