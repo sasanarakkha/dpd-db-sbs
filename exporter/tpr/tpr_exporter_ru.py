@@ -566,7 +566,7 @@ def copy_zip_to_tpr_downloads(g: GlobalVars):
                 "size": f"{filesize} MB",
             }
 
-            download_list[28] = dpd_with_rus_info
+            download_list[29] = dpd_with_rus_info
 
         with open(g.pth.tpr_download_list_path, "w") as f:
             f.write(json.dumps(download_list, indent=4, ensure_ascii=False))
