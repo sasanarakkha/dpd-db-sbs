@@ -67,11 +67,13 @@ nav:
   - Pāḷi Notes: "pali_notes/index.md"
   - Developer Docs:
     - "technical/index.md"
+    - Quick Start Guide: "technical/quick_start.md"
     - Build the DB from Scratch: "technical/build_db.md"
     - Use the DB in a Project: "technical/use_db.md"
     - Project Folder Structure: "technical/project_folder_structure.md" 
     - DpdHeadwords Table: "technical/dpd_headwords_table.md"
     - Tipiṭaka Source Files: "technical/tipitaka_source_files.md"
+    - API Endpoints: "technical/api_endpoints.md"
     # - Style Guide for DPD Entries: "technical/style_guide_for_dpd_entries.md"
 
 theme:

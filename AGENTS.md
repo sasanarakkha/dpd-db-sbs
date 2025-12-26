@@ -13,10 +13,11 @@
 
 ## Python Type Hints
 - Please add type hints to all code, especially when it is missing in existing code. 
-- Use modern type hints `dict[str, str]` not old type hints like `Dict[str, str]` 
-- Use `tuple[str, str]` not `Tuple[str, str]`
-- Use `list[str]` not `List[str]`
-- Use `| None` not Optional[None]
+- Use modern type hints not old type hints
+  - Use `dict[str, str]` not `Dict[str, str]` 
+  - Use `tuple[str, str]` not `Tuple[str, str]`
+  - Use `list[str]` not `List[str]`
+  - Use `| None` not Optional[None]
 
 ## Use Path from Pathlib
 - Use Path for anything related to filepaths, not os.
@@ -25,6 +26,14 @@
 - Do not add comments unnecessarily. 
 - Only add comments when truly necessary to explain WHY something is being done. Never WHAT is being done. 
 - Leave existing comments as they are.
+
+## Imports
+- NEVER use `sys.path` hacks or manual directory traversal (e.g., `Path(__file__).resolve().parents[n]`) to handle absolute imports. 
+- Assume the script will be run from the project root or within a correctly configured environment where absolute imports work naturally.
+
+## Execution
+- NEVER run the actual file being worked on or any scripts unless specifically asked to do so by the user. 
+- Always ask for permission before running any file. The user will typically handle the execution.
 
 ## Dependencies
 

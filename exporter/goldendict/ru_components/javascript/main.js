@@ -1,7 +1,7 @@
 
 //// listen for button clicks
 
-document.addEventListener("click", function(event) {
+document.addEventListener("click", function (event) {
     var target = event.target;
     const classNames = ["button"]
     if (classNames.some(className => target.classList.contains(className))) {
@@ -35,7 +35,7 @@ function button_click(el) {
 
 //// get the data to load into buttons
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     loadData()
 });
 
@@ -58,7 +58,7 @@ function loadData() {
 function loadButtonContent(data) {
 
     const lemmaTag = data.lemma.replace(/ /g, "_").replace(".", "_") // a 1.1 > a_1_1
-    
+
     //// feedback
 
     const feedbackHTML = makeFeedback(data);
@@ -75,61 +75,61 @@ function loadButtonContent(data) {
 
     //// family compounds
 
-        if (
-            data.family_compounds
-            && data.family_compounds.length > 0
-            && typeof family_compound_json !== "undefined"
-        ) {
-            const familyCompoundHtml = makeFamilyCompoundHtml(data)
-            const familyCompoundElement = document.getElementById(`ru_family_compound_${lemmaTag}`)
-            familyCompoundElement.innerHTML = familyCompoundHtml
-        };
+    if (
+        data.family_compounds
+        && data.family_compounds.length > 0
+        && typeof family_compound_json !== "undefined"
+    ) {
+        const familyCompoundHtml = makeFamilyCompoundHtml(data)
+        const familyCompoundElement = document.getElementById(`ru_family_compound_${lemmaTag}`)
+        familyCompoundElement.innerHTML = familyCompoundHtml
+    };
 
-        //// family root
+    //// family root
 
-        if (data.family_root != ""
-            && typeof family_root_json !== "undefined"
-        ) {
-            const fr = family_root_json[data.family_root];
-            const familyRootHtml = makeFamilyRootHtml(data, fr, "lemma");
-            const familyRootElement = document.getElementById(`ru_family_root_${lemmaTag}`);
-            familyRootElement.innerHTML = familyRootHtml;
-        };
+    if (data.family_root != ""
+        && typeof family_root_json !== "undefined"
+    ) {
+        const fr = family_root_json[data.family_root];
+        const familyRootHtml = makeFamilyRootHtml(data, fr, "lemma");
+        const familyRootElement = document.getElementById(`ru_family_root_${lemmaTag}`);
+        familyRootElement.innerHTML = familyRootHtml;
+    };
 
-        //// family idioms
+    //// family idioms
 
-        if (
-            data.family_idioms
-            && data.family_idioms.length > 0
-            && typeof family_idiom_json !== "undefined"
-        ) {
-            const familyIdiomHtml = makeFamilyIdioms(data)
-            const familyIdiomElement = document.getElementById(`ru_family_idiom_${lemmaTag}`)
-            familyIdiomElement.innerHTML = familyIdiomHtml
-        };
+    if (
+        data.family_idioms
+        && data.family_idioms.length > 0
+        && typeof family_idiom_json !== "undefined"
+    ) {
+        const familyIdiomHtml = makeFamilyIdioms(data)
+        const familyIdiomElement = document.getElementById(`ru_family_idiom_${lemmaTag}`)
+        familyIdiomElement.innerHTML = familyIdiomHtml
+    };
 
-        //// family sets
+    //// family sets
 
-        if (
-            data.family_sets 
-            && data.family_sets.length > 0
-            && typeof family_set_json !== "undefined"
-        ) {
-            const familySetHtml = makeFamilySets(data)
-            const familySetElement = document.getElementById(`ru_family_set_${lemmaTag}`)
-            familySetElement.innerHTML = familySetHtml
-        };
+    if (
+        data.family_sets
+        && data.family_sets.length > 0
+        && typeof family_set_json !== "undefined"
+    ) {
+        const familySetHtml = makeFamilySets(data)
+        const familySetElement = document.getElementById(`ru_family_set_${lemmaTag}`)
+        familySetElement.innerHTML = familySetHtml
+    };
 
-        //// family word
+    //// family word
 
-        if (
-            data.family_word
-            && typeof family_word_json !== "undefined"
-        ) {
-            const familyWordHtml = makeFamilyWordHtml(data);
-            const familyWordElement = document.getElementById(`ru_family_word_${lemmaTag}`)
-            familyWordElement.innerHTML = familyWordHtml
-        };
+    if (
+        data.family_word
+        && typeof family_word_json !== "undefined"
+    ) {
+        const familyWordHtml = makeFamilyWordHtml(data);
+        const familyWordElement = document.getElementById(`ru_family_word_${lemmaTag}`)
+        familyWordElement.innerHTML = familyWordHtml
+    };
 };
 
 //// load root dictionary button content
@@ -142,7 +142,7 @@ function loadRootButtonContent(data) {
         const key_clean = item.id.replace("ru_family_root_", "").replace(/_/g, " ")
         const fr = family_root_json[key_clean]
         const link = item.id.replace("ru_family_root_", "").replace(/_/g, "%20")
-        if (fr !==undefined ){
+        if (fr !== undefined) {
             const familyRootHtml = makeFamilyRootHtml(data, fr, "root", link);
             const familyRootElement = document.getElementById(key_id)
             familyRootElement.innerHTML = familyRootHtml
@@ -156,4 +156,32 @@ function loadRootButtonContent(data) {
 function superScripter(text) {
     const regex = /\d/g;
     return text.replace(regex, match => `&hairsp;<sup>${match}</sup>`);
+}
+
+function playAudio(headword, buttonElement) {
+    const gender = "male";
+    // const baseUrl = "https://www.dpdict.net/audio/";
+    const baseUrl = "http://127.1.1.1:8080/audio/";
+    var audio = new Audio(baseUrl + headword + "?gender=" + gender);
+
+    audio.addEventListener("error", function () {
+        if (buttonElement) {
+            // Change icon to cross
+            buttonElement.innerHTML = `
+                <svg viewBox="0 0 24 24" width="16px" height="16px" fill="currentColor" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            `;
+            // Disable button
+            buttonElement.classList.add("disabled");
+            buttonElement.style.pointerEvents = "none";
+            buttonElement.title = "Аудио не найдено";
+            buttonElement.removeAttribute("onclick");
+        }
+    });
+
+    audio.play().catch(function (error) {
+        console.log("Audio play failed: ", error);
+    });
 }

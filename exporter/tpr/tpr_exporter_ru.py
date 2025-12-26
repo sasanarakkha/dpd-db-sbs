@@ -25,7 +25,6 @@ from tools.paths import ProjectPaths
 from tools.paths_ru import RuPaths
 from tools.printer import printer as pr
 from tools.tsv_read_write import read_tsv
-from tools.uposatha_day import UposathaManger
 
 from tools.tools_for_ru_exporter import (
     make_ru_meaning_simpl,
@@ -48,10 +47,6 @@ class GlobalVars:
         self.tpr_df: pd.DataFrame
         self.i2h_df: pd.DataFrame
         self.deconstructor_df: pd.DataFrame
-
-        self.show_ru_data: bool = False
-        if config_test("dictionary", "show_ru_data", "yes"):
-            self.show_ru_data: bool = True
 
     def make_dpd_db(self):
         dpd_db = self.db_session.query(DpdHeadword).all()
@@ -99,7 +94,7 @@ def generate_tpr_data(g: GlobalVars):
             html_string += """<tr><th valign="top">IPA</th>"""
             html_string += f"""<td>/{i.lemma_ipa}/</td></tr>"""
 
-            if g.show_ru_data and i.ru:
+            if i.ru:
                 ru_meaning = make_ru_meaning_simpl(i)
                 if ru_meaning:
                     html_string += """<tr><th valign="top">Русский</th>"""
@@ -180,7 +175,7 @@ def generate_tpr_data(g: GlobalVars):
                 html_string += """<tr><th valign="top">Notes</th>"""
                 html_string += f"""<td>{notes_no_formatting}</td></tr>"""
 
-            if g.show_ru_data and i.ru and i.ru.ru_notes and i.needs_ru_notes:
+            if i.ru and i.ru.ru_notes and i.needs_ru_notes:
                 ru_notes_no_formatting = i.ru.ru_notes.replace("\n", "<br>")
                 html_string += """<tr><th valign="top">Заметки</th>"""
                 html_string += f"""<td>{ru_notes_no_formatting}</td></tr>"""
@@ -189,7 +184,7 @@ def generate_tpr_data(g: GlobalVars):
                 html_string += """<tr><th valign="top">Cognate</th>"""
                 html_string += f"""<td>{i.cognate}</td></tr>"""
 
-            if g.show_ru_data and i.ru and i.ru.ru_cognate:
+            if i.ru and i.ru.ru_cognate:
                 html_string += """<tr><th valign="top">Родствен.</th>"""
                 html_string += f"""<td>{i.ru.ru_cognate}</td></tr>"""
 
@@ -247,7 +242,7 @@ def generate_tpr_data(g: GlobalVars):
         html_string += f"""<b>{r.root_clean}</b> """
         html_string += f"""{r.root_group} {r.root_sign} ({r.root_meaning}"""
 
-        if g.show_ru_data and r.root_ru_meaning:
+        if r.root_ru_meaning:
             html_string += f""" - {r.root_ru_meaning}"""
 
         html_string += """)"""
@@ -495,15 +490,7 @@ def copy_zip_to_tpr_downloads(g: GlobalVars):
 
         day = TODAY.day
         month = TODAY.month
-        month_str = TODAY.strftime("%B")
         year = TODAY.year
-
-        if g.show_ru_data:
-            version = "dpd_with_rus"
-        elif UposathaManger.uposatha_today():
-            version = "release"
-        else:
-            version = "beta"
 
         file_path = g.pth.tpr_sql_file_path
         file_name = "dpd.sql"
@@ -517,61 +504,26 @@ def copy_zip_to_tpr_downloads(g: GlobalVars):
             filesize = f"{filestat.st_size / 1000 / 1000:.1f}"
             return filesize
 
-        if version == "release":
-            output_file = g.pth.tpr_release_path
-            _zip_it_up(file_path, file_name, output_file)
-            filesize = _file_size(output_file)
+        output_file = g.rupth.tpr_with_rus_path
+        _zip_it_up(file_path, file_name, output_file)
+        filesize = _file_size(output_file)
 
-            dpd_info = {
-                "name": f"DPD {month_str} {year} release",
-                "release_date": f"{day}.{month}.{year}",
-                "type": "dictionary",
-                "category": "Dictionaries",
-                "url": "https://github.com/bksubhuti/tpr_downloads/raw/master/release_zips/dpd.zip",
-                "filename": "dpd.sql",
-                "size": f"{filesize} MB",
-            }
+        dpd_with_rus_info = {
+            "name": "DPD with Russian",
+            "release_date": f"{day}.{month}.{year}",
+            "type": "dictionary",
+            "category": "Other Beta",
+            "url": "https://github.com/bksubhuti/tpr_downloads/raw/master/release_zips/dpd_with_rus.zip",
+            "filename": "dpd.sql",
+            "size": f"{filesize} MB",
+        }
 
-            download_list[7] = dpd_info
-
-        if version == "beta":
-            output_file = g.pth.tpr_beta_path
-            _zip_it_up(file_path, file_name, output_file)
-            filesize = _file_size(output_file)
-
-            dpd_beta_info = {
-                "name": "DPD Beta",
-                "release_date": f"{day}.{month}.{year}",
-                "type": "dictionary",
-                "category": "Other Beta",
-                "url": "https://github.com/bksubhuti/tpr_downloads/raw/master/release_zips/dpd_beta.zip",
-                "filename": "dpd.sql",
-                "size": f"{filesize} MB",
-            }
-
-            download_list[27] = dpd_beta_info
-
-        if version == "dpd_with_rus":
-            output_file = g.rupth.tpr_with_rus_path
-            _zip_it_up(file_path, file_name, output_file)
-            filesize = _file_size(output_file)
-
-            dpd_with_rus_info = {
-                "name": "DPD with Russian",
-                "release_date": f"{day}.{month}.{year}",
-                "type": "dictionary",
-                "category": "Other Beta",
-                "url": "https://github.com/bksubhuti/tpr_downloads/raw/master/release_zips/dpd_with_rus.zip",
-                "filename": "dpd.sql",
-                "size": f"{filesize} MB",
-            }
-
-            download_list[29] = dpd_with_rus_info
+        download_list[29] = dpd_with_rus_info
 
         with open(g.pth.tpr_download_list_path, "w") as f:
             f.write(json.dumps(download_list, indent=4, ensure_ascii=False))
 
-    pr.yes(version)
+    pr.yes("OK")
 
 
 def main():

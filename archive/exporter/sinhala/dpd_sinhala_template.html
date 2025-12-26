@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="utf-8">
+    <link href="dpd_sinhala.css" rel="stylesheet">
+    <title>DPD Sinhala</title>
+</head>
+
+<div class='dpd_sinhala'>
+    <p class='sinhala'>
+        {{ i.pos_si }}. 
+        {% if i.plus_case %}
+        ({{ i.plus_case_si }}) 
+        {% endif %}
+        <b>{{ i.meaning_si }}</b>. 
+        [{{ i.construction_summary_si }}] 
+        {{ i.degree_of_completion_html }} 
+    </p>
+    <hr>
+    <p class='english'>
+        {{ i.pos }}. 
+        {% if i.plus_case %}
+        ({{ i.plus_case }}) 
+        {% endif %}
+        {{ i.meaning_combo_html }}. 
+        [{{ i.construction_summary }}] 
+        {{ i.degree_of_completion_html }} 
+    <p class='sinhala_footer'>
+        ID {{ i.id }}  
+        <a class="link" href="https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.438735500={{ i.id }}%20{{ i.lemma_si }}&entry.1433863141=GoldenDict%20Sinhala%20{{ date }}" target="_blank">වැරදි නිවැරදි කරන්න</a>
+    </p>
+</div>

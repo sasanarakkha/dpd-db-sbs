@@ -368,18 +368,202 @@
         </tr>
         % endif
 
-        % if su.cst_code:
+        % if su.bjt_sutta_code:
         <tr>
             <th class="heading" colspan="2">
-                Buddha Jayanti Tipiṭaka
+                Buddha Jayanti Tipiṭaka (BJT)
             </th>
         </tr>
+        % endif
+
+        % if su.bjt_sutta_code:
         <tr>
             <th>
-                Продолжнние...
+                Код Сутты
             </th>
             <td>
-                ...
+                ${ su.bjt_sutta_code }
+            </td>
+        </tr>
+        % endif
+
+        % if su.bjt_piṭaka:
+        <tr>
+            <th>
+                Питака
+            </th>
+            <td>
+                ${ su.bjt_piṭaka }
+            </td>
+        </tr>
+        % endif
+
+        % if su.bjt_nikāya:
+        <tr>
+            <th>
+                Никая
+            </th>
+            <td>
+                ${ su.bjt_nikāya }
+            </td>
+        </tr>
+        % endif
+
+        % if su.bjt_major_section:
+        <tr>
+            <th>
+                Основной Раздел
+            </th>
+            <td>
+                ${ su.bjt_major_section }
+            </td>
+        </tr>
+        % endif
+
+        % if su.bjt_book:
+        <tr>
+            <th>
+                Книга
+            </th>
+            <td>
+                ${ su.bjt_book }
+            </td>
+        </tr>
+        % endif
+
+        % if su.bjt_minor_section:
+        <tr>
+            <th>
+                Малый Раздел
+            </th>
+            <td>
+                ${ su.bjt_minor_section }
+            </td>
+        </tr>
+        % endif
+
+        % if su.bjt_vagga:
+        <tr>
+            <th>
+                Вагга
+            </th>
+            <td>
+                ${ su.bjt_vagga }
+            </td>
+        </tr>
+        % endif
+
+        % if su.bjt_sutta:
+        <tr>
+            <th>
+                Сутта
+            </th>
+            <td>
+                ${ su.bjt_sutta }
+            </td>
+        </tr>
+        % endif
+
+        % if su.bjt_book_id:
+        <tr>
+            <th>
+                ID Книги
+            </th>
+            <td>
+                ${ su.bjt_book_id }
+            </td>
+        </tr>
+        % endif
+
+        % if su.bjt_page_num:
+        <tr>
+            <th>
+                Номер Страницы
+            </th>
+            <td>
+                ${ su.bjt_page_num }
+            </td>
+        </tr>
+        % endif
+
+        ## % if su.bjt_page_offset:
+        ## <tr>
+            ## <th>
+                ## Page Offset
+                ## </th>
+            ## <td>
+                ## ${ su.bjt_page_offset }
+                ## </td>
+            ## </tr>
+        ## % endif
+
+        % if su.bjt_filename:
+        <tr>
+            <th>
+                Имя Файла
+            </th>
+            <td>
+                ${ su.bjt_filename }.json
+            </td>
+        </tr>
+        % endif
+
+        % if su.bjt_github_link:
+        <tr>
+            <th>
+                Github
+            </th>
+            <td>
+                <a href="${ su.bjt_github_link }" target="_blank">
+                    ${ su.bjt_filename }.json
+                </a>
+            </td>
+        </tr>
+        % endif
+
+        % if su.bjt_web_code:
+        <tr>
+            <th class="heading" colspan="2">
+                Сайты с BJT
+            </th>
+        </tr>
+        % endif
+
+        % if su.bjt_tipitaka_lk_link:
+        <tr>
+            <th>
+                tipiṭaka.lk (Сингальский)
+            </th>
+            <td>
+                <a href="${ su.bjt_tipitaka_lk_link }" target="_blank">
+                    ${ su.bjt_tipitaka_lk_link }
+                </a>
+            </td>
+        </tr>
+        % endif
+
+        % if su.bjt_open_tipitaka_lk_link:
+        <tr>
+            <th>
+                open.tipiṭaka.lk (Латиница)
+            </th>
+            <td>
+                <a href="${ su.bjt_open_tipitaka_lk_link }" target="_blank">
+                    ${ su.bjt_open_tipitaka_lk_link }
+                </a>
+            </td>
+        </tr>
+        % endif
+
+        % if su.bjt_open_tipitaka_lk_link:
+        <tr>
+            <th>
+                open.tipiṭaka.lk (Деванагари)
+            </th>
+            <td>
+                <a href="${ su.bjt_open_tipitaka_lk_link.replace('latn', 'deva') }" target="_blank">
+                    ${ su.bjt_open_tipitaka_lk_link.replace('latn', 'deva') }
+                </a>
             </td>
         </tr>
         % endif
