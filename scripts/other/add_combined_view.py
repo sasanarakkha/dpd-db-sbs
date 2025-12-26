@@ -107,7 +107,8 @@ def main():
                 COALESCE(russian.ru_notes, '') AS ru_notes,
                 COALESCE(dpd_headwords.cognate, '') AS cognate, 
                 COALESCE(dpd_headwords.stem, '') AS stem, 
-                COALESCE(dpd_headwords.pattern, '') AS pattern 
+                COALESCE(dpd_headwords.pattern, '') AS pattern,
+                COALESCE(sbs.sbs_class, '') AS class 
             FROM dpd_headwords
             LEFT JOIN sbs ON dpd_headwords.id = sbs.id
             LEFT JOIN russian ON dpd_headwords.id = russian.id
