@@ -35,6 +35,14 @@
 - NEVER run the actual file being worked on or any scripts unless specifically asked to do so by the user. 
 - Always ask for permission before running any file. The user will typically handle the execution.
 
+### Python Scripts
+- When running python scripts or tests, ALWAYS use the local virtual environment: `.venv/bin/python3`.
+- Ensure correct import resolution by setting `PYTHONPATH` to the project root.
+- Example: `export PYTHONPATH=$PYTHONPATH:. && .venv/bin/python3 tests/test_script.py`
+
+
+## Tests
+- If you need to make any test file, please place it into test/ folder and call it "test_{etc}".
 ## Dependencies
 
 ### uv
