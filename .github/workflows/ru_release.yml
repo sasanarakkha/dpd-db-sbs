@@ -58,7 +58,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v6
       with:
-        python-version: 3.11
+        python-version: "3.12"
 
     - name: Install uv
       run: curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -112,7 +112,7 @@ jobs:
       run: uv run python db/families/family_root.py
 
     - name: Add Word Families
-      run: uv run db/families/family_word.py
+      run: uv run python db/families/family_word.py
     
     - name: Add Compound Families
       run: uv run python db/families/family_compound.py
@@ -160,10 +160,10 @@ jobs:
       run: uv run python db/inflections/inflections_to_headwords.py
 
     - name: Populate Sutta table
-      run: uv run db/suttas/suttas_update.py
+      run: uv run python db/suttas/suttas_update.py
 
     - name: Add Suttas to Lookup table
-      run: uv run db/suttas/suttas_to_lookup.py
+      run: uv run python db/suttas/suttas_to_lookup.py
 
     - name: Generate Grammar data
       run: uv run python db/grammar/grammar_to_lookup.py
