@@ -1,7 +1,0 @@
-#!/bin/bash
-
-# This script is running check_new_words.sh
-
-cd "$HOME/Documents/dpd-db"
-
-uv run bash scripts/bash/check_new_words.sh

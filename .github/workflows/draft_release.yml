@@ -19,9 +19,9 @@ jobs:
         repository: 'digitalpalidictionary/dpd-db'
         ref: 'main'
         submodules: 'recursive'
-        # Fetch depth 0 to allow committing back to the submodule
-        fetch-depth: 0
-        # Use PAT to allow pushing to submodule
+        # Fetch depth 1 for shallow clone to save disk space
+        fetch-depth: 1
+        # Use PAT to allow pushing to the submodule
         token: ${{ secrets.GH_PAT }}
 
     - name: Remove large dirs
@@ -48,7 +48,7 @@ jobs:
       run: curl -LsSf https://astral.sh/uv/install.sh | sh
     
     - name: Install dependencies
-      run: uv sync
+      run: uv sync --all-groups
 
     - name: Set up Go
       uses: actions/setup-go@v5
@@ -152,175 +152,85 @@ jobs:
       run: uv run python scripts/build/dealbreakers.py
 
     # ----------------------------------------
+    # Download Audio Database
+    # ----------------------------------------
+
+    - name: Download Audio Database
+      run: uv run python audio/db_release_download.py
+
+    # ----------------------------------------
     # Exporter
     # ----------------------------------------
+
+    - name: Setup disk space checker
+      run: |
+        cat << 'EOF' >> $HOME/check_disk.sh
+        #!/bin/bash
+        echo "=== Disk space and large files (>1GB) ==="
+        df -h
+        du -h --max-depth=2 ${{ github.workspace }} | grep -E "^[0-9.]+[GT]" || echo "No files >1GB found"
+        EOF
+        chmod +x $HOME/check_disk.sh
            
     - name: Export Grammar Dictionary
       run: uv run python exporter/grammar_dict/grammar_dict.py
     
     - name: Export GoldenDict & MDict
-      run: uv run python exporter/goldendict/main.py
+      run: |
+        uv run python exporter/goldendict/main.py
+        echo "=== After GoldenDict export ==="
+        $HOME/check_disk.sh
+
+    - name: Delete Audio Database to free space
+      run: |
+        echo "=== Before deleting audio DB ==="
+        $HOME/check_disk.sh
+        rm -rf ${{ github.workspace }}/audio/db/dpd_audio.db
+        echo "=== After deleting audio DB ==="
+        $HOME/check_disk.sh
 
     - name: Export Deconstructor
-      run: uv run python exporter/deconstructor/deconstructor_exporter.py
+      run: |
+        uv run python exporter/deconstructor/deconstructor_exporter.py
+        echo "=== After Deconstructor export ==="
+        $HOME/check_disk.sh
 
     - name: Export Kindle & ePub
-      run: uv run python exporter/kindle/kindle_exporter.py
+      run: |
+        uv run python exporter/kindle/kindle_exporter.py
+        echo "=== After Kindle export ==="
+        $HOME/check_disk.sh
 
     - name: Export Kobo
-      run: uv run python exporter/kobo/kobo.py
+      run: |
+        uv run python exporter/kobo/kobo.py
+        echo "=== After Kobo export ==="
+        $HOME/check_disk.sh
 
     - name: Export Variants
-      run: uv run exporter/variants/variants_exporter.py
+      run: |
+        uv run exporter/variants/variants_exporter.py
+        echo "=== After Variants export ==="
+        $HOME/check_disk.sh
 
     - name: Export TXT
-      run: uv run python exporter/txt/export_txt.py
-    
-    - name: Check disk space and memory
       run: |
-        free -h  # Check available memory
-        df -h    # Check disk space
-           
+        uv run python exporter/txt/export_txt.py
+        echo "=== After TXT export ==="
+        $HOME/check_disk.sh
+
     - name: Zip GoldenDict & Mdict
-      run: uv run python scripts/build/zip_goldendict_mdict.py
+      run: |
+        uv run python scripts/build/zip_goldendict_mdict.py
+        echo "=== After zipping ==="
+        $HOME/check_disk.sh
 
     - name: Tarball DB
-      run: uv run python scripts/build/tarball_db.py
-
-    # ----------------------------------------
-    # Uposatha Day Check
-    # ----------------------------------------
-
-    - name: Check if Uposatha day
-      id: uposatha_check
       run: |
-        if uv run python tools/uposatha_day.py; then
-          echo "is_uposatha=true" >> $GITHUB_OUTPUT
-          echo "Today is an Uposatha day - count updated"
-        else
-          echo "is_uposatha=false" >> $GITHUB_OUTPUT
-          echo "Today is not an Uposatha day"
-        fi
+        uv run python scripts/build/tarball_db.py
+        echo "=== After tarball ==="
+        $HOME/check_disk.sh
 
-    # ----------------------------------------
-    # Prepare Submodules (Uposatha day only)
-    # ----------------------------------------
-    
-    - name: Sync all submodules with Upstream
-      # if: steps.uposatha_check.outputs.is_uposatha == 'True'
-      if: false
-      run: |
-        for submodule in resources/fdg_dpd resources/bw2 resources/sc-data resources/tpr_downloads; do
-          echo "Syncing $submodule..."
-          cd "$submodule"
-          if [ "$submodule" = "resources/tpr_downloads" ]; then
-            branch="master"
-          else 
-            branch="main"
-          fi
-          git fetch origin $branch
-          git checkout $branch
-          git reset --hard origin/$branch
-          cd ../..
-        done
-
-    # ----------------------------------------
-    # Export TBW and TPR
-    # ----------------------------------------
-
-    - name: Run TBW Exporter
-      run: uv run python exporter/tbw/tbw_exporter.py
-
-    - name: Run TPR Exporter
-      run: uv run python exporter/tpr/tpr_exporter.py
-
-    # ----------------------------------------
-    # Update Submodules (Uposatha day only)
-    # ----------------------------------------
-
-    - name: Update All Submodules
-      # if: steps.uposatha_check.outputs.is_uposatha == 'True'
-      if: false
-      shell: bash
-      run: |
-        declare -A submodules=(
-          ["resources/fdg_dpd"]="fdg https://github.com/o28o/dictPlugin.git"
-          ["resources/bw2"]="tbw https://github.com/thebuddhaswords/BW2.git" 
-          ["resources/sc-data"]="sc https://github.com/digitalpalidictionary/sc-data.git"
-          ["resources/tpr_downloads"]="tpr https://github.com/bksubhuti/tpr_downloads"
-        )
-
-        for path in "${!submodules[@]}"; do
-          read name repo <<< "${submodules[$path]}"
-          echo "Updating $name submodule..."
-          cd "$path"
-          echo "Current branch: $(git branch --show-current)"
-          echo "Git status:"
-          git status --short
-          echo "Recent commits:"
-          git log -1 --oneline
-          
-          if [ "$path" = "resources/tpr_downloads" ]; then
-            branch="master"
-          else
-            branch="main"
-          fi
-          git checkout $branch
-          git pull origin $branch
-          
-          # Run sutta central exporter
-          if [ "$path" = "resources/sc-data" ]; then
-            echo "Running Sutta Central exporter..."
-            uv run python "$GITHUB_WORKSPACE/exporter/sutta_central/sutta_central_exporter.py"
-          fi
-
-          echo "=== POST-EXPORT STATUS ==="
-          git status --short
-          git add .
-          echo "=== STAGED CHANGES ==="
-          git diff --cached --name-only
-
-          echo "Checking for Uposatha day to commit changes in $name submodule..."
-          # Run the script from the workspace root to ensure uv finds the main pyproject.toml
-          # and the script path is correct.
-          if uv run python "$GITHUB_WORKSPACE/tools/uposatha_day.py"; then
-            echo "Uposatha day: Checking for staged changes in $name."
-            # Check if there are actual changes to commit.
-            # `git diff --staged --quiet` exits 0 if no staged changes, 1 if there are.
-            if ! git diff --staged --quiet; then
-              echo "Staged changes detected in $name. Proceeding with commit."
-              git config --global user.name "GitHub Actions"
-              git config --global user.email "actions@github.com"
-              
-              if [ "$path" = "resources/sc-data" ]; then
-                COMMIT_MSG="DPD $(date +'%Y-%m-%d') update"
-              else
-                COMMIT_MSG="DPD $(date +'%B') release"
-              fi
-
-              if git commit -m "$COMMIT_MSG"; then
-                echo "Commit successful for $name."
-                echo "=== PRE-PUSH STATUS for $name ==="
-                git log -2 --oneline
-                git remote -v
-                
-                echo "=== PUSHING CHANGES for $name ==="
-                git push origin $branch:$branch
-                echo "=== PUSH EXIT CODE for $name: $? ==="
-              else
-                echo "Error: git commit failed for $name even though changes were staged and it's an Uposatha day."
-              fi
-            else
-              echo "No staged changes to commit in $name, despite it being an Uposatha day."
-            fi
-          else
-            echo "Not an Uposatha day. Skipping commit and push for $name."
-          fi
-
-          cd "$GITHUB_WORKSPACE"
-        done
-
-    # ----------------------------------------
     # Create Draft Release
     # ----------------------------------------
 

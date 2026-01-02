@@ -1,7 +1,12 @@
-# Digital Pāḷi Dictionary (DPD)
+# Digital Pāḷi Dictionary (DPD) - Devamitta Pali Study (DPS) Fork
+
+## Repository
+[https://github.com/sasanarakkha/dpd-db-sbs](https://github.com/sasanarakkha/dpd-db-sbs)
 
 ## Product Vision
 To be the world's most precise, comprehensive, and accessible digital resource for the Pāḷi language. DPD bridges the gap between ancient Tipitaka texts and modern scholars by providing word-by-word grammatical analysis, complex compound deconstruction, and deep etymological insights across every digital platform.
+
+**This Fork (DPS):** Maintains specific extensions for Russian-speaking students and the SBS curriculum, including specialized reciting and course materials.
 
 ## Target Audience
 - **Scholars & Translators:** Requiring high-precision grammatical data and Sanskrit cognates for academic work.
@@ -10,6 +15,8 @@ To be the world's most precise, comprehensive, and accessible digital resource f
 
 ## Core Features & Functionality
 - **Word-by-Word Analysis:** Every word in the CST4 Pāḷi corpus is analyzed for its root, case, gender, and construction.
+- **Russian Translation (Fork Feature):** A dedicated `Russian` table providing localized meanings, literal translations, and etymological cognates for Russian-speaking scholars.
+- **SBS Study Tools (Fork Feature):** Integration of the `SBS` table, which maps Pāḷi examples, chantings, and chapter references specifically for SBS study materials.
 - **Compound Deconstructor:** A sophisticated engine (Python/Go) that breaks down complex Pāḷi compounds into their constituent parts.
 - **Multi-Format Exporters:** Automated pipelines that generate production-ready dictionary files for GoldenDict, MDict, Kindle, Kobo, and PDF (via Typst).
 - **Modern GUI:** A Flet-based interface for lexicographers to add, edit, and verify data with real-time integrity checks.

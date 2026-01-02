@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# This script is a wrapper for run_and_log.sh
+# It executes scripts/export/dps_anki_updater.py logging and rotation.
+
+# Determine the directory of this script
+PROJECT_ROOT="$HOME/Documents/dpd-db"
+
+MASTER_SCRIPT="$HOME/.local/bin/run_and_log.sh"
+
+LOG_BASE_NAME="anki_update"
+TARGET_SCRIPT_PATH="${PROJECT_ROOT}/scripts/export/dps_anki_updater.py"
+
+# The command to run, including 'uv run python'
+BASE_COMMAND_TO_EXECUTE="cd '${PROJECT_ROOT}' && uv run python '${TARGET_SCRIPT_PATH}'"
+
+read -p "Update 'test' and 'feedback' fields in Anki notes? (y/N): " answer
+
+if [[ "$answer" == "y" || "$answer" == "Y" ]]; then
+    echo "Running Anki updater script and updating 'test'/'feedback' fields..."
+    COMMAND_WITH_ARGS=("${BASE_COMMAND_TO_EXECUTE} test")
+    bash "${MASTER_SCRIPT}" "${LOG_BASE_NAME}" bash -c "${COMMAND_WITH_ARGS[*]}"
+elif [[ -z "$answer" || "$answer" == "n" || "$answer" == "N" ]]; then
+    echo "Running Anki updater script WITHOUT updating 'test'/'feedback' fields..."
+    bash "${MASTER_SCRIPT}" "${LOG_BASE_NAME}" bash -c "${BASE_COMMAND_TO_EXECUTE}"
+else
+    echo "Invalid input. Please enter 'y' for yes or 'n' (or press Enter) for no."
+fi

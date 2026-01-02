@@ -3,6 +3,7 @@
 ## Design Principles
 - **Clarity and Precision:** Dictionary definitions and grammatical info must be easy to read and technically accurate.
 - **Consistency:** Use consistent terminology and formatting across all platforms (Web, GoldenDict, etc.).
+- **CSS Single Source of Truth:** All styles MUST originate from `identity/css/`. Never modify CSS files directly in `exporter/` or `webapp/` subdirectories; use `tools/css_manager.py` to propagate changes from the source.
 - **Accessibility:** Ensure the content into accessible to users with different technical abilities and scripts.
 
 ## Visual Aesthetic: Minimalist and Functional
@@ -13,3 +14,21 @@
 ## Communication Style
 - **Technical Accuracy:** Use standard linguistic and Buddhist terminology consistently.
 - **Directness:** Present information without unnecessary ornamentation, focusing on the utility of the dictionary data.
+
+## DPS Localization Guidelines
+
+### Russian Translation (`Russian` table)
+- **Target Audience:** Modern educated Russian speakers.
+- **Tone & Style:** Grammatically correct and natural. Balance is key: avoid being overly academic/archaic, but strictly avoid over-simplification or slang. It must be precise enough for scholars but accessible to public.
+
+### SBS Study Data (`SBS` table)
+- **Source of Truth:**
+    - **Recitations:** Columns `sbs_source_1` and `sbs_source_2`, `sbs_sutta_1` and `sbs_sutta_2`, `sbs_example_1` and `sbs_example_2`, `sbs_chant_1` and `sbs_chant_2`, `sbs_chapter_1` and `sbs_chapter_2`, MUST derive directly from the [Pali English Recitations](https://github.com/sasanarakkha/pali-english-recitations) repository.
+    - **Course Mapping:** The `class_anki` column maps words to specific exercises in the [DPD Pali Courses](https://github.com/digitalpalidictionary/dpd-pali-courses).
+    - **Standard Examples:** Columns `dhp` (Dhammapada), `pat` (Patimokkha), `vib` (Vibhanga), and `discourses` must follow standard DPD quality guidelines for accuracy and context.
+
+## Fork Maintenance & Workflow
+- **Upstream Sync:** This fork is maintained via a strict sync protocol using `scripts/cl/dpd-sync-folders`.
+    - **Flow:** Upstream `dpd-db/main` -> Local `as_upstream` branch -> Local `sbs-ru` branch.
+    - **Preservation:** The sync script explicitly *excludes* DPS-specific files (like modified `db/models.py`) to prevent overwriting local features.
+- **"DPS" Terminology:** All fork-specific scripts and data related to Russian/SBS extensions are collectively referred to as "DPS".

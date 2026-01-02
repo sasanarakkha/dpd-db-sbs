@@ -1,0 +1,14 @@
+#!/bin/bash
+
+cd $HOME/Documents/dpd-db
+
+# local
+uv run uvicorn exporter.webapp.main_ru:app --host 127.0.0.1 --port 8080 --reload --reload-dir exporter/webapp
+
+# server
+# uv run uvicorn exporter.webapp.main_ru:app --host 0.0.0.0 --port 8080 --reload --reload-dir exporter/webapp
+
+# original local
+# uv run uvicorn exporter.webapp.main:app --host 127.0.0.1 --port 8080 --reload --reload-dir exporter/webapp
+
+

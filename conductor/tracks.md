@@ -1,8 +1,6 @@
 # Project Tracks
 
-# Project Tracks
 
-## [ ] Track: Mako to Jinja2 Template Refactoring
-*Link: [./conductor/tracks/mako_to_jinja2_20251224/](./conductor/tracks/mako_to_jinja2_20251224/)*
-
+## [ ] Track: Refine sync script and rehearse the upstream merge process including shadow copy updates.
+*Link: [./conductor/tracks/upstream_sync_rehearsal_20250102/](./conductor/tracks/upstream_sync_rehearsal_20250102/)*
 

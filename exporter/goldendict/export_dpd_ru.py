@@ -25,8 +25,6 @@ from db.models import (
     SuttaInfo,
     Russian,
 )
-from audio.db.models import DpdAudio
-from audio.db.db_helpers import get_audio_session
 from exporter.goldendict.helpers import TODAY
 from tools.configger import config_test
 from tools.css_manager import CSSManager
@@ -113,23 +111,12 @@ class DpdHeadwordRenderDataBase(TypedDict):
     sandhi_contractions: SandhiContractionDict
     cf_set: Set[str]
     idioms_set: Set[str]
-    audio_set: Set[str]
     show_id: bool
 
 
 class DpdHeadwordRenderData(DpdHeadwordRenderDataBase):
     pth: RuPaths
     word_templates: DpdHeadwordTemplates
-
-
-def get_audio_set() -> Set[str]:
-    """Get a set of all lemma_clean in the audio database."""
-    session = get_audio_session()
-    try:
-        results = session.query(DpdAudio.lemma_clean).all()
-        return {r[0] for r in results}
-    finally:
-        session.close()
 
 
 def render_pali_word_dpd_html(
@@ -196,7 +183,6 @@ def render_pali_word_dpd_html(
         i,
         rd["cf_set"],
         rd["idioms_set"],
-        rd["audio_set"],
         tt.button_box_templ,
     )
     html += button_box
@@ -404,8 +390,6 @@ def generate_dpd_html(
         num_logical_cores = 1  # Default to single core if count fails
     pr.green_title(f"running with {num_logical_cores} cores")
 
-    audio_set = get_audio_set()
-
     while offset <= pali_words_count:
         dpd_db_query = (
             db_session.query(DpdHeadword, FamilyRoot, FamilyWord, Russian)
@@ -458,7 +442,6 @@ def generate_dpd_html(
             "sandhi_contractions": sandhi_contractions,
             "cf_set": cf_set,
             "idioms_set": idioms_set,
-            "audio_set": audio_set,
             "show_id": show_id,
         }
 
@@ -551,7 +534,6 @@ def render_button_box_templ(
     i: DpdHeadword,
     cf_set: Set[str],
     idioms_set: Set[str],
-    audio_set: Set[str],
     button_box_templ: Template,
 ) -> str:
     """render buttons for each section of the dictionary"""
@@ -559,7 +541,7 @@ def render_button_box_templ(
     button_html = '<a class="button" href="#" data-target="{target}">{name}</a>'
 
     # play_button
-    if i.lemma_clean in audio_set:
+    if i.needs_audio_button:
         play_button = (
             f'<a class="button play" onclick="playAudio(\'{i.lemma_clean}\', this)" title="Прослушать">'
             '<svg viewBox="0 0 24 24" width="16px" height="16px" fill="currentColor" stroke="currentColor" stroke-width="0">'

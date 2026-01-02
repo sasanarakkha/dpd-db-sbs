@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# This script is a wrapper for run_and_log.sh
+# It executes uv run flet gui2/main.py with logging and rotation.
+
+MASTER_SCRIPT="$HOME/.local/bin/run_and_log.sh"
+PROJECT_ROOT="$HOME/Documents/dpd-db"
+LOG_BASE_NAME="gui2"
+TARGET_SCRIPT_PATH="${PROJECT_ROOT}/gui2/main.py"
+
+# The command to run, including 'uv run'
+COMMAND_TO_EXECUTE=(bash -c "cd '${PROJECT_ROOT}' && uv run python '${TARGET_SCRIPT_PATH}'")
+
+# Execute the master script
+bash "${MASTER_SCRIPT}" "${LOG_BASE_NAME}" "${COMMAND_TO_EXECUTE[@]}"

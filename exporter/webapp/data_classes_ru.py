@@ -3,7 +3,6 @@ from tools.tools_for_ru_exporter import (
     make_ru_meaning,
     ru_make_grammar_line,
     ru_replace_abbreviations,
-    ru_replace_abbreviations_list,
 )
 from tools.date_and_time import year_month_day_dash
 from tools.degree_of_completion_ru import rus_degree_of_completion
@@ -90,10 +89,48 @@ class SpellingData:
 class GrammarData:
     def __init__(self, result: Lookup):
         self.headword = result.lookup_key
-        self.grammar = result.grammar_unpack
-        self.ru_grammar = [
-            ru_replace_abbreviations_list(value) for value in self.grammar
-        ]
+        # self.grammar = result.grammar_unpack
+        self.grammar = self._process_grammar(result.grammar_unpack)
+        self.ru_grammar = []
+        for item in self.grammar:
+            headword, pos, components = item
+            ru_headword = ru_replace_abbreviations(headword, "no")
+            ru_pos = ru_replace_abbreviations(pos, "gram")
+            ru_components = [ru_replace_abbreviations(c, "gram") for c in components]
+            self.ru_grammar.append((ru_headword, ru_pos, ru_components))
+
+    def _process_grammar(self, grammar_list):
+        processed_list = []
+        for item in grammar_list:
+            headword, pos, grammar_str = item
+            components = []
+
+            if grammar_str.startswith("reflx"):
+                parts = grammar_str.split()
+                if len(parts) >= 2:
+                    components.append(parts[0] + " " + parts[1])
+                    components += parts[2:]
+                else:
+                    components.append(grammar_str)
+            elif grammar_str.startswith("in comps"):
+                # Handle 'in comps' specifically if needed,
+                # but based on my previous fix, we treat it as a normal component
+                # and let the template handle empty cells.
+                # Actually, for the webapp, let's just split it as is or keep it as one.
+                # In grammar_dict.py, I used:
+                # html_line += f"<td>{grammar_str}</td>"
+                # html_line += "<td class='col_empty'></td>"
+                # html_line += "<td class='col_empty'></td>"
+                components.append(grammar_str)
+            else:
+                components = grammar_str.split()
+
+            # Pad with empty strings to ensure 3 components
+            while len(components) < 3:
+                components.append("")
+
+            processed_list.append((headword, pos, components))
+        return processed_list
 
 
 class HelpData:

@@ -18,6 +18,40 @@
 ## Tooling and Infrastructure
 - **Astral uv:** Fast Python package manager and resolver.
 - **Ruff:** Extremely fast Python linter and code formatter.
+- **CSS Management:** `identity/css/` is the **Single Source of Truth** for all project styles. CSS files are distributed to the Webapp, exporters, and documentation via `tools/css_manager.py`.
 - **MkDocs & MkDocs Material:** Documentation generator and theme for project docs.
 - **Pytest:** Testing framework for Python.
 - **Typst:** New markup-based typesetting system for PDF generation.
+
+## DPS Ecosystem
+- **Fork Repository:** [dpd-db-sbs](https://github.com/sasanarakkha/dpd-db-sbs)
+- **Recitations:** [pali-english-recitations](https://github.com/sasanarakkha/pali-english-recitations) (Source for SBS chanting data)
+- **Courses:** [dpd-pali-courses](https://github.com/digitalpalidictionary/dpd-pali-courses) (Source for SBS class mapping)
+- **Study Tools:** [study-tools](https://github.com/sasanarakkha/study-tools) (Export destination for Anki decks and class materials)
+
+## Custom Tooling (DPS Fork)
+The fork maintains extensive deviations from upstream to support Russian localization, SBS chanting data, and DPS course mapping. These are detailed in `conductor/dps_sync_registry.json`.
+
+### Modified Upstream Files
+- **`db/models.py`:** Core schema extension adding `Russian` and `SBS` tables.
+
+### DPS & SBS Unique Tooling
+Unique files implementing the core DPS & SBS logic:
+- **Exporters:** `export_dpd_sbs.py`, `main_sbs.py`, `export_epd_sbs.py`.
+- **Logic:** `tools/sbs_table_functions.py`, `tools/utils_sbs.py`, `tools/paths_dps.py`.
+- **GUI:** `gui2/dps_view.py` and associated `dps_*` modules in `gui2/` and `gui/`.
+- **Docs:** `docs_rus/` (Russian documentation) and `mkdocs_ru.yaml`.
+
+### Localized Shadow Copies (`*_ru.py`)
+Key system components that have been "forked" within the repo to provide Russian-specific versions:
+- **Exporters:** `export_dpd_ru.py`, `grammar_dict_ru.py`, `kindle_exporter_ru.py`.
+- **Database:** `family_compound_ru.py`, `family_root_ru.py`, `help_abbrev_add_to_lookup_ru.py`.
+- **Webapp:** `main_ru.py`, `data_classes_ru.py`.
+
+### Unique Paths
+- **`scripts/cl_dps/`:** Custom CLI workflow scripts for Mac/DPS environment.
+- **`scripts/rus_exporter/` / `scripts/dps_archive/`:** Maintenance and legacy scripts.
+- **`shared_data/sbs_csvs/` / `shared_data/rus/`:** Source data for localization.
+
+## Project Management
+- **Project Board:** [GitHub Project 1](https://github.com/orgs/sasanarakkha/projects/1)
