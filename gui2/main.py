@@ -23,6 +23,7 @@ class App:
         from gui2.tests_tab_view import TestsTabView
         from gui2.translations_view import TranslationsView
         from gui2.dps_view import DpsView
+        # from gui2.analysis_view import AnalysisView
 
         self.page = page
 
@@ -67,6 +68,7 @@ class App:
         self.translations_view = TranslationsView(self.page, self.toolkit)
         self.bold_search_view = BoldSearchView(self.page, self.toolkit)
         self.dps_view: DpsView = DpsView(self.page, self.toolkit)
+        # self.analysis_view = AnalysisView(self.page, self.toolkit)
 
         self.build_ui()
 
@@ -154,6 +156,10 @@ class App:
                     text="Bold Search",
                     content=self.bold_search_view,
                 ),
+                # ft.Tab(
+                #     text="Analysis",
+                #     content=self.analysis_view,
+                # ),
             ],
             expand=True,
         )
