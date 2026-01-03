@@ -7,7 +7,7 @@ LABEL_WIDTH = 250
 BUTTON_WIDTH = 250
 LABEL_COLOUR = ft.Colors.GREY_500
 HIGHLIGHT_COLOUR = ft.Colors.BLUE_200
-TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=15)
+TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=12)
 
 
 class Pass2AutoView(ft.Column):

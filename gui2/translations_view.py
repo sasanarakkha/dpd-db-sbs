@@ -7,7 +7,7 @@ from tools.pali_text_files import cst_texts
 from tools.tipitaka_db import search_all_cst_texts, search_book
 
 # Style constants from pass1_auto_view.py
-TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=ft.Colors.GREY_500, size=10)
+TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=ft.Colors.GREY_500, size=12)
 HIGHLIGHT_COLOUR = ft.Colors.BLUE_200
 
 
@@ -27,7 +27,7 @@ class TranslationsView(ft.Column):
                 ft.dropdown.Option("English"),
             ],
             value="Pāḷi",
-            text_size=14,
+            text_size=17,
             border_color=ft.Colors.BLUE_200,
             border_radius=20,
             editable=True,
@@ -52,7 +52,7 @@ class TranslationsView(ft.Column):
             menu_height=500,
             options=[ft.dropdown.Option(key) for key in book_options],
             value="all",
-            text_size=14,
+            text_size=17,
             border_color=ft.Colors.BLUE_200,
             border_radius=20,
             editable=True,

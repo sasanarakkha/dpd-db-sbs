@@ -12,7 +12,7 @@ BUTTON_WIDTH = 100
 LABEL_WIDTH = 200
 LABEL_COLOUR = ft.Colors.GREY_500
 HIGHLIGHT_COLOUR = ft.Colors.BLUE_200
-TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=10)
+TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=12)
 
 
 class SandhiView(ft.Column, PopUpMixin):

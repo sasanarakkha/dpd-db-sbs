@@ -44,7 +44,7 @@ class DpdMeaningField(ft.Column):
         # Field to add words to the dictionary
         self.add_to_dict_field = ft.TextField(
             label="Add spelling ",
-            label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=15),
+            label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=12),
             dense=True,
             text_size=15,
             on_submit=self._handle_add_to_dict_submit,

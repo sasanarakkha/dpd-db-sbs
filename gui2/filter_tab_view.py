@@ -221,7 +221,7 @@ class FilterTabView(ft.Column):
             on_submit=self._apply_filters_clicked,
         )
         initial_regex_input.hint_text = "enter regex"
-        initial_regex_input.hint_style = ft.TextStyle(color=LABEL_COLOUR, size=15)
+        initial_regex_input.hint_style = ft.TextStyle(color=LABEL_COLOUR, size=12)
 
         self.column_dropdowns.append(initial_dropdown)
         self.regex_inputs.append(initial_regex_input)
@@ -261,7 +261,7 @@ class FilterTabView(ft.Column):
             on_submit=self._apply_filters_clicked,
         )
         new_regex_input.hint_text = "enter regex"
-        new_regex_input.hint_style = ft.TextStyle(color=LABEL_COLOUR, size=15)
+        new_regex_input.hint_style = ft.TextStyle(color=LABEL_COLOUR, size=12)
 
         self.column_dropdowns.append(new_dropdown)
         self.regex_inputs.append(new_regex_input)
@@ -379,7 +379,7 @@ class FilterTabView(ft.Column):
             on_submit=self._apply_filters_clicked,
         )
         self.limit_input.hint_text = "0 for all results"
-        self.limit_input.hint_style = ft.TextStyle(color=LABEL_COLOUR, size=15)
+        self.limit_input.hint_style = ft.TextStyle(color=LABEL_COLOUR, size=12)
         self.limit_input.width = 200
         self.limit_input.value = str(DEFAULT_LIMIT)
         return ft.Row([self.limit_input])

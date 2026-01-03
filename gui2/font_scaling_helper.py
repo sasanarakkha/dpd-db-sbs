@@ -3,7 +3,7 @@
 import re
 from pathlib import Path
 
-scale_factor: float = 1.25
+scale_factor: float = 1.4
 
 
 def scale_fonts_in_file(file_path: Path, scale_factor: float) -> None:
@@ -30,7 +30,7 @@ def scale_fonts_in_file(file_path: Path, scale_factor: float) -> None:
         print(f"Scaled fonts in {file_path}")
 
 
-def apply_font_scaling_to_gui2(scale_factor: float = 1.25) -> None:
+def apply_font_scaling_to_gui2(scale_factor: float = 1.4) -> None:
     """Apply font scaling to common GUI2 view files."""
     gui2_dir = Path(__file__).parent
 
@@ -40,6 +40,9 @@ def apply_font_scaling_to_gui2(scale_factor: float = 1.25) -> None:
         if (
             file_path.name.startswith("dps_")
             or file_path.name == "font_scaling_helper.py"
+            or file_path.name == "main.py"
+            or file_path.name == "pass2_add_view.py"
+            or file_path.name == "analysis_view.py"
         ):
             continue
 

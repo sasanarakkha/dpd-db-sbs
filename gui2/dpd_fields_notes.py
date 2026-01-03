@@ -40,7 +40,7 @@ class DpdNotesField(ft.Column):
 
         self.italicizing_field = ft.TextField(
             label="Italic",
-            label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=15),
+            label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=12),
             dense=True,
             text_size=15,
             on_submit=self._handle_italicizing_submit,
@@ -48,7 +48,7 @@ class DpdNotesField(ft.Column):
 
         self.bolding_field = ft.TextField(
             label="Bold",
-            label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=15),
+            label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=12),
             dense=True,
             text_size=15,
             on_submit=self._handle_bolding_submit,

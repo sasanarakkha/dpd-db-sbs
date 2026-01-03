@@ -16,7 +16,7 @@ class WordFinderPopup:
         self.search_field = ft.TextField(
             autofocus=True,
             label="Wordfinder",
-            label_style=ft.TextStyle(color=ft.Colors.WHITE, size=15),
+            label_style=ft.TextStyle(color=ft.Colors.WHITE, size=12),
             width=500,
             on_submit=self._handle_search,
             border_radius=20,
@@ -43,7 +43,7 @@ class WordFinderPopup:
             ],
             value="STARTS_WITH",  # Default
             label="Search Type",
-            label_style=ft.TextStyle(color=ft.Colors.WHITE, size=15),
+            label_style=ft.TextStyle(color=ft.Colors.WHITE, size=12),
             width=300,
             border_radius=20,
         )
