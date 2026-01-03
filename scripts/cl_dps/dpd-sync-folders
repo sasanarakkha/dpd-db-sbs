@@ -6,36 +6,18 @@ set -euo pipefail # Exit on error, treat unset variables as error, pipeline fail
 # offering a choice between full sync or selective sync based on predefined lists.
 
 PROJECT_DIR="$HOME/Documents/dpd-db"
-FOLDERS=(
-    db_tests
-    db_tests_gui
-    docs
-    go_modules
-    gui2
-    scripts
-    tools
-    db/backup_tsv
-)
-FILES=(
-    .gitattributes
-    .gitmodules
-    go.mod
-    go.sum
-    mkdocs.yaml
-    pyproject.toml
-    README.md
-)
+# files that should be preserved from sbs-ru
+# Read exclusions dynamically from conductor/dps_sync_registry.json
+# Extract 'modified_upstream_files' list using python
+echo "ℹ️ Reading exclusions from conductor/dps_sync_registry.json..."
+mapfile -t EXCLUDE_FILES < <(python3 -c 'import json, os; print("\n".join(json.load(open(os.path.join(os.environ["PROJECT_DIR"], "conductor/dps_sync_registry.json")))["modified_upstream_files"]))')
 
-# EXCLUDE_FOLDERS specifies subpaths within items in FOLDERS that should be preserved from sbs-ru
-EXCLUDE_FOLDERS=(
-    scripts/cl
-)
-EXCLUDE_FILES=(
-    tools/fast_api_utils.py
-    tools/goldendict_exporter.py
-    tools/utils.py
-    scripts/bash/generate_components.sh
-)
+# Check if we successfully got exclusions
+if [ ${#EXCLUDE_FILES[@]} -eq 0 ]; then
+    echo "⚠️ Warning: No exclusions found or failed to parse registry."
+else
+    echo "✅ Loadded ${#EXCLUDE_FILES[@]} exclusions."
+fi
 
 cd "$PROJECT_DIR" || exit 1
 
@@ -72,96 +54,42 @@ if [[ "$sync_choice" == "1" ]]; then
     COMMIT_MESSAGE="${COMMIT_MESSAGE_PREFIX}full update${COMMIT_MESSAGE_SUFFIX}"
 elif [[ "$sync_choice" == "2" ]]; then
     echo "🔄 Performing Selective Sync from as_upstream to sbs-ru..."
+    
+    echo "  ➡️ Performing full checkout from as_upstream..."
+    git checkout as_upstream -- . || exit 1
 
-    echo "  ➡️ Syncing specified folders (with exclusions from sbs-ru):"
-    for FOLDER in "${FOLDERS[@]}"; do
-        echo "    - Processing folder $FOLDER (initially from as_upstream)"
-        # Checkout the entire folder from as_upstream first
-        git checkout as_upstream -- "$FOLDER" || { echo "    ⚠️ Error checking out $FOLDER from as_upstream. Skipping preserve logic for this folder."; continue; }
-
-        # Preserve excluded sub-folders within this FOLDER
-        for EXCLUDED_SUBFOLDER in "${EXCLUDE_FOLDERS[@]}"; do
-            # Check if EXCLUDED_SUBFOLDER is a subpath of FOLDER
-            if [[ "$EXCLUDED_SUBFOLDER" == "$FOLDER/"* ]]; then
-                echo "      Restoring excluded subfolder $EXCLUDED_SUBFOLDER to its state from sbs-ru (commit $SBR_RU_ORIGINAL_SHA)..."
-                if git rev-parse --verify "${SBR_RU_ORIGINAL_SHA}:${EXCLUDED_SUBFOLDER}" >/dev/null 2>&1; then
-                    git restore --source="$SBR_RU_ORIGINAL_SHA" --staged --worktree "$EXCLUDED_SUBFOLDER" || \
-                        echo "      ⚠️ Warning: Failed to restore $EXCLUDED_SUBFOLDER from $SBR_RU_ORIGINAL_SHA."
-                else
-                    if [ -e "$EXCLUDED_SUBFOLDER" ]; then # Check if it exists in the working tree now
-                        echo "      $EXCLUDED_SUBFOLDER did not exist in $SBR_RU_ORIGINAL_SHA, removing it as it was likely added by as_upstream's $FOLDER."
-                        git rm -r --cached --ignore-unmatch "$EXCLUDED_SUBFOLDER" >/dev/null 2>&1
-                        rm -rf "$EXCLUDED_SUBFOLDER"
-                    else
-                        echo "      $EXCLUDED_SUBFOLDER did not exist in $SBR_RU_ORIGINAL_SHA and does not exist now. Nothing to do for preservation."
-                    fi
-                fi
-            fi
-        done
-
-        # Preserve excluded files within this FOLDER
-        for EXCLUDED_FILE in "${EXCLUDE_FILES[@]}"; do
-            # Check if EXCLUDED_FILE is a subpath of FOLDER
-            if [[ "$EXCLUDED_FILE" == "$FOLDER/"* ]]; then
-                echo "      Restoring excluded file $EXCLUDED_FILE to its state from sbs-ru (commit $SBR_RU_ORIGINAL_SHA)..."
-                if git rev-parse --verify "${SBR_RU_ORIGINAL_SHA}:${EXCLUDED_FILE}" >/dev/null 2>&1; then
-                    git restore --source="$SBR_RU_ORIGINAL_SHA" --staged --worktree "$EXCLUDED_FILE" || \
-                        echo "      ⚠️ Warning: Failed to restore $EXCLUDED_FILE from $SBR_RU_ORIGINAL_SHA."
-                else
-                    if [ -e "$EXCLUDED_FILE" ]; then # Check if it exists in the working tree now
-                        echo "      $EXCLUDED_FILE did not exist in $SBR_RU_ORIGINAL_SHA, removing it as it was likely added by as_upstream's $FOLDER."
-                        git rm --cached --ignore-unmatch "$EXCLUDED_FILE" >/dev/null 2>&1
-                        rm -f "$EXCLUDED_FILE"
-                    else
-                        echo "      $EXCLUDED_FILE did not exist in $SBR_RU_ORIGINAL_SHA and does not exist now. Nothing to do for preservation."
-                    fi
-                fi
-            fi
-        done
-    done
-
-    echo "  ➡️ Syncing specified top-level files (with exclusions from sbs-ru):"
-    for FILE in "${FILES[@]}"; do
-        IS_FILE_EXCLUDED=false
-        for EXCL_F in "${EXCLUDE_FILES[@]}"; do
-            if [[ "$FILE" == "$EXCL_F" ]]; then
-                IS_FILE_EXCLUDED=true
-                break
-            fi
-        done
-
-        if [[ "$IS_FILE_EXCLUDED" == "true" ]]; then
-            echo "    - $FILE (is excluded, ensuring sbs-ru version is preserved)"
-            # Attempt to checkout from as_upstream; don't fail hard if it's not there, SBR_RU_ORIGINAL_SHA state is key.
-            git checkout as_upstream -- "$FILE" >/dev/null 2>&1 || \
-                echo "      Note: $FILE not found in as_upstream. Will ensure sbs-ru state is preserved/restored."
-            
-            echo "      Restoring $FILE to its state from sbs-ru (commit $SBR_RU_ORIGINAL_SHA)..."
-            if git rev-parse --verify "${SBR_RU_ORIGINAL_SHA}:${FILE}" >/dev/null 2>&1; then
-                git restore --source="$SBR_RU_ORIGINAL_SHA" --staged --worktree "$FILE" || \
-                    echo "    ⚠️ Warning: Failed to restore $FILE from $SBR_RU_ORIGINAL_SHA."
-            else
-                if [ -e "$FILE" ]; then 
-                    echo "      $FILE did not exist in $SBR_RU_ORIGINAL_SHA, removing it as it was added by as_upstream but is in EXCLUDE_FILES."
-                    git rm --cached --ignore-unmatch "$FILE" >/dev/null 2>&1
-                    rm -f "$FILE"
-                else
-                    echo "      $FILE did not exist in $SBR_RU_ORIGINAL_SHA and does not exist now. Nothing to do for preservation."
-                fi
-            fi
+    echo "  ➡️ Restoring excluded files from sbs-ru..."
+    for EXCLUDED_FILE in "${EXCLUDE_FILES[@]}"; do
+        echo "    - Processing excluded file: $EXCLUDED_FILE"
+        
+        # Check if file existed in original sbs-ru state
+        if git rev-parse --verify "${SBR_RU_ORIGINAL_SHA}:${EXCLUDED_FILE}" >/dev/null 2>&1; then
+            echo "      Restoring usage of $EXCLUDED_FILE from $SBR_RU_ORIGINAL_SHA..."
+            git restore --source="$SBR_RU_ORIGINAL_SHA" --staged --worktree "$EXCLUDED_FILE" || \
+                echo "      ⚠️ Warning: Failed to restore $EXCLUDED_FILE from $SBR_RU_ORIGINAL_SHA."
         else
-            echo "    - $FILE (fully from as_upstream)"
-            git checkout as_upstream -- "$FILE" || { echo "    ⚠️ Error checking out $FILE from as_upstream."; exit 1; }
+            # File did not exist in sbs-ru
+            if [ -e "$EXCLUDED_FILE" ]; then 
+                echo "      $EXCLUDED_FILE did not exist in $SBR_RU_ORIGINAL_SHA, removing it as it was added by as_upstream."
+                git rm -r --cached --ignore-unmatch "$EXCLUDED_FILE" >/dev/null 2>&1
+                rm -rf "$EXCLUDED_FILE"
+            else
+                echo "      $EXCLUDED_FILE did not exist in sbs-ru and does not exist now. Nothing to do."
+            fi
         fi
     done
 
-    echo "  ➕ Staging selected folders and files for commit..."
-    git add "${FOLDERS[@]}" "${FILES[@]}" || exit 1 # Add the top-level items we processed.
+    echo "  ➕ Staging changes..."
+    git add . || exit 1
     COMMIT_MESSAGE="${COMMIT_MESSAGE_PREFIX}selective update${COMMIT_MESSAGE_SUFFIX}"
 else
     echo "❌ Invalid choice: $sync_choice. Exiting."
     exit 1
 fi
+
+# Run font scaling helper
+echo "ℹ️ Running font scaling helper..."
+uv run python gui2/font_scaling_helper.py || { echo "⚠️ Font scaling helper failed."; exit 1; }
 
 # Commit changes with date
 echo "📝 Committing changes to sbs-ru..."

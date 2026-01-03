@@ -1,0 +1,8 @@
+{
+  "track_id": "upstream_sync_rehearsal_20250102",
+  "type": "task",
+  "status": "new",
+  "created_at": "2025-01-02T00:00:00Z",
+  "updated_at": "2025-01-02T00:00:00Z",
+  "description": "Refine sync script and rehearse the upstream merge process including shadow copy updates."
+}
