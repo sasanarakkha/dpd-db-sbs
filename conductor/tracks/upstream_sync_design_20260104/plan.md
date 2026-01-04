@@ -7,17 +7,17 @@
 - [x] Task: Update references to registry
     - [x] Update `scripts/cl_dps/dpd-sync-folders` to point to the new registry path
     - [x] Verify no other files reference the old path (grep search)
-- [~] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
 
 ## Phase 2: Shadow Copy Identification (Scanning)
-- [ ] Task: Scan for shadow copies (Gemini Flash)
-    - [ ] Use `glob` or `find` to list all files in target directories: `.github/workflows`, `db`, `docs`, `docs_rus`, `exporter`, `gui2`, `scripts`, `tools`, and root.
-    - [ ] Filter for filenames containing `ru`, `sbs`, or `dps` separated by `-` or `_`.
-    - [ ] Update `conductor/templates/upstream_sync_rehearsal/dps_sync_registry.json` with the new list under `russian_copies` (or new categories if needed).
-- [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
+- [x] Task: Scan for shadow copies (Gemini Flash)
+    - [x] Use `glob` or `find` to list all files in target directories: `.github/workflows`, `db`, `docs`, `docs_rus`, `exporter`, `gui2`, `scripts`, `tools`, and root.
+    - [x] Filter for filenames containing `ru`, `sbs`, or `dps` separated by `-` or `_`.
+    - [x] Update `conductor/templates/upstream_sync_rehearsal/dps_sync_registry.json` with the new list under `russian_copies` (or new categories if needed).
+- [x] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
 
 ## Phase 3: Deep Analysis & Guide Creation (Reasoning)
-- [ ] Task: Analyze "Modified Upstream Files"
+- [~] Task: Analyze "Modified Upstream Files"
     - [ ] For each entry in `modified_upstream_files` from `dps_sync_registry.json`:
         - [ ] Compare `sbs-ru` version against `as_upstream` version.
         - [ ] Identify and document key local logic that must be preserved during sync.

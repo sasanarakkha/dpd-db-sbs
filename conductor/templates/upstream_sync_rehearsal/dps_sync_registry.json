@@ -25,7 +25,9 @@
   "ignored_files": [
     "gui2/data",
     "conductor/tracks",
-    "conductor/tracks.md"
+    "conductor/tracks.md",
+    "scripts/archive",
+    "db/backup_tsv/*.tsv"
   ],
   "unique_paths": [
     ".github/workflows/submodules_update.yml",
@@ -33,6 +35,9 @@
     "scripts/cl_dps/",
     "scripts/rus_exporter/",
     "scripts/dps_archive/",
+    "db/backup_tsv/ru_roots.tsv",
+    "db/backup_tsv/sbs.tsv",
+    "db/backup_tsv/russian.tsv",
     "gui2/dps_*",
     "gui2/font_scaling_helper.py",
     "misc/pat",
@@ -108,6 +113,7 @@
     "mkdocs_ru.yaml": "mkdocs.yaml"
   },
   "sbs_copies": {
+    "exporter/goldendict/templates/sbs_example.html": "exporter/goldendict/templates/dpd_example.html",
     "exporter/goldendict/sbs_templates/": "exporter/goldendict/templates/",
     "exporter/goldendict/export_dpd_sbs.py": "exporter/goldendict/export_dpd.py",
     "exporter/goldendict/export_epd_sbs.py": "exporter/goldendict/export_epd.py",
@@ -117,6 +123,7 @@
     "exporter/webapp/sbs_templates/": "exporter/webapp/templates/",
     "scripts/backup/backup_ru_sbs.py": "scripts/backup/backup_dpd_headwords_and_roots.py",
     "scripts/build/db_rebuild_from_tsv_ru_sbs.py": "scripts/build/db_rebuild_from_tsv.py",
+    "scripts/fix/character_replacer_sbs.py": "scripts/fix/character_replacer.py",
     "scripts/rus_exporter/config_github_release_dpd_sbs.py": "scripts/build/config_github_release.py",
     "scripts/rus_exporter/zip_dpd_sbs.py": "scripts/build/zip_goldendict_mdict.py",
     "scripts/server/update-dpd-sbs.sh": "scripts/server/update-dpd.sh",
