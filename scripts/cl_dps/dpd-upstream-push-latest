@@ -44,11 +44,11 @@ for FILE in "${FILES[@]}"; do
         echo "File $FILE was deleted in source, deleting in destination..."
         rm -f "$FILE"
     fi
+    git add "$FILE"
 done
 
 # Add and commit
 echo "Committing..."
-git add -A # Use -A to handle deletions as well
 git commit -m "$COMMIT_MSG"
 
 # Push to upstream

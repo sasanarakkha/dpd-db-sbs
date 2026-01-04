@@ -38,7 +38,7 @@ mkdir -p logs
 LOG_FILE="logs/$(date '+%Y-%m-%d_%H-%M-%S').uvicorn.log"
 
 echo "=== 7. Starting Uvicorn Webapp ==="
-nohup uv run uvicorn exporter.webapp.main_ru:app --host 0.0.0.0 --port 8081 > "$LOG_FILE" 2>&1 &
+nohup uv run python -m uvicorn exporter.webapp.main_ru:app --host 0.0.0.0 --port 8081 > "$LOG_FILE" 2>&1 &
 
 echo "=== DONE ==="
 echo "App started in background."
