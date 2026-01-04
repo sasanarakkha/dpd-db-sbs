@@ -1,19 +1,35 @@
 {
+  "folders_to_check": [
+    ".github/workflows/",
+    "db/",
+    "exporter/",
+    "gui2/",
+    "scripts/",
+    "shared_data/",
+    "tools/"
+  ],
   "modified_upstream_files": [
     "db/models.py",
     "conductor/product-guidelines.md",
     "conductor/product.md",
-    "conductor/tracks.md",
     "conductor/tech-stack.md",
     "exporter/webapp/data_classes.py",
+    "exporter/webapp/static/app.js",
+    "exporter/webapp/static/home.js",
     "gui2/main.py",
     "gui2/pass2_add_view.py",
     "tools/ai_manager.py",
     ".gitignore",
-    "AGENTS.md",
-    "conductor/tracks"
+    "AGENTS.md"
+  ],
+  "ignored_files": [
+    "gui2/data",
+    "conductor/tracks",
+    "conductor/tracks.md"
   ],
   "unique_paths": [
+    ".github/workflows/submodules_update.yml",
+    ".github/workflows/sync_upstream.yml",
     "scripts/cl_dps/",
     "scripts/rus_exporter/",
     "scripts/dps_archive/",
@@ -43,6 +59,7 @@
   "russian_copies": {
     ".github/workflows/ru_release.yml": ".github/workflows/draft_release.yml",
     ".github/workflows/ru_release_test.yml": ".github/workflows/draft_release.yml",
+    ".github/workflows/ru_static.yml": ".github/workflows/static.yml",
     "db/families/family_compound_ru.py": "db/families/family_compound.py",
     "db/families/family_idiom_ru.py": "db/families/family_idiom.py",
     "db/families/family_root_ru.py": "db/families/family_root.py",

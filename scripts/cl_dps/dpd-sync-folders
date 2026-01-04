@@ -7,14 +7,14 @@ set -euo pipefail # Exit on error, treat unset variables as error, pipeline fail
 
 PROJECT_DIR="$HOME/Documents/dpd-db"
 # files that should be preserved from sbs-ru
-# Read exclusions dynamically from conductor/dps_sync_registry.json
+# Read exclusions dynamically from conductor/templates/upstream_sync_rehearsal/dps_sync_registry.json
 # Extract 'modified_upstream_files' list using python
-echo "ℹ️ Reading exclusions from conductor/dps_sync_registry.json..."
+echo "ℹ️ Reading exclusions from conductor/templates/upstream_sync_rehearsal/dps_sync_registry.json..."
 export PROJECT_DIR
 EXCLUDE_FILES=()
 while IFS= read -r line; do
     EXCLUDE_FILES+=("$line")
-done < <(python3 -c 'import json, os; data = json.load(open(os.path.join(os.environ["PROJECT_DIR"], "conductor/dps_sync_registry.json"))); print("\n".join(data["modified_upstream_files"] + data["ignored_files"]))')
+done < <(python3 -c 'import json, os; data = json.load(open(os.path.join(os.environ["PROJECT_DIR"], "conductor/templates/upstream_sync_rehearsal/dps_sync_registry.json"))); print("\n".join(data["modified_upstream_files"] + data["ignored_files"]))')
 
 # Check if we successfully got exclusions
 if [ ${#EXCLUDE_FILES[@]} -eq 0 ]; then
