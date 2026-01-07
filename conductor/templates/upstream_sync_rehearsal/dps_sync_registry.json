@@ -27,7 +27,8 @@
     "conductor/tracks",
     "conductor/tracks.md",
     "scripts/archive",
-    "db/backup_tsv/*.tsv"
+    "db/backup_tsv/*.tsv",
+    "docs_rus/dpd_rus.md"
   ],
   "unique_paths": [
     ".github/workflows/submodules_update.yml",

@@ -29,6 +29,7 @@
     - [x] Draft `conductor/templates/upstream_sync_rehearsal/guide.md`.
     - [x] Document the logic for `dps_sync_registry.json` exclusions.
     - [x] Create a step-by-step manual merge checklist for complex files based on the analysis.
+    - [x] Refine "Documentation Parity" section with detailed steps for `docs/` vs `docs_rus/`.
 - [x] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
 
 ## Phase 4: Rehearsal Track Artifacts

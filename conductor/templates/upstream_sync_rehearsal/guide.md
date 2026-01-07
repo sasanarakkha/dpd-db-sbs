@@ -76,8 +76,26 @@ Shadow copies (`*_ru.py`, `*_sbs.py`, etc.) are fork-specific versions of upstre
 
 ## Documentation Parity
 
-- **`docs/` vs `docs_rus/`**: To maintain a consistent user experience, every English documentation file located in `docs/` MUST have a corresponding translated or adapted file in `docs_rus/`.
-- **Sync Action:** During sync, check for new files in `docs/` and create placeholders or translations in `docs_rus/` as part of the manual merge phase.
+Maintaining parity between English (`docs/`) and Russian (`docs_rus/`) documentation is critical for the DPS fork's user experience.
+
+### 1. Identify New Documentation
+- **Check for new files:** Compare the file list of `docs/` with `docs_rus/`.
+- **Action:** For every new `.md` file in `docs/`, create a corresponding file in `docs_rus/`. If immediate translation is not possible, copy the English content and add a "TRANSLATION PENDING" banner at the top.
+
+### 2. Identify Updated Documentation
+- **Check for changes:** For files that exist in both directories, check if the upstream English version has been updated significantly.
+- **Action:** Port the updates to the Russian version. Use AI translation if necessary, but always verify context.
+
+### 3. Handle Unique Documentation
+- **Preserve local-only docs:** Files like `docs_rus/dpd_rus.md` are unique to the fork. Ensure they are not overwritten by any automated sync logic.
+
+### 4. MkDocs Configuration Parity
+- **`mkdocs.yaml` vs `mkdocs_ru.yaml`**: 
+    - When new pages are added to `mkdocs.yaml` (original), they MUST be added to the Russian navigation structure in `mkdocs_ru.yaml`.
+    - Ensure `mkdocs_ru.yaml` continues to use the Russian theme/language settings.
+
+### 5. Automated Indexing
+- Run `python3 scripts/rus_exporter/docs_add_indexes.py` after updating documentation to ensure navigation indexes and links are correctly generated for the Russian site.
 
 ## Manual Sync Checklist
 
@@ -91,8 +109,13 @@ Follow these steps when performing an upstream sync:
 ### Phase 2: Manual Porting (Reasoning Phase)
 4. [ ] **`modified_upstream_files`**: For each file, compare `sbs-ru` version against `as_upstream`. If upstream has new features or bug fixes, manually integrate them into the fork's version.
 5. [ ] **`db/models.py`**: Pay special attention to core schema changes.
-6. [ ] **Shadow Copies**: For each entry in `russian_copies` and `sbs_copies`, check if their **upstream source (the 'value' in the registry)** has changed significantly compared to the **local shadow copy (the 'key' in the registry)**. If so, port those logic changes to the local shadow copy.
-7. [ ] **Deleted Upstream Files**:
+6. [ ] **Shadow Copies**: For each entry in `russian_copies` and `sbs_copies`, check if their **source (the 'value' in the registry)** has changed significantly compared to the **shadow copy (the 'key' in the registry)**. If so, port those logic changes to the shadow copy.
+7. [ ] **Documentation Parity**:
+    - [ ] List all files in `docs/` that don't have a counterpart in `docs_rus/`.
+    - [ ] Create missing files in `docs_rus/` (at least as placeholders).
+    - [ ] Update `mkdocs_ru.yaml` navigation to match `mkdocs.yaml`.
+    - [ ] Run `python3 scripts/rus_exporter/docs_add_indexes.py`.
+8. [ ] **Deleted Upstream Files**:
     - Iterate through `folders_to_check` in the registry.
     - Identify files present in `sbs-ru` but missing in `as_upstream`.
     - Filter out files already listed in `unique_paths` or `ignored_files`.
@@ -100,6 +123,6 @@ Follow these steps when performing an upstream sync:
         - **Grep** the codebase to see if they are imported or used by `*_ru.py`, `*_sbs.py`, or `gui2/dps_*`.
         - **If used:** You must either refactor your local code to stop using them OR add them to `unique_paths` to preserve them.
         - **If unused:** Ensure they are deleted to keep the fork clean.
-8. [ ] **UI Scaling**: Verify `gui2/font_scaling_helper.py` was executed correctly (it is part of the sync script).
-9. [ ] **Commit Changes**: Once manual merges are complete, perform a final commit with a descriptive message (e.g., `sync: manual merge of upstream updates` with the current date, same as done by the sync script).
-10. [ ] **Update Registry**: If new shadow copies were created during the process, add them to `dps_sync_registry.json`.
+9. [ ] **UI Scaling**: Verify `gui2/font_scaling_helper.py` was executed correctly (it is part of the sync script).
+10. [ ] **Commit Changes**: Once manual merges are complete, perform a final commit with a descriptive message (e.g., `sync: manual merge of upstream updates` with the current date, same as done by the sync script).
+11. [ ] **Update Registry**: If new shadow copies were created during the process, add them to `dps_sync_registry.json`.
