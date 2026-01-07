@@ -7,5 +7,5 @@
 
 ---
 
-## [~] Track: Design and refine the upstream sync process, consolidate artifacts, and create a reusable rehearsal track template.
+## [x] Track: Design and refine the upstream sync process, consolidate artifacts, and create a reusable rehearsal track template.
 *Link: [./conductor/tracks/upstream_sync_design_20260104/](./conductor/tracks/upstream_sync_design_20260104/)*

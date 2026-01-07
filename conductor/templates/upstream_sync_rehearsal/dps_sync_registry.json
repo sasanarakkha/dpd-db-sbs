@@ -129,6 +129,7 @@
     "scripts/server/update-dpd-sbs.sh": "scripts/server/update-dpd.sh",
     "tools/utils_sbs.py": "tools/utils.py",
     "tools/paths_dps.py": "tools/paths.py",
-    "tools/fast_api_utils_dps.py": "tools/fast_api_utils.py"
+    "tools/fast_api_utils_dps.py": "tools/fast_api_utils.py",
+    "scripts/export/dps_anki_updater.py": "scripts/build/anki_updater.py"
   }
 }

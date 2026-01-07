@@ -17,25 +17,25 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
 
 ## Phase 3: Deep Analysis & Guide Creation (Reasoning)
-- [~] Task: Analyze "Modified Upstream Files"
-    - [ ] For each entry in `modified_upstream_files` from `dps_sync_registry.json`:
-        - [ ] Compare `sbs-ru` version against `as_upstream` version.
-        - [ ] Identify and document key local logic that must be preserved during sync.
-- [ ] Task: Analyze Shadow Copies (Russian & SBS)
-    - [ ] For each key-value pair in `russian_copies` and `sbs_copies` from the registry:
-        - [ ] Compare the local shadow copy (key) with its original source (value) within the `sbs-ru` branch.
-        - [ ] Identify the specific local customizations and logic that must be maintained.
-- [ ] Task: Create Sync Guide
-    - [ ] Draft `conductor/templates/upstream_sync_rehearsal/guide.md`.
-    - [ ] Document the logic for `dps_sync_registry.json` exclusions.
-    - [ ] Create a step-by-step manual merge checklist for complex files based on the analysis.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
+- [x] Task: Analyze "Modified Upstream Files"
+    - [x] For each entry in `modified_upstream_files` from `dps_sync_registry.json`:
+        - [x] Compare `sbs-ru` version against `as_upstream` version.
+        - [x] Identify and document key local logic that must be preserved during sync.
+- [x] Task: Analyze Shadow Copies (Russian & SBS)
+    - [x] For each key-value pair in `russian_copies` and `sbs_copies` from the registry:
+        - [x] Compare the local shadow copy (key) with its original source (value) within the `sbs-ru` branch.
+        - [x] Identify the specific local customizations and logic that must be maintained.
+- [x] Task: Create Sync Guide
+    - [x] Draft `conductor/templates/upstream_sync_rehearsal/guide.md`.
+    - [x] Document the logic for `dps_sync_registry.json` exclusions.
+    - [x] Create a step-by-step manual merge checklist for complex files based on the analysis.
+- [x] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
 
 ## Phase 4: Rehearsal Track Artifacts
-- [ ] Task: Create Rehearsal Track Spec Template
-    - [ ] Draft `conductor/templates/upstream_sync_rehearsal/spec.md`.
-    - [ ] Ensure it references the new guide and registry.
-- [ ] Task: Create Rehearsal Track Plan Template
-    - [ ] Draft `conductor/templates/upstream_sync_rehearsal/plan.md`.
-    - [ ] Include tasks for executing the sync script, validating fonts, and manual merging based on the guide.
-- [ ] Task: Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md)
+- [x] Task: Create Rehearsal Track Spec Template
+    - [x] Draft `conductor/templates/upstream_sync_rehearsal/spec.md`.
+    - [x] Ensure it references the new guide and registry.
+- [x] Task: Create Rehearsal Track Plan Template
+    - [x] Draft `conductor/templates/upstream_sync_rehearsal/plan.md`.
+    - [x] Include tasks for executing the sync script, validating fonts, and manual merging based on the guide.
+- [x] Task: Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md)
