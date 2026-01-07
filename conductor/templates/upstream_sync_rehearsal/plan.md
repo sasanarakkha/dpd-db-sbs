@@ -13,10 +13,10 @@
 - [ ] Task: Integrate Upstream Updates into Modified Files
     - [ ] Following the `conductor/templates/upstream_sync_rehearsal/guide.md`, compare `sbs-ru` versions against `as_upstream` for all files in `modified_upstream_files`.
     - [ ] Manually port relevant bug fixes or new features.
-    - [ ] **Priority:** `db/models.py`, `gui2/main.py`, `exporter/webapp/static/app.js`.
+    - [ ] **Priority:** All files in the `modified_upstream_files` category must be treated with equal importance and manually merged if needed.
 - [ ] Task: Update Shadow Copies
     - [ ] For each entry in `russian_copies` and `sbs_copies` in the registry:
-        - [ ] Compare the **local shadow copy (the 'key')** with its **upstream source (the 'value')**.
+        - [ ] Compare the **shadow copy (the 'key')** with its **source (the 'value')**.
         - [ ] Port necessary logic while preserving `RuPaths`, `DPSPaths`, and translation/SBS logic.
 - [ ] Task: Validate Removed Upstream Files
     - [ ] Identify files in `folders_to_check` that were removed from upstream.
@@ -27,6 +27,11 @@
     - [ ] Create corresponding placeholders or translations in `docs_rus/`.
 
 ## Phase 3: Final Validation & Checkpoint
+- [ ] Task: Verification Tests
+    - [ ] Run `uv run pytest tests/test_dps_imports.py` to ensure all DPS modules are importable.
+    - [ ] Run `uv run pytest tests/test_dps_logic.py` to verify family generation logic.
+    - [ ] Run `uv run pytest tests/test_dps_exporters_functional.py` to verify exporter control flows.
+    - [ ] Run `uv run pytest tests/test_dps_docs_parity.py` to ensure documentation parity.
 - [ ] Task: Comprehensive System Check
     - [ ] Run project-specific tests: `uv run pytest`.
     - [ ] Manually verify that DPS-specific features (DpsView, SBS examples in GoldenDict) are still functional.

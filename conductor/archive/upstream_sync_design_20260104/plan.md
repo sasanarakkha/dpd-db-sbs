@@ -30,6 +30,19 @@
     - [x] Document the logic for `dps_sync_registry.json` exclusions.
     - [x] Create a step-by-step manual merge checklist for complex files based on the analysis.
     - [x] Refine "Documentation Parity" section with detailed steps for `docs/` vs `docs_rus/`.
+- [x] Task: Create Verification Tests
+    - [x] Analyze core DPS/SBS/Ru files to determine testable functionality.
+    - [x] Create `tests/test_dps_imports.py` and `tests/test_dps_logic.py` to test:
+        - [x] Family generation (`family_*_ru.py`)
+        - [x] Lookups (`rpd_to_lookup`, `help_abbrev`)
+    - [x] Create `tests/test_dps_exporters_functional.py` to test:
+        - [x] Exporters (mocked `main` execution)
+        - [x] Build scripts (mocked `main` execution)
+        - [x] GUI integrity (via import tests)
+    - [x] Create `tests/test_dps_docs_parity.py` to test:
+        - [x] Full file parity between `docs/` and `docs_rus/` (excluding `dpd_rus.md`)
+    - [x] Update `guide.md` to include running these tests as a success criterion.
+    - [x] Update Rehearsal Spec and Plan to include this testing step.
 - [x] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
 
 ## Phase 4: Rehearsal Track Artifacts

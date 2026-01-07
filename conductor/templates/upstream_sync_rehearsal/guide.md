@@ -1,5 +1,19 @@
 # Upstream Sync Guide (DPS Fork)
 
+## 🚀 How to Start a New Rehearsal
+
+1. **Initialize:** Run the setup script to create the track folder and register it.
+   ```bash
+   python3 conductor/init_rehearsal.py
+   ```
+
+2. **Implement:** Start the agent.
+   ```text
+   /conductor:implement Upstream Sync Rehearsal
+   ```
+
+---
+
 This guide documents the logic and manual steps required to synchronize the DPS fork (`sbs-ru` branch) with the upstream repository (`as_upstream` branch).
 
 ## Sync Registry (`dps_sync_registry.json`)
@@ -124,5 +138,10 @@ Follow these steps when performing an upstream sync:
         - **If used:** You must either refactor your local code to stop using them OR add them to `unique_paths` to preserve them.
         - **If unused:** Ensure they are deleted to keep the fork clean.
 9. [ ] **UI Scaling**: Verify `gui2/font_scaling_helper.py` was executed correctly (it is part of the sync script).
-10. [ ] **Commit Changes**: Once manual merges are complete, perform a final commit with a descriptive message (e.g., `sync: manual merge of upstream updates` with the current date, same as done by the sync script).
-11. [ ] **Update Registry**: If new shadow copies were created during the process, add them to `dps_sync_registry.json`.
+10. [ ] **Verification Tests**:
+    - Run `uv run pytest tests/test_dps_imports.py` to verify that all critical DPS modules are intact and dependencies are met.
+    - Run `uv run pytest tests/test_dps_logic.py` to verify that key family generation and lookup logic is preserved.
+    - Run `uv run pytest tests/test_dps_exporters_functional.py` to verify the control flow of critical exporters and build scripts.
+    - Run `uv run pytest tests/test_dps_docs_parity.py` to verify that `docs/` and `docs_rus/` are perfectly synced (except for `dpd_rus.md`).
+11. [ ] **Commit Changes**: Once manual merges are complete, perform a final commit with a descriptive message (e.g., `sync: manual merge of upstream updates` with the current date, same as done by the sync script).
+12. [ ] **Update Registry**: If new shadow copies were created during the process, add them to `dps_sync_registry.json`.
