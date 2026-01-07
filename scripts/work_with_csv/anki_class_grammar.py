@@ -20,7 +20,7 @@ project_dir: Path = Path.cwd()  # e.g., /Users/deva/Documents/dpd-db
 deva_dir: Path = project_dir.parent.parent  # e.g., /Users/deva
 
 
-current_date = datetime.now().strftime("%d-%m")
+current_date = datetime.now().strftime("%m-%d")
 
 console = Console()
 

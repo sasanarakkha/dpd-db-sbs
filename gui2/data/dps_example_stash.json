@@ -1,12 +1,12 @@
 {
     "dps_shared": {
-        "source": "VIN2.5.3.1",
-        "sutta": "ovādasikkhāpadaṃ",
-        "example": "vassasat'ūpasampannāya bhikkhuniyā tadah'upasampannassa bhikkhuno abhivādanaṃ paccuṭṭhānaṃ añjalikammaṃ sāmīcikammaṃ kātabbaṃ, ayam'pi dhammo sakkatvā garukatvā mānetvā pūjetvā yāvajīvaṃ anatikkamanīyo."
+        "source": "VIN2.5.6.4",
+        "sutta": "anādariyasikkhāpadaṃ",
+        "example": "apaññattena vuccamāno, idaṃ na sallekhāya na dhutatthāya na pāsādikatāya na apacayāya na vīriy'ārambhāya saṃvattatī'ti anādariyaṃ karoti, āpatti dukkaṭassa."
     },
     "dps_last": {
-        "source": "VIN2.5.3.1",
-        "sutta": "ovādasikkhāpadaṃ",
-        "example": "vassasat'ūpasampannāya bhikkhuniyā tadah'upasampannassa bhikkhuno abhivādanaṃ paccuṭṭhānaṃ añjalikammaṃ sāmīcikammaṃ kātabbaṃ, ayam'pi dhammo sakkatvā garukatvā mānetvā pūjetvā yāvajīvaṃ anatikkamanīyo."
+        "source": "VIN2.5.6.4",
+        "sutta": "anādariyasikkhāpadaṃ",
+        "example": "apaññattena vuccamāno, idaṃ na sallekhāya na dhutatthāya na pāsādikatāya na apacayāya na vīriy'ārambhāya saṃvattatī'ti anādariyaṃ karoti, āpatti dukkaṭassa."
     }
 }
