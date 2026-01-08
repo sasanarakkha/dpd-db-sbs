@@ -78,6 +78,11 @@
 - Unless otherwise specified the repository in question is https://github.com/digitalpalidictionary/dpd-db.
 - DO NOT add or commit to GitHub, unless specifically instructed to do so.
 
+### Issue Reference Mapping
+- When mentioning "upstream repo issue #", refer to the issues at https://github.com/digitalpalidictionary/dpd-db.
+- When mentioning "local repo issue #", refer to the issues at https://github.com/sasanarakkha/dpd-db-sbs.
+
+
 ### Solve
 - "Solve" means read the specified GitHub issue using get_issue and offer solutions. Don't think about it, don't ask questions, just read it.
 - Ask the user to open the necessary files that you need.
@@ -90,6 +95,11 @@
 
 # Code Review
 - When completed the task, ask the user for permission to run `coderabbit --prompt-only` in the terminal to get a review
+- If CodeRabbit is not installed or authenticated, provide the following instructions:
+    ```bash
+    brew install --cask coderabbit
+    coderabbit auth login
+    ```
 - Fix all the suggested issues
 - If there are no issues, there's nothing to fix.
 

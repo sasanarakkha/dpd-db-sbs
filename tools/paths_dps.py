@@ -253,6 +253,9 @@ class DPSPaths:
         self.addition_processed: Path = base_dir.joinpath(
             Path("gui2/data/addition_processed.json")
         )
+        self.corrections_processed_json_path: Path = base_dir.joinpath(
+            Path("gui2/data/corrections_processed.json")
+        )
 
         # .. external
         self.sbs_anki_style_dir = base_dir.joinpath(
