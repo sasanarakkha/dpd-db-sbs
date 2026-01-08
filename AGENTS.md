@@ -43,12 +43,14 @@
 
 ## Tests
 - If you need to make any test file, please place it into test/ folder and call it "test_{etc}".
+- Whenever you run some tests use "uv run python {relative_path_to_script}".
 ## Dependencies
 
 ### uv
 - Use astral uv to manage dependencies.
 - Install with "uv add" not "pip install" or "uv pip install" etc.
-- DO NOT run any scripts with uv UNLESS specifically asked to do so. 
+- Run any scripts with "uv run" UNLESS specifically asked to do otherwise. 
+
 
 ## Plan Mode
 - When starting to plan, show that you've understood the question by saying "Hmmm...". If not, ask more questions to clarify.

@@ -353,19 +353,19 @@ gdict_ru_info = {
 }
 
 
-def sbs_related_sign(i: DpdHeadword):
-    """Return html styled letter of which category of examples related to SBS."""
-    html = """<span color: #ab7b38>"""
-    if i.sbs:
-        if i.sbs.discourses_example:
-            html += "A "
-        if i.sbs.class_anki:
-            html += "C "
-        if i.sbs.pat_example:
-            html += "P "
-        if i.sbs.vib_example:
-            html += "V "
-        if i.sbs.sbs_index:
-            html += "S"
-    html += """</span>"""
-    return html
+# def sbs_related_sign(i: DpdHeadword):
+#     """Return html styled letter of which category of examples related to SBS."""
+#     html = """<span color: #ab7b38>"""
+#     if i.sbs:
+#         if i.sbs.discourses_example:
+#             html += "A "
+#         if i.sbs.class_anki:
+#             html += "C "
+#         if i.sbs.pat_example:
+#             html += "P "
+#         if i.sbs.vib_example:
+#             html += "V "
+#         if i.sbs.sbs_index:
+#             html += "S"
+#     html += """</span>"""
+#     return html

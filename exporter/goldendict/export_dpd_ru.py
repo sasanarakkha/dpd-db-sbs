@@ -76,7 +76,6 @@ class DpdHeadwordTemplates:
         self.sutta_info_templ = Template(filename=str(paths.sutta_info_templ_path))
         self.grammar_templ = Template(filename=str(paths.grammar_templ_path))
         self.example_templ = Template(filename=str(paths.example_templ_path))
-        self.sbs_example_templ = Template(filename=str(paths.sbs_example_templ_path))
         self.inflection_templ = Template(filename=str(paths.inflection_templ_path))
         self.family_root_templ = Template(filename=str(paths.family_root_templ_path))
         self.family_word_templ = Template(filename=str(paths.family_word_templ_path))
