@@ -1,7 +1,10 @@
 # Digital Pāḷi Dictionary (DPD) - Devamitta Pali Study (DPS) Fork
 
-## Repository
+## Fork Repository
 [https://github.com/sasanarakkha/dpd-db-sbs](https://github.com/sasanarakkha/dpd-db-sbs)
+
+## Original upstream repository
+[https://github.com/digitalpalidictionary/dpd-db](https://github.com/digitalpalidictionary/dpd-db)
 
 ## Product Vision
 To be the world's most precise, comprehensive, and accessible digital resource for the Pāḷi language. DPD bridges the gap between ancient Tipitaka texts and modern scholars by providing word-by-word grammatical analysis, complex compound deconstruction, and deep etymological insights across every digital platform.

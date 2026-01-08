@@ -11,6 +11,9 @@
 7. **Non-Interactive & CI-Aware:** Prefer non-interactive commands. Use `CI=true` for watch-mode tools (tests, linters) to ensure single execution.
 8. **Proactive Research:** Always perform a Google Search during the planning and task execution phases for any framework-specific (e.g., Flet), OS-specific (e.g., Linux window management), or non-trivial technical requirements to identify known quirks, limitations, or best practices.
 9. **Sync Template Maintenance:** Any task that creates or modifies "shadow" or "unique" files MUST include a step to update `conductor/templates/upstream_sync_rehearsal/` to keep the sync registry and guide current.
+10. **Issue Reference Mapping:**
+    - When mentioning "upstream repo issue #", refer to the issues at https://github.com/digitalpalidictionary/dpd-db.
+    - When mentioning "local repo issue #", refer to the issues at https://github.com/sasanarakkha/dpd-db-sbs.
 
 ## Task Workflow
 

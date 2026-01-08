@@ -32,3 +32,6 @@
     - **Flow:** Upstream `dpd-db/main` -> Local `as_upstream` branch -> Local `sbs-ru` branch.
     - **Preservation:** The sync script explicitly *excludes* DPS-specific files (like modified `db/models.py`) to prevent overwriting local features.
 - **"DPS" Terminology:** All fork-specific scripts and data related to Russian/SBS extensions are collectively referred to as "DPS".
+- **Issue Reference Mapping:**
+    - "upstream repo issue #" refers to the issues at https://github.com/digitalpalidictionary/dpd-db.
+    - "local repo issue #" refers to the issues at https://github.com/sasanarakkha/dpd-db-sbs.

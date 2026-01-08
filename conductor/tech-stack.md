@@ -53,5 +53,8 @@ Key system components that have been "forked" within the repo to provide Russian
 - **`scripts/rus_exporter/` / `scripts/dps_archive/`:** Maintenance and legacy scripts.
 - **`shared_data/sbs_csvs/` / `shared_data/rus/`:** Source data for localization.
 
-## Project Management
-- **Project Board:** [GitHub Project 1](https://github.com/orgs/sasanarakkha/projects/1)
+## Project Management (upstream)
+- **Project Board:** [DPD codebase](https://github.com/orgs/digitalpalidictionary/projects/1)
+
+## Project Management (dps, local fork)
+- **Project Board:** [DPD - SBS / Russian](https://github.com/orgs/sasanarakkha/projects/1)
