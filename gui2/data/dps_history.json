@@ -1,5 +1,9 @@
 [
     {
+        "id": 18279,
+        "lemma_1": "okāsa 2"
+    },
+    {
         "id": 69928,
         "lemma_1": "vīriyārambha"
     },
@@ -94,9 +98,5 @@
     {
         "id": 30165,
         "lemma_1": "tassa 3"
-    },
-    {
-        "id": 55062,
-        "lemma_1": "rukkhamūla"
     }
 ]

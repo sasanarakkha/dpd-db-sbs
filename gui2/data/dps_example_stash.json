@@ -1,8 +1,8 @@
 {
     "dps_shared": {
-        "source": "VIN2.5.6.4",
-        "sutta": "anādariyasikkhāpadaṃ",
-        "example": "apaññattena vuccamāno, idaṃ na sallekhāya na dhutatthāya na pāsādikatāya na apacayāya na vīriy'ārambhāya saṃvattatī'ti anādariyaṃ karoti, āpatti dukkaṭassa."
+        "source": "VIN1.4.3.2",
+        "sutta": "ūnapañcabandhanasikkhāpadaṃ",
+        "example": "abandhan'okāso nāma patto yassa dv'aṅgulā rāji na hoti. bandhan'okāso nāma patto yassa dv'aṅgulā rāji hoti. navo nāma patto viññattiṃ upādāya vuccati."
     },
     "dps_last": {
         "source": "VIN2.5.6.4",
