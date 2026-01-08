@@ -9,17 +9,17 @@ def main():
     dps_paths = DPSPaths()
     gui2_paths = Gui2Paths()
 
-    input_file = gui2_paths.corrections_added_path
-    processed_file = dps_paths.corrections_processed_json_path
+    input_file = gui2_paths.additions_added_path
+    processed_file = dps_paths.addition_processed_json_path
 
     if not input_file.exists():
         print(f"Error: {input_file} not found.")
         return
 
-    # Load corrections
+    # Load additions
     try:
         with open(input_file, "r") as f:
-            corrections = json.load(f)
+            additions = json.load(f)
     except (json.JSONDecodeError, OSError) as e:
         print(f"Error loading {input_file}: {e}")
         return
@@ -29,12 +29,14 @@ def main():
     if processed_file.exists():
         try:
             with open(processed_file, "r") as f:
-                processed_ids = set(json.load(f))
+                data = json.load(f)
+                if isinstance(data, list):
+                    processed_ids = set(data)
         except json.JSONDecodeError:
             print(f"Warning: {processed_file} is empty or invalid. Starting fresh.")
 
     # Filter items
-    all_with_comments = [item for item in corrections if item.get("comment")]
+    all_with_comments = [item for item in additions if item.get("comment")]
     total_with_comments = len(all_with_comments)
 
     to_process = [
@@ -43,11 +45,11 @@ def main():
 
     if not to_process:
         print(
-            f"No new corrections with comments to process. (Total with comments: {total_with_comments})"
+            f"No new additions with comments to process. (Total with comments: {total_with_comments})"
         )
         return
 
-    print(f"Total entries with comments: {total_with_comments}")
+    print(f"Total additions with comments: {total_with_comments}")
     print(f"Remaining to process: {len(to_process)}\n")
 
     newly_processed = []

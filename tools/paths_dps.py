@@ -250,7 +250,10 @@ class DPSPaths:
         self.example_stash_json_path: Path = base_dir.joinpath(
             Path("gui2/data/dps_example_stash.json")
         )
-        self.addition_processed: Path = base_dir.joinpath(
+        self.addition_replaced_json_path: Path = base_dir.joinpath(
+            Path("gui2/data/addition_replaced.json")
+        )
+        self.addition_processed_json_path: Path = base_dir.joinpath(
             Path("gui2/data/addition_processed.json")
         )
         self.corrections_processed_json_path: Path = base_dir.joinpath(
