@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# This script runs the corrections and additions review scripts one after another.
+
+# Determine the directory of this script
+PROJECT_ROOT="$HOME/Documents/dpd-db"
+
+echo "----------------------------------------"
+echo "Step 1: Reviewing Corrections"
+echo "----------------------------------------"
+cd "${PROJECT_ROOT}" && uv run python gui2/dps_process_corrections.py
+
+echo -e "\n----------------------------------------"
+echo "Step 2: Reviewing Additions"
+echo "----------------------------------------"
+cd "${PROJECT_ROOT}" && uv run python gui2/dps_process_additions.py
+
+echo -e "\nAll reviews completed."
