@@ -1,0 +1,8 @@
+{
+  "track_id": "pali_analysis_20260108",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-01-08T10:00:00Z",
+  "updated_at": "2026-01-08T10:00:00Z",
+  "description": "Advanced Pāḷi sentence analysis pipeline with pure Python analyzer, AI enhancer (Safe Merge), and GUI integration (Stage 1-5 including Pass 3 potential)."
+}
