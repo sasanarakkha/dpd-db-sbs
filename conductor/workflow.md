@@ -50,12 +50,17 @@ All tasks follow a strict lifecycle:
    - Add dated note explaining the change
    - Resume implementation
 
-8. **Notify User for Commit:**
+8. **Sync Registry Check:** Before proceeding, analyze all created or modified files:
+   - Identify if any are "unique" (DPS-specific) or "shadow" (`*_ru.py`, `*_sbs.py`).
+   - If found, update `conductor/templates/upstream_sync_rehearsal/dps_sync_registry.json` and `guide.md` accordingly.
+   - This is a CRITICAL step to prevent regressions during upstream synchronization.
+
+9. **Notify User for Commit:**
    - Inform the user that the task is complete and ready for manual review and commit.
    - List all created/modified files.
    - Propose a clear, concise commit message.
 
-9. **Update Plan:**
+10. **Update Plan:**
     - Read `plan.md`, find the line for the completed task, and update its status from `[~]` to `[x]`.
     - Write the updated content back to `plan.md`.
 

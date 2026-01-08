@@ -60,7 +60,8 @@
     "tools/ai_openai_manager.py",
     "tools/ai_related.py",
     "tools/sbs_table_functions.py",
-    "tools/tools_for_ru_exporter.py"
+    "tools/tools_for_ru_exporter.py",
+    "db_tests/sbs_consistency_tests.py"
   ],
   "russian_copies": {
     ".github/workflows/ru_release.yml": ".github/workflows/draft_release.yml",

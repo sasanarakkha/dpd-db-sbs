@@ -1,0 +1,8 @@
+{
+  "track_id": "sbs_consistency_tests_20260108",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-01-08T15:20:00Z",
+  "updated_at": "2026-01-08T15:20:00Z",
+  "description": "Implement a suite of data integrity tests to ensure consistency across the SBS (Sasanarakkha Buddhist Sanctuary) table and its relationships with the dpd_headwords table."
+}

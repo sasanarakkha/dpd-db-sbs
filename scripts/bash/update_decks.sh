@@ -18,6 +18,7 @@ while true; do
     case $yn in
         [Yy]* )
             uv run python scripts/change_in_db/class_relation.py
+            uv run python db_tests/sbs_consistency_tests.py
             uv run python scripts/export/anki_csv.py
             break;;
         * )

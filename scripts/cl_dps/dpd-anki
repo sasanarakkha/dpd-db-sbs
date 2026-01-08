@@ -10,6 +10,10 @@ MASTER_SCRIPT="$HOME/.local/bin/run_and_log.sh"
 
 LOG_BASE_NAME="anki_update"
 TARGET_SCRIPT_PATH="${PROJECT_ROOT}/scripts/export/dps_anki_updater.py"
+TEST_SCRIPT_PATH="${PROJECT_ROOT}/db_tests/sbs_consistency_tests.py"
+
+# run tests
+bash "${MASTER_SCRIPT}" "${LOG_BASE_NAME}" bash -c "cd '${PROJECT_ROOT}' && uv run python '${TEST_SCRIPT_PATH}'"
 
 # The command to run, including 'uv run python'
 BASE_COMMAND_TO_EXECUTE="cd '${PROJECT_ROOT}' && uv run python '${TARGET_SCRIPT_PATH}'"

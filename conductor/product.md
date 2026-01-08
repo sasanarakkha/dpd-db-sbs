@@ -31,7 +31,7 @@ DPD is uniquely positioned for the AI era. By providing a structured MCP interfa
 
 ## Technical Competitive Edge
 - **Hybrid Performance:** Using Go for CPU-bound tasks like compound deconstruction while maintaining Python's flexibility for database management.
-- **Data Integrity:** Strict SQLAlchemy models and a suite of over 100 automated data-integrity tests ensure the dictionary remains error-free.
+- **Data Integrity:** Strict SQLAlchemy models and a suite of over 100 automated data-integrity tests, including specialized SBS consistency checks, ensure the dictionary remains error-free.
 - **Platform Agnostic:** We don't just provide a website; we provide the *data* in formats that work offline, in e-readers, and on mobile devices.
 
 ## Future Road Map
