@@ -1,4 +1,7 @@
 import csv
+import sys
+import tty
+import termios
 from rich.console import Console
 
 from db.db_helpers import get_db_session
@@ -17,6 +20,18 @@ db_session = get_db_session(pth.dpd_db_path)
 
 # put in the path of the csv you want to open
 csv_path = dpspth.ru_apply_path
+
+
+def get_char():
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setraw(sys.stdin.fileno())
+        ch = sys.stdin.read(1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    return ch
+
 
 console.print(f"[yellow]Updating db from {csv_path}")
 
@@ -122,36 +137,63 @@ for idx, (i, db_entry) in enumerate(pending_items):
     if i.get("notes"):
         console.print(f"[green]Suggested Notes: {i.notes}")
 
-    response = (
-        input("Enter (both), 1 (meaning), 2 (lit), 3 (skip), q (quit): ")
-        .strip()
-        .lower()
+    console.print(
+        "Enter (both), 1 (skip), 2 (meaning), 3 (lit), 4 (man meaning), 5 (man lit), q (quit): ",
+        end="",
     )
+    response = get_char()
+    console.print(response)
 
-    if response == "q":
+    if response in ("\r", "\n"):
+        response = ""
+    elif response == "q":
         console.print("[yellow]Quitting loop...")
         break
 
     # All other options mark as processed
     i.processed = "ok"
 
-    if response == "3":
+    if response == "1":
         console.print("[yellow]Skipping...")
         continue
-    elif response == "1":
+    elif response == "2":
         if i.corrections_ru_meaning and i.corrections_ru_meaning.strip():
             db_entry.ru.ru_meaning = i.corrections_ru_meaning.strip()
             count_meanings += 1
-            console.print("[green]Updated ru_meaning")
+            console.print("[green]Updated ru_meaning from suggestion")
+
+            man_lit = input("input manual ru_meaning_lit (enter to skip) ")
+            if man_lit:
+                db_entry.ru.ru_meaning_lit = man_lit.strip()
+                count_lit += 1
+                console.print("[green]Updated ru_meaning_lit manually")
         else:
             console.print("[red]Suggested ru_meaning is empty, not updating.")
-    elif response == "2":
+    elif response == "3":
         if i.corrections_ru_meaning_lit and i.corrections_ru_meaning_lit.strip():
             db_entry.ru.ru_meaning_lit = i.corrections_ru_meaning_lit.strip()
             count_lit += 1
-            console.print("[green]Updated ru_meaning_lit")
+            console.print("[green]Updated ru_meaning_lit from suggestion")
+
+            user_m = input("input manual ru_meaning (enter to skip) ")
+            if user_m:
+                db_entry.ru.ru_meaning = user_m.strip()
+                count_meanings += 1
+                console.print("[green]Updated ru_meaning manually")
         else:
             console.print("[red]Suggested ru_meaning_lit is empty, not updating.")
+    elif response == "4":
+        user_m = input("user ru_meaning: ").strip()
+        if user_m:
+            db_entry.ru.ru_meaning = user_m
+            count_meanings += 1
+            console.print("[green]Updated ru_meaning manually")
+    elif response == "5":
+        user_lit = input("user ru_meaning_lit: ").strip()
+        if user_lit:
+            db_entry.ru.ru_meaning_lit = user_lit
+            count_lit += 1
+            console.print("[green]Updated ru_meaning_lit manually")
     elif response == "":
         updated = False
         if i.corrections_ru_meaning and i.corrections_ru_meaning.strip():
