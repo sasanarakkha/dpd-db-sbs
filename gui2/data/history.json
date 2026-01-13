@@ -1,5 +1,13 @@
 [
     {
+        "id": 42909,
+        "lemma_1": "parattha 1.1"
+    },
+    {
+        "id": 17461,
+        "lemma_1": "ekato 2"
+    },
+    {
         "id": 14183,
         "lemma_1": "uggaha 1"
     },
@@ -70,13 +78,5 @@
     {
         "id": 50706,
         "lemma_1": "majjavaṇṇa"
-    },
-    {
-        "id": 8444,
-        "lemma_1": "amajja 1.1"
-    },
-    {
-        "id": 8446,
-        "lemma_1": "amajjasaññī"
     }
 ]
