@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+
+from pathlib import Path
+import shutil
+from tools.printer import printer as pr
+
+pr.tic()
+
+print("\033[1;33m copying tipitaka_pali.db and dpd_goldendict_src \033[0m")
+
+# Project structure (same logic)
+project_dir: Path = Path.cwd()
+deva_dir: Path = project_dir.parent.parent  # HOME
+
+# ---------- Source paths ----------
+
+# tipitaka db source
+tp_db_src: Path = (
+    deva_dir
+    / "Library"
+    / "Containers"
+    / "org.americanmonk.tpp"
+    / "Data"
+    / "Documents"
+    / "tipitaka_pali.db"
+)
+
+# dpd goldendict source folder
+share_dir: Path = project_dir / "exporter" / "share"
+dpd_goldendict_src: Path = share_dir / "dpd"
+
+# copying script
+bash_script: Path = project_dir / "scripts" / "bash" / "copy_tpr_db.sh"
+
+# ---------- Destination ----------
+
+dest_dir: Path = (
+    deva_dir
+    / "filesrv1"
+    / "share1"
+    / "Sharing between users"
+    / "For A. Devamitta"
+    / "for_classes"
+)
+
+tp_db_dest: Path = dest_dir / "tipitaka_pali.db"
+dpd_goldendict_dest: Path = dest_dir / "dpd"
+
+# Ensure destination directory exists
+dest_dir.mkdir(parents=True, exist_ok=True)
+
+# ---------- Copy tipitaka db ----------
+
+if tp_db_src.exists():
+    shutil.copy2(tp_db_src, tp_db_dest)
+    print("\033[1;32m tipitaka_pali.db copied successfully \033[0m")
+else:
+    print(f"\033[1;31m Missing tipitaka db: {tp_db_src} \033[0m")
+
+# ---------- Copy dpd goldendict folder ----------
+
+if dpd_goldendict_src.exists():
+    if dpd_goldendict_dest.exists():
+        shutil.rmtree(dpd_goldendict_dest)
+    shutil.copytree(dpd_goldendict_src, dpd_goldendict_dest)
+    print("\033[1;32m dpd_goldendict_src folder copied successfully \033[0m")
+else:
+    print(f"\033[1;31m Missing dpd_goldendict_src folder: {dpd_goldendict_src} \033[0m")
+
+# ----------  Copy bash script ----------
+
+if bash_script.exists():
+    shutil.copy2(bash_script, dest_dir)
+    print("\033[1;32m bash script copied successfully \033[0m")
+else:
+    print(f"\033[1;31m Missing bash script: {bash_script} \033[0m")
+
+pr.toc()
