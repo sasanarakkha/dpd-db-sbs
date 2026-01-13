@@ -51,6 +51,10 @@ done
 echo "Committing..."
 git commit -m "$COMMIT_MSG"
 
+#add a pause here
+echo "Press enter to push to upstream..."
+read
+
 # Push to upstream
 echo "Pushing to upstream..."
 git push upstream as_upstream:main
