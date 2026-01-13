@@ -33,3 +33,15 @@
 - [x] Task: Verify that all tests in `tests/test_sbs_consistency.py` pass with the final implementation.
 - [x] Task: Update `db_tests/README.md` to include information about the new SBS consistency tests.
 - [x] Task: Conductor - User Manual Verification 'Integration & Finalization' (Protocol in workflow.md)
+
+**Phase 6: Bold Tag Verification (TDD)**
+- [x] Task: Write failing unit tests for bold tag presence in all SBS example fields.
+- [x] Task: Implement bold tag verification logic in `db_tests/sbs_consistency_tests.py` with categorized reporting.
+- [x] Task: Run the updated test script against the database and verify the new error reports.
+- [x] Task: Conductor - User Manual Verification 'Bold Tag Verification' (Protocol in workflow.md)
+
+**Phase 7: Class Translation Uniqueness (TDD)**
+- [x] Task: Write failing unit tests for `class_example_translation` uniqueness across different `class_source`.
+- [x] Task: Implement `class_example_translation` uniqueness check in `db_tests/sbs_consistency_tests.py`.
+- [x] Task: Run the updated test script against the database and verify the results.
+- [x] Task: Conductor - User Manual Verification 'Class Translation Uniqueness' (Protocol in workflow.md)

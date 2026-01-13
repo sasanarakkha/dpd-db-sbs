@@ -53,18 +53,19 @@ def test_pat_consistency_logic(in_memory_db):
 def test_dhp_source_consistency_logic(in_memory_db):
     from db_tests.sbs_consistency_tests import check_dhp_source_consistency
     # Case 1: Correct - DHP source in headword and SBS dhp_source
-    h1 = DpdHeadword(id=1, lemma_1="l1", source_1="DHP100")
+    h1 = DpdHeadword(id=1, lemma_1="l1", source_1="DHP100", meaning_1="m1")
     s1 = SBS(id=1, dhp_source="DHP100")
     in_memory_db.add_all([h1, s1])
     
     # Case 2: DHP source in headword but SBS dhp_source empty (Violation)
-    h2 = DpdHeadword(id=2, lemma_1="l2", source_1="DHP200")
+    h2 = DpdHeadword(id=2, lemma_1="l2", source_1="DHP200", meaning_1="m2")
     s2 = SBS(id=2, dhp_source="")
     in_memory_db.add_all([h2, s2])
     
     # Case 3: No SBS entry but headword has DHP source (Violation)
-    h3 = DpdHeadword(id=3, lemma_1="l3", source_2="DHP400")
+    h3 = DpdHeadword(id=3, lemma_1="l3", source_2="DHP400", meaning_1="m3")
     in_memory_db.add(h3)
+
     
     in_memory_db.commit()
     
@@ -232,3 +233,67 @@ def test_sbs_index_mapping_logic(in_memory_db):
         assert count == 2
         assert re.search(r"2", results)
         assert re.search(r"3", results)
+
+def test_bold_tag_verification_logic(in_memory_db):
+    from db_tests.sbs_consistency_tests import check_bold_tags
+    
+    # 1. Correct: both tags present
+    s1 = SBS(id=1, dhp_example="some <b>bold</b> text")
+    # 2. Violation: missing </b>
+    s2 = SBS(id=2, dhp_example="some <b>bold text")
+    # 3. Violation: missing <b>
+    s3 = SBS(id=3, dhp_example="some bold</b> text")
+    # 4. Violation: missing both
+    s4 = SBS(id=4, dhp_example="no bold text")
+    # 5. Correct: empty field
+    s5 = SBS(id=5, dhp_example="")
+    
+    # Test other fields too
+    s6 = SBS(id=6, sbs_example_1="<b>ex</b>", sbs_example_2="no bold")
+    
+    in_memory_db.add_all([s1, s2, s3, s4, s5, s6])
+    in_memory_db.commit()
+    
+    results_list = check_bold_tags(in_memory_db)
+    
+    # Check dhp_example results
+    dhp_res = next(r for r in results_list if r[0] == "bold_tags_dhp_example")
+    assert dhp_res[2] == 3 # ids 2, 3, 4
+    assert re.search(r"2", dhp_res[1])
+    assert re.search(r"3", dhp_res[1])
+    assert re.search(r"4", dhp_res[1])
+    
+    # Check sbs_example_2 results
+    sbs2_res = next(r for r in results_list if r[0] == "bold_tags_sbs_example_2")
+    assert sbs2_res[2] == 1 # id 6
+    assert re.search(r"6", sbs2_res[1])
+
+def test_class_translation_uniqueness_logic(in_memory_db):
+    from db_tests.sbs_consistency_tests import check_class_translation_uniqueness
+    
+    # 1. Correct: same translation, same source
+    s1 = SBS(id=1, class_example_translation="tr1", class_source="so1")
+    s2 = SBS(id=2, class_example_translation="tr1", class_source="so1")
+    
+    # 2. Violation: same translation, different sources
+    s3 = SBS(id=3, class_example_translation="tr2", class_source="so1")
+    s4 = SBS(id=4, class_example_translation="tr2", class_source="so2")
+    
+    # 3. Correct: different translations, different sources
+    s5 = SBS(id=5, class_example_translation="tr3", class_source="so3")
+    
+    # 4. Correct: empty translation
+    s6 = SBS(id=6, class_example_translation="", class_source="so4")
+    s7 = SBS(id=7, class_example_translation="", class_source="so5")
+    
+    in_memory_db.add_all([s1, s2, s3, s4, s5, s6, s7])
+    in_memory_db.commit()
+    
+    name, results, count, solution = check_class_translation_uniqueness(in_memory_db)
+    # Expect count to be 1 (one translation 'tr2' has conflicts)
+    assert count == 1
+    
+    assert re.search(r"so1", results)
+    assert re.search(r"so2", results)
+    assert "tr2" in results
+    assert not re.search(r"3", results) # Should not contain IDs

@@ -32,6 +32,23 @@ Implement a suite of data integrity tests to ensure consistency across the SBS (
 7.  **Chanting/Chapter Mapping Validation**
     *   For `sbs_example_1` and `sbs_example_2`, the combination of `sbs_chant_pali`, `sbs_chant_eng`, and `sbs_chapter` must match a valid row in `shared_data/sbs_csvs/sbs_index.csv`.
 
+8.  **Bold Tag Verification in Examples**
+    *   All SBS-related example fields must contain both start `<b>` and end `</b>` tags if the field is not empty.
+    *   **Fields to check**:
+        *   `sbs_example_1`
+        *   `sbs_example_2`
+        *   `dhp_example`
+        *   `pat_example`
+        *   `vib_example`
+        *   `class_example`
+        *   `discourses_example`
+    *   **Reporting**: The output must be categorized by the specific example field (e.g., "Missing bold tags in dhp_example") to clearly identify the source of the error.
+
+9.  **Class Example Translation Uniqueness**
+    *   Each unique `class_example_translation` should ideally correspond to only one `class_source`.
+    *   **Normalization**: Both `class_example_translation` and `class_source` must be stripped of leading/trailing whitespace before comparison to avoid false positives.
+    *   **Reporting**: If the same translation is used across different sources, it must be flagged. The output must group problematic sources by their shared translation for easier investigation.
+
 **Acceptance Criteria**
 *   A new test module `db_tests/sbs_consistency_tests.py` is created.
 *   The script `db_tests/sbs_consistency_tests.py` is made executable (`chmod +x`).

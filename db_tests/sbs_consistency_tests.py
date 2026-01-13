@@ -32,6 +32,8 @@ def run_sbs_consistency_tests():
     results_list.append(check_discourses_source_prefix(db_session))
     results_list.append(check_sbs_example_consistency(db_session))
     results_list.append(check_sbs_index_mapping(db_session))
+    results_list.extend(check_bold_tags(db_session))
+    results_list.append(check_class_translation_uniqueness(db_session))
 
     for name, results, count, solution in results_list:
         print(f"[green]{name.replace('_', ' ')} [{count}]")
@@ -358,6 +360,74 @@ def check_pat_consistency(db_session: Session) -> Tuple[str, Optional[str], int,
         regex_results(results),
         len(results),
         "ensure pat_example matches pat_source and all fields are present",
+    )
+
+
+def check_bold_tags(db_session: Session) -> List[Tuple[str, Optional[str], int, str]]:
+    """All SBS-related example fields must contain both start <b> and end </b> tags if not empty."""
+    example_fields = [
+        "sbs_example_1",
+        "sbs_example_2",
+        "dhp_example",
+        "pat_example",
+        "vib_example",
+        "class_example",
+        "discourses_example",
+    ]
+
+    all_results = []
+    sbs_data = db_session.query(SBS).all()
+
+    for field in example_fields:
+        results = []
+        for sbs in sbs_data:
+            val = getattr(sbs, field)
+            if val:
+                if "<b>" not in val or "</b>" not in val:
+                    results.append(str(sbs.id))
+
+        all_results.append(
+            (
+                f"bold_tags_{field}",
+                regex_results(results),
+                len(results),
+                f"ensure {field} has both <b> and </b> tags",
+            )
+        )
+
+    return all_results
+
+
+def check_class_translation_uniqueness(
+    db_session: Session,
+) -> Tuple[str, Optional[str], int, str]:
+    """If any class_example_translation has more than 1 corresponding class_source, it should be investigated."""
+    sbs_data = db_session.query(SBS).all()
+
+    # Map translation to set of sources
+    translation_map = {}  # {translation: set(sources)}
+
+    for sbs in sbs_data:
+        if sbs.class_example_translation:
+            tr = sbs.class_example_translation.strip()
+            if tr not in translation_map:
+                translation_map[tr] = set()
+            source = sbs.class_source.strip() if sbs.class_source else ""
+            translation_map[tr].add(source)
+
+    output_lines = []
+    for tr, sources in translation_map.items():
+        if len(sources) > 1:
+            sorted_sources = sorted([str(s) for s in sources])
+            output_lines.append(f"'{tr}': {sorted_sources}")
+
+    results_str = "\n".join(output_lines) if output_lines else None
+
+    return (
+        "class_translation_uniqueness",
+        results_str,
+        len(output_lines),
+        "ensure class_example_translation corresponds to only one class_source",
     )
 
 
