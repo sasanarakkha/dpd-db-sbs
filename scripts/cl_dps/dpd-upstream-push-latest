@@ -51,6 +51,10 @@ done
 echo "Committing..."
 git commit -m "$COMMIT_MSG"
 
+# Print files which are commited
+echo "Files commited:"
+git diff --name-only HEAD^ HEAD
+
 #add a pause here
 echo "Press enter to push to upstream..."
 read
