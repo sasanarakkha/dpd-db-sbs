@@ -14,6 +14,10 @@
 10. **Issue Reference Mapping:**
     - When mentioning "upstream repo issue #", refer to the issues at https://github.com/digitalpalidictionary/dpd-db.
     - When mentioning "local repo issue #", refer to the issues at https://github.com/sasanarakkha/dpd-db-sbs.
+11. **Model Efficiency:** Unless explicitly asked otherwise:
+    - Use **PRO** models for reasoning and decision-making.
+    - Use **FLASH** models to read output files (e.g., `*.md`, `*.json`) and large logs.
+    - If a contextual file is extremely large, ask the user to point to the exact relevant location, or use a FLASH model to extract relevant "snapshots" to feed into the PRO model. This minimizes token usage while maintaining reasoning quality.
 
 ## Task Workflow
 
@@ -36,6 +40,8 @@ All tasks follow a strict lifecycle:
 
 4. **Implement to Pass Tests (Green Phase):**
    - Write the minimum amount of application code necessary to make the failing tests pass.
+   - **CRITICAL:** After writing code, IMMEDIATELY run a syntax check (e.g., `uv run ruff check .` or `python -m py_compile <file>`) to ensure no syntax errors were introduced.
+   - **CRITICAL:** Ensure all variables are initialized before use, especially within conditional blocks, to prevent `UnboundLocalError`.
    - Run the test suite again and confirm that all tests now pass. This is the "Green" phase.
 
 5. **Refactor (Optional but Recommended):**
@@ -147,6 +153,17 @@ A task is complete when:
 4. Code passes all configured linting and static analysis checks
 5. Implementation notes added to `plan.md`
 6. User notified to perform manual commit
+
+### Session Cleanup
+
+When the user requests a "closing summary of this session" (or similar):
+1.  **Identify Current Track:** Determine the active track folder.
+2.  **Update `session_context.md`:** Write a profound, detailed summary to `conductor/tracks/<current_track>/session_context.md`.
+    *   **Current State:** Precise status of the code and features.
+    *   **Key Decisions:** Architectural choices and logic definitions that persisted (omit overwritten/obsolete intermediate steps).
+    *   **Next Steps:** Clear, actionable items for the next session.
+    *   **Outstanding Issues:** Any known bugs or unverified edge cases.
+3.  **Announce:** Confirm the context has been saved and the session is ready to be terminated.
 
 ## Continuous Improvement
 
