@@ -130,10 +130,18 @@ for idx, (i, db_entry) in enumerate(pending_items):
     console.print(
         f"[yellow]ID: {i.id} | Pali: {db_entry.lemma_1} |  POS: {db_entry.pos} | Meaning_1: {db_entry.meaning_1}"
     )
-    console.print(f"[blue]Current RU Meaning: {db_entry.ru.ru_meaning}")
-    console.print(f"[blue]Current RU Meaning Lit: {db_entry.ru.ru_meaning_lit}")
-    console.print(f"[green]Suggested RU Meaning: {i.corrections_ru_meaning}")
-    console.print(f"[green]Suggested RU Meaning Lit: {i.corrections_ru_meaning_lit}")
+    console.print(f"[blue]  Current RU Meaning: {db_entry.ru.ru_meaning}")
+    if i.corrections_ru_meaning != db_entry.ru.ru_meaning:
+        console.print(f"[green]Suggested RU Meaning: {i.corrections_ru_meaning}")
+    else:
+        console.print("[green]Suggested RU Meaning:")
+    console.print(f"[blue]  Current RU Meaning Lit: {db_entry.ru.ru_meaning_lit}")
+    if i.corrections_ru_meaning_lit != db_entry.ru.ru_meaning_lit:
+        console.print(
+            f"[green]Suggested RU Meaning Lit: {i.corrections_ru_meaning_lit}"
+        )
+    else:
+        console.print("[green]Suggested RU Meaning Lit:")
     if i.get("notes"):
         console.print(f"[green]Suggested Notes: {i.notes}")
 
