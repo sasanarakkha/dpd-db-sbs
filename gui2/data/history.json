@@ -1,5 +1,9 @@
 [
     {
+        "id": 49871,
+        "lemma_1": "bhikkhā 1"
+    },
+    {
         "id": 42909,
         "lemma_1": "parattha 1.1"
     },
@@ -74,9 +78,5 @@
     {
         "id": 50690,
         "lemma_1": "majjagandha"
-    },
-    {
-        "id": 50706,
-        "lemma_1": "majjavaṇṇa"
     }
 ]

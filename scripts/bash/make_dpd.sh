@@ -9,7 +9,7 @@ CHOSEN_OPTION=""
 git checkout sbs-ru
 
 while true; do
-    echo -ne "\033[1;36m Choose config: (1) DPD-SBS for the server; (2) DPD-SBS-RU for local use; (Esc) custom config\033[0m"
+    echo -ne "\033[1;36m Choose config: (1) DPD-SBS for the server; (2) DPD-SBS-RU for local use; (Enter) custom config\033[0m"
     read option
     case $option in
         [1]* )
