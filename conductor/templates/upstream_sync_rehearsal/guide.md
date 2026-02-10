@@ -16,8 +16,10 @@
 Synchronization is a high-risk task that requires semantic understanding, not just line-by-step diffing.
 - **Switch to PRO Model:** The agent MUST use a PRO model for **Phase 2 (Manual Merge)** and the **Test Expansion** task. 
 - **Why:** Flash models may miss logic dependencies when porting features from upstream sources to localized shadow copies. 
-- **🛑 MANDATORY MODEL SWITCH PROTOCOL:** Before starting Phase 2, the agent MUST stop and ask the user to switch models:
-    - *"Please run the `/model` command and select a PRO model (e.g., `gemini-2.0-pro-exp-02-05`) for this phase. I will wait for you to confirm the switch is complete."*
+- **🛑 MANDATORY MODEL SWITCH PROTOCOL (Manual Burst):**
+    - The CLI's "Auto" mode may default to Flash. To ensure deep reasoning, the agent MUST instruct the user to perform a **Manual Burst**:
+    - **Step 1 (Start Phase 2):** Agent asks user to switch to a Pro model manually: *"Please run `/model`, select 'Manual', and pick a PRO model (e.g., `gemini-2.0-pro-exp-02-05`) for the logic porting phase."*
+    - **Step 2 (End Phase 2):** Once manual porting is approved, the agent asks user to switch back: *"Logic porting is complete. Please run `/model` and switch back to 'Auto' or 'Flash' for the final verification phase."*
 - **Protocol:** Once the user confirms, the agent should explicitly announce: *"I am now operating with the PRO model for the semantic logic porting phase."*
 
 ## 🛑 Systematic Shadow Porting Protocol (Phase 2)
