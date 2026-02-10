@@ -15,8 +15,10 @@
 ## AI Agent Operation Strategy
 Synchronization is a high-risk task that requires semantic understanding, not just line-by-step diffing.
 - **Switch to PRO Model:** The agent MUST use a PRO model for **Phase 2 (Manual Merge)** and the **Test Expansion** task. 
-- **Why:** Flash models may miss logic dependencies when porting features from upstream sources to localized shadow copies. Pro models are required to understand the *reason* for a change and its impact on the localized fork features.
-- **Protocol:** Before starting Phase 2, the agent should explicitly announce: *"I am now switching to the PRO model for the semantic logic porting phase."*
+- **Why:** Flash models may miss logic dependencies when porting features from upstream sources to localized shadow copies. 
+- **🛑 MANDATORY MODEL SWITCH PROTOCOL:** Before starting Phase 2, the agent MUST stop and ask the user to switch models:
+    - *"Please run the `/model` command and select a PRO model (e.g., `gemini-2.0-pro-exp-02-05`) for this phase. I will wait for you to confirm the switch is complete."*
+- **Protocol:** Once the user confirms, the agent should explicitly announce: *"I am now operating with the PRO model for the semantic logic porting phase."*
 
 ## 🛑 Systematic Shadow Porting Protocol (Phase 2)
 To ensure no localized shadow copies are missed, the agent MUST execute the following automated check BEFORE declaring shadow porting complete:
