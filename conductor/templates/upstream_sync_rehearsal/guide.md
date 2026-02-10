@@ -80,6 +80,19 @@ Check for:
 - New logic in `status.html` or `home_simple.html`.
 - Flat parameter structure in `render` calls.
 
+## Phase 4: Manual User Verification
+The user manually verifies the functional state of the dictionary tools.
+
+### 🛑 Comprehensive Summary Protocol
+Before the final confirmation, the agent MUST use the **PRO model** to:
+1.  **Analyze History:** Review the entire session history.
+2.  **Summarize Technical Work:** List all major logic ports (e.g., renames, new features like RPD).
+3.  **Summarize Protocol Work:** Highlight any changes made to the rehearsal templates or core logic.
+4.  **Report Verification:** Summarize final test results and any manual checks performed.
+5.  **Save History:** Write a `history.md` file to the track folder for future reference.
+
+---
+
 ## 🛑 Unambiguous Approval Protocol
 To prevent premature commits or phase advancements, the AI agent MUST adhere to this strict protocol:
 1.  **Feedback is NOT Approval:** If the user points out an error, suggests a change, or asks a question, the agent MUST perform the requested action and then **ask for approval again**.

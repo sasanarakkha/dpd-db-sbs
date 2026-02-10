@@ -45,5 +45,7 @@
     - [ ] Verify Webapp (Ru/SBS) manually.
 - [ ] **Task: GUI Verification**
     - [ ] Verify GUI2 functionality (DpsView, Fonts, Tabs, Hotkeys).
+- [ ] **Task: Comprehensive Summary**
+    - [ ] Agent provides a detailed summary of all technical changes, protocol updates, and test results for the entire session.
 - [ ] **Task: Final Confirmation**
     - [ ] User provides final confirmation: "Track is complete".
