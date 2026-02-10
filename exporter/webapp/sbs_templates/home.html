@@ -2,347 +2,310 @@
 <html lang="{{ lang if lang else 'en' }}">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Digital Pāḷi Dictionary</title>
-    <link rel="stylesheet" type="text/css" href="/static/dpd.css" />
-    <link rel="stylesheet" type="text/css" href="/static/home.css" />
-    <link rel="stylesheet" type="text/css" href="/static/switch.css" />
-    <link rel="stylesheet" type="text/css" href="/static/tt.css" />
-    <link rel="icon" type="image/png" href="/static/dpd-logo-dark.svg" />
-
+    <link rel="icon" type="image/x-icon" href="static/favicon.ico">
+    <link rel="stylesheet" href="static/dpd.css">
+    <link rel="stylesheet" href="static/home.css">
+    <link rel="stylesheet" href="static/tt.css">
     <script>
-        // Prevents a flash of unstyled content (FOUC)
-        // This script is in the <head> so it runs before the page is rendered
-        (function () {
-            try {
-                const theme = localStorage.getItem("theme");
-                if (theme === "dark") {
-                    document.documentElement.classList.add("dark-mode");
-                }
-            } catch (e) {
-                console.log("LocalStorage is not available.", e);
-            }
-        })();
+        window.DPD_RELEASE_VERSION = "{{ dpd_release_version }}";
     </script>
+    <script defer src="static/home.js"></script>
+    <script defer src="static/app.js"></script>
+    <script defer src="static/tipitaka_translations.js"></script>
+    <script defer src="static/bold_definitions.js"></script>
 </head>
 
-<body>
-    <div class="top-controls">
-        <div class="tab-buttons">
-            <button class="tab-link active" data-tab="dpd-tab">DPD</button>
-            <button class="tab-link" data-tab="bold-def-tab">
+<body class="light-mode">
+    <div class="tabs">
+        <div class="tab-links">
+            <a href="#" class="tab-link active" onclick="switchTab('dpd')">
+                DPD
+            </a>
+            <a href="#" class="tab-link" onclick="switchTab('bd')">
                 CST Bold Definitions
-            </button>
-            <button class="tab-link" data-tab="tt-tab">
+            </a>
+            <a href="#" class="tab-link" data-tab="tt-tab" onclick="switchTab('tt')">
                 Tipiṭaka Translations
-            </button>
+            </a>
         </div>
-        <div class="header-controls">
+        <div class="header-right">
             <a href="https://forms.gle/gJ7ouhJriYREPm1s8" target="_blank" title="Get email updates"
-                class="email-button">
-                📧
+                class="email-updates-link">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="currentColor"
+                        d="M20,4H4C2.89,4,2,4.89,2,6v12c0,1.11,0.89,2,2,2h16c1.11,0,2-0.89,2-2V6C22,4.89,21.11,4,20,4z M20,18H4V8l8,5l8-5V18z M12,11L4,6h16L12,11z" />
+                </svg>
             </a>
             <div class="language-switcher">
-                <span class="language-icon" title="Language">
-                    🌐
-                    <span class="tooltip">
+                <span class="language-icon" title="Select Language">🌐</span>
+                <div class="dropdown">
+                    <div class="dropdown-content">
                         <b>Select Language</b>
-                    </span>
-                </span>
-                <div class="dropdown" style="display: none">
-                    <a href="#" class="dropdown-item" onclick="changeLanguage('en')">
-                        English
-                    </a>
-                    <a href="#" class="dropdown-item" onclick="changeLanguage('ru')">
-                        Русский
-                    </a>
+                        <hr>
+                        <a href="#" onclick="changeLanguage('ru')">Русский (ru.dpdict.net)</a>
+                        <a href="#" onclick="changeLanguage('en')">English (www.dpdict.net)</a>
+                    </div>
+                </div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="theme-toggle">
+                <span class="slider round"></span>
+            </label>
+        </div>
+    </div>
+
+    <div id="dpd-tab" class="tab-content active">
+        <div class="main-pane" id="main-pane">
+            <div class="header">
+                <a href="/" id="logo-link">
+                    <img src="static/dpd-logo.svg" alt="dpd logo" id="header-image" class="header-image" />
+                </a>
+                <h2 class="title" id="title-clear">Digital Pāḷi Dictionary</h2>
+            </div>
+            <div class="search-form" id="search-form">
+                <div class="search-input-container">
+                    <input class="search-box" type="text" name="search" id="search-box" value="{{ search }}"
+                        autocomplete="off" inputmode="text" autocapitalize="off" autofocus />
+                    <div id="search-dropdown" class="search-dropdown" style="display: none;"></div>
+                </div>
+                <button class="search-button" id="search-button">search</button>
+                <button class="search-button clear-button" id="clear-button">clear</button>
+            </div>
+            <div class="help-text">
+                <p class="message">
+                    <b>Velthuis typing:</b>
+                    aa=ā, ii=ī, uu=ū, "n=ṅ, ~n=ñ, .t=ṭ, .d=ḍ, .n=ṇ, .m=ṃ, .l=ḷ, .h=ḥ
+                </p>
+            </div>
+
+            <div id="summary-results" class="summary-results"></div>
+            <div id="dpd-results">
+                {{ dpd_results|safe }}
+            </div>
+
+            <div id="footer" class="footer">
+                <p class="message">
+                    Digital Pāḷi Dictionary by Bodhirasa Bhikkhu 2023 - 2026
+                </p>
+            </div>
+        </div>
+
+        <div class="side-pane">
+            <div class="history-pane" id="history-pane">
+                <div class="pane-header">
+                    <h3 class="dpd">History<button class="clear-history-button" id="clear-history-button" title="Clear history">x</button></h3>
+                    <button class="collapse-toggle" id="history-collapse-toggle" aria-label="Toggle history">
+                        <span class="collapse-icon">▼</span>
+                    </button>
+                </div>
+                <div id="history-list-pane" class="pane-content">
+                    <!-- History entries will be added here -->
+                </div>
+            </div>
+
+            <div class="settings-pane">
+                <div class="pane-header">
+                    <h3 class="dpd">Settings</h3>
+                    <button class="collapse-toggle" id="settings-collapse-toggle" aria-label="Toggle settings">
+                        <span class="collapse-icon">▼</span>
+                    </button>
+                </div>
+                <div class="pane-content">
+                    <div class="settings-item">
+                        font size
+                        <div class="font-size-controls">
+                            <button id="font-size-down">-</button>
+                            <span id="font-size-display">16px</span>
+                            <button id="font-size-up">+</button>
+                        </div>
+                    </div>
+                    <div class="settings-item">
+                        light / dark mode
+                        <label class="switch">
+                            <input type="checkbox" id="theme-toggle-settings">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        sans / serif font
+                        <label class="switch">
+                            <input type="checkbox" id="sans-serif-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        niggahīta ṃ / ṁ
+                        <label class="switch">
+                            <input type="checkbox" id="niggahita-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        grammar closed / open
+                        <label class="switch">
+                            <input type="checkbox" id="grammar-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        example closed / open
+                        <label class="switch">
+                            <input type="checkbox" id="example-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        one button at a time off / on
+                        <label class="switch">
+                            <input type="checkbox" id="one-button-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        summary hide / show
+                        <label class="switch">
+                            <input type="checkbox" id="summary-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        sandhi ' hide / show
+                        <label class="switch">
+                            <input type="checkbox" id="sandhi-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        audio male / female
+                        <label class="switch">
+                            <input type="checkbox" id="audio-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div id="dpd-tab" class="tab-content active">
-        <div class="header-pane">
-            <div class="logo-title">
-                <img src="static/dpd-logo.svg" alt="dpd logo" id="header-image" class="header-image" />
-                <h2 class="title" id="title-clear">DPD SBS</h2>
-            </div>
-            <form id="search-form">
-                <input class="search-box" type="text" name="search" id="search-box" value="{{ search }}"
-                    autocomplete="off" inputmode="text" autocapitalize="off" />
-                <button class="search-button" id="search-button">search</button>
-                <button class="help small-button" id="search-help-button">
-                    ?
-                    <span class="tooltip velthuis">
-                        <b>Velthuis typing:</b>
-                        <br />
-                        <br />
-                        aa > ā
-                        <br />
-                        ii > ī
-                        <br />
-                        uu > ū
-                        <br />
-                        "n > ṅ
-                        <br />
-                        ~n > ñ
-                        <br />
-                        .t > ṭ
-                        <br />
-                        .d > ḍ
-                        <br />
-                        .n > ṇ
-                        <br />
-                        .m > ṃ
-                        <br />
-                        .l > ḷ
-                    </span>
-                </button>
-            </form>
-        </div>
-        <div class="main-pane" id="main-pane">
-            <div class="history-pane" id="history-pane">
-                <h3>History</h3>
-                <button id="clear-history-button" class="clear-history-button">
-                    x
-                </button>
-                <div class="history-list-pane" id="history-list-pane"></div>
-            </div>
-            <div class="dpd-pane" id="dpd-pane">
-                <div class="summary-results" id="summary-results"></div>
-                <div class="dpd-results" id="dpd-results">{{
-                    dpd_results|safe }}</div>
-            </div>
-            <div class="settings-pane">
-                <h3>Settings</h3>
-                <p>
-                    <button class="small-button" id="font-size-down">-</button>
-                    <button class="small-button" id="font-size-up">+</button>
-                    font size
-                    <span id="font-size-display"></span>
-                </p>
-                <p>
-                    <label class="switch">
-                        <input type="checkbox" id="theme-toggle" />
-                        <span class="slider round"></span>
-                    </label>
-                    light / dark mode
-                </p>
-                <p>
-                    <label class="switch">
-                        <input type="checkbox" id="sans-serif-toggle" />
-                        <span class="slider round"></span>
-                    </label>
-                    sans / serif font
-                </p>
-                <p>
-                    <label class="switch">
-                        <input type="checkbox" id="niggahita-toggle" />
-                        <span class="slider round"></span>
-                    </label>
-                    niggahīta ṃ / ṁ
-                </p>
-                <p>
-                    <label class="switch">
-                        <input type="checkbox" id="grammar-toggle" />
-                        <span class="slider round"></span>
-                    </label>
-                    grammar closed / open
-                </p>
-                <p>
-                    <label class="switch">
-                        <input type="checkbox" id="example-toggle" />
-                        <span class="slider round"></span>
-                    </label>
-                    example closed / open
-                </p>
-                <p>
-                    <label class="switch">
-                        <input type="checkbox" id="one-button-toggle" />
-                        <span class="slider round"></span>
-                    </label>
-                    one button at a time off / on
-                </p>
-                <p>
-                    <label class="switch">
-                        <input type="checkbox" id="summary-toggle" checked />
-                        <span class="slider round"></span>
-                    </label>
-                    summary hide / show
-                </p>
-                <p>
-                    <label class="switch">
-                        <input type="checkbox" id="sandhi-toggle" checked />
-                        <span class="slider round"></span>
-                    </label>
-                    sandhi ' hide / show
-                </p>
-                <p>
-                    <label class="switch">
-                        <input type="checkbox" id="audio-toggle" />
-                        <span class="slider round"></span>
-                    </label>
-                    audio male / female
-                </p>
-            </div>
-        </div>
-        <div class="footer-pane">
+
+        <div class="dpd-footer-pane">
             For more information, please
             <a href="https://digitalpalidictionary.github.io/webapp/" target="_blank">
                 read the docs
-            </a>
-            &nbsp;|&nbsp;
+            </a>.
             <a href="https://github.com/digitalpalidictionary/dpd-db" target="_blank"
                 title="Report issues or suggest features on GitHub" class="footer-link github-link">
-                <svg class="footer-icon github-icon" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor" style="height: 1em; vertical-align: middle">
-                    <title>GitHub Issues</title>
-                    <path
-                        d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297 24 5.67 18.627.297 12 .297z" />
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="currentColor"
+                        d="M12,2A10,10,0,0,0,8.84,21.5c.5.08.66-.23.66-.5V19.31c-3.33.73-4-1.62-4-1.62-.54-1.37-1.35-1.72-1.35-1.72-1.1-.74.08-.73.08-.73,1.21.08,1.85,1.24,1.85,1.24,1.08,1.83,3.07,1.3,3.81,1a2.42,2.42,0,0,1,.72-1.54c-2.67-.3-5.47-1.33-5.47-5.93a4.61,4.61,0,0,1,1.22-3.2,4.29,4.29,0,0,1,.12-3.15s1-.32,3.3,1.23a11.36,11.36,0,0,1,6,0c2.28-1.55,3.29-1.23,3.29-1.23a4.28,4.28,0,0,1,.12,3.15,4.61,4.61,0,0,1,1.22,3.2c0,4.62-2.81,5.62-5.48,5.92a2.86,2.46,0,0,1,.82,1.93V21c0,.27.16.59.67.5A10,10,0,0,0,12,2Z" />
                 </svg>
             </a>
         </div>
     </div>
 
     <div id="bold-def-tab" class="tab-content">
-        <div class="header-pane bd-header-pane">
-            <div class="logo-title">
-                <h2 class="title" id="bd-title-clear">CST Bold
-                    Definitions</h2>
+        <div class="main-pane">
+            <div class="header">
+                <h2 class="title" id="bd-title-clear">CST Bold Definitions</h2>
             </div>
-            <p class="centered-text">
+            <div class="help-text">
                 Find
-                <b>{{ bd_count| safe }}</b>
+                <span class="pali">Pāḷi</span>
                 bold defined terms in the Chaṭṭha Saṅgāyana Tipiṭaka
-            </p>
-            <div class="bd-search-pane">
+            </div>
+            <div class="bd-search-form">
                 <h4>Search for definitions of the term</h4>
-                <form id="bd-search-form-1">
-                    <input class="search-box bd-search-box" type="text" name="bd-search-1" id="bd-search-box-1"
-                        value="{{ search }}" autocomplete="off" inputmode="text" autocapitalize="off" />
-                </form>
+                <input class="search-box" type="text" name="search" id="bd-search-box-1"
+                    value="{{ search }}" autocomplete="off" inputmode="text" autocapitalize="off" />
                 <h4>which contain</h4>
-                <form id="bd-search-form-2">
-                    <input class="search-box bd-search-box" type="text" name="bd-search-2" id="bd-search-box-2"
-                        value="{{ search }}" autocomplete="off" inputmode="text" autocapitalize="off" />
-                </form>
+                <input class="search-box" type="text" name="search" id="bd-search-box-2"
+                    value="{{ search }}" autocomplete="off" inputmode="text" autocapitalize="off" />
                 <h4>within them.</h4>
                 <button class="search-button" id="bd-search-button">search</button>
-                <button class="help small-button" id="search-help-button">
-                    ?
-                    <span class="tooltip velthuis">
-                        <b>Velthuis typing:</b>
-                        <br />
-                        <br />
-                        aa > ā
-                        <br />
-                        ii > ī
-                        <br />
-                        uu > ū
-                        <br />
-                        "n > ṅ
-                        <br />
-                        ~n > ñ
-                        <br />
-                        .t > ṭ
-                        <br />
-                        .d > ḍ
-                        <br />
-                        .n > ṇ
-                        <br />
-                        .m > ṃ
-                        <br />
-                        .l > ḷ
-                    </span>
-                </button>
             </div>
+            <div class="help-text">
+                <p class="message">
+                    <b>Velthuis typing:</b>
+                    aa=ā, ii=ī, uu=ū, "n=ṅ, ~n=ñ, .t=ṭ, .d=ḍ, .n=ṇ, .m=ṃ, .l=ḷ, .h=ḥ
+                </p>
+            </div>
+
             <div class="bd-search-options">
-                <input type="radio" id="option1" name="option" value="starts_with" />
+                <input type="radio" id="option1" name="option" value="start with">
                 <label for="option1">start with</label>
-                <input type="radio" id="option2" name="option" value="regex" checked />
+                <input type="radio" id="option2" name="option" value="regex" checked>
                 <label for="option2">normal/rx</label>
-                <input type="radio" id="option3" name="option" value="fuzzy" />
+                <input type="radio" id="option3" name="option" value="fuzzy">
                 <label for="option3">fuzzy</label>
                 <button type="button" class="bd-search-option-clear">clear</button>
             </div>
+
+            <div id="bd-results" class="bd-results">
+            </div>
         </div>
-        <div class="scrolling-pane" id="bd-results">{{ bd_results|safe
-            }}</div>
         <div class="footer-pane">
             For detailed information on this feature, please
             <a href="https://digitalpalidictionary.github.io/webapp/" target="_blank">
                 read the docs
-            </a>
-            . This uses
-            <a href="https://github.com/VipassanaTech/tipitaka-xml" target="_blank">
+            </a>. This uses text from the
+            <a href="https://www.tipitaka.org/" target="_blank">
                 Vipassana Research Institute
-            </a>
-            texts
+            </a>.
         </div>
     </div>
 
     <div id="tt-tab" class="tab-content">
-        <div class="header-pane bd-header-pane">
-            <div class="logo-title">
+        <div class="main-pane">
+            <div class="header">
                 <h2 class="title" id="tt-title-clear">Tipiṭaka Translations</h2>
             </div>
-            <p class="centered-text">
-                Search for Pāḷi text or English translations in the Chaṭṭha Saṅgāyana Tipiṭaka
-            </p>
-            <div class="bd-search-pane">
-                <form id="tt-search-form">
+            <div class="help-text">
+                Search for words or phrases in the texts and their translations.
+            </div>
+            <div class="tt-search-container">
+                <div class="tt-search-form">
                     <div class="tt-search-row">
-                        <label class="tt-label">Search for</label>
-                        <input class="search-box tt-search-box" type="text" id="tt-search-box" autocomplete="off"
+                        <input class="tt-search-box" type="text" id="tt-search-box"
                             inputmode="text" autocapitalize="off" placeholder="use plain text or regex" />
-                        <label class="tt-label">in</label>
                         <select id="tt-lang-select" class="tt-select">
-                            <option value="Pāḷi">Pāḷi texts</option>
-                            <option value="English">English translations</option>
+                            <option value="Pāḷi">Pāḷi</option>
+                            <option value="English">English</option>
                         </select>
-                        <label class="tt-label">in</label>
-                        <select id="tt-book-select" class="tt-select">
-                            <option value="all">all books</option>
-                            {% for book in book_options %}
-                            <option value="{{ book }}">{{ book }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="tt-book-dropdown">
+                            <button type="button" id="tt-book-dropdown-btn" class="tt-book-dropdown-btn">
+                                <span id="tt-book-selected-text">all books</span>
+                                <span class="tt-dropdown-arrow">▼</span>
+                            </button>
+                            <div id="tt-book-dropdown-menu" class="tt-book-dropdown-menu">
+                                <label class="tt-book-dropdown-option">
+                                    <input type="checkbox" class="tt-book-checkbox" value="all" checked>
+                                    all books
+                                </label>
+                                {% for book in book_options %}
+                                <label class="tt-book-dropdown-option">
+                                    <input type="checkbox" class="tt-book-checkbox" value="{{ book }}">
+                                    {{ book }}
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
                         <button class="search-button" id="tt-search-button">search</button>
+                        <button class="search-button clear-button" id="tt-clear-button">clear</button>
                     </div>
-                    <div class="tt-search-row">
-                        <label class="tt-label">Only show results</label>
-                        <select id="tt-filter-mode" class="tt-select">
-                            <option value="with">with</option>
-                            <option value="without">without</option>
-                        </select>
-                        <input class="search-box tt-search-box" type="text" id="tt-filter-box" autocomplete="off"
-                            placeholder="use plain text or regex" />
-                        <label class="tt-label">in them.</label>
-                        <button type="button" class="search-button" id="tt-clear-button"
-                            style="margin-left: auto;">clear</button>
-                    </div>
-                </form>
+                </div>
+            </div>
+            <div id="tt-results" class="tt-results">
             </div>
         </div>
-        <div class="scrolling-pane" id="tt-results"></div>
         <div class="footer-pane">
-            This page uses the database from <a href="https://tipitaka.paauksociety.org/index.php" target="_blank">Pa
-                Auk Society Tipiṭaka Translations</a>.
-            Pāḷī texts are from
-            <a href="https://github.com/VipassanaTech/tipitaka-xml" target="_blank">
-                Vipassana Research Institute
-            </a>
-            and English translations are generated using Deepseek.
+            Search for words or phrases in the texts and translations of
+            <a href="https://www.tipitaka.org/" target="_blank">CST</a> and
+            <a href="https://suttacentral.net/" target="_blank">SuttaCentral</a>.
         </div>
     </div>
 
-    <script src="static/app.js" defer></script>
-    <script src="static/home.js"></script>
-    <script src="static/bold_definitions.js"></script>
-    <script src="static/tipitaka_translations.js"></script>
-    <script src="static/dpd.js"></script>
-    <script src="static/sorter.js"></script>
 </body>
 
 </html>

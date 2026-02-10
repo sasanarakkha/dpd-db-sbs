@@ -12,6 +12,60 @@
    /conductor:implement Upstream Sync Rehearsal
    ```
 
+## AI Agent Operation Strategy
+Synchronization is a high-risk task that requires semantic understanding, not just line-by-step diffing.
+- **Switch to PRO Model:** The agent MUST use a PRO model for **Phase 2 (Manual Merge)** and the **Test Expansion** task. 
+- **Why:** Flash models may miss logic dependencies when porting features from upstream sources to localized shadow copies. Pro models are required to understand the *reason* for a change and its impact on the localized fork features.
+- **Protocol:** Before starting Phase 2, the agent should explicitly announce: *"I am now switching to the PRO model for the semantic logic porting phase."*
+
+## 🛑 Systematic Shadow Porting Protocol (Phase 2)
+To ensure no localized shadow copies are missed, the agent MUST execute the following automated check BEFORE declaring shadow porting complete:
+
+1.  **Identify Changes:** Run `git diff-tree --no-commit-id --name-only -r HEAD` (referencing the sync commit from Phase 1).
+2.  **Cross-Reference:** Use a script or tool to match EVERY changed file against the `dps_sync_registry.json`.
+    -   **Multi-Shadow Source Check:** Be aware that a single upstream source (file or folder) can have **MULTIPLE** shadow destinations in the fork.
+    -   **CRITICAL TRIPLE SHADOW CHECKLIST:** 
+        - `tools/paths.py` -> `tools/paths_ru.py` AND `tools/paths_dps.py`.
+        - `exporter/goldendict/templates/` -> `ru_components/templates/` AND `sbs_templates/`.
+        - `exporter/webapp/templates/` -> `ru_templates/` AND `sbs_templates/`.
+        - `exporter/goldendict/export_epd.py` -> `export_rpd.py` AND `export_epd_sbs.py`.
+    -   If a changed file is a **source** (value) in `russian_copies` or `sbs_copies`, **ALL** its corresponding **shadows** (keys) MUST be checked.
+3.  **Mandatory Review List:** The agent MUST present a list of every source/shadow pair identified for review to the user before proceeding with porting.
+
+---
+
+## 🛑 Modified Upstream Diffing Protocol
+Files in `modified_upstream_files` (like `gui2/main.py`, `db/models.py`) MUST NOT simply be restored to their previous local state.
+- **Mandatory Action:** Run `git diff as_upstream <file>` for EVERY file in this list.
+- **Goal:** Identify new upstream features or bugfixes that need to be manually integrated into the DPS version while preserving local elements.
+
+---
+
+## 🛑 .gitignore Merge Logic
+NEVER overwrite `.gitignore` with the upstream version. 
+- **Protocol:** You must manually merge upstream patterns into the existing `.gitignore`.
+- **Preservation:** Always ensure `.DS_Store`, local track paths, and DPS-specific exclusion patterns are maintained.
+
+---
+
+## Webapp Shadow Verification
+Upstream changes in `exporter/webapp/templates/` MUST be ported to BOTH:
+- `exporter/webapp/ru_templates/`
+- `exporter/webapp/sbs_templates/`
+
+Check for:
+- New template files (must be created and localized).
+- Class name changes (e.g., `dpd-button`, `dpd-link`).
+- Structural changes in `home.html` (new tabs, settings, or dropdowns).
+- New logic in `status.html` or `home_simple.html`.
+- Flat parameter structure in `render` calls.
+
+## 🛑 Unambiguous Approval Protocol
+To prevent premature commits or phase advancements, the AI agent MUST adhere to this strict protocol:
+1.  **Feedback is NOT Approval:** If the user points out an error, suggests a change, or asks a question, the agent MUST perform the requested action and then **ask for approval again**.
+2.  **Explicit Signal Required:** The agent MUST NOT proceed to a commit or the next phase until the user provides an explicit signal of completion, such as: *"Phase X is complete"*, *"Approved"*, or *"Proceed with commit"*.
+3.  **Confirm Understanding:** If the user's response is ambiguous, the agent MUST ask: *"Does this mean I have your approval to commit and proceed to the next task? Please confirm with 'Yes' or 'Phase X is complete'."*
+
 ---
 
 This guide documents the logic and manual steps required to synchronize the DPS fork (`sbs-ru` branch) with the upstream repository (`as_upstream` branch).
@@ -29,6 +83,15 @@ The `dps_sync_registry.json` is the source of truth for managing the relationshi
 ## Core Logic for Preservation
 
 The following logic and files MUST be preserved during any synchronization process.
+
+### 🛑 Mandatory Manual Diffing (Critical)
+The following files in `modified_upstream_files` MUST be manually diffed against `as_upstream` every single sync, as they contain critical fork-specific UI/logic that must be preserved while adopting upstream structural updates:
+- `gui2/pass2_add_view.py`: Preserves custom font sizes, clipboard logic, and `fast_api_utils_dps`.
+- `scripts/bash/generate_components.py`: Core build script that often requires manual merging of build steps.
+- `tools/paths.py`: Source for shadow paths; new upstream directories MUST be ported to `paths_ru.py` and `paths_dps.py`.
+- `exporter/webapp/data_classes.py`: Preserves `show_ru_data` and localized webapp features.
+- `db/models.py`: Preserves the primary schema deviations (SBS/Ru tables).
+- `tools/ai_manager.py`: Preserves additional AI providers.
 
 ### 1. Database Schema (`db/models.py`)
 - **Deviations:**
@@ -118,7 +181,8 @@ Follow these steps when performing an upstream sync:
 ### Phase 1: Automated Pull
 1. [ ] Run `bash scripts/cl_dps/dpd-sync-folders`.
 2. [ ] Choose **Option 2 (Selective Sync)**.
-3. [ ] Verify that `sbs-ru` is updated and modified files listed in the registry are preserved.
+3. [ ] **Update Submodules**: Run `git submodule init && git submodule update` to ensure resources (like `sc-data`) are up to date.
+4. [ ] Verify that `sbs-ru` is updated and modified files listed in the registry are preserved.
 
 ### Phase 2: Manual Porting (Reasoning Phase)
 4. [ ] **`modified_upstream_files`**: For each file, compare `sbs-ru` version against `as_upstream`. If upstream has new features or bug fixes, manually integrate them into the fork's version.
@@ -138,6 +202,8 @@ Follow these steps when performing an upstream sync:
         - **If used:** You must either refactor your local code to stop using them OR add them to `unique_paths` to preserve them.
         - **If unused:** Ensure they are deleted to keep the fork clean.
 9. [ ] **UI Scaling**: Verify `gui2/font_scaling_helper.py` was executed correctly (it is part of the sync script).
+    - **Protocol:** The sync script MUST run `git add .` AFTER the font scaling script so the Phase 1 commit is clean.
+    - **Verification:** Run `git diff HEAD^ gui2/` to confirm font sizes are scaled (e.g., 10 -> 14).
 10. [ ] **Verification Tests**:
     - Run `uv run pytest tests/test_dps_imports.py` to verify that all critical DPS modules are intact and dependencies are met.
     - Run `uv run pytest tests/test_dps_logic.py` to verify that key family generation and lookup logic is preserved.

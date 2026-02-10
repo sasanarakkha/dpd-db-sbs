@@ -20,7 +20,8 @@
     "gui2/pass2_add_view.py",
     "tools/ai_manager.py",
     ".gitignore",
-    "AGENTS.md"
+    "AGENTS.md",
+    "exporter/webapp/data_classes.py"
   ],
   "ignored_files": [
     "gui2/data",
@@ -28,7 +29,8 @@
     "conductor/tracks.md",
     "scripts/archive",
     "db/backup_tsv/*.tsv",
-    "docs_rus/dpd_rus.md"
+    "docs_rus/dpd_rus.md",
+    "exporter/mcp"
   ],
   "unique_paths": [
     ".github/workflows/submodules_update.yml",

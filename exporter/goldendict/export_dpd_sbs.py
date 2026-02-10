@@ -39,7 +39,7 @@ from tools.niggahitas import add_niggahitas
 from tools.paths_dps import DPSPaths
 from tools.pos import CONJUGATIONS, DECLENSIONS, INDECLINABLES
 from tools.printer import printer as pr
-from tools.sandhi_contraction import SandhiContractionDict
+from tools.speech_marks import SpeechMarksDict
 from tools.superscripter import superscripter_uni
 from tools.utils import (
     list_into_batches,
@@ -98,7 +98,7 @@ class DpdHeadwordDbParts(TypedDict):
 
 
 class DpdHeadwordRenderDataBase(TypedDict):
-    sandhi_contractions: SandhiContractionDict
+    speech_marks: SpeechMarksDict
     cf_set: Set[str]
     idioms_set: Set[str]
     show_id: bool
@@ -134,7 +134,7 @@ def render_pali_word_dpd_html(
 
     tt = rd["word_templates"]
     pth = rd["pth"]
-    sandhi_contractions = rd["sandhi_contractions"]
+    speech_marks = rd["speech_marks"]
 
     # replace \n with html line break
     if i.meaning_1:
@@ -309,8 +309,8 @@ def render_pali_word_dpd_html(
     synonyms = add_niggahitas(synonyms)
 
     for synonym in synonyms:
-        if synonym in sandhi_contractions:
-            contractions = sandhi_contractions[synonym]
+        if synonym in speech_marks:
+            contractions = speech_marks[synonym]
             for contraction in contractions:
                 if "'" in contraction:
                     synonyms.append(contraction)
@@ -378,8 +378,9 @@ def _parse_batch_top_level(
 
 def generate_dpd_html(
     db_session: Session,
-    pth: DPSPaths,
-    sandhi_contractions: SandhiContractionDict,
+    pth: ProjectPaths,
+    dpspth: DPSPaths,
+    speech_marks: SpeechMarksDict,
     cf_set: Set[str],
     idioms_set: set[str],
     show_sbs_data=False,
@@ -389,7 +390,7 @@ def generate_dpd_html(
 ) -> Tuple[List[DictEntry], RenderedSizes]:
     pr.green_title("generating dpd html")
 
-    paths = pth
+    paths = dpspth
 
     if config_test("dictionary", "show_id", "yes"):
         show_id: bool = True
@@ -475,7 +476,7 @@ def generate_dpd_html(
 
         # Create base render data without unpickleable fields
         render_data: DpdHeadwordRenderDataBase = {
-            "sandhi_contractions": sandhi_contractions,
+            "speech_marks": speech_marks,
             "cf_set": cf_set,
             "idioms_set": idioms_set,
             "show_id": show_id,
@@ -557,12 +558,12 @@ def render_button_box_templ(
 ) -> str:
     """render buttons for each section of the dictionary"""
 
-    button_html = '<a class="button" href="#" data-target="{target}">{name}</a>'
+    button_html = '<a class="dpd-button" href="#" data-target="{target}">{name}</a>'
 
     # play_button
     if i.needs_audio_button:
         play_button = (
-            f'<a class="button play" onclick="playAudio(\'{i.lemma_clean}\', this)" title="Play Audio">'
+            f'<a class="dpd-button play" onclick="playAudio(\'{i.lemma_clean}\', this)" title="Play Audio">'
             '<svg viewBox="0 0 24 24" width="16px" height="16px" fill="currentColor" stroke="currentColor" stroke-width="0">'
             '<path d="M8 5v14l11-7z"></path>'
             "</svg>"

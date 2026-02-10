@@ -31,7 +31,7 @@ class AiSearchPopup:
             modal=True,
             content=ft.Column(
                 [
-                    ft.Row([ft.Text("Ask AI", size=14, color=ft.Colors.GREY_500)]),
+                    ft.Row([ft.Text("Ask AI", size=19, color=ft.Colors.GREY_500)]),
                     ft.Row([self.prompt_field]),
                     ft.Container(
                         ft.Column(

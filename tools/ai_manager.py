@@ -22,16 +22,13 @@ class AIResponse(NamedTuple):
 class AIManager:
     # Ordered list of (provider, model, delay_seconds) tuples as fallback defaults
     DEFAULT_MODELS: list[tuple[str, str, int]] = [
-        # ("gemini", "gemini-2.5-pro", 12),
-        ("gemini", "gemini-2.5-flash", 8),
-        ("openrouter", "qwen/qwen3-235b-a22b:free", 8),
-        ("openrouter", "meituan/longcat-flash-chat:free", 8),
-        # ("openrouter", "google/gemma-3-27b-it:free", 8),
-        ("openrouter", "meta-llama/llama-3.3-70b-instruct:free", 8),
-        # ("openai", "gpt-4o-mini", 6),
-        # ("openai", "gpt-4.1", 12),
-        # cat from openrouter
-        # opencode
+        # gemini
+        ("gemini", "gemini-2.0-flash", 12),
+        ("gemini", "gemini-2.0-flash-lite", 6),
+        # openrouter
+        ("openrouter", "google/gemini-2.0-flash-001", 5),
+        ("openrouter", "qwen/qwen-turbo", 5),
+        ("openrouter", "mistralai/mistral-7b-instruct-v0.1", 5),
     ]
 
     # Grounded models for internet searches

@@ -13,7 +13,7 @@ LABEL_WIDTH = 250
 BUTTON_WIDTH = 250
 LABEL_COLOUR = ft.Colors.GREY_500
 HIGHLIGHT_COLOUR = ft.Colors.BLUE_200
-TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=10)
+TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=14)
 
 
 class Pass1AddView(ft.Column, PopUpMixin):
@@ -62,7 +62,7 @@ class Pass1AddView(ft.Column, PopUpMixin):
             autofocus=True,
             options=self.book_options,
             width=300,
-            text_size=14,
+            text_size=19,
             border_color=HIGHLIGHT_COLOUR,
             border_radius=20,
         )
@@ -88,7 +88,7 @@ class Pass1AddView(ft.Column, PopUpMixin):
             expand=True,
             expand_loose=True,
             border_radius=20,
-            text_size=14,
+            text_size=19,
             on_change=self._handle_history_selection,
         )
 

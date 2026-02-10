@@ -21,8 +21,10 @@ To be the world's most precise, comprehensive, and accessible digital resource f
 - **Russian Translation (Fork Feature):** A dedicated `Russian` table providing localized meanings, literal translations, and etymological cognates for Russian-speaking scholars.
 - **SBS Study Tools (Fork Feature):** Integration of the `SBS` table, which maps Pāḷi examples, chantings, and chapter references specifically for SBS study materials.
 - **Compound Deconstructor:** A sophisticated engine (Python/Go) that breaks down complex Pāḷi compounds into their constituent parts.
+- **Mobile-Optimized Webapp:** Responsive design with double-tap-to-lookup, collapsible panels, and touch-optimized interactions for a seamless experience on smartphones.
 - **Multi-Format Exporters:** Automated pipelines that generate production-ready dictionary files for GoldenDict, MDict, Kindle, Kobo, and PDF (via Typst).
 - **Modern GUI:** A Flet-based interface for lexicographers to add, edit, and verify data with real-time integrity checks.
+- **Cross-Browser Extension:** Instant Pāḷi lookup for Chrome and Firefox on SuttaCentral, Digital Pāli Reader, and other Dhamma websites with intelligent theme matching and customizable lookup settings.
 - **Audio Integration:** Synthesized and recorded Pāḷi pronunciations integrated directly into the lookup experience.
 - **Pāḷi MCP Server:** A Model Context Protocol server that enables AI agents to interact with the DPD database for high-precision linguistic analysis.
 
@@ -32,9 +34,36 @@ DPD is uniquely positioned for the AI era. By providing a structured MCP interfa
 ## Technical Competitive Edge
 - **Hybrid Performance:** Using Go for CPU-bound tasks like compound deconstruction while maintaining Python's flexibility for database management.
 - **Data Integrity:** Strict SQLAlchemy models and a suite of over 100 automated data-integrity tests, including specialized SBS consistency checks, ensure the dictionary remains error-free.
+- **Production Observability:** Integrated real-time monitoring of memory usage and request performance to ensure high availability and stability under load.
 - **Platform Agnostic:** We don't just provide a website; we provide the *data* in formats that work offline, in e-readers, and on mobile devices.
 
 ## Future Road Map
 - **DPD Mobile (Expo):** A full-featured mobile application with "Tap-to-Lookup" capabilities across the OS.
 - **Chrome Extension:** Instant Pāḷi lookup for SuttaCentral and other Dhamma websites.
 - **AI-Assisted Lexicography:** Integrated AI tools in the GUI to suggest spelling and grammar corrections, identify rare grammatical forms, and suggest literal meanings for verification.
+
+## Release Schedule
+
+DPD releases follow the **Uposatha** observance days in the Buddhist calendar. Specifically, DPD is released on the **full moon Uposatha** day, which occurs approximately once per month.
+
+### Current Uposatha Dates (2025-2027)
+
+The specific release dates are maintained in `tools/uposatha_day.py`. Key dates include:
+
+**2025:**
+- January 13, February 12, March 14, April 13, May 12, June 11
+- July 9-10, August 9, September 7, October 7, November 5, December 5
+
+**2026:**
+- January 3, February 2, March 3, April 2, May 2, May 31
+- June 30, July 29, August 28, September 27, October 26, November 24, December 24
+
+**2027:**
+- January 22 (and continuing...)
+
+### For Developers
+
+When building features related to update checking or distribution:
+- The `tools/uposatha_day.py` module provides `UposathaManger.uposatha_today()` to check if today is an uposatha day
+- Releases are published to GitHub on these dates
+- Users checking for updates should be informed that new releases come out monthly on Uposatha days

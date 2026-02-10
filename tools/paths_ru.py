@@ -20,6 +20,15 @@ class RuPaths:
         # /tsvs/
         self.sets_ru_path = base_dir / "shared_data/rus/sets_ru.tsv"
 
+        # db/suttas
+        self.dv_catalogue_suttas_tsv_path = (
+            base_dir / "db/suttas/dv_catalogue_suttas.tsv"
+        )
+
+        # tools
+        self.uposatha_day_ini = base_dir / "tools/uposatha_day.ini"
+        self.tpr_codes_json_path = base_dir / "tools/tpr_codes.json"
+
         # exporter/kindle/
         self.epub_dir = base_dir / "exporter/kindle/ru_components/epub/"
         self.kindlegen_path = base_dir / "exporter/kindle/kindlegen"
@@ -61,6 +70,12 @@ class RuPaths:
         )
         self.ebook_letter_templ_path = (
             base_dir / "exporter/kindle/ru_components/templates/ebook_ru_letter.html"
+        )
+        self.ebook_rpd_entry_templ_path = (
+            base_dir / "exporter/kindle/ru_components/templates/ebook_ru_rpd_entry.html"
+        )
+        self.ebook_rpd_letter_templ_path = (
+            base_dir / "exporter/kindle/ru_components/templates/ebook_ru_rpd_letter.html"
         )
         self.ebook_title_page_templ_path = (
             base_dir / "exporter/kindle/ru_components/templates/ebook_ru_titlepage.html"
@@ -291,6 +306,8 @@ class RuPaths:
         self.template_rpd = "rpd.html"
         self.template_variant_summary = "variant_summary.html"
         self.template_variant = "variant.html"
+        self.template_manual_variant = "manual_variant.html"
+        self.template_manual_variant_summary = "manual_variant_summary.html"
         self.template_spelling_summary = "spelling_summary.html"
         self.template_spelling = "spelling.html"
 

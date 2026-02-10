@@ -1,6 +1,6 @@
-<h3 id="abbreviation: {{ d.headword }}">{{d.headword}}</h3>
+<h3 class="dpd" id="abbreviation: {{ d.headword }}">{{d.headword}}</h3>
 <div class="tertiary">
-    <table class="help">
+    <table class="grammar">
         <tr>
             <th>
                 Abbreviation
@@ -23,11 +23,10 @@
                 Pāḷi
             </th>
             <td>
-                {{d.pali|safe}}
+                <i>{{d.pali|safe}}</i>
             </td>
         </tr>
         {% endif %}
-
         {% if d.example: %}
         <tr>
             <th>
@@ -38,7 +37,6 @@
             </td>
         </tr>
         {% endif %}
-
         {% if d.explanation: %}
         <tr>
             <th>
@@ -48,28 +46,6 @@
                 {{d.explanation|safe}}
             </td>
         </tr>
-        {% endif %}
-        {% if d.show_ru_data %}
-            {% if d.ru_abbrev and d.ru_abbrev != d.headword %}
-            <tr>
-                <th>
-                    Сокращение
-                </th>
-                <td>
-                    {{d.ru_abbrev|safe}}
-                </td>
-            </tr>
-            {% endif %}
-            {% if d.ru_meaning %}
-            <tr>
-                <th>
-                    Значение
-                </th>
-                <td>
-                    {{d.ru_meaning|safe}}
-                </td>
-            </tr>
-            {% endif %}
         {% endif %}
     </table>
 </div>

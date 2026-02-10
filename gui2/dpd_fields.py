@@ -402,7 +402,7 @@ class DpdFields(PopUpMixin):
         label = ft.Text(
             field_name,
             color=ft.Colors.GREY_500,
-            size=12,
+            size=16,
             width=150,
             selectable=True,
         )
@@ -415,7 +415,7 @@ class DpdFields(PopUpMixin):
                 # Create the button initially disabled
                 transfer_btn = ft.IconButton(
                     icon=ft.Icons.ARROW_BACK,
-                    icon_size=20,
+                    icon_size=28,
                     tooltip="Copy to db field",
                     # Use a lambda that captures the correct field names
                     on_click=lambda e,

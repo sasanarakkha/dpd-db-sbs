@@ -172,7 +172,7 @@ class TestKindleExporterRu:
     @patch('exporter.kindle.kindle_exporter_ru.config_test')
     @patch('exporter.kindle.kindle_exporter_ru.ProjectPaths')
     @patch('exporter.kindle.kindle_exporter_ru.RuPaths')
-    @patch('exporter.kindle.kindle_exporter_ru.render_xhtml')
+    @patch('exporter.kindle.kindle_exporter_ru.render_dpd_xhtml')
     @patch('exporter.kindle.kindle_exporter_ru.save_abbreviations_xhtml_page')
     @patch('exporter.kindle.kindle_exporter_ru.save_title_page_xhtml')
     @patch('exporter.kindle.kindle_exporter_ru.zip_epub')

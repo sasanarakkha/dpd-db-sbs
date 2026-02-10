@@ -12,6 +12,10 @@
 8. **Code Quality is Mandatory:** All changed files MUST pass `uv run ruff check --fix` and `uv run ruff format` before task completion. This is not optional.
 9. **Non-Interactive & CI-Aware:** Prefer non-interactive commands. Use `CI=true` for watch-mode tools (tests, linters) to ensure single execution.
 10. **Proactive Research:** Always perform a Google Search during the planning and task execution phases for any framework-specific (e.g., Flet), OS-specific (e.g., Linux window management), or non-trivial technical requirements to identify known quirks, limitations, or best practices.
+11. **Unambiguous Approval Protocol:** To prevent premature commits or phase advancements, the AI agent MUST adhere to this strict protocol:
+    - **Feedback is NOT Approval:** If the user points out an error, suggests a change, or asks a question, the agent MUST perform the requested action and then **ask for approval again**.
+    - **Explicit Signal Required:** The agent MUST NOT proceed to a commit or the next phase until the user provides an explicit signal of completion, such as: *"Phase X is complete"*, *"Approved"*, or *"Proceed with commit"*.
+    - **Confirm Understanding:** If the user's response is ambiguous, the agent MUST ask: *"Does this mean I have your approval to commit and proceed to the next task? Please confirm with 'Yes' or 'Phase X is complete'."*
 
 ## Task Workflow
 

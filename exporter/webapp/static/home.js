@@ -4,17 +4,25 @@ const c = console.log;
 
 const docBody = document.body;
 const titleClear = document.getElementById("title-clear");
+const logoLink = document.getElementById("logo-link");
 const mainPane = document.getElementById("main-pane");
 const dpdPane = document.getElementById("dpd-pane");
 const summaryResults = document.getElementById("summary-results");
 const dpdResults = document.getElementById("dpd-results");
 const historyPane = document.getElementById("history-pane");
 const historyListPane = document.getElementById("history-list-pane");
+const historyCollapseToggle = document.getElementById(
+  "history-collapse-toggle",
+);
+const settingsCollapseToggle = document.getElementById(
+  "settings-collapse-toggle",
+);
 const subTitle = document.getElementById("subtitle");
 const searchBox = document.getElementById("search-box");
 const entryBoxClass = document.getElementsByClassName("search-box");
 const searchForm = document.getElementById("search-form");
 const searchButton = document.getElementById("search-button");
+const clearButton = document.getElementById("clear-button");
 const footerText = document.getElementById("footer");
 
 const themeToggle = document.getElementById("theme-toggle");
@@ -144,19 +152,189 @@ titleClear.addEventListener("dblclick", function () {
   dpdPane.innerHTML = "";
 });
 
-// Original double-click functionality
+logoLink.addEventListener("click", function (e) {
+  e.preventDefault();
+  clearSearch();
+});
+
+// Double-click and tap functionality for desktop and mobile
 dpdPane.addEventListener("dblclick", processSelection);
 historyPane.addEventListener("dblclick", processSelection);
 
-function processSelection() {
-  const selection = window.getSelection().toString();
-  if (selection.trim() !== "") {
-    // Update appState before calling performSearch to prevent flashing
-    if (typeof appState !== "undefined" && appState.activeTab === "dpd") {
-      appState.dpd.searchTerm = selection;
+// Mobile tap support - detect double-tap
+dpdPane.addEventListener("touchend", handleTouchEnd);
+historyPane.addEventListener("touchend", handleTouchEnd);
+
+let lastTapTime = 0;
+let lastTapTarget = null;
+
+function handleTouchEnd(event) {
+  const currentTime = new Date().getTime();
+  const tapLength = currentTime - lastTapTime;
+  const target = event.target;
+
+  // Check if this is a double-tap (within 300ms and on same element)
+  if (tapLength < 300 && tapLength > 0 && target === lastTapTarget) {
+    event.preventDefault();
+    processSelection(event);
+  }
+
+  lastTapTime = currentTime;
+  lastTapTarget = target;
+}
+
+function processSelection(event) {
+  const selection = window.getSelection();
+
+  // First, expand the selection to include the full word across HTML elements
+  expandSelectionToWord();
+
+  // Get the expanded selection text
+  let selectedText = selection.toString().trim();
+
+  // If still no text, return
+  if (!selectedText || selectedText === "") {
+    return;
+  }
+
+  // Update appState before calling performSearch to prevent flashing
+  if (typeof appState !== "undefined" && appState.activeTab === "dpd") {
+    appState.dpd.searchTerm = selectedText;
+  }
+  searchBox.value = selectedText;
+  window.performSearch();
+}
+
+// Check if a character is a word character (Pāḷi or English alphabet)
+function isWordChar(char) {
+  // Pāḷi alphabet: a-z, A-Z, ā, ī, ū, ṅ, ñ, ṭ, ḍ, ṇ, ṁ, ṃ, ḷ
+  // Using Unicode ranges and specific characters
+  const wordCharRegex =
+    /[a-zA-Z\u0101\u012b\u016b\u1e45\u00f1\u1e6d\u1e0d\u1e47\u1e41\u1e43\u1e37]/;
+  return wordCharRegex.test(char);
+}
+
+// Expand selection to include the full word across HTML elements
+// Adapted from exporter/wxt_extension/utils/utils.ts
+function expandSelectionToWord() {
+  const selection = window.getSelection();
+  if (!selection || !selection.rangeCount) return;
+  const range = selection.getRangeAt(0);
+
+  // If the selection already spans across multiple nodes, trust it.
+  if (range.startContainer !== range.endContainer) return;
+
+  const initialNode = range.startContainer;
+  if (initialNode.nodeType !== Node.TEXT_NODE) return;
+
+  // Characters to stop on.
+  // Note: Apostrophe ('), hyphen (-) are removed from stopChars
+  // so expansion includes suffixes like "ti and compound words with hyphens/apostrophes.
+  const stopChars =
+    /[ \t\n\r\.\,\;\:\!\?\(\)\[\]\{\}\\\/\*\&\%\$\#\@\+\=\<\>\♦0-9"]/;
+  const isStop = (char) => !char || stopChars.test(char);
+
+  let startNode = initialNode;
+  let startOffset = range.startOffset;
+  let endNode = initialNode;
+  let endOffset = range.endOffset;
+
+  // Helper to find the next/previous text node in the document order
+  const getNextTextNode = (node, forward) => {
+    let current = node;
+    while (current) {
+      // Move to sibling or parent's sibling
+      let next = forward ? current.nextSibling : current.previousSibling;
+      if (!next) {
+        current = current.parentElement;
+        // Don't cross out of a block element
+        if (current && window.getComputedStyle(current).display !== "inline")
+          return null;
+        continue;
+      }
+      current = next;
+
+      // If we hit a block element or <br> tag, stop
+      if (current.nodeType === Node.ELEMENT_NODE) {
+        const element = current;
+        if (
+          window.getComputedStyle(element).display !== "inline" ||
+          element.tagName.toLowerCase() === "br"
+        ) {
+          return null;
+        }
+      }
+
+      // If it's a text node, return it
+      if (current.nodeType === Node.TEXT_NODE) return current;
+
+      // If it's an inline element, go inside it
+      if (current.nodeType === Node.ELEMENT_NODE) {
+        const walker = document.createTreeWalker(
+          current,
+          NodeFilter.SHOW_TEXT,
+          null,
+        );
+        const textNode = forward ? walker.firstChild() : walker.lastChild();
+        if (textNode) return textNode;
+      }
     }
-    searchBox.value = selection;
-    window.performSearch();
+    return null;
+  };
+
+  // Expand backwards
+  while (startNode && startNode.nodeValue) {
+    const text = startNode.nodeValue;
+    while (startOffset > 0 && !isStop(text[startOffset - 1])) {
+      startOffset--;
+    }
+
+    if (startOffset === 0) {
+      const prev = getNextTextNode(startNode, false);
+      if (
+        prev &&
+        prev.nodeValue &&
+        prev.nodeValue.length > 0 &&
+        !isStop(prev.nodeValue[prev.nodeValue.length - 1])
+      ) {
+        startNode = prev;
+        startOffset = prev.nodeValue.length;
+        continue;
+      }
+    }
+    break;
+  }
+
+  // Expand forwards
+  while (endNode && endNode.nodeValue) {
+    const text = endNode.nodeValue;
+    while (endOffset < text.length && !isStop(text[endOffset])) {
+      endOffset++;
+    }
+
+    if (endOffset === text.length) {
+      const next = getNextTextNode(endNode, true);
+      if (
+        next &&
+        next.nodeValue &&
+        next.nodeValue.length > 0 &&
+        !isStop(next.nodeValue[0])
+      ) {
+        endNode = next;
+        endOffset = 0;
+        continue;
+      }
+    }
+    break;
+  }
+
+  // Update selection
+  try {
+    if (startNode && endNode) {
+      selection.setBaseAndExtent(startNode, startOffset, endNode, endOffset);
+    }
+  } catch (e) {
+    console.error("[DPD] Expansion error:", e);
   }
 }
 
@@ -431,4 +609,68 @@ searchBox.addEventListener("input", function () {
   let textInput = searchBox.value;
   let convertedText = uniCoder(textInput);
   searchBox.value = convertedText;
+});
+
+//// clear search function
+
+function clearSearch() {
+  searchBox.value = "";
+  dpdResults.innerHTML = "";
+  summaryResults.innerHTML = "";
+  if (typeof appState !== "undefined") {
+    appState.dpd.searchTerm = "";
+  }
+  window.history.pushState({}, "", window.location.pathname);
+  searchBox.focus();
+}
+
+clearButton.addEventListener("click", clearSearch);
+
+//// collapse/expand functionality for mobile
+
+function initCollapseToggle(toggleButton, paneElement) {
+  if (!toggleButton || !paneElement) return;
+
+  const isMobile = window.innerWidth <= 576;
+
+  const handleToggle = function () {
+    paneElement.classList.toggle("collapsed");
+    const isCollapsed = paneElement.classList.contains("collapsed");
+    try {
+      localStorage.setItem(paneElement.id + "_collapsed", isCollapsed);
+    } catch (e) {
+      console.log("LocalStorage is not available.");
+    }
+  };
+
+  toggleButton.addEventListener("click", handleToggle);
+
+  const paneHeader = paneElement.querySelector(".pane-header");
+  if (paneHeader) {
+    paneHeader.addEventListener("click", function (e) {
+      if (e.target !== toggleButton && !toggleButton.contains(e.target)) {
+        handleToggle();
+      }
+    });
+  }
+
+  if (!isMobile) {
+    return;
+  }
+
+  const savedState = localStorage.getItem(paneElement.id + "_collapsed");
+  if (savedState === "true") {
+    paneElement.classList.add("collapsed");
+  } else if (savedState === null) {
+    paneElement.classList.add("collapsed");
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  initCollapseToggle(historyCollapseToggle, historyPane);
+
+  const settingsPane = document.querySelector(".settings-pane");
+  if (settingsPane) {
+    initCollapseToggle(settingsCollapseToggle, settingsPane);
+  }
 });

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статус DPD</title>
+    <style>
+        :root {
+            --light: hsl(198, 100%, 95%);
+            --dark: hsl(198, 100%, 5%);
+            --dark-shade: hsl(198, 100%, 7%);
+            --primary: hsl(198, 100%, 50%);
+            --primary-alt: hsl(205, 100%, 40%);
+            --primary-text: hsl(205, 79%, 48%);
+            --gray: hsl(0, 0%, 50%);
+            --gray-transparent: hsla(0, 0%, 50%, 0.25);
+        }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .dashboard {
+            width: 100%;
+            max-width: 800px;
+            background: var(--dark-shade);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            border: 1px solid var(--gray-transparent);
+        }
+        h1 { margin-top: 0; color: var(--primary); font-size: 1.8em; }
+        h2 { color: var(--primary-text); border-bottom: 1px solid var(--gray-transparent); padding-bottom: 5px; }
+        
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.03);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+        .stat-label { font-size: 0.75em; color: var(--gray); text-transform: uppercase; letter-spacing: 1px; }
+        .stat-value { font-size: 1.2em; font-weight: bold; margin-top: 5px; color: var(--light); }
+        
+        .progress-container {
+            width: 100%;
+            background-color: var(--gray-transparent);
+            border-radius: 10px;
+            margin: 10px 0;
+            height: 12px;
+        }
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .green { background-color: #4caf50; }
+        .orange { background-color: #ff9800; }
+        .red { background-color: #f44336; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9em; }
+        th, td { text-align: left; padding: 10px; border-bottom: 1px solid var(--gray-transparent); }
+        th { color: var(--primary-text); font-weight: 700; width: 30%; }
+        
+        .query-tag { 
+            background: var(--primary-alt); 
+            color: var(--light);
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            font-size: 0.85em;
+            margin-right: 5px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <h1>Статус веб-приложения DPD</h1>
+        
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="stat-label">Время работы</div>
+                <div class="stat-value">{{ stats.uptime }}</div>
+            </div>
+            <div class="stat-card" style="border-left-color: {{ stats.health_color }};">
+                <div class="stat-label">Память приложения (Исп/Всего)</div>
+                <div class="stat-value">{{ stats.app_mem_used }} / {{ stats.app_mem_total }}</div>
+                <div style="font-size: 0.9em; color: {{ stats.health_color }};">{{ stats.app_mem_percent }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Память системы (Исп/Всего)</div>
+                <div class="stat-value">{{ stats.sys_mem_used }} / {{ stats.sys_mem_total }}</div>
+                <div style="font-size: 0.9em; color: #9e9e9e;">{{ stats.sys_mem_percent }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Загрузка ЦП</div>
+                <div class="stat-value">{{ stats.cpu_percent }}</div>
+            </div>
+        </div>
+
+        <div class="stat-label">Использование памяти приложением (лимит: 4 ГБ)</div>
+        <div class="progress-container">
+            <div class="progress-bar {{ stats.health_color }}" style="width: {{ stats.app_mem_percent }};"></div>
+        </div>
+        <div style="text-align: right; font-size: 0.9em; margin-bottom: 30px;">Использовано {{ stats.app_mem_percent }} из 4 ГБ лимита</div>
+
+        <h2>Официальные конечные точки (Всего: {{ stats.total_requests }})</h2>
+        {% if stats.official %}
+        {% for route, data in stats.official.items() %}
+        <div style="margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <span style="color: var(--primary); font-weight: bold; font-family: monospace;">{{ route }}</span>
+                    <span style="font-size: 0.8em; color: var(--gray); margin-left: 10px;">
+                        Ср: <span style="color: {% if data.avg_time < 100 %}#4caf50{% elif data.avg_time < 300 %}#ff9800{% else %}#f44336{% endif %};">{{ "{:.1f}".format(data.avg_time) }} мс</span> | 
+                        Макс: <span style="color: var(--gray);">{{ "{:.1f}".format(data.max_time) }} мс</span>
+                    </span>
+                </div>
+                <span style="background: var(--gray-transparent); padding: 2px 10px; border-radius: 10px; font-size: 0.85em;">{{ data.count }} запросов</span>
+            </div>
+            {% if data.history %}
+            <div style="margin-top: 5px; padding-left: 15px; border-left: 2px solid var(--gray-transparent);">
+                {% for req in data.history %}
+                <div style="font-size: 0.85em; margin-bottom: 3px; color: #9e9e9e;">
+                    <span style="color: var(--primary-text);">{{ loop.index }}.</span> {{ req }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% else %}
+        <p style="color: var(--gray);">Официальные запросы не обрабатывались с момента перезапуска.</p>
+        {% endif %}
+
+        {% if stats.other.count > 0 %}
+        <h2 style="color: #f44336; border-bottom-color: rgba(244, 67, 54, 0.3);">Прочее / Спам (Всего: {{ stats.other.count }})</h2>
+        <div style="margin-bottom: 20px;">
+            {% if stats.other.history %}
+            <div style="padding-left: 15px; border-left: 2px solid rgba(244, 67, 54, 0.3);">
+                {% for req in stats.other.history %}
+                <div style="font-size: 0.85em; margin-bottom: 3px; color: #9e9e9e;">
+                    <span style="color: #f44336;">{{ loop.index }}.</span> {{ req }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <h2>Нагрузка на сервер и производительность</h2>
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="stat-label">Активные запросы</div>
+                <div class="stat-value">{{ stats.active_requests }}</div>
+                <div style="font-size: 0.8em; color: #9e9e9e;">Обрабатываются в данный момент</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Всего запросов</div>
+                <div class="stat-value">{{ "{:,}".format(stats.total_requests) }}</div>
+                <div style="font-size: 0.8em; color: #9e9e9e;">С момента перезапуска</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Последнее время ответа</div>
+                <div class="stat-value" style="color: {% if stats.ema_response_time|float < 100 %}#4caf50{% elif stats.ema_response_time|float < 300 %}#ff9800{% else %}#f44336{% endif %};">
+                    {{ stats.ema_response_time }}
+                </div>
+                <div style="font-size: 0.8em; color: #9e9e9e;">EMA (текущая скорость)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Кэш аудио</div>
+                <div class="stat-value">{% if stats.audio_cache_loaded %}Готов{% else %}Пуст{% endif %}</div>
+            </div>
+        </div>
+
+        <h2>Системная информация</h2>
+        <table>
+            <tr><th>PID</th><td>{{ stats.pid }}</td></tr>
+            <tr><th>Версия Python</th><td>{{ stats.python_version }}</td></tr>
+            <tr><th>Запущено в</th><td>{{ stats.start_time }}</td></tr>
+            <tr><th>Общая ОЗУ системы</th><td>{{ stats.sys_mem_total }}</td></tr>
+            <tr><th>Исп. ОЗУ системы</th><td>{{ stats.sys_mem_percent }}</td></tr>
+        </table>
+    </div>
+</body>
+</html>

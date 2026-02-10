@@ -1,41 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package version="3.0" unique-identifier="BookId" xml:lang="ru" xmlns="http://www.idpf.org/2007/opf">
-  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
     <dc:language>ru</dc:language>
-	<x-metadata>
-		<DictionaryInLanguage>pi</DictionaryInLanguage>
-		<DictionaryOutLanguage>ru</DictionaryOutLanguage>
-		<DefaultLookupIndex>Пали</DefaultLookupIndex>
-	</x-metadata>
+    <dc:identifier id="BookId">urn:uuid:6ca06004-ca06-4ca0-ca06-04ca06ca0604</dc:identifier>
+    <meta property="dcterms:modified">${date_time_zulu}</meta>
+              <DictionaryOutLanguage>ru</DictionaryOutLanguage>
+              <DefaultLookupIndex>Пали</DefaultLookupIndex>
     <dc:title id="title1">Цифровой Словарь Пали</dc:title>
     <meta refines="#title1" property="file-as">Цифровой Словарь Пали</meta>
-    <meta refines="#title1" property="title-type">main</meta>
+    <dc:title id="title2">Русский к Пали</dc:title>
     <dc:creator id="create1">Бодхираса Бхиккху</dc:creator>
     <meta refines="#create1" property="file-as">Дост. Бодхираса</meta>
-    <meta refines="#create1" property="role" scheme="marc:relators">aut</meta>
-    <dc:rights>CC BY-NC-SA 4.0</dc:rights>
-    <meta property="dcterms:modified">${date_time_zulu}</meta>
-    <dc:identifier id="BookId">urn:uuid:c2f8321b-cb69-43a4-a2e7-fc7f15646099</dc:identifier>
-    <meta name="Sigil version" content="1.9.30"/>
-    <meta name="cover" content="cover.jpg"/>
-    <meta property="schema:accessibilitySummary">This publication conforms to WCAG 2.0 AA.</meta>
-    <meta property="schema:accessMode">textual</meta>
-    <meta property="schema:accessMode">visual</meta>
-    <meta property="schema:accessModeSufficient">textual</meta>
-    <meta property="schema:accessibilityFeature">structuralNavigation</meta>
-    <meta property="schema:accessibilityHazard">none</meta>
   </metadata>
   <manifest>
-    <item id="abbreviations.xhtml" href="Text/abbreviations.xhtml" media-type="application/xhtml+xml"/>
-    <item id="cover.jpg" href="Images/cover.jpg" media-type="image/jpeg" properties="cover-image"/>
-    <item id="cover.xhtml" href="Text/cover.xhtml" media-type="application/xhtml+xml" properties="svg"/>
-    <item id="dpd_kindle.css" href="Styles/dpd_kindle.css" media-type="text/css"/>
-    <item id="dpdlogo.png" href="Images/dpdlogo.png" media-type="image/png"/>
-    <item id="imprint.xhtml" href="Text/imprint.xhtml" media-type="application/xhtml+xml"/>
-    <item id="nav.xhtml" href="Text/nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
-    <item id="sgc-nav.css" href="Styles/sgc-nav.css" media-type="text/css"/>
-    <item id="sgc-toc.css" href="Styles/sgc-toc.css" media-type="text/css"/>
+    <item id="font.inter.regular" href="Fonts/Inter-Regular.ttf" media-type="font/ttf"/>
+    <item id="font.inter.bold" href="Fonts/Inter-Bold.ttf" media-type="font/ttf"/>
+    <item id="font.source.serif.regular" href="Fonts/SourceSerif4-Regular.otf" media-type="font/otf"/>
+    <item id="font.source.serif.bold" href="Fonts/SourceSerif4-Bold.otf" media-type="font/otf"/>
+    <item id="font.source.serif.italic" href="Fonts/SourceSerif4-Italic.otf" media-type="font/otf"/>
+    <item id="font.source.serif.bold.italic" href="Fonts/SourceSerif4-BoldItalic.otf" media-type="font/otf"/>
+    <item id="nav" href="Text/nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
     <item id="titlepage.xhtml" href="Text/titlepage.xhtml" media-type="application/xhtml+xml"/>
+    <item id="abbreviations.xhtml" href="Text/abbreviations.xhtml" media-type="application/xhtml+xml"/>
+    <item id="style" href="Styles/style.css" media-type="text/css"/>
+    <item id="cover-image" href="Images/cover.jpg" media-type="image/jpeg" properties="cover-image"/>
     <item id="x0_a.xhtml" href="Text/0_a.xhtml" media-type="application/xhtml+xml"/>
     <item id="x1_a.xhtml" href="Text/1_a.xhtml" media-type="application/xhtml+xml"/>
     <item id="x2_i.xhtml" href="Text/2_i.xhtml" media-type="application/xhtml+xml"/>
@@ -77,11 +65,42 @@
     <item id="x38_h.xhtml" href="Text/38_h.xhtml" media-type="application/xhtml+xml"/>
     <item id="x39_l.xhtml" href="Text/39_l.xhtml" media-type="application/xhtml+xml"/>
     <item id="x40_m.xhtml" href="Text/40_m.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_0_а.xhtml" href="Text/rpd_0_а.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_1_б.xhtml" href="Text/rpd_1_б.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_2_в.xhtml" href="Text/rpd_2_в.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_3_г.xhtml" href="Text/rpd_3_г.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_4_д.xhtml" href="Text/rpd_4_д.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_5_е.xhtml" href="Text/rpd_5_е.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_6_ё.xhtml" href="Text/rpd_6_ё.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_7_ж.xhtml" href="Text/rpd_7_ж.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_8_з.xhtml" href="Text/rpd_8_з.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_9_и.xhtml" href="Text/rpd_9_и.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_10_й.xhtml" href="Text/rpd_10_й.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_11_к.xhtml" href="Text/rpd_11_к.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_12_л.xhtml" href="Text/rpd_12_л.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_13_м.xhtml" href="Text/rpd_13_м.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_14_н.xhtml" href="Text/rpd_14_н.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_15_о.xhtml" href="Text/rpd_15_о.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_16_п.xhtml" href="Text/rpd_16_п.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_17_р.xhtml" href="Text/rpd_17_р.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_18_с.xhtml" href="Text/rpd_18_с.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_19_т.xhtml" href="Text/rpd_19_т.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_20_у.xhtml" href="Text/rpd_20_у.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_21_ф.xhtml" href="Text/rpd_21_ф.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_22_х.xhtml" href="Text/rpd_22_х.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_23_ц.xhtml" href="Text/rpd_23_ц.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_24_ч.xhtml" href="Text/rpd_24_ч.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_25_ш.xhtml" href="Text/rpd_25_ш.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_26_щ.xhtml" href="Text/rpd_26_щ.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_27_ъ.xhtml" href="Text/rpd_27_ъ.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_28_ы.xhtml" href="Text/rpd_28_ы.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_29_ь.xhtml" href="Text/rpd_29_ь.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_30_э.xhtml" href="Text/rpd_30_э.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_31_ю.xhtml" href="Text/rpd_31_ю.xhtml" media-type="application/xhtml+xml"/>
+    <item id="rpd_32_я.xhtml" href="Text/rpd_32_я.xhtml" media-type="application/xhtml+xml"/>
   </manifest>
   <spine>
-    <itemref idref="cover.xhtml"/>
     <itemref idref="titlepage.xhtml"/>
-    <itemref idref="imprint.xhtml"/>
     <itemref idref="abbreviations.xhtml"/>
     <itemref idref="x0_a.xhtml"/>
     <itemref idref="x1_a.xhtml"/>
@@ -124,6 +143,38 @@
     <itemref idref="x38_h.xhtml"/>
     <itemref idref="x39_l.xhtml"/>
     <itemref idref="x40_m.xhtml"/>
-    <itemref idref="nav.xhtml" linear="no"/>
+    <itemref idref="rpd_0_а.xhtml"/>
+    <itemref idref="rpd_1_б.xhtml"/>
+    <itemref idref="rpd_2_в.xhtml"/>
+    <itemref idref="rpd_3_г.xhtml"/>
+    <itemref idref="rpd_4_д.xhtml"/>
+    <itemref idref="rpd_5_е.xhtml"/>
+    <itemref idref="rpd_6_ё.xhtml"/>
+    <itemref idref="rpd_7_ж.xhtml"/>
+    <itemref idref="rpd_8_з.xhtml"/>
+    <itemref idref="rpd_9_и.xhtml"/>
+    <itemref idref="rpd_10_й.xhtml"/>
+    <itemref idref="rpd_11_к.xhtml"/>
+    <itemref idref="rpd_12_л.xhtml"/>
+    <itemref idref="rpd_13_м.xhtml"/>
+    <itemref idref="rpd_14_н.xhtml"/>
+    <itemref idref="rpd_15_о.xhtml"/>
+    <itemref idref="rpd_16_п.xhtml"/>
+    <itemref idref="rpd_17_р.xhtml"/>
+    <itemref idref="rpd_18_с.xhtml"/>
+    <itemref idref="rpd_19_т.xhtml"/>
+    <itemref idref="rpd_20_у.xhtml"/>
+    <itemref idref="rpd_21_ф.xhtml"/>
+    <itemref idref="rpd_22_х.xhtml"/>
+    <itemref idref="rpd_23_ц.xhtml"/>
+    <itemref idref="rpd_24_ч.xhtml"/>
+    <itemref idref="rpd_25_ш.xhtml"/>
+    <itemref idref="rpd_26_щ.xhtml"/>
+    <itemref idref="rpd_27_ъ.xhtml"/>
+    <itemref idref="rpd_28_ы.xhtml"/>
+    <itemref idref="rpd_29_ь.xhtml"/>
+    <itemref idref="rpd_30_э.xhtml"/>
+    <itemref idref="rpd_31_ю.xhtml"/>
+    <itemref idref="rpd_32_я.xhtml"/>
   </spine>
 </package>

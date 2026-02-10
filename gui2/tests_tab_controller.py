@@ -679,7 +679,7 @@ class TestsTabController:
             self.view.test_add_exception_dropdown.options = [
                 ft.dropdown.Option(
                     opt.key,
-                    text_style=ft.TextStyle(size=12),
+                    text_style=ft.TextStyle(size=16),
                 )
                 for opt in options
                 if opt.key != selected_id
@@ -789,7 +789,7 @@ class TestsTabController:
             modal=True,
             content=ft.Column(
                 controls=[
-                    ft.Text("Add Exceptions", color=ft.Colors.RED_900, size=20),
+                    ft.Text("Add Exceptions", color=ft.Colors.RED_900, size=28),
                     ft.Text(
                         f"Add {len(new_ids)} exceptions to '{current_test.test_name}'?"
                     ),

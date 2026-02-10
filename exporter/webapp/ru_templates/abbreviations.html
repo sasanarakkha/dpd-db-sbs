@@ -1,6 +1,6 @@
-<h3 id="abbreviation: {{ d.headword }}">сокращение: {{d.headword}}</h3>
+<h3 class="dpd" id="abbreviation: {{ d.headword }}">сокращение: {{d.headword}}</h3>
 <div class="tertiary">
-    <table class="help">
+    <table class="grammar">
         <tr>
             <th>
                 Сокращение
@@ -38,11 +38,10 @@
                 Pāḷi
             </th>
             <td>
-                {{d.pali|safe}}
+                <i>{{d.pali|safe}}</i>
             </td>
         </tr>
         {% endif %}
-
         {% if d.example: %}
         <tr>
             <th>
@@ -53,7 +52,6 @@
             </td>
         </tr>
         {% endif %}
-
         {% if d.explanation: %}
         <tr>
             <th>

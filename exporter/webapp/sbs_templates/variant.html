@@ -1,5 +1,5 @@
-<h3 id="variants: {{ d.headword|safe }}">variants: {{ d.headword|safe }}</h3>
-<div class="dpd">
+<h3 class="dpd" id="variants: {{ d.headword|safe }}">variants: {{ d.headword|safe }}</h3>
+<div class="tertiary">
     <table class="variants">
         <tr>
             <th>source</th>
@@ -7,33 +7,24 @@
             <th>context</th>
             <th>variant</th>
         </tr>
-
-        {% set old_corpus = None %}
-        {% for corpus, data2 in d.variants.items() %}
-
-        {% if old_corpus != corpus %}
+        {% for variant in d.variants: %}
         <tr>
-            <td colspan="4">
-                <hr>
+            <td>{{ variant.source }}</td>
+            <td>{{ variant.file_name }}</td>
+            <td>{{ variant.context }}</td>
+            <td>
+                <b>{{ variant.variant }}</b>
+                <hr class="dpd">
+                {% for headword in variant.headwords: %}
+                <a class="jump" href="#{{ headword }}">{{ headword }}</a>
+                {% if not loop.last %} | {% endif %}
+                {% endfor %}
             </td>
         </tr>
-        {% endif %}
-
-        {% for book, data3 in data2.items() %}
-        {% for data4 in data3 %}
-        <tr>
-            <td>{{ corpus }}</td>
-            <td>{{ book }}</td>
-            <td>{{ data4[0] }}</td>
-            <td>{{ data4[1] }}</td>
-        </tr>
-        {% endfor %}
-        {% endfor %}
-
-        {% set old_corpus = corpus %}
         {% endfor %}
     </table>
-    <p class="footer">
-        For details on how to use this, please <a class='link' href='https://digitalpalidictionary.github.io/features/variants/' target='_blank'>read the docs</a>.
+    <br>
+    <p class="dpd-footer">
+        For details on how to use this, please <a class="dpd-link" href='https://digitalpalidictionary.github.io/features/variants/' target='_blank'>read the docs</a>.
     </p>
 </div>

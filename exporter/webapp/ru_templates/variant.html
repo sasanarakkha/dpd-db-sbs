@@ -1,5 +1,5 @@
-<h3 id="variants: {{ d.headword|safe }}">отличные формы: {{ d.headword|safe }}</h3>
-<div class="dpd">
+<h3 class="dpd" id="variants: {{ d.headword|safe }}">отличные формы: {{ d.headword|safe }}</h3>
+<div class="tertiary">
     <table class="variants">
         <tr>
             <th>источник</th>
@@ -7,33 +7,24 @@
             <th>контекст</th>
             <th>отличная форма</th>
         </tr>
-
-        {% set old_corpus = None %}
-        {% for corpus, data2 in d.variants.items() %}
-
-        {% if old_corpus != corpus %}
+        {% for variant in d.variants: %}
         <tr>
-            <td colspan="4">
+            <td>{{ variant.source }}</td>
+            <td>{{ variant.file_name }}</td>
+            <td>{{ variant.context }}</td>
+            <td>
+                <b>{{ variant.variant }}</b>
                 <hr>
+                {% for headword in variant.headwords: %}
+                <a class="jump" href="#{{ headword }}">{{ headword }}</a>
+                {% if not loop.last %} | {% endif %}
+                {% endfor %}
             </td>
         </tr>
-        {% endif %}
-
-        {% for book, data3 in data2.items() %}
-        {% for data4 in data3 %}
-        <tr>
-            <td>{{ corpus }}</td>
-            <td>{{ book }}</td>
-            <td>{{ data4[0] }}</td>
-            <td>{{ data4[1] }}</td>
-        </tr>
-        {% endfor %}
-        {% endfor %}
-
-        {% set old_corpus = corpus %}
         {% endfor %}
     </table>
-    <p class="footer">
-        Для подробностей, пожалуйста, <a class='link' href='https:///devamitta.github.io/dpd.rus/features/variants/' target='_blank'>читайте документацию</a>.
+    <br>
+    <p class="dpd-footer">
+        Для подробностей, пожалуйста, <a class="dpd-link" href='https:///devamitta.github.io/dpd.rus/features/variants/' target='_blank'>читайте документацию</a>.
     </p>
 </div>

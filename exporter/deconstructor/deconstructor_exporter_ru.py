@@ -21,7 +21,7 @@ from tools.mdict_exporter import export_to_mdict
 from tools.niggahitas import add_niggahitas
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
-from tools.sandhi_contraction import SandhiContractionDict, SandhiContractionManager
+from tools.speech_marks import SpeechMarkManager, SpeechMarksDict
 from tools.utils import squash_whitespaces
 
 
@@ -51,10 +51,8 @@ def make_deconstructor_dict_data(g: ProgData) -> None:
     db_session = get_db_session(g.pth.dpd_db_path)
     deconstructor_db = db_session.query(Lookup).filter(Lookup.deconstructor != "").all()
     deconstructor_db_length: int = len(deconstructor_db)
-    sandhi_finder = SandhiContractionManager()
-    sandhi_contractions: SandhiContractionDict = (
-        sandhi_finder.get_sandhi_contractions_simple()
-    )
+    speech_marks_manager = SpeechMarkManager()
+    speech_marks: SpeechMarksDict = speech_marks_manager.get_speech_marks()
 
     dict_data: list = []
 
@@ -88,8 +86,8 @@ def make_deconstructor_dict_data(g: ProgData) -> None:
 
         # make synonyms list
         synonyms = add_niggahitas([i.lookup_key], all=False)
-        if i.lookup_key in sandhi_contractions:
-            contractions = sandhi_contractions.get(i.lookup_key, [])
+        if i.lookup_key in speech_marks:
+            contractions = speech_marks.get(i.lookup_key, [])
             synonyms.extend(contractions)
 
         dict_data += [
@@ -111,7 +109,7 @@ def make_deconstructor_dict_data(g: ProgData) -> None:
 def prepare_and_export_to_gd_mdict(g: ProgData) -> None:
     """Prepare data to export to GoldenDict using pyglossary."""
 
-    dict_info = DictInfo(
+    dict_info1 = DictInfo(
         bookname="DPD Деконструктор",
         author="Дост. Бодхираса",
         description="<h3>DPD Деконструктор от Дост. Бодхирасы</h3><p>Автоматизированное разложение сложных слов и разделение сандхи для всех слов в текстах Типитаки <b>Chaṭṭha Saṅgāyana</b> и на <b>Sutta Central</b>.</p><p>Дополнительную информацию можно найти на странице <a href='https://devamitta.github.io/dpd.rus/deconstructor.html'>Деконструктора</a> на сайте <a href='https://devamitta.github.io/dpd.rus/features/deconstructor/'>DPD</a>.</p>",
@@ -119,24 +117,52 @@ def prepare_and_export_to_gd_mdict(g: ProgData) -> None:
         source_lang="pi",
         target_lang="pi",
     )
-    dict_name = "ru-dpd-deconstructor"
 
-    dict_vars = DictVariables(
+    dict_vars1 = DictVariables(
         css_paths=[g.pth.dpd_css_and_fonts_path],
         js_paths=None,
         gd_path=g.pth.share_dir,
         md_path=g.pth.share_dir,
-        dict_name=dict_name,
+        dict_name="ru-dpd-deconstructor",
         icon_path=g.pth.dpd_logo_svg,
         font_path=g.pth.fonts_dir,
         zip_up=False,
         delete_original=False,
     )
 
-    export_to_goldendict_with_pyglossary(dict_info, dict_vars, g.dict_data)
+    # the deconstructor is too large for goldendict, so needs to be split in two.
+    # find the halfway mark to use as a split point
+    half = int(len(g.dict_data) / 2)
+
+    # export the first half of goldendict
+    export_to_goldendict_with_pyglossary(dict_info1, dict_vars1, g.dict_data[:half])
+
+    # export the other half of goldendict
+    dict_info2 = DictInfo(
+        bookname="DPD Деконструктор2",
+        author="Дост. Бодхираса",
+        description="<h3>DPD Деконструктор от Дост. Бодхирасы</h3><p>Автоматизированное разложение сложных слов и разделение сандхи для всех слов в текстах Типитаки <b>Chaṭṭha Saṅgāyana</b> и на <b>Sutta Central</b>.</p><p>Дополнительную информацию можно найти на странице <a href='https://devamitta.github.io/dpd.rus/deconstructor.html'>Деконструктора</a> на сайте <a href='https://devamitta.github.io/dpd.rus/features/deconstructor/'>DPD</a>.</p>",
+        website="https://devamitta.github.io/dpd.rus/",
+        source_lang="pi",
+        target_lang="pi",
+    )
+
+    dict_vars2 = DictVariables(
+        css_paths=[g.pth.dpd_css_and_fonts_path],
+        js_paths=None,
+        gd_path=g.pth.share_dir,
+        md_path=g.pth.share_dir,
+        dict_name="ru-dpd-deconstructor2",
+        icon_path=g.pth.dpd_logo_svg,
+        font_path=g.pth.fonts_dir,
+        zip_up=False,
+        delete_original=False,
+    )
+
+    export_to_goldendict_with_pyglossary(dict_info2, dict_vars2, g.dict_data[half:])
 
     if g.make_mdict:
-        export_to_mdict(dict_info, dict_vars, g.dict_data)
+        export_to_mdict(dict_info1, dict_vars1, g.dict_data)
 
 
 def main():

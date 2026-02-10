@@ -10,7 +10,7 @@ COLUMN_WIDTH: int = 700
 BUTTON_WIDTH = 250
 LABEL_COLOUR = ft.Colors.GREY_500
 HIGHLIGHT_COLOUR = ft.Colors.BLUE_200
-TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=10)
+TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=14)
 
 
 def parse_html_bold(text: str) -> list[ft.TextSpan]:
@@ -204,7 +204,7 @@ class BoldSearchView(ft.Column):
                 metadata_text_widget = ft.Text(
                     f"{r.nikaya}, {r.book}, {r.title}, {r.subhead}",
                     color=ft.Colors.GREY_600,
-                    size=12,
+                    size=16,
                     selectable=True,
                 )
                 metadata_text_widget.data = [

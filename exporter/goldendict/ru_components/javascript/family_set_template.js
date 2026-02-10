@@ -1,4 +1,4 @@
-function makeFamilySets(data) {
+function familySetTemplate(data) {
     const familySetList = data.family_sets
     const familySetLen = familySetList.length
     const lemma = data.lemma
@@ -38,12 +38,13 @@ function makeFamilySets(data) {
         fc.data.forEach(data => {
             const [word, pos, meaning, complete] = data
             html += `
-                <tr>
-                <th>${word}</th>
-                <td><b>${pos}</b></td>
-                <td>${meaning}</td>
-                <td><span class="gray">${complete}</span></td>
-                </tr>`;
+            <tr>
+            <th>${superScripter(word)}</th>
+            <td><b>${pos}</b></td>
+            <td>${meaning}</td>
+            <td><span class="gray">${complete}</span></td>
+            </tr>
+            `;
         });
 
         html += `</tbody></table>`;
@@ -52,9 +53,9 @@ function makeFamilySets(data) {
     //// footer
 
     html += `
-        <p class="footer">
+        <p class="dpd-footer">
         Заметили ошибку? Можете предложить новую группу? 
-        <a class="link" 
+        <a class="dpd-link" 
         href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&amp;entry.438735500=${lemmaLink}&amp;entry.326955045=Группа&amp;entry.1433863141=GoldenDict+${data.date}" 
         target="_blank">
         Опишите здесь</a>.`; 

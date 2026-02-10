@@ -103,6 +103,15 @@ class DPSPaths:
         self.help_tsv_path = base_dir / "shared_data/help_ru/help.tsv"
         self.thanks_tsv_path = base_dir / "shared_data/help_ru/thanks.tsv"
 
+        # db/suttas
+        self.dv_catalogue_suttas_tsv_path = (
+            base_dir / "db/suttas/dv_catalogue_suttas.tsv"
+        )
+
+        # tools
+        self.uposatha_day_ini = base_dir / "tools/uposatha_day.ini"
+        self.tpr_codes_json_path = base_dir / "tools/tpr_codes.json"
+
         # shared_data
         self.sbs_index_path = base_dir.joinpath(
             Path("shared_data/sbs_csvs/sbs_index.csv")

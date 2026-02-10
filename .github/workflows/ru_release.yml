@@ -6,6 +6,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      RELEASE_DATE: ${{ steps.set_release_date.outputs.RELEASE_DATE }}
+      RELEASE_TAG: ${{ steps.set_release_tag.outputs.RELEASE_TAG }}
 
     steps:
 
@@ -402,11 +405,15 @@ jobs:
 
     - name: Set Release Date
       id: set_release_date
-      run: echo "RELEASE_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+      run: |
+        echo "RELEASE_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+        echo "RELEASE_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
     - name: Set Release Tag
       id: set_release_tag
-      run: echo "RELEASE_TAG=$(uv run python scripts/build/version_print.py)" >> $GITHUB_ENV
+      run: |
+        echo "RELEASE_TAG=$(uv run python scripts/build/version_print.py)" >> $GITHUB_ENV
+        echo "RELEASE_TAG=$(uv run python scripts/build/version_print.py)" >> $GITHUB_OUTPUT
     
     - name: Create Draft Release
       id: create_release

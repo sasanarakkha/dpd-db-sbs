@@ -13,13 +13,14 @@ const appState = {
   tt: {
     searchTerm: "",
     language: "Pāḷi",
-    book: "all",
+    books: ["all"],
     resultsHTML: "",
   },
   history: [], // An array of state snapshots
   historyIndex: -1, // Current position in the history stack
   // History panel entries - simpler list of search terms for persistence
   historyPanelEntries: [], // Array of search terms for the history panel
+  searchIndex: [], // Sorted array of "ascii|unicode1|unicode2" strings
 };
 
 // Initialize the application
@@ -55,8 +56,10 @@ function initializeApp() {
   const q1 = urlParams.get("q1") || "";
   const q2 = urlParams.get("q2") || "";
   const option = urlParams.get("option") || "regex";
-  const book = urlParams.get("book") || "all";
+  const bookParam = urlParams.get("book") || "all";
   const lang = urlParams.get("lang") || "Pāḷi";
+
+  const books = bookParam.split(",").map(b => b.trim()).filter(b => b);
 
   // Populate appState from the URL
   appState.activeTab = tab;
@@ -65,7 +68,7 @@ function initializeApp() {
   appState.bd.searchTerm2 = q2;
   appState.bd.searchOption = option;
   appState.tt.searchTerm = q; // Reusing q for tt search term
-  appState.tt.book = book;
+  appState.tt.books = books.length > 0 ? books : ["all"];
   appState.tt.language = lang;
 
   // If the URL contains search parameters, perform an initial search
@@ -96,10 +99,54 @@ function initializeApp() {
   if (clearHistoryButton) {
     clearHistoryButton.addEventListener("click", clearHistory);
   }
+
+  // Set up search dropdown listeners
+  const searchBox = document.getElementById("search-box");
+  if (searchBox) {
+    searchBox.addEventListener("input", handleSearchInput);
+    searchBox.addEventListener("keydown", handleSearchKeydown);
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    const dropdown = document.getElementById("search-dropdown");
+    const searchBoxContainer = document.querySelector(".search-input-container");
+    if (dropdown && !searchBoxContainer.contains(e.target)) {
+      dropdown.style.display = "none";
+    }
+  });
+
+  // Non-blocking Background Load Search Index
+  const loadIndex = () => {
+    const version = window.DPD_RELEASE_VERSION || "unknown";
+    fetch(`/static/search_index.json?v=${version}`)
+      .then(response => response.json())
+      .then(data => {
+        appState.searchIndex = data;
+      })
+      .catch(e => console.error("Error loading search index:", e));
+  };
+
+  if (window.requestIdleCallback) {
+    window.requestIdleCallback(loadIndex);
+  } else {
+    setTimeout(loadIndex, 1000);
+  }
 }
 
 // Perform a search operation
 async function performSearch(addHistory = true) {
+  let activeBtnId = "";
+  if (appState.activeTab === "dpd") {
+    activeBtnId = "search-button";
+  } else if (appState.activeTab === "bd") {
+    activeBtnId = "bd-search-button";
+  }
+
+  if (activeBtnId) {
+    showLoading(activeBtnId);
+  }
+
   try {
     if (appState.activeTab === "dpd") {
       // DPD search
@@ -107,6 +154,9 @@ async function performSearch(addHistory = true) {
         // Sync search term to other tabs
         appState.bd.searchTerm1 = appState.dpd.searchTerm;
         appState.tt.searchTerm = appState.dpd.searchTerm;
+
+        const htmlElement = document.documentElement;
+        const language = htmlElement.lang || "en";
 
         // Adjust the search URL based on the current language
         let searchUrl = '/search_json';
@@ -122,10 +172,6 @@ async function performSearch(addHistory = true) {
         const summaryResults = document.getElementById("summary-results");
         if (summaryResults) {
           if (data.summary_html && data.summary_html.trim() !== "") {
-            // Get language from HTML element
-            const htmlElement = document.documentElement;
-            const language = htmlElement.lang || "en";
-
             if (language === "en") {
               summaryResults.innerHTML = "<h3>Summary</h3>";
             } else {
@@ -236,6 +282,10 @@ async function performSearch(addHistory = true) {
     }
   } catch (error) {
     console.error("Error fetching data:", error);
+  } finally {
+    if (activeBtnId) {
+      hideLoading(activeBtnId);
+    }
   }
 }
 
@@ -286,11 +336,12 @@ function render() {
 
   const ttSearchBox = document.getElementById("tt-search-box");
   const ttLangSelect = document.getElementById("tt-lang-select");
-  const ttBookSelect = document.getElementById("tt-book-select");
 
   if (ttSearchBox) ttSearchBox.value = appState.tt.searchTerm;
   if (ttLangSelect) ttLangSelect.value = appState.tt.language;
-  if (ttBookSelect) ttBookSelect.value = appState.tt.book;
+  if (typeof window.restoreBookSelection === "function") {
+    window.restoreBookSelection(appState.tt.books);
+  }
 
   // Update the search option
   const bdSearchOptions = document.getElementsByName("option");
@@ -365,6 +416,9 @@ function render() {
   if (ttResults) {
     ttResults.innerHTML = appState.tt.resultsHTML;
   }
+
+  // Focus the search box for the active tab
+  focusActiveTabSearchBox();
 }
 
 // Switch to a different tab
@@ -414,7 +468,7 @@ function addToHistory() {
     tt: {
       searchTerm: appState.tt.searchTerm,
       language: appState.tt.language,
-      book: appState.tt.book,
+      books: appState.tt.books,
     }
   };
 
@@ -548,7 +602,7 @@ function updateURL() {
     )}&q2=${encodeURIComponent(appState.bd.searchTerm2)}&option=${appState.bd.searchOption
       }`;
   } else if (appState.activeTab === "tt") {
-    url = `/?tab=tt&q=${encodeURIComponent(appState.tt.searchTerm)}&book=${encodeURIComponent(appState.tt.book)}&lang=${encodeURIComponent(appState.tt.language)}`;
+    url = `/?tab=tt&q=${encodeURIComponent(appState.tt.searchTerm)}&book=${encodeURIComponent(appState.tt.books.join(","))}&lang=${encodeURIComponent(appState.tt.language)}`;
   }
 
   // Update the browser's URL using history.pushState()
@@ -574,7 +628,7 @@ function handlePopState(event) {
       )}&q2=${encodeURIComponent(appState.bd.searchTerm2)}&option=${appState.bd.searchOption
         }`;
     } else if (appState.activeTab === "tt") {
-      url = `/?tab=tt&q=${encodeURIComponent(appState.tt.searchTerm)}&book=${encodeURIComponent(appState.tt.book)}&lang=${encodeURIComponent(appState.tt.language)}`;
+      url = `/?tab=tt&q=${encodeURIComponent(appState.tt.searchTerm)}&book=${encodeURIComponent(appState.tt.books.join(","))}&lang=${encodeURIComponent(appState.tt.language)}`;
     }
     window.history.replaceState({ ...appState }, "", url);
 
@@ -1042,7 +1096,7 @@ function highlightInflections(searchTerm) {
       let modified = false;
       const newParts = parts.map(function (part) {
         // Create a temporary element to get the text content of this part
-        const tempElement = document.createElement("div");
+        tempElement = document.createElement("div");
         tempElement.innerHTML = part;
         const partText = tempElement.textContent || "";
 
@@ -1066,9 +1120,186 @@ function highlightInflections(searchTerm) {
   });
 }
 
+// Helper function to show loading state on a button
+function showLoading(buttonId) {
+  const button = document.getElementById(buttonId);
+  if (button) {
+    button.dataset.originalText = button.textContent;
+    button.classList.add("loading");
+    button.disabled = true;
+  }
+}
+
+// Strip diacritics from a string
+function stripDiacritics(text) {
+  if (!text) return "";
+  // Remove root sign and spaces for matching
+  const clean = text.replace(/[√ ]/g, "");
+  return clean.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+// Binary Search for prefix matching
+function findFirstMatch(arr, query) {
+  let low = 0;
+  let high = arr.length - 1;
+  let result = -1;
+
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2);
+    const midKey = arr[mid].split("|")[0];
+
+    if (midKey >= query) {
+      result = mid;
+      high = mid - 1;
+    } else {
+      low = mid + 1;
+    }
+  }
+  return result;
+}
+
+// Search Dropdown Logic
+let dropdownIndex = -1;
+let debounceTimer;
+
+function updateDropdown(query) {
+  const dropdown = document.getElementById("search-dropdown");
+  if (!dropdown) return;
+
+  if (query.length < 2 || appState.searchIndex.length === 0) {
+    dropdown.style.display = "none";
+    return;
+  }
+
+  const normalizedQuery = stripDiacritics(query).toLowerCase();
+  const matches = [];
+
+  // Find matches using binary search
+  let index = findFirstMatch(appState.searchIndex, normalizedQuery);
+  
+  if (index !== -1) {
+    while (index < appState.searchIndex.length) {
+      const entry = appState.searchIndex[index];
+      const parts = entry.split("|");
+      const key = parts[0];
+      
+      if (!key.startsWith(normalizedQuery)) break;
+      
+      // Add all Unicode values associated with this ASCII key
+      for (let i = 1; i < parts.length; i++) {
+        matches.push(parts[i]);
+      }
+      
+      if (matches.length >= 100) break;
+      index++;
+    }
+  }
+
+  // Sort matches: shortest ASCII first, then alphabetically
+  matches.sort((a, b) => {
+    const cleanA = stripDiacritics(a).toLowerCase();
+    const cleanB = stripDiacritics(b).toLowerCase();
+    if (cleanA.length !== cleanB.length) return cleanA.length - cleanB.length;
+    if (cleanA !== cleanB) return cleanA.localeCompare(cleanB);
+    return a.localeCompare(b);
+  });
+
+  const finalMatches = matches.slice(0, 100);
+
+  if (finalMatches.length > 0) {
+    dropdown.innerHTML = "";
+    finalMatches.forEach((term, index) => {
+      const item = document.createElement("div");
+      item.className = "dropdown-item";
+      item.textContent = term;
+      item.addEventListener("click", () => {
+        const searchBox = document.getElementById("search-box");
+        searchBox.value = term;
+        appState.dpd.searchTerm = term;
+        dropdown.style.display = "none";
+        performSearch();
+      });
+      dropdown.appendChild(item);
+    });
+    dropdown.style.display = "block";
+    dropdownIndex = -1;
+  } else {
+    dropdown.style.display = "none";
+  }
+}
+
+function handleSearchInput(e) {
+  clearTimeout(debounceTimer);
+  const query = e.target.value;
+  debounceTimer = setTimeout(() => {
+    updateDropdown(query);
+  }, 200);
+}
+
+function handleSearchKeydown(e) {
+  const dropdown = document.getElementById("search-dropdown");
+  if (!dropdown || dropdown.style.display === "none") return;
+
+  const items = dropdown.querySelectorAll(".dropdown-item");
+
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    dropdownIndex = (dropdownIndex + 1) % items.length;
+    updateDropdownSelection(items);
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    dropdownIndex = (dropdownIndex - 1 + items.length) % items.length;
+    updateDropdownSelection(items);
+  } else if (e.key === "Enter" && dropdownIndex > -1) {
+    e.preventDefault();
+    items[dropdownIndex].click();
+  } else if (e.key === "Escape") {
+    dropdown.style.display = "none";
+  }
+}
+
+function updateDropdownSelection(items) {
+  items.forEach((item, index) => {
+    if (index === dropdownIndex) {
+      item.classList.add("selected");
+      item.scrollIntoView({ block: "nearest" });
+    } else {
+      item.classList.remove("selected");
+    }
+  });
+}
+
+// Helper function to hide loading state on a button
+function hideLoading(buttonId) {
+  const button = document.getElementById(buttonId);
+  if (button) {
+    button.classList.remove("loading");
+    button.disabled = false;
+    if (button.dataset.originalText) {
+      button.textContent = button.dataset.originalText;
+    }
+  }
+}
+
+function focusActiveTabSearchBox() {
+  if (appState.activeTab === "dpd") {
+    const searchBox = document.getElementById("search-box");
+    if (searchBox) searchBox.focus();
+  } else if (appState.activeTab === "bd") {
+    const bdSearchBox = document.getElementById("bd-search-box-1");
+    if (bdSearchBox) bdSearchBox.focus();
+  } else if (appState.activeTab === "tt") {
+    const ttSearchBox = document.getElementById("tt-search-box");
+    if (ttSearchBox) ttSearchBox.focus();
+  }
+}
+
 // Expose performSearch to the global scope
 window.performSearch = performSearch;
 window.switchTab = switchTab;
 window.updateHistoryPanel = updateHistoryPanel;
 window.clearHistory = clearHistory;
 window.searchHistoryItem = searchHistoryItem;
+window.showLoading = showLoading;
+window.hideLoading = hideLoading;
+window.focusActiveTabSearchBox = focusActiveTabSearchBox;

@@ -25,6 +25,7 @@ if [ ! -f dpd.db ]; then
     echo "Error: dpd.db not found after extraction"
     exit 1
 fi
+uv run exporter/webapp/generate_search_index.py
 
 echo "=== 6. Killing Uvicorn Webapp ==="
 pkill -f "uvicorn exporter.webapp.main_ru:app" || echo "No existing uvicorn process found."

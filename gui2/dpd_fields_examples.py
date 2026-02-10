@@ -156,16 +156,16 @@ class DpdExampleField(ft.Column):
                 "",
                 width=240,
                 label="bold",
-                label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=10),
+                label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=14),
                 expand=True,
                 dense=True,
-                text_size=12,
+                text_size=16,
                 on_submit=self.click_bold_example,
                 on_blur=self._handle_last_control_blur,
             )
             self.counter_field = ft.Text(
                 "",
-                size=12,
+                size=16,
                 width=40,
                 expand=False,
             )
@@ -177,9 +177,9 @@ class DpdExampleField(ft.Column):
             self.book_dropdown = ft.Dropdown(
                 options=self.book_options,
                 width=300,
-                text_size=14,
+                text_size=19,
                 label="book",
-                label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=10),
+                label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=14),
                 editable=True,
                 enable_filter=True,
                 border_color=ft.Colors.GREY_800,
@@ -192,7 +192,7 @@ class DpdExampleField(ft.Column):
                 "",
                 width=300,
                 label="word to find",
-                label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=10),
+                label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=14),
                 on_submit=self._click_search_dialog_ok,
                 border_radius=20,
             )

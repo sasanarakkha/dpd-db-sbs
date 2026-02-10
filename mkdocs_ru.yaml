@@ -8,6 +8,7 @@ nav:
   - Особенности:
     - "features/index.md"
     - Особенности: "features/features.md"
+    - Информация о Суттах: "features/sutta_info.md"
     - Словарь корней: "features/rootdict.md"
     - Частота слов: "features/frequency.md"
     - Деконструктор: "features/deconstructor.md"
@@ -66,12 +67,14 @@ nav:
   - Лицензия: "license.md"  
   - Язык Пали: "pali_notes/index.md"
   - Для разработчиков:
-    - "technical/index.md"
+    - Краткое руководство: "technical/quick_start.md"
+    - Настройка локального сервера: "technical/local_server_setup.md"
     - Построить БД с нуля: "technical/build_db.md"
     - Использовать БД в проекте: "technical/use_db.md"
     - Структура папок проекта: "technical/project_folder_structure.md" 
     - Таблица DpdHeadwords: "technical/dpd_headwords_table.md"
     - Файлы источников Типитаки: "technical/tipitaka_source_files.md"
+    - API эндпоинты: "technical/api_endpoints.md"
     # - Стиль для записей DPD: "technical/style_guide_for_dpd_entries.md"
 
 theme:

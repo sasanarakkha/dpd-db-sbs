@@ -45,7 +45,7 @@ from tools.tools_for_ru_exporter import (
 )
 
 
-def render_xhtml(pth: ProjectPaths, rupth: RuPaths):
+def render_dpd_xhtml(pth: ProjectPaths, rupth: RuPaths):
     pr.green("querying dpd db")
     db_session = get_db_session(pth.dpd_db_path)
     dpd_db = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.ru)).all()
@@ -468,13 +468,103 @@ def html_friendly(text: str):
         return text
 
 
+def render_rpd_xhtml(pth: ProjectPaths, rupth: RuPaths, id_counter: int) -> int:
+    """Render RPD (Russian to Pāḷi Dictionary) entries and save to XHTML files."""
+
+    pr.green("querying rpd data from lookup table")
+    db_session = get_db_session(pth.dpd_db_path)
+    lookup_db = db_session.query(Lookup).filter(Lookup.rpd != "").all()
+    pr.yes(len(lookup_db))
+
+    # Create dictionary for Russian alphabet letters
+    russian_alphabet = [
+        "а", "б", "в", "г", "д", "е", "ё", "ж", "з", "и", "й", "к", "л", "м", "н", 
+        "о", "п", "р", "с", "т", "у", "ф", "х", "ц", "ч", "ш", "щ", "ъ", "ы", "ь", 
+        "э", "ю", "я"
+    ]
+    rpd_letter_dict: dict = {}
+    for letter in russian_alphabet:
+        rpd_letter_dict[letter] = []
+
+    # Process each lookup entry
+    for lookup_entry in lookup_db:
+        russian_headword = lookup_entry.lookup_key
+
+        # Get first letter and normalize to lowercase
+        first_letter = russian_headword[0].lower() if russian_headword else "а"
+
+        # Skip if not a standard Russian letter (e.g., numbers, symbols)
+        if first_letter not in russian_alphabet:
+            first_letter = "а"
+
+        # Unpack RPD data: list[tuple[str, str, str]] = (lemma_clean, pos, meaning_plus_case)
+        rpd_entries = lookup_entry.rpd_unpack
+
+        # Build Pāḷi equivalents HTML
+        pali_equivalents_list = []
+        for lemma_clean, pos, meaning_plus_case in rpd_entries:
+            entry_html = f"<b class='epd'>{lemma_clean}</b> {pos}. {meaning_plus_case}"
+            pali_equivalents_list.append(entry_html)
+
+        pali_equivalents = "<br/>".join(pali_equivalents_list)
+
+        # Render the entry
+        entry = render_rpd_entry(rupth, id_counter, russian_headword, pali_equivalents)
+        rpd_letter_dict[first_letter].append(entry)
+        id_counter += 1
+
+    # Save entries to XHTML files for each letter
+    pr.green("saving rpd entries xhtml")
+    total = 0
+
+    for counter, letter in enumerate(russian_alphabet):
+        entries_list = rpd_letter_dict[letter]
+        total += len(entries_list)
+        entries_str = "".join(entries_list)
+
+        xhtml = render_rpd_letter_templ(rupth, letter, entries_str)
+        output_path = rupth.epub_text_dir.joinpath(f"rpd_{counter}_{letter}.xhtml")
+
+        with open(output_path, "w") as f:
+            f.write(xhtml)
+
+    pr.yes(total)
+    db_session.close()
+    return id_counter
+
+
+def render_rpd_entry(
+    rupth: RuPaths,
+    counter: int,
+    russian_headword: str,
+    pali_equivalents: str,
+) -> str:
+    """Render single RPD entry."""
+    ebook_rpd_entry_templ = Template(filename=str(rupth.ebook_rpd_entry_templ_path))
+
+    return str(
+        ebook_rpd_entry_templ.render(
+            counter=counter,
+            english_headword=russian_headword,
+            pali_equivalents=pali_equivalents,
+        )
+    )
+
+
+def render_rpd_letter_templ(rupth: RuPaths, letter: str, entries: str) -> str:
+    """Render all RPD entries for a single Russian letter."""
+    ebook_rpd_letter_templ = Template(filename=str(rupth.ebook_rpd_letter_templ_path))
+    return str(ebook_rpd_letter_templ.render(letter=letter, entries=entries))
+
+
 def main():
     pr.tic()
     pr.title("rendering dpd for ebook")
     if config_test("exporter", "make_ebook", "yes"):
         pth = ProjectPaths()
         rupth = RuPaths()
-        id_counter = render_xhtml(pth, rupth)
+        id_counter = render_dpd_xhtml(pth, rupth)
+        id_counter = render_rpd_xhtml(pth, rupth, id_counter)
         save_abbreviations_xhtml_page(rupth, id_counter)
         save_title_page_xhtml(rupth)
         zip_epub(rupth)

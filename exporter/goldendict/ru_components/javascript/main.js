@@ -1,16 +1,11 @@
-
-//// listen for button clicks
-
 document.addEventListener("click", function (event) {
     var target = event.target;
-    const classNames = ["button"]
+    const classNames = ["button", "dpd-button"]
     if (classNames.some(className => target.classList.contains(className))) {
         button_click(target);
         event.preventDefault();
     }
 });
-
-//// handle button clicks
 
 function button_click(el) {
     const target_id = el.getAttribute("data-target");
@@ -24,6 +19,9 @@ function button_click(el) {
         target.classList.toggle("hidden");
         if (el.classList.contains("close")) {
             var target_control = document.querySelector('a.button[data-target="' + target_id.replace('ru_', '') + '"]');
+            if (!target_control) {
+                target_control = document.querySelector('a.dpd-button[data-target="' + target_id.replace('ru_', '') + '"]');
+            }
             if (target_control) {
                 target_control.classList.toggle("active");
             }
@@ -31,9 +29,7 @@ function button_click(el) {
             el.classList.toggle("active");
         }
     }
-}
-
-//// get the data to load into buttons
+};
 
 document.addEventListener('DOMContentLoaded', function () {
     loadData()
@@ -56,7 +52,6 @@ function loadData() {
 //// load json data into buttons 
 
 function loadButtonContent(data) {
-
     const lemmaTag = data.lemma.replace(/ /g, "_").replace(".", "_") // a 1.1 > a_1_1
 
     //// feedback
@@ -132,8 +127,6 @@ function loadButtonContent(data) {
     };
 };
 
-//// load root dictionary button content
-
 function loadRootButtonContent(data) {
     const familyRootDivs = document.querySelectorAll('div[id^="ru_family_root_"]');
     var familyRootArray = Array.from(familyRootDivs);
@@ -149,7 +142,6 @@ function loadRootButtonContent(data) {
         } else {
             console.log(`${key_clean} not found in family_root_json.js`)
         }
-
     })
 };
 
@@ -158,8 +150,11 @@ function superScripter(text) {
     return text.replace(regex, match => `&hairsp;<sup>${match}</sup>`);
 }
 
-function playAudio(headword, buttonElement) {
-    const gender = "male";
+function playAudio(headword, buttonElement, gender) {
+    const validGenders = ["male", "female", "male1", "male2", "female1"];
+    if (!validGenders.includes(gender)) {
+        gender = "male";
+    }
     const baseUrl = "https://www.dpdict.net/audio/";
     var audio = new Audio(baseUrl + headword + "?gender=" + gender);
 
@@ -167,10 +162,9 @@ function playAudio(headword, buttonElement) {
         if (buttonElement) {
             // Change icon to cross
             buttonElement.innerHTML = `
-                <svg viewBox="0 0 24 24" width="16px" height="16px" fill="currentColor" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
+            <svg viewBox="0 0 24 24" width="16px" height="16px" fill="currentColor" stroke="currentColor" stroke-width="0">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+            </svg>
             `;
             // Disable button
             buttonElement.classList.add("disabled");

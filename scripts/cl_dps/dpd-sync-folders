@@ -95,6 +95,10 @@ fi
 echo "ℹ️ Running font scaling helper..."
 uv run python gui2/font_scaling_helper.py || { echo "⚠️ Font scaling helper failed."; exit 1; }
 
+# Add changes again to include font scaling modifications
+echo "  ➕ Staging all changes (including scaled fonts)..."
+git add . || exit 1
+
 # Commit changes with date
 echo "📝 Committing changes to sbs-ru..."
 git commit -m "$COMMIT_MESSAGE" || { 

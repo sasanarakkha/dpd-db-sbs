@@ -1,17 +1,13 @@
 <div id="ru_sutta_info_${ i.lemma_1_ }" name="sutta-info-div" class="dpd content hidden">
-    <table class="sutta-info">
-
-        <!-- CST -->
+    <table class="sutta_info">
 
         % if su.cst_code:
         <tr>
-            <th class="heading top" colspan="2">
+            <th colspan="2">
                 Chaṭṭha Saṅgāyana Типитака (CST)
             </th>
         </tr>
-        % endif
 
-        % if su.cst_code:
         <tr>
             <th>
                 Код CST
@@ -20,9 +16,7 @@
                 ${ su.cst_code }
             </td>
         </tr>
-        % endif
 
-        % if su.cst_nikaya:
         <tr>
             <th>
                 Никая
@@ -31,9 +25,7 @@
                 ${ su.cst_nikaya }
             </td>
         </tr>
-        % endif
 
-        % if su.cst_book:
         <tr>
             <th>
                 Книга
@@ -42,9 +34,7 @@
                 ${ su.cst_book }
             </td>
         </tr>
-        % endif
 
-        % if su.cst_section:
         <tr>
             <th>
                 Раздел
@@ -53,9 +43,7 @@
                 ${ su.cst_section }
             </td>
         </tr>
-        % endif
 
-        % if su.cst_vagga:
         <tr>
             <th>
                 Вагга
@@ -64,9 +52,7 @@
                 ${ su.cst_vagga }
             </td>
         </tr>
-        % endif
 
-        % if su.cst_sutta:
         <tr>
             <th>
                 Сутта
@@ -75,9 +61,7 @@
                 ${ su.cst_sutta }
             </td>
         </tr>
-        % endif
 
-        % if su.cst_paranum:
         <tr>
             <th>
                 Параграф
@@ -86,70 +70,42 @@
                 ${ su.cst_paranum }
             </td>
         </tr>
-        % endif
 
-        % if su.cst_file:
         <tr>
             <th>
                 Файл
             </th>
             <td>
-                ${ su.cst_file }
+                <a href="https://github.com/VipassanaTech/tipitaka-xml/tree/main/${ su.cst_file }" target="_blank">${ su.cst_file }</a>
             </td>
         </tr>
+
         <tr>
             <th>
-                GitHub
-            </th>
-            <td>
-                <a href="https://github.com/VipassanaTech/tipitaka-xml/tree/main/${ su.cst_file }" target="_blank">${
-                    su.cst_file }</a>
-
-            </td>
-        </tr>
-        % endif
-
-        % if su.cst_code:
-        <tr>
-            <th class="heading" colspan="2">
                 Сайты с CST
             </th>
+            <td>
+                <a href="${ su.tpp_org }" target="_blank">tipitakapali.org</a>
+            </td>
         </tr>
-        % endif
 
-        % if su.dpr_link:
+        % if su.has_tpr:
         <tr>
             <th>
-                Digital Pali Reader
+                Tipiṭaka Pāḷi Reader
             </th>
             <td>
-                <a href="${ su.dpr_link }" target="_blank">${ su.dpr_link }</a>
+                <a href="https://tpr.pali.tools/open/?sutta=${ su.dpd_code.lower() }" target="_blank">https://tpr.pali.tools/open/?sutta=${ su.dpd_code.lower() }</a>
             </td>
         </tr>
         % endif
 
-        % if su.cst_code:
         <tr>
-            <th>
-                TipitakaPali.org
-            </th>
-            <td>
-                <a href="${ su.tpp_org }" target="_blank">${ su.tpp_org }</a>
-            </td>
-        </tr>
-        % endif
-
-        <!-- page numbers -->
-
-        % if su.cst_m_page:
-        <tr>
-            <th class="heading" colspan="2">
+            <th colspan="2">
                 Страницы в печатных изданиях CST
             </th>
         </tr>
-        % endif
 
-        % if su.cst_m_page:
         <tr>
             <th>
                 Мьянма
@@ -158,9 +114,7 @@
                 ${ su.cst_m_page }
             </td>
         </tr>
-        % endif
 
-        % if su.cst_t_page:
         <tr>
             <th>
                 Тайланд
@@ -169,9 +123,7 @@
                 ${ su.cst_t_page }
             </td>
         </tr>
-        % endif
 
-        % if su.cst_v_page:
         <tr>
             <th>
                 VRI
@@ -180,9 +132,7 @@
                 ${ su.cst_v_page }
             </td>
         </tr>
-        % endif
 
-        % if su.cst_p_page:
         <tr>
             <th>
                 PTS
@@ -193,17 +143,13 @@
         </tr>
         % endif
 
-        <!-- sutta central -->
-
         % if su.sc_code:
         <tr>
-            <th class="heading" colspan="2">
-                Sutta Central
+            <th colspan="2">
+                SuttaCentral (SC)
             </th>
         </tr>
-        % endif
 
-        % if su.sc_code:
         <tr>
             <th>
                 Код SC
@@ -212,9 +158,7 @@
                 ${ su.sc_code }
             </td>
         </tr>
-        % endif
 
-        % if su.sc_book:
         <tr>
             <th>
                 Книга
@@ -223,9 +167,7 @@
                 ${ su.sc_book }
             </td>
         </tr>
-        % endif
 
-        % if su.sc_vagga:
         <tr>
             <th>
                 Вагга
@@ -234,9 +176,7 @@
                 ${ su.sc_vagga }
             </td>
         </tr>
-        % endif
 
-        % if su.sc_sutta:
         <tr>
             <th>
                 Сутта
@@ -245,46 +185,36 @@
                 ${ su.sc_sutta }
             </td>
         </tr>
-        % endif
 
-        % if su.sc_eng_sutta:
         <tr>
             <th>
                 Название
             </th>
             <td>
-                <i>${ su.sc_eng_sutta }</i>
+                ${ su.sc_eng_sutta }
             </td>
         </tr>
-        % endif
 
-        % if su.sc_blurb:
         <tr>
             <th>
                 Краткое описание
             </th>
             <td>
-                <i>${ su.sc_blurb }</i>
+                ${ su.sc_blurb }
             </td>
         </tr>
-        % endif
 
-        % if su.sc_card_link:
         <tr>
             <th>
                 Ссылки
             </th>
             <td>
-                % if su.sc_code:
                 <a href="${ su.sc_card_link }" target="_blank">Карточка Сутты</a>,
                 <a href="${ su.sc_pali_link }" target="_blank">Текст на пали</a></i>,
                 <a href="${ su.sc_eng_link }" target="_blank">Перевод на английский</a></i><br>
-                % endif
             </td>
         </tr>
-        % endif
 
-        % if su.sc_file_path:
         <tr>
             <th>
                 Файл
@@ -293,6 +223,7 @@
                 ${ su.sc_file_path }
             </td>
         </tr>
+
         <tr>
             <th>
                 Github
@@ -301,82 +232,38 @@
                 <a href="${ su.sc_github }" target="_blank">${ su.sc_file_path }</a>
             </td>
         </tr>
-        % endif
 
-        <!-- websites -->
         <tr>
-            <th class="heading" colspan="2">
+            <th>
                 Веб-сайты с Sutta Central
             </th>
-        </tr>
-
-        % if su.sc_code:
-        <tr>
-            <th>
-                The Buddha's Words
-            </th>
             <td>
-                <a href="${ su.tbw }" target="_blank">${ su.tbw }</a>
-            </td>
-        </tr>
-        % endif
-
-        % if su.sc_code:
-        <tr>
-            <th>
-                TBW Legacy
-            </th>
-            <td>
-                <a href="${ su.tbw_legacy }" target="_blank">${ su.tbw_legacy
-                    }</a>
-            </td>
-        </tr>
-        % endif
-
-        % if su.sc_code:
-        <tr>
-            <th>
-                Dhamma.gift
-            </th>
-            <td>
-                <a href="${ su.dhamma_gift }" target="_blank">${ su.dhamma_gift
-                    }</a>
-            </td>
-        </tr>
-        % endif
-
-        % if su.sc_code:
-        <tr>
-            <th>
-                SC Voice
-            </th>
-            <td>
-                <a href="${ su.sc_express_link}" target="_blank">SC Express</a>
-            </td>
-        </tr>
-        % endif
-
-        % if su.sc_code:
-        <tr>
-            <th>
-                SC Voice
-            </th>
-            <td>
-                <a href="${ su.sc_voice_link }" target="_blank">${
-                    su.sc_voice_link }</a>
+                % if su.tbw:
+                <a href="${ su.tbw }" target="_blank">thebuddhaswords.net</a><br>
+                % endif
+                % if su.tbw_legacy:
+                <a href="${ su.tbw_legacy }" target="_blank">dhamma.gift (BW)</a><br>
+                % endif
+                % if su.dhamma_gift:
+                <a href="${ su.dhamma_gift }" target="_blank">find.dhamma.gift</a><br>
+                % endif
+                % if su.sc_express_link:
+                <a href="${ su.sc_express_link}" target="_blank">SC Express</a><br>
+                % endif
+                % if su.sc_voice_link:
+                <a href="${ su.sc_voice_link }" target="_blank">sc-voice.net</a><br>
+                % endif
             </td>
         </tr>
         % endif
 
         % if su.bjt_sutta_code:
         <tr>
-            <th class="heading" colspan="2">
+            <th colspan="2">
                 Buddha Jayanti Tipiṭaka (BJT)
             </th>
         </tr>
-        % endif
 
-        % if su.bjt_sutta_code:
         <tr>
             <th>
                 Код Сутты
@@ -385,9 +272,7 @@
                 ${ su.bjt_sutta_code }
             </td>
         </tr>
-        % endif
 
-        % if su.bjt_piṭaka:
         <tr>
             <th>
                 Питака
@@ -396,9 +281,7 @@
                 ${ su.bjt_piṭaka }
             </td>
         </tr>
-        % endif
 
-        % if su.bjt_nikāya:
         <tr>
             <th>
                 Никая
@@ -407,9 +290,7 @@
                 ${ su.bjt_nikāya }
             </td>
         </tr>
-        % endif
 
-        % if su.bjt_major_section:
         <tr>
             <th>
                 Основной Раздел
@@ -418,9 +299,7 @@
                 ${ su.bjt_major_section }
             </td>
         </tr>
-        % endif
 
-        % if su.bjt_book:
         <tr>
             <th>
                 Книга
@@ -429,9 +308,7 @@
                 ${ su.bjt_book }
             </td>
         </tr>
-        % endif
 
-        % if su.bjt_minor_section:
         <tr>
             <th>
                 Малый Раздел
@@ -440,9 +317,7 @@
                 ${ su.bjt_minor_section }
             </td>
         </tr>
-        % endif
 
-        % if su.bjt_vagga:
         <tr>
             <th>
                 Вагга
@@ -451,9 +326,7 @@
                 ${ su.bjt_vagga }
             </td>
         </tr>
-        % endif
 
-        % if su.bjt_sutta:
         <tr>
             <th>
                 Сутта
@@ -462,9 +335,7 @@
                 ${ su.bjt_sutta }
             </td>
         </tr>
-        % endif
 
-        % if su.bjt_book_id:
         <tr>
             <th>
                 ID Книги
@@ -473,9 +344,7 @@
                 ${ su.bjt_book_id }
             </td>
         </tr>
-        % endif
 
-        % if su.bjt_page_num:
         <tr>
             <th>
                 Номер Страницы
@@ -484,10 +353,8 @@
                 ${ su.bjt_page_num }
             </td>
         </tr>
-        % endif
 
-        ## % if su.bjt_page_offset:
-        ## <tr>
+        <tr>
             ## <th>
                 ## Page Offset
                 ## </th>
@@ -495,118 +362,44 @@
                 ## ${ su.bjt_page_offset }
                 ## </td>
             ## </tr>
-        ## % endif
 
-        % if su.bjt_filename:
         <tr>
             <th>
                 Имя Файла
             </th>
             <td>
-                ${ su.bjt_filename }.json
+                ${ su.bjt_filename }
             </td>
         </tr>
-        % endif
 
-        % if su.bjt_github_link:
         <tr>
             <th>
                 Github
             </th>
             <td>
-                <a href="${ su.bjt_github_link }" target="_blank">
-                    ${ su.bjt_filename }.json
-                </a>
+                <a href="${ su.bjt_github_link }" target="_blank">${ su.bjt_filename }</a>
             </td>
         </tr>
-        % endif
 
-        % if su.bjt_web_code:
         <tr>
-            <th class="heading" colspan="2">
+            <th>
                 Сайты с BJT
             </th>
-        </tr>
-        % endif
-
-        % if su.bjt_tipitaka_lk_link:
-        <tr>
-            <th>
-                tipiṭaka.lk (Сингальский)
-            </th>
             <td>
-                <a href="${ su.bjt_tipitaka_lk_link }" target="_blank">
-                    ${ su.bjt_tipitaka_lk_link }
-                </a>
+                <a href="${ su.bjt_tipitaka_lk_link }" target="_blank">tipiṭaka.lk (Сингальский)</a><br>
+                <a href="${ su.bjt_open_tipitaka_lk_link }" target="_blank">open.tipiṭaka.lk (Латиница)</a><br>
+                <a href="${ su.bjt_open_tipitaka_lk_link.replace('latn', 'deva') }" target="_blank">open.tipiṭaka.lk (Деванагари)</a><br>
             </td>
         </tr>
         % endif
-
-        % if su.bjt_open_tipitaka_lk_link:
-        <tr>
-            <th>
-                open.tipiṭaka.lk (Латиница)
-            </th>
-            <td>
-                <a href="${ su.bjt_open_tipitaka_lk_link }" target="_blank">
-                    ${ su.bjt_open_tipitaka_lk_link }
-                </a>
-            </td>
-        </tr>
-        % endif
-
-        % if su.bjt_open_tipitaka_lk_link:
-        <tr>
-            <th>
-                open.tipiṭaka.lk (Деванагари)
-            </th>
-            <td>
-                <a href="${ su.bjt_open_tipitaka_lk_link.replace('latn', 'deva') }" target="_blank">
-                    ${ su.bjt_open_tipitaka_lk_link.replace('latn', 'deva') }
-                </a>
-            </td>
-        </tr>
-        % endif
-
-        <!-- <tr>
-        <th>
-            Access to Insight
-        </th>
-        <td>
-            ...
-        </td>
-    </tr>
-
-    <tr>
-        <th>
-            Dhammatalks.org
-        </th>
-        <td>
-            ...
-        </td>
-    </tr>
-
-    <tr>
-        <th>
-            Tipitaka.sl
-        </th>
-        <td>
-            ...
-        </td>
-    </tr> -->
-
-        <!-- DV catalogue -->
 
         % if su.dv_exists:
         <tr>
-            <th class="heading" colspan="2">
+            <th colspan="2">
                 Дхамма Виная: Каталог Сутт
             </th>
         </tr>
 
-        % endif
-
-        % if su.dv_pts:
         <tr>
             <th>
                 PTS
@@ -615,9 +408,7 @@
                 ${ su.dv_pts }
             </td>
         </tr>
-        % endif
 
-        % if su.dv_main_theme:
         <tr>
             <th>
                 Основная Тема
@@ -626,9 +417,7 @@
                 ${ su.dv_main_theme }
             </td>
         </tr>
-        % endif
 
-        % if su.dv_subtopic:
         <tr>
             <th>
                 Особенная Тема
@@ -637,9 +426,7 @@
                 ${ su.dv_subtopic }
             </td>
         </tr>
-        % endif
 
-        % if su.dv_summary:
         <tr>
             <th>
                 Сводка
@@ -648,9 +435,7 @@
                 ${ su.dv_summary }
             </td>
         </tr>
-        % endif
 
-        % if su.dv_key_excerpt1:
         <tr>
             <th>
                 Основные выдержки 1
@@ -659,9 +444,7 @@
                 ${ su.dv_key_excerpt1 }
             </td>
         </tr>
-        % endif
 
-        % if su.dv_key_excerpt2:
         <tr>
             <th>
                 Основные выдержки 2
@@ -670,9 +453,7 @@
                 ${ su.dv_key_excerpt2 }
             </td>
         </tr>
-        % endif
 
-        % if su.dv_similes:
         <tr>
             <th>
                 Примеры
@@ -681,9 +462,7 @@
                 ${ su.dv_similes }
             </td>
         </tr>
-        % endif
 
-        % if su.dv_stage:
         <tr>
             <th>
                 Стадия
@@ -692,9 +471,7 @@
                 ${ su.dv_stage }
             </td>
         </tr>
-        % endif
 
-        % if su.dv_training:
         <tr>
             <th>
                 Тренировка
@@ -703,9 +480,7 @@
                 ${ su.dv_training }
             </td>
         </tr>
-        % endif
 
-        % if su.dv_aspect:
         <tr>
             <th>
                 Тип Учения
@@ -714,9 +489,7 @@
                 ${ su.dv_aspect }
             </td>
         </tr>
-        % endif
 
-        % if su.dv_teacher:
         <tr>
             <th>
                 Учитель
@@ -725,9 +498,7 @@
                 ${ su.dv_teacher }
             </td>
         </tr>
-        % endif
 
-        % if su.dv_audience:
         <tr>
             <th>
                 Публика
@@ -736,9 +507,7 @@
                 ${ su.dv_audience }
             </td>
         </tr>
-        % endif
 
-        % if su.dv_method:
         <tr>
             <th>
                 Метод Учения
@@ -747,9 +516,7 @@
                 ${ su.dv_method }
             </td>
         </tr>
-        % endif
 
-        % if su.dv_length:
         <tr>
             <th>
                 Длинна
@@ -758,9 +525,7 @@
                 ${ su.dv_length }
             </td>
         </tr>
-        % endif
 
-        % if su.dv_prominence:
         <tr>
             <th>
                 Особенность
@@ -769,9 +534,7 @@
                 ${ su.dv_prominence }
             </td>
         </tr>
-        % endif
 
-        % if su.dv_suggested_suttas:
         <tr>
             <th>
                 Рекомендация
@@ -780,31 +543,14 @@
                 ${ su.dv_suggested_suttas }
             </td>
         </tr>
-        % endif
-
-        % if su.dv_exists:
-        <tr>
-            <th>
-                GitHub
-            </th>
-            <td>
-                <a
-                    href="https://github.com/dhammavinaya-tools/dhamma-vinaya-catalogue">https://github.com/dhammavinaya-tools/dhamma-vinaya-catalogue</a>
-            </td>
-        </tr>
-        % endif
-
-        <!-- DV parallel texts -->
 
         % if su.dv_parallels_exists:
         <tr>
-            <th class="heading" colspan="2">
+            <th colspan="2">
                 Паралелли
             </th>
         </tr>
-        % endif
 
-        % if su.dv_nikayas_parallels:
         <tr>
             <th>
                 Никаи
@@ -813,9 +559,7 @@
                 ${ su.dv_nikayas_parallels }
             </td>
         </tr>
-        % endif
 
-        % if su.dv_āgamas_parallels:
         <tr>
             <th>
                 Агамы
@@ -824,20 +568,16 @@
                 ${ su.dv_āgamas_parallels }
             </td>
         </tr>
-        % endif
 
-        % if su.dv_taisho_parallels:
         <tr>
             <th>
-                Taisho
+                Тайсё
             </th>
             <td>
                 ${ su.dv_taisho_parallels }
             </td>
         </tr>
-        % endif
 
-        % if su.dv_sanskrit_parallels:
         <tr>
             <th>
                 Санскрит
@@ -846,9 +586,7 @@
                 ${ su.dv_sanskrit_parallels }
             </td>
         </tr>
-        % endif
 
-        % if su.dv_vinaya_parallels:
         <tr>
             <th>
                 Виная
@@ -857,9 +595,7 @@
                 ${ su.dv_vinaya_parallels }
             </td>
         </tr>
-        % endif
 
-        % if su.dv_others_parallels:
         <tr>
             <th>
                 Другое
@@ -868,27 +604,25 @@
                 ${ su.dv_others_parallels }
             </td>
         </tr>
-        % endif
 
-        ## % if su.dv_partial_parallels_all:
-        ## <tr>
-            ## <th>
+        <tr>
+            <th>
                 ## Частичные Паралелли
-                ## </th>
-            ## <td>
-                ## ${ su.dv_partial_parallels_all }
-                ## </td>
-            ## </tr>
-        ## % endif
+            </th>
+            <td>
+                ${ su.dv_partial_parallels_nā }<br>
+                ${ su.dv_partial_parallels_all }
+            </td>
+        </tr>
+        % endif
+        % endif
 
     </table>
 
-    <p class="footer">
+    <p class="dpd-footer">
         Заметили ошибку?
-        <a class="link"
+        <a class="dpd-link"
             href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500=${i.id}%20${i.lemma_link}&entry.326955045=Sutta&entry.1433863141=GoldenDict+${today}"
-            target="_blank">
-            Пожалуйста сообщите
-        </a>.
+            target="_blank">Пожалуйста сообщите</a>
     </p>
 </div>

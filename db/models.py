@@ -711,6 +711,23 @@ class SuttaInfo(Base):
             return None
 
     @property
+    def has_tpr(self) -> bool:
+        from tools.cache_load import load_tpr_codes_set
+
+        tpr_codes = load_tpr_codes_set()
+
+        if self.dpd_code:
+            code = self.dpd_code.lower().strip()
+            if code in tpr_codes:
+                return True
+            # Handle cases like an5.31.1 -> an5.31
+            if "." in code:
+                base_code = code.split(".")[0]
+                if base_code in tpr_codes:
+                    return True
+        return False
+
+    @property
     def tpp_org(self) -> str | None:
         if self.cst_code:
             tpp_org_code = re.sub(r"romn\/|\.xml", "", self.cst_file)
@@ -1338,6 +1355,24 @@ class DpdHeadword(Base):
 
         audio_set = load_audio_set()
         return self.lemma_clean in audio_set
+
+    @property
+    def audio_male1(self) -> bool:
+        from tools.cache_load import load_audio_dict
+
+        return load_audio_dict().get(self.lemma_clean, (False, False, False))[0]
+
+    @property
+    def audio_male2(self) -> bool:
+        from tools.cache_load import load_audio_dict
+
+        return load_audio_dict().get(self.lemma_clean, (False, False, False))[1]
+
+    @property
+    def audio_female1(self) -> bool:
+        from tools.cache_load import load_audio_dict
+
+        return load_audio_dict().get(self.lemma_clean, (False, False, False))[2]
 
     @property
     def needs_grammar_button(self) -> bool:

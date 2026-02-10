@@ -1,6 +1,6 @@
-<h3 id="help: {{ d.headword }}">{{d.headword}}</h3>
+<h3 class="dpd" id="help: {{ d.headword }}">{{d.headword}}</h3>
 <div class="tertiary">
-    <table class="help">
+    <table class="grammar">
         <tr>
             <th>
                 Help
@@ -14,7 +14,7 @@
                 Meaning
             </th>
             <td>
-                {{d.help|safe}}
+                {{d.meaning|safe}}
             </td>
         </tr>
     </table>

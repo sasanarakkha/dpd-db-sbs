@@ -3,10 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Digital Pāḷi Dictionary</title>
-
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
     <style>
         {{ dpd_css|safe }}
         {{ home_simple_css|safe }}
@@ -16,16 +15,17 @@
     </script>
 </head>
 
-
 <body>
-    <div class=" summary-results">
-    <h3>Summary</h3>
-    {{ summary|safe}}
-    <hr>
+    <div class="main-pane">
+        <div class="summary-results">
+            <h3 class="dpd">Summary</h3>
+            {{ summary|safe }}
+            <hr class="dpd">
+        </div>
+        <div id="dpd-results">
+            {{ dpd_results|safe }}
+        </div>
     </div>
-    <div class="dpd-results" id="dpd-results">
-        {{ dpd_results|safe }}
-    </div>
-    </body>
+</body>
 
 </html>

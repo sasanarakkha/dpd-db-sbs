@@ -35,9 +35,9 @@ class DpdFamilySetField(ft.Column):
         self.family_set_dropdown = ft.Dropdown(
             options=[ft.dropdown.Option(o) for o in options if o],
             label="Add Set",
-            label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=10),
+            label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=14),
             dense=True,
-            text_size=12,
+            text_size=16,
             on_change=self._handle_dropdown_change,
             enable_filter=True,
             editable=True,

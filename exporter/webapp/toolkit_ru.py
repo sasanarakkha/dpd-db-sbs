@@ -14,6 +14,7 @@ from exporter.webapp.data_classes_ru import (
     GrammarData,
     HeadwordData,
     HelpData,
+    ManualVariantData,
     RootsData,
     SpellingData,
     VariantData,
@@ -26,19 +27,59 @@ from tools.exporter_functions import (
 from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
 from tools.paths_ru import RuPaths
+from tools.variants_manager import VariantManager
+
+
+_variant_manager: VariantManager | None = None
+
+
+def get_variant_manager() -> VariantManager:
+    global _variant_manager
+    if _variant_manager is None:
+        _variant_manager = VariantManager()
+    return _variant_manager
 
 
 def make_dpd_html_ru(
+
+
     q: str,
+
+
     pth: ProjectPaths,
+
+
     rupth: RuPaths,
+
+
     templates,
+
+
     roots_count_dict,
+
+
     headwords_clean_set,
+
+
     ascii_to_unicode_dict,
+
+
 ) -> tuple[str, str]:
+
+
     retries = 3
+
+
+    vm = get_variant_manager()
+
+
+
+
+
     for attempt in range(retries):
+
+
+
         try:
             with get_db_session(pth.dpd_db_path) as db_session:
                 with db_session.no_autoflush:
@@ -52,6 +93,17 @@ def make_dpd_html_ru(
                         .filter(Lookup.lookup_key.ilike(q))
                         .all()
                     )
+
+                    # Check manual variants from TSV first
+                    main_form = vm.get_main(q)
+                    if main_form:
+                        d = ManualVariantData(variant=q, main=main_form)
+                        summary_html += templates.get_template(
+                            "manual_variant_summary.html"
+                        ).render(d=d)
+                        dpd_html += templates.get_template(
+                            "manual_variant.html"
+                        ).render(d=d)
 
                     # first try the lookup table, if no results, then try other options
                     if lookup_results:
