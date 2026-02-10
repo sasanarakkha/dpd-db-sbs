@@ -5,19 +5,13 @@
 1. **The Plan is the Source of Truth:** All work must be tracked in `plan.md`
 2. **NO AGENT COMMITS:** The AI agent must NEVER execute `git commit`, `git add`, or `git notes`. The user will perform all git operations manually.
 3. **The Tech Stack is Deliberate:** Changes to the tech stack must be documented in `tech-stack.md` *before* implementation
-4. **Data Output Verification:** Write tests to verify accurate data output. Do not test UI components - user interaction will reveal UI issues. Do not test internal function implementation details.
+4. **Data Output Verification:** Write tests to verify accurate data output. Automated tests are NOT required for UI elements, CSS, or HTML, as these are best verified and tweaked by a human. Do not test UI components - user interaction will reveal UI issues. Do not test internal function implementation details.
 5. **User Experience First:** Every decision should prioritize user experience
 6. **README Maintenance:** Each project folder contains a `README.md`, which MUST be updated if anything within the folder changes to ensure documentation stays in sync with code.
-7. **Non-Interactive & CI-Aware:** Prefer non-interactive commands. Use `CI=true` for watch-mode tools (tests, linters) to ensure single execution.
-8. **Proactive Research:** Always perform a Google Search during the planning and task execution phases for any framework-specific (e.g., Flet), OS-specific (e.g., Linux window management), or non-trivial technical requirements to identify known quirks, limitations, or best practices.
-9. **Sync Template Maintenance:** Any task that creates or modifies "shadow" or "unique" files MUST include a step to update `conductor/templates/upstream_sync_rehearsal/` to keep the sync registry and guide current.
-10. **Issue Reference Mapping:**
-    - When mentioning "upstream repo issue #", refer to the issues at https://github.com/digitalpalidictionary/dpd-db.
-    - When mentioning "local repo issue #", refer to the issues at https://github.com/sasanarakkha/dpd-db-sbs.
-11. **Model Efficiency:** Unless explicitly asked otherwise:
-    - Use **PRO** models for reasoning and decision-making.
-    - Use **FLASH** models to read output files (e.g., `*.md`, `*.json`) and large logs.
-    - If a contextual file is extremely large, ask the user to point to the exact relevant location, or use a FLASH model to extract relevant "snapshots" to feed into the PRO model. This minimizes token usage while maintaining reasoning quality.
+7. **Documentation is Mandatory:** Once a task is finished and approved by the user, the `docs/` folder MUST be updated with all relevant changes. This is not optional.
+8. **Code Quality is Mandatory:** All changed files MUST pass `uv run ruff check --fix` and `uv run ruff format` before task completion. This is not optional.
+9. **Non-Interactive & CI-Aware:** Prefer non-interactive commands. Use `CI=true` for watch-mode tools (tests, linters) to ensure single execution.
+10. **Proactive Research:** Always perform a Google Search during the planning and task execution phases for any framework-specific (e.g., Flet), OS-specific (e.g., Linux window management), or non-trivial technical requirements to identify known quirks, limitations, or best practices.
 
 ## Task Workflow
 
@@ -40,8 +34,6 @@ All tasks follow a strict lifecycle:
 
 4. **Implement to Pass Tests (Green Phase):**
    - Write the minimum amount of application code necessary to make the failing tests pass.
-   - **CRITICAL:** After writing code, IMMEDIATELY run a syntax check (e.g., `uv run ruff check .` or `python -m py_compile <file>`) to ensure no syntax errors were introduced.
-   - **CRITICAL:** Ensure all variables are initialized before use, especially within conditional blocks, to prevent `UnboundLocalError`.
    - Run the test suite again and confirm that all tests now pass. This is the "Green" phase.
 
 5. **Refactor (Optional but Recommended):**
@@ -56,10 +48,10 @@ All tasks follow a strict lifecycle:
    - Add dated note explaining the change
    - Resume implementation
 
-8. **Sync Registry Check:** Before proceeding, analyze all created or modified files:
-   - Identify if any are "unique" (DPS-specific) or "shadow" (`*_ru.py`, `*_sbs.py`).
-   - If found, update `conductor/templates/upstream_sync_rehearsal/dps_sync_registry.json` and `guide.md` accordingly.
-   - This is a CRITICAL step to prevent regressions during upstream synchronization.
+8. **Lint and Format Code (REQUIRED):**
+   - Run `uv run ruff check --fix` on all changed files to fix linting issues automatically.
+   - Run `uv run ruff format` on all changed files to ensure consistent formatting.
+   - Fix any remaining linting errors that cannot be auto-fixed.
 
 9. **Notify User for Commit:**
    - Inform the user that the task is complete and ready for manual review and commit.
@@ -67,8 +59,12 @@ All tasks follow a strict lifecycle:
    - Propose a clear, concise commit message.
 
 10. **Update Plan:**
-    - Read `plan.md`, find the line for the completed task, and update its status from `[~]` to `[x]`.
-    - Write the updated content back to `plan.md`.
+     - Read `plan.md`, find the line for the completed task, and update its status from `[~]` to `[x]`.
+     - Write the updated content back to `plan.md`.
+
+11. **Update Documentation (REQUIRED):**
+     - After user approval, the `docs/` folder MUST be updated with any relevant changes.
+     - This includes: feature documentation, technical specs, API docs, installation guides, or any other docs affected by the changes.
 
 ### Phase Completion Verification and Checkpointing Protocol
 
@@ -105,9 +101,9 @@ Before marking any task complete, verify:
 - [ ] Code follows project's code style guidelines
 - [ ] All public functions/methods are documented
 - [ ] Type safety is enforced
-- [ ] No linting or static analysis errors
+- [ ] No linting or static analysis errors (ruff check --fix and ruff format run on all changed files)
 - [ ] Works correctly on mobile (if applicable)
-- [ ] Documentation updated if needed
+- [ ] `docs/` folder updated with all relevant changes (features, technical specs, API docs, etc.)
 
 ## Development Commands
 
@@ -149,21 +145,10 @@ A task is complete when:
 
 1. All code implemented to specification
 2. Tests verify data output accuracy and are passing
-3. Documentation complete (if applicable)
-4. Code passes all configured linting and static analysis checks
-5. Implementation notes added to `plan.md`
-6. User notified to perform manual commit
-
-### Session Cleanup
-
-When the user requests a "closing summary of this session" (or similar):
-1.  **Identify Current Track:** Determine the active track folder.
-2.  **Update `session_context.md`:** Write a profound, detailed summary to `conductor/tracks/<current_track>/session_context.md`.
-    *   **Current State:** Precise status of the code and features.
-    *   **Key Decisions:** Architectural choices and logic definitions that persisted (omit overwritten/obsolete intermediate steps).
-    *   **Next Steps:** Clear, actionable items for the next session.
-    *   **Outstanding Issues:** Any known bugs or unverified edge cases.
-3.  **Announce:** Confirm the context has been saved and the session is ready to be terminated.
+3. Code passes all configured linting (`uv run ruff check --fix`) and formatting (`uv run ruff format`) on all changed files
+4. Implementation notes added to `plan.md`
+5. User notified to perform manual commit
+6. **Documentation Updated:** The `docs/` folder has been updated with all relevant changes (features, technical specs, API changes, etc.)
 
 ## Continuous Improvement
 

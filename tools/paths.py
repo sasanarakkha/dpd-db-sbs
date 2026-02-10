@@ -76,6 +76,12 @@ class ProjectPaths:
         self.ebook_letter_templ_path = (
             base_dir / "exporter/kindle/templates/ebook_letter.html"
         )
+        self.ebook_epd_entry_templ_path = (
+            base_dir / "exporter/kindle/templates/ebook_epd_entry.html"
+        )
+        self.ebook_epd_letter_templ_path = (
+            base_dir / "exporter/kindle/templates/ebook_epd_letter.html"
+        )
         self.ebook_title_page_templ_path = (
             base_dir / "exporter/kindle/templates/ebook_titlepage.html"
         )
@@ -420,6 +426,8 @@ class ProjectPaths:
         self.template_variant = "variant.html"
         self.template_spelling_summary = "spelling_summary.html"
         self.template_spelling = "spelling.html"
+        self.template_manual_variant = "manual_variant.html"
+        self.template_manual_variant_summary = "manual_variant_summary.html"
 
         # identity/
         self.dpd_css_path = base_dir / "identity/css/dpd.css"
@@ -637,9 +645,9 @@ class ProjectPaths:
         self.temp_dir = base_dir / "temp/"
 
         # tools
-        self.sandhi_contractions_path = base_dir / "tools/sandhi_contractions.json"
-        self.hyphenations_dict_path = base_dir / "tools/hyphenations.json"
+        self.speech_marks_path = base_dir / "tools/speech_marks.json"
         self.uposatha_day_ini = base_dir / "tools/uposatha_day.ini"
+        self.tpr_codes_json_path = base_dir / "tools/tpr_codes.json"
 
         # db_tests/
         self.internal_tests_path = base_dir / "db_tests/db_tests_columns.tsv"
@@ -650,9 +658,7 @@ class ProjectPaths:
         self.bold_example_path = base_dir / "db_tests/single/test_bold.json"
         self.compound_type_path = base_dir / "db_tests/single/add_compound_type.tsv"
         self.digu_json_path = base_dir / "db_tests/single/test_digu.json"
-        self.hyphenations_dict_path_old = (
-            base_dir / "db_tests/single/test_hyphenations.json"
-        )
+
         self.hyphenations_scratchpad_path = (
             base_dir / "db_tests/single/test_hyphenations.txt"
         )

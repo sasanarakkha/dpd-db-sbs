@@ -14,6 +14,3 @@ This directory follows a "Continuous Validation" pattern. It contains a suite of
 Tests are run within **GUI** and as individual python scripts from this folder. 
 The primary entry point is the test manager:
 `uv run python db_tests/db_tests_manager.py`
-
-Custom SBS consistency tests:
-`uv run python db_tests/sbs_consistency_tests.py`

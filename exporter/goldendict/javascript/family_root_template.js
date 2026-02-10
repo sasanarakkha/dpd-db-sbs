@@ -37,9 +37,9 @@ function makeFamilyRootHtml(data, fr, source, link) {
 
   if (source == "root") {
     html += `
-        <p class="footer">
+        <p class="dpd-footer">
         Something out of place? 
-        <a class="link" 
+        <a class="dpd-link" 
         href="https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&amp;entry.438735500=${link}&amp;entry.326955045=Root+Family&amp;entry.1433863141=GoldenDict+${data.date}" 
         target="_blank">
         Report it here
@@ -48,17 +48,17 @@ function makeFamilyRootHtml(data, fr, source, link) {
     `;
   } else {
     html += `
-        <p class="footer">
+        <p class="dpd-footer">
         Something out of place? 
-        <a class="link" 
+        <a class="dpd-link" 
         href="https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&amp;entry.438735500=${
           data.id
         }%20${data.lemma.replace(
-      / /g,
-      "%20"
-    )}&amp;entry.326955045=Root+Family&amp;entry.1433863141=GoldenDict+${
-      data.date
-    }" 
+          / /g,
+          "%20",
+        )}&amp;entry.326955045=Root+Family&amp;entry.1433863141=GoldenDict+${
+          data.date
+        }" 
         target="_blank">
         Report it here
         </a>.

@@ -30,9 +30,9 @@ from gui2.dpd_fields_notes import DpdNotesField
 from gui2.mixins import PopUpMixin
 from gui2.toolkit import ToolKit
 from tools.fuzzy_tools import find_closest_matches
-from tools.hyphenations import HyphenationFileManager, HyphenationsDict
+from tools.pali_sort_key import pali_list_sorter
 from tools.pos import DECLENSIONS, NOUNS, PARTICIPLES, POS, VERBS
-from tools.sandhi_contraction import SandhiContractionDict, SandhiContractionManager
+from tools.speech_marks import SpeechMarkManager
 from tools.spelling import CustomSpellChecker
 
 DpdFieldType = Union[
@@ -66,16 +66,8 @@ class DpdFields(PopUpMixin):
         self.spellchecker = CustomSpellChecker()
         self.toolkit: ToolKit = toolkit
 
-        self.sandhi_manager: SandhiContractionManager = self.toolkit.sandhi_manager
-        self.sandhi_dict: SandhiContractionDict = (
-            self.sandhi_manager.sandhi_contractions_simple
-        )
-        self.hyphenations_manager: HyphenationFileManager = (
-            self.toolkit.hyphenation_manager
-        )
-        self.hyphenation_dict: HyphenationsDict = (
-            self.hyphenations_manager.hyphenations_dict
-        )
+        self.speech_marks_manager: SpeechMarkManager = self.toolkit.speech_marks_manager
+        self.speech_marks_dict = self.speech_marks_manager.get_speech_marks()
         self.simple_examples = simple_examples  # Store the flag
 
         # Fetch compound types (ensure db is initialized first if needed)
@@ -237,8 +229,12 @@ class DpdFields(PopUpMixin):
             FieldConfig(
                 "synonym",
                 on_focus=self.synonym_focus,
+                on_change=self.synonym_variant_check,
             ),
-            FieldConfig("variant"),
+            FieldConfig(
+                "variant",
+                on_change=self.synonym_variant_check,
+            ),
             FieldConfig("var_phonetic"),
             FieldConfig("var_text"),
             FieldConfig("commentary", field_type="commentary"),
@@ -406,7 +402,7 @@ class DpdFields(PopUpMixin):
         label = ft.Text(
             field_name,
             color=ft.Colors.GREY_500,
-            size=15,
+            size=12,
             width=150,
             selectable=True,
         )
@@ -419,7 +415,7 @@ class DpdFields(PopUpMixin):
                 # Create the button initially disabled
                 transfer_btn = ft.IconButton(
                     icon=ft.Icons.ARROW_BACK,
-                    icon_size=25,
+                    icon_size=20,
                     tooltip="Copy to db field",
                     # Use a lambda that captures the correct field names
                     on_click=lambda e,
@@ -968,6 +964,38 @@ class DpdFields(PopUpMixin):
                 self.ui.update_message(
                     "POS, Meaning 1, and Lemma 1 needed for synonyms"
                 )
+            self.page.update()
+
+    def synonym_variant_check(self, e: ft.ControlEvent) -> None:
+        """Ensure that the same word does not exist in both synonym and variant fields."""
+
+        # Determine which field triggered the event
+        triggering_field_name = e.control.name
+
+        syn_field = self.get_field("synonym")
+        var_field = self.get_field("variant")
+
+        syn_value = syn_field.value or ""
+        var_value = var_field.value or ""
+
+        # Split into sets of cleaned words
+        syn_set = set(word.strip() for word in syn_value.split(",") if word.strip())
+        var_set = set(word.strip() for word in var_value.split(",") if word.strip())
+
+        intersection = syn_set.intersection(var_set)
+
+        if intersection:
+            if triggering_field_name == "synonym":
+                # Remove from variant
+                for word in intersection:
+                    var_set.discard(word)
+                var_field.value = ", ".join(pali_list_sorter(list(var_set)))
+            elif triggering_field_name == "variant":
+                # Remove from synonym
+                for word in intersection:
+                    syn_set.discard(word)
+                syn_field.value = ", ".join(pali_list_sorter(list(syn_set)))
+
             self.page.update()
 
     def construction_focus(self, e: ft.ControlEvent) -> None:

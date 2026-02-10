@@ -86,7 +86,7 @@ def main():
         html_list.append(
             "<tr><th>source</th><th>book</th><th>context</th><th>variant</th></tr>"
         )
-        html_list.append("<td colspan='100%'><hr></td>")
+        html_list.append("<td colspan='100%'><hr class='dpd'></td>")
 
         synonyms_list: list[str] = []
 
@@ -97,7 +97,7 @@ def main():
 
         for corpus, data2 in data_tuple.items():
             if old_corpus and old_corpus != corpus:
-                html_list.append("<td colspan='100%'><hr></td>")
+                html_list.append("<td colspan='100%'><hr class='dpd'></td>")
 
             for book, data3 in data2.items():
                 for data_tuple in data3:
@@ -117,9 +117,9 @@ def main():
             old_corpus = corpus
 
         html_list.append("</table>")
-        html_list.append("<p class='footer'>")
+        html_list.append("<p class='dpd-footer'>")
         html_list.append(
-            "For more information, please visit <a class='link' href='https://digitalpalidictionary.github.io/features/variants/' target='_blank'>this webpage</a>."
+            "For more information, please visit <a class='dpd-link' href='https://digitalpalidictionary.github.io/features/variants/' target='_blank'>this webpage</a>."
         )
         html_list.append("</p>")
         html_list.append("</div>")

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import flet as ft
-from rich import print
 
 from db.models import BoldDefinition
 from gui2.dpd_fields_classes import DpdTextField
@@ -9,8 +8,7 @@ from gui2.flet_functions import process_bold_tags
 from gui2.toolkit import ToolKit
 from tools.bold_definitions_search import BoldDefinitionsSearchManager
 from tools.clean_sentence import split_pali_sentence_into_words
-from tools.hyphenations import HyphenationFileManager, HyphenationsDict
-from tools.sandhi_contraction import SandhiContractionDict, SandhiContractionManager
+from tools.speech_marks import SpeechMarkManager
 
 
 class DpdCommentaryField(ft.Column):
@@ -39,17 +37,8 @@ class DpdCommentaryField(ft.Column):
         self.field_name = field_name
         self.dpd_fields: DpdFields = dpd_fields
         self.toolkit: ToolKit = toolkit
-        self.sandhi_manager: SandhiContractionManager = self.toolkit.sandhi_manager
-        self.sandhi_dict: SandhiContractionDict = (
-            self.sandhi_manager.sandhi_contractions_simple
-        )
-
-        self.hyphenation_manager: HyphenationFileManager = (
-            self.toolkit.hyphenation_manager
-        )
-        self.hyphenation_dict: HyphenationsDict = (
-            self.hyphenation_manager.hyphenations_dict
-        )
+        self.speech_marks_manager: SpeechMarkManager = self.toolkit.speech_marks_manager
+        self.speech_marks_dict = self.speech_marks_manager.get_speech_marks()
 
         self.commentary_field = DpdTextField(
             name=field_name,
@@ -66,14 +55,14 @@ class DpdCommentaryField(ft.Column):
             width=200,
             on_submit=self.click_commentary_search,
             label="search for",
-            label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=12),
+            label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=10),
         )
         self.search_field_2 = ft.TextField(
             "",
             width=200,
             on_submit=self.click_commentary_search,
             hint_text="which contains",
-            hint_style=ft.TextStyle(color=ft.Colors.GREY_700, size=12),
+            hint_style=ft.TextStyle(color=ft.Colors.GREY_700, size=10),
         )
 
         # Toggle Button
@@ -168,10 +157,9 @@ class DpdCommentaryField(ft.Column):
     def handle_hyphens_and_apostrophes(self, text):
         text_list: list[str] = split_pali_sentence_into_words(text)
         for word in text_list:
-            if "-" in word:
-                self.hyphenation_manager.update_hyphenations_dict(word)
-            elif "'" in word:
-                self.sandhi_manager.update_sandhi_contractions(word)
+            if "-" in word or "'" in word:
+                clean_word = word.replace("-", "").replace("'", "")
+                self.speech_marks_manager.update_variants(clean_word, word)
 
     def click_commentary_search(self, e: ft.ControlEvent):
         self.search_field_1.error_text = None
@@ -234,7 +222,7 @@ class DpdCommentaryField(ft.Column):
                             [
                                 ft.Text(
                                     f"{i.nikaya}, {i.book}, {i.title}, {i.subhead}",
-                                    size=12,
+                                    size=10,
                                     color=ft.Colors.GREY_500,
                                     selectable=True,
                                 )
@@ -270,10 +258,10 @@ class DpdCommentaryField(ft.Column):
             self.checked_items.append(item_index)
         elif not checkbox_value and item_index in self.checked_items:
             self.checked_items.remove(item_index)
-        print(self.checked_items)
 
     def click_choose_example_cancel(self, e: ft.ControlEvent):
         self.choose_example_dialog.open = False
+        self.commentary_field.value = "-"
         self.commentary_field.focus()
         self.page.update()
 
@@ -290,8 +278,7 @@ class DpdCommentaryField(ft.Column):
         )
         commentary_clean = clean_commentary(
             commentary_compiled,
-            self.sandhi_dict,
-            self.hyphenation_dict,
+            self.speech_marks_manager,
         )
 
         self.commentary_field.value = commentary_clean

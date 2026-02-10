@@ -2,7 +2,7 @@
 
 document.addEventListener("click", function (event) {
   var target = event.target;
-  const classNames = ["button"];
+  const classNames = ["dpd-button"];
   if (classNames.some((className) => target.classList.contains(className))) {
     button_click(target);
     event.preventDefault();
@@ -23,7 +23,7 @@ function button_click(el) {
     target.classList.toggle("hidden");
     if (el.classList.contains("close")) {
       var target_control = document.querySelector(
-        'a.button[data-target="' + target_id + '"]'
+         'a.dpd-button[data-target="' + target_id + '"]'
       );
       if (target_control) {
         target_control.classList.toggle("active");
@@ -163,8 +163,11 @@ function superScripter(text) {
   return text.replace(regex, (match) => `&hairsp;<sup>${match}</sup>`);
 }
 
-function playAudio(headword, buttonElement) {
-  const gender = "male";
+function playAudio(headword, buttonElement, gender) {
+  const validGenders = ["male", "female", "male1", "male2", "female1"];
+  if (!validGenders.includes(gender)) {
+    gender = "male";
+  }
   const baseUrl = "https://www.dpdict.net/audio/";
   var audio = new Audio(baseUrl + headword + "?gender=" + gender);
 

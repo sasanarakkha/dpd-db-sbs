@@ -11,6 +11,7 @@ This subsystem follows a "Dynamic SSR (Server-Side Rendering)" pattern:
 3.  **Performance:** `preloads.py` prepares frequently accessed data (like headword sets and roots counts) during startup to ensure responsive search results.
 4.  **Templating:** Uses Jinja2 (`templates/`) to dynamically render dictionary entries, allowing for high customization based on the user's request.
 5.  **Utilities:** `toolkit.py` encapsulates common logic for formatting dictionary data specifically for the web environment.
+6.  **UI Feedback:** A CSS-based spinner provides visual activity feedback on search buttons across all tabs (DPD, CST Bold Definitions, and Tipiṭaka Translations) during search operations.
 
 ## Relationships & Data Flow
 - **Data Source:** Pulls live data from the SQLite database using **db/** models.
@@ -20,5 +21,6 @@ This subsystem follows a "Dynamic SSR (Server-Side Rendering)" pattern:
 
 ## Interface
 - **Start Server:** `uv run uvicorn exporter.webapp.main:app --reload`
+- **Generate Search Index:** `uv run python exporter/webapp/generate_search_index.py` (Run this after adding new words to the database)
 - **Primary Endpoint:** Accessible via `/search` or `/word/{lemma}`.
 - **API:** Provides JSON endpoints for external tools to query the database programmatically.

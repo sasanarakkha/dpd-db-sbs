@@ -4,8 +4,11 @@ on:
  workflow_dispatch:
 
 jobs:
-  build:
+  build-linux:
     runs-on: ubuntu-latest
+    outputs:
+      RELEASE_DATE: ${{ steps.set_release_date.outputs.RELEASE_DATE }}
+      RELEASE_TAG: ${{ steps.set_release_tag.outputs.RELEASE_TAG }}
 
     steps:
 
@@ -219,6 +222,21 @@ jobs:
         echo "=== After TXT export ==="
         $HOME/check_disk.sh
 
+    # ----------------------------------------
+    # Export Apple Dictionary Source
+    # ----------------------------------------
+
+    - name: Export Apple Dictionary
+      run: |
+        uv run python exporter/apple_dictionary/apple_dictionary.py
+        echo "=== After Apple Dictionary export ==="
+        ls -lh exporter/share/apple_dictionary/
+        $HOME/check_disk.sh
+
+    # ----------------------------------------
+    # Package Assets
+    # ----------------------------------------
+
     - name: Zip GoldenDict & Mdict
       run: |
         uv run python scripts/build/zip_goldendict_mdict.py
@@ -231,7 +249,19 @@ jobs:
         echo "=== After tarball ==="
         $HOME/check_disk.sh
 
-    # Create Draft Release and Upload Assets
+    # ----------------------------------------
+    # Upload Artifacts for macOS Build
+    # ----------------------------------------
+
+    - name: Upload Apple Dictionary Source
+      uses: actions/upload-artifact@v4
+      with:
+        name: apple-dictionary-source
+        path: exporter/share/apple_dictionary/
+        retention-days: 1
+
+    # ----------------------------------------
+    # Prepare Release Metadata
     # ----------------------------------------
 
     - name: Make Release Notes
@@ -239,37 +269,28 @@ jobs:
 
     - name: Set Release Date
       id: set_release_date
-      run: echo "RELEASE_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+      run: |
+        echo "RELEASE_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+        echo "RELEASE_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
     - name: Set Release Tag
       id: set_release_tag
-      run: echo "RELEASE_TAG=$(uv run python scripts/build/version_print.py)" >> $GITHUB_ENV
+      run: |
+        echo "RELEASE_TAG=$(uv run python scripts/build/version_print.py)" >> $GITHUB_ENV
+        echo "RELEASE_TAG=$(uv run python scripts/build/version_print.py)" >> $GITHUB_OUTPUT
 
     - name: Prepare Kobo Asset
       run: cp exporter/share/dicthtml-pi-en.zip exporter/share/dpd-kobo.zip
-    
-    - name: Verify dpd-txt.zip exists
-      run: |
-        echo "=== Checking for dpd-txt.zip ==="
-        if [ -f "exporter/share/dpd-txt.zip" ]; then
-          ls -lh exporter/share/dpd-txt.zip
-          file exporter/share/dpd-txt.zip
-          unzip -t exporter/share/dpd-txt.zip
-        else
-          echo "ERROR: dpd-txt.zip not found!"
-          ls -la exporter/share/
-          exit 1
-        fi
 
-    - name: Create Release and Upload Assets
-      uses: softprops/action-gh-release@v2
+    # ----------------------------------------
+    # Upload Linux Artifacts
+    # ----------------------------------------
+
+    - name: Upload Linux Assets
+      uses: actions/upload-artifact@v4
       with:
-        tag_name: ${{ env.RELEASE_TAG }}
-        name: ${{ env.RELEASE_DATE }}
-        body_path: exporter/share/release_notes.md
-        draft: true
-        prerelease: false
-        files: |
+        name: linux-assets
+        path: |
           exporter/share/dpd-goldendict.zip
           exporter/share/dpd-mdict.zip
           exporter/share/dpd-kindle.epub
@@ -277,5 +298,117 @@ jobs:
           exporter/share/dpd.db.tar.bz2
           exporter/share/dpd-kobo.zip
           exporter/share/dpd-txt.zip
-      env:
-        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          exporter/share/release_notes.md
+        retention-days: 1
+
+  # ----------------------------------------
+  # Job 2: Build macOS Dictionary
+  # ----------------------------------------
+
+  build-macos:
+    needs: build-linux
+    runs-on: macos-14
+
+    steps:
+      - name: Download Apple Dictionary Source
+        uses: actions/download-artifact@v4
+        with:
+          name: apple-dictionary-source
+          path: ./apple-dictionary-source/
+
+      - name: Setup Dictionary Development Kit
+        run: |
+          # Install Rosetta 2 for legacy binary compatibility
+          if ! /usr/bin/pgrep oahd >/dev/null 2>&1; then
+              sudo softwareupdate --install-rosetta --agree-to-license
+          fi
+          
+          git clone --depth 1 https://github.com/SebastianSzturo/Dictionary-Development-Kit.git
+          
+          DDK_PATH="$(pwd)/Dictionary-Development-Kit"
+          echo "DDK_PATH=$DDK_PATH" >> $GITHUB_ENV
+          
+          # Ensure binaries are executable
+          chmod +x "$DDK_PATH/bin/"*
+
+      - name: Build Dictionary
+        run: |
+          if [ ! -s "./apple-dictionary-source/Dictionary.xml" ]; then
+            echo "Error: Dictionary.xml is missing or empty"
+            exit 1
+          fi
+          
+          mkdir -p build
+          cp ./apple-dictionary-source/Dictionary.xml ./build/
+          cp ./apple-dictionary-source/Dictionary.css ./build/
+          cp ./apple-dictionary-source/Info.plist ./build/
+          
+          cd build
+          
+          # Compile using Rosetta 2 (arch -x86_64)
+          arch -x86_64 "$DDK_PATH/bin/build_dict.sh" \
+            "Digital-Pali-Dictionary" \
+            Dictionary.xml \
+            Dictionary.css \
+            Info.plist
+            
+          # Move output from objects directory to root for packaging
+          if [ -d "objects/Digital-Pali-Dictionary.dictionary" ]; then
+            mv objects/Digital-Pali-Dictionary.dictionary .
+          else
+            echo "Error: Build failed to produce .dictionary bundle"
+            exit 1
+          fi
+
+      - name: Package Dictionary
+        run: |
+          cd build
+          zip -r Digital-Pali-Dictionary.dictionary.zip Digital-Pali-Dictionary.dictionary
+
+      - name: Upload macOS Dictionary
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-dictionary
+          path: build/Digital-Pali-Dictionary.dictionary.zip
+          retention-days: 1
+
+  # ----------------------------------------
+  # Job 3: Create Draft Release
+  # ----------------------------------------
+
+  create-release:
+    needs: [build-linux, build-macos]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Linux Assets
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-assets
+          path: ./linux-assets/
+
+      - name: Download macOS Dictionary
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-dictionary
+          path: ./macos-dictionary/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.build-linux.outputs.RELEASE_TAG }}
+          name: ${{ needs.build-linux.outputs.RELEASE_DATE }}
+          body_path: ./linux-assets/release_notes.md
+          draft: true
+          prerelease: false
+          files: |
+            ./linux-assets/dpd-goldendict.zip
+            ./linux-assets/dpd-mdict.zip
+            ./linux-assets/dpd-kindle.epub
+            ./linux-assets/dpd-kindle.mobi
+            ./linux-assets/dpd.db.tar.bz2
+            ./linux-assets/dpd-kobo.zip
+            ./linux-assets/dpd-txt.zip
+            ./macos-dictionary/Digital-Pali-Dictionary.dictionary.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}

@@ -1,13 +1,16 @@
-function playAudio(headword) {
+function playAudio(headword, gender) {
     if (!headword) return;
     
-    let gender = "male";
-    try {
-        const audioToggle = localStorage.getItem("audio-toggle");
-        if (audioToggle === "true") {
-            gender = "female";
-        }
-    } catch (e) {}
+    const validGenders = ["male", "female", "male1", "male2", "female1"];
+    if (!validGenders.includes(gender)) {
+        gender = "male";
+        try {
+            const audioToggle = localStorage.getItem("audio-toggle");
+            if (audioToggle === "true") {
+                gender = "female";
+            }
+        } catch (e) {}
+    }
 
     const url = '/audio/' + encodeURIComponent(headword) + '?gender=' + gender;
     var audio = new Audio(url);
@@ -21,17 +24,18 @@ window.playAudio = playAudio;
 
 // Global delegated click listener
 document.addEventListener("click", function (event) {
-    var playButton = event.target.closest(".button.play");
+    var playButton = event.target.closest(".dpd-button.play");
     if (playButton) {
         var headword = playButton.getAttribute("data-headword");
+        var gender = playButton.getAttribute("data-gender");
         if (headword) {
-            playAudio(headword);
+            playAudio(headword, gender);
             event.preventDefault();
             return false;
         }
     }
 
-    var otherButton = event.target.closest(".button");
+    var otherButton = event.target.closest(".dpd-button");
     if (otherButton && otherButton.getAttribute("data-target")) {
         const target_id = otherButton.getAttribute("data-target");
         var target = document.getElementById(target_id);
@@ -44,7 +48,7 @@ document.addEventListener("click", function (event) {
             }
 
             if (oneButtonToggleEnabled) {
-                var allButtons = document.querySelectorAll('.button');
+                 var allButtons = document.querySelectorAll('.dpd-button');
                 allButtons.forEach(function (button) {
                     if (button !== otherButton) {
                         button.classList.remove("active");
@@ -66,7 +70,7 @@ document.addEventListener("click", function (event) {
             }
 
             if (otherButton.classList.contains("close")) {
-                var target_control = document.querySelector('a.button[data-target="' + target_id + '"]');
+                 var target_control = document.querySelector('a.dpd-button[data-target="' + target_id + '"]');
                 if (target_control) {
                     target_control.classList.toggle("active");
                 }

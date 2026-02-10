@@ -1,0 +1,30 @@
+{
+  "name": "dpd-wxt-extension",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DPD Cross-Browser Extension built with WXT",
+  "type": "module",
+  "scripts": {
+    "dev": "wxt",
+    "dev:chrome": "wxt -b chrome",
+    "dev:firefox": "wxt -b firefox",
+    "build": "wxt build",
+    "build:chrome": "wxt build -b chrome",
+    "build:firefox": "wxt build -b firefox --mv3",
+    "zip": "wxt zip",
+    "zip:chrome": "wxt zip -b chrome",
+    "zip:firefox": "wxt zip -b firefox --mv3",
+    "package": "wxt build -b chrome && wxt build -b firefox --mv3 && wxt zip -b chrome && wxt zip -b firefox --mv3",
+    "compile": "tsc --noEmit",
+    "postinstall": "wxt prepare"
+  },
+  "dependencies": {
+    "webextension-polyfill": "^0.12.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/webextension-polyfill": "^0.12.0",
+    "typescript": "^5.7.0",
+    "wxt": "^0.19.0"
+  }
+}

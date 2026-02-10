@@ -2,7 +2,7 @@
 import flet as ft
 
 from gui2.dpd_fields_classes import DpdTextField
-from gui2.dpd_fields_functions import clean_example
+from gui2.dpd_fields_functions import clean_example, remove_brackets, remove_bold_tags
 from gui2.example_stash_manager import ExampleStashManager
 from gui2.flet_functions import (
     highlight_word_in_sentence,
@@ -13,8 +13,7 @@ from tools.cst_source_sutta_example import (
     CstSourceSuttaExample,
     find_cst_source_sutta_example,
 )
-from tools.hyphenations import HyphenationFileManager, HyphenationsDict
-from tools.sandhi_contraction import SandhiContractionDict, SandhiContractionManager
+from tools.speech_marks import SpeechMarkManager
 
 book_codes: dict[str, str] = {
     # vinaya
@@ -132,17 +131,8 @@ class DpdExampleField(ft.Column):
 
         self.toolkit: ToolKit = toolkit
 
-        self.sandhi_manager: SandhiContractionManager = self.toolkit.sandhi_manager
-        self.sandhi_dict: SandhiContractionDict = (
-            self.sandhi_manager.sandhi_contractions_simple
-        )
-
-        self.hyphenation_manager: HyphenationFileManager = (
-            self.toolkit.hyphenation_manager
-        )
-        self.hyphenation_dict: HyphenationsDict = (
-            self.hyphenation_manager.hyphenations_dict
-        )
+        self.speech_marks_manager: SpeechMarkManager = self.toolkit.speech_marks_manager
+        self.speech_marks_dict = self.speech_marks_manager.get_speech_marks()
 
         self.simple_mode = simple_mode
         self.stash_manager = ExampleStashManager(self.ui.toolkit)
@@ -166,16 +156,16 @@ class DpdExampleField(ft.Column):
                 "",
                 width=240,
                 label="bold",
-                label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=12),
+                label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=10),
                 expand=True,
                 dense=True,
-                text_size=15,
+                text_size=12,
                 on_submit=self.click_bold_example,
                 on_blur=self._handle_last_control_blur,
             )
             self.counter_field = ft.Text(
                 "",
-                size=15,
+                size=12,
                 width=40,
                 expand=False,
             )
@@ -187,9 +177,9 @@ class DpdExampleField(ft.Column):
             self.book_dropdown = ft.Dropdown(
                 options=self.book_options,
                 width=300,
-                text_size=17,
+                text_size=14,
                 label="book",
-                label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=12),
+                label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=10),
                 editable=True,
                 enable_filter=True,
                 border_color=ft.Colors.GREY_800,
@@ -202,7 +192,7 @@ class DpdExampleField(ft.Column):
                 "",
                 width=300,
                 label="word to find",
-                label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=12),
+                label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=10),
                 on_submit=self._click_search_dialog_ok,
                 border_radius=20,
             )
@@ -228,7 +218,9 @@ class DpdExampleField(ft.Column):
             # Action buttons row (initially hidden)
             self._actions_row = ft.Row(
                 [
-                    ft.ElevatedButton("Clean", on_click=self.click_clean_example),
+                    ft.ElevatedButton("Add '-", on_click=self.click_clean_example),
+                    ft.ElevatedButton("[]", on_click=self.click_remove_brackets),
+                    ft.ElevatedButton("<b>", on_click=self.click_remove_bold_tags),
                     ft.ElevatedButton("Delete", on_click=self.click_delete_example),
                     ft.ElevatedButton("Swap", on_click=self.click_swap_example),
                     ft.ElevatedButton("Stash", on_click=self._click_stash_example),
@@ -338,10 +330,9 @@ class DpdExampleField(ft.Column):
     def _handle_hyphens_and_apostrophes(self, text):
         text_list: list[str] = split_pali_sentence_into_words(text)
         for word in text_list:
-            if "-" in word:
-                self.hyphenation_manager.update_hyphenations_dict(word)
-            elif "'" in word:
-                self.sandhi_manager.update_sandhi_contractions(word)
+            if "-" in word or "'" in word:
+                clean_word = word.replace("-", "").replace("'", "")
+                self.speech_marks_manager.update_variants(clean_word, word)
 
     def click_book_and_word(self, e: ft.ControlEvent):
         self.word_to_find_field.error_text = None
@@ -449,6 +440,9 @@ class DpdExampleField(ft.Column):
         return source, sutta, example
 
     def click_choose_example_ok(self, e: ft.ControlEvent):
+        if not self.example_index:
+            return
+
         self.choose_example_dialog.open = False
         self.page.update()
 
@@ -457,9 +451,7 @@ class DpdExampleField(ft.Column):
         source, sutta, example = self.get_fields()
         source.value = cst_example.source
         sutta.value = cst_example.sutta
-        example.value = clean_example(
-            cst_example.example, self.sandhi_dict, self.hyphenation_dict
-        )
+        example.value = clean_example(cst_example.example, self.speech_marks_manager)
         self.page.update()
 
     def click_bold_example(self, e: ft.ControlEvent):
@@ -471,7 +463,17 @@ class DpdExampleField(ft.Column):
 
     def click_clean_example(self, e: ft.ControlEvent):
         if self.value:
-            self.value = self.value.replace("<b>", "").replace("</b>", "")
+            self.value = clean_example(self.value, self.speech_marks_manager)
+            self.update()
+
+    def click_remove_brackets(self, e: ft.ControlEvent):
+        if self.value:
+            self.value = remove_brackets(self.value)
+            self.update()
+
+    def click_remove_bold_tags(self, e: ft.ControlEvent):
+        if self.value:
+            self.value = remove_bold_tags(self.value)
             self.update()
 
     def click_swap_example(self, e: ft.ControlEvent):

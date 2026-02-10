@@ -2,6 +2,7 @@
 import re
 
 from sqlalchemy import desc, func, or_
+from sqlalchemy.orm import defer
 from sqlalchemy.orm.session import Session
 
 from db.db_helpers import get_db_session
@@ -15,6 +16,7 @@ from db.models import (
     Lookup,
 )
 from gui2.dpd_fields_functions import clean_lemma_1
+from gui2.needs_example import is_missing_sutta_example
 from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
 
@@ -92,7 +94,18 @@ class DatabaseManager:
         self.get_all_word_families()
         self.get_all_patterns()
         self.get_all_decon_no_headwords()
-        self.db = self.db_session.query(DpdHeadword).all()
+        self.db = (
+            self.db_session.query(DpdHeadword)
+            .options(
+                defer(DpdHeadword.inflections_html),
+                defer(DpdHeadword.freq_html),
+                defer(DpdHeadword.inflections_sinhala),
+                defer(DpdHeadword.inflections_devanagari),
+                defer(DpdHeadword.inflections_thai),
+                defer(DpdHeadword.freq_data),
+            )
+            .all()
+        )
 
     def get_all_roots(self) -> None:
         roots = self.db_session.query(DpdRoot.root).distinct().all()
@@ -104,9 +117,9 @@ class DatabaseManager:
         self.all_lemma_clean = set([clean_lemma_1(lemma) for lemma in self.all_lemma_1])
 
     def get_all_pos(self):
-        first_word = self.db_session.query(DpdHeadword).first()
-        if first_word:
-            self.all_pos = set(first_word.pos_list)
+        # Optimized to not load the full first word
+        pos_db = self.db_session.query(DpdHeadword.pos).group_by(DpdHeadword.pos).all()
+        self.all_pos = set([i[0] for i in pos_db])
 
     def get_all_root_families(self):
         root_families = self.db_session.query(FamilyRoot.root_family).all()
@@ -205,7 +218,18 @@ class DatabaseManager:
     def make_inflections_lists(self) -> None:
         """Load data from the database."""
 
-        self.db: list[DpdHeadword] = self.db_session.query(DpdHeadword).all()
+        self.db: list[DpdHeadword] = (
+            self.db_session.query(DpdHeadword)
+            .options(
+                defer(DpdHeadword.inflections_html),
+                defer(DpdHeadword.freq_html),
+                defer(DpdHeadword.inflections_sinhala),
+                defer(DpdHeadword.inflections_devanagari),
+                defer(DpdHeadword.inflections_thai),
+                defer(DpdHeadword.freq_data),
+            )
+            .all()
+        )
 
         self.all_inflections: set[str] = set()  # reset
         [self.all_inflections.update(i.inflections_list_all) for i in self.db]
@@ -257,16 +281,24 @@ class DatabaseManager:
     def make_pass2_lists(self) -> None:
         """Data that pass2 preprocessor needs."""
 
-        self.db: list[DpdHeadword] = self.db_session.query(DpdHeadword).all()
+        self.db: list[DpdHeadword] = (
+            self.db_session.query(DpdHeadword)
+            .options(
+                defer(DpdHeadword.inflections_html),
+                defer(DpdHeadword.freq_html),
+                defer(DpdHeadword.inflections_sinhala),
+                defer(DpdHeadword.inflections_devanagari),
+                defer(DpdHeadword.inflections_thai),
+                defer(DpdHeadword.freq_data),
+            )
+            .all()
+        )
 
         self.all_inflections_missing_example: set[str] = set()  # reset
         [
             self.all_inflections_missing_example.update(i.inflections_list_all)
             for i in self.db
-            if (
-                (i.meaning_1 and not i.source_1 and not i.source_1 == "-")
-                or (not i.meaning_1)
-            )
+            if is_missing_sutta_example(i)
         ]
 
         self.all_suffixes: set[str] = set()  # reset

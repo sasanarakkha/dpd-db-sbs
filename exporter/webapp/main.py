@@ -8,11 +8,11 @@ from fastapi.responses import HTMLResponse, Response, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import sessionmaker
-import sqlite3
 import re
 
 from db.db_helpers import get_db_session
-from db.models import BoldDefinition
+from db.models import BoldDefinition, DbInfo
+from audio.db.db_helpers import get_audio_record
 from exporter.webapp.preloads import (
     make_ascii_to_unicode_dict,
     make_headwords_clean_set,
@@ -22,11 +22,13 @@ from exporter.webapp.toolkit import make_dpd_html
 from tools.css_manager import CSSManager
 from tools.paths import ProjectPaths
 from tools.pali_text_files import cst_texts
-from tools.tipitaka_db import search_all_cst_texts, search_book
+from tools.tipitaka_db import search_all_cst_texts, search_books
 from tools.translit import auto_translit_to_roman
+from prometheus_fastapi_instrumentator import Instrumentator
 
 pth: ProjectPaths = ProjectPaths()
 app = FastAPI()
+
 app.add_middleware(GZipMiddleware, minimum_size=500)
 app.mount("/static", StaticFiles(directory=str(pth.webapp_static_dir)), name="static")
 
@@ -52,6 +54,12 @@ with get_db() as db_session:
     headwords_clean_set = make_headwords_clean_set(db_session)
     ascii_to_unicode_dict = make_ascii_to_unicode_dict(db_session)
     bd_count = db_session.query(BoldDefinition).count()
+
+    # Fetch database version for search index cache-busting
+    db_info = (
+        db_session.query(DbInfo).filter(DbInfo.key == "dpd_release_version").first()
+    )
+    dpd_release_version = db_info.value if db_info else "unknown"
 
 # Set up templates
 templates = Jinja2Templates(directory=str(pth.webapp_templates_dir))
@@ -86,6 +94,7 @@ def home_page(request: Request, response_class=HTMLResponse):
             "dpd_results": "",
             "bd_count": bd_count,
             "book_options": list(cst_texts.keys()),
+            "dpd_release_version": dpd_release_version,
         },
     )
 
@@ -101,6 +110,7 @@ def bold_definitions_page(request: Request, response_class=HTMLResponse):
             "dpd_results": "",
             "bd_count": bd_count,
             "book_options": list(cst_texts.keys()),
+            "dpd_release_version": dpd_release_version,
         },
     )
 
@@ -237,14 +247,17 @@ def tt_search(request: Request, q: str, book: str, lang: str):
     # Limit results
     limit = 100
 
+    # Parse books (comma-separated list)
+    books = [b.strip() for b in book.split(",") if b.strip()]
+
     # Determine search column
     search_column = "pali_text" if lang == "Pāḷi" else "english_translation"
 
     # Perform search
-    if book == "all":
+    if "all" in books:
         results = search_all_cst_texts(q, search_column=search_column)
     else:
-        results = search_book(book, q, search_column=search_column)
+        results = search_books(books, q, search_column=search_column)
 
     total_count = len(results)
     results = results[:limit]
@@ -271,57 +284,41 @@ def tt_search(request: Request, q: str, book: str, lang: str):
 def get_audio(request: Request, headword: str, gender: str = "male"):
     """Serve audio file for a headword with byte-range support."""
 
-    conn = sqlite3.connect(pth.dpd_audio_db_path)
-    cursor = conn.cursor()
-
     cleaned_headword = re.sub(r" \d.*$", "", headword)
+    audio_data = get_audio_record(cleaned_headword, gender)
 
-    cursor.execute(
-        "SELECT female1, male1 FROM dpd_audio WHERE lemma_clean = ?",
-        (cleaned_headword,),
-    )
-    result = cursor.fetchone()
-    conn.close()
+    if audio_data:
+        file_size = len(audio_data)
+        range_header = request.headers.get("range")
 
-    if result:
-        female1, male1 = result
-        if gender == "female":
-            audio_data = female1 if female1 else male1
-        else:
-            audio_data = male1 if male1 else female1
+        headers = {
+            "Accept-Ranges": "bytes",
+        }
 
-        if audio_data:
-            file_size = len(audio_data)
-            range_header = request.headers.get("range")
+        if range_header:
+            match = re.match(r"bytes=(\d+)-(\d*)", range_header)
+            if match:
+                start = int(match.group(1))
+                end = int(match.group(2)) if match.group(2) else file_size - 1
 
-            headers = {
-                "Accept-Ranges": "bytes",
-            }
+                if start < file_size:
+                    chunk = audio_data[start : end + 1]
+                    headers["Content-Range"] = f"bytes {start}-{end}/{file_size}"
+                    headers["Content-Length"] = str(len(chunk))
+                    return Response(
+                        content=chunk,
+                        status_code=206,
+                        headers=headers,
+                        media_type="audio/mpeg",
+                    )
 
-            if range_header:
-                match = re.match(r"bytes=(\d+)-(\d*)", range_header)
-                if match:
-                    start = int(match.group(1))
-                    end = int(match.group(2)) if match.group(2) else file_size - 1
-
-                    if start < file_size:
-                        chunk = audio_data[start : end + 1]
-                        headers["Content-Range"] = f"bytes {start}-{end}/{file_size}"
-                        headers["Content-Length"] = str(len(chunk))
-                        return Response(
-                            content=chunk,
-                            status_code=206,
-                            headers=headers,
-                            media_type="audio/mpeg",
-                        )
-
-            headers["Content-Length"] = str(file_size)
-            return Response(
-                content=audio_data, 
-                status_code=200,
-                headers=headers, 
-                media_type="audio/mpeg"
-            )
+        headers["Content-Length"] = str(file_size)
+        return Response(
+            content=audio_data,
+            status_code=200,
+            headers=headers,
+            media_type="audio/mpeg",
+        )
 
     return Response(status_code=404)
 
@@ -334,7 +331,177 @@ def update_history(
     if history_tuple in history_list:
         history_list.remove(history_tuple)
     history_list.insert(0, history_tuple)
-    return history_list[:250]
+    history_list = history_list[:250]
+    return history_list
+
+
+# Global metrics for /status
+metrics = {
+    "total_requests": 0,
+    "active_requests": 0,
+    "total_time": 0.0,
+    "ema_time": 0.0,  # Exponential Moving Average for recent performance
+    "official": {},  # route_pattern -> {"count": 0, "history": [], "avg_time": 0, "max_time": 0}
+    "other": {"count": 0, "history": []},
+}
+
+
+@app.middleware("http")
+async def track_performance(request: Request, call_next):
+    # Ignore background noise
+    path = request.url.path
+    if (
+        path.startswith("/static")
+        or path == "/favicon.ico"
+        or path == "/metrics"
+        or path == "/status"
+    ):
+        return await call_next(request)
+
+    import time
+    from urllib.parse import unquote
+    from starlette.routing import Match
+
+    start_time = time.time()
+    metrics["active_requests"] += 1
+    metrics["total_requests"] += 1
+
+    try:
+        response = await call_next(request)
+        return response
+    finally:
+        process_time = (time.time() - start_time) * 1000  # Convert to ms
+        metrics["total_time"] += process_time / 1000
+        metrics["active_requests"] -= 1
+
+        # Update Exponential Moving Average (alpha=0.1)
+        if metrics["ema_time"] == 0:
+            metrics["ema_time"] = process_time
+        else:
+            metrics["ema_time"] = (process_time * 0.1) + (metrics["ema_time"] * 0.9)
+
+        # Resolve the route pattern
+        route_pattern = None
+        # Try to get the route from the scope first (FastAPI/Starlette set this after routing)
+        route_obj = request.scope.get("route")
+        if route_obj:
+            route_pattern = getattr(route_obj, "path", None)
+
+        if not route_pattern:
+            for route in request.app.router.routes:
+                match, _ = route.matches(request.scope)
+                if match == Match.FULL:
+                    route_pattern = getattr(route, "path", None)
+                    break
+
+        # Decode Unicode request string
+        request_display = unquote(str(request.url.path))
+        if request.url.query:
+            request_display += f"?{unquote(str(request.url.query))}"
+
+        if route_pattern:
+            # Official Endpoint
+            if route_pattern not in metrics["official"]:
+                metrics["official"][route_pattern] = {
+                    "count": 0,
+                    "history": [],
+                    "avg_time": 0.0,
+                    "max_time": 0.0,
+                }
+
+            m = metrics["official"][route_pattern]
+            m["count"] += 1
+            # Update endpoint average and max
+            m["avg_time"] = (
+                (process_time * 0.1) + (m["avg_time"] * 0.9)
+                if m["avg_time"] > 0
+                else process_time
+            )
+            if process_time > m["max_time"]:
+                m["max_time"] = process_time
+
+            history = m["history"]
+            if request_display not in history:
+                history.insert(0, request_display)
+                m["history"] = history[:10]
+        else:
+            # Other / Spam
+            metrics["other"]["count"] += 1
+            history = metrics["other"]["history"]
+            if request_display not in history:
+                history.insert(0, request_display)
+                metrics["other"]["history"] = history[:10]
+
+
+@app.get("/status", response_class=HTMLResponse)
+def status_page(request: Request):
+    """Human-readable status dashboard."""
+    import psutil
+    import platform
+    import os
+    from datetime import datetime
+    from tools.cache_load import _audio_dict_cache
+
+    process = psutil.Process()
+    mem_info = process.memory_info()
+    sys_mem = psutil.virtual_memory()
+
+    # Memory Calculation (App)
+    app_used = mem_info.rss
+    app_total = 4096 * 1024 * 1024  # 4GB Limit
+    app_percent = (app_used / app_total) * 100
+
+    # Memory Calculation (System)
+    sys_used = sys_mem.used
+    sys_total = sys_mem.total
+    sys_percent = sys_mem.percent
+
+    health_color = "green"
+    if app_percent > 70 or metrics["ema_time"] > 300:
+        health_color = "orange"
+    if app_percent > 90 or metrics["ema_time"] > 600:
+        health_color = "red"
+
+    stats = {
+        "pid": os.getpid(),
+        "python_version": platform.python_version(),
+        "start_time": datetime.fromtimestamp(process.create_time()).strftime(
+            "%Y-%m-%d %H:%M:%S"
+        ),
+        "uptime": str(
+            datetime.now() - datetime.fromtimestamp(process.create_time())
+        ).split(".")[0],
+        # App Mem
+        "app_mem_used": f"{app_used / 1024 / 1024:.2f} MB",
+        "app_mem_total": f"{app_total / 1024 / 1024 / 1024:.2f} GB",
+        "app_mem_percent": f"{app_percent:.1f}%",
+        # Sys Mem
+        "sys_mem_used": f"{sys_used / 1024 / 1024 / 1024:.2f} GB",
+        "sys_mem_total": f"{sys_total / 1024 / 1024 / 1024:.2f} GB",
+        "sys_mem_percent": f"{sys_percent:.1f}%",
+        "health_color": health_color,
+        "cpu_percent": f"{process.cpu_percent(interval=0.1)}%",
+        "threads": process.num_threads(),
+        # Performance
+        "active_requests": metrics["active_requests"],
+        "total_requests": metrics["total_requests"],
+        "ema_response_time": f"{metrics['ema_time']:.2f} ms",
+        "official": metrics["official"],
+        "other": metrics["other"],
+        "audio_cache_loaded": _audio_dict_cache is not None,
+    }
+
+    return templates.TemplateResponse(
+        "status.html",
+        {
+            "request": request,
+            "stats": stats,
+        },
+    )
+
+
+# Proactively monitor memory and performance
+Instrumentator().instrument(app).expose(app)
 
 
 if __name__ == "__main__":

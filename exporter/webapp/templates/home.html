@@ -13,6 +13,7 @@
     <link rel="icon" type="image/png" href="/static/dpd-logo-dark.svg" />
 
     <script>
+        window.DPD_RELEASE_VERSION = "{{ dpd_release_version }}";
         // Prevents a flash of unstyled content (FOUC)
         // This script is in the <head> so it runs before the page is rendered
         (function () {
@@ -65,14 +66,20 @@
     <div id="dpd-tab" class="tab-content active">
         <div class="header-pane">
             <div class="logo-title">
-                <img src="static/dpd-logo.svg" alt="dpd logo" id="header-image" class="header-image" />
+                <a href="/" id="logo-link">
+                    <img src="static/dpd-logo.svg" alt="dpd logo" id="header-image" class="header-image" />
+                </a>
                 <h2 class="title" id="title-clear">Digital Pāḷi
                     Dictionary</h2>
             </div>
             <form id="search-form">
-                <input class="search-box" type="text" name="search" id="search-box" value="{{ search }}"
-                    autocomplete="off" inputmode="text" autocapitalize="off" />
+                <div class="search-input-container">
+                    <input class="search-box" type="text" name="search" id="search-box" value="{{ search }}"
+                        autocomplete="off" inputmode="text" autocapitalize="off" autofocus />
+                    <div id="search-dropdown" class="search-dropdown" style="display: none;"></div>
+                </div>
                 <button class="search-button" id="search-button">search</button>
+                <button class="search-button clear-button" id="clear-button">clear</button>
                 <button class="help small-button" id="search-help-button">
                     ?
                     <span class="tooltip velthuis">
@@ -104,10 +111,12 @@
         </div>
         <div class="main-pane" id="main-pane">
             <div class="history-pane" id="history-pane">
-                <h3>History</h3>
-                <button id="clear-history-button" class="clear-history-button">
-                    x
-                </button>
+                <div class="pane-header">
+                    <h3 class="dpd">History<button class="clear-history-button" id="clear-history-button" title="Clear history">x</button></h3>
+                    <button class="collapse-toggle" id="history-collapse-toggle" aria-label="Toggle history">
+                        <span class="collapse-icon">▼</span>
+                    </button>
+                </div>
                 <div class="history-list-pane" id="history-list-pane"></div>
             </div>
             <div class="dpd-pane" id="dpd-pane">
@@ -116,7 +125,12 @@
                     dpd_results|safe }}</div>
             </div>
             <div class="settings-pane">
-                <h3>Settings</h3>
+                <div class="pane-header">
+                    <h3 class="dpd">Settings</h3>
+                    <button class="collapse-toggle" id="settings-collapse-toggle" aria-label="Toggle settings">
+                        <span class="collapse-icon">▼</span>
+                    </button>
+                </div>
                 <p>
                     <button class="small-button" id="font-size-down">-</button>
                     <button class="small-button" id="font-size-up">+</button>
@@ -221,12 +235,12 @@
                 <h4>Search for definitions of the term</h4>
                 <form id="bd-search-form-1">
                     <input class="search-box bd-search-box" type="text" name="bd-search-1" id="bd-search-box-1"
-                        value="{{ search }}" autocomplete="off" inputmode="text" autocapitalize="off" />
+                        value="{{ search }}" autocomplete="off" inputmode="text" autocapitalize="off" autofocus />
                 </form>
                 <h4>which contain</h4>
                 <form id="bd-search-form-2">
                     <input class="search-box bd-search-box" type="text" name="bd-search-2" id="bd-search-box-2"
-                        value="{{ search }}" autocomplete="off" inputmode="text" autocapitalize="off" />
+                        value="{{ search }}" autocomplete="off" inputmode="text" autocapitalize="off" autofocus />
                 </form>
                 <h4>within them.</h4>
                 <button class="search-button" id="bd-search-button">search</button>
@@ -270,7 +284,7 @@
         </div>
         <div class="scrolling-pane" id="bd-results">{{ bd_results|safe
             }}</div>
-        <div class="footer-pane">
+        <div class="dpd-footer-pane">
             For detailed information on this feature, please
             <a href="https://digitalpalidictionary.github.io/webapp/" target="_blank">
                 read the docs
@@ -296,20 +310,33 @@
                     <div class="tt-search-row">
                         <label class="tt-label">Search for</label>
                         <input class="search-box tt-search-box" type="text" id="tt-search-box" autocomplete="off"
-                            inputmode="text" autocapitalize="off" placeholder="use plain text or regex" />
+                            inputmode="text" autocapitalize="off" placeholder="use plain text or regex" autofocus />
                         <label class="tt-label">in</label>
                         <select id="tt-lang-select" class="tt-select">
                             <option value="Pāḷi">Pāḷi texts</option>
                             <option value="English">English translations</option>
                         </select>
                         <label class="tt-label">in</label>
-                        <select id="tt-book-select" class="tt-select">
-                            <option value="all">all books</option>
-                            {% for book in book_options %}
-                            <option value="{{ book }}">{{ book }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="tt-book-dropdown">
+                            <button type="button" id="tt-book-dropdown-btn" class="tt-book-dropdown-btn">
+                                <span id="tt-book-selected-text">all books</span>
+                                <span class="tt-dropdown-arrow">▼</span>
+                            </button>
+                            <div id="tt-book-dropdown-menu" class="tt-book-dropdown-menu">
+                                <label class="tt-book-dropdown-option">
+                                    <input type="checkbox" class="tt-book-checkbox" value="all" checked>
+                                    all books
+                                </label>
+                                {% for book in book_options %}
+                                <label class="tt-book-dropdown-option">
+                                    <input type="checkbox" class="tt-book-checkbox" value="{{ book }}">
+                                    {{ book }}
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
                         <button class="search-button" id="tt-search-button">search</button>
+                        <button class="search-button clear-button" id="tt-clear-button">clear</button>
                     </div>
                     <div class="tt-search-row">
                         <label class="tt-label">Only show results</label>
@@ -320,8 +347,6 @@
                         <input class="search-box tt-search-box" type="text" id="tt-filter-box" autocomplete="off"
                             placeholder="use plain text or regex" />
                         <label class="tt-label">in them.</label>
-                        <button type="button" class="search-button" id="tt-clear-button"
-                            style="margin-left: auto;">clear</button>
                     </div>
                 </form>
             </div>

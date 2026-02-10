@@ -7,7 +7,7 @@ LABEL_WIDTH = 250
 BUTTON_WIDTH = 250
 LABEL_COLOUR = ft.Colors.GREY_500
 HIGHLIGHT_COLOUR = ft.Colors.BLUE_200
-TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=12)
+TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=10)
 
 
 class Pass2AutoView(ft.Column):
@@ -48,7 +48,7 @@ class Pass2AutoView(ft.Column):
             autofocus=True,
             options=self.book_options,
             width=300,
-            text_size=17,
+            text_size=14,
             border_color=HIGHLIGHT_COLOUR,
             border_radius=20,
             hint_text="Select a book",
@@ -65,7 +65,7 @@ class Pass2AutoView(ft.Column):
             options=self.ai_model_options,
             width=300,
             menu_width=500,
-            text_size=17,
+            text_size=14,
             border_color=HIGHLIGHT_COLOUR,
             border_radius=20,
             hint_text="Select AI Model",
