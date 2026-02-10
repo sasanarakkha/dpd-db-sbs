@@ -31,12 +31,19 @@
 - [ ] **MANDATORY SWITCH BACK**: Ask user to switch back to **Auto** via `/model`.
 - [ ] Task: Run All Tests
     - [ ] Run imports, exporters, docs parity, and new feature tests.
-- [ ] Task: Final Manual System Check
-    - [ ] Confirm DPS-specific UI features are intact.
 - [ ] Task: **🛑 FINAL USER APPROVAL GATE**
     - [ ] **HARD STOP**: Agent presents a summary of all changes.
     - [ ] **AWAIT SIGNAL**: "Phase 3 is complete" or "Proceed with final commit".
 - [ ] Task: **FINAL MANUAL COMMIT (COMMIT 2/2)**
     - [ ] Perform ONE consolidated commit for all manual work.
     - [ ] Message: `sync: manual merge resolutions and comprehensive validation (DD-MM)`.
-- [ ] Task: Conductor - User Manual Verification 'Final Validation & Checkpoint'
+
+## Phase 4: Manual User Verification
+- [ ] **Task: Exporter Verification**
+    - [ ] Verify GoldenDict SBS/Ru exports manually.
+    - [ ] Verify Kindle Ru export manually.
+    - [ ] Verify Webapp (Ru/SBS) manually.
+- [ ] **Task: GUI Verification**
+    - [ ] Verify GUI2 functionality (DpsView, Fonts, Tabs, Hotkeys).
+- [ ] **Task: Final Confirmation**
+    - [ ] User provides final confirmation: "Track is complete".
