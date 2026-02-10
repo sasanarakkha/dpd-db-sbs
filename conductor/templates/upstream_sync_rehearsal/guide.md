@@ -48,16 +48,18 @@ NEVER overwrite `.gitignore` with the upstream version.
 
 ---
 
+---
+
 ## 🛑 The 2-Commit Rule
 To keep the history clean and verification easy, EXACTLY TWO commits are allowed per sync:
-1.  **Commit 1 (Automated):** Performed by the Phase 1 sync script. Includes basic folder sync and UI scaling.
+1.  **Commit 1 (Automated):** Performed by the Phase 1 sync script. Includes basic folder sync, submodule update (`git submodule update`), and UI scaling.
 2.  **Commit 2 (Manual):** Performed at the VERY END after the PRO Logic Audit and Final Approval. Includes all manual merges, shadow updates, tests, and template fixes.
 
 ---
 
 ## 🛑 PRO Logic Audit Protocol (Phase 3)
 Before the final commit, the agent MUST use a **PRO model** to conduct a final audit:
-1.  **Cross-Check:** Compare EVERY file in `modified_upstream_files` against its `as_upstream` original to ensure no logic was lost, and all updates are implemented.
+1.  **Cross-Check:** Compare EVERY file in `modified_upstream_files` against its `as_upstream` original to ensure no logic was lost and all upstream improvements were integrated.
 2.  **Shadow Check:** Compare EVERY updated shadow copy against its upstream source.
 3.  **No Incremental Commits:** If mistakes are found, fix them and stage them. DO NOT COMMIT until the user says "Phase 3 is complete".
 
