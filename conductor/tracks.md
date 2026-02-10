@@ -9,5 +9,16 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
+
+
 ## [~] Track: SBS Example Consistency Tests
+
 *Link: [./conductor/tracks/sbs_consistency_tests_20260108/](./conductor/tracks/sbs_consistency_tests_20260108/)*
+
+
+
+---
+
+- [~] **Track: Upstream Sync Rehearsal following template**
+
+*Link: [./tracks/upstream_sync_rehearsal_20260210/](./tracks/upstream_sync_rehearsal_20260210/)*
