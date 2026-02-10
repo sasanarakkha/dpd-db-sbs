@@ -14,15 +14,9 @@
 
 ## AI Agent Operation Strategy
 Synchronization is a high-risk task that requires semantic understanding, not just line-by-step diffing.
-- **Switch to PRO Model:** The agent MUST use a PRO model for **Phase 2 (Manual Merge)** and the **Test Expansion** task. 
-- **Why:** Flash models may miss logic dependencies when porting features from upstream sources to localized shadow copies. 
-- **🛑 MANDATORY MODEL SWITCH PROTOCOL (Manual Burst):**
-    - The CLI's "Auto" mode may default to Flash. To ensure deep reasoning, the agent MUST instruct the user to perform a **Manual Burst**:
-    - **Step 1 (Start Phase 2):** Agent asks user to switch to a Pro model manually: *"Please run `/model`, select 'Manual', and pick a PRO model (e.g., `gemini-2.0-pro-exp-02-05`) for the logic porting phase."*
-    - **Step 2 (End Phase 2):** Once manual porting is approved, the agent asks user to switch back: *"Logic porting is complete. Please run `/model` and switch back to 'Auto' or 'Flash' for the final verification phase."*
-- **Protocol:** Once the user confirms, the agent should explicitly announce: *"I am now operating with the PRO model for the semantic logic porting phase."*
-
-## 🛑 Systematic Shadow Porting Protocol (Phase 2)
+- **Auto Mode:** The agent should operate in "Auto" mode for Phase 1 and Phase 2.
+- **Burst to PRO:** The agent MUST switch to a PRO model for the **Phase 3: PRO Logic Audit** to ensure full parity and catch semantic mistakes. (See Phase 3 protocol for details).
+- **🛑 Systematic Shadow Porting Protocol (Phase 2)**
 To ensure no localized shadow copies are missed, the agent MUST execute the following automated check BEFORE declaring shadow porting complete:
 
 1.  **Identify Changes:** Run `git diff-tree --no-commit-id --name-only -r HEAD` (referencing the sync commit from Phase 1).
@@ -62,10 +56,15 @@ To keep the history clean and verification easy, EXACTLY TWO commits are allowed
 ---
 
 ## 🛑 PRO Logic Audit Protocol (Phase 3)
-Before the final commit, the agent MUST use a **PRO model** to conduct a final audit:
-1.  **Cross-Check:** Compare EVERY file in `modified_upstream_files` against its `as_upstream` original to ensure no logic was lost and all upstream improvements were integrated.
-2.  **Shadow Check:** Compare EVERY updated shadow copy against its upstream source.
-3.  **No Incremental Commits:** If mistakes are found, fix them and stage them. DO NOT COMMIT until the user says "Phase 3 is complete".
+Phase 3 is the most critical reasoning phase. The agent MUST use a **PRO model** to conduct a final audit of all manual work performed in Phase 2.
+
+- **🛑 MANDATORY MODEL SWITCH:** Before starting the PRO Logic Audit, the agent MUST stop and ask the user to switch:
+    - *"I am starting the Final Logic Audit. Please run `/model`, select 'Manual', and pick a PRO model (e.g., `gemini-2.0-pro-exp-02-05`) for this audit."*
+- **Audit Steps:**
+    1. **Cross-Check:** Compare EVERY file in `modified_upstream_files` against its `as_upstream` original.
+    2. **Shadow Check:** Compare EVERY updated shadow copy against its upstream source.
+- **🛑 SWITCH BACK:** Once the audit is complete and fixes are staged, the agent MUST ask the user to switch back:
+    - *"The audit is complete and fixes are staged. Please run `/model` and switch back to 'Auto' for the final commit and validation."*
 
 ---
 

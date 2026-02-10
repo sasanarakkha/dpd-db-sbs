@@ -25,9 +25,10 @@
 
 ## Phase 3: Final Logic Audit & Validation
 - [ ] **🛑 NO COMMITS ALLOWED UNTIL FINAL APPROVAL.**
+- [ ] **MANDATORY MODEL SWITCH**: Ask user to switch to **PRO model** via `/model`.
 - [ ] Task: PRO Logic Audit
     - [ ] **AGENT ACTION**: Use PRO model to manually audit EVERY modified file and shadow copy against upstream originals.
-    - [ ] Verify that no structural improvements were missed during Phase 2.
+- [ ] **MANDATORY SWITCH BACK**: Ask user to switch back to **Auto** via `/model`.
 - [ ] Task: Run All Tests
     - [ ] Run imports, exporters, docs parity, and new feature tests.
 - [ ] Task: Final Manual System Check
