@@ -173,14 +173,16 @@ class TestKindleExporterRu:
     @patch('exporter.kindle.kindle_exporter_ru.ProjectPaths')
     @patch('exporter.kindle.kindle_exporter_ru.RuPaths')
     @patch('exporter.kindle.kindle_exporter_ru.render_dpd_xhtml')
+    @patch('exporter.kindle.kindle_exporter_ru.render_rpd_xhtml')
     @patch('exporter.kindle.kindle_exporter_ru.save_abbreviations_xhtml_page')
     @patch('exporter.kindle.kindle_exporter_ru.save_title_page_xhtml')
     @patch('exporter.kindle.kindle_exporter_ru.zip_epub')
     @patch('exporter.kindle.kindle_exporter_ru.make_mobi')
-    def test_main(self, mock_mobi, mock_zip, mock_title, mock_abbrev, mock_render, mock_rupth, mock_pth, mock_config):
+    def test_main(self, mock_mobi, mock_zip, mock_title, mock_abbrev, mock_rpd, mock_render, mock_rupth, mock_pth, mock_config):
         """Test Kindle exporter main flow."""
         mock_config.return_value = True
         mock_render.return_value = 100 # id_counter
+        mock_rpd.return_value = 200
         
         kindle_main()
         

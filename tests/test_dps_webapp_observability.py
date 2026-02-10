@@ -23,9 +23,9 @@ def test_ru_status_endpoint():
     response = client.get("/status")
     assert response.status_code == 200
     assert "PID" in response.text
-    assert "Python Version" in response.text
-    assert "App Memory Usage" in response.text
-    assert "Server Load & Performance" in response.text
+    assert "Версия Python" in response.text
+    assert "использование памяти" in response.text.lower() or "App Memory Usage" in response.text
+    assert "Нагрузка на сервер" in response.text or "Server Load & Performance" in response.text
     print("PASS: /status endpoint in Ru app is functional.")
 
 

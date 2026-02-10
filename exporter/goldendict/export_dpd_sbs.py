@@ -36,6 +36,7 @@ from tools.exporter_functions import (
 from tools.goldendict_exporter import DictEntry
 from tools.meaning_construction import make_grammar_line
 from tools.niggahitas import add_niggahitas
+from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
 from tools.pos import CONJUGATIONS, DECLENSIONS, INDECLINABLES
 from tools.printer import printer as pr
