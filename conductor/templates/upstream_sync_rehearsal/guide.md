@@ -226,21 +226,13 @@ Follow these steps when performing an upstream sync:
     - [ ] Create missing files in `docs_rus/` (at least as placeholders).
     - [ ] Update `mkdocs_ru.yaml` navigation to match `mkdocs.yaml`.
     - [ ] Run `python3 scripts/rus_exporter/docs_add_indexes.py`.
-8. [ ] **Deleted Upstream Files**:
-    - Iterate through `folders_to_check` in the registry.
-    - Identify files present in `sbs-ru` but missing in `as_upstream`.
-    - Filter out files already listed in `unique_paths` or `ignored_files`.
-    - For the remaining "orphaned" files:
-        - **Grep** the codebase to see if they are imported or used by `*_ru.py`, `*_sbs.py`, or `gui2/dps_*`.
-        - **If used:** You must either refactor your local code to stop using them OR add them to `unique_paths` to preserve them.
-        - **If unused:** Ensure they are deleted to keep the fork clean.
-9. [ ] **UI Scaling**: Verify `gui2/font_scaling_helper.py` was executed correctly (it is part of the sync script).
+8. [ ] **UI Scaling**: Verify `gui2/font_scaling_helper.py` was executed correctly (it is part of the sync script).
     - **Protocol:** The sync script MUST run `git add .` AFTER the font scaling script so the Phase 1 commit is clean.
     - **Verification:** Run `git diff HEAD^ gui2/` to confirm font sizes are scaled (e.g., 10 -> 14).
-10. [ ] **Verification Tests**:
+9. [ ] **Verification Tests**:
     - Run `uv run pytest tests/test_dps_imports.py` to verify that all critical DPS modules are intact and dependencies are met.
     - Run `uv run pytest tests/test_dps_logic.py` to verify that key family generation and lookup logic is preserved.
     - Run `uv run pytest tests/test_dps_exporters_functional.py` to verify the control flow of critical exporters and build scripts.
     - Run `uv run pytest tests/test_dps_docs_parity.py` to verify that `docs/` and `docs_rus/` are perfectly synced (except for `dpd_rus.md`).
-11. [ ] **Commit Changes**: Once manual merges are complete, perform a final commit with a descriptive message (e.g., `sync: manual merge of upstream updates` with the current date, same as done by the sync script).
-12. [ ] **Update Registry**: If new shadow copies were created during the process, add them to `dps_sync_registry.json`.
+10. [ ] **Commit Changes**: Once manual merges are complete, perform a final commit with a descriptive message (e.g., `sync: manual merge of upstream updates` with the current date, same as done by the sync script).
+11. [ ] **Update Registry**: If new shadow copies were created during the process, add them to `dps_sync_registry.json`.

@@ -18,8 +18,8 @@
 - [ ] Task: Update Shadow Copies
     - [ ] For each entry in `russian_copies` and `sbs_copies`:
         - [ ] Port logic from source to shadow.
-- [ ] Task: Documentation & Cleanup
-    - [ ] Ensure documentation parity and remove orphaned files.
+- [ ] Task: Documentation Parity
+    - [ ] Ensure documentation parity between docs/ and docs_rus/.
 - [ ] Task: Update Rehearsal Templates
     - [ ] Sync `dps_sync_registry.json` and `guide.md` with the new state.
 
@@ -37,6 +37,8 @@
 - [ ] Task: **FINAL MANUAL COMMIT (COMMIT 2/2)**
     - [ ] Perform ONE consolidated commit for all manual work.
     - [ ] Message: `sync: manual merge resolutions and comprehensive validation (DD-MM)`.
+- [ ] **Task: Comprehensive Summary**
+    - [ ] Agent provides a detailed summary of all technical changes, protocol updates, and test results for the entire session.
 
 ## Phase 4: Manual User Verification
 - [ ] **Task: Exporter Verification**
@@ -45,7 +47,5 @@
     - [ ] Verify Webapp (Ru/SBS) manually.
 - [ ] **Task: GUI Verification**
     - [ ] Verify GUI2 functionality (DpsView, Fonts, Tabs, Hotkeys).
-- [ ] **Task: Comprehensive Summary**
-    - [ ] Agent provides a detailed summary of all technical changes, protocol updates, and test results for the entire session.
 - [ ] **Task: Final Confirmation**
     - [ ] User provides final confirmation: "Track is complete".
