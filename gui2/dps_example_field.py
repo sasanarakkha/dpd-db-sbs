@@ -13,8 +13,7 @@ from tools.cst_source_sutta_example import (
     CstSourceSuttaExample,
     find_cst_source_sutta_example,
 )
-from tools.hyphenations import HyphenationFileManager, HyphenationsDict
-from tools.sandhi_contraction import SandhiContractionDict, SandhiContractionManager
+from tools.speech_marks import SpeechMarkManager
 from tools.tsv_read_write import read_tsv_dict
 from difflib import SequenceMatcher
 
@@ -133,17 +132,8 @@ class DpsExampleField(ft.Column):
 
         self.toolkit: ToolKit = toolkit
 
-        self.sandhi_manager: SandhiContractionManager = self.toolkit.sandhi_manager
-        self.sandhi_dict: SandhiContractionDict = (
-            self.sandhi_manager.sandhi_contractions_simple
-        )
-
-        self.hyphenation_manager: HyphenationFileManager = (
-            self.toolkit.hyphenation_manager
-        )
-        self.hyphenation_dict: HyphenationsDict = (
-            self.hyphenation_manager.hyphenations_dict
-        )
+        self.speech_marks_manager: SpeechMarkManager = self.toolkit.speech_marks_manager
+        self.speech_marks_dict = self.speech_marks_manager.get_speech_marks()
 
         self.simple_mode = simple_mode
         # Use passed stash manager or create new one if not provided
@@ -350,10 +340,11 @@ class DpsExampleField(ft.Column):
     def _handle_hyphens_and_apostrophes(self, text):
         text_list: list[str] = split_pali_sentence_into_words(text)
         for word in text_list:
-            if "-" in word:
-                self.hyphenation_manager.update_hyphenations_dict(word)
-            elif "'" in word:
-                self.sandhi_manager.update_sandhi_contractions(word)
+            if "-" in word or "'" in word:
+                clean_word = word.replace("-", "").replace("'", "")
+                self.speech_marks_dict = (
+                    self.speech_marks_manager.update_variants(clean_word, word)
+                )
 
     def click_book_and_word(self, e: ft.ControlEvent):
         self.word_to_find_field.error_text = None
@@ -528,7 +519,7 @@ class DpsExampleField(ft.Column):
             sutta_field.value = cst_example.sutta
         if example_field:
             example_field.value = clean_example(
-                cst_example.example, self.sandhi_dict, self.hyphenation_dict
+                cst_example.example, self.speech_marks_manager
             )
         
         # Automatically populate word_to_find_field with stem (Pass2Add style)

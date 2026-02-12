@@ -1,13 +1,26 @@
-{% if d.i %}
-<div class="dpd-headword">
+<!-- summary -->
+
 <h3 class="dpd" id="{{ d.i.lemma_1_ }}">{{d.i.lemma_1}}</h3>
-<div class="tertiary">
+<div class="dpd summary">
     <p>
+        {% if d.i.sbs %}
+        {% if d.i.sbs.class_anki %}
+        <a href="{{d.i.sbs.sbs_class_link}}" target="_blank"><i>(cl.{{d.i.sbs.class_anki}}{% if d.i.sbs.class_extra
+                %}*{% endif %})</i></a>
+        <span class="gray"> | </span>
+        {% endif %}
+        {% endif %}
         {{d.i.pos}}. {% if d.i.plus_case %} ({{d.i.plus_case}}) {% endif %}
         {{d.meaning|safe}} {% if d.summary %} [{{d.summary}}] {% endif %}
+        {% if d.show_ru_data %}
+        {{d.rus_complete|safe}}
+        {% else %}
         {{d.complete|safe}}
+        {% endif %}
     </p>
 </div>
+
+<!-- button box -->
 
 <div class="button-box">
     {% if d.i.needs_audio_button %}
@@ -21,76 +34,74 @@
     {% if d.i.needs_sutta_info_button %}
     <a class="dpd-button" name="sutta-info-button" href="#" data-target="sutta_info_{{d.i.lemma_1_}}">
         sutta</a>
+
     {% endif %}
 
     {% if d.i.needs_grammar_button %}
     <a class="dpd-button" name="grammar-button" href="#" data-target="grammar_{{d.i.lemma_1_}}">
         grammar</a>
-    {% endif %}
-    {% if d.i.needs_example_button %}
+    {% endif %} {% if d.i.needs_example_button %}
     <a class="dpd-button" name="example-button" href="#" data-target="example_{{d.i.lemma_1_}}">
         example</a>
-    {% endif %}
-    {% if d.i.needs_examples_button %}
+    {% endif %} {% if d.i.needs_examples_button %}
     <a class="dpd-button" name="example-button" href="#" data-target="examples_{{d.i.lemma_1_}}">
         examples</a>
-    {% endif %}
-    {% if d.i.needs_conjugation_button %}
+    {% endif %} {% if d.i.sbs and d.i.sbs.needs_sbs_example_button %}
+    <a class="dpd-button" name="sbs-example-button" href="#" data-target="sbs_example_{{d.i.lemma_1_}}">
+        sbs</a>
+    {% endif %} {% if d.i.needs_conjugation_button %}
     <a class="dpd-button" href="#" data-target="conjugation_{{d.i.lemma_1_}}">
         conjugation</a>
-    {% endif %}
-    {% if d.i.needs_declension_button %}
+    {% endif %} {% if d.i.needs_declension_button %}
     <a class="dpd-button" href="#" data-target="declension_{{d.i.lemma_1_}}">
         declension</a>
-    {% endif %}
-    {% if d.i.needs_root_family_button %}
+    {% endif %} {% if d.i.needs_root_family_button %}
     <a class="dpd-button" href="#" data-target="family_root_{{d.i.lemma_1_}}">
         root family</a>
-    {% endif %}
-    {% if d.i.needs_word_family_button %}
+    {% endif %} {% if d.i.needs_word_family_button %}
     <a class="dpd-button" href="#" data-target="family_word_{{d.i.lemma_1_}}">
         word family</a>
-    {% endif %}
-    {% if d.i.needs_compound_family_button %}
+    {% endif %} {% if d.i.needs_compound_family_button %}
     <a class="dpd-button" href="#" data-target="family_compound_{{d.i.lemma_1_}}">
         compound family</a>
-    {% endif %}
-    {% if d.i.needs_compound_families_button %}
+    {% endif %} {% if d.i.needs_compound_families_button %}
     <a class="dpd-button" href="#" data-target="family_compound_{{d.i.lemma_1_}}">
         compound families</a>
-    {% endif %}
-    {% if d.i.needs_idioms_button %}
+    {% endif %} {% if d.i.needs_idioms_button %}
     <a class="dpd-button" href="#" data-target="family_idiom_{{d.i.lemma_1_}}">
         idioms</a>
-    {% endif %}
-    {% if d.i.needs_set_button %}
+    {% endif %} {% if d.i.needs_set_button %}
     <a class="dpd-button" href="#" data-target="family_set_{{d.i.lemma_1_}}">
         set</a>
-    {% endif %}
-    {% if d.i.needs_sets_button %}
+    {% endif %} {% if d.i.needs_sets_button %}
     <a class="dpd-button" href="#" data-target="family_sets_{{d.i.lemma_1_}}">
         sets</a>
-    {% endif %}
-    {% if d.i.needs_frequency_button %}
+    {% endif %} {% if d.i.needs_frequency_button %}
     <a class="dpd-button" href="#" data-target="frequency_{{d.i.lemma_1_}}">
         frequency</a>
     {% endif %}
+
     <a class="dpd-button" href="#" data-target="feedback_{{d.i.lemma_1_}}">
         feedback</a>
 </div>
 
-{# Sutta Info #}
+<!-- sutta info -->
+
 {% if d.i.needs_sutta_info_button %}
-<div id="sutta_info_{{ d.i.lemma_1_ }}" name="sutta-info-div" class="dpd content hidden">
-    <table class="sutta_info">
+<div id="sutta_info_{{d.i.lemma_1_}}" name="sutta-info-div" class="dpd content hidden">
+    <table class="sutta-info">
+
+        <!-- CST -->
 
         {% if d.su.cst_code %}
         <tr>
-            <th colspan="2">
+            <th class="heading top" colspan="2">
                 Chaṭṭha Saṅgāyana Tipiṭaka (CST)
             </th>
         </tr>
+        {% endif %}
 
+        {% if d.su.cst_code %}
         <tr>
             <th>
                 CST Code
@@ -99,7 +110,9 @@
                 {{ d.su.cst_code }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.cst_nikaya %}
         <tr>
             <th>
                 Nikāya
@@ -108,7 +121,9 @@
                 {{ d.su.cst_nikaya }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.cst_book %}
         <tr>
             <th>
                 Book
@@ -117,7 +132,9 @@
                 {{ d.su.cst_book }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.cst_section %}
         <tr>
             <th>
                 Section
@@ -126,7 +143,9 @@
                 {{ d.su.cst_section }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.cst_vagga %}
         <tr>
             <th>
                 Vagga
@@ -135,7 +154,9 @@
                 {{ d.su.cst_vagga }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.cst_sutta %}
         <tr>
             <th>
                 Sutta
@@ -144,7 +165,9 @@
                 {{ d.su.cst_sutta }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.cst_paranum %}
         <tr>
             <th>
                 Paragraph
@@ -153,25 +176,49 @@
                 {{ d.su.cst_paranum }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.cst_file %}
         <tr>
             <th>
                 File
             </th>
             <td>
-                <a href="https://github.com/VipassanaTech/tipitaka-xml/tree/main/{{ d.su.cst_file }}"
-                    target="_blank">{{ d.su.cst_file }}</a>
+                {{ d.su.cst_file }}
             </td>
-        </tr>
 
+        </tr>
         <tr>
             <th>
-                Apps & Websites using CST
+                GitHub
             </th>
             <td>
-                <a href="{{ d.su.tpp_org }}" target="_blank">tipitakapali.org</a>
+                <a href="https://github.com/VipassanaTech/tipitaka-xml/tree/main/{{ d.su.cst_file }}" target="_blank">{{
+                    d.su.cst_file }}</a>
+
             </td>
         </tr>
+        {% endif %}
+
+        {% if d.su.cst_code %}
+        <tr>
+            <th class="heading" colspan="2">
+                Apps & Websites using CST
+            </th>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dpr_link %}
+        <tr>
+            <th>
+                Digital Pali Reader
+            </th>
+            <td>
+                <a href="{{ d.su.dpr_link }}" target="_blank">{{ d.su.dpr_link
+                    }}</a>
+            </td>
+        </tr>
+        {% endif %}
 
         {% if d.su.has_tpr %}
         <tr>
@@ -179,17 +226,35 @@
                 Tipiṭaka Pāḷi Reader
             </th>
             <td>
-                <a href="tpr.pali.tools://open/?sutta={{ d.su.dpd_code.lower() }}" target="_blank">tpr.pali.tools://open/?sutta={{ d.su.dpd_code.lower() }}</a>
+                <a href="tpr.pali.tools://open/?sutta={{ d.su.dpd_code.lower() }}"
+                    target="_blank">tpr.pali.tools://open/?sutta={{ d.su.dpd_code.lower() }}</a>
             </td>
         </tr>
         {% endif %}
 
+        {% if d.su.cst_code %}
         <tr>
-            <th colspan="2">
+            <th>
+                TipitakaPali.org
+            </th>
+            <td>
+                <a href="{{ d.su.tpp_org }}" target="_blank">{{ d.su.tpp_org
+                    }}</a>
+            </td>
+        </tr>
+        {% endif %}
+
+        <!-- page numbers -->
+
+        {% if d.su.cst_m_page %}
+        <tr>
+            <th class="heading" colspan="2">
                 CST Page Numbers in Printed Editions
             </th>
         </tr>
+        {% endif %}
 
+        {% if d.su.cst_m_page %}
         <tr>
             <th>
                 Myanmar
@@ -198,7 +263,9 @@
                 {{ d.su.cst_m_page }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.cst_t_page %}
         <tr>
             <th>
                 Thai
@@ -207,7 +274,9 @@
                 {{ d.su.cst_t_page }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.cst_v_page %}
         <tr>
             <th>
                 VRI
@@ -216,7 +285,9 @@
                 {{ d.su.cst_v_page }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.cst_p_page %}
         <tr>
             <th>
                 PTS
@@ -227,13 +298,17 @@
         </tr>
         {% endif %}
 
+        <!-- sutta central -->
+
         {% if d.su.sc_code %}
         <tr>
-            <th colspan="2">
-                SuttaCentral (SC)
+            <th class="heading" colspan="2">
+                Sutta Central
             </th>
         </tr>
+        {% endif %}
 
+        {% if d.su.sc_code %}
         <tr>
             <th>
                 SC Code
@@ -242,7 +317,9 @@
                 {{ d.su.sc_code }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.sc_book %}
         <tr>
             <th>
                 Book
@@ -251,7 +328,9 @@
                 {{ d.su.sc_book }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.sc_vagga %}
         <tr>
             <th>
                 Vagga
@@ -260,7 +339,9 @@
                 {{ d.su.sc_vagga }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.sc_sutta %}
         <tr>
             <th>
                 Sutta
@@ -269,38 +350,48 @@
                 {{ d.su.sc_sutta }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.sc_eng_sutta %}
         <tr>
             <th>
                 Title
             </th>
             <td>
-                {{ d.su.sc_eng_sutta }}
+                <i>{{ d.su.sc_eng_sutta }}</i>
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.sc_blurb %}
         <tr>
             <th>
                 Blurb
             </th>
             <td>
-                {{ d.su.sc_blurb }}
+                <i>{{ d.su.sc_blurb }}</i>
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.sc_card_link %}
         <tr>
             <th>
                 Links
             </th>
             <td>
+                {% if d.su.sc_code %}
                 <a href="{{ d.su.sc_card_link }}" target="_blank">Sutta
                     Card</a>,
                 <a href="{{ d.su.sc_pali_link }}" target="_blank">Pāḷi Text</a>,
                 <a href="{{ d.su.sc_eng_link }}" target="_blank">English
                     Translation</a>
+                {% endif %}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.sc_file_path %}
         <tr>
             <th>
                 File
@@ -309,47 +400,95 @@
                 {{ d.su.sc_file_path }}
             </td>
         </tr>
-
         <tr>
             <th>
                 GitHub
             </th>
             <td>
-                <a href="{{ d.su.sc_github }}" target="_blank">{{ d.su.sc_file_path }}</a>
+                <a href="{{ d.su.sc_github }}" target="_blank">{{
+                    d.su.sc_file_path }}</a>
             </td>
         </tr>
+        {% endif %}
 
+        <!-- websites -->
+
+        {% if d.su.sc_code %}
         <tr>
-            <th>
+            <th class="heading" colspan="2">
                 Websites using Sutta Central
             </th>
+        </tr>
+        {% endif %}
+
+        {% if d.su.tbw %}
+        <tr>
+            <th>
+                The Buddha's Words
+            </th>
             <td>
-                {% if d.su.tbw %}
-                <a href="{{ d.su.tbw }}" target="_blank">thebuddhaswords.net</a><br>
-                {% endif %}
-                {% if d.su.tbw_legacy %}
-                <a href="{{ d.su.tbw_legacy }}" target="_blank">dhamma.gift (BW)</a><br>
-                {% endif %}
-                {% if d.su.dhamma_gift %}
-                <a href="{{ d.su.dhamma_gift }}" target="_blank">find.dhamma.gift</a><br>
-                {% endif %}
-                {% if d.su.sc_express_link %}
-                <a href="{{ d.su.sc_express_link }}" target="_blank">SC Express</a><br>
-                {% endif %}
-                {% if d.su.sc_voice_link %}
-                <a href="{{ d.su.sc_voice_link }}" target="_blank">sc-voice.net</a><br>
-                {% endif %}
+                <a href="{{ d.su.tbw }}" target="_blank">{{ d.su.tbw }}</a>
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.tbw_legacy %}
+        <tr>
+            <th>
+                TBW Legacy
+            </th>
+            <td>
+                <a href="{{ d.su.tbw_legacy }}" target="_blank">{{
+                    d.su.tbw_legacy }}</a>
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.dhamma_gift %}
+        <tr>
+            <th>
+                Dhamma.gift
+            </th>
+            <td>
+                <a href="{{ d.su.dhamma_gift }}" target="_blank">{{
+                    d.su.dhamma_gift }}</a>
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.sc_express_link %}
+        <tr>
+            <th>
+                SC Express
+            </th>
+            <td>
+                <a href="{{ d.su.sc_express_link }}" target="_blank">{{
+                    d.su.sc_express_link }}</a>
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.sc_voice_link %}
+        <tr>
+            <th>
+                SC Voice
+            </th>
+            <td>
+                <a href="{{ d.su.sc_voice_link }}" target="_blank">{{
+                    d.su.sc_voice_link }}</a>
             </td>
         </tr>
         {% endif %}
 
         {% if d.su.bjt_sutta_code %}
         <tr>
-            <th colspan="2">
+            <th class="heading" colspan="2">
                 Buddha Jayanti Tipiṭaka (BJT)
             </th>
         </tr>
+        {% endif %}
 
+        {% if d.su.bjt_sutta_code %}
         <tr>
             <th>
                 Sutta Code
@@ -358,7 +497,9 @@
                 {{ d.su.bjt_sutta_code }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.bjt_piṭaka %}
         <tr>
             <th>
                 Piṭaka
@@ -367,7 +508,9 @@
                 {{ d.su.bjt_piṭaka }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.bjt_nikāya %}
         <tr>
             <th>
                 Nikāya
@@ -376,7 +519,9 @@
                 {{ d.su.bjt_nikāya }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.bjt_major_section %}
         <tr>
             <th>
                 Major Section
@@ -385,7 +530,9 @@
                 {{ d.su.bjt_major_section }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.bjt_book %}
         <tr>
             <th>
                 Book
@@ -394,7 +541,9 @@
                 {{ d.su.bjt_book }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.bjt_minor_section %}
         <tr>
             <th>
                 Minor Section
@@ -403,7 +552,9 @@
                 {{ d.su.bjt_minor_section }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.bjt_vagga %}
         <tr>
             <th>
                 Vagga
@@ -412,7 +563,9 @@
                 {{ d.su.bjt_vagga }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.bjt_sutta %}
         <tr>
             <th>
                 Sutta
@@ -421,7 +574,9 @@
                 {{ d.su.bjt_sutta }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.bjt_book_id %}
         <tr>
             <th>
                 Book ID
@@ -430,7 +585,9 @@
                 {{ d.su.bjt_book_id }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.bjt_page_num %}
         <tr>
             <th>
                 Page Number
@@ -439,54 +596,128 @@
                 {{ d.su.bjt_page_num }}
             </td>
         </tr>
+        {% endif %}
 
+        <!-- {% if d.su.bjt_page_offset %}
         <tr>
-            ## <th>
-            ## Page Offset
-            ## </th>
-            ## <td>
-            ## ${ d.su.bjt_page_offset }
-            ## </td>
-            ## </tr>
+            <th>
+                Page Offset
+            </th>
+            <td>
+                {{ d.su.bjt_page_offset }}
+            </td>
+        </tr>
+        {% endif %} -->
 
+        {% if d.su.bjt_filename %}
         <tr>
             <th>
                 Filename
             </th>
             <td>
-                {{ d.su.bjt_filename }}
+                {{ d.su.bjt_filename }}.json
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.bjt_github_link %}
         <tr>
             <th>
                 Github
             </th>
             <td>
-                <a href="{{ d.su.bjt_github_link }}" target="_blank">{{ d.su.bjt_filename }}</a>
-            </td>
-        </tr>
-
-        <tr>
-            <th>
-                Websites using BJT
-            </th>
-            <td>
-                <a href="{{ d.su.bjt_tipitaka_lk_link }}" target="_blank">tipiṭaka.lk (Sinhala)</a><br>
-                <a href="{{ d.su.bjt_open_tipitaka_lk_link }}" target="_blank">open.tipiṭaka.lk (Roman)</a><br>
-                <a href="{{ d.su.bjt_open_tipitaka_lk_link.replace('latn', 'deva') }}"
-                    target="_blank">open.tipiṭaka.lk (Devanagari)</a><br>
+                <a href="{{ d.su.bjt_github_link }}" target="_blank">
+                    {{ d.su.bjt_filename}}.json
+                </a>
             </td>
         </tr>
         {% endif %}
 
+        {% if d.su.bjt_web_code %}
+        <tr>
+            <th class="heading" colspan="2">
+                Websites using BJT
+            </th>
+        </tr>
+        {% endif %}
+
+        {% if d.su.bjt_tipitaka_lk_link %}
+        <tr>
+            <th>
+                tipiṭaka.lk (Sinhala)
+            </th>
+            <td>
+                <a href="{{ d.su.bjt_tipitaka_lk_link }}" target="_blank">
+                    {{ d.su.bjt_tipitaka_lk_link}}
+                </a>
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.bjt_open_tipitaka_lk_link %}
+        <tr>
+            <th>
+                open.tipiṭaka.lk (Roman)
+            </th>
+            <td>
+                <a href="{{ d.su.bjt_open_tipitaka_lk_link }}" target="_blank">
+                    {{ d.su.bjt_open_tipitaka_lk_link}}
+                </a>
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.bjt_open_tipitaka_lk_link %}
+        <tr>
+            <th>
+                open.tipiṭaka.lk (Devanagari)
+            </th>
+            <td>
+                <a href="{{ d.su.bjt_open_tipitaka_lk_link.replace('latn', 'deva') }}" target="_blank">
+                    {{ d.su.bjt_open_tipitaka_lk_link.replace('latn', 'deva') }}
+                </a>
+            </td>
+        </tr>
+        {% endif %}
+
+        <!-- <tr>
+        <th>
+            Access to Insight
+        </th>
+        <td>
+            ...
+        </td>
+    </tr>
+
+    <tr>
+        <th>
+            Dhammatalks.org
+        </th>
+        <td>
+            ...
+        </td>
+    </tr>
+
+    <tr>
+        <th>
+            Tipitaka.sl
+        </th>
+        <td>
+            ...
+        </td>
+    </tr> -->
+
+        <!-- DV catalogue -->
+
         {% if d.su.dv_exists %}
         <tr>
-            <th colspan="2">
+            <th class="heading" colspan="2">
                 Dhamma Vinaya Tools: Sutta Catalogue
             </th>
         </tr>
+        {% endif %}
 
+        {% if d.su.dv_pts %}
         <tr>
             <th>
                 PTS
@@ -495,7 +726,9 @@
                 {{ d.su.dv_pts }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.dv_main_theme %}
         <tr>
             <th>
                 General Theme
@@ -504,7 +737,9 @@
                 {{ d.su.dv_main_theme }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.dv_subtopic %}
         <tr>
             <th>
                 Particular Topic
@@ -513,7 +748,9 @@
                 {{ d.su.dv_subtopic }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.dv_summary %}
         <tr>
             <th>
                 Summary
@@ -522,7 +759,9 @@
                 {{ d.su.dv_summary }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.dv_key_excerpt1 %}
         <tr>
             <th>
                 Key Excerpts 1
@@ -531,7 +770,9 @@
                 {{ d.su.dv_key_excerpt1 }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.dv_key_excerpt2 %}
         <tr>
             <th>
                 Key Excerpts 2
@@ -540,7 +781,9 @@
                 {{ d.su.dv_key_excerpt2 }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.dv_similes %}
         <tr>
             <th>
                 Similes
@@ -549,7 +792,9 @@
                 {{ d.su.dv_similes }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.dv_stage %}
         <tr>
             <th>
                 Stage of Training
@@ -558,7 +803,9 @@
                 {{ d.su.dv_stage }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.dv_training %}
         <tr>
             <th>
                 Training In
@@ -567,7 +814,9 @@
                 {{ d.su.dv_training }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.dv_aspect %}
         <tr>
             <th>
                 Type of Teaching
@@ -576,7 +825,9 @@
                 {{ d.su.dv_aspect }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.dv_teacher %}
         <tr>
             <th>
                 Teacher
@@ -585,7 +836,9 @@
                 {{ d.su.dv_teacher }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.dv_audience %}
         <tr>
             <th>
                 Audience
@@ -594,7 +847,9 @@
                 {{ d.su.dv_audience }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.dv_method %}
         <tr>
             <th>
                 Method of Teaching
@@ -603,7 +858,9 @@
                 {{ d.su.dv_method }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.dv_length %}
         <tr>
             <th>
                 Sutta Length
@@ -612,7 +869,9 @@
                 {{ d.su.dv_length }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.dv_prominence %}
         <tr>
             <th>
                 Prominence
@@ -621,7 +880,9 @@
                 {{ d.su.dv_prominence }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.dv_suggested_suttas %}
         <tr>
             <th>
                 Suggested Reading
@@ -630,14 +891,32 @@
                 {{ d.su.dv_suggested_suttas }}
             </td>
         </tr>
+        {% endif %}
+
+        {% if d.su.dv_exists %}
+        <tr>
+            <th>
+                GitHub
+            </th>
+            <td>
+                <a href="https://github.com/dhammavinaya-tools/dhamma-vinaya-catalogue" target="_blank">
+                    https://github.com/dhammavinaya-tools/dhamma-vinaya-catalogue
+                </a>
+            </td>
+        </tr>
+        {% endif %}
+
+        <!-- DV parallel texts -->
 
         {% if d.su.dv_parallels_exists %}
         <tr>
-            <th colspan="2">
+            <th class="heading" colspan="2">
                 Parallels
             </th>
         </tr>
+        {% endif %}
 
+        {% if d.su.dv_nikayas_parallels %}
         <tr>
             <th>
                 Nikāyas
@@ -646,7 +925,9 @@
                 {{ d.su.dv_nikayas_parallels }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.dv_āgamas_parallels %}
         <tr>
             <th>
                 Āgamas
@@ -655,16 +936,20 @@
                 {{ d.su.dv_āgamas_parallels }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.dv_taisho_parallels %}
         <tr>
             <th>
-                Taishō
+                Taisho
             </th>
             <td>
                 {{ d.su.dv_taisho_parallels }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.dv_sanskrit_parallels %}
         <tr>
             <th>
                 Sanskrit
@@ -673,7 +958,9 @@
                 {{ d.su.dv_sanskrit_parallels }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.dv_vinaya_parallels %}
         <tr>
             <th>
                 Vinaya
@@ -682,7 +969,9 @@
                 {{ d.su.dv_vinaya_parallels }}
             </td>
         </tr>
+        {% endif %}
 
+        {% if d.su.dv_others_parallels %}
         <tr>
             <th>
                 Others
@@ -691,18 +980,18 @@
                 {{ d.su.dv_others_parallels }}
             </td>
         </tr>
+        {% endif %}
 
+        <!-- {% if d.su.dv_partial_parallels_all %}
         <tr>
             <th>
                 Partial Parallels
             </th>
             <td>
-                {{ d.su.dv_partial_parallels_nā }}<br>
                 {{ d.su.dv_partial_parallels_all }}
             </td>
         </tr>
-        {% endif %}
-        {% endif %}
+        {% endif %} -->
 
     </table>
 
@@ -710,14 +999,18 @@
         Did you spot a mistake?
         <a class="dpd-link"
             href="https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Sutta&entry.1433863141={{d.app_name}}+{{d.date}}"
-            target="_blank">Correct it here.</a>
+            target="_blank">
+            Correct it here.
+        </a>
     </p>
 </div>
+
 {% endif %}
 
-{# Grammar #}
-{% if d.i.needs_grammar_button %}
-<div id="grammar_{{ d.i.lemma_1_ }}" name="grammar-div" class="dpd content hidden">
+<!-- grammar -->
+
+{% if d.i.needs_grammar_button or d.show_ru_data %}
+<div id="grammar_{{d.i.lemma_1_}}" name="grammar-div" class="dpd content hidden">
     <table class="grammar">
         <tr>
             <th>Lemma</th>
@@ -735,9 +1028,53 @@
             <th>IPA</th>
             <td>
                 /{{d.i.lemma_ipa}}/
+                {% if d.i.audio_male1 %}
+                <a class="dpd-button play small" data-headword="{{d.i.lemma_1}}" data-gender="male1" data-title="male1">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z"></path>
+                    </svg>
+                </a>
+                {% endif %}
+                {% if d.i.audio_male2 %}
+                <a class="dpd-button play small" data-headword="{{d.i.lemma_1}}" data-gender="male2" data-title="male2">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z"></path>
+                    </svg>
+                </a>
+                {% endif %}
+                {% if d.i.audio_female1 %}
+                <a class="dpd-button play small" data-headword="{{d.i.lemma_1}}" data-gender="female1"
+                    data-title="female1">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z"></path>
+                    </svg>
+                </a>
+                {% endif %}
             </td>
         </tr>
 
+        {% if d.show_ru_data and d.i.ru %}
+        <tr>
+            <th>Русский</th>
+            <td>
+                {% if d.i.ru.ru_meaning %}
+                {{d.i.ru.ru_meaning}}
+                {% if d.i.ru.ru_meaning_lit %}
+                ; досл. {{d.i.ru.ru_meaning_lit}}
+                {% endif %}
+                {% else %}
+                <i>[пер. ИИ]</i> {{d.i.ru.ru_meaning_raw}}
+                {% endif %}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.i.sbs and d.i.sbs.sbs_meaning %}
+        <tr>
+            <th>SBS</th>
+            <td>{{d.i.sbs.sbs_meaning}}</td>
+        </tr>
+        {% endif %}
         <tr>
             <th>Grammar</th>
             <td>{{d.grammar}}</td>
@@ -746,10 +1083,9 @@
         {% if d.i.family_root %}
         <tr>
             <th>Root Family</th>
-            <td><b>{{d.i.family_root}}</b></td>
+            <td>{{d.i.family_root}}</td>
         </tr>
         {% endif %}
-
         {% if d.i.root_key %}
         <tr>
             <th>Root</th>
@@ -758,13 +1094,13 @@
                 {{d.i.root_sign}} ({{d.i.rt.root_meaning}})
             </td>
         </tr>
-
+        {% endif %}
+        {% if d.i.rt.root_in_comps %}
         <tr>
             <th>√ In Sandhi</th>
             <td>{{d.i.rt.root_in_comps}}</td>
         </tr>
         {% endif %}
-
         {% if d.i.root_base %}
         <tr>
             <th>Base</th>
@@ -776,25 +1112,23 @@
             <td>{{d.i.construction|safe}}</td>
         </tr>
         {% endif %}
-
         {% if d.i.derivative %}
         <tr>
             <th>Derivative</th>
             <td>{{d.i.derivative}} ({{d.i.suffix}})</td>
         </tr>
         {% endif %}
-
         {% if d.i.phonetic %}
         <tr>
             <th>Phonetic Change</th>
             <td>{{d.i.phonetic|safe}}</td>
         </tr>
         {% endif %}
-
-        {% if d.i.compound_type %}
+        {% if d.i.compound_type and "?" not in d.i.compound_type %}
         <tr>
             <th>Compound</th>
-            <td>{{d.i.compound_type}} ({{d.i.compound_construction|safe}})</td>
+            <td>{{d.i.compound_type}}
+                ({{d.i.compound_construction|safe}})</td>
         </tr>
         {% endif %} {% if d.i.antonym %}
         <tr>
@@ -802,7 +1136,6 @@
             <td>{{d.i.antonym}}</td>
         </tr>
         {% endif %}
-
         {% if d.i.synonym %}
         <tr>
             <th>Synonym</th>
@@ -814,55 +1147,71 @@
             <td>{{d.i.variant}}</td>
         </tr>
         {% endif %}
-
+        {% if d.i.commentary and d.i.commentary !="-" %}
         <tr>
             <th>Commentary</th>
             <td>{{d.i.commentary|safe}}</td>
         </tr>
-
+        {% endif %}
         {% if d.i.notes %}
         <tr>
             <th>Notes</th>
             <td>{{d.i.notes|safe}}</td>
         </tr>
         {% endif %}
-
-        {% if d.i.cognate %}
+        {% if d.i.sbs and d.i.sbs.sbs_notes %}
         <tr>
-            <th>Cognates</th>
-            <td>{{d.i.cognate}}</td>
+            <th>SBS Notes</th>
+            <td>{{d.i.sbs.sbs_notes|safe}}</td>
         </tr>
         {% endif %}
-
-        {% if d.i.link %}
+        {% if d.show_ru_data %}
+        {% if d.i.ru and d.i.ru.ru_notes and d.i.needs_ru_notes %}
+        <tr>
+            <th>Заметки</th>
+            <td>{{d.i.ru.ru_notes|safe}}</td>
+        </tr>
+        {% endif %}
+        {% if d.i.ru and d.i.ru.ru_cognate %}
+        <tr>
+            <th>Родствен.</th>
+            <td>{{d.i.ru.ru_cognate}}</td>
+        </tr>
+        {% endif %}
+        {% endif %}
+        {% if d.i.cognate %}
+        <tr>
+            <th>English Cognate</th>
+            <td>{{d.i.cognate}}</td>
+        </tr>
+        {% endif %} {% if d.i.link %}
         <tr>
             <th>Web Link</th>
             <td>
                 {% for website in d.i.link_list %}
-                <p style="margin: 0; padding: 0">
-                    <a href="{{ website }}" target="_blank"> {{ website }} </a>
+                <p>
+                    <a href="{{ website }}" target="_blank"> {{ website }}
+                    </a>
                 </p>
                 {% endfor %}
             </td>
         </tr>
         {% endif %}
-
         {% if d.i.non_ia %}
         <tr>
             <th>Non IA</th>
             <td>{{d.i.non_ia}}</td>
         </tr>
         {% endif %}
-
         {% if d.i.sanskrit %}
         <tr>
             <th>Sanskrit</th>
-            <td><i>{{d.i.sanskrit}}</i></td>
+            <td>
+                <i> {{d.i.sanskrit}} </i>
+            </td>
         </tr>
         {% endif %}
-
-        {% if d.i.root_key %}
-        {% if d.i.rt.sanskrit_root and d.i.rt.sanskrit_root != "-" %}
+        {% if d.i.rt.sanskrit_root %}
         <tr>
             <th>Sanskrit Root</th>
             <td>
@@ -873,123 +1222,212 @@
             </td>
         </tr>
         {% endif %}
-        {% endif %}
-
     </table>
-
     <p class="dpd-footer">
         Did you spot a mistake?
         <a class="dpd-link"
-            href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Grammar&entry.1433863141={{d.app_name}}+{{d.date}}"
+            href="https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Grammar&entry.1433863141={{d.app_name}}+{{d.date}}"
             target="_blank">
             Correct it here.</a>
     </p>
 </div>
 {% endif %}
 
-{# Example 1 #}
+<!-- examples -->
+
 {% if d.i.needs_example_button %}
-<div id="example_{{ d.i.lemma_1_ }}" name="example-div" class="dpd content hidden">
-    <p>{{d.i.example_1|safe}}</p>
-    <p class="sutta">{{d.i.source_1}} {{d.i.sutta_1}}</p>
-    <p class="dpd-footer">
-        Can you think of a better example?
-        <a class="dpd-link"
-            href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Examples&entry.1433863141={{d.app_name}}+{{d.date}}"
-            target="_blank">
-            Add it here.</a>
-    </p>
-</div>
-{% endif %}
+<div id="example_{{d.i.lemma_1_}}" name="example-div" class="dpd content hidden">
+    {% elif d.i.needs_examples_button %}
+    <div id="examples_{{d.i.lemma_1_}}" name="example-div" class="dpd content hidden">
+        {% endif %}
 
-{# Examples 1 & 2 #}
-{% if d.i.needs_examples_button %}
-<div id="examples_{{ d.i.lemma_1_ }}" name="example-div" class="dpd content hidden">
-    <p>{{d.i.example_1|safe}}</p>
-    <p class="sutta">{{d.i.source_1}} {{d.su.sutta_1}}</p>
-    <p>{{d.i.example_2|safe}}</p>
-    <p class="sutta">{{d.i.source_2}} {{d.i.sutta_2}}</p>
-    <p class="dpd-footer">
-        Can you think of a better example?
-        <a class="dpd-link"
-            href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Examples&entry.1433863141={{d.app_name}}+{{d.date}}"
-            target="_blank">
-            Add it here.</a>
-    </p>
-</div>
-{% endif %}
-
-{# Conjugation #}
-{% if d.i.needs_conjugation_button %}
-<div id="conjugation_{{ d.i.lemma_1_ }}" class="dpd content hidden">
-    <div class="tertiary">
-        {{d.i.inflections_html|safe}} {% if "gray" in d.i.inflections_html %}
-        <p class="message">
-            Inflections not found in any Pāḷi corpus, or within
-            processed
-            sandhi compounds are <span class="gray">grayed out</span>. They
-            might still occur within compounds.
+        {% if d.i.example_1 and d.i.meaning_1 %}
+        <p>
+            {{d.i.example_1|safe}}
         </p>
-        <p class="dpd-footer">{% else %}</p>
+        <p class="sutta">
+            {{d.i.source_1}} {{d.i.sutta_1|safe}}
+        </p>
+
+        {% if d.i.example_2 and d.i.meaning_1 %}
+        <p>
+            {{d.i.example_2|safe}}
+        </p>
+        <p class="sutta">
+            {{d.i.source_2}} {{d.i.sutta_2|safe}}
+        </p>
+        {% endif %}
+
         <p class="dpd-footer">
-            {% endif %} Did you spot a mistake in the conjugation table?
-            Something
-            missing?
+            Can you think of a better example?
             <a class="dpd-link"
-                href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{ d.i.id }}%20{{ d.i.lemma_link }}&entry.1433863141={{ d.app_name }}+{{ d.date }}"
+                href="https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Examples&entry.1433863141={{d.app_name}}+{{d.date}}"
                 target="_blank">
-                Report it here.</a>
+                Add it here.</a>
         </p>
     </div>
-</div>
-{% endif %}
+    {% endif %}
+    <!-- sbs examples -->
 
-{# Declension #}
-{% if d.i.needs_declension_button %}
-<div id="declension_{{ d.i.lemma_1_ }}" class="dpd content hidden">
-    <div class="tertiary">
-        {{d.i.inflections_html|safe}} {% if "gray" in d.i.inflections_html %}
-        <p class="message">
+    {% if d.i.sbs and d.i.sbs.needs_sbs_example_button %}
+    <div id="sbs_example_{{d.i.lemma_1_}}" name="sbs-example-div" class="dpd content hidden">
+        {% if d.i.sbs.needs_sbs_example %}
+        {% if d.i.sbs.sbs_example_1 %}
+        <p>{{ d.i.sbs.sbs_example_1|safe }}</p>
+        <p class="sutta">
+            {{ d.i.sbs.sbs_source_1 }} {{ d.i.sbs.sbs_sutta_1|safe }}
+        </p>
+        {% if d.i.sbs.sbs_chapter_1 %}
+        <p class="sutta">
+            {{ d.i.sbs.sbs_chapter_1 }} <a class="sutta_link" href="{{ d.i.sbs.sbs_chant_link_1 }}" target="_blank">{{
+                d.i.sbs.sbs_chant_pali_1 }}</a>
+            {{ d.i.sbs.sbs_chant_eng_1 }}
+        </p>
+        {% endif %}
+        {% endif %}
+        {% if d.i.sbs.sbs_example_2 %}
+        <p>{{ d.i.sbs.sbs_example_2|safe }}</p>
+        <p class="sutta">
+            {{ d.i.sbs.sbs_source_2 }} {{ d.i.sbs.sbs_sutta_2|safe }}
+        </p>
+        {% if d.i.sbs.sbs_chapter_2 %}
+        <p class="sutta">
+            {{ d.i.sbs.sbs_chapter_2 }} <a class="sutta_link" href="{{ d.i.sbs.sbs_chant_link_2 }}" target="_blank">{{
+                d.i.sbs.sbs_chant_pali_2 }}</a>
+            {{ d.i.sbs.sbs_chant_eng_2 }}
+        </p>
+        {% endif %}
+        {% endif %}
+        {% endif %}
+        {% if d.i.sbs.needs_dhp_example %}
+        <p>
+            {{d.i.sbs.dhp_example|safe}}
+        </p>
+        <p class="sutta">
+            {{d.i.sbs.dhp_source}} {{d.i.sbs.dhp_sutta|safe}}
+        </p>
+        {% endif %}
+        {% if d.i.sbs.needs_pat_example %}
+        <p>
+            {{d.i.sbs.pat_example|safe}}
+        </p>
+        <p class="sutta">
+            {{d.i.sbs.pat_source}} {{d.i.sbs.pat_sutta|safe}}
+        </p>
+        {% endif %}
+        {% if d.i.sbs.needs_vib_example %}
+        <p>
+            {{d.i.sbs.vib_example|safe}}
+        </p>
+        <p class="sutta">
+            {{d.i.sbs.vib_source}} {{d.i.sbs.vib_sutta|safe}}
+        </p>
+        {% endif %}
+        {% if d.i.sbs.needs_class_example %}
+        <p>
+            {{d.i.sbs.class_example|safe}}
+        </p>
+        {% endif %}
+        {% if d.i.sbs.class_anki %}
+        <p><span class="gray">{{d.i.sbs.class_example_translation}}</span></p>
+        <p class="sutta">
+            (cl.{{d.i.sbs.class_anki}})
+            {% if d.i.sbs.needs_class_example %}
+            {{d.i.sbs.class_source}} {{d.i.sbs.class_sutta|safe}}
+            {% endif %}
+        </p>
+        {% endif %}
+        {% if d.i.sbs.needs_discourses_example %}
+        <p>
+            {{d.i.sbs.discourses_example|safe}}
+        </p>
+        <p class="sutta">
+            {{d.i.sbs.discourses_source}} {{d.i.sbs.discourses_sutta|safe}}
+        </p>
+        {% endif %}
+        <p class='dpd-footer'>
+            Did you spot a mistake in SBS examples?
+            <a class="dpd-link"
+                href="https://docs.google.com/forms/d/e/1FAIpQLScNC5v2gQbBCM3giXfYIib9zrp-WMzwJuf_iVXEMX2re4BFFw/viewform?usp=pp_url&entry.438735500={{d.i.lemma_link}}&entry.326955045=Examples&entry.1433863141={{d.app_name}}+{{d.date}}"
+                target="_blank">
+                Correct it here.</a>
+        </p>
+    </div>
+    {% endif %}
+
+
+    <!-- declension -->
+
+    {% if d.i.needs_declension_button %}
+    <div id="declension_{{d.i.lemma_1_}}" class="dpd content hidden">
+        {{d.i.inflections_html|safe}} {% if "gray" in d.i.inflections_html
+        %}
+        <p>
             Inflections not found in any Pāḷi corpus, or within
             processed
             sandhi compounds are <span class="gray">grayed out</span>. They
             might still occur within compounds.
         </p>
         <p class="dpd-footer">{% else %}</p>
-        <p class="dpd-footer">
+
+        <p>
             {% endif %} Did you spot a mistake in the declension table?
             Something
             missing?
             <a class="dpd-link"
-                href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{ d.i.id }}%20{{ d.i.lemma_link }}&entry.1433863141={{ d.app_name }}+{{ d.date }}"
+                href="https://docs.google.com/forms/d/e/1FAIpQLSfKUBx-icfRCWmhHqUwzX60BVQE21s_NERNfU2VvbjEfE371A/viewform?usp=pp_url&entry.1370304754={{ d.i.id }}%20{{ d.i.lemma_link }}&entry.1433863141={{ d.app_name }}+{{ d.date }}"
                 target="_blank">
                 Report it here.</a>
         </p>
     </div>
-</div>
-{% endif %}
+    {% endif %}
 
-{# Root Family #}
-{% if d.i.needs_root_family_button %}
-<div id="family_root_{{ d.i.lemma_1_ }}" class="dpd content hidden">
-    <div class="tertiary">
+    <!-- conjugation -->
+
+    {% if d.i.needs_conjugation_button %}
+    <div id="conjugation_{{d.i.lemma_1_}}" class="dpd content hidden">
+        {{d.i.inflections_html|safe}} {% if "gray" in d.i.inflections_html
+        %}
+        <p>
+            Inflections not found in any Pāḷi corpus, or within
+            processed
+            sandhi compounds are <span class="gray">grayed out</span>. They
+            might still occur within compounds.
+        </p>
+        <p class="dpd-footer">{% else %}</p>
+
+        <p>
+            {% endif %} Did you spot a mistake in the conjugation table?
+            Something
+            missing?
+            <a class="dpd-link"
+                href="https://docs.google.com/forms/d/e/1FAIpQLSdAL2PzavyrtXgGmtNrZAMyh3hV6g3fU0chxhWFxunQEZtH0g/viewform?usp=pp_url&entry.1932605469={{ d.i.id }}%20{{ d.i.lemma_link }}&entry.1433863141={{ d.app_name }}+{{ d.date }}"
+                target="_blank">
+                Report it here.</a>
+        </p>
+    </div>
+    {% endif %}
+
+    <!-- root family -->
+
+    {% if d.i.needs_root_family_button %}
+    <div id="family_root_{{d.i.lemma_1_}}" class="dpd content hidden">
         {{d.i.fr.html|safe}}
         <p class="dpd-footer">
             Something out of place?
             <a class="dpd-link"
-                href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Root+Family&entry.1433863141={{d.app_name}}+{{d.date}}"
+                href="https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Root+Family&entry.1433863141={{d.app_name}}+{{d.date}}"
                 target="_blank">
                 Report it here</a>.
         </p>
     </div>
-</div>
-{% endif %}
+    {% endif %}
 
-{# Word Family #}
-{% if d.i.needs_word_family_button %}
-<div id="family_word_{{ d.i.lemma_1_ }}" class="dpd content hidden">
-    <div class="tertiary">
-        <p class="heading">
+    <!-- word family -->
+
+    {% if d.i.needs_word_family_button %}
+    <div id="family_word_{{d.i.lemma_1_}}" class="dpd content hidden">
+        <p class="heading underlined">
             <b>{{d.i.fw.count}}</b>
             words which belong to the
             <b>{{d.i.family_word}}</b>
@@ -999,106 +1437,112 @@
         <p class="dpd-footer">
             Something out of place?
             <a class="dpd-link"
-                href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Word+Family&entry.1433863141={{d.app_name}}+{{d.date}}"
+                href="https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Word+Family&entry.1433863141={{d.app_name}}+{{d.date}}"
                 target="_blank">
                 Report it here</a>.
         </p>
     </div>
-</div>
-{% endif %}
+    {% endif %}
 
-{# Compound Family #}
-{% if d.i.needs_compound_family_button %}
-<div id="family_compound_{{ d.i.lemma_1_ }}" class="dpd content hidden">
-    <div class="tertiary">
-        <p class="heading">
-            <b>{{d.fc[0].count}}</b>
+    <!-- compound family -->
+
+    {% if d.i.needs_compound_family_button %}
+    <div id="family_compound_{{d.i.lemma_1_}}" class="dpd content hidden">
+        <p class="heading underlined">
+            <b> {{d.fc[0].count}} </b>
             compounds which contains
-            <b>{{d.i.lemma_clean}}</b>
+            <b> {{d.fc[0].compound_family}} </b>
+            {{d.fc[0].html|safe}}
         </p>
-        {{d.fc[0].html|safe}}
         <p class="dpd-footer">
             Spot a mistake?
             <a class="dpd-link"
-                href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Compound+Family&entry.1433863141={{d.app_name}}+{{d.date}}"
+                href="https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Compound+Family&entry.1433863141={{d.app_name}}+{{d.date}}"
                 target="_blank">
                 Fix it here</a>.
         </p>
     </div>
-</div>
-{% endif %}
+    {% endif %}
 
-{# Compound Families #}
-{% if d.i.needs_compound_families_button %}
-<div id="family_compound_{{ d.i.lemma_1_ }}" class="dpd content hidden">
-    <div class="tertiary">
-        <p class="heading">
+    <!-- compound families -->
+
+    {% if d.i.needs_compound_families_button %}
+    <div id="family_compound_{{d.i.lemma_1_}}" class="dpd content hidden">
+        <p id="{{d.i.lemma_1_}}cf_top" class="heading">
             jump to: {% for f in d.fc%}
-            <a class="jump" href="#family_compound_{{d.i.lemma_1_}}_{{f.compound_family.replace(' ', '_')}}">
-                {{f.compound_family}}</a> {% if not loop.last %} | {% endif %} {%
-            endfor %}
+            <a class="jump" href="#{{d.i.lemma_1_}}cf_{{f.compound_family}}">
+                {% if not loop.last %} {{f.compound_family}}, {% else%}
+                {{f.compound_family}} {% endif %}
+            </a>
+            {% endfor %}
         </p>
 
-        {% for f in d.fc %}
-        <p class="heading underlined overlined" id="family_compound_{{d.i.lemma_1_}}_{{f.compound_family.replace(' ', '_')}}">
+        {% for f in d.fc %} {% if loop.index == 0 %}
+        <p class="heading underlined overlined">{% else %}</p>
+
+        <p id="{{d.i.lemma_1_}}cf_{{f.compound_family}}" class="heading underlined overlined">
+            {% endif %} {% if f.count == 1 %}
             <b>{{f.count}}</b>
-            {% if f.count == 1 %}
             compound which contains
-            {% else %}
-            compounds which contain
-            {% endif %}
             <b>{{f.compound_family}}</b>
-            <a class="jump" href="#{{ d.i.lemma_1_ }}"> ⤴</a>
+            {% else %}
+            <b>{{f.count}}</b>
+            compounds which contain
+            <b>{{f.compound_family}}</b>
+            <a class="jump" href="#{{d.i.lemma_1_}}cf_top"> ⤴ </a>
+            {% endif %}
         </p>
         {{f.html|safe}} {% endfor %}
-        <p class="heading underlined overlined">
-            <a class="jump" href="#{{ d.i.lemma_1_ }}">
-                Back to the top </a>
+        <p class="underline overlined">
+            Back to the top
+            <a class="jump" href="#{{d.i.lemma_1_}}cf_top">⤴</a>
         </p>
         <p class="dpd-footer">
             Spot a mistake?
             <a class="dpd-link"
-                href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Compound+Family&entry.1433863141={{d.app_name}}+{{d.date}}"
+                href="https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Compound+Family&entry.1433863141={{d.app_name}}+{{d.date}}"
                 target="_blank">
                 Fix it here</a>.
         </p>
     </div>
-</div>
-{% endif %}
+    {% endif %}
 
-{# Idioms #}
-{% if d.i.needs_idioms_button %}
-<div id="family_idiom_{{ d.i.lemma_1_ }}" class="dpd content hidden">
-    <div class="tertiary">
-        {% for f in d.fi %}
-        <p class="heading">
+    <!-- idioms -->
+
+    {% if d.i.needs_idioms_button %}
+    <div id="family_idiom_{{d.i.lemma_1_}}" class="dpd content hidden">
+        {% for f in d.fi %} {% if loop.index == 1 %}
+        <p class="heading underlined">{% else %}</p>
+
+        <p class="heading underlined overlined">
+            {% endif %} {% if f.count == 1 %}
             <b>{{f.count}}</b>
-            {% if f.count == 1 %}
             idiomatic expression which contains
-            {% else %}
-            idiomatic expressions which contain
-            {% endif %}
             <b>{{f.idiom}}</b>
+            {% else %}
+            <b>{{f.count}}</b>
+            idiomatic expressions which contain
+            <b>{{f.idiom}}</b>
+            {% endif %}
         </p>
         {{f.html|safe}} {% endfor %}
         <p class="dpd-footer">
             Please add more idioms
             <a class="dpd-link"
-                href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Idioms&entry.1433863141={{d.app_name}}+{{d.date}}"
+                href="https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Idioms&entry.1433863141={{d.app_name}}+{{d.date}}"
                 target="_blank">
                 here</a>.
         </p>
     </div>
-</div>
-{% endif %}
+    {% endif %}
 
-{# Set #}
-{% if d.i.needs_set_button %}
-<div id="family_set_{{ d.i.lemma_1_ }}" class="dpd content hidden">
-    <div class="tertiary">
+    <!-- set -->
+
+    {% if d.i.needs_set_button %}
+    <div id="family_set_{{d.i.lemma_1_}}" class="dpd content hidden">
         {% for f in d.fs %}
-        <p class="heading">
-            <b>{{d.i.lemma_1}}</b>
+        <p class="heading underlined">
+            <b>{{d.i.lemma_clean}}</b>
             belongs to the set of
             <b>{{f.set}}</b>
         </p>
@@ -1106,60 +1550,80 @@
         <p class="dpd-footer">
             Spot a mistake?
             <a class="dpd-link"
-                href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Set&entry.1433863141={{d.app_name}}+{{d.date}}"
+                href="https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Set&entry.1433863141={{d.app_name}}+{{d.date}}"
                 target="_blank">
                 Fix it here</a>.
         </p>
     </div>
-</div>
-{% endif %}
+    {% endif %}
 
-{# Sets #}
-{% if d.i.needs_sets_button %}
-<div id="family_sets_{{ d.i.lemma_1_ }}" class="dpd content hidden">
-    <div class="tertiary">
-        <p class="heading">
+    <!-- sets -->
+
+    {% if d.i.needs_sets_button %}
+    <div id="family_sets_{{d.i.lemma_1_}}" class="dpd content hidden">
+        <p id="{{d.i.lemma_1_}}sets_top" class="heading">
             jump to: {% for set in d.i.family_set_list %}
-            <a class="jump" href="#family_set_{{d.i.lemma_1_}}_{{set.replace(' ', '_')}}">
-                {{set|safe}}</a> {% if not loop.last %} | {% else%} {%
-            endif %} {% endfor %}
+            <a class="jump" href="#{{d.i.lemma_1_}}sets_{{set}}">
+                {% if not loop.last %} {{set|safe}}, {% else%} {{set|safe}}
+                {%
+                endif %}
+            </a>
+            {% endfor %}
         </p>
 
-        {% for f in d.fs %}
-        <p class="heading underlined overlined" id="family_set_{{d.i.lemma_1_}}_{{f.set.replace(' ', '_')}}">
-            <b>{{d.i.lemma_1}}</b>
+        {% for f in d.fs %} {% if loop.index0 == 0 %}
+        <p class="heading underlined overlined">{% else %}</p>
+
+        <p id="{{d.i.lemma_1_}}sets_{{f.set}}" class="heading underlined overlined">
+            {% endif %}
+            <b>{{d.i.lemma_clean}}</b>
             belongs to the set of
             <b>{{f.set}}</b>
-            <a class="jump" href="#{{ d.i.lemma_1_ }}"> ⤴</a>
+            {% if loop.index0 > 0 %}
+            <a class="jump" href="#{{d.i.lemma_1_}}sets_top"> ⤴</a>
+            {% endif %}
         </p>
         {{f.html|safe}} {% endfor %}
-        <p class="heading underlined overlined">
-            <a class="jump" href="#{{ d.i.lemma_1_ }}">
-                Back to the top </a>
+        <p class="underline overlined">
+            Back to the top
+            <a class="jump" href="#{{d.i.lemma_1_}}sets_top">⤴</a>
         </p>
         <p class="dpd-footer">
             Spot a mistake?
             <a class="dpd-link"
-                href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Set&entry.1433863141={{d.app_name}}+{{d.date}}"
+                href="https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Set&entry.1433863141={{d.app_name}}+{{d.date}}"
                 target="_blank">
                 Fix it here</a>.
         </p>
     </div>
-</div>
-{% endif %}
+    {% endif %} {% if d.i.needs_sets_button %}
+    <div id="sets_{{d.i.lemma_1_}}" class="dpd content hidden">
+        {% for f in d.fs %} {% if loop.index0 == 0 %}
+        <p class="heading underlined">{% else %}</p>
 
-{# Frequency #}
-{% if d.i.needs_frequency_button %}
-<div id="frequency_{{ d.i.lemma_1_ }}" class="dpd content hidden">
-    <div class="tertiary">
+        <p class="heading underlined overlined">
+            {% endif %}
+            <b>{{d.i.lemma_clean}}</b>
+            belongs to the set of
+            <b>{{f.set}}</b>
+        </p>
+        {{f.html|safe}} {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- frequency -->
+
+    {% if d.i.needs_frequency_button %}
+    <div id="frequency_{{d.i.lemma_1_}}" class="dpd content hidden">
         {% if not d.i.freq_html %}
-        <p class="heading">
+        <p class="heading underlined">
             There are no matches of <b>{{d.i.lemma_1}}</b> in any texts.
         </p>
         <p>It probably only occurs in compounds. Or perhaps there is an
             error.</p>
+
         {% else %}
-        <p class="heading">
+        <p class="heading underlined">
             {% if d.i.needs_declension_button %} Frequency of
             <b>{{d.i.lemma_1}}</b> and its declensions {% elif
             d.i.needs_conjugation_button %} Frequency of
@@ -1167,17 +1631,17 @@
             and
             its conjugations {% else %} Frequency of <b>{{d.i.lemma_1}}</b>
             {%
-            endif %}
+            endif
+            %} {{d.i.freq_html|safe}} {% endif %}
         </p>
-        {{d.i.freq_html|safe}}
-        <p class="message">
+
+        <p>
             For a detailed explanation of how this word frequency chart is
             calculated,
             it's accuracies and inaccuracies, please refer to
             <a class="dpd-link" href="https://digitalpalidictionary.github.io/features/frequency/" target="_blank">
                 this webpage </a>.
         </p>
-        {% endif %}
         <p class="dpd-footer">
             If something looks out of place,
             <a class="dpd-link"
@@ -1187,41 +1651,43 @@
             </a>
         </p>
     </div>
-</div>
-{% endif %}
+    {% endif %}
 
-{# Feedback #}
-<div id="feedback_{{ d.i.lemma_1_ }}" class="dpd content hidden">
-    <div class="tertiary">
-        <p class="message">
+    <!-- feedback -->
+
+    <div id="feedback_{{d.i.lemma_1_}}" class="dpd content hidden">
+        <p>ID <b>{{d.i.id}}</b></p>
+        <p>
             Digital Pāḷi Dictionary is a work in progress, made available
             for
             testing
             and feedback purposes.
         </p>
-        <p class="message">
+        <p>
             <a class="dpd-link"
-                href="https://docs.google.com/forms/d/e/1FAIpQLSfResxEUiRCyFITWPkzoQ2HhHEvUS5fyg68Rl28hFH6vhHlaA/viewform?usp=pp_url&entry.1433863141={{d.app_name}}+{{d.date}}"
+                href="https://docs.google.com/forms/d/e/1FAIpQLSfResxEUiRCyFITWPkzoQ2HhHEvUS5fyg68Rl28hFH6vhHlaA/viewform?usp=pp_url&amp;entry.1433863141={{d.app_name}}+{{d.date}}"
                 target="_blank">Add a missing word</a><span>. Please use
                 this
-                <a class="dpd-link"
-                    href="https://docs.google.com/forms/d/e/1FAIpQLSfResxEUiRCyFITWPkzoQ2HhHEvUS5fyg68Rl28hFH6vhHlaA/viewform?usp=pp_url&entry.1433863141={{d.app_name}}+{{d.date}}"
-                    target="_blank">
-                    online form</a>
-                to add missing words, especially from Vinaya, commentaries, and
-                other
-                later texts. If you prefer to work offline, here is a
-                <a class="dpd-link" download="true"
-                    href="https://github.com/digitalpalidictionary/dpd-db/raw/main/misc/DPD%20Add%20Words.xlsx"
-                    target="_blank">
-                    spreadsheet to download</a><span>, fill in and submit.
-                </span>
+            </span>
+            <a class="dpd-link"
+                href="https://docs.google.com/forms/d/e/1FAIpQLSfResxEUiRCyFITWPkzoQ2HhHEvUS5fyg68Rl28hFH6vhHlaA/viewform?usp=pp_url&amp;entry.1433863141={{d.app_name}}+{{d.date}}"
+                target="_blank">
+                online form</a>
+            to add missing words, especially from Vinaya, commentaries, and
+            other
+            later texts. If you prefer to work offline, here is a
+            <a class="dpd-link" download="true"
+                href="https://github.com/digitalpalidictionary/dpd-db/raw/main/misc/DPD%20Add%20Words.xlsx"
+                target="_blank">
+                spreadsheet to download</a><span>, fill in and submit.
+            </span>
         </p>
-        <p class="message">
+        <p>
             <a class="dpd-link"
                 href="https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.1433863141={{d.app_name}}+{{d.date}}"
                 target="_blank">
-                Correct a mistake</a>
+                Correct a mistake
+            </a>
             <span>
                 . Did you spot a mistake in the dictionary? Have something
                 to
@@ -1233,26 +1699,28 @@
                 dictionary for everyone who uses it.
             </span>
         </p>
-        <p class="message">
+        <p>
             <a class="dpd-link" href="https://digitalpalidictionary.github.io/" target="_blank">
-                Read the docs</a>
+                Read the docs
+            </a>
             <span>
                 . Get more detailed information about installation on your
                 devices,
                 upgrades, advanced settings and features.
             </span>
         </p>
-        <p class="message">
+        <p>
             <a class="dpd-link"
                 href="mailto:digitalpalidictionary@gmail.com?subject=I%20want%20to%20help!&body=Please%20let%20me%20know%20how%20I%20can%20get%20involved%20with%20the%20development%20of%20DPD.">
-                Get involved</a>
+                Get involved
+            </a>
             <span>
                 . If you're a Pāḷi specialist or a coder, or would like to
                 contribute to
                 the project in any way, please get in touch.
             </span>
         </p>
-        <p class="message">
+        <p>
             <a class="dpd-link"
                 href="mailto:digitalpalidictionary@gmail.com?subject=Keep%20me%20updated!&body=Please%20let%20me%20know%20about%20new%20features%20and%20updates%20as%20soon%20as%20they%20are%20available.">
                 Join the mailing list
@@ -1264,5 +1732,6 @@
             </span>
         </p>
     </div>
+
+    <!-- fin -->
 </div>
-{% endif %}

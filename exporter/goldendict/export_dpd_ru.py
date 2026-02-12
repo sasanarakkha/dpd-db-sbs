@@ -729,6 +729,7 @@ def render_grammar_templ(
             ru_base=ru_base,
             ru_phonetic=ru_phonetic,
             today=TODAY,
+            superscripter_uni=superscripter_uni,
         )
     )
 

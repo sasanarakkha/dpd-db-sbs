@@ -756,6 +756,7 @@ def render_grammar_templ(
             grammar=grammar,
             meaning=i.meaning_combo_html,
             today=TODAY,
+            superscripter_uni=superscripter_uni,
         )
     )
 

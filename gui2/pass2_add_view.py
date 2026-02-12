@@ -427,9 +427,6 @@ class Pass2AddView(ft.Column, PopUpMixin):
         self.speech_marks_manager.regenerate_from_db()
         self.speech_marks_dict = self.speech_marks_manager.get_speech_marks()
         self.update_message("speech marks updated")
-        self.update_message("updating sandhi... please wait...")
-        self.sandhi_dict = self.sandhi_manager.regenerate_contractions_simple()
-        self.update_message("sandhi updated")
 
     def _handle_filter_change(self, e: ft.ControlEvent) -> None:
         """Handles changes in the field filter RadioGroup."""

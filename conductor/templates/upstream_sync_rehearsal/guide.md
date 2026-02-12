@@ -16,6 +16,7 @@
 Synchronization is a high-risk task that requires semantic understanding, not just line-by-step diffing.
 - **Auto Mode:** The agent should operate in "Auto" mode for Phase 1 and Phase 2.
 - **Burst to PRO:** The agent MUST switch to a PRO model for the **Phase 3: PRO Logic Audit** to ensure full parity and catch semantic mistakes. (See Phase 3 protocol for details).
+- **🛑 SYNC ONLY - NO NEW SOLUTIONS:** The goal of this track is to synchronize the fork with the upstream repository. If an error occurs (e.g., in the webapp or GUI), it is almost certainly a synchronization failure (outdated shadow copy, missing import, missed upstream logic). **DO NOT introduce new solutions or custom fixes.** Instead, carefully compare the failing component with its upstream original and restore parity.
 - **🛑 Systematic Shadow Porting Protocol (Phase 2)**
 To ensure no localized shadow copies are missed, the agent MUST execute the following automated check BEFORE declaring shadow porting complete:
 
@@ -79,6 +80,12 @@ Check for:
 - Structural changes in `home.html` (new tabs, settings, or dropdowns).
 - New logic in `status.html` or `home_simple.html`.
 - Flat parameter structure in `render` calls.
+
+**Critical Template:** `dpd_headword.html`
+- This file is complex and prone to syntax errors during merges.
+- **Structure:** MUST match upstream (nested `if` blocks, loop variables, CSS classes).
+- **Content:** MUST preserve localized text (Russian) and specific links (SBS feedback forms).
+- **Strategy:** If upstream structure changes significantly, copy the new upstream template and manually re-apply the localized text/links block-by-block. Do NOT simply overwrite without restoring localization.
 
 ## Phase 4: Manual User Verification
 The user manually verifies the functional state of the dictionary tools.
@@ -149,7 +156,10 @@ The following files in `modified_upstream_files` MUST be manually diffed against
     - Uses `tools.fast_api_utils_dps`.
     - Preserves custom UI font sizes (17px for text, 15px for hints).
     - Preserves automatic lemma copying to clipboard on save.
-- **Sync Strategy:** Manual merge. Ensure `tools.fast_api_utils_dps` is used instead of the upstream version.
+- **`gui2/dps_*` files (Shadow relationship)**:
+    - These files are unique DPS views based on existing `gui2/*.py` files.
+    - **Logic Parity**: If the core logic or structure changes in the original `gui2/*.py` files, those changes MUST be manually ported to the corresponding `dps_*` files.
+- **Sync Strategy:** Manual merge for `main.py` and `pass2_add_view.py`. `pass2_add_view.py` has only unique localized import - the rest is identical to upstream. Parity check and manual porting for all `dps_*` files. Ensure `tools.fast_api_utils_dps` is used instead of the upstream version.
 
 ### 4. AI & Infrastructure
 - **`tools/ai_manager.py`**: Preserves additional providers (OpenAI) and custom model preferences/fallbacks.

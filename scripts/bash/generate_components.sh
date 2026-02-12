@@ -62,6 +62,10 @@ go run go_modules/frequency/main.go
 
 uv run python db/epd/epd_to_lookup.py
 
+uv run python exporter/webapp/generate_search_index.py
+
+uv run python audio/db_release_download.py
+
 uv run python scripts/build/dealbreakers.py
 status=$?
 if [[ $status -ne  0 ]]; then

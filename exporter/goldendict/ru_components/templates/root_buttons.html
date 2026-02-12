@@ -1,7 +1,7 @@
 <div class="button-box">
     <a class="dpd-button" href="#"  data-target="ru_root_info_${r.root_}">инфо корня</a>
     <a class="dpd-button" href="#"  data-target="ru_root_matrix_${r.root_}">матрица корня</a>
-    % for fr in family_root_list:
+    % for fr in frs:
         <a class="dpd-button" href="#"  data-target="ru_family_root_${r.root_}_${fr.root_family_}">${fr.root_family}</a>
     % endfor
 </div>
@@ -11,7 +11,7 @@
 <div id="ru_root_matrix_${r.root_}" class="dpd content hidden">
     ${root_matrix}
 </div>
-% for fr in family_root_list:
+% for fr in frs:
 <div id="ru_family_root_${r.root_}_${fr.root_family_}" class="dpd content hidden">
     ${fr.html_ru}
 </div>

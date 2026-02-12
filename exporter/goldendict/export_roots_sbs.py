@@ -17,6 +17,7 @@ from tools.paths_dps import DPSPaths
 from tools.printer import printer as pr
 from tools.utils import squash_whitespaces
 from tools.utils_sbs import RenderedSizes, default_rendered_sizes
+from tools.superscripter import superscripter_uni
 
 
 def generate_root_html(
@@ -194,7 +195,13 @@ def render_root_matrix_templ(
         count = 0
 
     return str(
-        root_matrix_templ.render(r=r, count=count, root_matrix=root_matrix, today=TODAY)
+        root_matrix_templ.render(
+            r=r,
+            count=count,
+            root_matrix=root_matrix,
+            today=TODAY,
+            superScripter=superscripter_uni,
+        )
     )
 
 

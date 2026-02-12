@@ -18,6 +18,7 @@ from tools.paths_ru import RuPaths
 from tools.printer import printer as pr
 from tools.utils import RenderedSizes, default_rendered_sizes, squash_whitespaces
 from tools.tools_for_ru_exporter import ru_replace_abbreviations
+from tools.superscripter import superscripter_uni
 
 
 def generate_root_html(
@@ -170,7 +171,14 @@ def render_root_buttons_templ(
 
     frs = sorted(frs, key=lambda x: pali_sort_key(x.root_family))
 
-    return str(root_buttons_templ.render(r=r, frs=frs))
+    root_info = ru_replace_abbreviations(r.root_info, "root")
+    root_matrix = ru_replace_abbreviations(r.root_matrix, "root")
+
+    return str(
+        root_buttons_templ.render(
+            r=r, frs=frs, root_info=root_info, root_matrix=root_matrix
+        )
+    )
 
 
 def render_root_info_templ(
@@ -201,7 +209,13 @@ def render_root_matrix_templ(
         count = 0
 
     return str(
-        root_matrix_templ.render(r=r, count=count, root_matrix=root_matrix, today=TODAY)
+        root_matrix_templ.render(
+            r=r,
+            count=count,
+            root_matrix=root_matrix,
+            today=TODAY,
+            superScripter=superscripter_uni,
+        )
     )
 
 
