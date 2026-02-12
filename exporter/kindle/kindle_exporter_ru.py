@@ -246,6 +246,9 @@ def render_ebook_entry(
         if isinstance(attr_value, str):
             setattr(i, attr_name, html_friendly(attr_value))
 
+    if i.ru and i.ru.ru_notes:
+        i.ru.ru_notes = html_friendly(i.ru.ru_notes)
+
     grammar_table = render_grammar_templ(rupth, i)
     if "&" in grammar_table:
         grammar_table = grammar_table.replace(" & ", " и ")
