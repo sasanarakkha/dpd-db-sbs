@@ -19,6 +19,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: Upstream Sync Rehearsal following template**
+- [x] **Track: Upstream Sync Rehearsal following template**
 
-*Link: [./tracks/upstream_sync_rehearsal_20260210/](./tracks/upstream_sync_rehearsal_20260210/)*
+*Link: [./archive/upstream_sync_rehearsal_20260210/](./archive/upstream_sync_rehearsal_20260210/)*
