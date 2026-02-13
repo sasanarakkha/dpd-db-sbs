@@ -22,8 +22,12 @@ def make_headwords_clean_set_ru(db_session: Session) -> set[str]:
     headwords_clean_set = set([i.lemma_clean for i in results])
 
     # add all english and russian meanings
-    results = db_session.query(Lookup).filter(Lookup.epd != "").filter(Lookup.rpd != "").all()
-    headwords_clean_set.update([i.lookup_key for i in results])
+    # Optimization: Query only lookup_key column to save memory
+    results_epd = db_session.query(Lookup.lookup_key).filter(Lookup.epd != "").all()
+    headwords_clean_set.update([i.lookup_key for i in results_epd])
+
+    results_rpd = db_session.query(Lookup.lookup_key).filter(Lookup.rpd != "").all()
+    headwords_clean_set.update([i.lookup_key for i in results_rpd])
 
     return headwords_clean_set
 

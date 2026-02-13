@@ -1,6 +1,6 @@
 # Plan: Upstream Sync Rehearsal (Standard Monthly)
 
-## Phase 1: Automated Synchronization
+## Phase 1: Automated Synchronization (Auto)
 - [ ] Task: Pre-Sync Branch Check
     - [ ] Verify there are no uncommitted changes in the `sbs-ru` branch.
 - [ ] Task: Execute Sync Script
@@ -10,37 +10,44 @@
     - [ ] **AUTO-COMMIT (COMMIT 1/2)**: The sync script performs an automated commit here.
 - [ ] Task: Conductor - User Manual Verification 'Automated Synchronization'
 
-## Phase 2: Manual Merge & Shadow Porting
-- [ ] **🛑 NO COMMITS ALLOWED IN THIS PHASE.** All changes must be staged.
-- [ ] Task: Integrate Upstream Updates into Modified Files
-    - [ ] Run `git diff as_upstream <file>` for all `modified_upstream_files`.
-    - [ ] Port relevant bug fixes or new features.
+## Phase 2: Analysis & Dynamic Planning (PRO)
+- [ ] **🛑 MANDATORY MODEL SWITCH: PRO** (Ask user to switch).
+- [ ] Task: Semantic Analysis
+    - [ ] Analyze `git diff HEAD^` and `modified_upstream_files`.
+    - [ ] Check upstream sources for all shadow copies.
+- [ ] Task: Create Dynamic Spec
+    - [ ] Write `dynamic_sync_plan.md` with precise instructions for the Auto model.
+- [ ] **🛑 MANDATORY MODEL SWITCH: AUTO** (Ask user to switch back).
+
+## Phase 3: Implementation (Auto)
+- [ ] **🛑 NO COMMITS ALLOWED IN THIS PHASE.**
+- [ ] Task: Execute Dynamic Plan
+    - [ ] Follow instructions in `dynamic_sync_plan.md`.
 - [ ] Task: Update Shadow Copies
-    - [ ] For each entry in `russian_copies` and `sbs_copies`:
-        - [ ] Port logic from source to shadow.
+    - [ ] **Check Render Parity**: Verify all variables passed to `render()` in upstream match the shadow copies.
+    - [ ] **Check Import Parity**: Verify new upstream imports are present in shadow copies.
+    - [ ] **Check Kindle/OPF Metadata**: Verify `content.opf` structure matches upstream requirements.
+    - [ ] **Check for New Upstream Files**: Run `git ls-files exporter/goldendict/templates/` (and other source dirs) to catch new templates that need Russian/SBS counterparts.
 - [ ] Task: Documentation Parity
     - [ ] Ensure documentation parity between docs/ and docs_rus/.
 - [ ] Task: Update Rehearsal Templates
     - [ ] Sync `dps_sync_registry.json` and `guide.md` with the new state.
 
-## Phase 3: Final Logic Audit & Validation
-- [ ] **🛑 NO COMMITS ALLOWED UNTIL FINAL APPROVAL.**
-- [ ] **MANDATORY MODEL SWITCH**: Ask user to switch to **PRO model** via `/model`.
+## Phase 4: Final Logic Audit (PRO)
+- [ ] **🛑 MANDATORY MODEL SWITCH: PRO** (Ask user to switch).
 - [ ] Task: PRO Logic Audit
     - [ ] **AGENT ACTION**: Use PRO model to manually audit EVERY modified file and shadow copy against upstream originals.
-- [ ] **MANDATORY SWITCH BACK**: Ask user to switch back to **Auto** via `/model`.
+- [ ] **🛑 MANDATORY MODEL SWITCH: AUTO** (Ask user to switch back).
+
+## Phase 5: Finalization & Verification (Auto)
 - [ ] Task: Run All Tests
     - [ ] Run imports, exporters, docs parity, and new feature tests.
 - [ ] Task: **🛑 FINAL USER APPROVAL GATE**
     - [ ] **HARD STOP**: Agent presents a summary of all changes.
-    - [ ] **AWAIT SIGNAL**: "Phase 3 is complete" or "Proceed with final commit".
+    - [ ] **AWAIT SIGNAL**: "Phase 5 is complete" or "Proceed with final commit".
 - [ ] Task: **FINAL MANUAL COMMIT (COMMIT 2/2)**
     - [ ] Perform ONE consolidated commit for all manual work.
     - [ ] Message: `sync: manual merge resolutions and comprehensive validation (DD-MM)`.
-- [ ] **Task: Comprehensive Summary**
-    - [ ] Agent provides a detailed summary of all technical changes, protocol updates, and test results for the entire session.
-
-## Phase 4: Manual User Verification
 - [ ] **Task: Exporter Verification**
     - [ ] Verify GoldenDict SBS/Ru exports manually.
     - [ ] Verify Kindle Ru export manually.

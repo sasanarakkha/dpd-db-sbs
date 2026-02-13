@@ -13,11 +13,41 @@
    ```
 
 ## AI Agent Operation Strategy
-Synchronization is a high-risk task that requires semantic understanding, not just line-by-step diffing.
-- **Auto Mode:** The agent should operate in "Auto" mode for Phase 1 and Phase 2.
-- **Burst to PRO:** The agent MUST switch to a PRO model for the **Phase 3: PRO Logic Audit** to ensure full parity and catch semantic mistakes. (See Phase 3 protocol for details).
-- **🛑 SYNC ONLY - NO NEW SOLUTIONS:** The goal of this track is to synchronize the fork with the upstream repository. If an error occurs (e.g., in the webapp or GUI), it is almost certainly a synchronization failure (outdated shadow copy, missing import, missed upstream logic). **DO NOT introduce new solutions or custom fixes.** Instead, carefully compare the failing component with its upstream original and restore parity.
-- **🛑 Systematic Shadow Porting Protocol (Phase 2)**
+Synchronization is a high-risk task that requires semantic understanding, not just line-by-step diffing. To mitigate this, we use a **Analyze -> Implement -> Verify** workflow that leverages the strengths of different models.
+
+### Phase 1: Automated Sync (Auto Model)
+- **Goal:** Execute the automated sync script and prepare the repo for manual merging.
+- **Model:** Auto.
+
+### Phase 2: Dynamic Analysis & Planning (PRO Model)
+- **Goal:** Analyze the state of the repo after Phase 1 and create a precise instruction list for the Auto model.
+- **Model:** PRO (e.g., `gemini-2.0-pro-exp-02-05`).
+- **Action:**
+    1.  **Analyze Diffs:** Run `git diff HEAD^` (or compare `sbs-ru` vs `as_upstream` for modified files).
+    2.  **Shadow Check:** Identify which shadow copies need updates based on changes to their upstream sources.
+    3.  **Output:** Create a temporary file `conductor/tracks/<current_track>/dynamic_sync_plan.md`.
+    4.  **Content of `dynamic_sync_plan.md`:**
+        -   **Manual Merges:** List exactly which files in `modified_upstream_files` changed and what blocks of code need to be ported.
+        -   **Shadow Updates:** List each shadow file that needs updating. explicitly stating *what* to update (e.g., "Add `superscripter` variable to `render` call in `export_roots_ru.py`").
+        -   **Documentation:** List new/updated docs to port.
+
+### Phase 3: Execution (Auto Model)
+- **Goal:** Implement the changes defined in `dynamic_sync_plan.md`.
+- **Model:** Auto.
+- **Action:** Follow the dynamic plan item by item. This is the "coding" phase.
+
+### Phase 4: Final Logic Audit (PRO Model)
+- **Goal:** Verify the work of the Auto model and catch semantic regressions.
+- **Model:** PRO.
+- **Action:** Compare the final state of shadow files against their upstream sources to ensure parity (logic, imports, variables).
+
+### Phase 5: Finalization
+- **Goal:** Run tests, manual verification, and final commit.
+- **Model:** Auto.
+
+---
+
+## 🛑 Systematic Shadow Porting Protocol (Phase 2 & 3)
 To ensure no localized shadow copies are missed, the agent MUST execute the following automated check BEFORE declaring shadow porting complete:
 
 1.  **Identify Changes:** Run `git diff-tree --no-commit-id --name-only -r HEAD` (referencing the sync commit from Phase 1).
@@ -30,6 +60,11 @@ To ensure no localized shadow copies are missed, the agent MUST execute the foll
         - `exporter/goldendict/export_epd.py` -> `export_rpd.py` AND `export_epd_sbs.py`.
     -   If a changed file is a **source** (value) in `russian_copies` or `sbs_copies`, **ALL** its corresponding **shadows** (keys) MUST be checked.
 3.  **Mandatory Review List:** The agent MUST present a list of every source/shadow pair identified for review to the user before proceeding with porting.
+4.  **🛑 Shadow Logic & Template Parity (CRITICAL):**
+    *   **Template Context:** If upstream Python code adds a new variable to a Mako `render()` call (e.g., `superscripter=superscripter_uni`), you **MUST** update the corresponding shadow Python file (`*_ru.py`, `*_sbs.py`) to pass that same variable. This is the #1 cause of "Undefined" errors.
+    *   **New Imports:** Check upstream files for new imports (e.g., `from tools.superscripter import ...`). If found, add them to the shadow file immediately.
+    *   **Metadata Structure:** For Kindle/Ebook templates (`content.opf`, `*.xhtml`), compare the *structure* of metadata tags against upstream. If upstream adds attributes like `title-type="main"`, the shadow template MUST adopt them to pass validation.
+    *   **Asset Manifest:** Ensure `content.opf` manifests only reference files that actually exist in the shadow directory (e.g., do not list fonts if they weren't copied).
 
 ---
 
@@ -56,8 +91,8 @@ To keep the history clean and verification easy, EXACTLY TWO commits are allowed
 
 ---
 
-## 🛑 PRO Logic Audit Protocol (Phase 3)
-Phase 3 is the most critical reasoning phase. The agent MUST use a **PRO model** to conduct a final audit of all manual work performed in Phase 2.
+## 🛑 PRO Logic Audit Protocol (Phase 4)
+Phase 4 is the most critical reasoning phase. The agent MUST use a **PRO model** to conduct a final audit of all manual work performed in Phase 3.
 
 - **🛑 MANDATORY MODEL SWITCH:** Before starting the PRO Logic Audit, the agent MUST stop and ask the user to switch:
     - *"I am starting the Final Logic Audit. Please run `/model`, select 'Manual', and pick a PRO model (e.g., `gemini-2.0-pro-exp-02-05`) for this audit."*
@@ -65,7 +100,7 @@ Phase 3 is the most critical reasoning phase. The agent MUST use a **PRO model**
     1. **Cross-Check:** Compare EVERY file in `modified_upstream_files` against its `as_upstream` original.
     2. **Shadow Check:** Compare EVERY updated shadow copy against its upstream source.
 - **🛑 SWITCH BACK:** Once the audit is complete and fixes are staged, the agent MUST ask the user to switch back:
-    - *"The audit is complete and fixes are staged. Please run `/model` and switch back to 'Auto' for the final commit and validation."*
+    - *"The audit is complete and fixes are staged. Please run `/model` and switch back to 'Auto' for Phase 5 (Finalization)."*
 
 ---
 
