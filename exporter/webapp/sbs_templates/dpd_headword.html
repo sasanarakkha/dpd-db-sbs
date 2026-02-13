@@ -1564,9 +1564,7 @@
         <p id="{{d.i.lemma_1_}}sets_top" class="heading">
             jump to: {% for set in d.i.family_set_list %}
             <a class="jump" href="#{{d.i.lemma_1_}}sets_{{set}}">
-                {% if not loop.last %} {{set|safe}}, {% else%} {{set|safe}}
-                {%
-                endif %}
+                {% if not loop.last %} {{set|safe}}, {% else%} {{set|safe}} {% endif %}
             </a>
             {% endfor %}
         </p>

@@ -42,6 +42,7 @@
 ## Phase 5: Finalization & Verification (Auto)
 - [ ] Task: Run All Tests
     - [ ] Run imports, exporters, docs parity, and new feature tests.
+    - [ ] Run `python3 tests/test_template_structure.py` to verify template structural parity.
 - [ ] Task: **🛑 FINAL USER APPROVAL GATE**
     - [ ] **HARD STOP**: Agent presents a summary of all changes.
     - [ ] **AWAIT SIGNAL**: "Phase 5 is complete" or "Proceed with final commit".
