@@ -8,7 +8,6 @@ from fastapi.responses import HTMLResponse, Response, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import sessionmaker
-import sqlite3
 import re
 
 from db.db_helpers import get_db_session
@@ -34,6 +33,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 pth: ProjectPaths = ProjectPaths()
 rupth: RuPaths = RuPaths()
 app = FastAPI()
+
 app.add_middleware(GZipMiddleware, minimum_size=500)
 app.mount("/static", StaticFiles(directory=str(pth.webapp_static_dir)), name="static")
 
@@ -600,7 +600,5 @@ if __name__ == "__main__":
 
 # TODO make help popup tooltips and a toggle to turn them off
 # TODO dropdown menu when searching
-# TODO summary of roots
-# TODO history forward and backwards buttons
 # TODO include mw, cpd, dppn, cone, etc.
 # TODO add set names in lookup table

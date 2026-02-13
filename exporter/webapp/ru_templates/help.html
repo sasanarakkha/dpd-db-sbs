@@ -1,6 +1,6 @@
 <h3 class="dpd" id="help: {{ d.headword }}">помощь: {{d.headword}}</h3>
 <div class="tertiary">
-    <table class="grammar">
+    <table class="help">
         <tr>
             <th>
                 Помощь
@@ -17,5 +17,37 @@
                 {{d.meaning|safe}}
             </td>
         </tr>
+        {% if d.pali: %}
+        <tr>
+            <th>
+                Пали
+            </th>
+            <td>
+                {{d.pali|safe}}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.example: %}
+        <tr>
+            <th>
+                Пример
+            </th>
+            <td>
+                {{d.example|safe}}
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.explanation: %}
+        <tr>
+            <th>
+                Инфо
+            </th>
+            <td>
+                {{d.explanation|safe}}
+            </td>
+        </tr>
+        {% endif %}
     </table>
 </div>

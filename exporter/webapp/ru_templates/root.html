@@ -1,31 +1,33 @@
-<div class="dpd-headword">
+<!-- definition -->
+
 <h3 class="dpd" id="root: {{ d.r.root_ }}">корень: {{d.r.root}}</h3>
-<div class="tertiary">
+<div class='dpd summary'>
     <p>
         корень.
-        <b>
-            {{d.r.root_clean}}
-        </b>
+        <b>{{d.r.root_clean}}</b>
         <sup>
             {{d.r.root_has_verb}}
         </sup>
         {{d.r.root_group}}
         {{d.r.root_sign}}
         ({{d.r.root_ru_meaning}})
+        {{count}}
     </p>
 </div>
+
+<!-- root buttons -->
 
 <div class="button-box">
     <a class="dpd-button" href="#" data-target="root_info_{{d.r.root_}}">инфо корня</a>
     <a class="dpd-button" href="#" data-target="root_matrix_{{d.r.root_}}">матрица корня</a>
     {% for fr in d.frs: %}
-    <a class="dpd-button" href="#"
-        data-target="family_root_{{d.r.root_}}_{{fr.root_family_}}">{{fr.root_family}}</a>
+    <a class="dpd-button" href="#" data-target="family_root_{{d.r.root_}}_{{fr.root_family_}}">{{fr.root_family}}</a>
     {% endfor %}
 </div>
 
-{# Root Info #}
-<div id="root_info_{{ d.r.root_ }}" class="dpd content hidden">
+<!-- root info -->
+
+<div id="root_info_{{d.r.root_}}" class="dpd content hidden">
     {{d.root_info_ru|safe}}
     <p class="dpd-footer">
         Заметили ошибку? <a class="dpd-link"
@@ -34,9 +36,10 @@
     </p>
 </div>
 
-{# Root Matrix #}
-<div id="root_matrix_{{ d.r.root_ }}" class="dpd content hidden">
-    <p class="heading">
+<!-- root matrix -->
+
+<div id="root_matrix_{{d.r.root_}}" class="dpd content hidden">
+    <p>
         {% if d.count <= 1: %}
         <b>{{d.count}}</b> слово образовано от корня
         {% else: %}
@@ -62,7 +65,8 @@
     </p>
 </div>
 
-{# Root Families #}
+<!-- root families -->
+
 {% for fr in d.frs: %}
 <div id="family_root_{{d.r.root_}}_{{fr.root_family_}}" class="dpd content hidden">
     {{fr.html_ru|safe}}
@@ -75,4 +79,3 @@
     </p>
 </div>
 {% endfor %}
-</div>

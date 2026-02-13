@@ -4,6 +4,7 @@ import json
 import re
 from typing import List, Optional
 
+from aksharamukha import transliterate
 from sqlalchemy import DateTime, ForeignKey, and_, case, null, or_
 from sqlalchemy import Column, Integer
 
@@ -621,6 +622,23 @@ class SuttaInfo(Base):
             return None
 
     @property
+    def has_tpr(self) -> bool:
+        from tools.cache_load import load_tpr_codes_set
+
+        tpr_codes = load_tpr_codes_set()
+
+        if self.dpd_code:
+            code = self.dpd_code.lower().strip()
+            if code in tpr_codes:
+                return True
+            # Handle cases like an5.31.1 -> an5.31
+            if "." in code:
+                base_code = code.split(".")[0]
+                if base_code in tpr_codes:
+                    return True
+        return False
+
+    @property
     def sc_book_code(self) -> str | None:
         if self.sc_code:
             return re.sub(r"\d+\.*-*\d*", "", self.sc_code)
@@ -709,23 +727,6 @@ class SuttaInfo(Base):
             return f"https://www.sc-voice.net/#/sutta/{self.sc_code.lower()}/en/sujato"
         else:
             return None
-
-    @property
-    def has_tpr(self) -> bool:
-        from tools.cache_load import load_tpr_codes_set
-
-        tpr_codes = load_tpr_codes_set()
-
-        if self.dpd_code:
-            code = self.dpd_code.lower().strip()
-            if code in tpr_codes:
-                return True
-            # Handle cases like an5.31.1 -> an5.31
-            if "." in code:
-                base_code = code.split(".")[0]
-                if base_code in tpr_codes:
-                    return True
-        return False
 
     @property
     def tpp_org(self) -> str | None:
@@ -978,7 +979,6 @@ class DpdHeadword(Base):
     def lemma_ipa(self) -> str:
         # from tools.ipa import convert_uni_to_ipa
         # return convert_uni_to_ipa(self.lemma_clean, "ipa")
-        from aksharamukha import transliterate
 
         return str(
             transliterate.process(

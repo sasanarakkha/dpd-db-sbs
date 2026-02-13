@@ -1,18 +1,20 @@
 <h3 class="dpd" id="deconstructor: {{ d.headword }}">деконструктор: {{d.headword}}</h3>
-<div class="tertiary">
-  {% for deconstruction in d.deconstructions: %}
-  <p>{{ deconstruction }}</p>
-  {% endfor %}
-  <br />
+<div class="dpd">
+  <p>
+    {% for deconstruction in d.deconstructions: %} {{deconstruction}} {% if not
+    loop.last: %}
+    <br />
+    {% endif %} {% endfor %}
+  </p>
   <p class="dpd-footer">
     Эти разбиения слов создаются автоматически. Подробнее
     <a
       class="dpd-link"
-      href="https://https://devamitta.github.io/dpd.rus/features/deconstructor/"
+      href="https://digitalpalidictionary.github.io/features/deconstructor/"
       target="_blank">в документации</a>. Предложения приветствуются
     <a
       class="dpd-link"
-      href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.headword}}&entry.326955045=Деконструктор&entry.1433863141={{d.app_name}}+{{d.date}}"
+      href="https://docs.google.com/forms/d/e/1FAIpQLSfResxEUiRCyFITWPkzoQ2HhHEvUS5fyg68Rl28hFH6vhHlaA/viewform?usp=pp_url&entry.438735500={{d.headword}}&entry.326955045=Deconstructor&entry.1433863141={{d.app_name}}+{{d.date}}"
       target="_blank">здесь</a>. Ошибки в деконструкции обычно вызваны отсутствием слова в словаре. Вы можете
     <a
       class="dpd-link"

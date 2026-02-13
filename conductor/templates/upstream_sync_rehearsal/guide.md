@@ -65,6 +65,11 @@ To ensure no localized shadow copies are missed, the agent MUST execute the foll
     *   **New Imports:** Check upstream files for new imports (e.g., `from tools.superscripter import ...`). If found, add them to the shadow file immediately.
     *   **Metadata Structure:** For Kindle/Ebook templates (`content.opf`, `*.xhtml`), compare the *structure* of metadata tags against upstream. If upstream adds attributes like `title-type="main"`, the shadow template MUST adopt them to pass validation.
     *   **Asset Manifest:** Ensure `content.opf` manifests only reference files that actually exist in the shadow directory (e.g., do not list fonts if they weren't copied).
+    *   **Shadow Copy Visual Identity (EXACT MATCH):** ALL shadow copies (templates AND Python files) MUST maintain the exact same structure, CSS classes, function order, and nesting as their upstream originals.
+        *   **Templates:** If upstream uses `<div class="dpd">`, shadow MUST use `<div class="dpd">`. If upstream uses a specific loop structure, shadow MUST match it.
+        *   **Python:** Shadow Python files (`*_ru.py`) must maintain the same function order, variable naming, and control flow as the original.
+        *   **Reason:** Visual parity is critical for side-by-side diffing. Do not refactor shadow files to be "better" if it creates visual diff noise.
+        *   **Exception:** Localization content (Russian text, specific extra fields) is preserved, but the *container/structural* logic must match.
 
 ---
 

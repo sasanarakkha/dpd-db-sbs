@@ -1,18 +1,19 @@
 <h3 class="dpd" id="grammar: {{ d.headword }}">грамматика: {{d.headword}}</h3>
-<div class="tertiary">
-    <table class="grammardict" id="grammardict">
+<div class='dpd'>
+    <table class='grammar_dict'>
         <thead>
             <tr>
                 <th id='col1'>грам. ⇅</th>
                 <th id='col2'>⇅</th>
                 <th id='col3'>⇅</th>
                 <th id='col4'>⇅</th>
-                <th id='col5'>⇅</th>
+                <th id='col5'></th>
                 <th id='col6'>слово ⇅</th>
             </tr>
         </thead>
         <tbody>
             {% for item in d.ru_grammar: %}
+            {# item is (headword, pos, components_list) #}
             <tr>
                 {% for comp in item[:-1]: %}
 
@@ -29,7 +30,6 @@
             {% endfor %}
         </tbody>
     </table>
-    <br>
     <p class="dpd-footer">
         For more information, please <a class="dpd-link"
             href='https://digitalpalidictionary.github.io/features/grammardict/'

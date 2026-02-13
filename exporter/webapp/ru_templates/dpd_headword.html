@@ -2,11 +2,11 @@
 
 <h3 class="dpd" id="{{ d.i.lemma_1_ }}">{{d.i.lemma_1}}</h3>
 <div class="dpd summary">
-    <div class="summary-content">
+    <p>
         {{d.ru_pos}}. {% if d.ru_plus_case %} ({{d.ru_plus_case}}) {% endif %}
         {{d.ru_meaning|safe}} {% if d.summary %} [{{d.summary}}] {% endif %}
         {{d.rus_complete|safe}}
-    </div>
+    </p>
 </div>
 
 <!-- button box -->
@@ -66,7 +66,7 @@
         частота</a>
     {% endif %}
 
-    <a class="dpd-button" data-target="feedback_{{d.i.lemma_1_}}">
+    <a class="dpd-button" href="#" data-target="feedback_{{d.i.lemma_1_}}">
         о словаре</a>
 </div>
 
@@ -1123,45 +1123,36 @@
 
 {% if d.i.needs_example_button %}
 <div id="example_{{d.i.lemma_1_}}" name="example-div" class="dpd content hidden">
-    <p>{{d.i.example_1|safe}}</p>
-    <p class="sutta">{{d.i.source_1}} {{d.i.sutta_1}}</p>
-    <p class="dpd-footer">
-        Пожалуйста, подскажите более подходящий
-        <a class="dpd-link"
-            href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Examples&entry.1433863141={{d.app_name}}+{{d.date}}"
-            target="_blank">
-            пример.</a>
-    </p>
-</div>
-{% elif d.i.needs_examples_button %}
-<div id="examples_{{d.i.lemma_1_}}" name="example-div" class="dpd content hidden">
-    {% if d.i.example_1 and d.i.meaning_1 %}
-    <p>
-        {{d.i.example_1|safe}}
-    </p>
-    <p class="sutta">
-        {{d.i.source_1}} {{d.i.sutta_1|safe}}
-    </p>
-    {% endif %}
+    {% elif d.i.needs_examples_button %}
+    <div id="examples_{{d.i.lemma_1_}}" name="example-div" class="dpd content hidden">
+        {% endif %}
 
-    {% if d.i.example_2 and d.i.meaning_1 %}
-    <p>
-        {{d.i.example_2|safe}}
-    </p>
-    <p class="sutta">
-        {{d.i.source_2}} {{d.i.sutta_2|safe}}
-    </p>
-    {% endif %}
+        {% if d.i.example_1 and d.i.meaning_1 %}
+        <p>
+            {{d.i.example_1|safe}}
+        </p>
+        <p class="sutta">
+            {{d.i.source_1}} {{d.i.sutta_1|safe}}
+        </p>
+        {% endif %}
 
-    <p class="dpd-footer">
-        Пожалуйста, подскажите более подходящий
-        <a class="dpd-link"
-            href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Examples&entry.1433863141={{d.app_name}}+{{d.date}}"
-            target="_blank">
-            пример.</a>
-    </p>
-</div>
-{% endif %}
+        {% if d.i.example_2 and d.i.meaning_1 %}
+        <p>
+            {{d.i.example_2|safe}}
+        </p>
+        <p class="sutta">
+            {{d.i.source_2}} {{d.i.sutta_2|safe}}
+        </p>
+        {% endif %}
+
+        <p class="dpd-footer">
+            Пожалуйста, подскажите более подходящий
+            <a class="dpd-link"
+                href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{d.i.id}}%20{{d.i.lemma_link}}&entry.326955045=Examples&entry.1433863141={{d.app_name}}+{{d.date}}"
+                target="_blank">
+                пример.</a>
+        </p>
+    </div>
 
 <!-- conjugation -->
 

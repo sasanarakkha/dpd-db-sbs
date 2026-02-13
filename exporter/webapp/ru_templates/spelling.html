@@ -1,8 +1,11 @@
 <h3 class="dpd" id="spelling: {{ d.headword }}">неправильное написание: {{d.headword}}</h3>
-<div class="tertiary">
-    {% for spelling in d.spellings: %}
+<div class='dpd'>
     <p>
+        {% for spelling in d.spellings: %}
         неправильное написание <b><i>{{spelling}}</i></b>
+        {% if not loop.last: %}
+        <br>
+        {% endif %}
+        {% endfor %}
     </p>
-    {% endfor %}
 </div>

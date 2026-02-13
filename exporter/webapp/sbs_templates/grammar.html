@@ -1,35 +1,36 @@
 <h3 class="dpd" id="grammar: {{ d.headword }}">grammar: {{d.headword}}</h3>
-<div class="tertiary">
-    <table class="grammardict" id="grammardict">
+<div class='dpd'>
+    <table class='grammar_dict'>
         <thead>
             <tr>
                 <th id='col1'>pos ⇅</th>
                 <th id='col2'>⇅</th>
                 <th id='col3'>⇅</th>
                 <th id='col4'>⇅</th>
-                <th id='col5'>⇅</th>
+                <th id='col5'></th>
                 <th id='col6'>word ⇅</th>
             </tr>
         </thead>
         <tbody>
             {% for item in d.grammar: %}
+            {# item is (headword, pos, components_list) #}
             <tr>
-                {% for comp in item[:-1]: %}
-
-                {% if comp == "" %}
-                <td class='col_empty'></td>
-                {% else %}
-                <td>{{comp}}</td>
-                {% endif %}
-
+                <td><b>{{item[1]}}</b></td>
+                
+                {% for comp in item[2]: %}
+                    {% if comp == "" %}
+                    <td class='col_empty'></td>
+                    {% else %}
+                    <td>{{comp}}</td>
+                    {% endif %}
                 {% endfor %}
+
                 <td>of</td>
-                <td><a class="jump" href="#{{item[-1]}}">{{item[-1]}}</a></td>
+                <td>{{item[0]}}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-    <br>
     <p class="dpd-footer">
         For more information, please <a class="dpd-link"
             href='https://digitalpalidictionary.github.io/features/grammardict/'

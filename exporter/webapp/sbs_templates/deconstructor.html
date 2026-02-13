@@ -1,9 +1,11 @@
 <h3 class="dpd" id="deconstructor: {{ d.headword }}">deconstructor: {{d.headword}}</h3>
-<div class="tertiary">
-  {% for deconstruction in d.deconstructions: %}
-  <p>{{ deconstruction }}</p>
-  {% endfor %}
-  <br />
+<div class="dpd">
+  <p>
+    {% for deconstruction in d.deconstructions: %} {{deconstruction}} {% if not
+    loop.last: %}
+    <br />
+    {% endif %} {% endfor %}
+  </p>
   <p class="dpd-footer">
     These word breakups are code-generated. For more information,
     <a class="dpd-link" href="https://digitalpalidictionary.github.io/features/deconstructor/" target="_blank">read the

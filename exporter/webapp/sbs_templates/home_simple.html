@@ -16,16 +16,14 @@
 </head>
 
 <body>
-    <div class="main-pane">
-        <div class="summary-results">
-            <h3 class="dpd">Summary</h3>
-            {{ summary|safe }}
-            <hr class="dpd">
-        </div>
-        <div id="dpd-results">
-            {{ dpd_results|safe }}
-        </div>
+    <div class=" summary-results">
+    <h3 class="dpd">Summary</h3>
+    {{ summary|safe}}
+    <hr class="dpd">
     </div>
-</body>
+    <div class="dpd-results" id="dpd-results">
+        {{ dpd_results|safe }}
+    </div>
+    </body>
 
 </html>

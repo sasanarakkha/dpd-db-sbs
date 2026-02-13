@@ -173,12 +173,12 @@ async function performSearch(addHistory = true) {
         if (summaryResults) {
           if (data.summary_html && data.summary_html.trim() !== "") {
             if (language === "en") {
-              summaryResults.innerHTML = "<h3>Summary</h3>";
+              summaryResults.innerHTML = '<h3 class="dpd">Summary</h3>';
             } else {
-              summaryResults.innerHTML = "<h3>Сводка</h3>";
+              summaryResults.innerHTML = '<h3 class="dpd">Сводка</h3>';
             }
             summaryResults.innerHTML += data.summary_html;
-            summaryResults.innerHTML += "<hr>";
+            summaryResults.innerHTML += "<hr class=\"dpd\">";
           } else {
             summaryResults.innerHTML = "";
           }
@@ -1261,7 +1261,7 @@ function highlightInflections(searchTerm) {
       let modified = false;
       const newParts = parts.map(function (part) {
         // Create a temporary element to get the text content of this part
-        tempElement = document.createElement("div");
+        const tempElement = document.createElement("div");
         tempElement.innerHTML = part;
         const partText = tempElement.textContent || "";
 
@@ -1341,20 +1341,20 @@ function updateDropdown(query) {
 
   // Find matches using binary search
   let index = findFirstMatch(appState.searchIndex, normalizedQuery);
-  
+
   if (index !== -1) {
     while (index < appState.searchIndex.length) {
       const entry = appState.searchIndex[index];
       const parts = entry.split("|");
       const key = parts[0];
-      
+
       if (!key.startsWith(normalizedQuery)) break;
-      
+
       // Add all Unicode values associated with this ASCII key
       for (let i = 1; i < parts.length; i++) {
         matches.push(parts[i]);
       }
-      
+
       if (matches.length >= 100) break;
       index++;
     }

@@ -41,45 +41,18 @@ def get_variant_manager() -> VariantManager:
 
 
 def make_dpd_html_ru(
-
-
     q: str,
-
-
     pth: ProjectPaths,
-
-
     rupth: RuPaths,
-
-
     templates,
-
-
     roots_count_dict,
-
-
     headwords_clean_set,
-
-
     ascii_to_unicode_dict,
-
-
 ) -> tuple[str, str]:
-
-
     retries = 3
-
-
     vm = get_variant_manager()
 
-
-
-
-
     for attempt in range(retries):
-
-
-
         try:
             with get_db_session(pth.dpd_db_path) as db_session:
                 with db_session.no_autoflush:
@@ -99,10 +72,10 @@ def make_dpd_html_ru(
                     if main_form:
                         d = ManualVariantData(variant=q, main=main_form)
                         summary_html += templates.get_template(
-                            "manual_variant_summary.html"
+                            pth.template_manual_variant_summary
                         ).render(d=d)
                         dpd_html += templates.get_template(
-                            "manual_variant.html"
+                            pth.template_manual_variant
                         ).render(d=d)
 
                     # first try the lookup table, if no results, then try other options
@@ -127,10 +100,10 @@ def make_dpd_html_ru(
                                     fs = get_family_set(i)
                                     d = HeadwordData(i, fc, fi, fs)
                                     summary_html += templates.get_template(
-                                        "dpd_summary.html"
+                                        pth.template_dpd_summary
                                     ).render(d=d)
                                     dpd_html += templates.get_template(
-                                        "dpd_headword.html"
+                                        pth.template_dpd_headword
                                     ).render(d=d)
 
                             # roots
@@ -293,6 +266,15 @@ def make_dpd_html_ru(
             db_session.query(Lookup).filter(Lookup.lookup_key.ilike(q)).all()
         )
 
+        # Check manual variants from TSV first
+        main_form = vm.get_main(q)
+        if main_form:
+            d = ManualVariantData(variant=q, main=main_form)
+            summary_html += templates.get_template(
+                pth.template_manual_variant_summary
+            ).render(d=d)
+            dpd_html += templates.get_template(pth.template_manual_variant).render(d=d)
+
         # first try the lookup table, if no results, then try other options
 
         if lookup_results:
@@ -380,6 +362,7 @@ def make_dpd_html_ru(
                         d=d
                     )
 
+                # grammar
                 if lookup_result.grammar:
                     d = GrammarData(lookup_result)
                     summary_html += templates.get_template(
