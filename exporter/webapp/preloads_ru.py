@@ -1,3 +1,4 @@
+import re
 from sqlalchemy.orm import Session, defer
 
 from db.models import DpdHeadword, Lookup
@@ -7,19 +8,9 @@ def make_headwords_clean_set_ru(db_session: Session) -> set[str]:
     """Make a set of Pāḷi headwords and English and Russian meanings."""
 
     # add headwords
-    results = (
-        db_session.query(DpdHeadword)
-        .options(
-            defer(DpdHeadword.inflections_html),
-            defer(DpdHeadword.freq_html),
-            defer(DpdHeadword.inflections_sinhala),
-            defer(DpdHeadword.inflections_devanagari),
-            defer(DpdHeadword.inflections_thai),
-            defer(DpdHeadword.freq_data),
-        )
-        .all()
-    )
-    headwords_clean_set = set([i.lemma_clean for i in results])
+    # Optimization: Query only lemma_1 column to save memory
+    results = db_session.query(DpdHeadword.lemma_1).all()
+    headwords_clean_set = set([re.sub(r" \d.*$", "", i[0]) for i in results])
 
     # add all english and russian meanings
     # Optimization: Query only lookup_key column to save memory
