@@ -40,40 +40,7 @@
         "kathā": 19853,
         "sukhaṃ": 63457
     },
-    "matched": {
-        "ajapālanigrodhamūlā": {
-            "id": 1143,
-            "sentence": [
-                "pli-tv-kd1:3.1.1",
-                "Atha kho bhagavā sattāhassa accayena tamhā samādhimhā vuṭṭhahitvā ajapālanigrodhamūlā yena mucalindo tenupasaṅkami, upasaṅkamitvā mucalindamūle sattāhaṁ ekapallaṅkena nisīdi vimuttisukhapaṭisaṁvedī. ",
-                "After seven days, the Buddha came out from that stillness and went from the goatherd’s banyan tree to a powderpuff tree. There too he sat cross-legged for seven days without moving, experiencing the bliss of freedom. "
-            ]
-        },
-        "mucalindo": {
-            "id": 52818,
-            "sentence": [
-                "pli-tv-kd1:3.1.1",
-                "Atha kho bhagavā sattāhassa accayena tamhā samādhimhā vuṭṭhahitvā ajapālanigrodhamūlā yena mucalindo tenupasaṅkami, upasaṅkamitvā mucalindamūle sattāhaṁ ekapallaṅkena nisīdi vimuttisukhapaṭisaṁvedī. ",
-                "After seven days, the Buddha came out from that stillness and went from the goatherd’s banyan tree to a powderpuff tree. There too he sat cross-legged for seven days without moving, experiencing the bliss of freedom. "
-            ]
-        },
-        "uparimuddhani": {
-            "id": 16007,
-            "sentence": [
-                "pli-tv-kd1:3.2.2",
-                "Atha kho mucalindo nāgarājā sakabhavanā nikkhamitvā bhagavato kāyaṁ sattakkhattuṁ bhogehi parikkhipitvā uparimuddhani mahantaṁ phaṇaṁ karitvā aṭṭhāsi—",
-                "Mucalinda, the dragon king, came out from his abode. He encircled the body of the Buddha with seven coils and spread his large hood over his head, thinking, "
-            ]
-        },
-        "udā": {
-            "id": 15003,
-            "sentence": [
-                "VIN3.1.1",
-                "mahākhandhako, bodhikathā",
-                "1. [udā. 1 ādayo] tena samayena buddho bhagavā uruvelāyaṃ viharati najjā nerañjarāya tīre bodhirukkhamūle paṭhamābhisambuddho. "
-            ]
-        }
-    },
+    "matched": {},
     "new_word": {
         "mucalindo": [
             "pli-tv-kd1:3.2.2",
@@ -87,6 +54,11 @@
         "udā",
         "ādayo",
         "ajapālanigrodhamūle",
+        "nikkasāvo",
+        "ajapālanigrodhamūlā",
+        "mucalindo",
+        "uparimuddhani",
+        "udā",
         "nikkasāvo"
     ]
 }

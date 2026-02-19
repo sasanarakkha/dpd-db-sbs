@@ -17,7 +17,7 @@ class DpdDatatable(ft.DataTable):
         super().__init__(
             columns=columns,
             rows=rows,
-            data_text_style=ft.TextStyle(size=16, color=ft.Colors.GREY_300),
+            data_text_style=ft.TextStyle(size=12, color=ft.Colors.GREY_300),
             border=ft.border.all(2, ft.Colors.BLACK),
             horizontal_lines=ft.border.BorderSide(1, ft.Colors.GREY_300),
             vertical_lines=ft.border.BorderSide(1, ft.Colors.GREY_300),
@@ -25,7 +25,7 @@ class DpdDatatable(ft.DataTable):
             column_spacing=20,
             horizontal_margin=10,
             heading_text_style=ft.TextStyle(
-                color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD, size=16
+                color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD, size=12
             ),
             heading_row_height=30,
             data_row_min_height=30,
@@ -55,7 +55,7 @@ class CellTextField(ft.TextField):
             border_color=ft.Colors.TRANSPARENT,
             text_align=ft.TextAlign.LEFT,
             text_style=ft.TextStyle(
-                size=16,
+                size=12,
                 color=ft.Colors.GREY_300,
             ),
         )

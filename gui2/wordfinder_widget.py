@@ -6,7 +6,7 @@ LABEL_WIDTH = 250
 BUTTON_WIDTH = 250
 LABEL_COLOUR = ft.Colors.GREY_500
 HIGHLIGHT_COLOUR = ft.Colors.BLUE_200
-TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=14)
+TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=10)
 
 
 class WordFinderWidget:
@@ -21,12 +21,12 @@ class WordFinderWidget:
             "wordfinder",
             color=ft.Colors.GREY_500,
             width=150,
-            size=16,
+            size=12,
         )
 
         self.search_field = ft.TextField(
             autofocus=True,
-            text_style=ft.TextStyle(color=LABEL_COLOUR, size=14),
+            text_style=ft.TextStyle(color=LABEL_COLOUR, size=10),
             label="Wordfinder",
             label_style=TEXT_FIELD_LABEL_STYLE,
             value=self.initial_word or "",
@@ -56,7 +56,7 @@ class WordFinderWidget:
             label="Search Type",
             label_style=TEXT_FIELD_LABEL_STYLE,
             width=300,
-            text_size=14,
+            text_size=10,
             border_color=ft.Colors.BLUE_200,
             border_radius=20,
         )

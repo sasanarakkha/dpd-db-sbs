@@ -88,41 +88,84 @@ elif [[ "$sync_choice" == "2" ]]; then
     git add . || exit 1
     COMMIT_MESSAGE="${COMMIT_MESSAGE_PREFIX}selective update${COMMIT_MESSAGE_SUFFIX}"
 elif [[ "$sync_choice" == "3" ]]; then
-    echo "🔄 Performing Single Folder Sync..."
-    echo "Available folders in root:"
-    # List only directories in the root of the repository
-    find . -maxdepth 1 -type d -not -path '*/.*' -not -path '.' | sed 's|./||' | sort
-    echo ""
-    read -r -p "Enter the folder name to sync: " target_folder
-    
-    if [ -z "$target_folder" ]; then
-        echo "❌ No folder name provided. Exiting."
-        exit 1
+    SYNCED_ITEMS=()
+    while true; do
+        echo "🔄 Performing Single Folder Sync..."
+        echo "Available folders in root:"
+        # List only directories in the root of the repository
+        find . -maxdepth 1 -type d -not -path '*/.*' -not -path '.' | sed 's|./||' | sort
+        echo ""
+        read -r -p "Enter the folder name to sync (or / for root files): " target_folder
+        
+        if [ -z "$target_folder" ]; then
+            echo "⚠️ No input provided. Skipping."
+        elif [[ "$target_folder" == "/" ]]; then
+            echo "  ➡️ Syncing root files from as_upstream..."
+            # Get list of files (blobs) in the root of as_upstream
+            ROOT_FILES=$(git ls-tree as_upstream -- | grep "blob" | awk '{print $4}' || true)
+            
+            if [ -z "$ROOT_FILES" ]; then
+                echo "⚠️ No root files found in as_upstream."
+            else
+                echo "    - Processing root files..."
+                # shellcheck disable=SC2086
+                git checkout as_upstream -- $ROOT_FILES || exit 1
+                # shellcheck disable=SC2086
+                git add $ROOT_FILES || exit 1
+                SYNCED_ITEMS+=("root files")
+            fi
+        else
+            if ! git rev-parse --verify "as_upstream:${target_folder}" >/dev/null 2>&1; then
+                echo "❌ Folder '$target_folder' does not exist in as_upstream branch."
+            else
+                echo "  ➡️ Checking out '$target_folder' from as_upstream..."
+                git checkout as_upstream -- "$target_folder" || exit 1
+                
+                echo "  ➕ Staging changes for '$target_folder'..."
+                git add "$target_folder" || exit 1
+                SYNCED_ITEMS+=("$target_folder")
+            fi
+        fi
+
+        echo ""
+        read -r -p "Add another folder? [y/Enter for continue]: " another
+        if [[ ! "$another" =~ ^[Yy]$ ]]; then
+            break
+        fi
+        echo ""
+    done
+
+    if [ ${#SYNCED_ITEMS[@]} -eq 0 ]; then
+        echo "⚠️ No items were synced. Exiting."
+        exit 0
     fi
 
-    if ! git rev-parse --verify "as_upstream:${target_folder}" >/dev/null 2>&1; then
-        echo "❌ Folder '$target_folder' does not exist in as_upstream branch. Exiting."
-        exit 1
-    fi
-
-    echo "  ➡️ Checking out '$target_folder' from as_upstream..."
-    git checkout as_upstream -- "$target_folder" || exit 1
-    
-    echo "  ➕ Staging changes for '$target_folder'..."
-    git add "$target_folder" || exit 1
-    COMMIT_MESSAGE="${COMMIT_MESSAGE_PREFIX}update $target_folder${COMMIT_MESSAGE_SUFFIX}"
+    # Create comma-separated list for commit message
+    ITEMS_LIST=$(IFS=,; echo "${SYNCED_ITEMS[*]}")
+    COMMIT_MESSAGE="${COMMIT_MESSAGE_PREFIX}update $ITEMS_LIST${COMMIT_MESSAGE_SUFFIX}"
 else
     echo "❌ Invalid choice: $sync_choice. Exiting."
     exit 1
 fi
 
-# # Run font scaling helper
+# Run font scaling helper (keep disabled for now!)
 # echo "ℹ️ Running font scaling helper..."
 # uv run python gui2/font_scaling_helper.py || { echo "⚠️ Font scaling helper failed."; exit 1; }
 
 # Add changes again to include font scaling modifications
 echo "  ➕ Staging all changes (including scaled fonts)..."
 git add . || exit 1
+
+echo ""
+echo "--------------------------------------------------"
+echo "🔍 Review staged changes:"
+git status --short
+echo "--------------------------------------------------"
+read -r -p "Press [Enter] to commit or 'q' to quit: " confirm_commit
+if [[ "$confirm_commit" == "q" ]]; then
+    echo "❌ Sync cancelled by user. No changes committed."
+    exit 0
+fi
 
 # Commit changes with date
 echo "📝 Committing changes to sbs-ru..."

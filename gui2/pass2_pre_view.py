@@ -11,7 +11,7 @@ from tools.cst_source_sutta_example import CstSourceSuttaExample
 
 LABEL_COLOUR = ft.Colors.GREY_500
 HIGHLIGHT_COLOUR = ft.Colors.BLUE_200
-TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=14)
+TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=10)
 
 
 class Pass2PreProcessView(ft.Column):
@@ -59,7 +59,7 @@ class Pass2PreProcessView(ft.Column):
             label_style=TEXT_FIELD_LABEL_STYLE,
             options=self.book_options,
             width=300,
-            text_size=19,
+            text_size=14,
             border_color=HIGHLIGHT_COLOUR,
             border_radius=20,
         )
@@ -309,7 +309,7 @@ class Pass2PreProcessView(ft.Column):
                         [
                             ft.Text(
                                 "Whats the meaning of the new word?",
-                                size=19,
+                                size=14,
                                 color=ft.Colors.GREY_500,
                             )
                         ]

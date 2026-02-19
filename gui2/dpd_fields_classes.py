@@ -83,7 +83,7 @@ class DpdText(ft.TextField):
         super().__init__(
             expand=False,
             color=ft.Colors.GREY_500,
-            text_size=22,
+            text_size=16,
             width=500,
             read_only=True,
             border=ft.InputBorder.NONE,

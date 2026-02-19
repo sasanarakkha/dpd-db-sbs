@@ -165,3 +165,21 @@ server-reload:
     sleep 2
     mkdir -p logs
     nohup uv run uvicorn exporter.webapp.main:app --host 0.0.0.0 --port 8080 > "logs/$(date '+%Y-%m-%d_%H-%M-%S').uvicorn.log" 2>&1 &
+
+# ===== CONFIGURATION =====
+
+# Turn off deconstructor premade mode
+nodecon:
+    uv run python -c "from tools.configger import config_update; config_update('deconstructor', 'use_premade', 'yes')"
+
+# Turn on deconstructor premade mode
+decon:
+    uv run python -c "from tools.configger import config_update; config_update('deconstructor', 'use_premade', 'no')"
+
+# Set data limit to 100
+limit100:
+    uv run python -c "from tools.configger import config_update; config_update('dictionary', 'data_limit', '100')"
+
+# Set data limit to 0 (no limit)
+limit0:
+    uv run python -c "from tools.configger import config_update; config_update('dictionary', 'data_limit', '0')"

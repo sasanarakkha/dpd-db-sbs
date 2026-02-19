@@ -55,14 +55,14 @@ class DpdCommentaryField(ft.Column):
             width=200,
             on_submit=self.click_commentary_search,
             label="search for",
-            label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=14),
+            label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=10),
         )
         self.search_field_2 = ft.TextField(
             "",
             width=200,
             on_submit=self.click_commentary_search,
             hint_text="which contains",
-            hint_style=ft.TextStyle(color=ft.Colors.GREY_700, size=14),
+            hint_style=ft.TextStyle(color=ft.Colors.GREY_700, size=10),
         )
 
         # Toggle Button
@@ -222,7 +222,7 @@ class DpdCommentaryField(ft.Column):
                             [
                                 ft.Text(
                                     f"{i.nikaya}, {i.book}, {i.title}, {i.subhead}",
-                                    size=14,
+                                    size=10,
                                     color=ft.Colors.GREY_500,
                                     selectable=True,
                                 )

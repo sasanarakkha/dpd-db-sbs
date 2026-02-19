@@ -26,9 +26,14 @@ class AIManager:
         ("gemini", "gemini-2.5-flash", 12),
         ("gemini", "gemini-2.5-flash-lite", 6),
         # openrouter
-        ("openrouter", "google/gemini-2.0-flash-001", 5),
-        ("openrouter", "qwen/qwen-turbo", 5),
-        ("openrouter", "mistralai/mistral-7b-instruct-v0.1", 5),
+        # ("openrouter", "google/gemini-2.5-flash-001", 5),
+        # ("openrouter", "qwen/qwen-turbo", 5),
+        # ("openrouter", "mistralai/mistral-7b-instruct-v0.1", 5),
+        ("openrouter", "deepseek/deepseek-v3.2", 5),
+        ("openrouter", "openrouter/aurora-alpha", 5),
+        # openai
+        ("openai", "gpt-4.1", 5),
+        ("openai", "gpt-4o-mini", 5),
     ]
 
     # Grounded models for internet searches

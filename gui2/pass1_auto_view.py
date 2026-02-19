@@ -8,7 +8,7 @@ COLUMN_WIDTH: int = 700
 BUTTON_WIDTH = 250
 LABEL_COLOUR = ft.Colors.GREY_500
 HIGHLIGHT_COLOUR = ft.Colors.BLUE_200
-TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=14)
+TEXT_FIELD_LABEL_STYLE = ft.TextStyle(color=LABEL_COLOUR, size=10)
 
 
 class Pass1AutoView(ft.Column):
@@ -47,7 +47,7 @@ class Pass1AutoView(ft.Column):
             autofocus=True,
             options=self.book_options,
             width=300,
-            text_size=19,
+            text_size=14,
             border_color=ft.Colors.BLUE_200,
             border_radius=20,
         )
@@ -63,7 +63,7 @@ class Pass1AutoView(ft.Column):
             autofocus=True,
             options=self.ai_model_options,
             width=300,
-            text_size=19,
+            text_size=14,
             border_color=ft.Colors.BLUE_200,
             border_radius=20,
             menu_width=700,
