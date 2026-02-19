@@ -23,8 +23,8 @@ class AIManager:
     # Ordered list of (provider, model, delay_seconds) tuples as fallback defaults
     DEFAULT_MODELS: list[tuple[str, str, int]] = [
         # gemini
-        ("gemini", "gemini-2.0-flash", 12),
-        ("gemini", "gemini-2.0-flash-lite", 6),
+        ("gemini", "gemini-2.5-flash", 12),
+        ("gemini", "gemini-2.5-flash-lite", 6),
         # openrouter
         ("openrouter", "google/gemini-2.0-flash-001", 5),
         ("openrouter", "qwen/qwen-turbo", 5),
@@ -201,7 +201,7 @@ if __name__ == "__main__":
         prompt=prompt,
         prompt_sys=sys_prompt,
         provider_preference="openrouter",
-        model="qwen/qwen3-235b-a22b:free",
+        model="xiaomi/mimo-v2-flash:free",
     )
     pr.info(f"Status: {open_router_response.status_message}")
     pr.info(f"Content: {open_router_response.content}")
