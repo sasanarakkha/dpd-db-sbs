@@ -74,7 +74,7 @@ while true; do
 done
 
 while true; do
-    echo -ne "\033[1;34m copy DPD + TPR for class to the /Sharing between users/For A. Devamitta/temp/ folder? \033[0m"
+    echo -ne "\033[1;34m copy DPD + TPR for class to the /Sharing between users/For A Deva/for_classes/ folder? \033[0m"
     read -n 1 -s user_input
     echo
     if [[ $user_input == "q" ]]; then

@@ -32,8 +32,8 @@ class AIManager:
         ("openrouter", "deepseek/deepseek-v3.2", 5),
         ("openrouter", "openrouter/aurora-alpha", 5),
         # openai
-        ("openai", "gpt-4.1", 5),
-        ("openai", "gpt-4o-mini", 5),
+        ("openai", "gpt-5.1", 5),
+        ("openai", "gpt-5-mini", 5),
     ]
 
     # Grounded models for internet searches

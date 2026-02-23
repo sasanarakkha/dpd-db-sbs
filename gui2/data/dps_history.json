@@ -1,5 +1,29 @@
 [
     {
+        "id": 40248,
+        "lemma_1": "paṭikkamana 1"
+    },
+    {
+        "id": 24986,
+        "lemma_1": "gilānātiritta"
+    },
+    {
+        "id": 18687,
+        "lemma_1": "opadhika"
+    },
+    {
+        "id": 10736,
+        "lemma_1": "avītarāga"
+    },
+    {
+        "id": 57828,
+        "lemma_1": "sattāhaṃ"
+    },
+    {
+        "id": 20918,
+        "lemma_1": "kāṇamātusikkhāpada"
+    },
+    {
         "id": 18279,
         "lemma_1": "okāsa 2"
     },
@@ -74,29 +98,5 @@
     {
         "id": 88622,
         "lemma_1": "amagga 2"
-    },
-    {
-        "id": 20404,
-        "lemma_1": "kammunā"
-    },
-    {
-        "id": 18315,
-        "lemma_1": "okkanta"
-    },
-    {
-        "id": 39081,
-        "lemma_1": "pakkamitabba 2"
-    },
-    {
-        "id": 39080,
-        "lemma_1": "pakkamitabba 1"
-    },
-    {
-        "id": 88621,
-        "lemma_1": "vattanta 2"
-    },
-    {
-        "id": 30165,
-        "lemma_1": "tassa 3"
     }
 ]

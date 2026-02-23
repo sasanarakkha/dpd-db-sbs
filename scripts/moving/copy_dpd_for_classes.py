@@ -39,7 +39,7 @@ dest_dir: Path = (
     / "filesrv1"
     / "share1"
     / "Sharing between users"
-    / "For A. Devamitta"
+    / "For A Deva"
     / "for_classes"
 )
 

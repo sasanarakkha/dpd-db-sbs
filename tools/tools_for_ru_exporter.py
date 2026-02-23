@@ -65,6 +65,26 @@ def make_ru_meaning_simpl(i: DpdHeadword) -> str:
         return ""
 
 
+def make_ru_meaning_no_bold(i: DpdHeadword) -> str:
+    """Uses only DpdHeadword input. Compile html of ru_meaning and literal meaning, or return ru_meaning_raw.
+    ru_meaning in regular text, or return english meaning"""
+
+    if i.ru is None:
+        ru_meaning: str = f"{make_meaning_combo(i)}"
+        return ru_meaning
+
+    elif i.ru.ru_meaning:
+        ru_meaning: str = i.ru.ru_meaning
+        if i.ru.ru_meaning_lit:
+            ru_meaning += f"; досл. {i.ru.ru_meaning_lit}"
+        return ru_meaning
+    elif i.ru.ru_meaning_raw:
+        ru_meaning: str = i.ru.ru_meaning_raw
+        return ru_meaning
+    else:
+        return ""
+
+
 def make_short_ru_meaning(i: DpdHeadword, ru: Russian) -> str:
     """Extract first synonym from ru_meaning or ru_meaning_raw"""
     if ru is None:

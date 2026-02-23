@@ -34,20 +34,20 @@ def main():
             print(f"Warning: {processed_file} is empty or invalid. Starting fresh.")
 
     # Filter items
-    all_with_comments = [item for item in corrections if item.get("comment")]
-    total_with_comments = len(all_with_comments)
+    all_with_comment_add = [item for item in corrections if item.get("comment_add")]
+    total_with_comment_add = len(all_with_comment_add)
 
     to_process = [
-        item for item in all_with_comments if item.get("id") not in processed_ids
+        item for item in all_with_comment_add if item.get("id") not in processed_ids
     ]
 
     if not to_process:
         print(
-            f"No new corrections with comments to process. (Total with comments: {total_with_comments})"
+            f"No new corrections with 'comment_add' to process. (Total with comment_add: {total_with_comment_add})"
         )
         return
 
-    print(f"Total entries with comments: {total_with_comments}")
+    print(f"Total entries with 'comment_add': {total_with_comment_add}")
     print(f"Remaining to process: {len(to_process)}\n")
 
     newly_processed = []
@@ -61,7 +61,7 @@ def main():
 
             print("-" * 40)
             print(
-                f"Progress: {i + 1}/{len(to_process)} (Total with comments: {total_with_comments})"
+                f"Progress: {i + 1}/{len(to_process)} (Total with 'comment_add': {total_with_comment_add})"
             )
 
             # Print Context

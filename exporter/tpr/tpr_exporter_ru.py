@@ -27,7 +27,7 @@ from tools.printer import printer as pr
 from tools.tsv_read_write import read_tsv
 
 from tools.tools_for_ru_exporter import (
-    make_ru_meaning_simpl,
+    make_ru_meaning_no_bold,
 )
 
 
@@ -95,7 +95,7 @@ def generate_tpr_data(g: GlobalVars):
             html_string += f"""<td>/{i.lemma_ipa}/</td></tr>"""
 
             if i.ru:
-                ru_meaning = make_ru_meaning_simpl(i)
+                ru_meaning = make_ru_meaning_no_bold(i)
                 if ru_meaning:
                     html_string += """<tr><th valign="top">Русский</th>"""
                     html_string += f"""<td>{ru_meaning}</td></tr>"""
