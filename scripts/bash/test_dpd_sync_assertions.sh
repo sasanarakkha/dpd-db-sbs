@@ -21,7 +21,7 @@ git add db/models.py exporter/goldendict/templates/mock_template.html
 git commit -m "chore(test): mock changes for testing assertions"
 
 echo "Running assertions..."
-bash scripts/cl_dps/dpd-sync-assertions.sh "$PREV_SHA"
+bash scripts/bash/dpd-sync-assertions.sh "$PREV_SHA"
 
 echo "Cleaning up mock changes..."
 git reset --hard HEAD^

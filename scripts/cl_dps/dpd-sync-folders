@@ -162,8 +162,8 @@ echo "🔍 Review staged changes:"
 git status --short
 echo "--------------------------------------------------"
 
-if [ -f "$PROJECT_DIR/scripts/cl_dps/dpd-sync-assertions.sh" ]; then
-    bash "$PROJECT_DIR/scripts/cl_dps/dpd-sync-assertions.sh" "$SBR_RU_ORIGINAL_SHA"
+if [ -f "$PROJECT_DIR/scripts/bash/dpd-sync-assertions.sh" ]; then
+    bash "$PROJECT_DIR/scripts/bash/dpd-sync-assertions.sh" "$SBR_RU_ORIGINAL_SHA"
 fi
 
 read -r -p "Press [Enter] to commit or 'q' to quit: " confirm_commit
