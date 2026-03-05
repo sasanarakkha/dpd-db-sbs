@@ -257,6 +257,20 @@ Maintaining parity between English (`docs/`) and Russian (`docs_rus/`) documenta
 ### 5. Automated Indexing
 - Run `python3 scripts/rus_exporter/docs_add_indexes.py` after updating documentation to ensure navigation indexes and links are correctly generated for the Russian site.
 
+## 🛑 Systematic Handling of Common Errors
+
+### 1. Shadow Copy Conflicts
+- **Symptom:** Upstream modifies a function but the shadow copy doesn't receive the update, causing `AttributeError` or logic divergence.
+- **Resolution:** Run `uv run pytest tests/test_shadow_parity.py`. It will flag missing imports and classes/functions in shadow copies compared to their upstream sources. Port the changes explicitly.
+
+### 2. Missing Dependencies
+- **Symptom:** Upstream adds new Mako templates or imports new modules that the shadow copy requires to function.
+- **Resolution:** `dpd-sync-assertions.sh` runs automatically after the Phase 1 bash script to flag new upstream templates in `/templates/` directories. Always create corresponding localized versions in `/ru_templates/` or `/sbs_templates/`. Similarly, `test_shadow_parity.py` will catch missing Python module imports.
+
+### 3. DB Schema Breaks
+- **Symptom:** Upstream renames a column or alters a model that the fork's `Russian` or `SBS` tables depend on.
+- **Resolution:** Check the `dpd-sync-assertions.sh` warning for `db/models.py`. Manually inspect the diff (`git diff as_upstream db/models.py`) and ensure relationships like `.ru` and `.sbs` remain valid.
+
 ## Manual Sync Checklist
 
 Follow these steps when performing an upstream sync:
