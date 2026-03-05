@@ -26,4 +26,4 @@ This file tracks all major tracks for the project. Each track has its own detail
 ---
 
 - [x] **Track: Improve Upstream Sync Rehearsal Template**
-*Link: [./tracks/upstream_sync_template_20260305/](./tracks/upstream_sync_template_20260305/)*
+*Link: [./archive/upstream_sync_template_20260305/](./archive/upstream_sync_template_20260305/)*
