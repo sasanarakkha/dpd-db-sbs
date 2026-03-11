@@ -4,7 +4,7 @@
 - [ ] Task: Pre-Sync Branch Check
     - [ ] Verify there are no uncommitted changes in the `sbs-ru` branch.
 - [ ] Task: Execute Sync Script
-    - [ ] Run `bash scripts/cl_dps/dpd-sync-folders`.
+    - [ ] Run `bash scripts/bash/full_sync.sh`.
     - [ ] Select **Option 2 (Selective Sync)**.
     - [ ] **Update Submodules**: Run `git submodule init && git submodule update`.
     - [ ] **AUTO-COMMIT (COMMIT 1/2)**: The sync script performs an automated commit here, immediately preceded by `dpd-sync-assertions.sh` output.

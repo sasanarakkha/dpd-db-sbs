@@ -276,27 +276,26 @@ Maintaining parity between English (`docs/`) and Russian (`docs_rus/`) documenta
 Follow these steps when performing an upstream sync:
 
 ### Phase 1: Automated Pull
-1. [ ] Run `bash scripts/cl_dps/dpd-sync-folders`.
-2. [ ] Choose **Option 2 (Selective Sync)**.
-3. [ ] **Update Submodules**: Run `git submodule init && git submodule update` to ensure resources (like `sc-data`) are up to date.
-4. [ ] Verify that `sbs-ru` is updated and modified files listed in the registry are preserved.
+1. [ ] Run `bash scripts/bash/full_sync.sh`.
+2. [ ] **Update Submodules**: Run `git submodule init && git submodule update` to ensure resources (like `sc-data`) are up to date.
+3. [ ] Verify that `sbs-ru` is updated and modified files listed in the registry are preserved.
 
 ### Phase 2: Manual Porting (Reasoning Phase)
-4. [ ] **`modified_upstream_files`**: For each file, compare `sbs-ru` version against `as_upstream`. If upstream has new features or bug fixes, manually integrate them into the fork's version.
-5. [ ] **`db/models.py`**: Pay special attention to core schema changes.
-6. [ ] **Shadow Copies**: For each entry in `russian_copies` and `sbs_copies`, check if their **source (the 'value' in the registry)** has changed significantly compared to the **shadow copy (the 'key' in the registry)**. If so, port those logic changes to the shadow copy.
-7. [ ] **Documentation Parity**:
+1. [ ] **`modified_upstream_files`**: For each file, compare `sbs-ru` version against `as_upstream`. If upstream has new features or bug fixes, manually integrate them into the fork's version.
+2. [ ] **`db/models.py`**: Pay special attention to core schema changes.
+3. [ ] **Shadow Copies**: For each entry in `russian_copies` and `sbs_copies`, check if their **source (the 'value' in the registry)** has changed significantly compared to the **shadow copy (the 'key' in the registry)**. If so, port those logic changes to the shadow copy.
+4. [ ] **Documentation Parity**:
     - [ ] List all files in `docs/` that don't have a counterpart in `docs_rus/`.
     - [ ] Create missing files in `docs_rus/` (at least as placeholders).
     - [ ] Update `mkdocs_ru.yaml` navigation to match `mkdocs.yaml`.
     - [ ] Run `python3 scripts/rus_exporter/docs_add_indexes.py`.
-8. [ ] **UI Scaling**: Verify `gui2/font_scaling_helper.py` was executed correctly (it is part of the sync script).
+5. [ ] **UI Scaling**: Verify `gui2/font_scaling_helper.py` was executed correctly (it is part of the sync script).
     - **Protocol:** The sync script MUST run `git add .` AFTER the font scaling script so the Phase 1 commit is clean.
     - **Verification:** Run `git diff HEAD^ gui2/` to confirm font sizes are scaled (e.g., 10 -> 14).
-9. [ ] **Verification Tests**:
+6. [ ] **Verification Tests**:
     - Run `uv run pytest tests/test_dps_imports.py` to verify that all critical DPS modules are intact and dependencies are met.
     - Run `uv run pytest tests/test_dps_logic.py` to verify that key family generation and lookup logic is preserved.
     - Run `uv run pytest tests/test_dps_exporters_functional.py` to verify the control flow of critical exporters and build scripts.
     - Run `uv run pytest tests/test_dps_docs_parity.py` to verify that `docs/` and `docs_rus/` are perfectly synced (except for `dpd_rus.md`).
-10. [ ] **Commit Changes**: Once manual merges are complete, perform a final commit with a descriptive message (e.g., `sync: manual merge of upstream updates` with the current date, same as done by the sync script).
-11. [ ] **Update Registry**: If new shadow copies were created during the process, add them to `dps_sync_registry.json`.
+7. [ ] **Commit Changes**: Once manual merges are complete, perform a final commit with a descriptive message (e.g., `sync: manual merge of upstream updates` with the current date, same as done by the sync script).
+8. [ ] **Update Registry**: If new shadow copies were created during the process, add them to `dps_sync_registry.json`.
