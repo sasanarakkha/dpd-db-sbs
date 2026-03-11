@@ -21,6 +21,7 @@ DPD_links=(
     "https://github.com/digitalpalidictionary/dpd-db/releases/latest/download/dpd-kobo.zip"
     "https://github.com/digitalpalidictionary/dpd-db/releases/latest/download/dpd-mdict.zip"
     "https://github.com/digitalpalidictionary/dpd-db/releases/latest/download/dpd-pdf.zip"
+    "https://github.com/digitalpalidictionary/dpd-db/releases/latest/download/dpd-apple.dictionary.zip"
 )
 
 DPD_SBS_links=(

@@ -97,7 +97,7 @@
     "exporter/webapp/preloads_ru.py": "exporter/webapp/preloads.py",
     "exporter/webapp/toolkit_ru.py": "exporter/webapp/toolkit.py",
     "exporter/webapp/ru_templates/": "exporter/webapp/templates/",
-    "scripts/bash/generate_components.py": "scripts/bash/generate_components.py",
+    "scripts/bash/generate_components.sh": "scripts/bash/generate_components.py",
     "scripts/bash/make_dpd.sh": "scripts/bash/makedict.py",
     "scripts/bash/make_ru_dpd.sh": "scripts/bash/makedict.py",
     "scripts/build/families_to_json_ru.py": "scripts/build/families_to_json.py",

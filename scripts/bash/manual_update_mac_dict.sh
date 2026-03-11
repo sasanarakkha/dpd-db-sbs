@@ -6,11 +6,11 @@ DEST_DIR="$HOME/Library/Dictionaries"
 TARGET_DICT_PATH="$DEST_DIR/$DICT_NAME"
 
 # Option 1 Source: The unzipped folder path
-SRC_FOLDER="$HOME/Downloads/$DICT_NAME/Contents"
+SRC_FOLDER="$HOME/Downloads/DPDs/$DICT_NAME/Contents"
 
 # Option 2 Source: The zip file path
 ZIP_FILENAME="dpd-apple.dictionary.zip"
-ZIP_PATH="$HOME/Downloads/$ZIP_FILENAME"
+ZIP_PATH="$HOME/Downloads/DPDs/$ZIP_FILENAME"
 # ---------------------
 
 # Helper function to close Dictionary app to prevent lock issues

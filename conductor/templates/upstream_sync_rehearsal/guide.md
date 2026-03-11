@@ -42,7 +42,7 @@ Synchronization is a high-risk task that requires semantic understanding, not ju
 - **Action:** Compare the final state of shadow files against their upstream sources to ensure parity (logic, imports, variables).
 
 ### Phase 5: Finalization
-- **Goal:** Run tests, manual verification, and final commit.
+- **Goal:** Run tests, manual verification, and final commit after ALL user feedback been implemented.
 - **Model:** Auto.
 
 ---
@@ -92,7 +92,7 @@ NEVER overwrite `.gitignore` with the upstream version.
 ## 🛑 The 2-Commit Rule
 To keep the history clean and verification easy, EXACTLY TWO commits are allowed per sync:
 1.  **Commit 1 (Automated):** Performed by the Phase 1 sync script. Includes basic folder sync, submodule update (`git submodule update`), and UI scaling.
-2.  **Commit 2 (Manual):** Performed at the VERY END after the PRO Logic Audit and Final Approval. Includes all manual merges, shadow updates, tests, and template fixes.
+2.  **Commit 2 (Manual):** Performed at the VERY END after the PRO Logic Audit and Final Approval, after ALL user feedback been implemented. Includes all manual merges, shadow updates, tests, and template fixes.
 
 ---
 
@@ -166,8 +166,8 @@ The following logic and files MUST be preserved during any synchronization proce
 
 ### 🛑 Mandatory Manual Diffing (Critical)
 The following files in `modified_upstream_files` MUST be manually diffed against `as_upstream` every single sync, as they contain critical fork-specific UI/logic that must be preserved while adopting upstream structural updates:
-- `gui2/pass2_add_view.py`: Preserves custom font sizes, clipboard logic, and `fast_api_utils_dps`.
-- `scripts/bash/generate_components.py`: Core build script that often requires manual merging of build steps.
+- `gui2/pass2_add_view.py`: Preserves only custom `fast_api_utils_dps`.
+- `gui2/main.py`: Preserves custom `fast_api_utils_dps`, DpsView and DPS tab, AnalysisView and Analysis tab.
 - `tools/paths.py`: Source for shadow paths; new upstream directories MUST be ported to `paths_ru.py` and `paths_dps.py`.
 - `exporter/webapp/data_classes.py`: Preserves `show_ru_data` and localized webapp features.
 - `db/models.py`: Preserves the primary schema deviations (SBS/Ru tables).
