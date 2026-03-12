@@ -7,12 +7,14 @@ class Flags:
 
     construction_done: bool = field(default=False)
     stem_pattern_done: bool = field(default=False)
+    lemma_2_done: bool = field(default=False)
     derived_from_done: bool = field(default=False)
     family_compound_done: bool = field(default=False)
     loaded_from_db: bool = field(default=False)
     sanskrit_done: bool = field(default=False)
     synonyms_done: bool = field(default=False)
     family_word_done: bool = field(default=False)
+    commentary_search_done: bool = field(default=False)
     correction: bool = field(default=False)
     addition: bool = field(default=False)
 

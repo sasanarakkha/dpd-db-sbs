@@ -1,5 +1,27 @@
 import { MessageRequest } from '../types/extension';
 
+const PUNCTUATION_REGEX = /[-'\u2018\u2019\u201c\u201d\"'.,;:!?()\[\]{}\\\/0-9]/g;
+
+export function cleanWord(word: string): string {
+  let cleaned = word
+    .replace(PUNCTUATION_REGEX, "")
+    .trim()
+    .toLowerCase();
+
+  // Handle double-click "word expansion" artifact for some Pāli words
+  if (cleaned.length >= 6 && cleaned.length % 2 === 0 && !cleaned.includes(" ")) {
+    const mid = cleaned.length / 2;
+    if (
+      cleaned.slice(0, mid).toLowerCase() ===
+      cleaned.slice(mid).toLowerCase()
+    ) {
+      cleaned = cleaned.slice(0, mid);
+    }
+  }
+
+  return cleaned;
+}
+
 export function expandSelectionToWord(): void {
   const selection = window.getSelection();
   if (!selection || !selection.rangeCount) return;
@@ -13,7 +35,7 @@ export function expandSelectionToWord(): void {
 
   // Characters to stop on - SPACE is critical and must never be crossed
   // Note: Closing quotes (’ ”) are removed from stopChars so expansion includes suffixes like ”ti.
-  const stopChars = /[ \t\n\r\.\,\;\:\!\?\(\)\[\]\{\}\\\/\*\&\%\$\#\@\+\=\<\>\♦0-9'"]/;
+  const stopChars = /[ \t\n\r\.\,\;\:\!\?\(\)\[\]\{\}\\\/\*\&\%\$\#\@\+\=\<\>\♦0-9]/;
   const isStop = (char: string) => !char || stopChars.test(char);
 
   // Explicit space check - spaces should NEVER be crossed under any circumstances
@@ -146,10 +168,13 @@ export function handleMouseDown(e: MouseEvent): void {
 
 export function handleMouseUp(e: MouseEvent): void {
   const target = e.target as Element;
-  // Ignore clicks on inputs or buttons
-  if (target.tagName === 'INPUT' || target.tagName === 'BUTTON' || target.closest('button')) return;
+  // Ignore clicks on inputs, textareas, or buttons
+  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.closest('button')) return;
 
-  // Ignore drag-selection search if within the dictionary panel to allow copying text
+  // Ignore drag-selection search only when within the DPD search bar
+  if (target.closest('.dpd-search-box')) return;
+
+  // Allow drag-selecting text in the extension panel without triggering search
   if (target.closest('#dict-panel-25445')) return;
 
   const dx = Math.abs(e.clientX - dragStartX);
@@ -171,8 +196,11 @@ export function handleMouseUp(e: MouseEvent): void {
 
 export function handleDblClick(e: MouseEvent): void {
   const target = e.target as Element;
-  // Ignore clicks on inputs or buttons
-  if (target.tagName === 'INPUT' || target.tagName === 'BUTTON' || target.closest('button')) return;
+  // Ignore clicks on inputs, textareas, or buttons
+  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.closest('button')) return;
+
+  // Ignore double-clicks only within the search bar
+  if (target.closest('.dpd-search-box')) return;
 
   const word = getSelectedWord();
   if (word && typeof window.handleSelectedWord === 'function') {
@@ -194,6 +222,19 @@ export function removeListenersFromTextElements(): void {
   document.body.removeEventListener("dblclick", handleDblClick);
   document.body.removeEventListener("mousedown", handleMouseDown);
   document.body.removeEventListener("mouseup", handleMouseUp);
+}
+
+export function replaceFeedbackSource(html: string, hostname: string = ''): string {
+  const browser = (import.meta as any).env.BROWSER;
+  const prefix = browser === 'firefox' 
+    ? 'dpd-firefox-extension ' 
+    : browser === 'chrome' 
+      ? 'dpd-chrome-extension ' 
+      : 'dpd-browser-extension ';
+  
+  const source = hostname ? `${prefix}${hostname} ` : prefix.slice(0, -1);
+  
+  return html.replace(/dpdict\.net\+/g, source);
 }
 
 // Attach to window for legacy compatibility if needed, 

@@ -2,6 +2,7 @@
 
 import json
 import re
+from functools import cached_property
 from typing import List, Optional
 
 from aksharamukha import transliterate
@@ -118,32 +119,32 @@ class DpdRoot(Base):
 
     pw: Mapped[List["DpdHeadword"]] = relationship(back_populates="rt")
 
-    @property
+    @cached_property
     def root_clean(self) -> str:
         """Remove digits from the end"""
         return re.sub(r" \d.*$", "", self.root)
 
-    @property
+    @cached_property
     def root_no_sign(self) -> str:
         """Remove digits from the end and root sign"""
         return re.sub(r"\d| |√", "", self.root)
 
-    @property
+    @cached_property
     def root_(self) -> str:
         """Replace whitespace with underscores"""
         return self.root.replace(" ", "_")
 
-    @property
+    @cached_property
     def root_no_sign_(self) -> str:
         """Remove root sign and replace whitespace with underscores.
         Useful for html links."""
         return self.root.replace(" ", "_").replace("√", "")
 
-    @property
+    @cached_property
     def root_link(self) -> str:
         return self.root.replace(" ", "%20")
 
-    @property
+    @cached_property
     def root_count(self) -> int:
         db_session = object_session(self)
         if db_session is None:
@@ -155,7 +156,7 @@ class DpdRoot(Base):
             .count()
         )
 
-    @property
+    @cached_property
     def root_family_list(self) -> list:
         db_session = object_session(self)
         if db_session is None:
@@ -195,33 +196,33 @@ class FamilyRoot(Base):
     def data_ru_pack(self, list: list[str]) -> None:
         self.data_ru = json.dumps(list, ensure_ascii=False, indent=1)
 
-    @property
+    @cached_property
     def data_unpack(self) -> list[str]:
         return json.loads(self.data)
 
-    @property
+    @cached_property
     def data_ru_unpack(self) -> list[str]:
         return json.loads(self.data_ru)
 
-    @property
+    @cached_property
     def root_family_link(self) -> str:
         return self.root_family.replace(" ", "%20")
 
-    @property
+    @cached_property
     def root_family_(self) -> str:
         return self.root_family.replace(" ", "_")
 
-    @property
+    @cached_property
     def root_family_clean(self) -> str:
         """Remove root sign"""
         return self.root_family.replace("√", "")
 
-    @property
+    @cached_property
     def root_family_clean_no_space(self) -> str:
         """Remove root sign and space"""
         return self.root_family.replace("√", "").replace(" ", "")
 
-    @property
+    @cached_property
     def root_family_key_typst(self) -> str:
         return self.root_family_key.replace(" ", "_").replace("√", "")
 
@@ -237,6 +238,7 @@ class Lookup(Base):
     roots: Mapped[str] = mapped_column(default="")
     deconstructor: Mapped[str] = mapped_column(default="")
     variant: Mapped[str] = mapped_column(default="")
+    see: Mapped[str] = mapped_column(default="")
     spelling: Mapped[str] = mapped_column(default="")
     grammar: Mapped[str] = mapped_column(default="")
     help: Mapped[str] = mapped_column(default="")
@@ -307,6 +309,21 @@ class Lookup(Base):
             return json.loads(self.variant)
         else:
             return {}
+
+    # see pack unpack
+
+    def see_pack(self, list: list[str]) -> None:
+        if list:
+            self.see = json.dumps(list, ensure_ascii=False)
+        else:
+            raise ValueError("A list must be provided to pack.")
+
+    @property
+    def see_unpack(self) -> list[str]:
+        if self.see:
+            return json.loads(self.see)
+        else:
+            return []
 
     # spelling pack unpack
 
@@ -600,28 +617,28 @@ class SuttaInfo(Base):
     dv_partial_parallels_all: Mapped[str] = mapped_column(default="")
     dv_suggested_suttas: Mapped[str] = mapped_column(default="")
 
-    @property
+    @cached_property
     def sc_card_link(self) -> str | None:
         if self.sc_code:
             return f"https://suttacentral.net/{self.sc_code}"
         else:
             return None
 
-    @property
+    @cached_property
     def sc_pali_link(self) -> str | None:
         if self.sc_code:
             return f"https://suttacentral.net/{self.sc_code}/pli/ms"
         else:
             return None
 
-    @property
+    @cached_property
     def sc_eng_link(self) -> str | None:
         if self.sc_code:
             return f"https://suttacentral.net/{self.sc_code}/en/sujato"
         else:
             return None
 
-    @property
+    @cached_property
     def has_tpr(self) -> bool:
         from tools.cache_load import load_tpr_codes_set
 
@@ -638,14 +655,14 @@ class SuttaInfo(Base):
                     return True
         return False
 
-    @property
+    @cached_property
     def sc_book_code(self) -> str | None:
         if self.sc_code:
             return re.sub(r"\d+\.*-*\d*", "", self.sc_code)
         else:
             return None
 
-    @property
+    @cached_property
     def sc_github(self) -> str | None:
         if self.sc_code:
             return (
@@ -654,21 +671,21 @@ class SuttaInfo(Base):
         else:
             return None
 
-    @property
+    @cached_property
     def sc_express_link(self) -> str | None:
         if self.sc_code:
             return f"https://suttacentral.express/{self.sc_code.lower()}/en/sujato"
         else:
             return None
 
-    @property
+    @cached_property
     def dhamma_gift(self) -> str | None:
         if self.sc_code:
             return f"https://find.dhamma.gift/read/?q={self.sc_code}"
         else:
             return None
 
-    @property
+    @cached_property
     def tbw(self) -> str | None:
         link_url = config_read("dictionary", "link_url")
         if not link_url:
@@ -696,7 +713,7 @@ class SuttaInfo(Base):
         else:
             return None
 
-    @property
+    @cached_property
     def tbw_legacy(self) -> str | None:
         if self.sc_code:
             if self.book_code in [
@@ -721,14 +738,14 @@ class SuttaInfo(Base):
         else:
             return None
 
-    @property
+    @cached_property
     def sc_voice_link(self) -> str | None:
         if self.sc_code:
             return f"https://www.sc-voice.net/#/sutta/{self.sc_code.lower()}/en/sujato"
         else:
             return None
 
-    @property
+    @cached_property
     def tpp_org(self) -> str | None:
         if self.cst_code:
             tpp_org_code = re.sub(r"romn\/|\.xml", "", self.cst_file)
@@ -738,7 +755,7 @@ class SuttaInfo(Base):
         else:
             return None
 
-    @property
+    @cached_property
     def sutta_info_count(self) -> int:
         db_session = object_session(self)
         if db_session is None:
@@ -755,13 +772,13 @@ class SuttaInfo(Base):
             .count()
         )
 
-    @property
+    @cached_property
     def sutta_codes_list(self) -> list[str]:
         from tools.sutta_codes import make_list_of_sutta_codes
 
         return make_list_of_sutta_codes(self)
 
-    @property
+    @cached_property
     def dv_exists(self) -> bool:
         if (
             self.dv_pts
@@ -793,7 +810,7 @@ class SuttaInfo(Base):
         else:
             return False
 
-    @property
+    @cached_property
     def dv_parallels_exists(self) -> bool:
         if (
             self.dv_nikayas_parallels
@@ -812,21 +829,21 @@ class SuttaInfo(Base):
     def __repr__(self) -> str:
         return f"SuttaInfo: {self.dpd_code} {self.dpd_sutta}"
 
-    @property
+    @cached_property
     def bjt_github_link(self):
         if self.bjt_filename:
             return f"https://github.com/pathnirvana/tipitaka.lk/blob/master/public/static/text/{self.bjt_filename}.json"
         else:
             return None
 
-    @property
+    @cached_property
     def bjt_tipitaka_lk_link(self):
         if self.bjt_web_code:
             return f"https://tipitaka.lk/{self.bjt_web_code}"
         else:
             return None
 
-    @property
+    @cached_property
     def bjt_open_tipitaka_lk_link(self):
         if self.bjt_web_code:
             return f"https://open.tipitaka.lk/latn/{self.bjt_web_code}"
@@ -963,19 +980,19 @@ class DpdHeadword(Base):
             else_="",
         )
 
-    @property
+    @cached_property
     def lemma_1_(self) -> str:
         return self.lemma_1.replace(" ", "_").replace(".", "_")
 
-    @property
+    @cached_property
     def lemma_link(self) -> str:
         return self.lemma_1.replace(" ", "%20")
 
-    @property
+    @cached_property
     def lemma_clean(self) -> str:
         return re.sub(r" \d.*$", "", self.lemma_1)
 
-    @property
+    @cached_property
     def lemma_ipa(self) -> str:
         # from tools.ipa import convert_uni_to_ipa
         # return convert_uni_to_ipa(self.lemma_clean, "ipa")
@@ -990,39 +1007,39 @@ class DpdHeadword(Base):
 
     # meaning construction
 
-    @property
+    @cached_property
     def meaning_combo(self) -> str:
         """`meaning_1` if it exists, else `meaning_2`, plus `literal meaning` if it exists."""
         from tools.meaning_construction import make_meaning_combo
 
         return make_meaning_combo(self)
 
-    @property
+    @cached_property
     def meaning_combo_html(self) -> str:
         """`meaning_1` in bold tags if it exists, else `meaning_1`, plus `literal meaning` if it exists."""
         from tools.meaning_construction import make_meaning_combo_html
 
         return make_meaning_combo_html(self)
 
-    @property
+    @cached_property
     def root_base_clean(self) -> str:
         from tools.meaning_construction import clean_construction
 
         return clean_construction(self.root_base)
 
-    @property
+    @cached_property
     def construction_summary(self) -> str:
         from tools.meaning_construction import summarize_construction
 
         return summarize_construction(self)
 
-    @property
+    @cached_property
     def construction_clean(self) -> str:
         from tools.meaning_construction import clean_construction
 
         return clean_construction(self.construction)
 
-    @property
+    @cached_property
     def degree_of_completion_html(self) -> str:
         """How complete is a word's information?
         ✔ complete, meaning_1 and example.
@@ -1034,7 +1051,7 @@ class DpdHeadword(Base):
 
         return degree_of_completion(self)
 
-    @property
+    @cached_property
     def degree_of_completion(self) -> str:
         """How complete is a word's information?
         ✔ complete, meaning_1 and example.
@@ -1046,13 +1063,13 @@ class DpdHeadword(Base):
 
         return degree_of_completion(self, html=False)
 
-    @property
+    @cached_property
     def lemma_trad(self) -> str:
         from tools.lemma_traditional import make_lemma_trad
 
         return make_lemma_trad(self)
 
-    @property
+    @cached_property
     def lemma_trad_clean(self) -> str:
         from tools.lemma_traditional import make_lemma_trad_clean
 
@@ -1060,7 +1077,7 @@ class DpdHeadword(Base):
 
     # root
 
-    @property
+    @cached_property
     def root_clean(self) -> str:
         try:
             if self.root_key is None:
@@ -1071,45 +1088,45 @@ class DpdHeadword(Base):
             print(f"{self.lemma_1}: {e}")
             return ""
 
-    @property
+    @cached_property
     def construction_line1(self) -> str:
         if self.construction:
             return re.sub("\n.*", "", self.construction)
         else:
             return ""
 
-    @property
+    @cached_property
     def construction_line1_clean(self) -> str:
         from tools.meaning_construction import clean_construction
 
         return clean_construction(self.construction_line1)
 
-    @property
+    @cached_property
     def construction_line1_clean_list(self) -> list[str]:
         return self.construction_line1_clean.split(" + ")
 
-    @property
+    @cached_property
     def family_compound_list(self) -> list:
         if self.family_compound:
             return self.family_compound.split(" ")
         else:
             return [self.lemma_clean]
 
-    @property
+    @cached_property
     def family_idioms_list(self) -> list:
         if self.family_idioms:
             return self.family_idioms.split(" ")
         else:
             return [self.lemma_clean]
 
-    @property
+    @cached_property
     def family_set_list(self) -> list:
         if self.family_set:
             return self.family_set.split("; ")
         else:
             return []
 
-    @property
+    @cached_property
     def root_count(self) -> int:
         db_session = object_session(self)
         if db_session is None:
@@ -1121,7 +1138,7 @@ class DpdHeadword(Base):
             .count()
         )
 
-    @property
+    @cached_property
     def pos_list(self) -> list:
         db_session = object_session(self)
         if db_session is None:
@@ -1130,77 +1147,77 @@ class DpdHeadword(Base):
         pos_db = db_session.query(DpdHeadword.pos).group_by(DpdHeadword.pos).all()
         return sorted([i.pos for i in pos_db])
 
-    @property
+    @cached_property
     def antonym_list(self) -> list:
         if self.antonym:
             return self.antonym.split(", ")
         else:
             return []
 
-    @property
+    @cached_property
     def synonym_list(self) -> list:
         if self.synonym:
             return self.synonym.split(", ")
         else:
             return []
 
-    @property
+    @cached_property
     def variant_list(self) -> list:
         if self.variant:
             return self.variant.split(", ")
         else:
             return []
 
-    @property
+    @cached_property
     def sanskrit_clean(self) -> str:
         sanskrit_clean = re.sub(r"\[.+\]", "", self.sanskrit)
         return sanskrit_clean.strip()
 
     # derived data properties
 
-    @property
+    @cached_property
     def inflections_list(self) -> list[str]:
         if self.inflections:
             return self.inflections.split(",")
         else:
             return []
 
-    @property
+    @cached_property
     def inflections_list_api_ca_eva_iti(self) -> list[str]:
         if self.inflections_api_ca_eva_iti:
             return self.inflections_api_ca_eva_iti.split(",")
         else:
             return []
 
-    @property
+    @cached_property
     def inflections_list_all(self) -> list[str]:
         all_inflections = []
         all_inflections.extend(self.inflections.split(","))
         all_inflections.extend(self.inflections_api_ca_eva_iti.split(","))
         return all_inflections
 
-    @property
+    @cached_property
     def inflections_sinhala_list(self) -> list[str]:
         if self.inflections_sinhala:
             return self.inflections_sinhala.split(",")
         else:
             return []
 
-    @property
+    @cached_property
     def inflections_devanagari_list(self) -> list[str]:
         if self.inflections_devanagari:
             return self.inflections_devanagari.split(",")
         else:
             return []
 
-    @property
+    @cached_property
     def inflections_thai_list(self) -> list[str]:
         if self.inflections_thai:
             return self.inflections_thai.split(",")
         else:
             return []
 
-    @property
+    @cached_property
     def freq_data_unpack(self) -> dict[str, int]:
         if self.freq_data:
             return json.loads(self.freq_data)
@@ -1209,45 +1226,45 @@ class DpdHeadword(Base):
 
     # typst
 
-    @property
+    @cached_property
     def meaning_1_typst(self) -> str:
         return self.meaning_1.replace("*", r"\*")
 
-    @property
+    @cached_property
     def meaning_2_typst(self) -> str:
         return self.meaning_2.replace("*", r"\*")
 
-    @property
+    @cached_property
     def sanskrit_typst(self) -> str:
         return self.sanskrit.replace("[", r"\[").replace("]", r"\]")
 
-    @property
+    @cached_property
     def root_family_key_typst(self) -> str:
         return self.root_family_key.replace(" ", "_").replace("√", "")
 
-    @property
+    @cached_property
     def root_base_typst(self) -> str:
         return self.root_base.replace("*", "\\*")
 
-    @property
+    @cached_property
     def root_sign_typst(self) -> str:
         return self.root_sign.replace("*", "\\*")
 
-    @property
+    @cached_property
     def construction_typst(self) -> str:
         return self.construction.replace("\n", r"\ ").replace("*", "\\*")
 
-    @property
+    @cached_property
     def construction_summary_typst(self) -> str:
         from tools.meaning_construction import summarize_construction
 
         return summarize_construction(self).replace("*", "\\*")
 
-    @property
+    @cached_property
     def suffix_typst(self) -> str:
         return self.suffix.replace("*", "\\*")
 
-    @property
+    @cached_property
     def compound_construction_typst(self) -> str:
         return (
             self.compound_construction.replace("*", "\\*")
@@ -1255,19 +1272,19 @@ class DpdHeadword(Base):
             .replace("</b>", "]")
         )
 
-    @property
+    @cached_property
     def compound_construction_txt(self) -> str:
         return self.compound_construction.replace("<b>", "").replace("</b>", "")
 
-    @property
+    @cached_property
     def phonetic_typst(self) -> str:
         return self.phonetic.replace("\n", r"\ ")
 
-    @property
+    @cached_property
     def phonetic_txt(self) -> str:
         return self.phonetic.replace("\n", r", ")
 
-    @property
+    @cached_property
     def commentary_typst(self) -> str:
         return (
             self.commentary.replace("\n", r"\ ")
@@ -1275,7 +1292,7 @@ class DpdHeadword(Base):
             .replace("</b>", "]")
         )
 
-    @property
+    @cached_property
     def notes_typst(self) -> str:
         return (
             self.notes.replace("*", r"\*")
@@ -1286,7 +1303,7 @@ class DpdHeadword(Base):
             .replace("</i>", "_")
         )
 
-    @property
+    @cached_property
     def notes_txt(self) -> str:
         notes_clean = (
             self.notes.replace("\n", r" ")
@@ -1297,26 +1314,26 @@ class DpdHeadword(Base):
         )
         return re.sub(r"\.$", "", notes_clean)
 
-    @property
+    @cached_property
     def cognate_typst(self) -> str:
         return self.cognate.replace("*", "\\*")
 
-    @property
+    @cached_property
     def link_typst(self) -> str:
         link_string: str = ""
         for website in self.link.split("\n"):
             link_string += f"""#link("{website}")\\n"""
         return link_string
 
-    @property
+    @cached_property
     def link_txt(self) -> str:
         return ", ".join(self.link.split("\n"))
 
-    @property
+    @cached_property
     def link_list(self) -> list[str]:
         return self.link.split("\n")
 
-    @property
+    @cached_property
     def example_1_typst(self) -> str:
         return (
             self.example_1.replace("\n", r"\ ")
@@ -1324,7 +1341,7 @@ class DpdHeadword(Base):
             .replace("</b>", "]")
         )
 
-    @property
+    @cached_property
     def example_2_typst(self) -> str:
         return (
             self.example_2.replace("\n", r"\ ")
@@ -1332,89 +1349,89 @@ class DpdHeadword(Base):
             .replace("</b>", "]")
         )
 
-    @property
+    @cached_property
     def sutta_1_typst(self) -> str:
         return self.sutta_1.replace("\n", ", ")
 
-    @property
+    @cached_property
     def sutta_2_typst(self) -> str:
         return self.sutta_2.replace("\n", ", ")
 
     # needs_button
 
-    @property
+    @cached_property
     def needs_sutta_info_button(self) -> int:
         from tools.cache_load import load_sutta_info_set
 
         sutta_info_set = load_sutta_info_set()
         return self.lemma_1 in sutta_info_set
 
-    @property
+    @cached_property
     def needs_audio_button(self) -> bool:
         from tools.cache_load import load_audio_set
 
         audio_set = load_audio_set()
         return self.lemma_clean in audio_set
 
-    @property
+    @cached_property
     def audio_male1(self) -> bool:
         from tools.cache_load import load_audio_dict
 
         return load_audio_dict().get(self.lemma_clean, (False, False, False))[0]
 
-    @property
+    @cached_property
     def audio_male2(self) -> bool:
         from tools.cache_load import load_audio_dict
 
         return load_audio_dict().get(self.lemma_clean, (False, False, False))[1]
 
-    @property
+    @cached_property
     def audio_female1(self) -> bool:
         from tools.cache_load import load_audio_dict
 
         return load_audio_dict().get(self.lemma_clean, (False, False, False))[2]
 
-    @property
+    @cached_property
     def needs_grammar_button(self) -> bool:
         return bool(self.meaning_1)
 
-    @property
+    @cached_property
     def needs_example_button(self) -> bool:
         return bool(self.meaning_1 and self.example_1 and not self.example_2)
 
-    @property
+    @cached_property
     def needs_examples_button(self) -> bool:
         return bool(self.meaning_1 and self.example_1 and self.example_2)
 
-    @property
+    @cached_property
     def needs_conjugation_button(self) -> bool:
         return bool(self.pos in CONJUGATIONS)
 
-    @property
+    @cached_property
     def needs_declension_button(self) -> bool:
         return bool(self.pos in DECLENSIONS)
 
-    @property
+    @cached_property
     def needs_root_family_button(self) -> bool:
         return bool(self.family_root)
 
-    @property
+    @cached_property
     def needs_word_family_button(self) -> bool:
         return bool(self.family_word)
 
-    @property
+    @cached_property
     def cf_set(self) -> set[str]:
         from tools.cache_load import load_cf_set
 
         return load_cf_set()
 
-    @property
+    @cached_property
     def idioms_set(self) -> set[str]:
         from tools.cache_load import load_idioms_set
 
         return load_idioms_set()
 
-    @property
+    @cached_property
     def needs_compound_family_button(self) -> bool:
         return bool(
             self.meaning_1
@@ -1440,7 +1457,7 @@ class DpdHeadword(Base):
         #     and any(item in cf_set
         #         for item in i.family_compound_list))
 
-    @property
+    @cached_property
     def needs_compound_families_button(self) -> bool:
         return bool(
             self.meaning_1
@@ -1457,7 +1474,7 @@ class DpdHeadword(Base):
             )
         )
 
-    @property
+    @cached_property
     def needs_idioms_button(self) -> bool:
         return bool(
             self.meaning_1
@@ -1467,24 +1484,24 @@ class DpdHeadword(Base):
             )
         )
 
-    @property
+    @cached_property
     def needs_set_button(self) -> bool:
         return bool(
             self.meaning_1 and self.family_set and len(self.family_set_list) == 1
         )
 
-    @property
+    @cached_property
     def needs_sets_button(self) -> bool:
         return bool(
             self.meaning_1 and self.family_set and len(self.family_set_list) > 1
         )
 
-    @property
+    @cached_property
     def needs_frequency_button(self) -> bool:
         return bool(self.pos not in EXCLUDE_FROM_FREQ)
 
     # Determine uniqueness of ru_notes
-    @property
+    @cached_property
     def needs_ru_notes(self) -> bool:
         if self.ru and self.ru.ru_notes:
             if not self.notes:
@@ -1514,11 +1531,11 @@ class FamilyCompound(Base):
     def data_ru_pack(self, list: list[str]) -> None:
         self.data_ru = json.dumps(list, ensure_ascii=False, indent=1)
 
-    @property
+    @cached_property
     def data_unpack(self) -> list[str]:
         return json.loads(self.data)
 
-    @property
+    @cached_property
     def data_ru_unpack(self) -> list[str]:
         return json.loads(self.data_ru)
 
@@ -1546,11 +1563,11 @@ class FamilyWord(Base):
     def data_ru_pack(self, list: list[str]) -> None:
         self.data_ru = json.dumps(list, ensure_ascii=False, indent=1)
 
-    @property
+    @cached_property
     def data_unpack(self) -> list[str]:
         return json.loads(self.data)
 
-    @property
+    @cached_property
     def data_ru_unpack(self) -> list[str]:
         return json.loads(self.data_ru)
 
@@ -1575,11 +1592,11 @@ class FamilySet(Base):
     def data_ru_pack(self, list: list[str]) -> None:
         self.data_ru = json.dumps(list, ensure_ascii=False, indent=1)
 
-    @property
+    @cached_property
     def data_unpack(self) -> list[str]:
         return json.loads(self.data)
 
-    @property
+    @cached_property
     def data_ru_unpack(self) -> list[str]:
         return json.loads(self.data_ru)
 
@@ -1603,11 +1620,11 @@ class FamilyIdiom(Base):
     def data_ru_pack(self, list: list[str]) -> None:
         self.data_ru = json.dumps(list, ensure_ascii=False, indent=1)
 
-    @property
+    @cached_property
     def data_unpack(self) -> list[str]:
         return json.loads(self.data)
 
-    @property
+    @cached_property
     def data_ru_unpack(self) -> list[str]:
         return json.loads(self.data_ru)
 
@@ -1686,7 +1703,7 @@ class SBS(Base):
         else:
             return ""
 
-    @property
+    @cached_property
     def needs_sbs_example_button(self) -> bool:
         return any(
             example and example.strip()
@@ -1701,7 +1718,7 @@ class SBS(Base):
             )
         )
 
-    @property
+    @cached_property
     def needs_sbs_example(self) -> bool:
         return any(
             example and example.strip()
@@ -1712,7 +1729,7 @@ class SBS(Base):
         )
 
     # Determine uniqueness of examples
-    @property
+    @cached_property
     def needs_dhp_example(self) -> bool:
         if self.dhp_example:
             examples = [
@@ -1730,7 +1747,7 @@ class SBS(Base):
             return True
         return False
 
-    @property
+    @cached_property
     def needs_pat_example(self) -> bool:
         if self.pat_example:
             examples = [
@@ -1748,7 +1765,7 @@ class SBS(Base):
             return True
         return False
 
-    @property
+    @cached_property
     def needs_vib_example(self) -> bool:
         if self.vib_example:
             examples = [
@@ -1766,7 +1783,7 @@ class SBS(Base):
             return True
         return False
 
-    @property
+    @cached_property
     def needs_class_example(self) -> bool:
         if self.class_example:
             examples = [
@@ -1783,7 +1800,7 @@ class SBS(Base):
             return True
         return False
 
-    @property
+    @cached_property
     def needs_discourses_example(self) -> bool:
         if self.discourses_example:
             examples = [
@@ -1802,17 +1819,17 @@ class SBS(Base):
         return False
 
     # Properties for sbs_chant_link_X
-    @property
+    @cached_property
     def sbs_chant_link_1(self):
         chant_link_map = SBS_table_tools().load_chant_link_map()
         return chant_link_map.get(self.sbs_chant_pali_1, "")
 
-    @property
+    @cached_property
     def sbs_chant_link_2(self):
         chant_link_map = SBS_table_tools().load_chant_link_map()
         return chant_link_map.get(self.sbs_chant_pali_2, "")
 
-    @property
+    @cached_property
     def sbs_class_link(self):
         class_link_map = SBS_table_tools().load_class_link_map()
         return class_link_map.get(self.class_anki, "")

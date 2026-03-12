@@ -13,6 +13,8 @@ export interface Settings {
     summary: boolean;
     sandhi: boolean;
     audio: boolean;
+    goldenDict: boolean;
+    minimized: boolean;
 }
 
 export interface Theme {

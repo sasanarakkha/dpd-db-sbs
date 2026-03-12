@@ -89,6 +89,8 @@ shared_data/frequency/*.json
 shared_data/headword_stem_pattern_dict
 temp/
 typescript
+CLAUDE.md
+gui2/data/*.json
 
 # --- DPS / SBS / RU UNIQUE patterns ---
 

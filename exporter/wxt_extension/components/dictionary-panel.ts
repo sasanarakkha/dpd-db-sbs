@@ -1,6 +1,7 @@
 import { Settings } from '../types/extension';
 import { browser } from 'wxt/browser';
 import { getAudioUrl } from '../utils/api';
+import { replaceFeedbackSource } from '../utils/utils';
 
 // Define helper functions first
 export function wrapApostrophesInHTML(html: string): string {
@@ -85,6 +86,7 @@ export class DictionaryPanel {
   backBtn!: HTMLButtonElement;
   forwardBtn!: HTMLButtonElement;
   isResizing: boolean = false;
+  savedWidth: string = "";
 
   history: { html: string; query: string }[] = [];
   historyIndex: number = -1;
@@ -99,6 +101,8 @@ export class DictionaryPanel {
     summary: true,
     sandhi: true,
     audio: false,
+    goldenDict: false,
+    minimized: false,
   };
 
   constructor() {
@@ -144,6 +148,7 @@ export class DictionaryPanel {
       "settingsSandhi",
       "settingsOneButton",
       "settingsAudio",
+      "settingsMinimized",
     ]) as { [key: string]: any };
 
     if (result.settingsFontSize !== undefined)
@@ -179,6 +184,10 @@ export class DictionaryPanel {
       this.settings.oneButton = result.settingsOneButton as boolean;
     if (result.settingsAudio !== undefined)
       this.settings.audio = result.settingsAudio as boolean;
+    if (result.settingsGoldenDict !== undefined)
+      this.settings.goldenDict = result.settingsGoldenDict as boolean;
+    if (result.settingsMinimized !== undefined)
+      this.settings.minimized = result.settingsMinimized as boolean;
 
     this._applySettings();
   }
@@ -192,6 +201,21 @@ export class DictionaryPanel {
     // DETERMINISTIC CSS TOGGLES via Class
     panelEl.classList.toggle("dpd-hide-summary", !this.settings.summary);
     panelEl.classList.toggle("dpd-hide-sandhi", !this.settings.sandhi);
+    panelEl.classList.toggle("dpd-minimized", this.settings.minimized);
+
+    // Handle width for minimized state
+    const docStyle = document.documentElement.style;
+    if (this.settings.minimized) {
+        const current = docStyle.getPropertyValue("--dpd-panel-width");
+        if (current && current !== "30px") this.savedWidth = current;
+        docStyle.setProperty("--dpd-panel-width", "30px");
+    } else {
+        if (this.savedWidth) {
+            docStyle.setProperty("--dpd-panel-width", this.savedWidth);
+        } else {
+            docStyle.removeProperty("--dpd-panel-width");
+        }
+    }
 
     this._updateNiggahita();
   }
@@ -274,7 +298,7 @@ export class DictionaryPanel {
       this._updateNavigationButtons();
     }
 
-    const processedHtml = wrapApostrophesInHTML(html);
+    const processedHtml = replaceFeedbackSource(wrapApostrophesInHTML(html), window.location.hostname);
     const parts = processedHtml.split('<hr class="dpd">');
 
     if (parts.length >= 2) {
@@ -408,6 +432,12 @@ export class DictionaryPanel {
     const url = await getAudioUrl(headword, gender);
     const audio = new Audio(url);
     audio.play().catch((err) => console.error("Audio playback error:", err));
+  }
+
+  openInGoldenDict(word: string) {
+    this.content.innerHTML = "";
+    this.setText(`Opened "${word}" in GoldenDict`);
+    window.location.href = `goldendict://${encodeURIComponent(word)}`;
   }
 
   _initGrammarSorter() {
@@ -646,6 +676,20 @@ export class DictionaryPanel {
     actionGroup.appendChild(infoBtn);
     actionGroup.appendChild(themeBtn);
     actionGroup.appendChild(settingsBtn);
+
+    const maximizeBtn = document.createElement("button");
+    maximizeBtn.className = "dpd-nav-btn maximize-btn";
+    maximizeBtn.innerHTML = `
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+      </svg>
+    `;
+    // maximizeBtn.style.display = "none"; // Managed by CSS
+    maximizeBtn.onclick = (e) => {
+        e.stopPropagation();
+        this._saveSetting("minimized", false);
+    };
+    actionGroup.appendChild(maximizeBtn);
     
     topRow.appendChild(logoTitleGroup);
     topRow.appendChild(navGroup);
@@ -713,6 +757,7 @@ export class DictionaryPanel {
     searchRow.appendChild(searchBtn);
 
     const stickyMsg = document.createElement("div");
+    stickyMsg.className = "dpd-sticky-msg";
     stickyMsg.style.fontSize = "0.7rem";
     stickyMsg.style.textAlign = "center";
     stickyMsg.style.marginTop = "2px";
@@ -904,6 +949,14 @@ export class DictionaryPanel {
             <span style="font-size: 0.8rem;">Audio Male / Female</span>
             <label class="dpd-switch"><input type="checkbox" id="settings-audio-toggle" ${this.settings.audio ? "checked" : ""}><span class="dpd-slider dpd-round"></span></label>
           </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 0;">
+            <span style="font-size: 0.8rem;">Use GoldenDict</span>
+            <label class="dpd-switch"><input type="checkbox" id="settings-goldendict-toggle" ${this.settings.goldenDict ? "checked" : ""}><span class="dpd-slider dpd-round"></span></label>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 0;">
+            <span style="font-size: 0.8rem;">Minimize Panel</span>
+            <label class="dpd-switch"><input type="checkbox" id="settings-minimize-toggle" ${this.settings.minimized ? "checked" : ""}><span class="dpd-slider dpd-round"></span></label>
+          </div>
         </div>
       `;
 
@@ -947,7 +1000,9 @@ export class DictionaryPanel {
         "settings-onebutton-toggle",
         "settings-summary-toggle",
         "settings-sandhi-toggle",
-        "settings-audio-toggle"
+        "settings-audio-toggle",
+        "settings-goldendict-toggle",
+        "settings-minimize-toggle"
     ];
 
     toggles.forEach(id => {
@@ -967,6 +1022,8 @@ export class DictionaryPanel {
             
             let settingsKey = key;
             if (key === 'onebutton') settingsKey = 'oneButton';
+            if (key === 'goldendict') settingsKey = 'goldenDict';
+            if (key === 'minimize') settingsKey = 'minimized';
 
             el.onchange = (e) => this._saveSetting(settingsKey as keyof Settings, (e.target as HTMLInputElement).checked);
         }

@@ -99,6 +99,7 @@ class DpdFields(PopUpMixin):
             FieldConfig(
                 "lemma_2",
                 on_blur=self.lemma_2_blur,
+                on_submit=self.lemma_2_submit,
             ),
             FieldConfig(
                 "pos",
@@ -137,6 +138,7 @@ class DpdFields(PopUpMixin):
                 multiline=True,
                 field_type="meaning",
                 on_focus=self.meaning_1_focus,
+                on_blur=self.meaning_1_blur,
             ),
             FieldConfig(
                 "meaning_lit",
@@ -243,19 +245,21 @@ class DpdFields(PopUpMixin):
             FieldConfig(
                 "antonym",
                 on_change=self.clean_pali_field,
+                on_blur=self.clean_pali_field,
             ),
             FieldConfig(
                 "synonym",
                 on_focus=self.synonym_focus,
                 on_change=self.synonym_field_change,
+                on_blur=self.clean_pali_field,
             ),
             FieldConfig(
                 "variant",
                 on_change=self.synonym_variant_check,
                 on_blur=self.variant_blur,
             ),
-            FieldConfig("var_phonetic"),
-            FieldConfig("var_text"),
+            FieldConfig("var_phonetic", on_blur=self.clean_pali_field),
+            FieldConfig("var_text", on_blur=self.clean_pali_field),
             FieldConfig(
                 "commentary", field_type="commentary", on_focus=self.commentary_focus
             ),
@@ -583,6 +587,7 @@ class DpdFields(PopUpMixin):
         """
         Checks if main fields and their corresponding _add fields have different values
         and changes the _add field's text color to red if they do.
+        Also syncs the transfer button enabled state based on whether the _add field has content.
         """
         for config in self.field_configs:
             main_field_name = config.name
@@ -599,6 +604,22 @@ class DpdFields(PopUpMixin):
                     add_field_control.color = ft.Colors.RED
                 else:
                     add_field_control.color = ft.Colors.GREY_500
+
+                field_row = self.field_containers.get(main_field_name)
+                if field_row:
+                    for control in field_row.controls:
+                        if (
+                            isinstance(control, ft.IconButton)
+                            and control.data == f"{main_field_name}_transfer_btn"
+                        ):
+                            control.disabled = not bool(add_value)
+                            control.on_click = (
+                                lambda e,
+                                mf=main_field_control,
+                                af=add_field_control,
+                                btn=control: self.transfer_add_value(e, mf, af, btn)
+                            )
+                            break
 
         self.page.update()
 
@@ -723,10 +744,34 @@ class DpdFields(PopUpMixin):
                         field.update()
                         self.page.update()
 
+    def meaning_1_blur(self, e: ft.ControlEvent) -> None:
+        """Clear synonyms when meaning_1 loses focus so they regenerate from the new meaning."""
+        syn_field = self.get_field("synonym")
+        if self.flags.synonyms_done or (syn_field and syn_field.value):
+            self.flags.synonyms_done = False
+            syn_field.value = ""
+            syn_field.update()
+            self.ui.update_message("synonyms deleted - redo them")
+            self.page.update()
+
     def lemma_2_blur(self, e: ft.ControlEvent) -> None:
         field, value = self.get_event_field_and_value(e)
-        new_value = self.get_field("lemma_1").value
-        field.value = clean_lemma_1(new_value)
+        if not self.flags.lemma_2_done:
+            new_value = self.get_field("lemma_1").value
+            field.value = clean_lemma_1(new_value)
+        self.page.update()
+
+    def lemma_2_submit(self, e: ft.ControlEvent) -> None:
+        self.update_lemma_2(e)
+
+    def update_lemma_2(self, e: ft.ControlEvent) -> None:
+        lemma_1 = self.get_field("lemma_1").value
+        pos = self.get_field("pos").value
+        grammar = self.get_field("grammar").value
+        lemma_2_field = self.get_field("lemma_2")
+        lemma_2 = make_lemma_2(lemma_1, pos, grammar)
+        lemma_2_field.value = lemma_2
+        lemma_2_field.update()
         self.page.update()
 
     def pos_blur(self, e: ft.ControlEvent) -> None:
@@ -748,13 +793,15 @@ class DpdFields(PopUpMixin):
             pos_field.error_text = None
         self.page.update()
 
-        # then update lemma_2 based on lemma_1 and pos
-        lemma_1 = self.get_field("lemma_1").value
-        lemma_2_field = self.get_field("lemma_2")
-        lemma_2 = make_lemma_2(lemma_1, pos, grammar)
-        lemma_2_field.value = lemma_2
-        lemma_2_field.update()
-        self.page.update()
+        # then update lemma_2 based on lemma_1 and pos (only once)
+        if not self.flags.lemma_2_done:
+            lemma_1 = self.get_field("lemma_1").value
+            lemma_2_field = self.get_field("lemma_2")
+            lemma_2 = make_lemma_2(lemma_1, pos, grammar)
+            lemma_2_field.value = lemma_2
+            lemma_2_field.update()
+            self.flags.lemma_2_done = True
+            self.page.update()
 
         # then update grammar field
         if grammar == "":
@@ -1209,8 +1256,14 @@ class DpdFields(PopUpMixin):
                 if synonyms_string:
                     var_field = self.get_field("variant")
                     var_value = var_field.value or ""
-                    var_set = set(word.strip() for word in var_value.split(",") if word.strip())
-                    syn_set = set(word.strip() for word in synonyms_string.split(",") if word.strip())
+                    var_set = set(
+                        word.strip() for word in var_value.split(",") if word.strip()
+                    )
+                    syn_set = set(
+                        word.strip()
+                        for word in synonyms_string.split(",")
+                        if word.strip()
+                    )
                     syn_set = syn_set - var_set
                     synonyms_string = ", ".join(pali_list_sorter(list(syn_set)))
                     field.value = synonyms_string
@@ -1257,6 +1310,7 @@ class DpdFields(PopUpMixin):
             self.page.update()
 
     def variant_blur(self, e: ft.ControlEvent) -> None:
+        self.clean_pali_field(e)
         field, value = self.get_event_field_and_value(e)
         var_text_field = self.get_field("var_text")
         var_text_field.value = value

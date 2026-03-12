@@ -12,6 +12,8 @@ check_db_exists()
 
 # List of commands to execute - all commands from the original script
 COMMANDS = [
+    "tools/logo.py",
+    
     "tools/version.py",
     "scripts/build/config_uposatha_day.py",
 
@@ -45,7 +47,7 @@ COMMANDS = [
     "db/suttas/suttas_to_lookup.py",
     
     "db/grammar/grammar_to_lookup.py",
-    
+    "db/lookup/see.py",
     "db/lookup/spelling_mistakes.py",
     "db/lookup/transliterate_lookup_table.py",
     "db/lookup/help_abbrev_add_to_lookup.py",

@@ -4,10 +4,8 @@
 import csv
 from typing import List, Tuple
 
-from mako.template import Template
 from minify_html import minify
 
-from tools.css_manager import CSSManager
 from tools.goldendict_exporter import DictEntry
 from tools.niggahitas import add_niggahitas
 from tools.paths import ProjectPaths
@@ -18,41 +16,108 @@ from tools.utils import (
     squash_whitespaces,
     sum_rendered_sizes,
 )
+from exporter.jinja2_env import get_jinja2_env
+from exporter.goldendict.data_classes import SeeData, SpellingData, VariantData
 
 
 def generate_variant_spelling_html(
     pth: ProjectPaths,
 ) -> Tuple[List[DictEntry], RenderedSizes]:
-    """Generate html for variant readings and spelling corrections."""
+    """Generate html for see entries, variant readings and spelling corrections."""
 
     pr.green("generating variants html")
 
     rendered_sizes = []
 
-    header_templ = Template(filename=str(pth.dpd_header_plain_templ_path))
+    jinja_env = get_jinja2_env("exporter/goldendict/templates")
 
+    see_dict = test_and_make_see_dict(pth)
     variant_dict = test_and_make_variant_dict(pth)
     spelling_dict = test_and_make_spelling_dict(pth)
+
+    see_data_list, sizes = generate_see_data_list(pth, see_dict, jinja_env)
+    rendered_sizes.append(sizes)
 
     variant_data_list, sizes = generate_variant_data_list(
         pth,
         variant_dict,
-        header_templ,
+        jinja_env,
     )
     rendered_sizes.append(sizes)
 
     spelling_data_list, sizes = generate_spelling_data_list(
         pth,
         spelling_dict,
-        header_templ,
+        jinja_env,
     )
     rendered_sizes.append(sizes)
 
-    if variant_data_list:
-        variant_spelling_data_list = variant_data_list + spelling_data_list
+    variant_spelling_data_list = see_data_list + variant_data_list + spelling_data_list
 
     pr.yes(len(variant_spelling_data_list))
     return variant_spelling_data_list, sum_rendered_sizes(rendered_sizes)
+
+
+def test_and_make_see_dict(pth: ProjectPaths) -> dict:
+    see_dict: dict = {}
+
+    with open(pth.see_path, "r", newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f, delimiter="\t")
+
+        for row in reader:
+            see = row["see"]
+            headword = row["headword"]
+
+            # test if see equals headword
+            if see == headword:
+                pr.red(f"ERROR: see==headword! {see}: {headword}")
+
+            # test if see occurs twice
+            if see in see_dict:
+                pr.red(f"ERROR: dupes! {see}")
+
+            # all ok then add
+            else:
+                see_dict[see] = headword
+
+    return see_dict
+
+
+def generate_see_data_list(
+    pth: ProjectPaths,
+    see_dict: dict,
+    jinja_env,
+) -> Tuple[List[DictEntry], RenderedSizes]:
+    size_dict = default_rendered_sizes()
+
+    template = jinja_env.get_template("dpd_see.jinja")
+
+    see_data_list: List[DictEntry] = []
+
+    for see, headword in see_dict.items():
+        data = SeeData(see, headword, jinja_env)
+
+        html_rendered = template.render(d=data)
+
+        header = data.header
+        body_start = html_rendered.find("<body>")
+        body = html_rendered[body_start:]
+
+        final_html = squash_whitespaces(header) + minify(body)
+
+        size_dict["see_entries"] += len(final_html)
+        synonyms = add_niggahitas([see])
+
+        res = DictEntry(
+            word=see,
+            definition_html=final_html,
+            definition_plain="",
+            synonyms=synonyms,
+        )
+
+        see_data_list.append(res)
+
+    return see_data_list, size_dict
 
 
 def test_and_make_variant_dict(pth: ProjectPaths) -> dict:
@@ -83,36 +148,35 @@ def test_and_make_variant_dict(pth: ProjectPaths) -> dict:
 def generate_variant_data_list(
     pth: ProjectPaths,
     variant_dict: dict,
-    header_templ: Template,
+    jinja_env,
 ) -> Tuple[List[DictEntry], RenderedSizes]:
     size_dict = default_rendered_sizes()
 
-    variant_templ = Template(filename=str(pth.variant_templ_path))
-
-    header = str(header_templ.render())
-
-    # Add Variables and fonts
-    css_manager = CSSManager()
-    header = css_manager.update_style(header, "primary")
+    template = jinja_env.get_template("dpd_variant_reading.jinja")
 
     variant_data_list: List[DictEntry] = []
 
-    for __counter__, (variant, main) in enumerate(variant_dict.items()):
-        html = ""
-        html += "<body>"
-        html += str(variant_templ.render(main=main))
-        html += "</body></html>"
+    for variant, main in variant_dict.items():
+        # Use ViewModel
+        data = VariantData(variant, main, jinja_env)
 
-        html = squash_whitespaces(header) + minify(html)
+        html_rendered = template.render(d=data)
 
-        size_dict["variant_readings"] += len(html)
+        # Re-calculate parts for parity
+        header = data.header
+        body_start = html_rendered.find("<body>")
+        body = html_rendered[body_start:]
+
+        final_html = squash_whitespaces(header) + minify(body)
+
+        size_dict["variant_readings"] += len(final_html)
         synonyms = add_niggahitas([variant])
 
         size_dict["variant_synonyms"] += len(str(synonyms))
 
         res = DictEntry(
             word=variant,
-            definition_html=html,
+            definition_html=final_html,
             definition_plain="",
             synonyms=synonyms,
         )
@@ -144,44 +208,41 @@ def test_and_make_spelling_dict(pth: ProjectPaths) -> dict:
             else:
                 spelling_dict[mistake] = correction
 
-        assert "mātāpituraakhatañca" in spelling_dict
-
     return spelling_dict
 
 
 def generate_spelling_data_list(
     pth: ProjectPaths,
     spelling_dict: dict,
-    header_templ: Template,
+    jinja_env,
 ) -> Tuple[List[DictEntry], RenderedSizes]:
     size_dict = default_rendered_sizes()
 
-    spelling_templ = Template(filename=str(pth.spelling_templ_path))
-
-    header = str(header_templ.render())
-
-    # Add Variables and fonts
-    css_manager = CSSManager()
-    header = css_manager.update_style(header, "primary")
+    template = jinja_env.get_template("dpd_spelling_mistake.jinja")
 
     spelling_data_list: List[DictEntry] = []
 
-    for __counter__, (mistake, correction) in enumerate(spelling_dict.items()):
-        html = ""
-        html += "<body>"
-        html += str(spelling_templ.render(correction=correction))
-        html += "</body></html>"
+    for mistake, correction in spelling_dict.items():
+        # Use ViewModel
+        data = SpellingData(mistake, correction, jinja_env)
 
-        html = squash_whitespaces(header) + minify(html)
+        html_rendered = template.render(d=data)
 
-        size_dict["spelling_mistakes"] += len(html)
+        # Re-calculate parts for parity
+        header = data.header
+        body_start = html_rendered.find("<body>")
+        body = html_rendered[body_start:]
+
+        final_html = squash_whitespaces(header) + minify(body)
+
+        size_dict["spelling_mistakes"] += len(final_html)
         synonyms = add_niggahitas([mistake])
 
         size_dict["spelling_synonyms"] += len(str(synonyms))
 
         res = DictEntry(
             word=mistake,
-            definition_html=html,
+            definition_html=final_html,
             definition_plain="",
             synonyms=synonyms,
         )
@@ -189,8 +250,3 @@ def generate_spelling_data_list(
         spelling_data_list.append(res)
 
     return spelling_data_list, size_dict
-
-
-if __name__ == "__main__":
-    pth = ProjectPaths()
-    generate_variant_spelling_html(pth)

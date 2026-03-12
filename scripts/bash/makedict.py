@@ -21,6 +21,7 @@ COMMANDS = [
     "exporter/variants/variants_exporter.py",
 
     # Additional exporters
+    "exporter/mobile/mobile_exporter.py",
     "exporter/tpr/tpr_exporter.py",
     "exporter/kindle/kindle_exporter.py",
     "exporter/tbw/tbw_exporter.py",
@@ -37,6 +38,9 @@ COMMANDS = [
     "tools/docs_update_bibliography.py",
     "tools/docs_update_thanks.py",
     "tools/docs_changelog_and_release_notes.py",
+
+    # Reset config to baseline after uposatha build
+    "scripts/build/config_uposatha_reset.py",
 ]
 
 run_script("Make Dictionary", COMMANDS)

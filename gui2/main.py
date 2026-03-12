@@ -4,6 +4,7 @@ from pathlib import Path
 
 import flet as ft
 
+from gui2.roots_tab_view import RootsTabView
 from gui2.sandhi_find_replace_view import SandhiFindReplaceView
 from gui2.sandhi_view import SandhiView
 from gui2.toolkit import ToolKit
@@ -39,13 +40,33 @@ class App:
         # toolkit contains all the managers
         self.toolkit: ToolKit = ToolKit(self.page)
 
+        appbar_actions: list[ft.Control] = [
+            ft.Text(self.toolkit.daily_log.get_counts())
+        ]
+        if self.toolkit.username_manager.is_not_primary():
+            appbar_actions.extend(
+                [
+                    ft.VerticalDivider(),
+                    ft.TextButton(
+                        "Submit Data",
+                        icon=ft.Icons.CLOUD_UPLOAD,
+                        on_click=self._on_submit_data,
+                    ),
+                    ft.TextButton(
+                        "Update",
+                        icon=ft.Icons.REFRESH,
+                        on_click=self._on_check_updates,
+                    ),
+                ]
+            )
+
         page.appbar = ft.AppBar(
             title=ft.Text("dpd gui"),
             bgcolor=ft.Colors.LIGHT_BLUE_900,
             elevation=100,
             title_spacing=20,
             center_title=False,
-            actions=[ft.Text(self.toolkit.daily_log.get_counts())],
+            actions=appbar_actions,
         )
 
         # Now create views
@@ -69,10 +90,39 @@ class App:
         self.bold_search_view = BoldSearchView(self.page, self.toolkit)
         self.dps_view: DpsView = DpsView(self.page, self.toolkit)
         self.analysis_view = AnalysisView(self.page, self.toolkit)
+        self.roots_view = RootsTabView(self.page, self.toolkit)
 
         self.build_ui()
 
         self.toolkit.username_manager.get_username()
+
+    def _on_submit_data(self, e: ft.ControlEvent) -> None:
+        """Handle Submit Data button click."""
+        from scripts.onboarding.data_submission import submit_data
+
+        result = submit_data(Path.cwd())
+        dialog = ft.AlertDialog(
+            title=ft.Text("Submit Data"),
+            content=ft.Text(result.message),
+            actions=[
+                ft.TextButton("OK", on_click=lambda _: self.page.close(dialog)),
+            ],
+        )
+        self.page.open(dialog)
+
+    def _on_check_updates(self, e: ft.ControlEvent) -> None:
+        """Handle Update button click."""
+        from scripts.onboarding.contributor_update import update_environment
+
+        summary = update_environment(Path.cwd())
+        dialog = ft.AlertDialog(
+            title=ft.Text("Update Complete"),
+            content=ft.Text(summary),
+            actions=[
+                ft.TextButton("OK", on_click=lambda _: self.page.close(dialog)),
+            ],
+        )
+        self.page.open(dialog)
 
     def on_keyboard(self, e: ft.KeyboardEvent) -> None:
         """Handles global keyboard events."""
@@ -81,7 +131,7 @@ class App:
         elif e.key == "A" and e.ctrl and e.shift:
             self.toolkit.ai_search_popup.open_popup()
         elif e.key == "F" and e.ctrl:
-            self.toolkit.wordfinder_popup.open_popup()
+            self.toolkit.wordfinder_popup.open_popup(self._get_current_lemma())
         elif e.key == "W" and e.ctrl:
             # Universal close key - close any open dialog
             if self.toolkit.ai_search_popup.is_dialog_open():
@@ -96,6 +146,21 @@ class App:
             if self.tabs.selected_index < len(self.tabs.tabs) - 1:
                 self.tabs.selected_index += 1
                 self.page.update()
+
+    def _get_current_lemma(self) -> str:
+        """Return lemma_1 from the active add-view, or empty string."""
+        tab_to_view = {
+            3: self.pass1_add_view,
+            6: self.pass2_add_view,
+        }
+        view = tab_to_view.get(self.tabs.selected_index)
+        if view is None:
+            return ""
+        try:
+            field = view.dpd_fields.get_field("lemma_1")
+            return (field.value or "").strip() if field else ""
+        except Exception:
+            return ""
 
     def tab_clicked(self, e: ft.ControlEvent) -> None:
         """Handles tab clicks."""
@@ -167,6 +232,10 @@ class App:
                 ft.Tab(
                     text="Analysis",
                     content=self.analysis_view,
+                ),
+                ft.Tab(
+                    text="√",
+                    content=self.roots_view,
                 ),
             ],
             expand=True,

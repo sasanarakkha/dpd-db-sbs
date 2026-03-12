@@ -75,12 +75,6 @@ class SuttaCentralSource:
 
 
 sutta_central_books: dict[str, SuttaCentralSource] = {
-    "one_book": SuttaCentralSource(
-        "one_book",
-        ["vin2"],
-        "resources/sc-data/sc_bilara_data/root/pli/ms/vinaya/pli-tv-bu-vb/pli-tv-bu-pc",
-        "resources/sc-data/sc_bilara_data/translation/en/brahmali/vinaya/pli-tv-bu-vb/pli-tv-bu-pc",
-    ),
     "vin1&2": SuttaCentralSource(
         "vin1&2",
         ["vin1", "vin2"],

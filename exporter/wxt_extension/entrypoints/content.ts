@@ -1,8 +1,9 @@
 import { defineContentScript } from 'wxt/sandbox';
 import { browser } from 'wxt/browser';
 import { DictionaryPanel } from '../components/dictionary-panel';
-import { addListenersToTextElements, removeListenersFromTextElements } from '../utils/utils';
+import { addListenersToTextElements, removeListenersFromTextElements, cleanWord } from '../utils/utils';
 import { applyTheme } from '../utils/themes';
+import { isAutoDomain, isExcludedDomain } from '../utils/domains';
 import '@/assets/styles/chrome-extension.css';
 import '@/assets/styles/dpd-variables.css';
 import '@/assets/styles/dpd.css';
@@ -15,6 +16,14 @@ export default defineContentScript({
 
     // Define handleSelectedWord globally so utils and panel can call it
     (window as any).handleSelectedWord = async (word: string) => {
+      const cleanedWord = cleanWord(word);
+      
+      // Check "Use GoldenDict" setting - if ON, always use GoldenDict
+      if (panel?.settings?.goldenDict) {
+        panel.openInGoldenDict(cleanedWord);
+        return;
+      }
+
       // Get API route for logging
       try {
         const response = await browser.runtime.sendMessage({ action: "getApiBaseUrl" });
@@ -25,50 +34,41 @@ export default defineContentScript({
       } catch (e) {
         console.log("[DPD] Searching for:", word, "(route detection failed)");
       }
-      
-      // Remove punctuation, quotes, and numbers but PRESERVE internal spaces
-      let cleanWord = word
-        .replace(/[’‘“”\"'.,;:!?()\[\]{}\\\/0-9]/g, "")
-        .trim()
-        .toLowerCase();
-
-      // Handle double-click "word expansion" artifact for some Pāli words
-      if (cleanWord.length >= 6 && cleanWord.length % 2 === 0 && !cleanWord.includes(" ")) {
-        const mid = cleanWord.length / 2;
-        if (
-          cleanWord.slice(0, mid).toLowerCase() ===
-          cleanWord.slice(mid).toLowerCase()
-        ) {
-          cleanWord = cleanWord.slice(0, mid);
-        }
-      }
 
       if (panel) {
-        panel.setSearchValue(cleanWord);
+        panel.setSearchValue(cleanedWord);
         panel.setText("Loading...");
+      }
+
+      // Check if offline - use GoldenDict fallback
+      if (!navigator.onLine) {
+        panel?.openInGoldenDict(cleanedWord);
+        return;
       }
 
       browser.runtime.sendMessage(
         {
           action: "fetchData",
-          endpoint: "/search_json?q=" + encodeURIComponent(cleanWord),
+          endpoint: "/search_json?q=" + encodeURIComponent(cleanedWord),
         }
       ).then((response: any) => {
           if (response?.success) {
             const data = response.data;
             if (!data || (!data.summary_html && !data.dpd_html)) {
-              panel?.setText("No results for " + cleanWord);
+              panel?.setText("No results for " + cleanedWord);
             } else {
-              panel?.setText("Result for " + cleanWord);
+              panel?.setText("Result for " + cleanedWord);
               panel?.setContent(
                 (data.summary_html || "") + '<hr class="dpd">' + (data.dpd_html || ""),
               );
             }
           } else {
-            panel?.setText("Error: " + (response?.error || "Unknown error"));
+            // API error - use GoldenDict fallback
+            panel?.openInGoldenDict(cleanedWord);
           }
       }).catch(err => {
-         panel?.setText("Error: " + err.message);
+          // API failure - use GoldenDict fallback
+          panel?.openInGoldenDict(cleanedWord);
       });
     };
 
@@ -76,17 +76,6 @@ export default defineContentScript({
       if (panel) return;
       document.documentElement.classList.add("dpd-active");
       document.body.classList.add("dpd-active");
-
-      // Wrap content to avoid interference (or whatever the original reason was)
-      if (!document.getElementById("main-content-32050248")) {
-        const container = document.createElement("div");
-        container.id = "main-content-32050248";
-        Array.from(document.body.childNodes).forEach((node) => {
-          if (node.nodeName !== "SCRIPT" && (node as Element).id !== "dict-panel-25445")
-            container.appendChild(node);
-        });
-        document.body.appendChild(container);
-      }
 
       addListenersToTextElements();
       panel = new DictionaryPanel();
@@ -146,22 +135,19 @@ export default defineContentScript({
       }
     });
 
-    const AUTO_DOMAINS = [
-      "suttacentral.net",
-      "suttacentral.express",
-      "suttacentral.now",
-      "digitalpalireader.online",
-      "thebuddhaswords.net",
-      "tipitaka.org",
-      "tipitaka.lk",
-      "open.tipitaka.lk",
-    ];
-    if (AUTO_DOMAINS.some((d) => window.location.hostname.includes(d))) {
+    const hostname = window.location.hostname;
+
+    browser.storage.local.get(`state_${hostname}`).then((data) => {
+      const savedState = data[`state_${hostname}`];
+      
+      if (savedState === "ON") {
         init();
-    } else {
-      browser.storage.local.get(`state_${window.location.hostname}`).then((data) => {
-        if (data[`state_${window.location.hostname}`] === "ON") init();
-      });
-    }
+      } else if (savedState === "OFF") {
+        // User explicitly turned it off - do nothing
+      } else if (!isExcludedDomain(hostname) && isAutoDomain(hostname)) {
+        // No saved state, use default behavior for auto-domains
+        init();
+      }
+    });
   },
 });

@@ -1,4 +1,5 @@
 import { defineConfig } from 'wxt';
+import { version } from './package.json';
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
@@ -7,7 +8,7 @@ export default defineConfig({
   manifest: ({ browser }) => ({
     name: "Digital Pāḷi Dictionary",
     description: "Search the Digital Pāḷi Dictionary by double-clicking any word on any website.",
-    version: "1.0",
+    version,
     icons: {
       "16": "icons/dpd-logo_16.png",
       "32": "icons/dpd-logo_32.png",
@@ -22,7 +23,7 @@ export default defineConfig({
         "128": "icons/dpd-logo-gray_128.png"
       }
     },
-    permissions: ["storage", "activeTab", "scripting"],
+    permissions: ["storage", "activeTab"],
     web_accessible_resources: [
       {
         resources: ["icons/*.png", "icons/*.svg", "*.png", "*.css"],
@@ -38,8 +39,11 @@ export default defineConfig({
     ],
     browser_specific_settings: browser === 'firefox' ? {
       gecko: {
-        id: "digitalpalidictionary@digitalpalidictionary.github.io",
-        strict_min_version: "109.0"
+        id: "dpd@dpdict.net",
+        strict_min_version: "109.0",
+        data_collection_permissions: {
+          required: ["searchTerms"]
+        }
       }
     } : undefined
   }),

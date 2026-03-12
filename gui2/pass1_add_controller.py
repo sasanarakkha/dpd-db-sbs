@@ -19,7 +19,7 @@ from gui2.toolkit import ToolKit
 from gui2.user import UsernameManager
 from gui2.variants import VariantReadingFileManager
 from tools.fast_api_utils import request_dpd_server
-from tools.goldendict_tools import open_in_goldendict_os
+from tools.goldendict_tools import open_in_goldendict
 from tools.wordfinder_manager import WordFinderManager
 
 LABEL_WIDTH = 250
@@ -109,7 +109,7 @@ class Pass1AddController(SandhiOK, SnackBarMixin):
             return False
 
     def load_into_gui(self):
-        open_in_goldendict_os(self.word_in_text)
+        open_in_goldendict(self.word_in_text)
         pyperclip.copy(self.word_in_text)
         self.ui.word_in_text.value = self.word_in_text
         self.ui.word_in_text.update()
@@ -128,6 +128,17 @@ class Pass1AddController(SandhiOK, SnackBarMixin):
             if hasattr(DpdHeadword, field_name)
         }
         comment = self.ui.dpd_fields.get_field("comment").value or ""
+
+        for field_name in ("meaning_1", "meaning_lit"):
+            value = field_data.get(field_name, "")
+            if value:
+                misspelled = self.ui.dpd_fields.spellchecker.check_sentence(value)
+                if misspelled:
+                    error_string = ", ".join(misspelled.keys())
+                    self.ui.update_message(
+                        f"spelling mistakes in {field_name}: {error_string}"
+                    )
+                    return
 
         # Create the DpdHeadword object using the imported function
         new_word = make_dpd_headword_from_dict(field_data)

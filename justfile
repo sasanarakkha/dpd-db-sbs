@@ -52,6 +52,9 @@ webapp:
 gui:
     uv run python gui2/main.py
 
+mkdocs:
+    uv run mkdocs serve
+
 # ===== INDIVIDUAL EXPORTERS (run after generate) =====
 
 # Export GoldenDict format only
@@ -73,6 +76,10 @@ export-deconstructor:
 # Export variants only
 export-variants:
     uv run python exporter/variants/variants_exporter.py
+
+# Export mobile SQLite database for DPD Flutter app
+export-mobile:
+    uv run python exporter/mobile/mobile_exporter.py
 
 # Export TPR data for Tipitaka Pali Reader
 export-tpr:
@@ -117,7 +124,14 @@ families:
     uv run python db/families/family_set.py
     uv run python db/families/family_idiom.py
 
+# ===== FINDERS =====
+
+# Find commentary words not in the lookup table
+find_comm:
+    uv run python scripts/find/comm_not_in_decon_finder.py
+
 # ===== AUDIO =====
+
 # Generate missing audio files
 audio:
     uv run python audio/bhashini/generate_dpd.py
@@ -166,6 +180,18 @@ server-reload:
     mkdir -p logs
     nohup uv run uvicorn exporter.webapp.main:app --host 0.0.0.0 --port 8080 > "logs/$(date '+%Y-%m-%d_%H-%M-%S').uvicorn.log" 2>&1 &
 
+# ===== CONE DICTIONARY IMPORT =====
+
+# Extract Cone entries to TSV (includes comparison)
+cone:
+    uv run python scripts/extractor/extract_cone.py
+
+# ===== CPD DICTIONARY IMPORT =====
+
+# Extract CPD entries to TSV (includes comparison)
+cpd:
+    uv run python scripts/extractor/extract_cpd.py
+
 # ===== CONFIGURATION =====
 
 # Turn off deconstructor premade mode
@@ -183,3 +209,7 @@ limit100:
 # Set data limit to 0 (no limit)
 limit0:
     uv run python -c "from tools.configger import config_update; config_update('dictionary', 'data_limit', '0')"
+
+# Open config.ini in fresh
+config:
+    fresh config.ini

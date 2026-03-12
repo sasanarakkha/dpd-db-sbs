@@ -1,5 +1,9 @@
 [
     {
+        "id": 48512,
+        "lemma_1": "buddha 2"
+    },
+    {
         "id": 79414,
         "lemma_1": "paṭisāmeti 2"
     },
@@ -74,9 +78,5 @@
     {
         "id": 18687,
         "lemma_1": "opadhika"
-    },
-    {
-        "id": 7058,
-        "lemma_1": "appavāritasaññī"
     }
 ]
