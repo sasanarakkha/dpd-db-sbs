@@ -3,10 +3,8 @@
 import csv
 from typing import List, Tuple
 
-from mako.template import Template
 from minify_html import minify
 
-from tools.css_manager import CSSManager
 from tools.goldendict_exporter import DictEntry
 from tools.niggahitas import add_niggahitas
 from tools.paths import ProjectPaths
@@ -18,6 +16,8 @@ from tools.utils import (
     squash_whitespaces,
     sum_rendered_sizes,
 )
+from exporter.jinja2_env import get_jinja2_env
+from exporter.goldendict.data_classes_dps import VariantData, SpellingData
 
 
 def generate_variant_spelling_html(
@@ -30,7 +30,7 @@ def generate_variant_spelling_html(
 
     rendered_sizes = []
 
-    header_templ = Template(filename=str(rupth.dpd_header_plain_templ_path))
+    jinja_env = get_jinja2_env("exporter/goldendict/ru_components/templates")
 
     variant_dict = test_and_make_variant_dict(pth)
     spelling_dict = test_and_make_spelling_dict(pth)
@@ -38,14 +38,14 @@ def generate_variant_spelling_html(
     variant_data_list, sizes = generate_variant_data_list(
         rupth,
         variant_dict,
-        header_templ,
+        jinja_env,
     )
     rendered_sizes.append(sizes)
 
     spelling_data_list, sizes = generate_spelling_data_list(
         rupth,
         spelling_dict,
-        header_templ,
+        jinja_env,
     )
     rendered_sizes.append(sizes)
 
@@ -84,24 +84,22 @@ def test_and_make_variant_dict(pth: ProjectPaths) -> dict:
 def generate_variant_data_list(
     rupth: RuPaths,
     variant_dict: dict,
-    header_templ: Template,
+    jinja_env,
 ) -> Tuple[List[DictEntry], RenderedSizes]:
     size_dict = default_rendered_sizes()
-
-    variant_templ = Template(filename=str(rupth.variant_templ_path))
-
-    header = str(header_templ.render())
-
-    # Add Variables and fonts
-    css_manager = CSSManager()
-    header = css_manager.update_style(header, "primary")
 
     variant_data_list: List[DictEntry] = []
 
     for __counter__, (variant, main) in enumerate(variant_dict.items()):
+        data = VariantData(variant, main, jinja_env)
+        header = data.header
+        
+        template = jinja_env.get_template("dpd_variant_reading_ru.jinja")
+        content = template.render(main=main)
+
         html = ""
         html += "<body>"
-        html += str(variant_templ.render(main=main))
+        html += content
         html += "</body></html>"
 
         html = squash_whitespaces(header) + minify(html)
@@ -153,24 +151,22 @@ def test_and_make_spelling_dict(pth: ProjectPaths) -> dict:
 def generate_spelling_data_list(
     rupth: RuPaths,
     spelling_dict: dict,
-    header_templ: Template,
+    jinja_env,
 ) -> Tuple[List[DictEntry], RenderedSizes]:
     size_dict = default_rendered_sizes()
-
-    spelling_templ = Template(filename=str(rupth.spelling_templ_path))
-
-    header = str(header_templ.render())
-
-    # Add Variables and fonts
-    css_manager = CSSManager()
-    header = css_manager.update_style(header, "primary")
 
     spelling_data_list: List[DictEntry] = []
 
     for __counter__, (mistake, correction) in enumerate(spelling_dict.items()):
+        data = SpellingData(mistake, correction, jinja_env)
+        header = data.header
+
+        template = jinja_env.get_template("dpd_spelling_mistake_ru.jinja")
+        content = template.render(correction=correction)
+
         html = ""
         html += "<body>"
-        html += str(spelling_templ.render(correction=correction))
+        html += content
         html += "</body></html>"
 
         html = squash_whitespaces(header) + minify(html)

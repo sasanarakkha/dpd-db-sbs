@@ -3,17 +3,17 @@
 import csv
 from typing import Dict, List, Tuple
 
-from mako.template import Template
 from minify_html import minify
 from sqlalchemy.orm import Session
 
 from tools.paths_ru import RuPaths
-from tools.css_manager import CSSManager
 from tools.goldendict_exporter import DictEntry
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 from tools.tsv_read_write import read_tsv_dict, read_tsv_dot_dict
 from tools.utils import RenderedSizes, default_rendered_sizes, squash_whitespaces
+from exporter.jinja2_env import get_jinja2_env
+from exporter.goldendict.data_classes_dps import AbbreviationsData, HelpData
 
 
 class Abbreviation:
@@ -63,22 +63,21 @@ def generate_help_html(
     # 3. thank yous
     # 4. bibliography
 
-    header_templ = Template(filename=str(rupth.dpd_header_plain_templ_path))
-    header = str(header_templ.render())
-
-    # Add Variables and fonts
-    css_manager = CSSManager()
-    header = css_manager.update_style(header, "secondary")
+    jinja_env = get_jinja2_env("exporter/goldendict/ru_components/templates")
 
     help_data_list: List[DictEntry] = []
 
-    abbrev = add_abbrev_html(rupth, header)
+    abbrev = add_abbrev_html(rupth, jinja_env)
     help_data_list.extend(abbrev)
     size_dict["help"] += len(str(abbrev))
 
-    help_html = add_help_html(rupth, header)
+    help_html = add_help_html(rupth, jinja_env)
     help_data_list.extend(help_html)
     size_dict["help"] += len(str(help_html))
+
+    # For bibliography and thanks, we use a plain header
+    data_plain = HelpData(None, jinja_env)
+    header = data_plain.header
 
     bibliography = add_bibliography(rupth, header)
     help_data_list.extend(bibliography)
@@ -94,20 +93,12 @@ def generate_help_html(
 
 def add_abbrev_html(
     rupth: RuPaths,
-    header: str,
+    jinja_env,
 ) -> List[DictEntry]:
     help_data_list = []
 
     file_path = rupth.abbreviations_tsv_path
     rows = read_tsv_dict(file_path)
-
-    rows2 = []
-    with open(rupth.abbreviations_tsv_path) as f:
-        reader = csv.DictReader(f, delimiter="\t")
-        for row in reader:
-            rows2.append(row)
-
-    assert rows == rows2
 
     def _csv_row_to_abbreviations(x: Dict[str, str]) -> Abbreviation:
         return Abbreviation(
@@ -123,12 +114,18 @@ def add_abbrev_html(
     items = list(map(_csv_row_to_abbreviations, rows))
 
     for i in items:
+        data = AbbreviationsData(i, jinja_env)
+        header = data.header
+        
+        template = jinja_env.get_template("help_abbrev_ru.jinja")
+        content = template.render(i=i)
+
         html = ""
         html += "<body>"
-        html += render_abbrev_templ(rupth, i)
+        html += content
         html += "</body></html>"
 
-        html = squash_whitespaces(header) + minify(html)
+        final_html = squash_whitespaces(header) + minify(html)
 
         if i.ru_abbrev:
             word = i.ru_abbrev
@@ -137,7 +134,7 @@ def add_abbrev_html(
 
         res = DictEntry(
             word=word,
-            definition_html=html,
+            definition_html=final_html,
             definition_plain="",
             synonyms=[],
         )
@@ -149,20 +146,12 @@ def add_abbrev_html(
 
 def add_help_html(
     rupth: RuPaths,
-    header: str,
+    jinja_env,
 ) -> List[DictEntry]:
     help_data_list = []
 
     file_path = rupth.help_tsv_path
     rows = read_tsv_dict(file_path)
-
-    rows2 = []
-    with open(rupth.help_tsv_path) as f:
-        reader = csv.DictReader(f, delimiter="\t")
-        for row in reader:
-            rows2.append(row)
-
-    assert rows == rows2
 
     def _csv_row_to_help(x: Dict[str, str]) -> Help:
         return Help(
@@ -175,18 +164,24 @@ def add_help_html(
     items = list(map(_csv_row_to_help, rows))
 
     for i in items:
+        data = HelpData(i, jinja_env)
+        header = data.header
+
+        template = jinja_env.get_template("help_help_ru.jinja")
+        content = template.render(i=i)
+
         html = ""
         html += "<body>"
-        html += render_help_templ(rupth, i)
+        html += content
         html += "</body></html>"
 
-        html = squash_whitespaces(header) + minify(html)
+        final_html = squash_whitespaces(header) + minify(html)
 
         word = i.ru_help
 
         res = DictEntry(
             word=word,
-            definition_html=html,
+            definition_html=final_html,
             definition_plain="",
             synonyms=[],
         )
@@ -194,6 +189,7 @@ def add_help_html(
         help_data_list.append(res)
 
     return help_data_list
+
 
 
 def add_bibliography(rupth: RuPaths, header: str) -> List[DictEntry]:

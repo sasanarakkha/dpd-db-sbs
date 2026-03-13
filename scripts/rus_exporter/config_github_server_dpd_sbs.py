@@ -18,7 +18,7 @@ def main():
     config_update("regenerate", "freq_maps", "no")
 
     config_update("dictionary", "make_mdict", "yes")
-    config_update("dictionary", "link_url", "http://filesrv1:8083/")
+    config_update("dictionary", "link_url", "https://buddhas-words.sbs.rocks/")
     config_update("dictionary", "show_id", "no")
     config_update("dictionary", "show_sbs_data", "yes")
     config_update("dictionary", "show_ru_data", "no")

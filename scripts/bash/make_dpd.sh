@@ -63,4 +63,7 @@ git checkout -- db/sanskrit/root_families_sanskrit.tsv
 
 git checkout -- shared_data/changed_templates
 
-uv run python scripts/rus_exporter/config_github_local_dpd_sbs.py
+# If option 1 was not selected, return settings back to default
+if [ "$CHOSEN_OPTION" != "1" ]; then
+    uv run python scripts/rus_exporter/config_github_local_dpd_sbs.py
+fi

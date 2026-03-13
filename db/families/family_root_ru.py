@@ -3,12 +3,22 @@
 """Create an html list of all words belonging to the same root family
 and add to db (ru)."""
 
+import re
+from collections import defaultdict
+
+from root_info import generate_root_info_html
+from root_matrix import generate_root_matrix
+
 from db.db_helpers import get_db_session
-from db.models import DpdHeadword, FamilyRoot
-from tools.pali_sort_key import pali_sort_key
+from db.models import DpdHeadword, DpdRoot, FamilyRoot, Lookup
+from scripts.build.anki_updater import family_updater
+from tools.configger import config_test
+from tools.lookup_is_another_value import is_another_value
+from tools.pali_sort_key import pali_list_sorter, pali_sort_key
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 from tools.superscripter import superscripter_uni
+from tools.update_test_add import update_test_add
 
 from tools.degree_of_completion_ru import rus_degree_of_completion
 
@@ -24,6 +34,14 @@ def main():
     pr.tic()
     pr.title("root families (ru)")
 
+    if not (
+        config_test("exporter", "make_dpd", "yes")
+        or config_test("regenerate", "db_rebuild", "yes")
+    ):
+        pr.green("disabled in config.ini")
+        pr.toc()
+        return
+
     pth = ProjectPaths()
     db_session = get_db_session(pth.dpd_db_path)
 
@@ -36,19 +54,32 @@ def main():
 
     dpd_db = sorted(dpd_db, key=lambda x: pali_sort_key(x.lemma_1))
 
-    rf_dict = make_roots_family_dict(dpd_db)
+    roots_db = db_session.query(DpdRoot).all()
+    roots_db = sorted(roots_db, key=lambda x: pali_sort_key(x.root))
+
+    rf_dict, bases_dict = make_roots_family_dict_and_bases_dict(dpd_db)
     rf_dict = compile_rf_html_ru(dpd_db, rf_dict)
-    update_db(db_session, rf_dict)
+    add_rf_to_db(db_session, rf_dict)
+    # update_lookup_table(db_session) # Already done by the main script
+
+    # generate_root_info_html and generate_root_matrix are shared, but they use
+    # root meanings. If we want RU specific matrix, we'd need more changes.
+    # For now, let's just keep parity with structure.
 
     db_session.close()
+
+    if config_test("anki", "update", "yes"):
+        anki_data_list = make_anki_data(rf_dict)
+        deck = ["Family Root RU"]
+        family_updater(anki_data_list, deck)
 
     pr.toc()
 
 
-def make_roots_family_dict(dpd_db):
-    pr.green("extracting root families")
+def make_roots_family_dict_and_bases_dict(dpd_db):
+    pr.green("extracting root families and bases")
     rf_dict = {}
-
+    bases_dict = {}
     for i in dpd_db:
         # compile root subfamilies
         family = i.root_family_key
@@ -63,13 +94,23 @@ def make_roots_family_dict(dpd_db):
                 "count": 1,
                 "meaning_ru": i.rt.root_ru_meaning,
                 "data_ru": [],
+                "anki": [],
             }
         else:
             rf_dict[family]["headwords"] += [i.lemma_1]
             rf_dict[family]["count"] += 1
 
+        # compile bases
+        base = re.sub("^.+> ", "", i.root_base)
+
+        if base:
+            if i.root_key not in bases_dict:
+                bases_dict[i.root_key] = {base}
+            else:
+                bases_dict[i.root_key].add(base)
+
     pr.yes(len(rf_dict))
-    return rf_dict
+    return rf_dict, bases_dict
 
 
 def compile_rf_html_ru(dpd_db: list[DpdHeadword], rf_dict):
@@ -101,6 +142,16 @@ def compile_rf_html_ru(dpd_db: list[DpdHeadword], rf_dict):
                 (i.lemma_1, pos, ru_meaning, rus_degree_of_completion(i, html=False))
             )
 
+            # anki data
+            anki_family = f"<b>{i.family_root}</b> "
+            anki_family += f"{i.rt.root_group} ({i.rt.root_ru_meaning})"
+            cf_construction = i.construction_clean
+            if not i.meaning_1:
+                cf_construction = f"-{cf_construction}"
+            rf_dict[family]["anki"].append(
+                (anki_family, i.lemma_1, pos, ru_meaning, cf_construction)
+            )
+
     for rf in rf_dict:
         header_ru = make_root_header_ru(rf_dict, rf)
         rf_dict[rf]["html_ru"] = header_ru + rf_dict[rf]["html_ru"] + "</table>"
@@ -120,7 +171,7 @@ def make_root_header_ru(rf_dict, rf):
     return header
 
 
-def update_db(db_session, rf_dict):
+def add_rf_to_db(db_session, rf_dict):
     pr.green("updating db")
 
     for rf in rf_dict:
@@ -141,6 +192,44 @@ def update_db(db_session, rf_dict):
 
     db_session.commit()
     pr.yes("ok")
+
+
+def make_anki_data(rf_dict):
+    """Create anki_data_list for updating"""
+
+    pr.green("making anki data")
+
+    anki_data_list = []
+
+    for i in rf_dict:
+        html = "<table><tbody>"
+        family, headword, pos, meaning, construction = "", "", "", "", ""
+        for row in rf_dict[i]["anki"]:
+            family, headword, pos, meaning, construction = row
+            html += "<tr valign='top'>"
+            html += "<div style='color: #FFB380'>"
+            html += f"<td>{headword}</td>"
+            html += f"<td><div style='color: #FF6600'>{pos}</div></td>"
+            html += f"<td><div style='color: #FFB380'>{meaning}</td>"
+            if construction.startswith("-"):
+                construction = construction.lstrip("-")
+                html += (
+                    f"<td><div style='color: #421B01'>{construction}</div></td></tr>"
+                )
+            else:
+                html += (
+                    f"<td><div style='color: #FF6600'>{construction}</div></td></tr>"
+                )
+
+        html += "</tbody></table>"
+        if len(html) > 131072:
+            pr.red(f"{i} longer than 131072 characters")
+        else:
+            anki_data_list += [(family, html)]
+
+    pr.yes(len(anki_data_list))
+
+    return anki_data_list
 
 
 if __name__ == "__main__":

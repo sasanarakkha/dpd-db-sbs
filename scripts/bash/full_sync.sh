@@ -18,7 +18,7 @@ export PROJECT_DIR
 EXCLUDE_FILES=()
 while IFS= read -r line; do
     EXCLUDE_FILES+=("$line")
-done < <(python3 -c 'import json, os; registry_path = os.path.join(os.environ["PROJECT_DIR"], "conductor/templates/upstream_sync_rehearsal/dps_sync_registry.json"); data = json.load(open(registry_path)); print("\n".join(data["modified_upstream_files"] + data["ignored_files"]))')
+done < <(python3 -c 'import json, os; registry_path = os.path.join(os.environ["PROJECT_DIR"], "conductor/templates/upstream_sync_rehearsal/dps_sync_registry.json"); data = json.load(open(registry_path)); print("\n".join(data["modified_upstream_files"] + data["no_sync_files"]))')
 
 # Check if we successfully got exclusions
 if [ ${#EXCLUDE_FILES[@]} -eq 0 ]; then

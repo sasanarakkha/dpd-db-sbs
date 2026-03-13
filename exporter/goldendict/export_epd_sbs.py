@@ -1,18 +1,24 @@
 """Compile HTML data for English to Pāḷi dictionary."""
 
-from mako.template import Template
 from minify_html import minify
 from sqlalchemy.orm import Session
 from typing import List, Tuple
 
 from db.models import Lookup
-from tools.css_manager import CSSManager
+from tools.goldendict_exporter import DictEntry
 from tools.paths_dps import DPSPaths
 from tools.printer import printer as pr
-from tools.utils import squash_whitespaces
-from tools.utils_sbs import RenderedSizes, default_rendered_sizes
-from tools.goldendict_exporter import DictEntry
+from tools.utils import RenderedSizes, default_rendered_sizes, squash_whitespaces
+from exporter.jinja2_env import get_jinja2_env
+from exporter.goldendict.data_classes_dps import EpdData
 
+class EpdDataSBS(EpdData):
+    def __init__(self, lookup_key, html_entries, pth, jinja_env):
+        self.lookup_key = lookup_key
+        self.html_string = "<br>".join(html_entries)
+        self.pth = pth
+        self.jinja_env = jinja_env
+        self.header = self._generate_header()
 
 def generate_epd_html(
     db_session: Session,
@@ -25,11 +31,8 @@ def generate_epd_html(
 
     pr.green("generating epd html from lookup")
 
-    header_templ = Template(filename=str(pth.dpd_header_plain_templ_path))
-    header = str(header_templ.render(css="", js=""))
-
-    css_manager = CSSManager()
-    header = css_manager.update_style(header, "primary")
+    jinja_env = get_jinja2_env("exporter/goldendict/sbs_templates")
+    template = jinja_env.get_template("epd_sbs.jinja")
 
     # Final data dictionary
     epd_dict: dict = {}
@@ -65,24 +68,28 @@ def generate_epd_html(
     epd_data_list: List[DictEntry] = []
 
     for word, html_entries in epd_dict.items():
-        html_string = "<br>".join(html_entries)
+        data = EpdDataSBS(word, html_entries, pth, jinja_env)
+        
+        html_rendered = template.render(d=data)
 
-        html = ""
-        html += "<body>"
-        html += f"<div class ='dpd'><p>{html_string}</p></div>"
-        html += "</body></html>"
+        # Re-calculate parts for parity
+        header = data.header
+        body_start = html_rendered.find("<body>")
+        body = html_rendered[body_start:]
 
-        html = squash_whitespaces(header) + minify(html)
+        final_html = squash_whitespaces(header) + minify(body)
+
+        size_dict["epd"] += len(final_html)
+        size_dict["epd_header"] += len(squash_whitespaces(header))
 
         res = DictEntry(
             word=word,
-            definition_html=html,
+            definition_html=final_html,
             definition_plain="",
             synonyms=[],
         )
 
         epd_data_list.append(res)
-        size_dict["epd"] += len(html)
 
     pr.yes(len(epd_data_list))
     return epd_data_list, size_dict

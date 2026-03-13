@@ -28,6 +28,7 @@ uv run python db/families/family_idiom.py
 uv run python db/families/family_root_ru.py
 uv run python db/families/family_word_ru.py
 uv run python db/families/family_compound_ru.py
+uv run python db/families/family_set_ru_update.py
 uv run python db/families/family_set_ru.py
 uv run python db/families/family_idiom_ru.py
 
@@ -50,6 +51,7 @@ uv run db/suttas/suttas_update.py
 uv run db/suttas/suttas_to_lookup.py
 
 uv run python db/grammar/grammar_to_lookup.py
+uv run python db/lookup/see.py
 
 uv run python db/lookup/spelling_mistakes.py
 

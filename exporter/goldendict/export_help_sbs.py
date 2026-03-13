@@ -3,17 +3,17 @@
 import csv
 from typing import Dict, List, Tuple
 
-from mako.template import Template
 from minify_html import minify
 from sqlalchemy.orm import Session
 
-from tools.css_manager import CSSManager
 from tools.goldendict_exporter import DictEntry
 from tools.paths_dps import DPSPaths
 from tools.printer import printer as pr
 from tools.tsv_read_write import read_tsv_dict, read_tsv_dot_dict
 from tools.utils import squash_whitespaces
 from tools.utils_sbs import RenderedSizes, default_rendered_sizes
+from exporter.jinja2_env import get_jinja2_env
+from exporter.goldendict.data_classes_dps import AbbreviationsData, HelpData
 
 
 class Abbreviation:
@@ -62,22 +62,21 @@ def generate_help_html(
     # 3. thank yous
     # 4. bibliography
 
-    header_templ = Template(filename=str(pth.dpd_header_plain_templ_path))
-    header = str(header_templ.render())
-
-    # Add Variables and fonts
-    css_manager = CSSManager()
-    header = css_manager.update_style(header, "secondary")
+    jinja_env = get_jinja2_env("exporter/goldendict/sbs_templates")
 
     help_data_list: List[DictEntry] = []
 
-    abbrev = add_abbrev_html(pth, header, show_ru_data)
+    abbrev = add_abbrev_html(pth, jinja_env, show_ru_data)
     help_data_list.extend(abbrev)
     size_dict["help"] += len(str(abbrev))
 
-    help_html = add_help_html(pth, header, show_ru_data)
+    help_html = add_help_html(pth, jinja_env, show_ru_data)
     help_data_list.extend(help_html)
     size_dict["help"] += len(str(help_html))
+
+    # For bibliography and thanks, we use a plain header
+    data_plain = HelpData(None, jinja_env)
+    header = data_plain.header
 
     bibliography = add_bibliography(pth, header)
     help_data_list.extend(bibliography)
@@ -91,19 +90,15 @@ def generate_help_html(
     return help_data_list, size_dict
 
 
-def add_abbrev_html(pth: DPSPaths, header: str, show_ru_data=False) -> List[DictEntry]:
+def add_abbrev_html(
+    pth: DPSPaths,
+    jinja_env,
+    show_ru_data=False,
+) -> List[DictEntry]:
     help_data_list = []
 
     file_path = pth.abbreviations_tsv_path
     rows = read_tsv_dict(file_path)
-
-    rows2 = []
-    with open(pth.abbreviations_tsv_path) as f:
-        reader = csv.DictReader(f, delimiter="\t")
-        for row in reader:
-            rows2.append(row)
-
-    assert rows == rows2
 
     def _csv_row_to_abbreviations(x: Dict[str, str]) -> Abbreviation:
         return Abbreviation(
@@ -119,18 +114,24 @@ def add_abbrev_html(pth: DPSPaths, header: str, show_ru_data=False) -> List[Dict
     items = list(map(_csv_row_to_abbreviations, rows))
 
     for i in items:
+        data = AbbreviationsData(i, jinja_env)
+        header = data.header
+        
+        template = jinja_env.get_template("help_abbrev_sbs.jinja")
+        content = template.render(i=i, show_ru_data=show_ru_data)
+
         html = ""
         html += "<body>"
-        html += render_abbrev_templ(pth, i, show_ru_data)
+        html += content
         html += "</body></html>"
 
-        html = squash_whitespaces(header) + minify(html)
+        final_html = squash_whitespaces(header) + minify(html)
 
         word = i.abbrev
 
         res = DictEntry(
             word=word,
-            definition_html=html,
+            definition_html=final_html,
             definition_plain="",
             synonyms=[],
         )
@@ -142,21 +143,13 @@ def add_abbrev_html(pth: DPSPaths, header: str, show_ru_data=False) -> List[Dict
 
 def add_help_html(
     pth: DPSPaths,
-    header: str,
+    jinja_env,
     show_ru_data=False,
 ) -> List[DictEntry]:
     help_data_list = []
 
     file_path = pth.help_tsv_path
     rows = read_tsv_dict(file_path)
-
-    rows2 = []
-    with open(pth.help_tsv_path) as f:
-        reader = csv.DictReader(f, delimiter="\t")
-        for row in reader:
-            rows2.append(row)
-
-    assert rows == rows2
 
     def _csv_row_to_help(x: Dict[str, str]) -> Help:
         return Help(
@@ -169,18 +162,24 @@ def add_help_html(
     items = list(map(_csv_row_to_help, rows))
 
     for i in items:
+        data = HelpData(i, jinja_env)
+        header = data.header
+
+        template = jinja_env.get_template("help_help_sbs.jinja")
+        content = template.render(i=i, show_ru_data=show_ru_data)
+
         html = ""
         html += "<body>"
-        html += render_help_templ(pth, i, show_ru_data)
+        html += content
         html += "</body></html>"
 
-        html = squash_whitespaces(header) + minify(html)
+        final_html = squash_whitespaces(header) + minify(html)
 
         word = i.help
 
         res = DictEntry(
             word=word,
-            definition_html=html,
+            definition_html=final_html,
             definition_plain="",
             synonyms=[],
         )
@@ -188,6 +187,7 @@ def add_help_html(
         help_data_list.append(res)
 
     return help_data_list
+
 
 
 def add_bibliography(pth: DPSPaths, header: str) -> List[DictEntry]:

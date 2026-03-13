@@ -1,4 +1,23 @@
+import difflib
+import re
 from typing import List, TypedDict
+
+
+def paragraphs_are_similar(p1: str, p2: str, ratio: float) -> bool:
+    """Compare two paragraphs and return True if they are similar."""
+    # strip html
+    p1 = re.sub("<[^<]+?>", "", p1)
+    p2 = re.sub("<[^<]+?>", "", p2)
+    # strip punctuation
+    p1 = re.sub(r"[^\w\s]", "", p1)
+    p2 = re.sub(r"[^\w\s]", "", p2)
+    # lowercase
+    p1 = p1.lower()
+    p2 = p2.lower()
+    # compare
+    if not p1 or not p2:
+        return False
+    return difflib.SequenceMatcher(None, p1, p2).ratio() > ratio
 
 
 class RenderedSizes(TypedDict):
@@ -17,23 +36,20 @@ class RenderedSizes(TypedDict):
     dpd_frequency: int
     dpd_feedback: int
     dpd_synonyms: int
-
     root_definition: int
     root_buttons: int
     root_info: int
     root_matrix: int
     root_families: int
     root_synonyms: int
-
     variant_readings: int
     variant_synonyms: int
-
     spelling_mistakes: int
     spelling_synonyms: int
-
+    see_entries: int
+    see_synonyms: int
     epd_header: int
     epd: int
-
     help: int
 
 
@@ -64,6 +80,8 @@ def default_rendered_sizes() -> RenderedSizes:
         variant_synonyms=0,
         spelling_mistakes=0,
         spelling_synonyms=0,
+        see_entries=0,
+        see_synonyms=0,
         epd_header=0,
         epd=0,
         help=0,

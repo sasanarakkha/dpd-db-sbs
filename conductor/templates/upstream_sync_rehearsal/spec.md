@@ -19,7 +19,8 @@ To ensure high-quality reasoning and prevent regressions, the AI agent MUST adhe
 
 ## 🛑 Unambiguous Approval Protocol
 The agent MUST NOT commit or advance phases based on error feedback. **Explicit approval** (e.g., *"Phase X is complete"*) is required before every commit or phase transition.
-- **HARD STOP:** The agent MUST pause and wait for this exact string before executing any final commit or moving to the next phase.
+- **HARD STOP:** The agent MUST NOT assume a phase is complete simply because tests pass or a single bug is fixed. 
+- You are strictly forbidden from moving to the next phase or committing code until the user explicitly provides the exact phrase: `"Phase X is complete"` or `"Proceed with final commit"`.
 
 ## Key Artifacts
 -   **Registry:** `conductor/templates/upstream_sync_rehearsal/dps_sync_registry.json` (The source of truth for sync logic).

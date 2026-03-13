@@ -1,0 +1,77 @@
+{% if d.needs_sbs_example_button %}
+<div id="sbs_example_{{ d.i.lemma_1_ }}" class="dpd content hidden">
+    {% if d.needs_sbs_example %}
+        {% if d.sbs.sbs_example_1 %}
+            <p>{{ d.sbs.sbs_example_1 }}</p>
+            <p class="sutta">
+                {{ d.sbs.sbs_source_1 }} {{ d.sbs.sbs_sutta_1 }}
+            </p>
+            {% if d.sbs.sbs_chapter_1 %}
+                <p class="sutta">
+                    {{ d.sbs.sbs_chapter_1 }} <a class="sutta_link" href="{{ d.sbs_chant_link_1 }}">{{ d.sbs.sbs_chant_pali_1 }}</a>
+                    {{ d.sbs.sbs_chant_eng_1 }}
+                </p>
+            {% endif %}
+        {% endif %}
+
+        {% if d.sbs.sbs_example_2 %}
+            <p>{{ d.sbs.sbs_example_2 }}</p>
+            <p class="sutta">
+                {{ d.sbs.sbs_source_2 }} {{ d.sbs.sbs_sutta_2 }}
+            </p>
+            {% if d.sbs.sbs_chapter_2 %}
+                <p class="sutta">
+                    {{ d.sbs.sbs_chapter_2 }} <a class="sutta_link" href="{{ d.sbs_chant_link_2 }}">{{ d.sbs.sbs_chant_pali_2 }}</a>
+                    {{ d.sbs.sbs_chant_eng_2 }}
+                </p>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+
+    {% if d.needs_dhp_example %}
+        <p>{{ d.sbs.dhp_example }}</p>
+        <p class="sutta">
+            {{ d.sbs.dhp_source }} {{ d.sbs.dhp_sutta }}
+        </p>
+    {% endif %}
+
+    {% if d.needs_pat_example %}
+        <p>{{ d.sbs.pat_example }}</p>
+        <p class="sutta">
+            {{ d.sbs.pat_source }} {{ d.sbs.pat_sutta }}
+        </p>
+    {% endif %}
+
+    {% if d.needs_vib_example %}
+        <p>{{ d.sbs.vib_example }}</p>
+        <p class="sutta">
+            {{ d.sbs.vib_source }} {{ d.sbs.vib_sutta }}
+        </p>
+    {% endif %}
+
+    {% if d.needs_class_example %}
+    <p>{{ d.sbs.class_example }}</p>
+    {% endif %}
+    {% if d.sbs.class_anki %}
+    <p><span class="gray">{{ d.sbs.class_example_translation }}</span></p>
+    <p class="sutta">
+        cl.{{ d.sbs.class_anki }} 
+    {% endif %}
+    {% if d.needs_class_example %}
+        {{ d.sbs.class_source }} {{ d.sbs.class_sutta }}
+    </p>
+    {% endif %}
+
+    {% if d.needs_discourses_example %}
+        <p>{{ d.sbs.discourses_example }}</p>
+        <p class="sutta">
+            {{ d.sbs.discourses_source }} {{ d.sbs.discourses_sutta }}
+        </p>
+    {% endif %}
+
+    <p class='footer'>
+        Did you spot a mistake in SBS examples? <a class="link" href="https://docs.google.com/forms/d/e/1FAIpQLScNC5v2gQbBCM3giXfYIib9zrp-WMzwJuf_iVXEMX2re4BFFw/viewform?usp=pp_url&entry.438735500={{ d.i.lemma_link }}&entry.1433863141=SBS" target="_blank">Correct it here.</a>
+    </p>
+
+</div>
+{% endif %}

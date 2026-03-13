@@ -63,7 +63,7 @@ class DPSPaths:
         self.spelling_templ_path = (
             base_dir / "exporter/goldendict/sbs_templates/dpd_spelling_mistake.html"
         )
-        self.templates_dir = base_dir / "exporter/sbs_templates"
+        self.templates_dir = base_dir / "exporter/goldendict/sbs_templates"
         self.variant_templ_path = (
             base_dir / "exporter/goldendict/sbs_templates/dpd_variant_reading.html"
         )
@@ -165,7 +165,7 @@ class DPSPaths:
         self.sbs_path = base_dir / "db/backup_tsv/sbs.tsv"
 
         # temp
-
+        self.temp_dir = base_dir / "temp/"
         self.text_to_add_path = base_dir.joinpath(Path("temp/text.txt"))
         self.temp_csv_backup_dir = base_dir.joinpath(Path("temp/backup_csv/"))
         self.temp_csv_path = base_dir.joinpath(Path("temp/temp.csv"))
@@ -294,5 +294,6 @@ class DPSPaths:
             self.ai_from_batch_api_dir,
             self.sbs_class_vocab_dir,
             self.ai_translated_dir,
+            self.temp_dir,
         ]:
             d.mkdir(parents=True, exist_ok=True)

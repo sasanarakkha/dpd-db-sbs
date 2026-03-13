@@ -15,7 +15,9 @@ from exporter.goldendict.export_dpd_ru import generate_dpd_html
 from exporter.goldendict.export_rpd import generate_epd_html
 from exporter.goldendict.export_help_ru import generate_help_html
 from exporter.goldendict.export_roots_ru import generate_root_html
-from exporter.goldendict.export_variant_spelling_ru import generate_variant_spelling_html
+from exporter.goldendict.export_variant_spelling_ru import (
+    generate_variant_spelling_html,
+)
 from exporter.goldendict.helpers import make_roots_count_dict
 from tools.cache_load import load_cf_set, load_idioms_set
 from tools.configger import config_read, config_test
@@ -57,7 +59,7 @@ class GlobalVars:
 
 def main():
     pr.tic()
-    pr.title("exporting dpd to goldendict and mdict")
+    pr.title("exporting dpd to goldendict and mdict (ru)")
 
     if not config_test("exporter", "make_dpd", "yes"):
         pr.green_title("disabled in config.ini")
@@ -87,12 +89,10 @@ def main():
         )
         g.rendered_sizes.append(sizes)
 
-        epd_data_list, sizes = generate_epd_html(
-            g.db_session, g.pth, g.rupth)
+        epd_data_list, sizes = generate_epd_html(g.db_session, g.pth, g.rupth)
         g.rendered_sizes.append(sizes)
 
-        help_data_list, sizes = generate_help_html(
-            g.db_session, g.pth, g.rupth)
+        help_data_list, sizes = generate_help_html(g.db_session, g.pth, g.rupth)
         g.rendered_sizes.append(sizes)
 
         g.db_session.close()
@@ -143,23 +143,22 @@ def prepare_export_to_goldendict_mdict(g: GlobalVars) -> None:
     dict_name = "ru-dpd"
 
     dict_var = DictVariables(
-        css_paths=[g.paths.dpd_css_and_fonts_path],
-        js_paths=[
-            g.paths.family_compound_json,
-            g.paths.family_compound_template_js,
-            g.paths.family_idiom_json,
-            g.paths.family_idiom_template_js,
-            g.paths.family_root_json,
-            g.paths.family_root_template_js,
-            g.paths.family_set_json,
-            g.paths.family_set_template_js,
-            g.paths.family_word_json,
-            g.paths.family_word_template_js,
-            g.paths.feedback_template_js,
-            g.paths.frequency_template_js,
-            g.paths.main_js_path,
-        ],
-        gd_path=g.paths.share_dir,
+    css_paths=[g.paths.dpd_css_and_fonts_path],
+    js_paths=[
+        g.paths.family_compound_json,
+        g.paths.family_compound_template_js,
+        g.paths.family_idiom_json,
+        g.paths.family_idiom_template_js,
+        g.paths.family_root_json,
+        g.paths.family_root_template_js,
+        g.paths.family_set_json,
+        g.paths.family_set_template_js,
+        g.paths.family_word_json,
+        g.paths.family_word_template_js,
+        g.paths.feedback_template_js,
+        g.paths.frequency_template_js,
+        g.paths.main_js_path,
+        ],        gd_path=g.paths.share_dir,
         md_path=g.paths.share_dir,
         dict_name=dict_name,
         icon_path=g.paths.dpd_logo_svg,
@@ -172,6 +171,7 @@ def prepare_export_to_goldendict_mdict(g: GlobalVars) -> None:
         dict_info,
         dict_var,
         g.dict_data,
+        # include_slob=True,
     )
 
     if g.make_mdict and g.data_limit == 0:

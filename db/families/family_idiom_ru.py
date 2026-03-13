@@ -2,8 +2,12 @@
 
 """Compile idioms and save to database (ru)."""
 
+import json
+import re
+
 from db.db_helpers import get_db_session
-from db.models import DpdHeadword, FamilyIdiom
+from db.models import DbInfo, DpdHeadword, FamilyIdiom
+from tools.configger import config_test
 from tools.degree_of_completion_ru import rus_degree_of_completion
 from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
@@ -22,6 +26,14 @@ def main():
     pr.tic()
     pr.title("idioms generator (ru)")
 
+    if not (
+        config_test("exporter", "make_dpd", "yes")
+        or config_test("regenerate", "db_rebuild", "yes")
+    ):
+        pr.green_title("disabled in config.ini")
+        pr.toc()
+        return
+
     pth = ProjectPaths()
     db_session = get_db_session(pth.dpd_db_path)
 
@@ -35,7 +47,8 @@ def main():
 
     idioms_dict = create_idioms_dict(dpd_db)
     idioms_dict = compile_idioms_html_ru(dpd_db, idioms_dict)
-    update_db(db_session, idioms_dict)
+    add_idioms_to_db(db_session, idioms_dict)
+    update_db_cache(db_session, idioms_dict)
 
     pr.toc()
 
@@ -104,8 +117,8 @@ def compile_idioms_html_ru(dpd_db: list[DpdHeadword], idioms_dict):
     return idioms_dict
 
 
-def update_db(db_session, idioms_dict):
-    pr.green("updating db")
+def add_idioms_to_db(db_session, idioms_dict):
+    pr.green("adding to db")
 
     for idiom in idioms_dict:
         # find in db
@@ -116,7 +129,27 @@ def update_db(db_session, idioms_dict):
             db_session.add(idiom_data)
 
     db_session.commit()
-    db_session.close()
+    pr.yes("ok")
+
+
+def update_db_cache(db_session, idioms_dict):
+    """Update the db_info with idioms_set for use in the exporter."""
+
+    pr.green("adding DbInfo cache item")
+
+    idioms_set = set()
+    for i in idioms_dict:
+        idioms_set.add(i)
+
+    idioms_set_cache = db_session.query(DbInfo).filter_by(key="idioms_set").first()
+
+    if not idioms_set_cache:
+        idioms_set_cache = DbInfo()
+
+    idioms_set_cache.key = "idioms_set"
+    idioms_set_cache.value = json.dumps(list(idioms_set), ensure_ascii=False, indent=1)
+    db_session.add(idioms_set_cache)
+    db_session.commit()
     pr.yes("ok")
 
 

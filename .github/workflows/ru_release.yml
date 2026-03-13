@@ -1,4 +1,5 @@
 name: Russian Draft Release
+# Synced with upstream draft_release.yml (2026-03-12)
 
 on: 
  workflow_dispatch:

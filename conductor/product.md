@@ -15,6 +15,7 @@ To be the world's most precise, comprehensive, and accessible digital resource f
 - **Scholars & Translators:** Requiring high-precision grammatical data and Sanskrit cognates for academic work.
 - **Dhamma Practitioners:** Students of Pāḷi looking for contextual meanings and examples from the Suttas.
 - **Developers:** Using our open-source data and API to build the next generation of Buddhist study tools (e.g., Tipitaka Pali Reader, Dhamma Gift).
+- **Contributors:** Scholars and students who contribute to data verification and enrichment.
 
 ## Core Features & Functionality
 - **Word-by-Word Analysis:** Every word in the CST4 Pāḷi corpus is analyzed for its root, case, gender, and construction.
@@ -27,6 +28,7 @@ To be the world's most precise, comprehensive, and accessible digital resource f
 - **Cross-Browser Extension:** Instant Pāḷi lookup for Chrome and Firefox on SuttaCentral, Digital Pāli Reader, and other Dhamma websites with intelligent theme matching and customizable lookup settings.
 - **Audio Integration:** Synthesized and recorded Pāḷi pronunciations integrated directly into the lookup experience.
 - **Pāḷi MCP Server:** A Model Context Protocol server that enables AI agents to interact with the DPD database for high-precision linguistic analysis.
+- **Contributor Onboarding:** Automated workflows and integrated tools in the GUI to facilitate data submission from external contributors.
 
 ## AI-Ready Data
 DPD is uniquely positioned for the AI era. By providing a structured MCP interface, we enable Large Language Models (LLMs) to perform accurate word-by-word translation and grammatical analysis, reducing hallucinations in Buddhist AI applications.

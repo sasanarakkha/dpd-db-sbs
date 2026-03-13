@@ -95,11 +95,11 @@ gui2/data/*.json
 # --- DPS / SBS / RU UNIQUE patterns ---
 
 config.ini
-exporter/goldendict/ru_components/javascript/family_compound_json.js
-exporter/goldendict/ru_components/javascript/family_idiom_json.js
-exporter/goldendict/ru_components/javascript/family_root_json.js
-exporter/goldendict/ru_components/javascript/family_set_json.js
-exporter/goldendict/ru_components/javascript/family_word_json.js
+exporter/goldendict/ru_components/javascript/ru_family_compound_json.js
+exporter/goldendict/ru_components/javascript/ru_family_idiom_json.js
+exporter/goldendict/ru_components/javascript/ru_family_root_json.js
+exporter/goldendict/ru_components/javascript/ru_family_set_json.js
+exporter/goldendict/ru_components/javascript/ru_family_word_json.js
 exporter/kindle/ru_components/epub/OEBPS/Text/[0-9]*_*.xhtml
 exporter/kindle/ru_components/epub/OEBPS/Text/abbreviations.xhtml
 exporter/kindle/ru_components/epub/OEBPS/Text/rpd_*.xhtml

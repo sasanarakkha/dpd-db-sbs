@@ -6,6 +6,7 @@ from rich import print
 
 from db.db_helpers import get_db_session
 from db.models import Lookup
+from tools.lookup_is_another_value import is_another_value
 from tools.paths import ProjectPaths
 from tools.paths_ru import RuPaths
 from tools.printer import printer as pr
@@ -20,6 +21,14 @@ class GlobalVars:
 
 def add_help_ru(g: GlobalVars):
     print("[green]adding help (ru)")
+
+    # first remove old abbreviations from the table
+    results = g.db_session.query(Lookup).filter(Lookup.help != "").all()
+    for r in results:
+        if is_another_value(r, "help"):
+            r.help = ""
+        else:
+            g.db_session.delete(r)
 
     # add ru help
     ru_help_data = read_tsv_as_dict_with_different_key(g.rupth.help_tsv_path, 2)
@@ -46,6 +55,14 @@ def add_help_ru(g: GlobalVars):
 def add_abbreviations_ru(g: GlobalVars):
     """Add abbreviations to lookup (ru)"""
     print("[green]adding abbreviations (ru)")
+
+    # first remove old abbreviations from the table
+    results = g.db_session.query(Lookup).filter(Lookup.abbrev != "").all()
+    for r in results:
+        if is_another_value(r, "abbrev"):
+            r.abbrev = ""
+        else:
+            g.db_session.delete(r)
 
     # add ru abbrev
     ru_abbrevs = read_tsv_as_dict_with_different_key(g.rupth.abbreviations_tsv_path, 5)

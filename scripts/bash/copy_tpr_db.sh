@@ -8,7 +8,7 @@ SRC_DB="$SCRIPT_DIR/tipitaka_pali.db"
 SRC_DPD_DIR="$SCRIPT_DIR/dpd"
 
 # ---------- Destinations ----------
-DEST_DB="$HOME/Library/Containers/org.americanmonk.tpp/Data/Documents/tipitaka_pali.db"
+DEST_DB="$HOME/Library/Containers/org.americanmonk.tpp/Data/Library/Application Support/org.americanmonk.tpp/tipitaka_pali.db"
 DEST_DPD_DIR="$HOME/Documents/GoldenDict/dpd"
 
 # ---------- Checks ----------

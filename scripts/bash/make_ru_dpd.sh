@@ -51,6 +51,12 @@ uv run python scripts/rus_exporter/ru_zip_goldendict_mdict.py
 
 uv run python scripts/moving/move_mdict_ru.py
 
+uv run python scripts/build/tarball_db.py
+
+uv run python exporter/tbw/tbw_exporter_ru.py
+
+uv run python exporter/tpr/tpr_exporter_ru.py
+
 uv run python scripts/rus_exporter/config_github_local_dpd_sbs.py
 
 git checkout -- pyproject.toml

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Rebuild the database from scratch from files in backup_tsv folder."""
+"""Adding to existing db newly made Russian and SBS tables and modify data in existing Root table, read data from files in backup_tsv folder."""
 
 import csv
 import sys
@@ -28,7 +28,7 @@ def main():
     tsvs_to_check = [
         {"path": dpspth.russian_path, "id_col": "id"},
         {"path": dpspth.sbs_path, "id_col": "id"},
-        {"path": dpspth.ru_root_path, "id_col": "root"}
+        {"path": dpspth.ru_root_path, "id_col": "root"},
     ]
 
     # Check each TSV for duplicates before processing
@@ -36,13 +36,14 @@ def main():
         if not tsv_info["path"].exists():
             pr.red(f"TSV backup file does not exist: {tsv_info['path']}")
             sys.exit(1)
-        
+
         has_dupes, dupes_list, dupes_lines = has_duplicate_values_in_column(
-            tsv_path=tsv_info["path"],
-            column_name=tsv_info["id_col"]
+            tsv_path=tsv_info["path"], column_name=tsv_info["id_col"]
         )
         if has_dupes:
-            pr.red(f"Duplicate values found in '{tsv_info['path']}' (column: '{tsv_info['id_col']}'):")
+            pr.red(
+                f"Duplicate values found in '{tsv_info['path']}' (column: '{tsv_info['id_col']}'):"
+            )
             for val in dupes_list:
                 lines = ", ".join(map(str, dupes_lines[val]))
                 pr.red(f"  - Value: '{val}' found on lines: {lines}")
@@ -106,9 +107,7 @@ def main():
         for row in russian_missing_rows:
             pr.red("  - " + "\t".join(row))
     with open(dpspth.russian_path, "w", newline="") as f:
-        csvwriter = csv.writer(
-            f, delimiter="\t", quotechar='"', quoting=csv.QUOTE_ALL
-        )
+        csvwriter = csv.writer(f, delimiter="\t", quotechar='"', quoting=csv.QUOTE_ALL)
         csvwriter.writerows(russian_rows)
 
     # Re-read the cleaned data for processing
@@ -208,7 +207,7 @@ def make_ru_root_table_data(dpspth: DPSPaths, db_session: Session):
     pr.green("filling ru in DpdRoot table")
     updated_counter = 0
     not_found_in_db_counter = 0
-    
+
     # Keep track of roots found in the TSV file
     roots_in_tsv = set()
 
@@ -216,7 +215,7 @@ def make_ru_root_table_data(dpspth: DPSPaths, db_session: Session):
     for columns, row in read_tsv_files(ru_root_files):
         data = dict(zip(columns, row))
         roots_in_tsv.add(data["root"])
-        
+
         existing_record = db_session.query(DpdRoot).filter_by(root=data["root"]).first()
         if existing_record:
             for key, value in data.items():
@@ -229,11 +228,15 @@ def make_ru_root_table_data(dpspth: DPSPaths, db_session: Session):
     # Check for roots in DB not present in TSV
     all_db_roots = db_session.query(DpdRoot.root).all()
     db_roots_set = {r[0] for r in all_db_roots}
-    
+
     roots_in_db_not_in_tsv = db_roots_set - roots_in_tsv
     if roots_in_db_not_in_tsv:
-        pr.green("Roots in DpdRoot table not found in TSV (no update performed for these):")
-        for root_val in sorted(list(roots_in_db_not_in_tsv)): # Sort for consistent output
+        pr.green(
+            "Roots in DpdRoot table not found in TSV (no update performed for these):"
+        )
+        for root_val in sorted(
+            list(roots_in_db_not_in_tsv)
+        ):  # Sort for consistent output
             pr.white(f"  - {root_val}")
 
     pr.yes(f"Updated: {updated_counter}")

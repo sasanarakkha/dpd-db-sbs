@@ -29,6 +29,7 @@ from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
 from tools.printer import printer as pr
 from tools.speech_marks import SpeechMarkManager
+from tools.utils import list_into_batches, squash_whitespaces
 from tools.utils_sbs import RenderedSizes, sum_rendered_sizes
 
 
@@ -68,7 +69,7 @@ class GlobalVars:
 
 def main():
     pr.tic()
-    pr.title("exporting dpd to goldendict and mdict")
+    pr.title("exporting dpd to goldendict and mdict (sbs)")
 
     if not config_test("exporter", "make_dpd", "yes"):
         pr.green_title("disabled in config.ini")
@@ -97,8 +98,7 @@ def main():
         )
         g.rendered_sizes.append(sizes)
 
-        variant_spelling_data_list, sizes_temp = generate_variant_spelling_html(g.pth)
-        sizes = RenderedSizes(**sizes_temp, sbs_example=0)
+        variant_spelling_data_list, sizes = generate_variant_spelling_html(g.pth)
         g.rendered_sizes.append(sizes)
 
         epd_data_list, sizes = generate_epd_html(g.db_session, g.dpspth, g.show_ru_data)
@@ -137,6 +137,7 @@ def prepare_export_to_goldendict_mdict(g: GlobalVars) -> None:
 
     description = """
     <p>Digital Pāḷi Dictionary by Bodhirasa</p>
+    <p>SBS fork by Devamitta</p>
     <p>For more information, please visit
     <a href=\"https://digitalpalidictionary.github.io\">
     the Digital Pāḷi Dictionary website</a></p>
@@ -144,7 +145,7 @@ def prepare_export_to_goldendict_mdict(g: GlobalVars) -> None:
 
     dict_info = DictInfo(
         bookname="Digital Pāḷi Dictionary",
-        author="Bodhirasa",
+        author="Bodhirasa, SBS fork by Devamitta",
         description=description,
         website="https://digitalpalidictionary.github.io/",
         source_lang="pi",
@@ -154,23 +155,22 @@ def prepare_export_to_goldendict_mdict(g: GlobalVars) -> None:
     dict_name = "dpd"
 
     dict_var = DictVariables(
-        css_paths=[g.paths.dpd_css_and_fonts_path],
-        js_paths=[
-            g.paths.family_compound_json,
-            g.paths.family_compound_template_js,
-            g.paths.family_idiom_json,
-            g.paths.family_idiom_template_js,
-            g.paths.family_root_json,
-            g.paths.family_root_template_js,
-            g.paths.family_set_json,
-            g.paths.family_set_template_js,
-            g.paths.family_word_json,
-            g.paths.family_word_template_js,
-            g.paths.feedback_template_js,
-            g.paths.frequency_template_js,
-            g.paths.main_js_path,
-        ],
-        gd_path=g.paths.share_dir,
+    css_paths=[g.paths.dpd_css_and_fonts_path],
+    js_paths=[
+        g.paths.family_compound_json,
+        g.paths.family_compound_template_js,
+        g.paths.family_idiom_json,
+        g.paths.family_idiom_template_js,
+        g.paths.family_root_json,
+        g.paths.family_root_template_js,
+        g.paths.family_set_json,
+        g.paths.family_set_template_js,
+        g.paths.family_word_json,
+        g.paths.family_word_template_js,
+        g.paths.feedback_template_js,
+        g.paths.frequency_template_js,
+        g.dpspth.templates_dir / "main.js",
+        ],        gd_path=g.paths.share_dir,
         md_path=g.paths.share_dir,
         dict_name=dict_name,
         icon_path=g.paths.dpd_logo_svg,

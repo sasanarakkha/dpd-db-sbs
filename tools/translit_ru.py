@@ -3,7 +3,7 @@ from aksharamukha import transliterate
 from typing import List # Added for type hint in main
 
 from tools.printer import printer as pr
-from tools.pali_alphabet import pali_alphabet
+from tools.pali_alphabet import english_alphabet, pali_alphabet
 
 
 def is_cyrillic(text: str) -> bool:
@@ -22,19 +22,20 @@ def auto_translit_to_roman(text: str) -> str:
     if not text: # Handle empty string case
         return ""
 
-    # 1. Check if already Roman Pali
-    # Assuming pali_alphabet contains Roman characters used in Pali transliteration
-    if text[0] in pali_alphabet:
+    if (
+        (
+            # If the first two characters are uppercase e.g. DN1, DHPa
+            len(text) >= 2 and text[0].isupper() and text[1].isupper()
+        )
+        or text[0].lower() in pali_alphabet  # if pure Pāḷi, even UpperCase
+        or text[0].lower() in english_alphabet  # if English, even UpperCase
+        or is_cyrillic(text)  # if Cyrillic
+    ):
         return text
 
-    # 2. Check if Cyrillic
-    if is_cyrillic(text):
-        return text
-
-    # 3. If not Roman Pali or Cyrillic, attempt transliteration
+    # else convert to Roman
     else:
         try:
-            # REMOVE the ': str | None' hint from this line
             transliterated_text = transliterate.process(
                 "autodetect", "IASTPali", text, post_options=["AnusvaratoNasalASTISO"]
             )

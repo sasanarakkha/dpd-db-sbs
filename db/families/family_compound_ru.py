@@ -2,10 +2,13 @@
 
 """Compile compound families and save to database."""
 
+import json
 import re
 
 from db.db_helpers import get_db_session
-from db.models import DpdHeadword, FamilyCompound
+from db.models import DbInfo, DpdHeadword, FamilyCompound
+from scripts.build.anki_updater import family_updater
+from tools.configger import config_test
 from tools.degree_of_completion_ru import rus_degree_of_completion
 from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
@@ -24,6 +27,14 @@ def main():
     pr.tic()
     pr.title("compound families generator (ru)")
 
+    if not (
+        config_test("exporter", "make_dpd", "yes")
+        or config_test("regenerate", "db_rebuild", "yes")
+    ):
+        pr.green_title("disabled in config.ini")
+        pr.toc()
+        return
+
     pth = ProjectPaths()
     db_session = get_db_session(pth.dpd_db_path)
 
@@ -38,7 +49,14 @@ def main():
 
     cf_dict = create_comp_fam_dict(dpd_db)
     cf_dict = compile_cf_html_ru(dpd_db, cf_dict)
-    update_db(db_session, cf_dict)
+    add_cf_to_db(db_session, cf_dict)
+    update_db_cache(db_session, cf_dict)
+
+    # update anki
+    if config_test("anki", "update", "yes"):
+        anki_data_list = make_anki_data(cf_dict)
+        deck = ["Family Compound RU"]
+        family_updater(anki_data_list, deck)
 
     pr.toc()
 
@@ -50,6 +68,13 @@ def create_comp_fam_dict(dpd_db: list[DpdHeadword]):
 
     for __counter__, i in enumerate(dpd_db):
         for cf in i.family_compound_list:
+            if cf == " ":
+                pr.red("ERROR: spaces found please remove!")
+            elif not cf:
+                pr.red("ERROR: '' found please remove!")
+            elif cf == "+":
+                pr.red("ERROR: + found please remove!")
+
             test1 = re.findall(r"\bcomp\b", i.grammar) != []
             test2 = len(i.lemma_clean) < 30
             test3 = i.meaning_1
@@ -62,6 +87,7 @@ def create_comp_fam_dict(dpd_db: list[DpdHeadword]):
                         "headwords": [i.lemma_1],
                         "html_ru": "",
                         "data_ru": [],
+                        "anki": [],
                     }
 
     pr.yes(len(cf_dict))
@@ -103,13 +129,20 @@ def compile_cf_html_ru(dpd_db: list[DpdHeadword], cf_dict):
                             )
                         )
 
+                    # anki data
+                    if i.meaning_1:
+                        construction = i.construction_clean if i.meaning_1 else ""
+                        cf_dict[cf]["anki"] += [
+                            (i.lemma_1, pos, ru_meaning, construction)
+                        ]
+
     for i in cf_dict:
         cf_dict[i]["html_ru"] += "</table>"
     pr.yes(len(cf_dict))
     return cf_dict
 
 
-def update_db(db_session, cf_dict):
+def add_cf_to_db(db_session, cf_dict):
     pr.green("updating db")
 
     for __counter__, cf in enumerate(cf_dict):
@@ -123,7 +156,53 @@ def update_db(db_session, cf_dict):
             pr.red(f"{cf} not found in db")
 
     db_session.commit()
-    db_session.close()
+    pr.yes("ok")
+
+
+def make_anki_data(cf_dict):
+    """Make data list for anki updater."""
+
+    anki_data_list = []
+
+    for family in cf_dict:
+        anki_family = f"<b>{family}</b>"
+        html = "<table><tbody>"
+        for row in cf_dict[family]["anki"]:
+            headword, pos, meaning, construction = row
+            html += "<tr valign='top'>"
+            html += "<div style='color: #FFB380'>"
+            html += f"<td>{headword}</td>"
+            html += f"<td><div style='color: #FF6600'>{pos}</div></td>"
+            html += f"<td><div style='color: #FFB380'>{meaning}</td>"
+            html += f"<td><div style='color: #FF6600'>{construction}</div></td></tr>"
+        html += "</tbody></table>"
+
+        if len(html) > 131072:
+            pr.red(f"{family} longer than 131072 characters")
+        else:
+            anki_data_list += [(anki_family, html)]
+
+    return anki_data_list
+
+
+def update_db_cache(db_session, cf_dict):
+    """Update the db_info with cf_set for use in the exporter."""
+
+    pr.green("adding DbInfo cache item")
+
+    cf_set = set()
+    for i in cf_dict:
+        cf_set.add(i)
+
+    cf_set_cache = db_session.query(DbInfo).filter_by(key="cf_set").first()
+
+    if not cf_set_cache:
+        cf_set_cache = DbInfo()
+
+    cf_set_cache.key = "cf_set"
+    cf_set_cache.value = json.dumps(list(cf_set), ensure_ascii=False, indent=1)
+    db_session.add(cf_set_cache)
+    db_session.commit()
     pr.yes("ok")
 
 

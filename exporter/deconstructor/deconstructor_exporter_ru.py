@@ -2,7 +2,6 @@
 
 """Export Deconstructor To GoldenDict and MDict formats."""
 
-from mako.template import Template
 from minify_html import minify
 
 from db.db_helpers import get_db_session
@@ -23,7 +22,16 @@ from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 from tools.speech_marks import SpeechMarkManager, SpeechMarksDict
 from tools.utils import squash_whitespaces
+from exporter.jinja2_env import get_jinja2_env
+from exporter.deconstructor.data_classes import DeconstructorData
 
+class DeconstructorDataRu(DeconstructorData):
+    def _generate_header(self, pth: ProjectPaths, jinja_env) -> str:
+        header_templ = jinja_env.get_template("deconstructor_header_ru.jinja")
+        css_manager = CSSManager()
+        html_header = header_templ.render(css="", js="")
+        html_header = css_manager.update_style(html_header, "deconstructor")
+        return squash_whitespaces(html_header)
 
 class ProgData:
     """Global variables."""
@@ -56,33 +64,16 @@ def make_deconstructor_dict_data(g: ProgData) -> None:
 
     dict_data: list = []
 
-    header_templ = Template(filename=str(g.pth.deconstructor_header_templ_path))
-    deconstructor_header = str(header_templ.render(css="", js=""))
-
-    # add css variables and roots
-    css_manager = CSSManager()
-    deconstructor_header = css_manager.update_style(
-        deconstructor_header, "deconstructor"
-    )
-
-    deconstructor_templ = Template(filename=str(g.rupth.deconstructor_templ_path))
+    jinja_env_header = get_jinja2_env("exporter/deconstructor")
+    jinja_env_body = get_jinja2_env("exporter/goldendict/ru_components/templates")
+    template = jinja_env_body.get_template("deconstructor_ru.jinja")
 
     pr.yes(len(deconstructor_db))
 
     for counter, i in enumerate(deconstructor_db):
-        deconstructions = i.deconstructor_unpack
-
-        html_string: str = ""
-        html_string += "<body>"
-        html_string += str(
-            deconstructor_templ.render(
-                i=i, deconstructions=deconstructions, today=TODAY
-            )
-        )
-
-        html_string += "</body></html>"
-
-        html_string = squash_whitespaces(deconstructor_header) + minify(html_string)
+        data = DeconstructorDataRu(i, g.pth, jinja_env_header)
+        
+        html_string = data.header + minify(template.render(data=data))
 
         # make synonyms list
         synonyms = add_niggahitas([i.lookup_key], all=False)

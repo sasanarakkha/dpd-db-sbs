@@ -24,8 +24,9 @@ Synchronization is a high-risk task that requires semantic understanding, not ju
 - **Model:** PRO (e.g., `gemini-2.0-pro-exp-02-05`).
 - **Action:**
     1.  **Analyze Diffs:** Run `git diff HEAD^` (or compare `sbs-ru` vs `as_upstream` for modified files).
-    2.  **Shadow Check:** Identify which shadow copies need updates based on changes to their upstream sources.
-    3.  **Output:** Create a temporary file `conductor/tracks/<current_track>/dynamic_sync_plan.md`.
+    2.  **Localized Exporter Audit:** Identify which upstream exporters have changed. Cross-reference this with the list of localized RU/SBS/DPS exporters. If an upstream exporter has no localized counterpart or relevance to localized data, DO NOT plan any updates for it.
+    3.  **Shadow Check:** Identify which shadow copies need updates based on changes to their upstream sources.
+    4.  **Output:** Create a temporary file `conductor/tracks/<current_track>/dynamic_sync_plan.md`.
     4.  **Content of `dynamic_sync_plan.md`:**
         -   **Manual Merges:** List exactly which files in `modified_upstream_files` changed and what blocks of code need to be ported.
         -   **Shadow Updates:** List each shadow file that needs updating. explicitly stating *what* to update (e.g., "Add `superscripter` variable to `render` call in `export_roots_ru.py`").
@@ -66,6 +67,7 @@ To ensure no localized shadow copies are missed, the agent MUST execute the foll
     *   **Metadata Structure:** For Kindle/Ebook templates (`content.opf`, `*.xhtml`), compare the *structure* of metadata tags against upstream. If upstream adds attributes like `title-type="main"`, the shadow template MUST adopt them to pass validation.
     *   **Asset Manifest:** Ensure `content.opf` manifests only reference files that actually exist in the shadow directory (e.g., do not list fonts if they weren't copied).
     *   **Shadow Copy Visual Identity (EXACT MATCH):** ALL shadow copies (templates AND Python files) MUST maintain the exact same structure, CSS classes, function order, and nesting as their upstream originals.
+        *   **Localized Tracking Only:** ONLY track and update exporters that have localized versions (RU, SBS, DPS). If an upstream exporter (e.g., `exporter/kobo/kobo.py`) is updated but has no localized counterpart or relevance to localized data, ignore its changes.
         *   **Templates:** If upstream uses `<div class="dpd">`, shadow MUST use `<div class="dpd">`. If upstream uses a specific loop structure, shadow MUST match it.
         *   **Python:** Shadow Python files (`*_ru.py`) must maintain the same function order, variable naming, and control flow as the original.
         *   **Reason:** Visual parity is critical for side-by-side diffing. Do not refactor shadow files to be "better" if it creates visual diff noise.

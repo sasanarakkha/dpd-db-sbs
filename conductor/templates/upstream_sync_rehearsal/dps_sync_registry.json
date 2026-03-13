@@ -20,17 +20,27 @@
     "gui2/pass2_add_view.py",
     "tools/ai_manager.py",
     ".gitignore",
-    "AGENTS.md",
-    "exporter/webapp/data_classes.py"
+    "AGENTS.md"
   ],
-  "ignored_files": [
-    "gui2/data",
+  "no_sync_files": [
+    "conductor/archive",
     "conductor/tracks",
     "conductor/tracks.md",
-    "scripts/archive",
-    "db/backup_tsv/*.tsv",
-    "docs_rus/dpd_rus.md",
+    "conductor/templates",
     "exporter/mcp"
+  ],
+  "ignored_files": [
+    "gui2/data/",
+    "scripts/archive/",
+    "exporter/apple_dictionary/",
+    "exporter/chrome_extension/",
+    "exporter/kobo/",
+    "exporter/wxt_extension/",
+    "exporter/mobile/",
+    "exporter/tester/",
+    "exporter/sutta_central/",
+    "exporter/pdf/",
+    "tests/"
   ],
   "unique_paths": [
     ".github/workflows/submodules_update.yml",
@@ -63,7 +73,9 @@
     "tools/ai_related.py",
     "tools/sbs_table_functions.py",
     "tools/tools_for_ru_exporter.py",
-    "db_tests/sbs_consistency_tests.py"
+    "db_tests/sbs_consistency_tests.py",
+    "docs_rus/dpd_rus.md",
+    "db/families/family_set_ru_update.py"
   ],
   "russian_copies": {
     ".github/workflows/ru_release.yml": ".github/workflows/draft_release.yml",
@@ -85,6 +97,7 @@
     "exporter/goldendict/export_roots_ru.py": "exporter/goldendict/export_roots.py",
     "exporter/goldendict/export_variant_spelling_ru.py": "exporter/goldendict/export_variant_spelling.py",
     "exporter/goldendict/main_ru.py": "exporter/goldendict/main.py",
+    "exporter/goldendict/data_classes_dps.py": "exporter/goldendict/data_classes.py",
     "exporter/grammar_dict/grammar_dict_ru.py": "exporter/grammar_dict/grammar_dict.py",
     "exporter/kindle/kindle_exporter_ru.py": "exporter/kindle/kindle_exporter.py",
     "exporter/kindle/ru_components/cover/": "exporter/kindle/cover/",
@@ -124,6 +137,7 @@
     "exporter/goldendict/export_help_sbs.py": "exporter/goldendict/export_help.py",
     "exporter/goldendict/export_roots_sbs.py": "exporter/goldendict/export_roots.py",
     "exporter/goldendict/main_sbs.py": "exporter/goldendict/main.py",
+    "exporter/goldendict/data_classes_dps.py": "exporter/goldendict/data_classes.py",
     "exporter/webapp/sbs_templates/": "exporter/webapp/templates/",
     "scripts/backup/backup_ru_sbs.py": "scripts/backup/backup_dpd_headwords_and_roots.py",
     "scripts/build/db_rebuild_from_tsv_ru_sbs.py": "scripts/build/db_rebuild_from_tsv.py",

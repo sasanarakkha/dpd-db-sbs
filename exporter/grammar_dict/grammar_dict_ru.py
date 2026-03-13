@@ -2,11 +2,8 @@
 
 """Compile HTML table of all grammatical possibilities of every inflected word-form."""
 
-from mako.template import Template
-
 from db.db_helpers import get_db_session
 from db.models import Lookup
-
 from tools.configger import config_test
 from tools.css_manager import CSSManager
 from tools.goldendict_exporter import DictInfo, DictVariables, DictEntry
@@ -16,11 +13,27 @@ from tools.niggahitas import add_niggahitas
 from tools.paths import ProjectPaths
 from tools.paths_ru import RuPaths
 from tools.printer import printer as pr
+from exporter.jinja2_env import get_jinja2_env
+from exporter.grammar_dict.data_classes import GrammarData
 
 from tools.tools_for_ru_exporter import (
     ru_replace_abbreviations,
     load_abbreviations_dict,
 )
+
+
+class GrammarDataRu(GrammarData):
+    def _process_grammar(self, grammar_data_list):
+        processed_rows = super()._process_grammar(grammar_data_list)
+        
+        # Translate components to Russian
+        for row in processed_rows:
+            row["pos"] = ru_replace_abbreviations(row["pos"])
+            for i in range(len(row["components"])):
+                if row["components"][i]:
+                    row["components"][i] = ru_replace_abbreviations(row["components"][i], kind="gram")
+        
+        return processed_rows
 
 
 class ProgData:
@@ -35,7 +48,7 @@ class ProgData:
         self.db_session = get_db_session(self.pth.dpd_db_path)
 
         # the grammar dictionaries
-        self.html_dict: dict[str, str] = {}  # Renamed from grammar_dict_html
+        self.html_dict: dict[str, str] = {}
 
         # goldendict and mdict data_list
         self.dict_data: list[DictEntry] = []
@@ -49,7 +62,7 @@ class ProgData:
 
 def main():
     pr.tic()
-    pr.title("exporting grammar dictionary")
+    pr.title("exporting grammar dictionary (ru)")
 
     if not config_test("exporter", "make_grammar", "yes"):
         pr.green("disabled in config.ini")
@@ -58,9 +71,9 @@ def main():
 
     g = ProgData()
 
-    generate_html_from_lookup(g)  # New function replaces old ones
+    generate_html_from_lookup(g)
 
-    g.close_db()  # Close db session when done
+    g.close_db()
 
     make_data_lists(g)
     prepare_gd_mdict_and_export(g)
@@ -68,58 +81,10 @@ def main():
     pr.toc()
 
 
-def render_header_templ(
-    __pth__: ProjectPaths, css: str, js: str, header_templ: Template
-) -> str:
-    """render the html header with css and js"""
-
-    return str(header_templ.render(css=css, js=js))
-
-
-def generate_grammar_row_html(data_tuple: tuple[str, str, str]) -> str:
-    """Generate HTML for a single row in the grammar table."""
-    headword, pos, grammar_str = data_tuple
-    html_line = "<tr>"
-    html_line += f"<td><b>{pos}</b></td>"
-
-    # get grammatical_categories from grammar_str
-    grammatical_categories: list[str] = []
-    if grammar_str.startswith("reflx"):
-        parts = grammar_str.split()
-        if len(parts) >= 2:
-            grammatical_categories.append(parts[0] + " " + parts[1])
-            grammatical_categories += parts[2:]
-        else:
-            grammatical_categories.append(grammar_str)
-
-        for grammatical_category in grammatical_categories:
-            html_line += f"<td>{grammatical_category}</td>"
-    elif grammar_str.startswith("in comps"):
-        html_line += f"<td>{grammar_str}</td>"
-        html_line += "<td class='col_empty'></td>"
-        html_line += "<td class='col_empty'></td>"
-    else:
-        grammatical_categories = grammar_str.split()
-        # adding empty values if there are less than 3
-        while len(grammatical_categories) < 3:
-            grammatical_categories.append("")
-        for grammatical_category in grammatical_categories:
-            if grammatical_category == "":
-                html_line += "<td class='col_empty'></td>"
-            else:
-                html_line += f"<td>{grammatical_category}</td>"
-
-    html_line += "<td>of</td>"
-    html_line += f"<td>{headword}</td>"
-    html_line += "</tr>"
-    return html_line
-
-
 def generate_html_from_lookup(g: ProgData):
     """Generate HTML grammar tables from Lookup table data."""
     pr.green("querying database")
 
-    # Query the Lookup table for entries with grammar data
     lookup_results = (
         g.db_session.query(Lookup)
         .filter(Lookup.grammar.is_not(None), Lookup.grammar != "")
@@ -128,64 +93,40 @@ def generate_html_from_lookup(g: ProgData):
 
     pr.yes(f"{len(lookup_results)}")
 
-    pr.green_title("compiling html")
+    pr.green("compiling html")
 
     # Preload abbreviations dictionary
     load_abbreviations_dict(g.rupth.abbreviations_tsv_path)
 
+    jinja_env = get_jinja2_env("exporter/grammar_dict")
+    template = jinja_env.get_template("grammar.jinja")
+
     html_dict = {}
-
-    # create the header from a template
-    header_templ = Template(filename=str(g.pth.grammar_dict_header_templ_path))
-    html_header = render_header_templ(g.pth, css="", js="", header_templ=header_templ)
-
-    # Add variables and fonts to header
-    css_manager = CSSManager()
-    html_header = css_manager.update_style(html_header, "primary")
-
-    html_table_start = "<body><div class='dpd'><table class='grammar_dict'>"
-    html_table_start += "<thead><tr><th id='col1'>чр ⇅</th><th id='col2'>⇅</th><th id='col3'>⇅</th><th id='col4'>⇅</th><th id='col5'></th><th id='col6'>слово ⇅</th></tr></thead><tbody>"
-
-    # Cache for identical grammar sets
     grammar_cache: dict[str, str] = {}
 
-    # Process each lookup entry
-    for counter, lookup_entry in enumerate(lookup_results):
+    for lookup_entry in lookup_results:
         inflected_word = lookup_entry.lookup_key
         grammar_data = lookup_entry.grammar
 
         if grammar_data in grammar_cache:
-            html_body = grammar_cache[grammar_data]
+            entry_html = grammar_cache[grammar_data]
         else:
-            grammar_data_list = (
-                lookup_entry.grammar_unpack
-            )  # [(headword, pos, grammar_str)]
+            # Use ViewModel
+            data = GrammarDataRu(lookup_entry, g.pth, jinja_env)
+            entry_html = template.render(data=data)
+            
+            # Since the Jinja template hardcodes "of", we need to replace it with "для"
+            # It also hardcodes the column headers in English, so we replace them.
+            entry_html = entry_html.replace("<td>of</td>", "<td>для</td>")
+            entry_html = entry_html.replace("<th id='col1'>pos ⇅</th>", "<th id='col1'>чр ⇅</th>")
+            entry_html = entry_html.replace("<th id='col6'>word ⇅</th>", "<th id='col6'>слово ⇅</th>")
+            
+            grammar_cache[grammar_data] = entry_html
 
-            html_lines = []
-            for data_tuple in grammar_data_list:
-                # Generate English Row
-                row_en = generate_grammar_row_html(data_tuple)
-                # Translate to Russian
-                row_ru = ru_replace_abbreviations(row_en, kind="gram")
-                html_lines.append(row_ru)
-
-            html_body = "".join(html_lines)
-            grammar_cache[grammar_data] = html_body
-
-        # Assemble the full HTML for the entry
-        entry_html = (
-            html_header
-            + html_table_start
-            + html_body
-            + "</tbody></table></div></body></html>"
-        )
         html_dict[inflected_word] = entry_html
 
-        if counter % 10000 == 0:
-            pr.counter(counter, len(lookup_results), inflected_word)
-
     g.html_dict = html_dict
-    pr.yes(len(g.html_dict))
+    pr.yes(len(html_dict))
 
 
 def make_data_lists(g: ProgData):
@@ -193,7 +134,6 @@ def make_data_lists(g: ProgData):
     pr.green("making data lists")
 
     dict_data: list[DictEntry] = []
-    # Use the refactored html_dict
     for word, html in g.html_dict.items():
         synonyms = add_niggahitas([word])
 

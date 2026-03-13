@@ -72,7 +72,7 @@ Here is a quick overview:
 
 - **`non_ia`** `[str]` what non Indo-Aryan word is the headword derived from?
 
-- **`sanskrit`** `[str]` what is the closest Sanskrit cognate in Monier-Williams or Edgerton?
+- **`sanskrit`** `[str]` ближайшее санскритское соответствие в словаре Монье-Вильямса (MW) или Эджертона. Префикс и корень, найденные в MW, указаны в квадратных скобках [kṛ].
 
 - *`sanskrit_clean`* `[str]` what is the Sanskrit stripped of all content in `[square brackets]`?
 
@@ -243,6 +243,16 @@ Here is a quick overview:
 - *`idioms_set`* `[set]` set of all the idioms in the database
 
 - *`__repr__`* `[str]` quick overview of headword data
+
+## Особые символы
+
+Некоторые поля содержат символы, значение которых может быть неочевидным.
+
+- `sanskrit`: `[квадратные скобки]` содержат префикс и корень, найденные в словаре Монье-Вильямса, например, `[anukṛ]`.
+- `source_1`: `-` означает, что реальный пример не найден. Часто используется для названий сутт и других структурных элементов палийских текстов. Запись считается полной даже без примера.
+- `stem`: `!` означает отсутствие фактической основы. Слово полностью выводится из колонки `pattern`.
+- `stem`: `*` означает, что не следует генерировать полный список флексий для колонки `inflection`. Слово часто является неправильной формой, и необходимо распознавать только точное написание `lemma_clean`.
+
 
 ## Database Relationships
 

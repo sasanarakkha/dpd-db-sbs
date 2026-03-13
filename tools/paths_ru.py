@@ -75,7 +75,8 @@ class RuPaths:
             base_dir / "exporter/kindle/ru_components/templates/ebook_ru_rpd_entry.html"
         )
         self.ebook_rpd_letter_templ_path = (
-            base_dir / "exporter/kindle/ru_components/templates/ebook_ru_rpd_letter.html"
+            base_dir
+            / "exporter/kindle/ru_components/templates/ebook_ru_rpd_letter.html"
         )
         self.ebook_title_page_templ_path = (
             base_dir / "exporter/kindle/ru_components/templates/ebook_ru_titlepage.html"
@@ -84,53 +85,54 @@ class RuPaths:
         self.buttons_js_path = base_dir / "exporter/goldendict/javascript/buttons.js"
         self.family_compound_json = (
             base_dir
-            / "exporter/goldendict/ru_components/javascript/family_compound_json.js"
+            / "exporter/goldendict/ru_components/javascript/ru_family_compound_json.js"
         )
         self.family_compound_template_js = (
             base_dir
-            / "exporter/goldendict/ru_components/javascript/family_compound_template.js"
+            / "exporter/goldendict/ru_components/javascript/ru_family_compound_template.js"
         )
         self.family_idiom_json = (
             base_dir
-            / "exporter/goldendict/ru_components/javascript/family_idiom_json.js"
+            / "exporter/goldendict/ru_components/javascript/ru_family_idiom_json.js"
         )
         self.family_idiom_template_js = (
             base_dir
-            / "exporter/goldendict/ru_components/javascript/family_idiom_template.js"
+            / "exporter/goldendict/ru_components/javascript/ru_family_idiom_template.js"
         )
         self.family_root_json = (
             base_dir
-            / "exporter/goldendict/ru_components/javascript/family_root_json.js"
+            / "exporter/goldendict/ru_components/javascript/ru_family_root_json.js"
         )
         self.family_root_template_js = (
             base_dir
-            / "exporter/goldendict/ru_components/javascript/family_root_template.js"
+            / "exporter/goldendict/ru_components/javascript/ru_family_root_template.js"
         )
         self.family_set_json = (
-            base_dir / "exporter/goldendict/ru_components/javascript/family_set_json.js"
+            base_dir
+            / "exporter/goldendict/ru_components/javascript/ru_family_set_json.js"
         )
         self.family_set_template_js = (
             base_dir
-            / "exporter/goldendict/ru_components/javascript/family_set_template.js"
+            / "exporter/goldendict/ru_components/javascript/ru_family_set_template.js"
         )
         self.family_word_json = (
             base_dir
-            / "exporter/goldendict/ru_components/javascript/family_word_json.js"
+            / "exporter/goldendict/ru_components/javascript/ru_family_word_json.js"
         )
         self.family_word_template_js = (
             base_dir
-            / "exporter/goldendict/ru_components/javascript/family_word_template.js"
+            / "exporter/goldendict/ru_components/javascript/ru_family_word_template.js"
         )
         self.feedback_template_js = (
             base_dir
-            / "exporter/goldendict/ru_components/javascript/feedback_template.js"
+            / "exporter/goldendict/ru_components/javascript/ru_feedback_template.js"
         )
         self.frequency_template_js = (
             base_dir
-            / "exporter/goldendict/ru_components/javascript/frequency_template.js"
+            / "exporter/goldendict/ru_components/javascript/ru_frequency_template.js"
         )
         self.main_js_path = (
-            base_dir / "exporter/goldendict/ru_components/javascript/main.js"
+            base_dir / "exporter/goldendict/ru_components/javascript/ru_main.js"
         )
 
         # exporter/share
@@ -141,9 +143,9 @@ class RuPaths:
         self.dpd_goldendict_dir = base_dir / "exporter/share/ru-dpd/"
         self.dpd_goldendict_zip_path = base_dir / "exporter/share/ru-dpd-goldendict.zip"
         self.dpd_grammar_goldendict_dir = base_dir / "exporter/share/ru-dpd-grammar/"
+        self.dpd_variants_goldendict_dir = base_dir / "exporter/share/dpd-variants/"
         self.dpd_mdict_zip_path = base_dir / "exporter/share/ru-dpd-mdict.zip"
         self.dpd_mobi_path = base_dir / "exporter/share/ru-dpd-kindle.mobi"
-        self.dpd_variants_goldendict_dir = base_dir / "exporter/share/dpd-variants/"
         self.share_dir = base_dir / "exporter/share"
 
         # exporter/share/mdict
@@ -155,10 +157,10 @@ class RuPaths:
         )
         self.dpd_grammar_mdd_path = base_dir / "exporter/share/ru-dpd-grammar-mdict.mdd"
         self.dpd_grammar_mdx_path = base_dir / "exporter/share/ru-dpd-grammar-mdict.mdx"
-        self.dpd_mdd_path = base_dir / "exporter/share/ru-dpd-mdict.mdd"
-        self.dpd_mdx_path = base_dir / "exporter/share/ru-dpd-mdict.mdx"
         self.dpd_variants_mdd_path = base_dir / "exporter/share/dpd-variants-mdict.mdd"
         self.dpd_variants_mdx_path = base_dir / "exporter/share/dpd-variants-mdict.mdx"
+        self.dpd_mdd_path = base_dir / "exporter/share/ru-dpd-mdict.mdd"
+        self.dpd_mdx_path = base_dir / "exporter/share/ru-dpd-mdict.mdx"
 
         # exporter/deconstructor/templates
         self.deconstructor_header_templ_path = (
@@ -222,9 +224,7 @@ class RuPaths:
         self.root_header_templ_path = (
             base_dir / "exporter/goldendict/ru_components/templates/root_header.html"
         )
-        self.sbs_example_templ_path = (
-            base_dir / "exporter/goldendict/templates/sbs_example.html"
-        )
+        self.see_templ_path = base_dir / "exporter/goldendict/templates/dpd_see.jinja"
         self.spelling_templ_path = (
             base_dir
             / "exporter/goldendict/ru_components/templates/dpd_spelling_mistake.html"
@@ -306,6 +306,8 @@ class RuPaths:
         self.template_rpd = "rpd.html"
         self.template_variant_summary = "variant_summary.html"
         self.template_variant = "variant.html"
+        self.template_see_summary = "see_summary.html"
+        self.template_see = "see.html"
         self.template_manual_variant = "manual_variant.html"
         self.template_manual_variant_summary = "manual_variant_summary.html"
         self.template_spelling_summary = "spelling_summary.html"
@@ -347,6 +349,9 @@ class RuPaths:
         self.docs_changelog_md_path = base_dir / "docs_rus/changelog.md"
         self.docs_thanks_md_path = base_dir / "docs_rus/thanks.md"
 
+        # temp
+        self.temp_dir = base_dir / "temp/"
+
         if create_dirs:
             self.create_dirs()
 
@@ -356,5 +361,6 @@ class RuPaths:
             self.share_dir,
             self.epub_dir,
             self.epub_text_dir,
+            self.temp_dir,
         ]:
             d.mkdir(parents=True, exist_ok=True)

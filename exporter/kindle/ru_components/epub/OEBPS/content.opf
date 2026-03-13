@@ -3,11 +3,12 @@
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
     <dc:language>ru</dc:language>
     <dc:identifier id="BookId">urn:uuid:6ca06004-ca06-4ca0-ca06-04ca06ca0604</dc:identifier>
-    <meta property="dcterms:modified">2026-02-12T15:41:31Z</meta>
+    <meta property="dcterms:modified">2026-03-13T16:06:50Z</meta>
               <DictionaryOutLanguage>ru</DictionaryOutLanguage>
               <DefaultLookupIndex>Пали</DefaultLookupIndex>
     <dc:title id="title1">Цифровой Словарь Пали</dc:title>
     <meta refines="#title1" property="file-as">Цифровой Словарь Пали</meta>
+    <meta refines="#title1" property="title-type">main</meta>
     <dc:title id="title2">Русский к Пали</dc:title>
     <dc:creator id="create1">Бодхираса Бхиккху</dc:creator>
     <meta refines="#create1" property="file-as">Дост. Бодхираса</meta>

@@ -4,6 +4,7 @@
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword, FamilySet
+from tools.configger import config_test
 from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
@@ -22,6 +23,14 @@ def main():
     pr.tic()
     pr.title("sets generator (ru)")
 
+    if not (
+        config_test("exporter", "make_dpd", "yes")
+        or config_test("regenerate", "db_rebuild", "yes")
+    ):
+        pr.green("disabled in config.ini")
+        pr.toc()
+        return
+
     pth = ProjectPaths()
     db_session = get_db_session(pth.dpd_db_path)
 
@@ -35,7 +44,8 @@ def main():
 
     sets_dict = make_sets_dict(sets_db)
     sets_dict = compile_sf_html_ru(sets_db, sets_dict)
-    update_db(db_session, sets_dict)
+    errors_list = add_sf_to_db(db_session, sets_dict)
+    print_errors_list(errors_list)
 
     pr.toc()
 
@@ -47,6 +57,13 @@ def make_sets_dict(sets_db):
 
     for __counter__, i in enumerate(sets_db):
         for fs in i.family_set_list:
+            if fs == " ":
+                pr.red("ERROR: spaces found please remove!")
+            elif not fs:
+                pr.red("ERROR: '' found please remove!")
+            elif fs == "+":
+                pr.red("ERROR: + found please remove!")
+
             if i.meaning_1:
                 if fs in sets_dict:
                     sets_dict[fs]["headwords"] += [i.lemma_1]
@@ -104,24 +121,38 @@ def compile_sf_html_ru(sets_db: list[DpdHeadword], sets_dict):
     return sets_dict
 
 
-def update_db(db_session, sets_dict):
+def add_sf_to_db(db_session, sets_dict):
     pr.green("updating db")
+
+    errors_list = []
 
     for sf in sets_dict:
         # find in db
         sf_data = db_session.query(FamilySet).filter_by(set=sf).first()
 
         if sf_data:
+            count = len(sets_dict[sf]["headwords"])
             sf_data.html_ru = sets_dict[sf]["html_ru"]
             sf_data.set_ru = sets_dict[sf]["set_ru"]
             sf_data.data_ru_pack(sets_dict[sf]["data_ru"])
             db_session.add(sf_data)
+
+            if count < 3:
+                errors_list += [sf]
         else:
             pr.red(f"{sf} not found in db")
 
     db_session.commit()
-    db_session.close()
     pr.yes("ok")
+
+    return errors_list
+
+
+def print_errors_list(errors_list):
+    if errors_list != []:
+        pr.red("ERROR: less than 3 names in set: ")
+        for error in sorted(errors_list):
+            pr.red(f"{error}")
 
 
 if __name__ == "__main__":

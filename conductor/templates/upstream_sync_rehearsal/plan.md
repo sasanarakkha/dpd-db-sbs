@@ -1,10 +1,15 @@
 # Plan: Upstream Sync Rehearsal (Standard Monthly)
 
 ## Phase 1: Automated Synchronization (Auto)
+
+- [ ] Task: Backup SBS and Russian data
+    - [ ] Backup SBS and Russian data by running: `scripts/backup/backup_ru_sbs.py`
+    - [ ] Commit all uncommitted changes: `git commit -am "backup before sync"`
 - [ ] Task: Pre-Sync Branch Check
     - [ ] Verify there are no uncommitted changes in the `sbs-ru` branch.
 - [ ] Task: Execute Sync Script
-    - [ ] Run `bash scripts/bash/full_sync.sh`.
+    - [ ] **CRITICAL:** The sync script requires user input. You MUST run it non-interactively by piping the required option (e.g., Option 2). 
+    - [ ] Run `echo 2 | bash scripts/bash/full_sync.sh` (or utilize a dedicated non-interactive script if one was created).
     - [ ] **Update Submodules**: Run `git submodule init && git submodule update`.
     - [ ] **AUTO-COMMIT (COMMIT 1/2)**: The sync script performs an automated commit here, immediately preceded by `dpd-sync-assertions.sh` output.
 - [ ] Task: Post-Bash Sync Verification
@@ -15,24 +20,33 @@
 
 ## Phase 2: Analysis & Dynamic Planning (PRO)
 - [ ] **🛑 MANDATORY MODEL SWITCH: PRO** (Ask user to switch).
+- [ ] Task: Process Improvement (Continuous)
+    - [ ] **EXPLICIT INSTRUCTION**: While going through this stage with the PRO model, think about how this process may be improved. After trying an improvement, add that improvement directly to this template (`conductor/templates/upstream_sync_rehearsal/plan.md`).
 - [ ] Task: Semantic Analysis
     - [ ] Analyze `git diff HEAD^` and `modified_upstream_files`.
-    - [ ] Check upstream sources for all shadow copies.
+    - [ ] **Localized Exporter Audit:** Identify which upstream exporters have changed. Cross-reference this with the list of localized RU/SBS/DPS exporters. Only plan updates for those that are relevant to localized data.
+    - [ ] **CRITICAL:** Check upstream sources for *all* shadow copies defined in `russian_copies` and `sbs_copies` in the registry. You MUST use a script to intersect the latest commit's modified files with all mapped source files AND source directories (e.g., `exporter/goldendict/templates/`). Do NOT rely on `modified_upstream_files` alone for shadow copies. All sources for shadow copies mentioned in "russian_copies" and "sbs_copies" must be checked for changes.
 - [ ] Task: Create Dynamic Spec
-    - [ ] Write `dynamic_sync_plan.md` with precise instructions for the Auto model.
+    - [ ] Write `dynamic_sync_plan.md` in the current track folder with precise instructions for the Auto model.
 - [ ] **🛑 MANDATORY MODEL SWITCH: AUTO** (Ask user to switch back).
 
 ## Phase 3: Implementation (Auto)
 - [ ] **🛑 NO COMMITS ALLOWED IN THIS PHASE.**
 - [ ] Task: Execute Dynamic Plan
-    - [ ] Follow instructions in `dynamic_sync_plan.md`.
+    - [ ] Follow instructions in the track's `dynamic_sync_plan.md`.
 - [ ] Task: Update Shadow Copies
+    - [ ] **Relevant Exporters Only:** Only port changes to localized exporters (`_ru.py`, `_sbs.py`, `_dps.py`, etc.). If an upstream exporter has no localized counterpart or relevance, ignore its changes.
+    - [ ] **Dual-Shadow Check**: For every modified upstream file, you MUST verify if it has BOTH an `_ru` and an `_sbs` shadow copy. If so, apply the updates to BOTH. Do not update one and ignore the other.
+    - [ ] **Preserve CSS/JS Uniqueness**: When copying HTML, CSS, or JS from upstream templates to shadow templates, you MUST ensure that HTML IDs, CSS classes, and JS function names remain unique (e.g., using `_ru` or `_sbs` suffixes). Failure to do this will cause GoldenDict buttons to conflict when both dictionaries are loaded simultaneously.
     - [ ] **Check Render Parity**: Verify all variables passed to `render()` in upstream match the shadow copies.
     - [ ] **Check Import Parity**: Verify new upstream imports are present in shadow copies.
     - [ ] **Check Kindle/OPF Metadata**: Verify `content.opf` structure matches upstream requirements.
     - [ ] **Check for New Upstream Files**: Run `git ls-files exporter/goldendict/templates/` (and other source dirs) to catch new templates that need Russian/SBS counterparts.
+    - [ ] **New Exporter Audit:** If any new upstream exporters are detected, only track them if they contain relevant localized data (RU, SBS, DPS). Otherwise, add them to `ignored_files` in the registry.
 - [ ] Task: Post-Shadow Update Verification
+    - [ ] Run `uv run python tests/check_shadow_modifications.py` to mathematically verify that every modified upstream source has a corresponding modification in its shadow copy.
     - [ ] Run `uv run pytest tests/test_shadow_parity.py` to validate data flow and structural parity of shadow copies.
+    - [ ] If there are failures due to intentional differences (like missing classes or functions in shadow copies because of localization), automatically generate a whitelist of exact AST differences and inject it into `WHITELIST` in `tests/test_shadow_parity.py`, then re-run to ensure all other parities are intact.
 - [ ] Task: Documentation Parity
     - [ ] Ensure documentation parity between docs/ and docs_rus/.
 - [ ] Task: Update Rehearsal Templates
@@ -40,6 +54,9 @@
 
 ## Phase 4: Final Logic Audit (PRO)
 - [ ] **🛑 MANDATORY MODEL SWITCH: PRO** (Ask user to switch).
+- [ ] **🛑 MANDATORY FIXING RULE**: Whenever errors are identified in shadow copies (e.g., via user feedback or test failures), DO NOT introduce a new solution. You MUST double-check how the logic is implemented in the original upstream source file and emulate it exactly, only layering localized updates on top. The goal is complete logic parity with upstream. If unsure about a fix, ask the user for clarification.
+- [ ] Task: Process Improvement (Continuous)
+    - [ ] **EXPLICIT INSTRUCTION**: While going through this stage with the PRO model, think about how this process may be improved. After trying an improvement, add that improvement directly to this template (`conductor/templates/upstream_sync_rehearsal/plan.md`).
 - [ ] Task: PRO Logic Audit
     - [ ] **AGENT ACTION**: Use PRO model to manually audit EVERY modified file and shadow copy against upstream originals.
 - [ ] Task: Post-DB Rebuild Verification
@@ -47,6 +64,10 @@
 - [ ] **🛑 MANDATORY MODEL SWITCH: AUTO** (Ask user to switch back).
 
 ## Phase 5: Finalization & Verification (Auto)
+- [ ] **🛑 MANDATORY FIXING RULE**: Whenever errors are identified in shadow copies (via test failures or user feedback), DO NOT invent new logic or try to guess the solution. You MUST:
+    1. Open the original upstream source file.
+    2. Analyze how upstream successfully implemented the logic.
+    3. Emulate that exact logic in the shadow copy, layered ONLY with intended localization differences. Upstream is the source of truth. If unsure about a fix, ask the user for clarification.
 - [ ] Task: Pre-Final Commit Verification
     - [ ] Run all exporters tests, imports tests, docs parity tests, and new feature tests.
     - [ ] Run `uv run pytest tests/test_template_structure.py` to verify HTML template structural parity.
@@ -54,6 +75,8 @@
 - [ ] Task: **🛑 FINAL USER APPROVAL GATE**
     - [ ] **HARD STOP**: Agent presents a summary of all changes.
     - [ ] **USER MANUAL CHECK**: User reviews all changes and provides approval. Whenever user provide feedback, after implementation of user feedback, ask again for next feedback. Until user explicitly provide "Phase 5 is complete" or "Proceed with final commit".
+    - [ ] **ERROR CORRECTION**: If user provide any feedback, correct it but not introduce a new solution - just double check how it is in the original source and fix it if needed. If you are not sure about the fix, ask user for clarification. The goal is to have compleat sync with upstream. Upstream files are error free, so we can rely on them.
+    - [ ] **CRITICAL REMINDER TO AGENT**: You are FORBIDDEN from proceeding to the "FINAL MANUAL COMMIT" task or marking the track as complete until the user explicitly types the exact phrase "Proceed with final commit". Do not proceed on implicit agreement.
     - [ ] **AWAIT SIGNAL**: "Phase 5 is complete" or "Proceed with final commit".
 - [ ] Task: **FINAL MANUAL COMMIT (COMMIT 2/2)**
     - [ ] Perform ONE consolidated commit for all manual work, only after ALL user feedback been implemented.

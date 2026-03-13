@@ -198,11 +198,15 @@ class FamilyRoot(Base):
 
     @cached_property
     def data_unpack(self) -> list[str]:
-        return json.loads(self.data)
+        if self.data:
+            return json.loads(self.data)
+        return []
 
     @cached_property
     def data_ru_unpack(self) -> list[str]:
-        return json.loads(self.data_ru)
+        if self.data_ru:
+            return json.loads(self.data_ru)
+        return []
 
     @cached_property
     def root_family_link(self) -> str:
@@ -1533,11 +1537,15 @@ class FamilyCompound(Base):
 
     @cached_property
     def data_unpack(self) -> list[str]:
-        return json.loads(self.data)
+        if self.data:
+            return json.loads(self.data)
+        return []
 
     @cached_property
     def data_ru_unpack(self) -> list[str]:
-        return json.loads(self.data_ru)
+        if self.data_ru:
+            return json.loads(self.data_ru)
+        return []
 
     def __repr__(self) -> str:
         return f"FamilyCompound: {self.compound_family} {self.count}"
@@ -1565,11 +1573,15 @@ class FamilyWord(Base):
 
     @cached_property
     def data_unpack(self) -> list[str]:
-        return json.loads(self.data)
+        if self.data:
+            return json.loads(self.data)
+        return []
 
     @cached_property
     def data_ru_unpack(self) -> list[str]:
-        return json.loads(self.data_ru)
+        if self.data_ru:
+            return json.loads(self.data_ru)
+        return []
 
     def __repr__(self) -> str:
         return f"FamilyWord: {self.word_family} {self.count}"
@@ -1594,11 +1606,15 @@ class FamilySet(Base):
 
     @cached_property
     def data_unpack(self) -> list[str]:
-        return json.loads(self.data)
+        if self.data:
+            return json.loads(self.data)
+        return []
 
     @cached_property
     def data_ru_unpack(self) -> list[str]:
-        return json.loads(self.data_ru)
+        if self.data_ru:
+            return json.loads(self.data_ru)
+        return []
 
     def __repr__(self) -> str:
         return f"FamilySet: {self.set} {self.count}"
@@ -1622,11 +1638,15 @@ class FamilyIdiom(Base):
 
     @cached_property
     def data_unpack(self) -> list[str]:
-        return json.loads(self.data)
+        if self.data:
+            return json.loads(self.data)
+        return []
 
     @cached_property
     def data_ru_unpack(self) -> list[str]:
-        return json.loads(self.data_ru)
+        if self.data_ru:
+            return json.loads(self.data_ru)
+        return []
 
     def __repr__(self) -> str:
         return f"FamilyIdiom: {self.idiom} {self.count}"

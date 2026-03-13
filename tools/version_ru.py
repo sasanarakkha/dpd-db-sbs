@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import tomlkit
 
@@ -13,7 +14,7 @@ from tools.printer import printer as pr
 
 
 major = 0
-minor = 2
+minor = 3
 
 
 def printer(key, value):
