@@ -47,7 +47,23 @@
     - [x] Verify database models, relationships, and data integrity after integrating upstream schema changes.
 - [ ] **🛑 MANDATORY MODEL SWITCH: AUTO** (Ask user to switch back).
 
-## Phase 5: Finalization & Verification (Auto)
+## Phase 5: Cleanup & Deprecation (Auto)
+- [x] Task: Identify Removed Upstream Files
+    - [x] Run `scripts/bash/check_shadow_cleanup.py` to check all folders in `folders_to_check` against `dps_sync_registry.json`.
+    - [x] Identify shadow copies whose upstream sources have been removed.
+- [x] Task: Cleanup Deprecated Shadow Copies
+    - [x] Verify if the deprecated shadow copies are still imported or used in active scripts.
+    - [x] Remove unused shadow copies (`scripts/other/ai_individual_word_ru.py`).
+    - [x] Update `dps_sync_registry.json` to remove references to deprecated shadow copies.
+- [x] Task: Post-Cleanup Verification
+    - [x] Run `uv run pytest tests/` to ensure no broken imports or tests remain.
+- [x] Task: Conductor - User Manual Verification 'Cleanup Phase'
+    - [x] Orphaned files `ai_individual_word_ru.py` and `rpd_to_lookup_ru.py` removed and archived.
+    - [x] Persistent ghost files `sbs_example.html` and `move_mdict_ru.py` promoted to `unique_paths`.
+    - [x] Registry updated and `tests/test_shadow_cleanup.py` established.
+    - [x] Clean Root protocol added to GEMINI.md.
+
+## Phase 6: Finalization & Verification (Auto)
 - [ ] **🛑 MANDATORY FIXING RULE**: Whenever errors are identified in shadow copies, DO NOT introduce a new solution. You MUST double-check how the logic is implemented in the original upstream source file and emulate it exactly, only layering localized updates on top. If unsure, ask the user.
 - [ ] Task: Pre-Final Commit Verification
     - [ ] Run all exporters tests, imports tests, docs parity tests, and new feature tests.

@@ -5,9 +5,9 @@ from sqlalchemy.orm import sessionmaker
 from db.models import Base, DpdHeadword, Russian, DpdRoot, FamilyCompound, Lookup
 
 # Import functions
-from db.families.family_compound_ru import create_comp_fam_dict, compile_cf_html_ru, update_db as update_cf_db
+from db.families.family_compound_ru import create_comp_fam_dict, compile_cf_html_ru, add_cf_to_db as update_cf_db
 from db.families.family_idiom_ru import create_idioms_dict, compile_idioms_html_ru
-from db.families.family_root_ru import make_roots_family_dict, compile_rf_html_ru
+from db.families.family_root_ru import make_roots_family_dict_and_bases_dict as make_roots_family_dict, compile_rf_html_ru
 from db.families.family_set_ru import make_sets_dict, compile_sf_html_ru
 from db.families.family_word_ru import make_word_fam_dict, compile_wf_html_ru
 from db.rpd.rpd_to_lookup import make_clean_meaning_list, make_meaning_plus_case
@@ -46,6 +46,7 @@ class TestDPSLogic:
         mock_word.root_family_key = ""
         mock_word.family_set_list = []
         mock_word.family_word = ""
+        mock_word.root_base = ""
         
         return mock_word
 
@@ -91,7 +92,7 @@ class TestDPSLogic:
         
         dpd_db = [mock_word]
         
-        rf_dict = make_roots_family_dict(dpd_db)
+        rf_dict, bases_dict = make_roots_family_dict(dpd_db)
         key = "root_key root_fam"
         assert rf_dict[key]["meaning_ru"] == "корень"
         

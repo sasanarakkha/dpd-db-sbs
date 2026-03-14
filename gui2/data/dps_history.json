@@ -1,5 +1,9 @@
 [
     {
+        "id": 48511,
+        "lemma_1": "buddha 1"
+    },
+    {
         "id": 48512,
         "lemma_1": "buddha 2"
     },
@@ -94,9 +98,5 @@
     {
         "id": 49930,
         "lemma_1": "bhikkhusaṅgha"
-    },
-    {
-        "id": 49906,
-        "lemma_1": "bhikkhunīsaṅgha"
     }
 ]

@@ -42,9 +42,40 @@ Synchronization is a high-risk task that requires semantic understanding, not ju
 - **Model:** PRO.
 - **Action:** Compare the final state of shadow files against their upstream sources to ensure parity (logic, imports, variables).
 
-### Phase 5: Finalization
+### Phase 5: Cleanup & Deprecation (Auto Model)
+- **Goal:** Identify and archive orphaned original files and outdated artifacts.
+- **Model:** Auto.
+- **Action:** 
+    1.  **Systematic Scan**: Run `tests/test_shadow_cleanup.py` folder-by-folder for all monitored paths.
+    2.  **Orphan Identification**: Compare `HEAD` with `as_upstream` to find original files missing from upstream.
+    3.  **Usage Check**: Verify if orphans or their shadow copies are still referenced in the active codebase.
+    4.  **Archiving**: Move unused orphans to `scripts/dps_archive/` or `archive/dps/`.
+    5.  **Manual Investigation**: Flag persistent orphans (still in use) for registry re-mapping or promotion to `unique_paths`.
+    6.  **Purge Root**: Delete all temporary scripts and logs from the root directory.
+
+### Phase 6: Finalization
 - **Goal:** Run tests, manual verification, and final commit after ALL user feedback been implemented.
 - **Model:** Auto.
+
+---
+
+## 🛑 Clean Root Folder Protocol
+To maintain project cleanliness and prevent artifact pollution, the AI agent MUST adhere to this protocol during any synchronization track:
+1.  **Strict Isolation**: The root directory is reserved for core configuration (`pyproject.toml`, `config.ini`, etc.) and project-essential scripts.
+2.  **No Artifacts**: Logs, temporary data dumps, and helper scripts MUST NOT be left in the root after a session.
+3.  **Mandatory Cleanup Phase**: Every sync track MUST include a Cleanup Phase using `tests/test_shadow_cleanup.py`.
+4.  **Standard Archiving Paths**:
+    -   **Scripts**: `scripts/dps_archive/` (Maintains execution context).
+    -   **Data/Assets**: `archive/dps/` (Preserves project history).
+5.  **Verification**: The root folder must be audited using `ls -F` before the final commit.
+
+---
+
+## 🛑 Engineering Standards for Maintainability
+- **Mandatory Header Descriptions**: EVERY new or modified `.py` and `.sh` file MUST start with a concise one-sentence description of its purpose.
+- **Namespace Isolation**: Localized features MUST use unique prefixes (`ru_`, `sbs_`, `dps_`) for all global variables, functions, and element IDs.
+- **Surgical Layering**: Modifications to shadow copies should be layered on top of the original logic to simplify future upstream diffing.
+- **Registry as Source of Truth**: All localizations and unique paths MUST be registered in `dps_sync_registry.json`.
 
 ---
 

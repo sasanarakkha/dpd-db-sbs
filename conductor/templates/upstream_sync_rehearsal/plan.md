@@ -63,7 +63,20 @@
     - [ ] Verify database models, relationships, and data integrity after integrating upstream schema changes.
 - [ ] **🛑 MANDATORY MODEL SWITCH: AUTO** (Ask user to switch back).
 
-## Phase 5: Finalization & Verification (Auto)
+## Phase 5: Cleanup & Deprecation (Auto)
+- [ ] **🛑 MANDATORY CLEAN ROOT RULE**: The root directory MUST remain free of temporary scripts, logs, and artifacts. All session-specific tools MUST be purged before completing this phase.
+- [ ] Task: Systematic Orphan Identification
+    - [ ] Run `tests/test_shadow_cleanup.py` folder-by-folder (or subfolder-by-subfolder) for all paths in `folders_to_check`.
+    - [ ] Identify "original" files present in `HEAD` but missing in the `as_upstream` branch.
+- [ ] Task: Usage Verification & Archiving
+    - [ ] For every identified orphan, check if the file OR its associated shadow copy (from registry) is still referenced anywhere in the active codebase (excluding `archive/` and `dps_archive/`).
+    - [ ] **ARCHIVE UNUSED**: Move unused orphans to `scripts/dps_archive/` (for scripts) or `archive/dps/` (for other files).
+    - [ ] **FLAG PERSISTENT**: If an orphan or its shadow is STILL IN USE, perform a manual investigation. Decide whether to re-map it in the registry (if upstream source moved) or promote it to `unique_paths` (if it is now an independent local feature).
+- [ ] Task: Registry Update
+    - [ ] Ensure `dps_sync_registry.json` is updated to reflect all deletions, re-mappings, and promotions.
+- [ ] Task: Conductor - User Manual Verification 'Cleanup Phase'
+
+## Phase 6: Finalization & Verification (Auto)
 - [ ] **🛑 MANDATORY FIXING RULE**: Whenever errors are identified in shadow copies (via test failures or user feedback), DO NOT invent new logic or try to guess the solution. You MUST:
     1. Open the original upstream source file.
     2. Analyze how upstream successfully implemented the logic.

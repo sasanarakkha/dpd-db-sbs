@@ -27,7 +27,8 @@
     "conductor/tracks",
     "conductor/tracks.md",
     "conductor/templates",
-    "exporter/mcp"
+    "exporter/mcp",
+    "exporter/archive/"
   ],
   "ignored_files": [
     "gui2/data/",
@@ -51,6 +52,10 @@
     "db/backup_tsv/ru_roots.tsv",
     "db/backup_tsv/sbs.tsv",
     "db/backup_tsv/russian.tsv",
+    "db/families/family_set_ru_update.py",
+    "db_tests/sbs_consistency_tests.py",
+    "docs_rus/dpd_rus.md",
+    "exporter/goldendict/templates/sbs_example.html",
     "gui2/dps_*",
     "gui2/font_scaling_helper.py",
     "misc/pat",
@@ -63,8 +68,8 @@
     "scripts/work_with_csv/",
     "shared_data/discourses/",
     "shared_data/pali_class/",
-    "shared_data/sbs_csvs/",
     "shared_data/rus/",
+    "shared_data/sbs_csvs/",
     "tools/ai_batch_processor.py",
     "tools/ai_json_parser.py",
     "tools/ai_llm_factory.py",
@@ -114,8 +119,6 @@
     "scripts/bash/make_dpd.sh": "scripts/bash/makedict.py",
     "scripts/bash/make_ru_dpd.sh": "scripts/bash/makedict.py",
     "scripts/build/families_to_json_ru.py": "scripts/build/families_to_json.py",
-    "scripts/moving/move_mdict_ru.py": "scripts/moving/move_mdict.py",
-    "scripts/other/ai_individual_word_ru.py": "scripts/other/ai_individual_word.py",
     "scripts/rus_exporter/config_github_release_dpd_rus.py": "scripts/build/config_github_release.py",
     "scripts/rus_exporter/ru_config_github_release.py": "scripts/build/config_github_release.py",
     "scripts/rus_exporter/ru_zip_goldendict_mdict.py": "scripts/build/zip_goldendict_mdict.py",
@@ -130,7 +133,6 @@
     "mkdocs_ru.yaml": "mkdocs.yaml"
   },
   "sbs_copies": {
-    "exporter/goldendict/templates/sbs_example.html": "exporter/goldendict/templates/dpd_example.html",
     "exporter/goldendict/sbs_templates/": "exporter/goldendict/templates/",
     "exporter/goldendict/export_dpd_sbs.py": "exporter/goldendict/export_dpd.py",
     "exporter/goldendict/export_epd_sbs.py": "exporter/goldendict/export_epd.py",
@@ -139,7 +141,7 @@
     "exporter/goldendict/main_sbs.py": "exporter/goldendict/main.py",
     "exporter/goldendict/data_classes_dps.py": "exporter/goldendict/data_classes.py",
     "exporter/webapp/sbs_templates/": "exporter/webapp/templates/",
-    "scripts/backup/backup_ru_sbs.py": "scripts/backup/backup_dpd_headwords_and_roots.py",
+    "scripts/backup/backup_ru_sbs.py": "db/backup_tsv/backup_dpd_headwords_and_roots.py",
     "scripts/build/db_rebuild_from_tsv_ru_sbs.py": "scripts/build/db_rebuild_from_tsv.py",
     "scripts/fix/character_replacer_sbs.py": "scripts/fix/character_replacer.py",
     "scripts/rus_exporter/config_github_release_dpd_sbs.py": "scripts/build/config_github_release.py",

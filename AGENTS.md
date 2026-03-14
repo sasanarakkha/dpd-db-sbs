@@ -114,3 +114,20 @@ npm install -g @google/gemini-cli@latest
 - If you perform any task which creates or modifies any "shadow" (`*_ru.py`, `*_sbs.py`) or "unique" files (files that exist only in this fork):
   - You MUST update the corresponding files in `conductor/templates/upstream_sync_rehearsal/` (specifically `dps_sync_registry.json` and `guide.md` if needed).
   - This template MUST always be kept up-to-date with the local repository state to ensure accurate upstream synchronization.
+## Engineering Standards for Maintainability & Collaboration
+- **Mandatory Header Descriptions**: EVERY `.py` and `.sh` file MUST start with a concise one-sentence docstring or comment explaining its purpose. This description MUST be updated if the file's primary responsibility changes.
+- **Surgical Logic Layering**: When modifying shadow copies, avoid rewriting core logic. Layer localized changes (RU/SBS) clearly on top of the original upstream structure to ensure easy synchronization.
+- **Namespace Isolation**: Always use specific prefixes (`ru_`, `sbs_`, `dps_`) for localized functions, variables, and IDs to prevent collisions in shared environments like GoldenDict.
+- **Clean Codebase**:
+    - Prefer modular abstractions over threading state across layers.
+    - Keep imports clean and remove unused dependencies immediately.
+    - Use modern type hints and pathlib for all file operations.
+
+## Clean Root Folder Protocol
+- The root directory MUST remain free of temporary scripts, logs, and artifacts.
+- During any 'Sync' or 'Cleanup' phase, the agent MUST run `tests/test_shadow_cleanup.py` to identify orphaned files.
+- Orphaned files NOT in use must be ARCHIVED:
+    - Scripts go to `scripts/dps_archive/`.
+    - Other files go to `archive/dps/`.
+- Orphaned files STILL in use must be either re-mapped in `dps_sync_registry.json` (if source moved) or promoted to `unique_paths` (if source deleted but local logic requires it).
+- All temporary artifacts created during a session MUST be purged before finalization.

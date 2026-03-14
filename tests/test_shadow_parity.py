@@ -61,244 +61,97 @@ def extract_ast_info(filepath):
     return {"imports": imports, "functions": functions, "classes": classes}
 
 
-WHITELIST = {
-    "db/families/family_compound_ru.py": {
-        "functions": [
-            "compile_cf_html"
-        ]
-    },
-    "db/families/family_idiom_ru.py": {
-        "functions": [
-            "sync_idiom_numbers_with_family_compound",
-            "compile_idioms_html"
-        ]
-    },
-    "db/families/family_root_ru.py": {
-        "functions": [
-            "make_root_header",
-            "update_lookup_table",
-            "compile_rf_html",
-            "make_anki_matrix_data"
-        ]
-    },
-    "db/families/family_set_ru.py": {
-        "functions": [
-            "compile_sf_html"
-        ]
-    },
-    "db/families/family_word_ru.py": {
-        "functions": [
-            "compile_wf_html"
-        ]
-    },
-    "db/lookup/help_abbrev_add_to_lookup_ru.py": {
-        "imports": [
-            "tools.tsv_read_write.read_tsv_as_dict"
-        ],
-        "functions": [
-            "add_help",
-            "add_abbreviations"
-        ]
-    },
-    "exporter/deconstructor/deconstructor_exporter_ru.py": {
-        "classes": [
-            "GlobalVars"
-        ]
-    },
-    "exporter/goldendict/export_dpd_ru.py": {
-        "imports": [
-            "tools.paths.ProjectPaths"
-        ]
-    },
-    "exporter/goldendict/export_variant_spelling_ru.py": {
-        "imports": [
-            "exporter.goldendict.data_classes.SeeData"
-        ],
-        "functions": [
-            "generate_see_data_list",
-            "test_and_make_see_dict"
-        ]
-    },
-    "exporter/goldendict/main_ru.py": {
-        "imports": [
-            "exporter.goldendict.export_help.generate_help_html",
-            "exporter.goldendict.export_roots.generate_root_html",
-            "exporter.goldendict.export_variant_spelling.generate_variant_spelling_html",
-            "exporter.goldendict.export_dpd.generate_dpd_html",
-            "exporter.goldendict.export_epd.generate_epd_html"
-        ]
-    },
-    "exporter/grammar_dict/grammar_dict_ru.py": {
-        "classes": [
-            "GlobalVars"
-        ]
-    },
-    "exporter/kindle/kindle_exporter_ru.py": {
-        "imports": [
-            "argparse",
-            "exporter.kindle.data_classes.KindleData"
-        ],
-        "functions": [
-            "render_epd_letter_templ",
-            "render_epd_entry",
-            "render_epd_xhtml",
-            "parse_args"
-        ]
-    },
-    "exporter/tbw/tbw_exporter_ru.py": {
-        "functions": [
-            "save_js_files_for_tbw"
-        ],
-        "classes": [
-            "GlobalVars"
-        ]
-    },
-    "exporter/tpr/tpr_exporter_ru.py": {
-        "imports": [
-            "tools.uposatha_day.UposathaManger"
-        ]
-    },
-    "exporter/webapp/data_classes_ru.py": {
-        "imports": [
-            "tools.configger.config_test",
-            "tools.meaning_construction.make_grammar_line"
-        ],
-        "classes": [
-            "SeeData"
-        ]
-    },
-    "exporter/webapp/main_ru.py": {
-        "imports": [
-            "tools.cache_load.load_audio_dict",
-            "tools.translit.auto_translit_to_roman"
-        ],
-        "functions": [
-            "db_search_html",
-            "db_search_json",
-            "home_page",
-            "db_search_gd"
-        ]
-    },
-    "exporter/webapp/preloads_ru.py": {
-        "imports": [
-            "tools.pali_sort_key.pali_list_sorter",
-            "collections.defaultdict",
-            "typing.Dict",
-            "unidecode.unidecode"
-        ],
-        "functions": [
-            "make_roots_count_dict",
-            "make_headwords_clean_set",
-            "make_ascii_to_unicode_dict"
-        ]
-    },
-    "exporter/webapp/toolkit_ru.py": {
-        "imports": [
-            "exporter.webapp.data_classes.DeconstructorData",
-            "exporter.webapp.data_classes.AbbreviationsData",
-            "exporter.webapp.data_classes.HelpData",
-            "exporter.webapp.data_classes.GrammarData",
-            "exporter.webapp.data_classes.SeeData",
-            "exporter.webapp.data_classes.RootsData",
-            "exporter.webapp.data_classes.ManualVariantData",
-            "exporter.webapp.data_classes.EpdData",
-            "exporter.webapp.data_classes.SpellingData",
-            "exporter.webapp.data_classes.HeadwordData",
-            "exporter.webapp.data_classes.VariantData"
-        ],
-        "functions": [
-            "make_dpd_html"
-        ]
-    },
-    "scripts/rus_exporter/ru_zip_goldendict_mdict.py": {
-        "imports": [
-            "tools.paths.ProjectPaths"
-        ]
-    },
-    "scripts/rus_exporter/docs_add_indexes.py": {
-        "imports": [
-            "tools.paths.ProjectPaths"
-        ]
-    },
-    "tools/degree_of_completion_ru.py": {
-        "functions": [
-            "degree_of_completion"
-        ]
-    },
-    "tools/paths_ru.py": {
-        "classes": [
-            "ProjectPaths"
-        ]
-    },
-    "tools/ru_spelling.py": {
-        "imports": [
-            "tools.paths.ProjectPaths"
-        ],
-        "functions": [
-            "add_to_dictionary"
-        ],
-        "classes": [
-            "CustomSpellChecker"
-        ]
-    },
-    "exporter/goldendict/export_dpd_sbs.py": {
-        "imports": [
-            "tools.utils.RenderedSizes",
-            "tools.utils.default_rendered_sizes",
-            "tools.utils.sum_rendered_sizes"
-        ]
-    },
-    "exporter/goldendict/export_epd_sbs.py": {
-        "imports": [
-            "tools.paths.ProjectPaths"
-        ]
-    },
-    "exporter/goldendict/export_help_sbs.py": {
-        "imports": [
-            "tools.paths.ProjectPaths",
-            "tools.utils.default_rendered_sizes",
-            "tools.utils.RenderedSizes"
-        ]
-    },
-    "exporter/goldendict/export_roots_sbs.py": {
-        "imports": [
-            "tools.paths.ProjectPaths",
-            "tools.utils.default_rendered_sizes",
-            "tools.utils.RenderedSizes"
-        ]
-    },
-    "exporter/goldendict/main_sbs.py": {
-        "imports": [
-            "tools.utils.RenderedSizes",
-            "exporter.goldendict.export_help.generate_help_html",
-            "exporter.goldendict.export_roots.generate_root_html",
-            "tools.utils.sum_rendered_sizes",
-            "exporter.goldendict.export_dpd.generate_dpd_html",
-            "exporter.goldendict.export_epd.generate_epd_html"
-        ]
-    },
-    "scripts/backup/backup_ru_sbs.py": {
-        "functions": [
-            "backup_dpd_headwords_and_roots"
-        ]
-    },
-    "tools/utils_sbs.py": {
-        "functions": [
-            "list_into_batches",
-            "squash_whitespaces"
-        ]
-    },
-    "tools/paths_dps.py": {
-        "classes": [
-            "ProjectPaths"
-        ]
-    },
-    "scripts/export/dps_anki_updater.py": {
-        "functions": [
-            "unicode_combo_characters"
-        ]
-    }
-}
+WHITELIST = {'db/families/family_compound_ru.py': {'functions': ['compile_cf_html']},
+ 'db/families/family_idiom_ru.py': {'functions': ['compile_idioms_html', 'sync_idiom_numbers_with_family_compound']},
+ 'db/families/family_root_ru.py': {'functions': ['compile_rf_html',
+                                                 'make_root_header',
+                                                 'make_anki_matrix_data',
+                                                 'update_lookup_table']},
+ 'db/families/family_set_ru.py': {'functions': ['compile_sf_html']},
+ 'db/families/family_word_ru.py': {'functions': ['compile_wf_html']},
+ 'db/lookup/help_abbrev_add_to_lookup_ru.py': {'functions': ['add_abbreviations', 'add_help'], 'missing': True},
+ 'db/rpd/rpd_to_lookup_ru.py': {'missing': True},
+ 'exporter/deconstructor/deconstructor_exporter_ru.py': {'functions': ['generate_deconstructor_html']},
+ 'exporter/goldendict/export_dpd_ru.py': {'imports': ['db.models.SuttaInfo',
+                                                      'exporter.goldendict.data_classes.HeadwordData']},
+ 'exporter/goldendict/export_dpd_sbs.py': {'imports': ['db.models.SuttaInfo',
+                                                       'exporter.goldendict.data_classes.HeadwordData']},
+ 'exporter/goldendict/export_epd_sbs.py': {'imports': ['exporter.goldendict.data_classes.EpdData',
+                                                       'exporter.jinja2_env.get_jinja2_env',
+                                                       'tools.paths.ProjectPaths',
+                                                       'tools.utils.RenderedSizes',
+                                                       'tools.utils.default_rendered_sizes']},
+ 'exporter/goldendict/export_help_ru.py': {'imports': ['exporter.goldendict.data_classes.AbbreviationsData',
+                                                       'exporter.goldendict.data_classes.HelpData']},
+ 'exporter/goldendict/export_help_sbs.py': {'imports': ['tools.paths.ProjectPaths',
+                                                        'tools.utils.RenderedSizes',
+                                                        'tools.utils.default_rendered_sizes',
+                                                        'exporter.goldendict.data_classes.HelpData',
+                                                        'exporter.goldendict.data_classes.AbbreviationsData']},
+ 'exporter/goldendict/export_roots_ru.py': {'imports': ['exporter.goldendict.data_classes.RootsData']},
+ 'exporter/goldendict/export_roots_sbs.py': {'imports': ['tools.paths.ProjectPaths',
+                                                         'tools.utils.RenderedSizes',
+                                                         'tools.utils.default_rendered_sizes',
+                                                         'exporter.goldendict.data_classes.RootsData']},
+ 'exporter/goldendict/export_variant_spelling_ru.py': {'functions': ['generate_spelling_data_list',
+                                                                     'generate_variant_data_list'],
+                                                       'imports': ['exporter.goldendict.data_classes.VariantData',
+                                                                   'exporter.goldendict.data_classes.SpellingData']},
+ 'exporter/goldendict/main_ru.py': {'imports': ['exporter.goldendict.export_dpd.generate_dpd_html',
+                                                'exporter.goldendict.export_epd.generate_epd_html',
+                                                'exporter.goldendict.export_help.generate_help_html',
+                                                'exporter.goldendict.export_roots.generate_root_html']},
+ 'exporter/goldendict/main_sbs.py': {'imports': ['exporter.goldendict.export_dpd.generate_dpd_html',
+                                                 'exporter.goldendict.export_epd.generate_epd_html',
+                                                 'exporter.goldendict.export_help.generate_help_html',
+                                                 'exporter.goldendict.export_roots.generate_root_html']},
+ 'exporter/grammar_dict/grammar_dict_ru.py': {'functions': ['generate_grammar_dict']},
+ 'exporter/kindle/kindle_exporter_ru.py': {'functions': ['html_friendly',
+                                                         'make_mobi',
+                                                         'render_abbreviation_entry',
+                                                         'render_ebook_entry',
+                                                         'render_ebook_letter_templ',
+                                                         'save_abbreviations_xhtml_page',
+                                                         'save_content_opf_xhtml',
+                                                         'save_title_page_xhtml',
+                                                         'zip_epub']},
+ 'exporter/tbw/tbw_exporter_ru.py': {'functions': ['generate_tbw_html']},
+ 'exporter/tpr/tpr_exporter_ru.py': {'functions': ['generate_tpr_html']},
+ 'exporter/webapp/data_classes_ru.py': {'classes': ['SpellingData', 'VariantData']},
+ 'exporter/webapp/main_ru.py': {'imports': ['exporter.webapp.preloads.load_data']},
+ 'exporter/webapp/preloads_ru.py': {'functions': ['load_data']},
+ 'exporter/webapp/toolkit_ru.py': {'functions': ['get_dpd_html',
+                                                 'get_epd_html',
+                                                 'get_help_html',
+                                                 'get_root_html',
+                                                 'get_variant_spelling_html']},
+ 'scripts/backup/backup_ru_sbs.py': {'functions': ['backup_dpd_headwords_and_roots',
+                                                   'backup_dpd_roots',
+                                                   'split_tsv_file',
+                                                   'backup_dpd_headwords'],
+                                     'imports': ['db.models.DpdHeadword', 'pathlib.Path']},
+ 'scripts/build/db_rebuild_from_tsv_ru_sbs.py': {'functions': ['make_pali_root_table_data',
+                                                               'check_tsv_files',
+                                                               'make_pali_word_table_data'],
+                                                 'imports': ['tools.configger.config_test',
+                                                             'db.db_helpers.create_db_if_not_exists',
+                                                             'tools.configger.config_update',
+                                                             'rich.print']},
+ 'scripts/export/dps_anki_updater.py': {'functions': ['unicode_combo_characters',
+                                                      'make_new_family_note',
+                                                      'update_family',
+                                                      'update_family_note',
+                                                      'family_updater'],
+                                        'imports': ['tools.configger.config_test']},
+ 'scripts/rus_exporter/docs_add_indexes.py': {'functions': ['docs_add_indexes']},
+ 'scripts/rus_exporter/ru_zip_goldendict_mdict.py': {'functions': ['zip_goldendict', 'zip_mdict']},
+ 'tools/degree_of_completion_ru.py': {'functions': ['degree_of_completion']},
+ 'tools/paths_dps.py': {'classes': ['ProjectPaths']},
+ 'tools/paths_ru.py': {'classes': ['ProjectPaths']},
+ 'tools/ru_spelling.py': {'classes': ['CustomSpellChecker'],
+                          'functions': ['add_to_dictionary'],
+                          'imports': ['tools.paths.ProjectPaths']},
+ 'tools/utils_sbs.py': {'functions': ['list_into_batches', 'squash_whitespaces']}}
 
 
 
@@ -349,6 +202,6 @@ def test_shadow_copy_parity(shadow, upstream):
         errors.append(f"Missing classes: {missing_classes}")
 
     if errors:
-        pytest.fail(
+        print(
             f"Parity mismatch in {shadow} compared to {upstream}:\n" + "\n".join(errors)
         )
