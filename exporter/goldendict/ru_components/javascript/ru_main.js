@@ -34,9 +34,11 @@ function ru_button_click(el) {
     }
 };
 
-document.addEventListener('DOMContentLoaded', function () {
-    ru_loadData()
-});
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", ru_loadData);
+} else {
+    ru_loadData();
+}
 
 function ru_loadData() {
     var metaTags = document.querySelectorAll("meta[data_key]");

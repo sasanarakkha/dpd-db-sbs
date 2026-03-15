@@ -13,88 +13,88 @@ class DPSPaths:
 
         # exporter/sbs_templates
         self.button_box_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/dpd_button_box.html"
+            base_dir / "exporter/goldendict/sbs_templates/dpd_button_box.jinja"
         )
         self.dpd_definition_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/dpd_definition.html"
+            base_dir / "exporter/goldendict/sbs_templates/dpd_definition.jinja"
         )
         self.dpd_header_plain_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/dpd_header_plain.html"
+            base_dir / "exporter/goldendict/sbs_templates/dpd_header_plain.jinja"
         )
         self.dpd_header_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/dpd_header.html"
+            base_dir / "exporter/goldendict/sbs_templates/dpd_header.jinja"
         )
         self.example_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/dpd_example.html"
+            base_dir / "exporter/goldendict/sbs_templates/dpd_example.jinja"
         )
         self.sbs_example_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/sbs_example.html"
+            base_dir / "exporter/goldendict/sbs_templates/sbs_example.jinja"
         )
         self.family_compound_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/dpd_family_compound.html"
+            base_dir / "exporter/goldendict/sbs_templates/dpd_family_compound.jinja"
         )
         self.family_idiom_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/dpd_family_idiom.html"
+            base_dir / "exporter/goldendict/sbs_templates/dpd_family_idiom.jinja"
         )
         self.family_root_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/dpd_family_root.html"
+            base_dir / "exporter/goldendict/sbs_templates/dpd_family_root.jinja"
         )
         self.family_set_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/dpd_family_set.html"
+            base_dir / "exporter/goldendict/sbs_templates/dpd_family_set.jinja"
         )
         self.family_word_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/dpd_family_word.html"
+            base_dir / "exporter/goldendict/sbs_templates/dpd_family_word.jinja"
         )
         self.feedback_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/dpd_feedback.html"
+            base_dir / "exporter/goldendict/sbs_templates/dpd_feedback.jinja"
         )
         self.frequency_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/dpd_frequency.html"
+            base_dir / "exporter/goldendict/sbs_templates/dpd_frequency.jinja"
         )
         self.grammar_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/dpd_grammar.html"
+            base_dir / "exporter/goldendict/sbs_templates/dpd_grammar.jinja"
         )
         self.inflection_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/dpd_inflection.html"
+            base_dir / "exporter/goldendict/sbs_templates/dpd_inflection.jinja"
         )
         self.root_header_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/root_header.html"
+            base_dir / "exporter/goldendict/sbs_templates/root_header.jinja"
         )
         self.spelling_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/dpd_spelling_mistake.html"
+            base_dir / "exporter/goldendict/sbs_templates/dpd_spelling_mistake.jinja"
         )
         self.templates_dir = base_dir / "exporter/goldendict/sbs_templates"
         self.variant_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/dpd_variant_reading.html"
+            base_dir / "exporter/goldendict/sbs_templates/dpd_variant_reading.jinja"
         )
         self.sutta_info_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/dpd_sutta_info.html"
+            base_dir / "exporter/goldendict/sbs_templates/dpd_sutta_info.jinja"
         )
 
         # exporter/goldendict/sbs_templates - root
         self.root_button_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/root_buttons.html"
+            base_dir / "exporter/goldendict/sbs_templates/root_buttons.jinja"
         )
         self.root_definition_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/root_definition.html"
+            base_dir / "exporter/goldendict/sbs_templates/root_definition.jinja"
         )
         self.root_families_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/root_families.html"
+            base_dir / "exporter/goldendict/sbs_templates/root_families.jinja"
         )
         self.root_info_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/root_info.html"
+            base_dir / "exporter/goldendict/sbs_templates/root_info.jinja"
         )
         self.root_matrix_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/root_matrix.html"
+            base_dir / "exporter/goldendict/sbs_templates/root_matrix.jinja"
         )
 
         # exporter/goldendict/sbs_templates - other
         self.abbrev_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/help_abbrev.html"
+            base_dir / "exporter/goldendict/sbs_templates/help_abbrev.jinja"
         )
-        self.epd_templ_path = base_dir / "exporter/goldendict/sbs_templates/epd.html"
+        self.epd_templ_path = base_dir / "exporter/goldendict/sbs_templates/epd.jinja"
         self.help_templ_path = (
-            base_dir / "exporter/goldendict/sbs_templates/help_help.html"
+            base_dir / "exporter/goldendict/sbs_templates/help_help.jinja"
         )
 
         # shared_data/help_ru/

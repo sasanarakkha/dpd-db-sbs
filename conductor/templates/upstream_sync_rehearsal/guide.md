@@ -42,7 +42,16 @@ Synchronization is a high-risk task that requires semantic understanding, not ju
 - **Model:** PRO.
 - **Action:** Compare the final state of shadow files against their upstream sources to ensure parity (logic, imports, variables).
 
-### Phase 5: Cleanup & Deprecation (Auto Model)
+### Phase 5: Pre-Cleanup Testing & Second Commit (Auto Model)
+- **Goal:** Verify the implementation work and perform the second commit (Commit 2/3) before starting the cleanup phase.
+- **Model:** Auto.
+- **Action:**
+    1.  **Automated Testing**: Run structural, logic, and parity tests.
+    2.  **Manual Verification**: User verifies dictionaries and GUI.
+    3.  **Approval Gate**: Agent MUST WAIT for explicit user approval (e.g., "Proceed with second commit").
+    4.  **Commit**: Commit all manual merges and shadow logic updates.
+
+### Phase 6: Cleanup & Deprecation (Auto Model)
 - **Goal:** Identify and archive orphaned original files and outdated artifacts.
 - **Model:** Auto.
 - **Action:** 
@@ -53,9 +62,15 @@ Synchronization is a high-risk task that requires semantic understanding, not ju
     5.  **Manual Investigation**: Flag persistent orphans (still in use) for registry re-mapping or promotion to `unique_paths`.
     6.  **Purge Root**: Delete all temporary scripts and logs from the root directory.
 
-### Phase 6: Finalization
-- **Goal:** Run tests, manual verification, and final commit after ALL user feedback been implemented.
+### Phase 7: Finalization & Third Commit (Auto Model)
+- **Goal:** Run final tests after cleanup, perform a comprehensive history audit for process improvement, and execute the final commit (Commit 3/3).
 - **Model:** Auto.
+- **Action:**
+    1.  **Retest**: Run all tests again to ensure cleanup didn't break imports or logic.
+    2.  **History Audit**: Analyze the entire session history, user feedback, and error logs to identify systemic improvements.
+    3.  **Documentation**: Create `improvements_fresh.md` with exhaustive detail on rehearsal failures and logic gaps.
+    4.  **Approval Gate**: Agent MUST WAIT for explicit user approval (e.g., "Proceed with final commit").
+    5.  **Commit**: Commit the cleanup, documentation, and finalization.
 
 ---
 
@@ -122,10 +137,11 @@ NEVER overwrite `.gitignore` with the upstream version.
 
 ---
 
-## 🛑 The 2-Commit Rule
-To keep the history clean and verification easy, EXACTLY TWO commits are allowed per sync:
+## 🛑 The 3-Commit Rule
+To keep the history clean and verification easy, EXACTLY THREE commits are allowed per sync:
 1.  **Commit 1 (Automated):** Performed by the Phase 1 sync script. Includes basic folder sync, submodule update (`git submodule update`), and UI scaling.
-2.  **Commit 2 (Manual):** Performed at the VERY END after the PRO Logic Audit and Final Approval, after ALL user feedback been implemented. Includes all manual merges, shadow updates, tests, and template fixes.
+2.  **Commit 2 (Manual Implementation):** Performed at the end of Phase 5 after the PRO Logic Audit, complete automated testing, and explicit User Approval. Includes all manual merges, shadow updates, and template fixes prior to cleanup.
+3.  **Commit 3 (Manual Cleanup):** Performed at the end of Phase 7 after the Cleanup Phase, re-testing, and explicit User Approval. Includes all archive file moves and removals.
 
 ---
 
@@ -308,27 +324,37 @@ Maintaining parity between English (`docs/`) and Russian (`docs_rus/`) documenta
 
 Follow these steps when performing an upstream sync:
 
-### Phase 1: Automated Pull
-1. [ ] Run `bash scripts/bash/full_sync.sh`.
-2. [ ] **Update Submodules**: Run `git submodule init && git submodule update` to ensure resources (like `sc-data`) are up to date.
+### Phase 1: Automated Pull (Commit 1/3)
+1. [ ] Run `echo 2 | bash scripts/bash/full_sync.sh` (or specific non-interactive script).
+2. [ ] **Update Submodules**: Run `git submodule init && git submodule update`.
 3. [ ] Verify that `sbs-ru` is updated and modified files listed in the registry are preserved.
 
-### Phase 2: Manual Porting (Reasoning Phase)
+### Phase 2, 3, 4: Porting & Auditing (Reasoning Phase)
 1. [ ] **`modified_upstream_files`**: For each file, compare `sbs-ru` version against `as_upstream`. If upstream has new features or bug fixes, manually integrate them into the fork's version.
 2. [ ] **`db/models.py`**: Pay special attention to core schema changes.
-3. [ ] **Shadow Copies**: For each entry in `russian_copies` and `sbs_copies`, check if their **source (the 'value' in the registry)** has changed significantly compared to the **shadow copy (the 'key' in the registry)**. If so, port those logic changes to the shadow copy.
+3. [ ] **Shadow Copies**: Map all shadow copies from the registry to modified upstream sources. Port upstream logic changes exactly.
 4. [ ] **Documentation Parity**:
     - [ ] List all files in `docs/` that don't have a counterpart in `docs_rus/`.
     - [ ] Create missing files in `docs_rus/` (at least as placeholders).
     - [ ] Update `mkdocs_ru.yaml` navigation to match `mkdocs.yaml`.
     - [ ] Run `python3 scripts/rus_exporter/docs_add_indexes.py`.
-5. [ ] **UI Scaling**: Verify `gui2/font_scaling_helper.py` was executed correctly (it is part of the sync script).
-    - **Protocol:** The sync script MUST run `git add .` AFTER the font scaling script so the Phase 1 commit is clean.
-    - **Verification:** Run `git diff HEAD^ gui2/` to confirm font sizes are scaled (e.g., 10 -> 14).
-6. [ ] **Verification Tests**:
-    - Run `uv run pytest tests/test_dps_imports.py` to verify that all critical DPS modules are intact and dependencies are met.
-    - Run `uv run pytest tests/test_dps_logic.py` to verify that key family generation and lookup logic is preserved.
-    - Run `uv run pytest tests/test_dps_exporters_functional.py` to verify the control flow of critical exporters and build scripts.
-    - Run `uv run pytest tests/test_dps_docs_parity.py` to verify that `docs/` and `docs_rus/` are perfectly synced (except for `dpd_rus.md`).
-7. [ ] **Commit Changes**: Once manual merges are complete, perform a final commit with a descriptive message (e.g., `sync: manual merge of upstream updates` with the current date, same as done by the sync script).
-8. [ ] **Update Registry**: If new shadow copies were created during the process, add them to `dps_sync_registry.json`.
+5. [ ] **UI Scaling**: Verify `gui2/font_scaling_helper.py` was executed correctly by the Phase 1 script.
+
+### Phase 5: Verification & Implementation Commit (Commit 2/3)
+1. [ ] **Verification Tests**:
+    - Run all parity, logic, imports, and template structure tests (`tests/test_shadow_parity.py`, `tests/test_dps_logic.py`, etc.).
+2. [ ] **Manual Approvals**: Ensure user manually verifies exports and GUI functionality. 
+3. [ ] **Explicit Gate**: Obtain explicit User Approval for the second commit.
+4. [ ] **Commit Changes**: Perform the second commit with a descriptive message (e.g., `sync: manual merge resolutions`).
+5. [ ] **Update Registry**: Add newly created shadow copies to `dps_sync_registry.json`.
+
+### Phase 6: Cleanup & Deprecation
+1. [ ] **Identify Orphans**: Run `tests/test_shadow_cleanup.py` on monitored folders.
+2. [ ] **Archive Unused**: Archive unused obsolete upstream files in the current branch.
+3. [ ] **Resolve Persistent Orphans**: If flagged as in-use, promote them to `unique_paths` or re-map them.
+4. [ ] **Registry Update**: Ensure `dps_sync_registry.json` is updated with cleanup changes.
+
+### Phase 7: Final Verification & Cleanup Commit (Commit 3/3)
+1. [ ] **Final Retest**: Rerun all automated tests to ensure no dependencies were broken during cleanup.
+2. [ ] **Explicit Gate**: Obtain explicit User Approval for the final commit.
+3. [ ] **Commit Changes**: Perform the final commit (e.g., `sync: obsolete file cleanup and finalization`).

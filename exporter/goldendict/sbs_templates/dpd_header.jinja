@@ -12,31 +12,31 @@
 
         <link href="dpd-css-and-fonts.css" rel="stylesheet">
 
-        <link href="family_compound_json.js" class="load_js" rel="preload"
+        <link href="family_compound_json.js" class="sbs_load_js" rel="preload"
             as="script">
-        <link href="family_compound_template.js" class="load_js" rel="preload"
+        <link href="sbs_family_compound_template.js" class="sbs_load_js" rel="preload"
             as="script">
-        <link href="family_idiom_json.js" class="load_js" rel="preload"
+        <link href="family_idiom_json.js" class="sbs_load_js" rel="preload"
             as="script">
-        <link href="family_idiom_template.js" class="load_js" rel="preload"
+        <link href="sbs_family_idiom_template.js" class="sbs_load_js" rel="preload"
             as="script">
-        <link href="family_root_json.js" class="load_js" rel="preload"
+        <link href="family_root_json.js" class="sbs_load_js" rel="preload"
             as="script">
-        <link href="family_root_template.js" class="load_js" rel="preload"
+        <link href="sbs_family_root_template.js" class="sbs_load_js" rel="preload"
             as="script">
-        <link href="family_set_json.js" class="load_js" rel="preload"
+        <link href="family_set_json.js" class="sbs_load_js" rel="preload"
             as="script">
-        <link href="family_set_template.js" class="load_js" rel="preload"
+        <link href="sbs_family_set_template.js" class="sbs_load_js" rel="preload"
             as="script">
-        <link href="family_word_json.js" class="load_js" rel="preload"
+        <link href="family_word_json.js" class="sbs_load_js" rel="preload"
             as="script">
-        <link href="family_word_template.js" class="load_js" rel="preload"
+        <link href="sbs_family_word_template.js" class="sbs_load_js" rel="preload"
             as="script">
-        <link href="feedback_template.js" class="load_js" rel="preload"
+        <link href="sbs_feedback_template.js" class="sbs_load_js" rel="preload"
             as="script">
-        <link href="frequency_template.js" class="load_js" rel="preload"
+        <link href="sbs_frequency_template.js" class="sbs_load_js" rel="preload"
             as="script">
-        <link href="main.js" class="load_js" rel="preload" as="script">
+        <link href="main.js" class="sbs_load_js" rel="preload" as="script">
 
         <script>
         var sbsdata_{{ d.i.lemma_1_ }} = {
@@ -88,7 +88,7 @@
     </script>
 
         <script>
-        var els2load = document.getElementsByClassName("load_js");
+        var els2load = document.getElementsByClassName("sbs_load_js");
         if (typeof sbs_js_already_loaded === "undefined") {
             var sbs_js_already_loaded = true;
             var elsArray = Array.from(els2load);

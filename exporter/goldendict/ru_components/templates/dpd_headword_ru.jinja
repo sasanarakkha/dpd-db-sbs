@@ -1175,8 +1175,8 @@
     {% elif d.i.pos in d.conjugations %}
     <div id="ru_conjugation_{{ d.i.lemma_1_ }}" class="dpd content hidden">
         {% endif %}
-        {{ d.i.inflections_html }}
-        {% if "gray" in d.i.inflections_html %}
+        {{ d.ru_inflections_html }}
+        {% if "gray" in d.ru_inflections_html %}
         <p>
             Словоформы, не найденные ни в одном корпусе пали, или в обработанных сандхи, выделены <span class='gray'>серым цветом</span>.
         </p>

@@ -1,210 +1,188 @@
-<div id="ru_grammar_${i.lemma_1_}" class="dpd content hidden">
+<div id="ru_grammar_{{ i.lemma_1_ }}" class="dpd content hidden">
     <table class = "grammar">
         <tr>
             <th>Пали</th>
-            <td>${i.lemma_2}</td>
+            <td>{{ i.lemma_2 }}</td>
         </tr>
-
-        % if i.lemma_trad_clean != i.lemma_clean:
+{% if i.lemma_trad_clean != i.lemma_clean %}
         <tr>
             <th>Trad. Lemma</th>
-            <td>${i.lemma_trad_clean}</td>
+            <td>{{ i.lemma_trad_clean }}</td>
         </tr>
-        % endif
-
+{% endif %}
         <tr>
             <th>IPA</th>
             <td>
-                /${i.lemma_ipa}/
-                % if i.audio_male1:
-                <a class="dpd-button play small" data-title="male1" onclick="playAudio('${i.lemma_clean}', this, 'male1')">
+                /{{ i.lemma_ipa }}/
+{% if i.audio_male1 %}
+                <a class="dpd-button play small" data-title="male1" onclick="playAudio('{{ i.lemma_clean }}', this, 'male1')">
                     <svg viewBox="0 0 24 24">
                         <path d="M8 5v14l11-7z"></path>
                     </svg>
                 </a>
-                % endif
-                % if i.audio_male2:
-                <a class="dpd-button play small" data-title="male2" onclick="playAudio('${i.lemma_clean}', this, 'male2')">
+{% endif %}
+{% if i.audio_male2 %}
+                <a class="dpd-button play small" data-title="male2" onclick="playAudio('{{ i.lemma_clean }}', this, 'male2')">
                     <svg viewBox="0 0 24 24">
                         <path d="M8 5v14l11-7z"></path>
                     </svg>
                 </a>
-                % endif
-                % if i.audio_female1:
-                <a class="dpd-button play small" data-title="female1" onclick="playAudio('${i.lemma_clean}', this, 'female1')">
+{% endif %}
+{% if i.audio_female1 %}
+                <a class="dpd-button play small" data-title="female1" onclick="playAudio('{{ i.lemma_clean }}', this, 'female1')">
                     <svg viewBox="0 0 24 24">
                         <path d="M8 5v14l11-7z"></path>
                     </svg>
                 </a>
-                % endif
+{% endif %}
             </td>
         </tr>
-
-        % if meaning:
+{% if meaning %}
             <tr>
                 <th>English</th>
-                <td>${meaning}
+                <td>{{ meaning }}
                 </td>
             </tr> 
-        % endif        
-
+{% endif %}
         <tr>
             <th>Грамматика</th>
-            <td>${grammar}</td>
+            <td>{{ grammar }}</td>
         </tr>
-
-        % if i.family_root:
+{% if i.family_root %}
         <tr>
             <th>Семья корня</th>
-            <td><b>${superscripter_uni(i.family_root)}</b></td>
+            <td><b>{{ superscripter_uni(i.family_root) }}</b></td>
         </tr>
-        % endif
-
-        % if i.root_key:
+{% endif %}
+{% if i.root_key %}
         <tr>
             <th>Корень</th>
-            <td>${i.root_clean}<sup>${rt.root_has_verb}</sup>${rt.root_group}
-                ${i.root_sign} (${rt.root_ru_meaning})</td>
+            <td>{{ i.root_clean }}<sup>{{ rt.root_has_verb }}</sup>{{ rt.root_group }}
+                {{ i.root_sign }} ({{ rt.root_ru_meaning }})</td>
         </tr>
 
         <tr>
             <th>√ в сочетании</th>
-            <td>${rt.root_in_comps}</td>
+            <td>{{ rt.root_in_comps }}</td>
         </tr>
-        % endif
-
-        % if ru_base:
+{% endif %}
+{% if ru_base %}
         <tr>
             <th>Основа</th>
-            <td>${ru_base}</td>
+            <td>{{ ru_base }}</td>
         </tr>
-        % endif
-
-        % if i.construction:
+{% endif %}
+{% if i.construction %}
         <tr>
             <th>Образование</th>
-            <td>${i.construction.replace("\n", "<br>")}</td>
+            <td>{{ i.construction.replace("\n", "<br>") }}</td>
         </tr>
-        % endif
-
-        % if i.derivative:
+{% endif %}
+{% if i.derivative %}
         <tr>
             <th>Производное</th>
-            <td>${i.derivative} ${i.suffix}</td>
+            <td>{{ i.derivative }} {{ i.suffix }}</td>
         </tr>
-        % endif
-
-        % if ru_phonetic:
+{% endif %}
+{% if ru_phonetic %}
         <tr>
             <th>Фонетика</th>
-            <td>${ru_phonetic}</td>
+            <td>{{ ru_phonetic }}</td>
         </tr>
-        % endif
-
-        % if i.compound_type:
+{% endif %}
+{% if i.compound_type %}
         <tr>
             <th>Составное</th>
-            <td>${i.compound_type} (${i.compound_construction})</td>
+            <td>{{ i.compound_type }} ({{ i.compound_construction }})</td>
         </tr>
-        % endif
-
-        % if i.antonym:
+{% endif %}
+{% if i.antonym %}
         <tr>
             <th>Антоним</th>
-            <td>${i.antonym}</td>
+            <td>{{ i.antonym }}</td>
         </tr>
-        % endif
-
-        % if i.synonym:
+{% endif %}
+{% if i.synonym %}
         <tr>
             <th>Синоним</th>
-            <td>${i.synonym}</td>
+            <td>{{ i.synonym }}</td>
         </tr>
-        % endif
-
-        % if i.variant:
+{% endif %}
+{% if i.variant %}
         <tr>
             <th>Вариант</th>
-            <td>${i.variant}</td>
+            <td>{{ i.variant }}</td>
         </tr>
-        % endif
-
-        % if i.commentary:
+{% endif %}
+{% if i.commentary %}
         <tr>
             <th>Комментарий</th>
-            <td>${i.commentary.replace("\n", "<br>")}</td>
+            <td>{{ i.commentary.replace("\n", "<br>") }}</td>
         </tr>
-        % endif
-
-        % if ru.ru_notes:
+{% endif %}
+{% if ru.ru_notes %}
         <tr>
             <th>Заметки</th>
-            <td>${ru.ru_notes}</td>
+            <td>{{ ru.ru_notes }}</td>
         </tr>
-            % if "[пер. ИИ]" in ru.ru_notes and i.notes:
+{% if "[пер. ИИ]" in ru.ru_notes and i.notes %}
                 <tr>
                     <th>Notes</th>
-                    <td>${i.notes}</td>
+                    <td>{{ i.notes }}</td>
                 </tr>
-            % endif
-        % elif i.notes:
+{% endif %}
+{% elif i.notes %}
         <tr>
             <th>Заметки</th>
-            <td>${i.notes.replace("\n", "<br>")}</td>
+            <td>{{ i.notes.replace("\n", "<br>") }}</td>
         </tr>
-        % endif
-
-        % if i.cognate:
+{% endif %}
+{% if i.cognate %}
         <tr>
             <th>Когнаты</th>
-            <td>${i.cognate}</td>
+            <td>{{ i.cognate }}</td>
         </tr>
-        % endif
-
-        % if i.link:
+{% endif %}
+{% if i.link %}
         <tr>
             <th>Ссылка</th>
             <td>
-                % for website in i.link.split("\n"):
+{% for website in i.link.split("\n") %}
                     <p style="margin: 0; padding: 0;">
-                        <a href="${website}" target="_blank">
-                            ${website}
+                        <a href="{{ website }}" target="_blank">
+                            {{ website }}
                         </a>
                     </p>
-                % endfor
+{% endfor %}
             </td>
         </tr>
-        % endif
-
-        % if i.non_ia:
+{% endif %}
+{% if i.non_ia %}
         <tr>
             <th>Не Индоевроп</th>
-            <td>${i.non_ia}</td>
+            <td>{{ i.non_ia }}</td>
         </tr>
-        % endif
-
-        % if i.sanskrit:
+{% endif %}
+{% if i.sanskrit %}
         <tr>
             <th>Санскрит</th>
-            <td>${i.sanskrit}</td>
+            <td>{{ i.sanskrit }}</td>
         </tr>
-        % endif
-
-        % if rt and rt.sanskrit_root and rt.sanskrit_root != "-": 
+{% endif %}
+{% if rt and rt.sanskrit_root and rt.sanskrit_root != "-" %}
         <tr>
             <th>Санск. Корень</th>
             <td>
                 <i>
-                    ${rt.sanskrit_root} ${rt.sanskrit_root_class} (${rt.sanskrit_root_ru_meaning})
+                    {{ rt.sanskrit_root }} {{ rt.sanskrit_root_class }} ({{ rt.sanskrit_root_ru_meaning }})
                 </i>
             </td>
         </tr>
-        % endif
-
+{% endif %}
     </table>
 
     <p class='dpd-footer'>
-        Заметили ошибку? <a class="dpd-link" href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500=${i.lemma_link}&entry.326955045=Грамматика&entry.1433863141=GoldenDict+${today}" target="_blank">Исправьте здесь</a>. 
-        <br>Отсутствует какое-то слово в словаре? <a class="dpd-link" href="https://docs.google.com/forms/d/e/1FAIpQLSfResxEUiRCyFITWPkzoQ2HhHEvUS5fyg68Rl28hFH6vhHlaA/viewform?usp=pp_url&entry.1433863141=GoldenDict+${today}" target="_blank">Добавьте его здесь</a>.
+        Заметили ошибку? <a class="dpd-link" href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{ i.lemma_link }}&entry.326955045=Грамматика&entry.1433863141=GoldenDict+{{ today }}" target="_blank">Исправьте здесь</a>. 
+        <br>Отсутствует какое-то слово в словаре? <a class="dpd-link" href="https://docs.google.com/forms/d/e/1FAIpQLSfResxEUiRCyFITWPkzoQ2HhHEvUS5fyg68Rl28hFH6vhHlaA/viewform?usp=pp_url&entry.1433863141=GoldenDict+{{ today }}" target="_blank">Добавьте его здесь</a>.
     </p>
 </div>

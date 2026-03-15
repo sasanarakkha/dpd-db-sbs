@@ -83,6 +83,7 @@ class HeadwordData:
             self.ru_grammar = ru_make_grammar_line(i)
             self.ru_base = ru_replace_abbreviations(i.root_base, "base")
             self.ru_phonetic = ru_replace_abbreviations(i.phonetic, "phonetic")
+            self.ru_inflections_html = ru_replace_abbreviations(i.inflections_html, "inflect")
             self.ru_is_ai_translation = not ru.ru_meaning and ru.ru_meaning_raw
 
         # SBS fields

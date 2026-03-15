@@ -1,14 +1,14 @@
-<div id="ru_root_matrix_${r.root_}" class="dpd content hidden">
+<div id="ru_root_matrix_{{ r.root_ }}" class="dpd content hidden">
     <p class="heading">
-        % if count == 1:
-        <b>${count}</b> слово произошло от корня
-        % else:
-        <b>${count}</b> слов(а) произошли от корня
-        % endif
-        <b>${superScripter(r.root)}</b>
+{% if count == 1 %}
+        <b>{{ count }}</b> слово произошло от корня
+{% else %}
+        <b>{{ count }}</b> слов(а) произошли от корня
+{% endif %}
+        <b>{{ superScripter(r.root) }}</b>
     </p>
-    ${root_matrix}
+    {{ root_matrix }}
     <p class="dpd-footer">
-        Заметили ошибку? <a class="dpd-link" href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500=${r.root_link}&entry.326955045=Матрица+корня&entry.1433863141=GoldenDict+${today}" target="_blank">Пожалуйста сообщите.</a>
+        Заметили ошибку? <a class="dpd-link" href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={{ r.root_link }}&entry.326955045=Матрица+корня&entry.1433863141=GoldenDict+{{ today }}" target="_blank">Пожалуйста сообщите.</a>
     </p>
 </div>

@@ -5,7 +5,7 @@ document.addEventListener("click", function (event) {
   const classNames = ["dpd-button"];
   if (classNames.some((className) => target.classList.contains(className))) {
     const target_id = target.getAttribute("data-target");
-    if (target_id && !target_id.startsWith("ru_")) {
+    if (target_id && target_id.startsWith("sbs_")) {
         sbs_button_click(target);
         event.preventDefault();
     }
@@ -39,14 +39,19 @@ function sbs_button_click(el) {
 
 //// get the data to load into buttons
 
-document.addEventListener("DOMContentLoaded", function () {
+function sbs_init() {
   sbs_loadData();
   const gdParams = new URLSearchParams(window.location.search);
   const gdWord = gdParams.get("word");
   if (gdWord) {
     highlightInflections(gdWord.trim());
   }
-});
+}
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", sbs_init);
+} else {
+  sbs_init();
+}
 
 function sbs_loadData() {
   var metaTags = document.querySelectorAll("meta[data_key]");
@@ -69,15 +74,15 @@ function sbs_loadButtonContent(data) {
 
   //// feedback
 
-  const feedbackHTML = makeFeedback(data);
-  const feedbackElement = document.getElementById(`feedback_${lemmaTag}`);
+  const feedbackHTML = sbs_makeFeedback(data);
+  const feedbackElement = document.getElementById(`sbs_feedback_${lemmaTag}`);
   if (feedbackElement) feedbackElement.innerHTML = feedbackHTML;
 
   // frequency
 
   if (data.CstFreq != undefined) {
-    const frequencyHTML = makeFrequency(data);
-    const frequencyElement = document.getElementById(`frequency_${lemmaTag}`);
+    const frequencyHTML = sbs_makeFrequency(data);
+    const frequencyElement = document.getElementById(`sbs_frequency_${lemmaTag}`);
     if (frequencyElement) frequencyElement.innerHTML = frequencyElement.innerHTML.replace(
       "frequency loading...",
       frequencyHTML
@@ -91,9 +96,9 @@ function sbs_loadButtonContent(data) {
     data.family_compounds.length > 0 &&
     typeof family_compound_json !== "undefined"
   ) {
-    const familyCompoundHtml = makeFamilyCompoundHtml(data);
+    const familyCompoundHtml = sbs_makeFamilyCompoundHtml(data);
     const familyCompoundElement = document.getElementById(
-      `family_compound_${lemmaTag}`
+      `sbs_family_compound_${lemmaTag}`
     );
     if (familyCompoundElement) familyCompoundElement.innerHTML = familyCompoundHtml;
   }
@@ -102,9 +107,9 @@ function sbs_loadButtonContent(data) {
 
   if (data.family_root != "" && typeof family_root_json !== "undefined") {
     const fr = family_root_json[data.family_root];
-    const familyRootHtml = makeFamilyRootHtml(data, fr, "lemma");
+    const familyRootHtml = sbs_makeFamilyRootHtml(data, fr, "lemma");
     const familyRootElement = document.getElementById(
-      `family_root_${lemmaTag}`
+      `sbs_family_root_${lemmaTag}`
     );
     if (familyRootElement) familyRootElement.innerHTML = familyRootHtml;
   }
@@ -116,9 +121,9 @@ function sbs_loadButtonContent(data) {
     data.family_idioms.length > 0 &&
     typeof family_idiom_json !== "undefined"
   ) {
-    const familyIdiomHtml = makeFamilyIdioms(data);
+    const familyIdiomHtml = sbs_makeFamilyIdioms(data);
     const familyIdiomElement = document.getElementById(
-      `family_idiom_${lemmaTag}`
+      `sbs_family_idiom_${lemmaTag}`
     );
     if (familyIdiomElement) familyIdiomElement.innerHTML = familyIdiomHtml;
   }
@@ -130,17 +135,17 @@ function sbs_loadButtonContent(data) {
     data.family_sets.length > 0 &&
     typeof family_set_json !== "undefined"
   ) {
-    const familySetHtml = makeFamilySets(data);
-    const familySetElement = document.getElementById(`family_set_${lemmaTag}`);
+    const familySetHtml = sbs_makeFamilySets(data);
+    const familySetElement = document.getElementById(`sbs_family_set_${lemmaTag}`);
     if (familySetElement) familySetElement.innerHTML = familySetHtml;
   }
 
   //// family word
 
   if (data.family_word && typeof family_word_json !== "undefined") {
-    const familyWordHtml = makeFamilyWordHtml(data);
+    const familyWordHtml = sbs_makeFamilyWordHtml(data);
     const familyWordElement = document.getElementById(
-      `family_word_${lemmaTag}`
+      `sbs_family_word_${lemmaTag}`
     );
     if (familyWordElement) familyWordElement.innerHTML = familyWordHtml;
   }
@@ -149,15 +154,15 @@ function sbs_loadButtonContent(data) {
 //// load root dictionary button content
 
 function sbs_loadRootButtonContent(data) {
-  const familyRootDivs = document.querySelectorAll('div[id^="root_family_"]');
+  const familyRootDivs = document.querySelectorAll('div[id^="sbs_root_family_"]');
   var familyRootArray = Array.from(familyRootDivs);
   familyRootArray.forEach((item) => {
     const key_id = item.id;
-    const key_clean = item.id.replace("root_family_", "").replace(/_/g, " ");
+    const key_clean = item.id.replace("sbs_root_family_", "").replace(/_/g, " ");
     const fr = family_root_json[key_clean];
-    const link = item.id.replace("root_family_", "").replace(/_/g, "%20");
+    const link = item.id.replace("sbs_root_family_", "").replace(/_/g, "%20");
     if (fr !== undefined) {
-      const familyRootHtml = makeFamilyRootHtml(data, fr, "root", link);
+      const familyRootHtml = sbs_makeFamilyRootHtml(data, fr, "root", link);
       const familyRootElement = document.getElementById(key_id);
       familyRootElement.innerHTML = familyRootHtml;
     } else {

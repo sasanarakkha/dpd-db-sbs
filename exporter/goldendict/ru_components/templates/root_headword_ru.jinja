@@ -1,6 +1,6 @@
 {{ d.header }}
 <body>
-<div class="root">
+<div class="dpd">
     <p>
         <b>{{ d.r.root_clean }}</b> 
         {{ d.r.root_group }} 
@@ -25,7 +25,7 @@
 </div>
 
 {% if d.r.root_info %}
-<div id="ru_root_info_{{ d.r.root_ }}" class="root content hidden">
+<div id="ru_root_info_{{ d.r.root_ }}" class="dpd content hidden">
     <table class="root_info">
         <tr>
             <th>Корень</th>
@@ -66,7 +66,7 @@
 {% endif %}
 
 {% if d.r.root_matrix %}
-<div id="ru_root_matrix_{{ d.r.root_ }}" class="root content hidden">
+<div id="ru_root_matrix_{{ d.r.root_ }}" class="dpd content hidden">
     <table class="root_matrix">
         <tr>
             <th colspan="2">Матрица корня</th>
@@ -79,7 +79,7 @@
 {% endif %}
 
 {% for fr in d.frs %}
-<div id="ru_root_family_{{ fr.root_family_ }}" class="root content hidden">
+<div id="ru_root_family_{{ fr.root_family_ }}" class="dpd content hidden">
     {{ fr.html_ru }}
 </div>
 {% endfor %}

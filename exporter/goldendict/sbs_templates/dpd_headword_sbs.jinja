@@ -35,53 +35,53 @@
     <a class="dpd-button play" onclick="sbs_playAudio('{{ d.i.lemma_clean }}', this)" title="Play Audio"><svg viewBox="0 0 24 24" width="16px" height="16px" fill="currentColor" stroke="currentColor" stroke-width="0"><path d="M8 5v14l11-7z"></path></svg></a>
     {% endif %}
     {% if d.i.needs_sutta_info_button %}
-    <a class="dpd-button" href="#" data-target="sutta_info_{{ d.i.lemma_1_ }}">sutta</a>
+    <a class="dpd-button" href="#" data-target="sbs_sutta_info_{{ d.i.lemma_1_ }}">sutta</a>
     {% endif %}
     {% if d.i.needs_grammar_button or d.show_grammar %}
-    <a class="dpd-button" href="#" data-target="grammar_{{ d.i.lemma_1_ }}">grammar</a>
+    <a class="dpd-button" href="#" data-target="sbs_grammar_{{ d.i.lemma_1_ }}">grammar</a>
     {% endif %}
     {% if d.needs_sbs_example_button %}
-    <a class="dpd-button" href="#" data-target="sbs_example_{{ d.i.lemma_1_ }}">sbs</a>
+    <a class="dpd-button" href="#" data-target="sbs_sbs_example_{{ d.i.lemma_1_ }}">sbs</a>
     {% endif %}
     {% if d.i.needs_example_button %}
-    <a class="dpd-button" href="#" data-target="example_{{ d.i.lemma_1_ }}">example</a>
+    <a class="dpd-button" href="#" data-target="sbs_example_{{ d.i.lemma_1_ }}">example</a>
     {% endif %}
     {% if d.i.needs_examples_button %}
-    <a class="dpd-button" href="#" data-target="examples_{{ d.i.lemma_1_ }}">examples</a>
+    <a class="dpd-button" href="#" data-target="sbs_examples_{{ d.i.lemma_1_ }}">examples</a>
     {% endif %}
     {% if d.i.needs_conjugation_button %}
-    <a class="dpd-button" href="#" data-target="conjugation_{{ d.i.lemma_1_ }}">conjugation</a>
+    <a class="dpd-button" href="#" data-target="sbs_conjugation_{{ d.i.lemma_1_ }}">conjugation</a>
     {% endif %}
     {% if d.i.needs_declension_button %}
-    <a class="dpd-button" href="#" data-target="declension_{{ d.i.lemma_1_ }}">declension</a>
+    <a class="dpd-button" href="#" data-target="sbs_declension_{{ d.i.lemma_1_ }}">declension</a>
     {% endif %}
     {% if d.i.needs_root_family_button %}
-    <a class="dpd-button" href="#" data-target="family_root_{{ d.i.lemma_1_ }}">root family</a>
+    <a class="dpd-button" href="#" data-target="sbs_family_root_{{ d.i.lemma_1_ }}">root family</a>
     {% endif %}
     {% if d.i.needs_word_family_button %}
-    <a class="dpd-button" href="#" data-target="family_word_{{ d.i.lemma_1_ }}">word family</a>
+    <a class="dpd-button" href="#" data-target="sbs_family_word_{{ d.i.lemma_1_ }}">word family</a>
     {% endif %}
     {% if d.i.needs_compound_family_button %}
-    <a class="dpd-button" href="#" data-target="family_compound_{{ d.i.lemma_1_ }}">compound family</a>
+    <a class="dpd-button" href="#" data-target="sbs_family_compound_{{ d.i.lemma_1_ }}">compound family</a>
     {% elif d.i.needs_compound_families_button %}
-    <a class="dpd-button" href="#" data-target="family_compound_{{ d.i.lemma_1_ }}">compound families</a>
+    <a class="dpd-button" href="#" data-target="sbs_family_compound_{{ d.i.lemma_1_ }}">compound families</a>
     {% endif %}
     {% if d.i.needs_idioms_button %}
-    <a class="dpd-button" href="#" data-target="family_idiom_{{ d.i.lemma_1_ }}">idioms</a>
+    <a class="dpd-button" href="#" data-target="sbs_family_idiom_{{ d.i.lemma_1_ }}">idioms</a>
     {% endif %}
     {% if d.i.needs_set_button %}
-    <a class="dpd-button" href="#" data-target="family_set_{{ d.i.lemma_1_ }}">set</a>
+    <a class="dpd-button" href="#" data-target="sbs_family_set_{{ d.i.lemma_1_ }}">set</a>
     {% elif d.i.needs_sets_button %}
-    <a class="dpd-button" href="#" data-target="family_set_{{ d.i.lemma_1_ }}">sets</a>
+    <a class="dpd-button" href="#" data-target="sbs_family_set_{{ d.i.lemma_1_ }}">sets</a>
     {% endif %}
     {% if d.i.needs_frequency_button %}
-    <a class="dpd-button" href="#" data-target="frequency_{{ d.i.lemma_1_ }}">frequency</a>
+    <a class="dpd-button" href="#" data-target="sbs_frequency_{{ d.i.lemma_1_ }}">frequency</a>
     {% endif %}
-    <a class="dpd-button" href="#" data-target="feedback_{{ d.i.lemma_1_ }}">feedback</a>
+    <a class="dpd-button" href="#" data-target="sbs_feedback_{{ d.i.lemma_1_ }}">feedback</a>
 </div>
 
 {% if d.i.needs_sutta_info_button %}
-<div id="sutta_info_{{ d.i.lemma_1_ }}" name="sutta-info-div"
+<div id="sbs_sutta_info_{{ d.i.lemma_1_ }}" name="sutta-info-div"
     class="dpd content hidden">
     <table class="sutta-info">
 
@@ -948,7 +948,7 @@
 {% endif %}
 
 {% if d.i.needs_grammar_button or d.show_grammar %}
-<div id="grammar_{{ d.i.lemma_1_ }}" class="dpd content hidden">
+<div id="sbs_grammar_{{ d.i.lemma_1_ }}" class="dpd content hidden">
     <table class="grammar">
         <tr>
             <th>Lemma</th>
@@ -1199,7 +1199,7 @@
 {% endif %}
 
 {% if d.needs_sbs_example_button %}
-<div id="sbs_example_{{ d.i.lemma_1_ }}" class="dpd content hidden">
+<div id="sbs_sbs_example_{{ d.i.lemma_1_ }}" class="dpd content hidden">
     {% if d.needs_sbs_example %}
         {% if d.sbs.sbs_example_1 %}
             <p>{{ d.sbs.sbs_example_1 }}</p>
@@ -1278,9 +1278,9 @@
 
 {% if d.i.needs_example_button or d.i.needs_examples_button %}
 {% if d.i.example_1 and d.i.example_2 %}
-<div id="examples_{{ d.i.lemma_1_ }}" class="dpd content hidden">
+<div id="sbs_examples_{{ d.i.lemma_1_ }}" class="dpd content hidden">
     {% elif d.i.example_1 and not d.i.example_2 %}
-    <div id="example_{{ d.i.lemma_1_ }}" class="dpd content hidden">
+    <div id="sbs_example_{{ d.i.lemma_1_ }}" class="dpd content hidden">
         {% endif %}
 
         {% if d.i.example_1 %}
@@ -1307,9 +1307,9 @@
 
 {% if d.i.needs_conjugation_button or d.i.needs_declension_button %}
 {% if d.i.pos in d.declensions %}
-<div id="declension_{{ d.i.lemma_1_ }}" class="dpd content hidden">
+<div id="sbs_declension_{{ d.i.lemma_1_ }}" class="dpd content hidden">
     {% elif d.i.pos in d.conjugations %}
-    <div id="conjugation_{{ d.i.lemma_1_ }}" class="dpd content hidden">
+    <div id="sbs_conjugation_{{ d.i.lemma_1_ }}" class="dpd content hidden">
         {% endif %}
         {{ d.i.inflections_html }}
         {% if "gray" in d.i.inflections_html %}
@@ -1338,42 +1338,42 @@
 {% endif %}
 
 {% if d.i.needs_root_family_button %}
-<div id="family_root_{{ d.i.lemma_1_ }}" class="dpd content hidden">
+<div id="sbs_family_root_{{ d.i.lemma_1_ }}" class="dpd content hidden">
     root family loading...
 </div>
 {% endif %}
 
 {% if d.i.needs_word_family_button %}
-<div id="family_word_{{ d.i.lemma_1_ }}" class="dpd content hidden">
+<div id="sbs_family_word_{{ d.i.lemma_1_ }}" class="dpd content hidden">
     family word loading...
 </div>
 {% endif %}
 
 {% if d.i.needs_compound_family_button or d.i.needs_compound_families_button %}
-<div id="family_compound_{{ d.i.lemma_1_ }}" class="dpd content hidden">
+<div id="sbs_family_compound_{{ d.i.lemma_1_ }}" class="dpd content hidden">
     compound families loading...
 </div>
 {% endif %}
 
 {% if d.i.needs_idioms_button %}
-<div id="family_idiom_{{ d.i.lemma_1_ }}" class="dpd content hidden">
+<div id="sbs_family_idiom_{{ d.i.lemma_1_ }}" class="dpd content hidden">
     idioms loading...
 </div>
 {% endif %}
 
 {% if d.i.needs_set_button or d.i.needs_sets_button %}
-<div id="family_set_{{ d.i.lemma_1_ }}" class="dpd content hidden">
+<div id="sbs_family_set_{{ d.i.lemma_1_ }}" class="dpd content hidden">
     sets loading...
 </div>
 {% endif %}
 
 {% if d.i.needs_frequency_button %}
-<div id="frequency_{{ d.i.lemma_1_ }}" class="dpd content hidden">
+<div id="sbs_frequency_{{ d.i.lemma_1_ }}" class="dpd content hidden">
     frequency loading...
 </div>
 {% endif %}
 
-<div id="feedback_{{ d.i.lemma_1_ }}" class="dpd content hidden">
+<div id="sbs_feedback_{{ d.i.lemma_1_ }}" class="dpd content hidden">
     feedback loading...
 </div>
 </body></html>

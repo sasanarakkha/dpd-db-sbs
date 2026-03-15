@@ -1,8 +1,7 @@
-<div id="sutta_info_${ i.lemma_1_ }" name="sutta-info-div"
+<div id="sbs_sutta_info_{{  i.lemma_1_  }}" name="sutta-info-div"
     class="dpd content hidden">
     <table class="sutta_info">
-
-        % if su.cst_code:
+{% if su.cst_code %}
         <tr>
             <th colspan="2">
                 Chaṭṭha Saṅgāyana Tipiṭaka (CST)
@@ -14,7 +13,7 @@
                 CST Code
             </th>
             <td>
-                ${ su.cst_code }
+                {{  su.cst_code  }}
             </td>
         </tr>
 
@@ -23,7 +22,7 @@
                 Nikāya
             </th>
             <td>
-                ${ su.cst_nikaya }
+                {{  su.cst_nikaya  }}
             </td>
         </tr>
 
@@ -32,7 +31,7 @@
                 Book
             </th>
             <td>
-                ${ su.cst_book }
+                {{  su.cst_book  }}
             </td>
         </tr>
 
@@ -41,7 +40,7 @@
                 Section
             </th>
             <td>
-                ${ su.cst_section }
+                {{  su.cst_section  }}
             </td>
         </tr>
 
@@ -50,7 +49,7 @@
                 Vagga
             </th>
             <td>
-                ${ su.cst_vagga }
+                {{  su.cst_vagga  }}
             </td>
         </tr>
 
@@ -59,7 +58,7 @@
                 Sutta
             </th>
             <td>
-                ${ su.cst_sutta }
+                {{  su.cst_sutta  }}
             </td>
         </tr>
 
@@ -68,7 +67,7 @@
                 Paragraph
             </th>
             <td>
-                ${ su.cst_paranum }
+                {{  su.cst_paranum  }}
             </td>
         </tr>
 
@@ -78,9 +77,9 @@
             </th>
             <td>
                 <a
-                    href="https://github.com/VipassanaTech/tipitaka-xml/tree/main/${ su.cst_file }"
-                    target="_blank">${
-                    su.cst_file }</a>
+                    href="https://github.com/VipassanaTech/tipitaka-xml/tree/main/{{  su.cst_file  }}"
+                    target="_blank">{{ 
+                    su.cst_file  }}</a>
             </td>
         </tr>
 
@@ -89,21 +88,19 @@
                 Apps & Websites using CST
             </th>
             <td>
-                <a href="${ su.tpp_org }" target="_blank">tipitakapali.org</a>
+                <a href="{{  su.tpp_org  }}" target="_blank">tipitakapali.org</a>
             </td>
         </tr>
-
-        % if su.has_tpr:
+{% if su.has_tpr %}
         <tr>
             <th>
                 Tipiṭaka Pāḷi Reader
             </th>
             <td>
-                <a href="https://tpr.pali.tools/open/?sutta=${ su.dpd_code.lower() }" target="_blank">https://tpr.pali.tools/open/?sutta=${ su.dpd_code.lower() }</a>
+                <a href="https://tpr.pali.tools/open/?sutta={{  su.dpd_code.lower()  }}" target="_blank">https://tpr.pali.tools/open/?sutta={{  su.dpd_code.lower()  }}</a>
             </td>
         </tr>
-        % endif
-
+{% endif %}
         <tr>
             <th colspan="2">
                 CST Page Numbers in Printed Editions
@@ -115,7 +112,7 @@
                 Myanmar
             </th>
             <td>
-                ${ su.cst_m_page }
+                {{  su.cst_m_page  }}
             </td>
         </tr>
 
@@ -124,7 +121,7 @@
                 Thai
             </th>
             <td>
-                ${ su.cst_t_page }
+                {{  su.cst_t_page  }}
             </td>
         </tr>
 
@@ -133,7 +130,7 @@
                 VRI
             </th>
             <td>
-                ${ su.cst_v_page }
+                {{  su.cst_v_page  }}
             </td>
         </tr>
 
@@ -142,12 +139,11 @@
                 PTS
             </th>
             <td>
-                ${ su.cst_p_page }
+                {{  su.cst_p_page  }}
             </td>
         </tr>
-        % endif
-
-        % if su.sc_code:
+{% endif %}
+{% if su.sc_code %}
         <tr>
             <th colspan="2">
                 SuttaCentral (SC)
@@ -159,7 +155,7 @@
                 SC Code
             </th>
             <td>
-                ${ su.sc_code }
+                {{  su.sc_code  }}
             </td>
         </tr>
 
@@ -168,7 +164,7 @@
                 Book
             </th>
             <td>
-                ${ su.sc_book }
+                {{  su.sc_book  }}
             </td>
         </tr>
 
@@ -177,7 +173,7 @@
                 Vagga
             </th>
             <td>
-                ${ su.sc_vagga }
+                {{  su.sc_vagga  }}
             </td>
         </tr>
 
@@ -186,7 +182,7 @@
                 Sutta
             </th>
             <td>
-                ${ su.sc_sutta }
+                {{  su.sc_sutta  }}
             </td>
         </tr>
 
@@ -195,7 +191,7 @@
                 Title
             </th>
             <td>
-                ${ su.sc_eng_sutta }
+                {{  su.sc_eng_sutta  }}
             </td>
         </tr>
 
@@ -204,7 +200,7 @@
                 Blurb
             </th>
             <td>
-                ${ su.sc_blurb }
+                {{  su.sc_blurb  }}
             </td>
         </tr>
 
@@ -213,10 +209,10 @@
                 Links
             </th>
             <td>
-                <a href="${ su.sc_card_link }" target="_blank">Sutta
+                <a href="{{  su.sc_card_link  }}" target="_blank">Sutta
                     Card</a>,
-                <a href="${ su.sc_pali_link }" target="_blank">Pāḷi Text</a>,
-                <a href="${ su.sc_eng_link }" target="_blank">English
+                <a href="{{  su.sc_pali_link  }}" target="_blank">Pāḷi Text</a>,
+                <a href="{{  su.sc_eng_link  }}" target="_blank">English
                     Translation</a>
             </td>
         </tr>
@@ -226,7 +222,7 @@
                 File
             </th>
             <td>
-                ${ su.sc_file_path }
+                {{  su.sc_file_path  }}
             </td>
         </tr>
 
@@ -235,8 +231,8 @@
                 GitHub
             </th>
             <td>
-                <a href="${ su.sc_github }" target="_blank">${ su.sc_file_path
-                    }</a>
+                <a href="{{  su.sc_github  }}" target="_blank">{{  su.sc_file_path
+                     }}</a>
             </td>
         </tr>
 
@@ -245,27 +241,26 @@
                 Websites using Sutta Central
             </th>
             <td>
-                % if su.tbw:
-                <a href="${ su.tbw }" target="_blank">thebuddhaswords.net</a><br>
-                % endif
-                % if su.tbw_legacy:
-                <a href="${ su.tbw_legacy }" target="_blank">dhamma.gift (BW)</a><br>
-                % endif
-                % if su.dhamma_gift:
-                <a href="${ su.dhamma_gift }" target="_blank">find.dhamma.gift</a><br>
-                % endif
-                % if su.sc_express_link:
-                <a href="${ su.sc_express_link }" target="_blank">${
-                    su.sc_express_link }</a><br>
-                % endif
-                % if su.sc_voice_link:
-                <a href="${ su.sc_voice_link }" target="_blank">sc-voice.net</a><br>
-                % endif
+{% if su.tbw %}
+                <a href="{{  su.tbw  }}" target="_blank">thebuddhaswords.net</a><br>
+{% endif %}
+{% if su.tbw_legacy %}
+                <a href="{{  su.tbw_legacy  }}" target="_blank">dhamma.gift (BW)</a><br>
+{% endif %}
+{% if su.dhamma_gift %}
+                <a href="{{  su.dhamma_gift  }}" target="_blank">find.dhamma.gift</a><br>
+{% endif %}
+{% if su.sc_express_link %}
+                <a href="{{  su.sc_express_link  }}" target="_blank">{{ 
+                    su.sc_express_link  }}</a><br>
+{% endif %}
+{% if su.sc_voice_link %}
+                <a href="{{  su.sc_voice_link  }}" target="_blank">sc-voice.net</a><br>
+{% endif %}
             </td>
         </tr>
-        % endif
-
-        % if su.bjt_sutta_code:
+{% endif %}
+{% if su.bjt_sutta_code %}
         <tr>
             <th colspan="2">
                 Buddha Jayanti Tipiṭaka (BJT)
@@ -277,7 +272,7 @@
                 Sutta Code
             </th>
             <td>
-                ${ su.bjt_sutta_code }
+                {{  su.bjt_sutta_code  }}
             </td>
         </tr>
 
@@ -286,7 +281,7 @@
                 Piṭaka
             </th>
             <td>
-                ${ su.bjt_piṭaka }
+                {{  su.bjt_piṭaka  }}
             </td>
         </tr>
 
@@ -295,7 +290,7 @@
                 Nikāya
             </th>
             <td>
-                ${ su.bjt_nikāya }
+                {{  su.bjt_nikāya  }}
             </td>
         </tr>
 
@@ -304,7 +299,7 @@
                 Major Section
             </th>
             <td>
-                ${ su.bjt_major_section }
+                {{  su.bjt_major_section  }}
             </td>
         </tr>
 
@@ -313,7 +308,7 @@
                 Book
             </th>
             <td>
-                ${ su.bjt_book }
+                {{  su.bjt_book  }}
             </td>
         </tr>
 
@@ -322,7 +317,7 @@
                 Minor Section
             </th>
             <td>
-                ${ su.bjt_minor_section }
+                {{  su.bjt_minor_section  }}
             </td>
         </tr>
 
@@ -331,7 +326,7 @@
                 Vagga
             </th>
             <td>
-                ${ su.bjt_vagga }
+                {{  su.bjt_vagga  }}
             </td>
         </tr>
 
@@ -340,7 +335,7 @@
                 Sutta
             </th>
             <td>
-                ${ su.bjt_sutta }
+                {{  su.bjt_sutta  }}
             </td>
         </tr>
 
@@ -349,7 +344,7 @@
                 Book ID
             </th>
             <td>
-                ${ su.bjt_book_id }
+                {{  su.bjt_book_id  }}
             </td>
         </tr>
 
@@ -358,7 +353,7 @@
                 Page Number
             </th>
             <td>
-                ${ su.bjt_page_num }
+                {{  su.bjt_page_num  }}
             </td>
         </tr>
 
@@ -367,7 +362,7 @@
             ## Page Offset
             ## </th>
             ## <td>
-            ## ${ su.bjt_page_offset }
+            ## {{  su.bjt_page_offset  }}
             ## </td>
             ## </tr>
 
@@ -376,7 +371,7 @@
                 Filename
             </th>
             <td>
-                ${ su.bjt_filename }
+                {{  su.bjt_filename  }}
             </td>
         </tr>
 
@@ -385,8 +380,8 @@
                 Github
             </th>
             <td>
-                <a href="${ su.bjt_github_link }" target="_blank">${
-                    su.bjt_filename }</a>
+                <a href="{{  su.bjt_github_link  }}" target="_blank">{{ 
+                    su.bjt_filename  }}</a>
             </td>
         </tr>
 
@@ -395,17 +390,16 @@
                 Websites using BJT
             </th>
             <td>
-                <a href="${ su.bjt_tipitaka_lk_link }" target="_blank">tipiṭaka.lk
+                <a href="{{  su.bjt_tipitaka_lk_link  }}" target="_blank">tipiṭaka.lk
                     (Sinhala)</a><br>
-                <a href="${ su.bjt_open_tipitaka_lk_link }"
+                <a href="{{  su.bjt_open_tipitaka_lk_link  }}"
                     target="_blank">open.tipiṭaka.lk (Roman)</a><br>
-                <a href="${ su.bjt_open_tipitaka_lk_link.replace('latn', 'deva') }"
+                <a href="{{  su.bjt_open_tipitaka_lk_link.replace('latn', 'deva')  }}"
                     target="_blank">open.tipiṭaka.lk (Devanagari)</a><br>
             </td>
         </tr>
-        % endif
-
-        % if su.dv_exists:
+{% endif %}
+{% if su.dv_exists %}
         <tr>
             <th colspan="2">
                 Dhamma Vinaya Tools: Sutta Catalogue
@@ -417,7 +411,7 @@
                 PTS
             </th>
             <td>
-                ${ su.dv_pts }
+                {{  su.dv_pts  }}
             </td>
         </tr>
 
@@ -426,7 +420,7 @@
                 General Theme
             </th>
             <td>
-                ${ su.dv_main_theme }
+                {{  su.dv_main_theme  }}
             </td>
         </tr>
 
@@ -435,7 +429,7 @@
                 Particular Topic
             </th>
             <td>
-                ${ su.dv_subtopic }
+                {{  su.dv_subtopic  }}
             </td>
         </tr>
 
@@ -444,7 +438,7 @@
                 Summary
             </th>
             <td>
-                ${ su.dv_summary }
+                {{  su.dv_summary  }}
             </td>
         </tr>
 
@@ -453,7 +447,7 @@
                 Key Excerpts 1
             </th>
             <td>
-                ${ su.dv_key_excerpt1 }
+                {{  su.dv_key_excerpt1  }}
             </td>
         </tr>
 
@@ -462,7 +456,7 @@
                 Key Excerpts 2
             </th>
             <td>
-                ${ su.dv_key_excerpt2 }
+                {{  su.dv_key_excerpt2  }}
             </td>
         </tr>
 
@@ -471,7 +465,7 @@
                 Similes
             </th>
             <td>
-                ${ su.dv_similes }
+                {{  su.dv_similes  }}
             </td>
         </tr>
 
@@ -480,7 +474,7 @@
                 Stage of Training
             </th>
             <td>
-                ${ su.dv_stage }
+                {{  su.dv_stage  }}
             </td>
         </tr>
 
@@ -489,7 +483,7 @@
                 Training In
             </th>
             <td>
-                ${ su.dv_training }
+                {{  su.dv_training  }}
             </td>
         </tr>
 
@@ -498,7 +492,7 @@
                 Type of Teaching
             </th>
             <td>
-                ${ su.dv_aspect }
+                {{  su.dv_aspect  }}
             </td>
         </tr>
 
@@ -507,7 +501,7 @@
                 Teacher
             </th>
             <td>
-                ${ su.dv_teacher }
+                {{  su.dv_teacher  }}
             </td>
         </tr>
 
@@ -516,7 +510,7 @@
                 Audience
             </th>
             <td>
-                ${ su.dv_audience }
+                {{  su.dv_audience  }}
             </td>
         </tr>
 
@@ -525,7 +519,7 @@
                 Method of Teaching
             </th>
             <td>
-                ${ su.dv_method }
+                {{  su.dv_method  }}
             </td>
         </tr>
 
@@ -534,7 +528,7 @@
                 Sutta Length
             </th>
             <td>
-                ${ su.dv_length }
+                {{  su.dv_length  }}
             </td>
         </tr>
 
@@ -543,7 +537,7 @@
                 Prominence
             </th>
             <td>
-                ${ su.dv_prominence }
+                {{  su.dv_prominence  }}
             </td>
         </tr>
 
@@ -552,11 +546,10 @@
                 Suggested Reading
             </th>
             <td>
-                ${ su.dv_suggested_suttas }
+                {{  su.dv_suggested_suttas  }}
             </td>
         </tr>
-
-        % if su.dv_parallels_exists:
+{% if su.dv_parallels_exists %}
         <tr>
             <th colspan="2">
                 Parallels
@@ -568,7 +561,7 @@
                 Nikāyas
             </th>
             <td>
-                ${ su.dv_nikayas_parallels }
+                {{  su.dv_nikayas_parallels  }}
             </td>
         </tr>
 
@@ -577,7 +570,7 @@
                 Āgamas
             </th>
             <td>
-                ${ su.dv_āgamas_parallels }
+                {{  su.dv_āgamas_parallels  }}
             </td>
         </tr>
 
@@ -586,7 +579,7 @@
                 Taishō
             </th>
             <td>
-                ${ su.dv_taisho_parallels }
+                {{  su.dv_taisho_parallels  }}
             </td>
         </tr>
 
@@ -595,7 +588,7 @@
                 Sanskrit
             </th>
             <td>
-                ${ su.dv_sanskrit_parallels }
+                {{  su.dv_sanskrit_parallels  }}
             </td>
         </tr>
 
@@ -604,7 +597,7 @@
                 Vinaya
             </th>
             <td>
-                ${ su.dv_vinaya_parallels }
+                {{  su.dv_vinaya_parallels  }}
             </td>
         </tr>
 
@@ -613,7 +606,7 @@
                 Others
             </th>
             <td>
-                ${ su.dv_others_parallels }
+                {{  su.dv_others_parallels  }}
             </td>
         </tr>
 
@@ -622,19 +615,18 @@
                 ## Partial Parallels
             </th>
             <td>
-                ${ su.dv_partial_parallels_nā }<br>
-                ${ su.dv_partial_parallels_all }
+                {{  su.dv_partial_parallels_nā  }}<br>
+                {{  su.dv_partial_parallels_all  }}
             </td>
         </tr>
-        % endif
-        % endif
-
+{% endif %}
+{% endif %}
     </table>
 
     <p class="dpd-footer">
         Did you spot a mistake?
         <a class="dpd-link"
-            href="https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.438735500=${i.id}%20${i.lemma_link}&entry.326955045=Sutta&entry.1433863141=GoldenDict+${today}"
+            href="https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.438735500={{ i.id }}%20{{ i.lemma_link }}&entry.326955045=Sutta&entry.1433863141=GoldenDict+{{ today }}"
             target="_blank">Correct it here</a>
     </p>
 </div>
