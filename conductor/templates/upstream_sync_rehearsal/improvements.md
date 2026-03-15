@@ -1,43 +1,93 @@
-# Upstream Sync Rehearsal: Improvement Suggestions
+# Upstream Sync Rehearsal: Comprehensive Improvement Analysis
 
-Based on a comprehensive analysis of the session history, user feedback, and error reports from the recent synchronization track, the following systemic improvements should be integrated into the workflow and templates (`plan.md`, `guide.md`) to prevent recurring issues in future syncs.
+This document provides a unified, exhaustive post-mortem of the Upstream Sync Rehearsal sessions. It identifies friction points, logic gaps, and systemic failures encountered during the process to ensure future synchronizations are more robust, efficient, and maintainable.
 
-## 1. Automated Non-Interactive Sync Execution
-**Issue:** The automated sync script (`scripts/bash/full_sync.sh` or `makedict.py`) originally required interactive user input to select options, causing the AI agent to stall or fail.
-**Improvement:** 
-- The `plan.md` template must explicitly mandate running sync scripts non-interactively (e.g., using `echo 2 | bash ...` or a dedicated non-interactive script flag). 
-- Ensure the agent does not attempt to use interactive shell sessions.
+## 1. Mandatory Dual-Shadow Parity Enforcement
+**Issue:** Agents frequently updated one localized shadow (e.g., SBS) but neglected its sibling (e.g., RU), leading to broken builds and fragmentation.
+**Recommendation:**
+- Whenever an upstream source is modified, the agent MUST explicitly cross-reference the registry and update *all* mapped shadow copies (both RU and SBS) in the same implementation step.
+- Update the track plan to include a mandatory "Dual-Shadow Check" task.
 
-## 2. Mandatory Dual-Shadow Parity Enforcement
-**Issue:** The agent frequently updated one localized shadow copy (e.g., `exporter/goldendict/main_sbs.py`) but neglected to update its sibling (e.g., `exporter/goldendict/main_ru.py`).
-**Improvement:**
-- Enforce a strict **"Dual-Shadow Check"** in `guide.md` and `plan.md`. 
-- Whenever an upstream file (e.g., `main.py`) is modified, the agent MUST explicitly cross-reference the registry and update *all* mapped shadow copies (both RU and SBS) in the same implementation step.
+## 2. Strict Upstream Mirroring & Logic Alignment
+**Issue:** When shadow copies failed, agents occasionally attempted to "guess" fixes or invent new logic that diverged from upstream, creating long-term maintenance debt.
+**Recommendation:**
+- **Mirror Upstream Logic**: The primary fix for any shadow copy failure is to examine the original upstream source and emulate its logic exactly.
+- Layer localizations surgically on top of the original logic to keep future diffs manageable.
+- Discourage arbitrary "cleanup" or refactoring during sync unless it aligns with upstream shifts.
 
-## 3. Strict UI Namespace Isolation
-**Issue:** During the migration from Mako to Jinja2, the agent lost the unique HTML IDs and JavaScript function names required to run the RU and SBS GoldenDict dictionaries side-by-side. This caused button collisions.
-**Improvement:**
-- Add a **"Namespace Isolation"** rule to the engineering standards in the template. 
-- All HTML IDs, CSS classes, JS data objects, and global functions in localized templates MUST carry a distinct prefix (`ru_`, `sbs_`, `dps_`) to prevent global scope pollution in GoldenDict.
+## 3. UI Namespace Isolation in GoldenDict
+**Issue:** GoldenDict merges scripts and styles from multiple dictionaries into a single web view. Generic HTML IDs, CSS classes, and global JS functions caused catastrophic collisions (e.g., SBS buttons failing to open or toggling RU content).
+**Recommendation:**
+- **Strict Prefix Mandate**: Every localized dictionary MUST use a unique prefix (`ru_`, `sbs_`, `dps_`) for:
+    - JavaScript Data Objects (e.g., `rudata_`, `sbsdata_`).
+    - JavaScript Functions (e.g., `ru_loadData`, `sbs_playAudio`).
+    - HTML element IDs (e.g., `id="ru_grammar_..."`).
+    - Script loader classes (e.g., `class="ru_load_js"`).
+- **Template Isolation**: Localized versions should bundle their own namespaced JS versions rather than referencing shared global files that might change upstream.
 
-## 4. Comprehensive Source-to-Shadow Diffing
-**Issue:** The agent missed significant upstream changes (especially in `exporter/goldendict/templates/`) because it relied too heavily on the narrow `modified_upstream_files` list instead of checking the actual `git diff` of upstream sources.
-**Improvement:**
-- The Dynamic Planning Phase (Phase 2) must explicitly instruct the PRO model to run a `git diff-tree` for the sync commit and mathematically intersect it with *every* value (upstream source) listed in `russian_copies` and `sbs_copies` in the registry.
+## 4. UI Structural Formatting (`.dpd` vs `.root`)
+**Issue:** Localized templates using custom classes like `.root` bypassed upstream CSS rules defined for `.dpd`, resulting in missing frames and improper padding.
+**Recommendation:**
+- Shadow copies MUST strictly adhere to upstream's core CSS class architecture.
+- Deviations must be explicitly justified and accompanied by custom CSS in the localization folder.
 
-## 5. Dependency and Import Verification
-**Issue:** Upstream's transition from Mako to Jinja2 caused `ModuleNotFoundError` in localized scripts (`tpr_exporter_ru.py`) because the shadow copies were not updated to reflect the new dependency tree. Furthermore, test imports failed due to relative pathing issues (`root_info`).
-**Improvement:**
-- Add a step to explicitly verify missing or changed dependencies in shadow copies if an upstream architectural shift is detected.
-- Enforce the use of absolute imports (`from db.families.root_info import ...`) in all shadow copies to ensure testability from the project root.
+## 5. Template Migration & Syntax Integrity (Mako → Jinja2)
+**Issue:** During the migration from Mako to Jinja2, several templates were left with invalid Mako syntax (`% if`, `${var}`), causing them to render as raw code.
+**Recommendation:** 
+- Include a mandatory automated syntax validation step that greps for `${` and `%` tags in all localized `.jinja` files.
+- The `plan.md` should include an explicit "Syntax Sanity Check" task.
 
-## 6. Sub-Agent Reliability Fallbacks
-**Issue:** The agent repeatedly attempted to use a sub-agent (`generalist`) that failed, causing frustration and delays.
-**Improvement:**
-- The agent should be instructed to rely on direct codebase analysis using fast shell commands (`grep`, `rg`, `git diff`) and standard file reading tools rather than delegating critical semantic analysis to unreliable sub-agents.
+## 6. Comprehensive Source-to-Shadow Diffing
+**Issue:** Agents missed significant upstream changes (especially in template directories) by relying solely on narrow `modified_upstream_files` lists.
+**Recommendation:**
+- Phase 2 (Planning) must explicitly instruct the agent to run a `git diff-tree` for the sync commit and mathematically intersect it with *every* mapped source file and directory in the registry.
 
-## 7. Formalized Cleanup and Archiving
-**Issue:** The root directory became cluttered with temporary helper scripts, and tracking deleted upstream files against local shadows was chaotic.
-**Improvement:**
-- The newly developed `tests/test_shadow_cleanup.py` must become a permanent, mandatory step in the finalization phase (`plan.md`). 
-- The **Clean Root Folder Protocol** must be strictly enforced before the final user approval gate.
+## 7. Dependency, Import Verification & absolute imports
+**Issue:** Upstream architectural shifts (like Mako to Jinja2) caused `ModuleNotFoundError` in localized scripts. Relative imports also failed in root-level test environments.
+**Recommendation:**
+- Explicitly verify changed dependencies in shadow copies after any upstream reorganization.
+- **Absolute Import Mandate**: Enforce absolute imports (`from db.families.root_info import ...`) in all shadow copies to ensure they are runnable from the project root and within tests.
+
+## 8. Automated Parity Verification & Whitelisting
+**Issue:** `test_shadow_parity.py` often fails due to legitimate, intended localization differences.
+**Recommendation:**
+- Implement an automated "Whitelist Generation" step where the agent can generate a temporary AST-based whitelist for intended divergences, allowing focus on actual regressions.
+
+## 9. Formalized Cleanup, Archiving & Clean Root
+**Issue:** The root directory became cluttered with temporary scripts, and tracking deleted upstream files was disorganized.
+**Recommendation:**
+- **Recursive Subfolder Protocol**: `tests/test_shadow_cleanup.py` must run recursively folder-by-folder for all monitored paths.
+- **Usage-First Gating**: A file should only be archived if NEITHER the original name nor its associated shadow copy is referenced in the active codebase (excluding archives).
+- **Archive Protocol**: Scripts move to `scripts/dps_archive/`; data moves to `archive/dps/`.
+- **Clean Root Mandate**: All temporary session artifacts MUST be purged before finalization.
+
+## 10. Registry Management & Logic Promotion
+**Issue:** Essential local files were flagged as orphans because their upstream sources were deleted.
+**Recommendation:**
+- **Promotion Workflow**: If an orphaned original is still in use, it must be promoted to the `unique_paths` section of `dps_sync_registry.json`.
+- The registry is the absolute source of truth for both shadow mappings and unique exclusions.
+
+## 11. Reinforced Phase Gating & User Approval
+**Issue:** Agents sometimes committed partial work or advanced phases while critical bugs remained.
+**Recommendation:**
+- **The 3-Commit Rule**:
+    1. Commit 1: Auto Sync.
+    2. Commit 2: Implementation (post-testing & approval).
+    3. Commit 3: Cleanup (post-retesting & approval).
+- **Explicit Gating**: Agents are forbidden from committing or moving phases until the user explicitly provides a signal (e.g., "Proceed with second commit").
+
+## 12. Sub-Agent Reliability Fallbacks
+**Issue:** Repeated attempts to use unreliable sub-agents caused delays.
+**Recommendation:**
+- Agents should rely on direct codebase analysis using fast shell commands (`grep`, `rg`, `git diff`) and standard file reading tools rather than delegating critical analysis to sub-agents.
+
+## 13. Automated Substitution Pitfalls
+**Issue:** Bulk replacements occasionally introduced escaped character artifacts (e.g., `data-target=\"sbs_...`), breaking HTML attributes.
+**Recommendation:**
+- Never perform bulk replacements on templates without a subsequent "Quote Consistency" check.
+- Enhance `test_template_structure.py` to catch malformed HTML attributes.
+
+## 14. Engineering Standards for Maintainability
+**Recommendation:**
+- **Mandatory Header Descriptions**: EVERY new or modified `.py` and `.sh` file MUST start with a concise one-sentence description of its purpose.
+- **Namespace Isolation**: Ensure unique prefixes for all global variables and element IDs to facilitate easier collaboration and multi-dictionary support.

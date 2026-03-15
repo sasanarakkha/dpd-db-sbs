@@ -205,7 +205,8 @@ The `dps_sync_registry.json` is the source of truth for managing the relationshi
 
 ### Categories:
 - **`modified_upstream_files`**: Files that exist upstream but have been significantly modified in the fork. These files are **restored from the fork's current state** after an upstream pull to preserve local logic. They require manual merging if upstream changes occur.
-- **`ignored_files`**: Paths that should be completely ignored by the sync process (e.g., local data, tracks).
+- **`no_sync_files`**: Paths that should be completely ignored by the sync process (e.g., local data, tracks).
+- **`ignored_files`**: Paths which should be ignored by manual audit process.
 - **`unique_paths`**: Files and folders that exist ONLY in the fork. The sync script should never touch or delete these.
 - **`russian_copies` & `sbs_copies`**: Map shadow copies to their upstream sources. Used to track which files need manual logic porting when upstream is updated. The copies should not be deleted by the sync script, unless the corresponding copy has been deleted.
 
