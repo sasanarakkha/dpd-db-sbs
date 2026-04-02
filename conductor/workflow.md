@@ -3,6 +3,7 @@
 ## Guiding Principles
 
 1. **The Plan is the Source of Truth:** All work must be tracked in `plan.md`
+<!-- LOCAL-START: Extended Principles -->
 2. **NO AGENT COMMITS WITHOUT EXPLICIT SIGNAL:** The AI agent must NEVER execute `git commit`, `git add`, or `git notes` for the final stage or mark a track complete without the user explicitly stating the exact phrase "Proceed with final commit". Do NOT assume the stage is complete just because tests pass. The user will manually review all changes.
 3. **Strict Upstream Logic Parity:** For all shadow copies (localized Russian or SBS versions), you MUST maintain strict logic parity with the original upstream source files. When fixing bugs or implementing updates in shadow copies, DO NOT introduce new solutions. Instead, refer back to the original source as the absolute authority and emulate its implementation exactly, only layering localized data or UI updates on top.
 4. **The Tech Stack is Deliberate:** Changes to the tech stack must be documented in `tech-stack.md` *before* implementation
@@ -17,9 +18,11 @@
 13. **Focused Exporter Tracking:** During synchronization, only track and update exporters that contain localized data (Russian, SBS, or DPS-specific). Ignore changes to upstream exporters that have no localized counterparts or relevance to localized data. Maintain a list of relevant exporters in the sync registry.
 14. **Unambiguous Approval Protocol:** To prevent premature commits or phase advancements, the AI agent MUST adhere to this strict protocol:
     - **Feedback is NOT Approval:** If the user points out an error, suggests a change, or asks a question, the agent MUST perform the requested action and then **ask for approval again**.
-    - **Explicit Signal Required:** The agent MUST NOT proceed to a commit or the next phase until the user provides an explicit signal of completion, such as: *"Phase X is complete"*, *"Approved"*, or *"Proceed with commit"*.
-    - **Confirm Understanding:** If the user's response is ambiguous, the agent MUST ask: *"Does this mean I have your approval to commit and proceed to the next task? Please confirm with 'Yes' or 'Phase X is complete'."*
+    - **Explicit Signal Required:** The agent MUST NOT proceed to a commit or the next phase until the user provides an explicit signal of completion, such as: "Phase X is complete", "Approved", or "Proceed with commit".
+    - **Confirm Understanding:** If the user's response is ambiguous, the agent MUST ask: "Does this mean I have your approval to commit and proceed to the next task? Please confirm with 'Yes' or 'Phase X is complete'."
+<!-- LOCAL-END: Extended Principles -->
 
+<!-- LOCAL-START: Task Workflow -->
 ## Task Workflow
 
 All tasks follow a strict lifecycle:
@@ -98,8 +101,9 @@ All tasks follow a strict lifecycle:
     -   Update `plan.md` to show the phase is finished.
 
 7.  **Announce Completion:** Inform the user that the phase is complete and ready for their manual checkpoint commit.
+<!-- LOCAL-END: Task Workflow -->
 
-### Quality Gates
+## Quality Gates
 
 Before marking any task complete, verify:
 
@@ -112,6 +116,7 @@ Before marking any task complete, verify:
 - [ ] Works correctly on mobile (if applicable)
 - [ ] `docs/` folder updated with all relevant changes (features, technical specs, API docs, etc.)
 
+<!-- LOCAL-START: Development Commands -->
 ## Development Commands
 
 ### Daily Development
@@ -123,12 +128,15 @@ uv run ruff format .
 # Testing
 uv run pytest
 ```
+<!-- LOCAL-END: Development Commands -->
 
+<!-- LOCAL-START: Testing Requirements -->
 ## Testing Requirements
 
 ### Unit Testing
 - Every module must have corresponding tests.
 - Test both success and failure cases.
+<!-- LOCAL-END: Testing Requirements -->
 
 ## Commit Guidelines (For User)
 
