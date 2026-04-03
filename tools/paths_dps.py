@@ -125,9 +125,6 @@ class DPSPaths:
         self.ru_user_dict_path = base_dir.joinpath(
             Path("shared_data/russian_words_user_dict.txt")
         )
-        self.vinaya_tsv_path = base_dir.joinpath(
-            Path("shared_data/sbs_csvs/vinaya.tsv")
-        )
         self.translation_example_path = base_dir.joinpath(
             Path("shared_data/sbs_csvs/translation_examples.csv")
         )
