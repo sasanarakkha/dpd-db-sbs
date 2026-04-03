@@ -17,42 +17,13 @@ Digital Pali Dictionary.
 ## Use Path from Pathlib
 - Use Path for anything related to filepaths, not os.
 
-## Debugging
-- Use `icecream` for debugging, not `print()`.
-- Import: `from icecream import ic`
-- Usage: `ic(variable_name)`
-
-## Imports
-- NEVER use `sys.path` hacks or manual directory traversal (e.g., `Path(__file__).resolve().parents[n]`) to handle absolute imports.
-- Assume the script will be run from the project root or within a correctly configured environment where absolute imports work naturally.
-
-## Dependencies
-
-### uv
-- Use astral uv to manage dependencies.
-- Install with "uv add" not "pip install" or "uv pip install" etc.
-- DO NOT run any scripts with uv UNLESS specifically asked to do so.
-
 ## Flet
 - When answering questions about Flet refer to the /resources/flet-docs folder.
 
 
 ## GitHub (upstream repository)
 - Unless otherwise specified the repository in question is https://github.com/digitalpalidictionary/dpd-db.
-- DO NOT add or commit to GitHub, unless specifically instructed to do so.
-
-### Commit
-- Only ever commit when asked. NEVER unasked.
-- "Commit" means commit the changed files using execute_command.
-- Use this format, all in lowercase. #issue number area: change1, change2 . E.g. `#67 webapp: updated css, fixed overflow`
-- Maximum number of characters in the first line is 72. Do not exceed that. 
-
-### Solve
-- "Solve" means read the specified GitHub issue using get_issue and offer solutions. Don't think about it, don't ask questions, just read it.
-- Ask the user to open the necessary files that you need.
-- Is this a straightforward solution, or does it need to be solved at a higher level?
-- Show code snippets of suggested changes.
-
+- **Solve:** Read the specified GitHub issue using `get_issue` and offer solutions. Show code snippets of suggested changes.
 
 ## DPD Database Model (`db/models.py`)
 
@@ -167,7 +138,6 @@ Existing tables which has additional columns:
   - This template MUST always be kept up-to-date with the local repository state to ensure accurate upstream synchronization.
 
 ## Engineering Standards for Maintainability & Collaboration
-- **Mandatory Header Descriptions**: EVERY `.py` and `.sh` file MUST start with a concise one-sentence docstring or comment explaining its purpose. This description MUST be updated if the file's primary responsibility changes.
 - **Surgical Logic Layering**: When modifying shadow copies, avoid rewriting core logic. Layer localized changes (RU/SBS) clearly on top of the original upstream structure to ensure easy synchronization.
 - **Namespace Isolation**: Always use specific prefixes (`ru_`, `sbs_`, `dps_`) for localized functions, variables, and IDs to prevent collisions in shared environments like GoldenDict.
 - **Clean Codebase**:
@@ -183,3 +153,14 @@ Existing tables which has additional columns:
     - Other files go to `archive/dps/`.
 - Orphaned files STILL in use must be either re-mapped in `dps_sync_registry.json` (if source moved) or promoted to `unique_paths` (if source deleted but local logic requires it).
 - All temporary artifacts created during a session MUST be purged before finalization.
+
+## Project Principles
+- **Strict Upstream Logic Parity:** For all shadow copies (localized Russian or SBS versions), you MUST maintain strict logic parity with the original upstream source files. When fixing bugs or implementing updates in shadow copies, DO NOT introduce new solutions. Instead, refer back to the original source as the absolute authority and emulate its implementation exactly, only layering localized data or UI updates on top.
+- **The Tech Stack is Deliberate:** Changes to the tech stack must be documented in `tech-stack.md` *before* implementation
+- **Data Output Verification:** Write tests to verify accurate data output. Automated tests are NOT required for UI elements, CSS, or HTML, as these are best verified and tweaked by a human. Do not test UI components - user interaction will reveal UI issues. Do not test internal function implementation details.
+- **User Experience First:** Every decision should prioritize user experience
+- **README Maintenance:** Each project folder contains a `README.md`, which MUST be updated if anything within the folder changes to ensure documentation stays in sync with code.
+- **Documentation is Mandatory:** Once a task is finished and approved by the user, the `docs/` folder MUST be updated with all relevant changes. This is not optional.
+- **Code Quality is Mandatory:** All changed files MUST pass `uv run ruff check --fix` and `uv run ruff format` before task completion. This is not optional.
+- **Proactive Research:** Always perform a Google Search during the planning and task execution phases for any framework-specific (e.g., Flet), OS-specific (e.g., Linux window management), or non-trivial technical requirements to identify known quirks, limitations, or best practices.
+- **Focused Exporter Tracking:** During synchronization, only track and update exporters that contain localized data (Russian, SBS, or DPS-specific). Ignore changes to upstream exporters that have no localized counterparts or relevance to localized data. Maintain a list of relevant exporters in the sync registry.

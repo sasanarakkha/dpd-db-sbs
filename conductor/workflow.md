@@ -1,81 +1,26 @@
 # Project Workflow
 
-## Guiding Principles
+## Principles
 
-1. **The Plan is the Source of Truth:** All work must be tracked in `plan.md`
-<!-- LOCAL-START: Extended Principles -->
-2. **NO AGENT COMMITS WITHOUT EXPLICIT SIGNAL:** The AI agent must NEVER execute `git commit`, `git add`, or `git notes` for the final stage or mark a track complete without the user explicitly stating the exact phrase "Proceed with final commit". Do NOT assume the stage is complete just because tests pass. The user will manually review all changes.
-3. **Strict Upstream Logic Parity:** For all shadow copies (localized Russian or SBS versions), you MUST maintain strict logic parity with the original upstream source files. When fixing bugs or implementing updates in shadow copies, DO NOT introduce new solutions. Instead, refer back to the original source as the absolute authority and emulate its implementation exactly, only layering localized data or UI updates on top.
-4. **The Tech Stack is Deliberate:** Changes to the tech stack must be documented in `tech-stack.md` *before* implementation
-5. **Data Output Verification:** Write tests to verify accurate data output. Automated tests are NOT required for UI elements, CSS, or HTML, as these are best verified and tweaked by a human. Do not test UI components - user interaction will reveal UI issues. Do not test internal function implementation details.
-6. **User Experience First:** Every decision should prioritize user experience
-7. **README Maintenance:** Each project folder contains a `README.md`, which MUST be updated if anything within the folder changes to ensure documentation stays in sync with code.
-8. **Documentation is Mandatory:** Once a task is finished and approved by the user, the `docs/` folder MUST be updated with all relevant changes. This is not optional.
-9. **Code Quality is Mandatory:** All changed files MUST pass `uv run ruff check --fix` and `uv run ruff format` before task completion. This is not optional.
-10. **Non-Interactive & CI-Aware:** Prefer non-interactive commands. Use `CI=true` for watch-mode tools (tests, linters) to ensure single execution.
-11. **Proactive Research:** Always perform a Google Search during the planning and task execution phases for any framework-specific (e.g., Flet), OS-specific (e.g., Linux window management), or non-trivial technical requirements to identify known quirks, limitations, or best practices.
-12. **Root Directory Cleanliness:** NEVER create temporary files, scripts, or reports in the project's root directory. All temporary data should go into `temp/` (which is git-ignored), scripts into `scripts/`, and track-specific reports into their respective folder in `conductor/tracks/`. A clean root directory is mandatory for project organization.
-13. **Focused Exporter Tracking:** During synchronization, only track and update exporters that contain localized data (Russian, SBS, or DPS-specific). Ignore changes to upstream exporters that have no localized counterparts or relevance to localized data. Maintain a list of relevant exporters in the sync registry.
-14. **Unambiguous Approval Protocol:** To prevent premature commits or phase advancements, the AI agent MUST adhere to this strict protocol:
-    - **Feedback is NOT Approval:** If the user points out an error, suggests a change, or asks a question, the agent MUST perform the requested action and then **ask for approval again**.
-    - **Explicit Signal Required:** The agent MUST NOT proceed to a commit or the next phase until the user provides an explicit signal of completion, such as: "Phase X is complete", "Approved", or "Proceed with commit".
-    - **Confirm Understanding:** If the user's response is ambiguous, the agent MUST ask: "Does this mean I have your approval to commit and proceed to the next task? Please confirm with 'Yes' or 'Phase X is complete'."
-<!-- LOCAL-END: Extended Principles -->
+1. **The Plan is the Source of Truth:** All work must be tracked in `plan.md`.
+2. **Task Sequentiality:** Choose the next available task from `plan.md` in sequential order.
 
-<!-- LOCAL-START: Task Workflow -->
-## Task Workflow
+
+
+## Task Lifecycle (TDD)
 
 All tasks follow a strict lifecycle:
 
-### Standard Task Workflow
+1. **Mark In Progress:** Change task status from `[ ]` to `[~]` in `plan.md`.
+2. **Red Phase (Failing Tests):**
+   - Create a new test file or add cases to existing ones in `tests/`.
+   - Run tests and confirm failure (see **Quality Gates** for commands).
+3. **Green Phase (Implementation):** Write minimum code to pass tests.
+4. **Refactor Phase:** Clean up code while keeping tests green.
+5. **Empirical Validation:** Run the script against a real test target and verify output. Confirm all **Quality Gates** pass.
+6. **Completion:** Mark task as complete `[x]` in `plan.md`. Do NOT commit yet.
 
-1. **Select Task:** Choose the next available task from `plan.md` in sequential order
-
-2. **Research & Planning:** 
-   - Before marking a task in progress, perform a Google Search to identify any known issues or platform-specific nuances related to the task.
-   - Update the implementation approach if research reveals a more robust solution.
-
-3. **Mark In Progress:** Before beginning work, edit `plan.md` and change the task from `[ ]` to `[~]`
-
-3. **Write Failing Tests (Red Phase):**
-   - Create a new test file for the feature or bug fix.
-   - Write one or more unit tests that clearly define the expected behavior and acceptance criteria for the task.
-   - **CRITICAL:** Run the tests and confirm that they fail as expected. This is the "Red" phase of TDD. Do not proceed until you have failing tests.
-
-4. **Implement to Pass Tests (Green Phase):**
-   - Write the minimum amount of application code necessary to make the failing tests pass.
-   - Run the test suite again and confirm that all tests now pass. This is the "Green" phase.
-
-5. **Refactor (Optional but Recommended):**
-    - With the safety of passing tests, refactor the implementation code and the test code to improve clarity, remove duplication, and enhance performance without changing the external behavior.
-    - Rerun tests to ensure they still pass after refactoring.
-
-6. **Verify Output Accuracy:** Ensure tests verify data output accuracy. Do not enforce coverage metrics or test internal implementation details. Focus on validating that the system produces correct data outputs.
-
-7. **Document Deviations:** If implementation differs from tech stack:
-   - **STOP** implementation
-   - Update `tech-stack.md` with new design
-   - Add dated note explaining the change
-   - Resume implementation
-
-8. **Lint and Format Code (REQUIRED):**
-   - Run `uv run ruff check --fix` on all changed files to fix linting issues automatically.
-   - Run `uv run ruff format` on all changed files to ensure consistent formatting.
-   - Fix any remaining linting errors that cannot be auto-fixed.
-
-9. **Notify User for Commit:**
-   - Inform the user that the task is complete and ready for manual review and commit.
-   - List all created/modified files.
-   - Propose a clear, concise commit message.
-
-10. **Update Plan:**
-     - Read `plan.md`, find the line for the completed task, and update its status from `[~]` to `[x]`.
-     - Write the updated content back to `plan.md`.
-
-11. **Update Documentation (REQUIRED):**
-     - After user approval, the `docs/` folder MUST be updated with any relevant changes.
-     - This includes: feature documentation, technical specs, API docs, installation guides, or any other docs affected by the changes.
-
+<!-- LOCAL-START: Task Workflow -->
 ### Phase Completion Verification and Checkpointing Protocol
 
 **Trigger:** This protocol is executed immediately after a task is completed that also concludes a phase in `plan.md`.
@@ -107,14 +52,67 @@ All tasks follow a strict lifecycle:
 
 Before marking any task complete, verify:
 
-- [ ] All tests pass
-- [ ] Data output accuracy verified through tests
-- [ ] Code follows project's code style guidelines
-- [ ] All public functions/methods are documented
-- [ ] Type safety is enforced
-- [ ] No linting or static analysis errors (ruff check --fix and ruff format run on all changed files)
-- [ ] Works correctly on mobile (if applicable)
-- [ ] `docs/` folder updated with all relevant changes (features, technical specs, API docs, etc.)
+- [ ] All tests pass via `uv run pytest --tb=short -q`.
+- [ ] Code follows project style guides (see `conductor/code_styleguides/`).
+- [ ] No security vulnerabilities introduced.
+- [ ] Documentation updated if needed.
+- [ ] Data integrity preserved (no data removed from `docs/`).
+- [ ] All public functions/methods are documented.
+- [ ] Type safety is enforced.
+- [ ] Works correctly on mobile (if applicable).
+- [ ] `docs/` folder updated with all relevant changes (features, technical specs, API docs, etc.).
+
+## Review Protocol
+
+When reviewing a track's implementation:
+
+1. Read `spec.md` and `plan.md` — does code match intent?
+2. Check against `conductor/code_styleguides/` files.
+3. Verify all **Quality Gates** pass.
+4. Run external review tool if available: `coderabbit --prompt-only`.
+5. Output findings with severity levels (Critical/High/Medium/Low).
+
+## Revert Protocol
+
+Since `conductor/` is version-controlled, revert via git:
+
+1. Identify scope (whole track, single phase, or single task).
+2. Use `git revert` or `git checkout` for the relevant changes.
+3. Update `plan.md` to reflect reverted state.
+4. Document reason in `handoff.md`.
+
+## Track File Set (Canonical)
+
+Every track folder must contain:
+
+- **metadata.json** — track ID, type, status, timestamps, description.
+- **index.md** — links to other track files.
+- **spec.md** — specification / requirements.
+- **plan.md** — implementation plan with status markers.
+  - **Plan Mode Target Enforcement:** The generated plan MUST be written directly to `conductor/tracks/<track_id>/plan.md`.
+- **handoff.md** — cross-session state.
+
+## Definition of Done
+
+A track is complete when:
+
+1. All tasks marked `[x]` in `plan.md`.
+2. All **Quality Gates** pass.
+3. User has approved all changes.
+4. Single atomic commit prepared by AI and manually committed by user.
+5. Track archived to `conductor/archive/` (this folder is never committed).
+
+## Skills
+
+| Skill | Description |
+|---|---|
+| `/conductor-new-track` | Create a new track for planning a feature or task |
+| `/conductor-continue` | Resume work on an in-progress track |
+| `/conductor-review` | Review implementation against spec and quality gates |
+| `/conductor-complete` | Finish, archive, and close a track (coderabbit → fix → test → archive) |
+| `/conductor-goodnight` | End-of-session protocol — write session log, optionally update handoff |
+| `/conductor-sync` | Sync Conductor workflow across all registered projects |
+| `/conductor-fix` | Run ruff and pyright on a script, then fix all reported errors |
 
 <!-- LOCAL-START: Development Commands -->
 ## Development Commands
@@ -153,17 +151,6 @@ uv run pytest
 - `refactor`: Code change that neither fixes a bug nor adds a feature
 - `test`: Adding missing tests
 - `chore`: Maintenance tasks
-
-## Definition of Done
-
-A task is complete when:
-
-1. All code implemented to specification
-2. Tests verify data output accuracy and are passing
-3. Code passes all configured linting (`uv run ruff check --fix`) and formatting (`uv run ruff format`) on all changed files
-4. Implementation notes added to `plan.md`
-5. User notified to perform manual commit
-6. **Documentation Updated:** The `docs/` folder has been updated with all relevant changes (features, technical specs, API changes, etc.)
 
 ## Continuous Improvement
 
