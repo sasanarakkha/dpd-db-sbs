@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
 """
-    saving words for vocab pali class into separate csv and untute them to one xlsx  and combining them into XLSX/HTML outputs.
+saving words for vocab pali class into separate csv and untute them to one xlsx  and combining them into XLSX/HTML outputs.
 """
+
 import pandas as pd
 import os
 from string import Template
@@ -26,18 +27,20 @@ def main():
 
     # save vocab for HTML
     seen_words = set()  # Track words that have already been added
-    total_words_saved = 0 
+    total_words_saved = 0
 
     # Save words for each class to a separate CSV file
     for sbs_class in range(2, 30):
-        filename = os.path.join(dpspth.sbs_class_vocab_dir, f'vocab-class{sbs_class}.csv')
+        filename = os.path.join(
+            dpspth.sbs_class_vocab_dir, f"vocab-class{sbs_class}.csv"
+        )
         words_saved = save_words_to_csv(sbs_class, filename, seen_words)
         if words_saved:
             total_words_saved += words_saved
 
     print(f"Total words saved to all CSVs: {total_words_saved}")
 
-    convert_csv_to_html()
+    # convert_csv_to_html()
 
     # Close the session
     db_session.close()
@@ -51,17 +54,28 @@ def save_words_to_csv(sbs_class: int, filename: str, seen_words: set) -> int:
     :param seen_words: Set to track already saved words
     :return: Number of words saved.
     """
-    words = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.sbs)).join(SBS).filter(
-        SBS.sbs_class <= sbs_class,
-        SBS.class_anki <= sbs_class
-    ).all()
+    words = (
+        db_session.query(DpdHeadword)
+        .options(joinedload(DpdHeadword.sbs))
+        .join(SBS)
+        .filter(SBS.sbs_class <= sbs_class, SBS.class_anki <= sbs_class)
+        .all()
+    )
 
     words_saved = 0  # Counter for words saved in this CSV file
     # seen_words = seen_words or set()
 
     # Open the CSV file and write the headers
-    with open(filename, 'w', newline='') as csvfile:
-        fieldnames = ['pali', 'pos', 'meaning', 'root', 'construction', 'pattern', 'cl.']
+    with open(filename, "w", newline="") as csvfile:
+        fieldnames = [
+            "pali",
+            "pos",
+            "meaning",
+            "root",
+            "construction",
+            "pattern",
+            "cl.",
+        ]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
 
@@ -77,15 +91,17 @@ def save_words_to_csv(sbs_class: int, filename: str, seen_words: set) -> int:
             else:
                 root_value = word.root_key
 
-            writer.writerow({
-                'pali': word.lemma_1,
-                'pos': word.pos,
-                'meaning': word.meaning_1,
-                'root': root_value,
-                'construction': word.construction_line1,
-                'pattern': word.pattern,
-                'cl.': word.sbs.sbs_class
-            })
+            writer.writerow(
+                {
+                    "pali": word.lemma_1,
+                    "pos": word.pos,
+                    "meaning": word.meaning_1,
+                    "root": root_value,
+                    "construction": word.construction_line1,
+                    "pattern": word.pattern,
+                    "cl.": word.sbs.sbs_class,
+                }
+            )
 
             words_saved += 1  # Increment words saved counter
 
@@ -96,23 +112,30 @@ def convert_csv_to_html():
     """
     Convert CSV files to HTML, separating them into two groups (Beginner and Intermediate Pāli Course).
     """
-    csv_files = [file for file in os.listdir(dpspth.sbs_class_vocab_dir) if file.endswith('.csv')]
+    csv_files = [
+        file for file in os.listdir(dpspth.sbs_class_vocab_dir) if file.endswith(".csv")
+    ]
 
     # Separate files into two groups
     group1_files = [file for file in csv_files if 2 <= extract_class_number(file) <= 15]
-    group2_files = [file for file in csv_files if 16 <= extract_class_number(file) <= 29]
-
+    group2_files = [
+        file for file in csv_files if 16 <= extract_class_number(file) <= 29
+    ]
 
     # Convert each group to HTML
-    convert_group_to_html(group1_files, 'vocab_bpc.html', '2-15', 'Beginner Pāli Course')
-    convert_group_to_html(group2_files, 'vocab_ipc.html', '16-29', 'Intermediate Pāli Course')
+    convert_group_to_html(
+        group1_files, "vocab_bpc.html", "2-15", "Beginner Pāli Course"
+    )
+    convert_group_to_html(
+        group2_files, "vocab_ipc.html", "16-29", "Intermediate Pāli Course"
+    )
 
 
 def extract_class_number(filename):
     # Extract the class number from the filename
     # Assumes filename format is 'vocab-class#.csv'
-    class_part = filename.split('-')[-1]
-    class_number = class_part.split('.')[0].replace('class', '')
+    class_part = filename.split("-")[-1]
+    class_number = class_part.split(".")[0].replace("class", "")
     return int(class_number)
 
 
@@ -131,20 +154,20 @@ def convert_group_to_html(csv_files, output_filename, class_range, title):
     for csv_file in sorted_csv_files:
         csv_path = os.path.join(dpspth.sbs_class_vocab_dir, csv_file)
 
-        df = pd.read_csv(csv_path).fillna("").sort_values(by='cl.')
+        df = pd.read_csv(csv_path).fillna("").sort_values(by="cl.")
 
         # Convert DataFrame to HTML table
-        html_table = df.to_html(index=False, classes='sortable')
+        html_table = df.to_html(index=False, classes="sortable")
 
         # Extract class number from filename
-        class_number = os.path.splitext(csv_file)[0].split('-')[-1]
+        class_number = os.path.splitext(csv_file)[0].split("-")[-1]
 
         # Add heading and table to the list
         html_tables.append(f"<h2>{class_number}</h2>")
         html_tables.append(html_table)
 
     # HTML template for the tables
-    html_template = Template('''
+    html_template = Template("""
         <!DOCTYPE html>
         <html>
         <head>
@@ -173,18 +196,20 @@ def convert_group_to_html(csv_files, output_filename, class_range, title):
         $tables
         </body>
         </html>
-    ''')
+    """)
 
     ## Substitute the class range placeholder with the actual tital
-    html_content = html_template.safe_substitute(tables="\n".join(html_tables), title=title)
+    html_content = html_template.safe_substitute(
+        tables="\n".join(html_tables), title=title
+    )
 
     # Write the HTML content to the file in the same directory
     html_output_path = os.path.join(dpspth.pali_class_vocab_html_dir, output_filename)
-    with open(html_output_path, 'w') as file:
+    with open(html_output_path, "w") as file:
         file.write(html_content)
 
     print(f"HTML file '{output_filename}' created successfully.")
 
+
 if __name__ == "__main__":
     main()
-

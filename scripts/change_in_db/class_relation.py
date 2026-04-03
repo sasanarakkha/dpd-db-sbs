@@ -108,17 +108,12 @@ def debug_print_sbs_class():
 
 
 def filling_sbs_class():
-    pr.tic()
-    console.print("[bold bright_yellow]changing sbs_class accordingly")
+    pr.green("changing sbs_class accordingly")
 
-    console.print(f"[green]filtered db {len(db)}")
-
-    count_same = 0
     count_added = 0
     count_changed = 0
     count_new = 0
     count_delete = 0
-    count_empty = 0
 
     # Iterate over all DpdHeadword instances and update their sbs_class
     for word in db:
@@ -126,44 +121,39 @@ def filling_sbs_class():
         sbs_class = determine_sbs_class(word)
         if sbs_class is not None:
             if word.sbs.sbs_class == int(sbs_class):
-                count_same += 1
+                pass
 
             elif word.sbs and not word.sbs.sbs_class:
                 word.sbs.sbs_class = int(sbs_class)
                 count_added += 1
-                # print(f"(added) for {word.lemma_1} new sbs_class: {sbs_class}")
 
             elif word.sbs:
                 word.sbs.sbs_class = int(sbs_class)
                 count_changed += 1
-                # print(f"(added) for {word.lemma_1} new sbs_class: {sbs_class}")
 
             elif not word.sbs:
                 word.sbs = SBS(id=word.id)
                 word.sbs.sbs_class = int(sbs_class)
                 count_new += 1
-                # print(f"(added) for {word.lemma_1} new sbs_class: {sbs_class}")
 
         else:
             if word.sbs and word.sbs.sbs_class:
                 word.sbs.sbs_class = ""
                 count_delete += 1
-                # print(f"(del) for {word.lemma_1} new sbs_class: {sbs_class}")
-
-            elif not word.sbs.sbs_class:
-                count_empty += 1
-
-    console.print(f"[green]{count_same} rows same")
-    console.print(f"[green]{count_added} rows added")
-    console.print(f"[green]{count_changed} rows changed")
-    console.print(f"[green]{count_new} rows new")
-    console.print(f"[green]{count_delete} rows removed")
-    console.print(f"[green]{count_empty} rows have no sbs_class")
 
     db_session.commit()
-
     db_session.close()
-    pr.toc()
+    
+    summary = []
+    if count_added: summary.append(f"{count_added} added")
+    if count_changed: summary.append(f"{count_changed} changed")
+    if count_new: summary.append(f"{count_new} new")
+    if count_delete: summary.append(f"{count_delete} removed")
+    
+    if summary:
+        pr.yes(", ".join(summary))
+    else:
+        pr.yes("ok")
 
 
 def determine_sbs_class(word) -> Optional[int]:

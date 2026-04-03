@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-    saving words for vocab pali class into separate csv and untute them to one xlsx and converting them into separate XLSX/HTML outputs.
+saving words for vocab pali class into separate csv and untute them to one xlsx and converting them into separate XLSX/HTML outputs.
 """
 
 import pandas as pd
@@ -27,14 +27,18 @@ console = Console()
 def main():
     print("saving vocab for classes one by one...")
 
-    outputxlsx = os.path.join(dpspth.pali_class_vocab_html_dir, 'vocab-for-classes.xlsx') 
+    outputxlsx = os.path.join(
+        dpspth.pali_class_vocab_html_dir, "vocab-for-classes.xlsx"
+    )
 
     # save vocab for HTML
-    with pd.ExcelWriter(outputxlsx) as writer: # type: ignore
+    with pd.ExcelWriter(outputxlsx) as writer:  # type: ignore
         total_words_saved = 0
         # Save words for each class to a separate CSV file
         for sbs_class in range(1, 30):
-            filename = os.path.join(dpspth.sbs_class_vocab_dir, f'vocab-class{sbs_class}.csv')
+            filename = os.path.join(
+                dpspth.sbs_class_vocab_dir, f"vocab-class{sbs_class}.csv"
+            )
             words_saved = save_words_to_csv(sbs_class, filename)
 
             if words_saved:
@@ -55,11 +59,10 @@ def main():
     #     filename = os.path.join(dpspth.discourses_vocab_dir, f'vocab_{sutta}.csv')
     #     save_words_for_discources(sutta, filename)
 
-
     # Close the session
     db_session.close()
 
-    convert_csv_to_html()
+    # convert_csv_to_html()
 
 
 def save_words_to_csv(sbs_class: int, filename: str) -> int:
@@ -69,18 +72,28 @@ def save_words_to_csv(sbs_class: int, filename: str) -> int:
     :param filename: Output CSV file path.
     :return: Number of words saved.
     """
-    
 
-    words = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.sbs)).join(SBS).filter(
-        SBS.sbs_class <= sbs_class,
-        SBS.class_anki <= sbs_class
-    ).all()
+    words = (
+        db_session.query(DpdHeadword)
+        .options(joinedload(DpdHeadword.sbs))
+        .join(SBS)
+        .filter(SBS.sbs_class <= sbs_class, SBS.class_anki <= sbs_class)
+        .all()
+    )
 
     words_saved = 0
 
     # Open the CSV file and write the headers
-    with open(filename, 'w', newline='') as csvfile:
-        fieldnames = ['pali', 'pos', 'meaning', 'root', 'construction', 'pattern',  'cl.']
+    with open(filename, "w", newline="") as csvfile:
+        fieldnames = [
+            "pali",
+            "pos",
+            "meaning",
+            "root",
+            "construction",
+            "pattern",
+            "cl.",
+        ]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
 
@@ -91,15 +104,17 @@ def save_words_to_csv(sbs_class: int, filename: str) -> int:
             else:
                 root_value = word.root_key
 
-            writer.writerow({
-                'pali': word.lemma_1,
-                'pos': word.pos,
-                'meaning': word.meaning_1,
-                'root': root_value,
-                'construction': word.construction_line1,
-                'pattern': word.pattern,
-                'cl.': word.sbs.sbs_class
-            })
+            writer.writerow(
+                {
+                    "pali": word.lemma_1,
+                    "pos": word.pos,
+                    "meaning": word.meaning_1,
+                    "root": root_value,
+                    "construction": word.construction_line1,
+                    "pattern": word.pattern,
+                    "cl.": word.sbs.sbs_class,
+                }
+            )
             words_saved += 1
 
     return words_saved
@@ -107,39 +122,38 @@ def save_words_to_csv(sbs_class: int, filename: str) -> int:
 
 def save_words_for_class_to_csv(sbs_class: int, filename: str):
     # Get all words that meet the conditions
-    
 
-    words = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.sbs)).join(SBS).filter(
-        SBS.class_anki == sbs_class
-    ).all()
+    words = (
+        db_session.query(DpdHeadword)
+        .options(joinedload(DpdHeadword.sbs))
+        .join(SBS)
+        .filter(SBS.class_anki == sbs_class)
+        .all()
+    )
 
     print(f"total words for class {sbs_class}: {len(words)}")
 
-
     # Open the CSV file and write the headers
-    with open(filename, 'w', newline='') as csvfile:
-        fieldnames = [
-            'id', 'pali', 'pos', 'meaning'
-            ]
+    with open(filename, "w", newline="") as csvfile:
+        fieldnames = ["id", "pali", "pos", "meaning"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
 
         # Write each word to the CSV file
         for word in words:
-
-            writer.writerow({
-                'id': word.id,
-                'pali': word.lemma_1,
-                'pos': word.pos,
-                'meaning': word.meaning_1
-            })
-
-
+            writer.writerow(
+                {
+                    "id": word.id,
+                    "pali": word.lemma_1,
+                    "pos": word.pos,
+                    "meaning": word.meaning_1,
+                }
+            )
 
 
 # def save_words_for_discources(sutta, filename: str):
 #     # Get all words that meet the conditions
-    
+
 
 #     words = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.sbs)).join(SBS).filter(
 #         SBS.sbs_category == sutta,
@@ -177,10 +191,10 @@ def save_csv_files_to_xlsx(filename: str, writer):
         print(f"File {filename} does not exist.")
         return
 
-    df = pd.read_csv(filename).sort_values('cl.')
+    df = pd.read_csv(filename).sort_values("cl.")
 
     # Get the base name of the CSV file without the extension
-    sheet_name = os.path.basename(filename).split('.')[0]
+    sheet_name = os.path.basename(filename).split(".")[0]
 
     # Write the DataFrame to the Excel file
     df.to_excel(writer, sheet_name=sheet_name, index=False)
@@ -194,21 +208,23 @@ def convert_csv_to_html():
     print("Converting CSV files to HTML...")
 
     # Get all CSV files in the current directory
-    csv_files = [file for file in os.listdir(dpspth.sbs_class_vocab_dir) if file.endswith('.csv')]
+    csv_files = [
+        file for file in os.listdir(dpspth.sbs_class_vocab_dir) if file.endswith(".csv")
+    ]
 
     for csv_file in csv_files:
         csv_path = os.path.join(dpspth.sbs_class_vocab_dir, csv_file)
 
-        df = pd.read_csv(csv_path).fillna("").sort_values(by='cl.')
+        df = pd.read_csv(csv_path).fillna("").sort_values(by="cl.")
 
         # Convert DataFrame to HTML table
-        html_table = df.to_html(index=False, classes='sortable')
+        html_table = df.to_html(index=False, classes="sortable")
 
         # Extract class number from filename
-        class_number = os.path.splitext(csv_file)[0].split('-')[-1]
+        class_number = os.path.splitext(csv_file)[0].split("-")[-1]
 
         # HTML template for the table
-        html_template = Template('''
+        html_template = Template("""
             <!DOCTYPE html>
             <html>
             <head>
@@ -238,17 +254,21 @@ def convert_csv_to_html():
             $table
             </body>
             </html>
-        ''')
+        """)
 
         # Substitute the class number placeholder with the actual class number
-        html_content = html_template.safe_substitute(table=html_table, class_number=class_number)
+        html_content = html_template.safe_substitute(
+            table=html_table, class_number=class_number
+        )
 
         # Generate output HTML file name
-        html_output_file = os.path.splitext(csv_file)[0] + '.html'
+        html_output_file = os.path.splitext(csv_file)[0] + ".html"
 
         # Write the HTML content to the file in the same directory
-        html_output_path = os.path.join(dpspth.pali_class_vocab_html_dir, html_output_file)
-        with open(html_output_path, 'w') as file:
+        html_output_path = os.path.join(
+            dpspth.pali_class_vocab_html_dir, html_output_file
+        )
+        with open(html_output_path, "w") as file:
             file.write(html_content)
 
         print(f"HTML file '{html_output_file}' created successfully.")
@@ -256,4 +276,3 @@ def convert_csv_to_html():
 
 if __name__ == "__main__":
     main()
-

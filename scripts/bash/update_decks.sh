@@ -38,10 +38,8 @@ while true; do
     case $yn in
         [Yy]* )
             echo -e "\033[1;33m pushing vocab for classes...\033[0m"
-            uv run python scripts/export/save_classes_vocab_individual.py
-            uv run python scripts/export/save_classes_vocab_united.py
-            cp -X -rf "$HOME/Documents/sasanarakkha/study-tools/pali-class/vocab/vocab-for-classes.xlsx" "$HOME/filesrv1/share1/Sharing between users/13 For Pāli class/vocab-for-classes.xlsx"
-            cd "$HOME/Documents/sasanarakkha/study-tools"
+            uv run python scripts/export/vocab_abbrev_pali_course.py
+            cd "$HOME/Documents/dpd-pali-courses"
             git-push
             break;;
         * )

@@ -9,7 +9,7 @@ if ! ping -c 1 google.com &> /dev/null; then
     exit 1
 fi
 
-echo "--- download_patimokkha Script Started at $(date) ---"
+echo "--- download_dpd Script Started at $(date) ---"
 
 mkdir -p "$HOME/Downloads/DPDs"
 cd "$HOME/Downloads/DPDs"
