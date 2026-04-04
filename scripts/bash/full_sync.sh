@@ -12,13 +12,21 @@ COMMIT_MESSAGE_SUFFIX=" from as_upstream ($DATE)"
 
 echo "ℹ️ Project directory: $PROJECT_DIR"
 
-# Read exclusions dynamically from conductor/templates/upstream_sync_rehearsal/dps_sync_registry.json
-echo "ℹ️ Reading exclusions from conductor/templates/upstream_sync_rehearsal/dps_sync_registry.json..."
+# Read exclusions dynamically from kamma/upstream_sync/registry.json
+echo "ℹ️ Reading exclusions from kamma/upstream_sync/registry.json..."
 export PROJECT_DIR
 EXCLUDE_FILES=()
 while IFS= read -r line; do
     EXCLUDE_FILES+=("$line")
-done < <(python3 -c 'import json, os; registry_path = os.path.join(os.environ["PROJECT_DIR"], "conductor/templates/upstream_sync_rehearsal/dps_sync_registry.json"); data = json.load(open(registry_path)); print("\n".join(data["modified_upstream_files"] + data["no_sync_files"]))')
+done < <(python3 -c '
+import json, os, sys
+registry_path = os.path.join(os.environ["PROJECT_DIR"], "kamma/upstream_sync/registry.json")
+sys.path.insert(0, os.environ["PROJECT_DIR"])
+from kamma.upstream_sync.registry_helper import get_modified_upstream_paths
+data = json.load(open(registry_path))
+paths = get_modified_upstream_paths(data) + data["no_sync_files"]
+print("\n".join(paths))
+')
 
 # Check if we successfully got exclusions
 if [ ${#EXCLUDE_FILES[@]} -eq 0 ]; then

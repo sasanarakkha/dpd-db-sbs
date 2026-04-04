@@ -86,9 +86,9 @@ This document provides a unified, exhaustive post-mortem of the Upstream Sync Re
 ## 12. Continuous Template and Registry Management
 **Issue:** Essential local files were flagged as orphans because their upstream sources were deleted. Reusable templates fell behind newly discovered requirements.
 **Recommendation:**
-- Whenever a new sync requirement is discovered, immediately update `conductor/templates/upstream_sync_rehearsal/guide.md` and `plan.md`.
-- **Promotion Workflow**: If an orphaned original is still in use locally, it must be explicitly promoted to the `unique_paths` section of `dps_sync_registry.json`.
-- Keep `dps_sync_registry.json` meticulously updated as the absolute source of truth for both shadow mappings and unique exclusions.
+- Whenever a new sync requirement is discovered, immediately update `kamma/upstream_sync/guide.md` and `kamma/upstream_sync/smd.md`.
+- **Promotion Workflow**: If an orphaned original is still in use locally, it must be explicitly promoted to the `unique_paths` section of `kamma/upstream_sync/registry.json`.
+- Keep `kamma/upstream_sync/registry.json` meticulously updated as the absolute source of truth for both shadow mappings and unique exclusions.
 
 ## 13. Engineering Standards for Maintainability
 **Recommendation:**

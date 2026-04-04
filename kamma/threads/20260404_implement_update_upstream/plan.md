@@ -162,7 +162,7 @@ review before installation.
   - Run: `uv run python3 kamma/upstream_sync/verify_smd_coverage.py` — must pass.
   - Run: `uv run python3 kamma/upstream_sync/validate_registry.py` — must pass.
   - Run: `uv run ruff check . && uv run ruff format .`
-  - Document any improvements in `kamma/upstream_sync/improvements.md`.
+  - Write `kamma/upstream_sync/new_improvements.md` with lessons from this run.
   - Delete `dynamic_plan.md` from the active thread folder (temp artifact).
   - **USER APPROVAL GATE**: Wait for explicit "Proceed with Commit 3".
   - Prepare commit message: `sync: cleanup and finalization YYYY-MM-DD`

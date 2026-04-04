@@ -134,8 +134,8 @@ Existing tables which has additional columns:
 
 ## Shadow Files & Sync Templates
 - If you perform any task which creates or modifies any "shadow" (`*_ru.py`, `*_sbs.py`, `*_dps.py`) or "unique" files (files that exist only in this fork):
-  - You MUST update the corresponding files in `conductor/templates/upstream_sync_rehearsal/` (specifically `dps_sync_registry.json` and `guide.md` if needed).
-  - This template MUST always be kept up-to-date with the local repository state to ensure accurate upstream synchronization.
+  - You MUST update the corresponding files in `kamma/upstream_sync/` (specifically `registry.json` and `guide.md` if needed).
+  - This registry MUST always be kept up-to-date with the local repository state to ensure accurate upstream synchronization.
 
 ## Engineering Standards for Maintainability & Collaboration
 - **Surgical Logic Layering**: When modifying shadow copies, avoid rewriting core logic. Layer localized changes (RU/SBS) clearly on top of the original upstream structure to ensure easy synchronization.
@@ -151,7 +151,7 @@ Existing tables which has additional columns:
 - Orphaned files NOT in use must be ARCHIVED:
     - Scripts go to `scripts/dps_archive/`.
     - Other files go to `archive/dps/`.
-- Orphaned files STILL in use must be either re-mapped in `dps_sync_registry.json` (if source moved) or promoted to `unique_paths` (if source deleted but local logic requires it).
+- Orphaned files STILL in use must be either re-mapped in `kamma/upstream_sync/registry.json` (if source moved) or promoted to `unique_paths` (if source deleted but local logic requires it).
 - All temporary artifacts created during a session MUST be purged before finalization.
 
 ## Project Principles

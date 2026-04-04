@@ -4,5 +4,5 @@ This file lists all major threads for the project. Each thread has its own detai
 
 ---
 
-## [~] Thread: Create `/update-upstream` skill for smooth, reliable upstream sync
-*Link: [./threads/20260404_update_upstream/](./threads/20260404_update_upstream/)*
+## [x] Thread: Create `/update-upstream` skill for smooth, reliable upstream sync
+*Link: [./archive/20260404_prepare_update_skill/](./archive/20260404_prepare_update_skill)*

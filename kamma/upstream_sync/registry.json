@@ -9,18 +9,66 @@
     "tools/"
   ],
   "modified_upstream_files": [
-    "db/models.py",
-    "conductor/product-guidelines.md",
-    "conductor/product.md",
-    "conductor/tech-stack.md",
-    "exporter/webapp/data_classes.py",
-    "exporter/webapp/static/app.js",
-    "exporter/webapp/static/home.js",
-    "gui2/main.py",
-    "gui2/pass2_add_view.py",
-    "tools/ai_manager.py",
-    ".gitignore",
-    "AGENTS.md"
+    {
+      "path": "db/models.py",
+      "discuss": true,
+      "discuss_reason": "Adds SBS table (~30 cols), Russian table (~5 cols), Sinhala table, .sbs/.ru/.si relationships on DpdHeadword, root_ru_meaning/sanskrit_root_ru_meaning on DpdRoot, and hybrid properties. Blind porting would silently delete all localized tables and columns."
+    },
+    {
+      "path": "conductor/product-guidelines.md",
+      "discuss": false,
+      "discuss_reason": ""
+    },
+    {
+      "path": "conductor/product.md",
+      "discuss": false,
+      "discuss_reason": ""
+    },
+    {
+      "path": "conductor/tech-stack.md",
+      "discuss": false,
+      "discuss_reason": ""
+    },
+    {
+      "path": "exporter/webapp/data_classes.py",
+      "discuss": false,
+      "discuss_reason": ""
+    },
+    {
+      "path": "exporter/webapp/static/app.js",
+      "discuss": false,
+      "discuss_reason": ""
+    },
+    {
+      "path": "exporter/webapp/static/home.js",
+      "discuss": false,
+      "discuss_reason": ""
+    },
+    {
+      "path": "gui2/main.py",
+      "discuss": true,
+      "discuss_reason": "Imports fast_api_utils_dps (DPS-specific) and adds DpsView and AnalysisView tabs. Blind porting would remove these tabs and break the DPS GUI."
+    },
+    {
+      "path": "gui2/pass2_add_view.py",
+      "discuss": false,
+      "discuss_reason": ""
+    },
+    {
+      "path": "tools/ai_manager.py",
+      "discuss": false,
+      "discuss_reason": ""
+    },
+    {
+      "path": ".gitignore",
+      "discuss": true,
+      "discuss_reason": "Contains DPS-specific exclusions for local build artifacts, Russian export outputs, and SBS data paths. Blind porting would re-track files that must remain untracked in this fork."
+    },
+    {
+      "path": "AGENTS.md",
+      "discuss": true,
+      "discuss_reason": "Fork identity and sync policy sections are localized. Blind porting would overwrite fork-specific AI instructions with upstream defaults, breaking sync and shadow-file protocols."
+    }
   ],
   "no_sync_files": [
     "conductor/archive",
@@ -64,7 +112,6 @@
     "scripts/export/",
     "scripts/moving/",
     "scripts/other/",
-    "scripts/rus_exporter/",
     "scripts/work_with_csv/",
     "shared_data/discourses/",
     "shared_data/pali_class/",
@@ -77,10 +124,7 @@
     "tools/ai_openai_manager.py",
     "tools/ai_related.py",
     "tools/sbs_table_functions.py",
-    "tools/tools_for_ru_exporter.py",
-    "db_tests/sbs_consistency_tests.py",
-    "docs_rus/dpd_rus.md",
-    "db/families/family_set_ru_update.py"
+    "tools/tools_for_ru_exporter.py"
   ],
   "russian_copies": {
     ".github/workflows/ru_release.yml": ".github/workflows/draft_release.yml",

@@ -34,7 +34,7 @@
 - **Study Tools:** [study-tools](https://github.com/sasanarakkha/study-tools) (Export destination for Anki decks and class materials)
 
 ## Custom Tooling (DPS Fork)
-The fork maintains extensive deviations from upstream to support Russian localization, SBS chanting data, and DPS course mapping. These are detailed in `conductor/templates/upstream_sync_rehearsal/dps_sync_registry.json`.
+The fork maintains extensive deviations from upstream to support Russian localization, SBS chanting data, and DPS course mapping. These are detailed in `kamma/upstream_sync/registry.json`.
 
 ### Modified Upstream Files
 - **`db/models.py`:** Core schema extension adding `Russian` and `SBS` tables.
