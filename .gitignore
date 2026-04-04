@@ -113,7 +113,12 @@ typescript
 
 # --- DPS / SBS / RU UNIQUE patterns ---
 
-exporter/archive/
+.claude/
+.gemini/
+archive
+.roo/
+.agent/
+sessions
 gui2/data/*.json
 exporter/goldendict/ru_components/javascript/ru_family_compound_json.js
 exporter/goldendict/ru_components/javascript/ru_family_idiom_json.js
