@@ -33,7 +33,7 @@
 
 ### 3. Workflow Updates (`conductor/workflow.md`)
 *   **Quality Gates:** Added explicit checks for syntax errors (`ruff check`) and variable initialization (`UnboundLocalError`) in the "Green Phase".
-*   **Model Efficiency:** Formalized the rule to use FLASH models for reading large logs/files and PRO models for reasoning.
+*   **Model Efficiency:** Formalized the rule to use FLASH models for reading large logs/files and Higher models for reasoning.
 *   **Session Cleanup:** Added protocol for generating this closing summary.
 
 ## Verified Test Cases

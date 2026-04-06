@@ -1,6 +1,6 @@
 # Project Rules (from original upstream)
 
-These rules are specific to the dpd-db project. Global rules (security, etc.) are in `~/.claude/CLAUDE.md`.
+These rules are specific to the dpd-db project. Global rules (security, etc.) are in `~/agents/AGENTS.md`.
 
 ## Project Overview
 

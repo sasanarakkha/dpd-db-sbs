@@ -1,6 +1,6 @@
-# Upstream Sync Process Reference
+# Upstream Sync Protocol
 
-> This is a process reference only — no AI instructions here. For per-file merge
+> This is the canonical protocol for running `/update-upstream`. For per-file merge
 > guidance, see `smd.md`. For accumulated lessons, see `archive_improvements.md`.
 > For lessons from the most recent run, see `new_improvements.md` (if it exists).
 
@@ -46,6 +46,7 @@ If you are tempted to add a try/except, change an import, or take a different ap
 Before touching ANY `modified_upstream_files` entry in the registry, check its `discuss` field.
 
 If `discuss: true`:
+!TODO! double check if all modified files which need manual attention have that flag set to true
 1. **STOP.** Do not modify the file.
 2. Run `git diff as_upstream -- <path>` and present the full diff to the user.
 3. State the `discuss_reason` from the registry entry.
@@ -63,7 +64,7 @@ If `discuss: true`:
 | `sbs_copies` | `shadow: upstream` map | Shadow files that mirror an upstream source with SBS-specific additions. |
 | `unique_paths` | string array | Files/dirs that exist only in this fork. Never in upstream; never auto-synced. |
 | `no_sync_files` | string array | Paths that must never be overwritten by an upstream sync (fork-only infrastructure). |
-| `ignored_files` | string array | Paths ignored during sync scanning (build artifacts, local-only dirs). |
+| `ignored_files` | string array | !TODO! (we do not use it at all, I forgot what was the purpose of that list, please analyze and suggest) Paths ignored during sync scanning (build artifacts, local-only dirs). |
 | `folders_to_check` | string array | Top-level directories included in sync diff analysis. |
 
 ---
@@ -81,7 +82,7 @@ Steps:
 ### MIRROR_EXACTLY
 Shadow must be byte-for-byte identical to upstream (e.g., template directories where
 all localization is in a separate namespaced copy). Simply overwrite from upstream.
-
+ d
 ### PRESERVE
 Fork-specific content that has no upstream equivalent. Do not sync; only update manually.
 
@@ -97,7 +98,6 @@ and plan explicitly before touching the file.
 2. **Duplicate HTML IDs in GoldenDict** — RU/SBS template lost its `ru_`/`sbs_` ID prefix.
 3. **Mako syntax left in Jinja2 template** — `${var}` or `% if` leaked in after a template sync.
 4. **`data_classes_dps.py` divergence** — this file appears in BOTH `russian_copies` AND `sbs_copies`; it must satisfy both.
-5. **`unique_paths` duplication** — same path listed twice; deduplicate before relying on the list.
 
 ---
 
@@ -120,38 +120,171 @@ This calls `scripts/cl_dps/dpd_init_sync.py`, which:
 
 Open `kamma/threads/<date>_upstream_sync/spec.md` and fill in the "From" commit/tag.
 
-### Step 3 — Execute
-
-Run `/kamma:2-do` (points to the new thread). The thread plan walks through 7 phases:
-
-| Phase | Description | Model |
-|---|---|---|
-| 0 | Pre-flight: clean worktree, validators, SMD check | Auto |
-| 1 | Automated sync (`full_sync.sh`) + Commit 1 gate | Auto |
-| 2 | Dynamic analysis: diff all changed files, build `dynamic_plan.md` | **PRO** |
-| 3 | Execution: port each item in `dynamic_plan.md`, Iron Rule enforced | Auto |
-| 4 | Logic audit: verify Iron Rule compliance, SMD parity | **PRO** |
-| 5 | Automated tests → manual verification gate → Commit 2 gate | Auto |
-| 6 | Cleanup: orphan archiving, registry/SMD update | Auto |
-| 7 | Final validation, `new_improvements.md`, Commit 3 gate | Auto |
+### Step 3 — Execute all 7 phases
 
 **3 commit gates** — each requires explicit **"Proceed with Commit N"** from the user.
 The agent presents `git add` + `git commit` for the user to run manually. Never self-commits.
 
 `dynamic_plan.md` is always created inside the active thread folder, NEVER in `kamma/upstream_sync/`.
 
-### Step 4 — Post-sync write-up
+---
 
-At the end of Phase 7, write `kamma/upstream_sync/new_improvements.md` with lessons from this run.
+#### Phase 0 — Pre-flight (Lower model)
+
+1. Read `kamma/upstream_sync/smd.md` end-to-end. **STOP** if any entry is incomplete.
+2. Read `kamma/upstream_sync/registry.json` end-to-end.
+3. Run `uv run python3 kamma/upstream_sync/verify_smd_coverage.py` — **STOP** if any gaps.
+4. Run `uv run python3 kamma/upstream_sync/validate_registry.py` — **STOP** if any errors.
+5. Verify `sbs-ru` branch is clean: `git status` — **STOP** if dirty, document state.
+6. Verify `as_upstream` tracking branch exists: `git branch -a | grep as_upstream`.
+7. Create a backup tag: `git tag pre-sync-$(date +%Y%m%d)`.
+
+**Phase 0 complete when:** All validators pass and SMD is confirmed complete.
 
 ---
 
-## Improvements Workflow
+#### Phase 1 — Automated Sync + Commit 1 gate (Lower model)
+
+1. Run `echo 2 | bash scripts/bash/full_sync.sh` (selective sync mode — syncs tracked
+   files, skips `modified_upstream_files` and `no_sync_files`).
+2. Run `git submodule init && git submodule update`.
+3. Spot-check: run `git diff HEAD -- db/models.py gui2/main.py .gitignore` to verify
+   protected files were NOT overwritten.
+4. Present full `git diff --stat` to user.
+5. **USER APPROVAL GATE**: Wait for explicit "Proceed with Commit 1".
+6. Prepare commit: `sync: automated upstream pull YYYY-MM-DD`
+7. Present `git add` + `git commit -m "..."` to user. NEVER run commit yourself.
+
+**Phase 1 complete when:** Commit 1 staged and user has run it manually.
+
+---
+
+#### Phase 2 — Dynamic Analysis (Higher model)
+
+**MODEL SWITCH**: Instruct user to switch to Higher model before starting this phase.
+
+1. Run `git diff HEAD^` to see what changed in the automated sync.
+2. For each file in `modified_upstream_files` registry entries: run
+   `git diff as_upstream -- <path>` to see what upstream has changed.
+3. Cross-reference every changed upstream file against `russian_copies` and
+   `sbs_copies` in registry — list ALL shadow destinations.
+4. **Triple Shadow Checklist**: Explicitly check `tools/paths.py`,
+   `exporter/goldendict/templates/`, `exporter/webapp/templates/`,
+   `exporter/goldendict/export_epd.py`. For each, list both shadow destinations.
+5. Check `discuss` flags: for every `discuss: true` file, **STOP** and present
+   `git diff as_upstream -- <path>` to user, state the `discuss_reason`, wait for
+   decision before including in plan.
+6. Output: Create `dynamic_plan.md` in the active thread folder (NOT in
+   `kamma/upstream_sync/`) with:
+   - Manual Merges: which `modified_upstream_files` changed, what code blocks to port
+   - Shadow Updates: each shadow file + exactly what to update + SMD sync rule
+   - Documentation: new/updated upstream docs to port to `docs_rus/`
+
+**MODEL SWITCH BACK**: Instruct user to switch back to Lower model.
+
+**Phase 2 complete when:** `dynamic_plan.md` written, all discuss flags resolved.
+
+---
+
+#### Phase 3 — Execution (Lower model)
+
+**Print the Iron Rule at the start of this phase.**
+
+1. Read `dynamic_plan.md` — execute item by item.
+2. For each shadow update:
+   1. Read the SMD entry for this file from `kamma/upstream_sync/smd.md`.
+   2. Read the upstream source file (`git show as_upstream:<path>`).
+   3. Read the current shadow copy.
+   4. Apply upstream changes while preserving ONLY the local changes listed in SMD.
+   5. Verify namespace isolation (`ru_`, `sbs_`, `dps_` prefixes intact).
+3. For each modified upstream file:
+   1. Run `git diff as_upstream -- <path>` to see upstream delta.
+   2. Manually integrate new upstream features while preserving local elements per SMD.
+   3. If `discuss: true`, confirm user already approved in Phase 2.
+4. **Dual-Shadow Parity Rule**: When updating one shadow, immediately check if a
+   sibling shadow exists (e.g., updating `paths_ru.py` → also check `paths_dps.py`).
+   Both must be updated in the same step.
+5. Run `uv run pytest tests/test_shadow_parity.py --tb=short -q` after every batch of
+   shadow updates.
+
+**Phase 3 complete when:** All items in `dynamic_plan.md` executed and parity tests pass.
+
+---
+
+#### Phase 4 — Logic Audit (Higher model)
+
+**MODEL SWITCH**: Instruct user to switch to Higher model.
+
+1. For each `modified_upstream_files` entry: compare final state against `as_upstream`
+   — verify local changes match SMD exactly, nothing extra introduced.
+2. For each updated shadow copy: compare against upstream source — verify structural parity.
+3. Check all `discuss: true` files received explicit user approval in Phase 2.
+4. Verify Iron Rule compliance: no workarounds, no novel solutions, no alternative
+   libraries not in upstream.
+
+**MODEL SWITCH BACK**: Instruct user to switch back to Lower model.
+
+**Phase 4 complete when:** Audit passes, Iron Rule compliance confirmed.
+
+---
+
+#### Phase 5 — Testing + Commit 2 gate (Lower model)
+
+1. Run: `uv run pytest --tb=short -q` (full suite — includes shadow parity).
+2. Run: `uv run python3 tests/check_shadow_modifications.py`.
+3. Run: `uv run ruff check . && uv run ruff format .`
+4. Present test results summary to user.
+5. **USER MANUAL VERIFICATION**: Ask user to open GoldenDict/webapp and verify
+   dictionaries load correctly. Do NOT assume pass. Wait for explicit confirmation.
+6. **USER APPROVAL GATE**: Wait for explicit "Proceed with Commit 2".
+7. Prepare commit: `sync: manual merge resolutions YYYY-MM-DD`
+8. Present `git add` + `git commit -m "..."` to user.
+
+**Phase 5 complete when:** All tests pass, user confirmed manual verification, Commit 2 staged.
+
+---
+
+#### Phase 6 — Cleanup + Orphan Archiving (Lower model)
+
+1. Run `uv run python3 tests/test_shadow_cleanup.py` for each path in
+   `folders_to_check` from registry.
+2. Identify orphans: files present locally but missing upstream source in `as_upstream`.
+3. For each orphan:
+   - Still referenced in codebase? → Promote to `unique_paths` in registry.
+   - Unused? → Archive: scripts → `scripts/dps_archive/`, other → `archive/dps/`.
+4. Update `kamma/upstream_sync/registry.json` with any changes.
+5. Root directory audit: `ls -F` on project root — remove any temp artifacts.
+6. Update `kamma/upstream_sync/smd.md` if files were added or removed.
+
+**Phase 6 complete when:** No orphans remain, registry updated, root clean.
+
+---
+
+#### Phase 7 — Final Verification + Commit 3 gate (Lower model)
+
+1. Re-run: `uv run pytest --tb=short -q`.
+2. Re-run: `uv run pytest tests/test_shadow_parity.py tests/test_shadow_cleanup.py --tb=short -q`.
+3. Run: `uv run python3 kamma/upstream_sync/verify_smd_coverage.py` — must pass.
+4. Run: `uv run python3 kamma/upstream_sync/validate_registry.py` — must pass.
+5. Run: `uv run ruff check . && uv run ruff format .`
+6. Write `kamma/upstream_sync/new_improvements.md` with lessons from this run.
+7. Delete `dynamic_plan.md` from the active thread folder (temp artifact).
+8. **USER APPROVAL GATE**: Wait for explicit "Proceed with Commit 3".
+9. Prepare commit: `sync: cleanup and finalization YYYY-MM-DD`
+10. Present `git add` + `git commit -m "..."` to user.
+
+**Phase 7 complete when:** All validators pass, `new_improvements.md` written, Commit 3 staged.
+
+---
+
+## Improvements Workflow (TODO need top rewrite)
 
 | File | Purpose |
 |---|---|
-| `archive_improvements.md` | Accumulated lessons from all past sync runs. Grows over time. |
+| `archive_improvements.md` | Accumulated lessons from all past sync runs. Which has been already implemented, at least attempted to. |
 | `new_improvements.md` | Written at the end of each sync run. Overwritten each cycle. |
+
+!TODO! we analyze current session and add them to a new improvement maybe we call it new suggestions and then we wait. We suggest something for the guide and for the whole process itself and only after that suggestions been saved. We moved those to the Archie So the suggestions file just a temporary file after analysis of the history of this exact process before adapting some implementation into the guide and then clean the file move everything what has been adopted into Archie.
 
 **At the end of a sync run**, write `new_improvements.md` covering:
 - Errors encountered that weren't in `archive_improvements.md`.
@@ -166,7 +299,7 @@ At the end of Phase 7, write `kamma/upstream_sync/new_improvements.md` with less
 ## Verification Sequence (Phase 5 Order — Must Not Reorder)
 
 1. **Automated tests** — must all pass before showing anything to the user.
-   - `uv run pytest tests/test_shadow_parity.py --tb=short -q`
+   - `uv run pytest --tb=short -q` (full suite — includes shadow parity)
    - `uv run python3 tests/check_shadow_modifications.py`
    - `uv run ruff check . && uv run ruff format .`
 2. **Present results** — summarize pass/fail to user.

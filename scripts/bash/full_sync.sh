@@ -83,15 +83,8 @@ fi
 echo "  ➕ Staging all changes..."
 git add . || exit 1
 
-# Commit changes
+# Commit message
 COMMIT_MESSAGE="${COMMIT_MESSAGE_PREFIX}selective update${COMMIT_MESSAGE_SUFFIX}"
-echo "📝 Committing changes to sbs-ru..."
-if git diff --staged --quiet; then
-    echo "✅ No changes to commit. Branch is already up-to-date with selective sync."
-else
-    git commit -m "$COMMIT_MESSAGE" || { 
-        echo "❌ Commit failed."
-        exit 1
-    }
-    echo "✅ Done! Commited: $COMMIT_MESSAGE"
-fi
+
+echo "✅ Done! Please commit with message: $COMMIT_MESSAGE"
+

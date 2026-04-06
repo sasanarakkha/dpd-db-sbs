@@ -72,7 +72,7 @@ Do NOT proceed past this gate without explicit user approval.
 
 ## Phase 2: Dynamic Analysis
 
-> ⚡ **MODEL SWITCH**: Ask user to switch to **PRO model** before starting this phase.
+> ⚡ **MODEL SWITCH**: Ask user to switch to **Higher model** before starting this phase.
 > Switch back to Auto after Phase 2 is complete.
 
 - [ ] **2.1** Run `git diff HEAD^` to see what changed in the automated sync.
@@ -90,7 +90,7 @@ Do NOT proceed past this gate without explicit user approval.
   - **Shadow Updates**: each shadow file + exactly what to update + SMD sync rule.
   - **Documentation**: new/updated upstream docs to port to `docs_rus/`.
 
-> ⚡ **MODEL SWITCH BACK**: Ask user to switch back to **Auto model**.
+> ⚡ **MODEL SWITCH BACK**: Ask user to switch back to **Lower model**.
 
 **Phase 2 complete when:** `dynamic_plan.md` written and covers every changed upstream file. All `discuss: true` decisions logged.
 
@@ -120,7 +120,7 @@ Do NOT proceed past this gate without explicit user approval.
 
 ## Phase 4: Logic Audit
 
-> ⚡ **MODEL SWITCH**: Ask user to switch to **PRO model** before starting this phase.
+> ⚡ **MODEL SWITCH**: Ask user to switch to **Higher model** before starting this phase.
 > Switch back to Auto after Phase 4 is complete.
 
 - [ ] **4.1** For each `modified_upstream_files` entry updated: compare final state against `as_upstream` — verify local changes match SMD exactly and nothing extra was introduced.
@@ -128,7 +128,7 @@ Do NOT proceed past this gate without explicit user approval.
 - [ ] **4.3** Check all `discuss: true` files — confirm explicit user approval was logged in Phase 2.
 - [ ] **4.4** Iron Rule compliance check: no workarounds, no novel solutions, no alternative libraries not in upstream.
 
-> ⚡ **MODEL SWITCH BACK**: Ask user to switch back to **Auto model**.
+> ⚡ **MODEL SWITCH BACK**: Ask user to switch back to **Lower model**.
 
 **Phase 4 complete when:** Audit complete. All deviations from upstream are SMD-listed local changes only.
 
