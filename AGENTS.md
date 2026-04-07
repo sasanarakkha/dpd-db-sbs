@@ -159,6 +159,17 @@ Existing tables which has additional columns:
 - Orphaned files STILL in use must be either re-mapped in `kamma/upstream_sync/registry.json` (if source moved) or promoted to `unique_paths` (if source deleted but local logic requires it).
 - All temporary artifacts created during a session MUST be purged before finalization.
 
+## Atomic Rename Protocol
+A file or directory rename/move is an atomic operation that is NOT complete until all references are updated.
+- **Mandatory Search**: Whenever you rename a file, you MUST immediately use `grep_search` to find all occurrences of the old filename and path throughout the repository.
+- **Scope of Updates**: You are responsible for updating:
+    - Language-specific imports (Python, TypeScript, Go).
+    - Hardcoded paths in bash scripts, python scripts, and `justfile`.
+    - GitHub Actions workflows (`.github/workflows/`).
+    - Registry files (`kamma/upstream_sync/registry.json`).
+    - Documentation references in `docs/` and `README.md`.
+- **Validation**: You MUST run a verification search after your edits to confirm that zero references to the old name remain in tracked files.
+
 ## Project Principles
 - **Strict Upstream Logic Parity:** For all shadow copies (localized Russian or SBS versions), you MUST maintain strict logic parity with the original upstream source files. When fixing bugs or implementing updates in shadow copies, DO NOT introduce new solutions. Instead, refer back to the original source as the absolute authority and emulate its implementation exactly, only layering localized data or UI updates on top.
 - **Template Standards**:

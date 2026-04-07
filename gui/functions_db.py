@@ -13,7 +13,6 @@ from gui.functions_daily_record import daily_record_update
 
 from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
-from tools.tsv_read_write import append_tsv_list
 from tools.fast_api_utils import request_dpd_server
 
 

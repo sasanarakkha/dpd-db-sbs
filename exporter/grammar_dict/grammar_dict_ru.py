@@ -5,7 +5,6 @@
 from db.db_helpers import get_db_session
 from db.models import Lookup
 from tools.configger import config_test
-from tools.css_manager import CSSManager
 from tools.goldendict_exporter import DictInfo, DictVariables, DictEntry
 from tools.goldendict_exporter import export_to_goldendict_with_pyglossary
 from tools.mdict_exporter import export_to_mdict
@@ -22,21 +21,23 @@ from tools.tools_for_ru_exporter import (
 )
 
 
-class GrammarDataRu(GrammarData):
+class GrammarData_ru(GrammarData):
     def _process_grammar(self, grammar_data_list):
         processed_rows = super()._process_grammar(grammar_data_list)
-        
+
         # Translate components to Russian
         for row in processed_rows:
             row["pos"] = ru_replace_abbreviations(row["pos"])
             for i in range(len(row["components"])):
                 if row["components"][i]:
-                    row["components"][i] = ru_replace_abbreviations(row["components"][i], kind="gram")
-        
+                    row["components"][i] = ru_replace_abbreviations(
+                        row["components"][i], kind="gram"
+                    )
+
         return processed_rows
 
 
-class ProgData:
+class ProgData_ru:
     def __init__(self) -> None:
         if config_test("dictionary", "make_mdict", "yes"):
             self.make_mdict = True
@@ -69,7 +70,7 @@ def main():
         pr.toc()
         return
 
-    g = ProgData()
+    g = ProgData_ru()
 
     generate_html_from_lookup(g)
 
@@ -81,7 +82,7 @@ def main():
     pr.toc()
 
 
-def generate_html_from_lookup(g: ProgData):
+def generate_html_from_lookup(g: ProgData_ru):
     """Generate HTML grammar tables from Lookup table data."""
     pr.green("querying database")
 
@@ -112,15 +113,19 @@ def generate_html_from_lookup(g: ProgData):
             entry_html = grammar_cache[grammar_data]
         else:
             # Use ViewModel
-            data = GrammarDataRu(lookup_entry, g.pth, jinja_env)
+            data = GrammarData_ru(lookup_entry, g.pth, jinja_env)
             entry_html = template.render(data=data)
-            
+
             # Since the Jinja template hardcodes "of", we need to replace it with "для"
             # It also hardcodes the column headers in English, so we replace them.
             entry_html = entry_html.replace("<td>of</td>", "<td>для</td>")
-            entry_html = entry_html.replace("<th id='col1'>pos ⇅</th>", "<th id='col1'>чр ⇅</th>")
-            entry_html = entry_html.replace("<th id='col6'>word ⇅</th>", "<th id='col6'>слово ⇅</th>")
-            
+            entry_html = entry_html.replace(
+                "<th id='col1'>pos ⇅</th>", "<th id='col1'>чр ⇅</th>"
+            )
+            entry_html = entry_html.replace(
+                "<th id='col6'>word ⇅</th>", "<th id='col6'>слово ⇅</th>"
+            )
+
             grammar_cache[grammar_data] = entry_html
 
         html_dict[inflected_word] = entry_html
@@ -129,7 +134,7 @@ def generate_html_from_lookup(g: ProgData):
     pr.yes(len(html_dict))
 
 
-def make_data_lists(g: ProgData):
+def make_data_lists(g: ProgData_ru):
     """Make the data_lists to be consumed by GoldenDict and MDict"""
     pr.green("making data lists")
 
@@ -147,7 +152,7 @@ def make_data_lists(g: ProgData):
     pr.yes("ok")
 
 
-def prepare_gd_mdict_and_export(g: ProgData):
+def prepare_gd_mdict_and_export(g: ProgData_ru):
     """Prepare the metadata and export to goldendict & mdict."""
 
     dict_info = DictInfo(
@@ -176,7 +181,6 @@ def prepare_gd_mdict_and_export(g: ProgData):
 
     if g.make_mdict:
         export_to_mdict(dict_info, dict_vars, g.dict_data)
-
 
 if __name__ == "__main__":
     main()

@@ -19,9 +19,12 @@ from exporter.goldendict.helpers import TODAY
 from tools.date_and_time import year_month_day_dash
 from tools.css_manager import CSSManager
 from tools.pali_sort_key import pali_sort_key
-from tools.tools_for_ru_exporter import ru_replace_abbreviations, make_ru_meaning_html, ru_make_grammar_line
-from tools.degree_of_completion import degree_of_completion
-from tools.degree_of_completion_ru import rus_degree_of_completion
+from tools.tools_for_ru_exporter import (
+    ru_replace_abbreviations,
+    make_ru_meaning_html,
+    ru_make_grammar_line,
+)
+from tools.degree_of_completion_ru import degree_of_completion_ru
 from tools.meaning_construction import summarize_construction
 
 
@@ -72,18 +75,22 @@ class HeadwordData:
         self.declensions = DECLENSIONS
         self.conjugations = CONJUGATIONS
         self.app_name = "GoldenDict"
-        
+
         # Russian fields
         if ru:
             self.ru_pos = ru_replace_abbreviations(i.pos)
-            self.ru_plus_case = ru_replace_abbreviations(i.plus_case) if i.plus_case else ""
+            self.ru_plus_case = (
+                ru_replace_abbreviations(i.plus_case) if i.plus_case else ""
+            )
             self.ru_meaning = make_ru_meaning_html(i, ru) or make_meaning_combo_html(i)
             self.ru_summary = summarize_construction(i)
-            self.ru_complete = rus_degree_of_completion(i)
+            self.ru_complete = degree_of_completion_ru(i)
             self.ru_grammar = ru_make_grammar_line(i)
             self.ru_base = ru_replace_abbreviations(i.root_base, "base")
             self.ru_phonetic = ru_replace_abbreviations(i.phonetic, "phonetic")
-            self.ru_inflections_html = ru_replace_abbreviations(i.inflections_html, "inflect")
+            self.ru_inflections_html = ru_replace_abbreviations(
+                i.inflections_html, "inflect"
+            )
             self.ru_is_ai_translation = not ru.ru_meaning and ru.ru_meaning_raw
 
         # SBS fields
@@ -102,7 +109,7 @@ class HeadwordData:
             self.needs_vib_example = sbs.needs_vib_example
             self.needs_class_example = sbs.needs_class_example
             self.needs_discourses_example = sbs.needs_discourses_example
-        
+
         self.header = self._generate_header()
 
     @staticmethod
@@ -183,11 +190,11 @@ class RootsData:
         except KeyError:
             self.count = 0
         self.frs = sorted(frs, key=lambda x: pali_sort_key(x.root_family))
-        
+
         # Russian fields
         self.ru_root_info = ru_replace_abbreviations(r.root_info, "root")
         self.ru_root_matrix = ru_replace_abbreviations(r.root_matrix, "root")
-        
+
         self.header = self._generate_header()
 
     @staticmethod
@@ -233,6 +240,8 @@ class EpdData:
 
 
 class RpdData(EpdData):
+    """RPD is already semantically localized: Russian Pali Dictionary."""
+
     def __init__(self, lookup_entry: Lookup, pth: ProjectPaths, jinja_env):
         super().__init__(lookup_entry, pth, jinja_env)
         self.epd_entries = lookup_entry.rpd_unpack

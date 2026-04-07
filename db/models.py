@@ -26,7 +26,7 @@ from tools.pali_sort_key import pali_sort_key
 from tools.pos import CONJUGATIONS, DECLENSIONS, EXCLUDE_FROM_FREQ
 from tools.clean_machine import clean_machine
 
-from tools.sbs_table_functions import SBS_table_tools, paragraphs_are_similar
+from tools.sbs_table_functions import SBS_table_tools, paragraphs_are_similar_sbs
 from tools.configger import config_read
 
 
@@ -1510,7 +1510,7 @@ class DpdHeadword(Base):
         if self.ru and self.ru.ru_notes:
             if not self.notes:
                 return True
-            if paragraphs_are_similar(self.ru.ru_notes, self.notes, 0.999):
+            if paragraphs_are_similar_sbs(self.ru.ru_notes, self.notes, 0.999):
                 return False
             return True
         return False
@@ -1760,7 +1760,7 @@ class SBS(Base):
             if not any(examples):
                 return True
             for example in examples:
-                if example and paragraphs_are_similar(
+                if example and paragraphs_are_similar_sbs(
                     clean_machine(example), clean_machine(self.dhp_example), 0.8
                 ):
                     return False
@@ -1778,7 +1778,7 @@ class SBS(Base):
             if not any(examples):
                 return True
             for example in examples:
-                if example and paragraphs_are_similar(
+                if example and paragraphs_are_similar_sbs(
                     clean_machine(example), clean_machine(self.pat_example), 0.8
                 ):
                     return False
@@ -1796,7 +1796,7 @@ class SBS(Base):
             if not any(examples):
                 return True
             for example in examples:
-                if example and paragraphs_are_similar(
+                if example and paragraphs_are_similar_sbs(
                     clean_machine(example), clean_machine(self.vib_example), 0.8
                 ):
                     return False
@@ -1813,7 +1813,7 @@ class SBS(Base):
             if not any(examples):
                 return True
             for example in examples:
-                if example and paragraphs_are_similar(
+                if example and paragraphs_are_similar_sbs(
                     clean_machine(example), clean_machine(self.class_example), 0.8
                 ):
                     return False
@@ -1831,7 +1831,7 @@ class SBS(Base):
             if not any(examples):
                 return True
             for example in examples:
-                if example and paragraphs_are_similar(
+                if example and paragraphs_are_similar_sbs(
                     clean_machine(example), clean_machine(self.discourses_example), 0.8
                 ):
                     return False

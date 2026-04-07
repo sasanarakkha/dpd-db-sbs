@@ -4,23 +4,18 @@
 and add to db (ru)."""
 
 import re
-from collections import defaultdict
 
-from root_info import generate_root_info_html
-from root_matrix import generate_root_matrix
 
 from db.db_helpers import get_db_session
-from db.models import DpdHeadword, DpdRoot, FamilyRoot, Lookup
+from db.models import DpdHeadword, DpdRoot, FamilyRoot
 from scripts.build.anki_updater import family_updater
 from tools.configger import config_test
-from tools.lookup_is_another_value import is_another_value
-from tools.pali_sort_key import pali_list_sorter, pali_sort_key
+from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 from tools.superscripter import superscripter_uni
-from tools.update_test_add import update_test_add
 
-from tools.degree_of_completion_ru import rus_degree_of_completion
+from tools.degree_of_completion_ru import degree_of_completion_ru
 
 from tools.tools_for_ru_exporter import (
     make_short_ru_meaning,
@@ -132,14 +127,14 @@ def compile_rf_html_ru(dpd_db: list[DpdHeadword], rf_dict):
             ru_html_string += f"<th>{superscripter_uni(i.lemma_1)}</th>"
             ru_html_string += f"<td><b>{pos}</b></td>"
             ru_html_string += f"<td>{ru_meaning}</td>"
-            ru_html_string += f"<td>{rus_degree_of_completion(i)}</td>"
+            ru_html_string += f"<td>{degree_of_completion_ru(i)}</td>"
             ru_html_string += "</tr>"
 
             rf_dict[family]["html_ru"] = ru_html_string
 
             # rus data
             rf_dict[family]["data_ru"].append(
-                (i.lemma_1, pos, ru_meaning, rus_degree_of_completion(i, html=False))
+                (i.lemma_1, pos, ru_meaning, degree_of_completion_ru(i, html=False))
             )
 
             # anki data

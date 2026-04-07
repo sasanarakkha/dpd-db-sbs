@@ -5,7 +5,7 @@ from tools.tools_for_ru_exporter import (
     ru_replace_abbreviations,
 )
 from tools.date_and_time import year_month_day_dash
-from tools.degree_of_completion_ru import rus_degree_of_completion
+from tools.degree_of_completion_ru import degree_of_completion_ru
 
 
 class HeadwordData:
@@ -13,7 +13,7 @@ class HeadwordData:
         self.meaning = i.meaning_combo_html
         self.ru_meaning = make_ru_meaning(i)
         self.summary = i.construction_summary
-        self.rus_complete = rus_degree_of_completion(i)
+        self.rus_complete = degree_of_completion_ru(i)
         self.ru_grammar = ru_make_grammar_line(i)
         self.ru_pos = ru_replace_abbreviations(i.pos, "gram")
         self.ru_plus_case = ru_replace_abbreviations(i.plus_case, "gram")
@@ -180,6 +180,8 @@ class EpdData:
 
 
 class RpdData:
+    """RPD is already semantically localized: Russian Pali Dictionary."""
+
     def __init__(self, result: Lookup):
         self.headword = result.lookup_key
         self.rpd = result.rpd_unpack

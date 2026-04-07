@@ -8,7 +8,6 @@ import re
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm import aliased
 from sqlalchemy import and_
-from sqlalchemy.orm import joinedload
 
 from db.models import DpdHeadword, SBS, Russian
 from tools.paths import ProjectPaths

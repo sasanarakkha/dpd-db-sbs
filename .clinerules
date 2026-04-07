@@ -86,3 +86,9 @@
 
 
 
+
+
+## Plan Mode File Creation
+- Whenever you create an implementation plan, you MUST create a new directory for the task under `kamma/threads/<descriptive_name>/`.
+- Save the plan file strictly as `kamma/threads/<descriptive_name>/plan.md`. 
+- NEVER create `.md` files directly in the `kamma/` root directory.

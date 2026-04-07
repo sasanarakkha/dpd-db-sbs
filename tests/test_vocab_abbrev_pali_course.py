@@ -1,8 +1,6 @@
 # Test Markdown vocabulary and abbreviation generation for dpd-pali-courses.
 
-import pytest
-from unittest.mock import MagicMock, patch
-from pathlib import Path
+from unittest.mock import MagicMock
 import csv
 
 # We will need to mock these as they might not be importable in the test environment if not set up

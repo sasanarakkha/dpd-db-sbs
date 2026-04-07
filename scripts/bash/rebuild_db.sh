@@ -23,7 +23,7 @@ while true; do
     fi
     case $yn in
         [Yy]* )
-            scripts/backup/backup_ru_sbs.py
+            scripts/backup/backup_dps.py
             break;;
         * )
             break;;
@@ -60,7 +60,7 @@ while true; do
             # build dpd.db from scratch using backup_tsv
             scripts/build/db_rebuild_from_tsv.py
             scripts/change_in_db/apply_all_additions.py
-            scripts/build/db_rebuild_from_tsv_ru_sbs.py
+            scripts/build/db_rebuild_from_tsv_dps.py
             db/bold_definitions/update_bold_definitions_db.py
             scripts/bash/generate_components.sh
             db/rpd/rpd_to_lookup.py

@@ -295,7 +295,7 @@
 ---
 
 
-**File**: `exporter/webapp/main_ru.py`
+**File**: `exporter/webapp/main_dps.py`
 - **Category**: russian_copy
 - **Sync Rule**: PORT
 - **Local Changes**:
@@ -303,7 +303,7 @@
   2. `templates_ru` and `templates_sbs` initialized separately.
   3. `db_search_json_ru` calls `make_dpd_html_ru`.
   4. `db_search_gd_ru` returns Russian HTML for GoldenDict API.
-  5. Application entry point changed to `main_ru:app`.
+  5. Application entry point changed to `main_dps:app`.
 - **Watch For**:
   - This file serves as the main entry point for the Russian webapp (port 8081).
   - It maintains a dual-mode (RU at root, SBS at `/sbs`).

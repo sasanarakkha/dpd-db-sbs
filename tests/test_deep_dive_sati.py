@@ -1,9 +1,8 @@
 
-import json
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword, Lookup
 from tools.paths import ProjectPaths
-from exporter.mcp.analyzer import analyze_sentence, get_word_details
+from exporter.mcp.analyzer import get_word_details
 
 def deep_dive_sati():
     paths = ProjectPaths()

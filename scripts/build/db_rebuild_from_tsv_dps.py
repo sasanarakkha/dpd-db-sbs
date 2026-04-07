@@ -113,9 +113,9 @@ def main():
     # Re-read the cleaned data for processing
     db_session = get_db_session(pth.dpd_db_path)
 
-    make_russian_table_data(dpspth, db_session)
-    make_sbs_table_data(dpspth, db_session)
-    make_ru_root_table_data(dpspth, db_session)
+    make_table_data_ru(dpspth, db_session)
+    make_table_data_sbs(dpspth, db_session)
+    make_root_table_data_ru(dpspth, db_session)
 
     pr.green("committing to db")
     db_session.commit()
@@ -176,7 +176,7 @@ def read_tsv_files(file_paths: List[Path]) -> Iterator[Tuple[List[str], List[str
                     yield columns, row
 
 
-def make_russian_table_data(dpspth: DPSPaths, db_session: Session):
+def make_table_data_ru(dpspth: DPSPaths, db_session: Session):
     """Read TSV and return Russian table data."""
     pr.green("creating Russian table data")
     counter = 0
@@ -189,7 +189,7 @@ def make_russian_table_data(dpspth: DPSPaths, db_session: Session):
     pr.yes(counter)
 
 
-def make_sbs_table_data(dpspth: DPSPaths, db_session: Session):
+def make_table_data_sbs(dpspth: DPSPaths, db_session: Session):
     """Read TSV and return SBS table data."""
     pr.green("creating SBS table data")
     counter = 0
@@ -202,7 +202,7 @@ def make_sbs_table_data(dpspth: DPSPaths, db_session: Session):
     pr.yes(counter)
 
 
-def make_ru_root_table_data(dpspth: DPSPaths, db_session: Session):
+def make_root_table_data_ru(dpspth: DPSPaths, db_session: Session):
     """Read TSV and return ru columns from DpdRoot."""
     pr.green("filling ru in DpdRoot table")
     updated_counter = 0

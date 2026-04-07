@@ -50,6 +50,7 @@ All tasks follow a strict lifecycle:
 Before marking any task complete, verify:
 
 - [ ] All tests pass via `uv run pytest --tb=short -q`.
+- [ ] **Structural Integrity**: For all renames/moves, confirmed via `grep` that 100% of references (imports, scripts, workflows, docs) are updated.
 - [ ] Code follows project style guides (see `conductor/code_styleguides/`).
 - [ ] No security vulnerabilities introduced.
 - [ ] Documentation updated if needed.

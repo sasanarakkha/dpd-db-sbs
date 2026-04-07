@@ -1,6 +1,5 @@
 """Verifies that the structural integrity of shadow templates matches their upstream counterparts."""
 import os
-import glob
 import pytest
 import re
 from pathlib import Path

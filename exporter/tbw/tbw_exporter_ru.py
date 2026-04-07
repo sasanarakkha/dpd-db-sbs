@@ -25,7 +25,8 @@ from tools.tools_for_ru_exporter import (
     ru_replace_abbreviations,
 )
 
-class ProgData:
+
+class ProgData_ru:
     def __init__(self) -> None:
         pr.green("setting up data")
         self.pth: ProjectPaths = ProjectPaths()
@@ -53,7 +54,7 @@ class ProgData:
         pr.yes("ok")
 
 
-def generate_sc_word_set(g: ProgData):
+def generate_sc_word_set(g: ProgData_ru):
     sc_text_list = [
         "vin1",
         "vin2",
@@ -95,7 +96,7 @@ def generate_sc_word_set(g: ProgData):
     g.word_set = sc_word_set
 
 
-def generate_deconstructed_word_set(g: ProgData):
+def generate_deconstructed_word_set(g: ProgData_ru):
     """make a set of all words in deconstructed compounds"""
 
     pr.green("making deconstructor splits set")
@@ -108,7 +109,7 @@ def generate_deconstructed_word_set(g: ProgData):
     pr.yes(len(g.deconstructed_splits_set))
 
 
-def generate_i2h_dict(g: ProgData):
+def generate_i2h_dict(g: ProgData_ru):
     """make an inflections to headwords dictionary"""
 
     pr.green("making inflection2headwords dict")
@@ -126,7 +127,7 @@ def generate_i2h_dict(g: ProgData):
     pr.yes(len(g.i2h_dict))
 
 
-def sort_i2h_dict(g: ProgData):
+def sort_i2h_dict(g: ProgData_ru):
     """sort i2h dict by values"""
 
     pr.green("sorting i2h_dict")
@@ -135,7 +136,7 @@ def sort_i2h_dict(g: ProgData):
     pr.yes(len(g.i2h_dict))
 
 
-def generate_unmatched_word_set(g: ProgData):
+def generate_unmatched_word_set(g: ProgData_ru):
     """make a set of unmatched words"""
 
     pr.green("making set of unmatched words")
@@ -143,7 +144,7 @@ def generate_unmatched_word_set(g: ProgData):
     pr.yes(len(g.unmatched_set))
 
 
-def generate_ebt_headwords_set(g: ProgData):
+def generate_ebt_headwords_set(g: ProgData_ru):
     """make a set of headwords in ebts"""
 
     pr.green("making headwords set")
@@ -152,7 +153,7 @@ def generate_ebt_headwords_set(g: ProgData):
     pr.yes(len(g.headwords_set))
 
 
-def generate_dpd_ebt_dict(g: ProgData):
+def generate_dpd_ebt_dict(g: ProgData_ru):
     """make a dict of dpd data - only words in ebts"""
 
     pr.green("making dpd ebts dict")
@@ -170,7 +171,7 @@ def generate_dpd_ebt_dict(g: ProgData):
     pr.yes(len(g.dpd_dict))
 
 
-def generate_deconstructor_dict(g: ProgData):
+def generate_deconstructor_dict(g: ProgData_ru):
     """make a dict of all deconstructed compounds"""
 
     pr.green("making deconstructor dict")
@@ -183,7 +184,7 @@ def generate_deconstructor_dict(g: ProgData):
     pr.yes(len(g.deconstructor_dict))
 
 
-def deconstructor_dict_add_variants(g: ProgData):
+def deconstructor_dict_add_variants(g: ProgData_ru):
     """add variant readings to deconstructor data"""
 
     pr.green("adding variants")
@@ -200,7 +201,7 @@ def deconstructor_dict_add_variants(g: ProgData):
     pr.yes(var_counter)
 
 
-def deconstructor_dict_add_spelling_mistakes(g: ProgData):
+def deconstructor_dict_add_spelling_mistakes(g: ProgData_ru):
     """add spelling mistakes to deconstructor data"""
 
     pr.green("adding spelling mistakes")
@@ -217,7 +218,7 @@ def deconstructor_dict_add_spelling_mistakes(g: ProgData):
     pr.yes(spell_counter)
 
 
-def sort_deconstructor_dict(g: ProgData):
+def sort_deconstructor_dict(g: ProgData_ru):
     """sort deconstructor dict"""
 
     pr.green("sorting deconstructor dict")
@@ -227,9 +228,7 @@ def sort_deconstructor_dict(g: ProgData):
     pr.yes(len(g.deconstructor_dict))
 
 
-
-
-def save_js_files_for_fdg(g: ProgData):
+def save_js_files_for_fdg(g: ProgData_ru):
     """saving .js files for fdg"""
 
     pr.green("saving .js files for fdg")
@@ -245,7 +244,6 @@ def save_js_files_for_fdg(g: ProgData):
     pr.yes("ok")
 
 
-
 def main():
     pr.tic()
     pr.title("export dpd data for TBW and Sutta Central")
@@ -255,7 +253,7 @@ def main():
         pr.toc()
         return
 
-    g = ProgData()
+    g = ProgData_ru()
     generate_sc_word_set(g)
     generate_deconstructed_word_set(g)
     generate_i2h_dict(g)
@@ -271,7 +269,6 @@ def main():
     save_js_files_for_fdg(g)
 
     pr.toc()
-
 
 if __name__ == "__main__":
     main()

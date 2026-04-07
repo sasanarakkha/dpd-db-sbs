@@ -43,7 +43,6 @@ from tools.utils_sbs import (
     RenderedSizes,
     default_rendered_sizes,
     sum_rendered_sizes,
-    paragraphs_are_similar,
 )
 
 from tools.tools_for_ru_exporter import read_set_ru_from_tsv

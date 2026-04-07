@@ -9,6 +9,3 @@ This file lists all major threads for the project. Each thread has its own detai
 
 ---
 
-## [ ] Thread: Normalize Function Naming in Shadow Files
-*Link: [./threads/normalize_function_naming/](./threads/normalize_function_naming/)*
-

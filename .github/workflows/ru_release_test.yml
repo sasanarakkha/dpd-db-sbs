@@ -92,7 +92,7 @@ jobs:
     #   run: uv run python scripts/change_in_db/apply_all_additions.py
 
     - name: Populating RU SBS tables
-      run: uv run python scripts/build/db_rebuild_from_tsv_ru_sbs.py
+      run: uv run python scripts/build/db_rebuild_from_tsv_dps.py
 
     - name: Run initial setup script
       run: uv run python scripts/bash/initial_setup_run_once.py

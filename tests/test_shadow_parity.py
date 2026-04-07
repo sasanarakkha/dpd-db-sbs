@@ -28,6 +28,10 @@ def get_python_pairs() -> list[tuple[str, str]]:
         if shadow.endswith(".py") and upstream.endswith(".py"):
             pairs.append((shadow, upstream))
 
+    for shadow, upstream in registry.get("dps_copies", {}).items():  # type: ignore[union-attr]
+        if shadow.endswith(".py") and upstream.endswith(".py"):
+            pairs.append((shadow, upstream))
+
     return pairs
 
 
@@ -172,7 +176,7 @@ WHITELIST = {
     "exporter/tbw/tbw_exporter_ru.py": {"functions": ["generate_tbw_html"]},
     "exporter/tpr/tpr_exporter_ru.py": {"functions": ["generate_tpr_html"]},
     "exporter/webapp/data_classes_ru.py": {"classes": ["SpellingData", "VariantData"]},
-    "exporter/webapp/main_ru.py": {"imports": ["exporter.webapp.preloads.load_data"]},
+    "exporter/webapp/main_dps.py": {"imports": ["exporter.webapp.preloads.load_data"]},
     "exporter/webapp/preloads_ru.py": {"functions": ["load_data"]},
     "exporter/webapp/toolkit_ru.py": {
         "functions": [
@@ -183,7 +187,7 @@ WHITELIST = {
             "get_variant_spelling_html",
         ]
     },
-    "scripts/backup/backup_ru_sbs.py": {
+    "scripts/backup/backup_dps.py": {
         "functions": [
             "backup_dpd_headwords_and_roots",
             "backup_dpd_roots",
@@ -192,7 +196,7 @@ WHITELIST = {
         ],
         "imports": ["db.models.DpdHeadword", "pathlib.Path"],
     },
-    "scripts/build/db_rebuild_from_tsv_ru_sbs.py": {
+    "scripts/build/db_rebuild_from_tsv_dps.py": {
         "functions": [
             "make_pali_root_table_data",
             "check_tsv_files",

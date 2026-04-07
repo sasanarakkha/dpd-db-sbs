@@ -3,7 +3,7 @@ import re
 from typing import List, TypedDict
 
 
-def paragraphs_are_similar(p1: str, p2: str, ratio: float) -> bool:
+def paragraphs_are_similar_sbs(p1: str, p2: str, ratio: float) -> bool:
     """Compare two paragraphs and return True if they are similar."""
     # strip html
     p1 = re.sub("<[^<]+?>", "", p1)

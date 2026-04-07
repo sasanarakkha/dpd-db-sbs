@@ -581,7 +581,7 @@ Instrumentator().instrument(app).expose(app)
 
 if __name__ == "__main__":
     uvicorn.run(
-        "main_ru:app",
+        "main_dps:app",
         # host="0.0.0.0",
         host="127.1.1.1",
         port=8080,
@@ -590,13 +590,13 @@ if __name__ == "__main__":
     )
 
 # Run on local machine with reload on changes
-# uv run uvicorn exporter.webapp.main_ru:app --host 127.1.1.1 --port 8080 --reload --reload-dir exporter/webapp
+# uv run uvicorn exporter.webapp.main_dps:app --host 127.1.1.1 --port 8080 --reload --reload-dir exporter/webapp
 
 # Run on mac with reload on changes
-# uv run uvicorn exporter.webapp.main_ru:app --host 127.0.0.1 --port 8080 --reload --reload-dir exporter/webapp
+# uv run uvicorn exporter.webapp.main_dps:app --host 127.0.0.1 --port 8080 --reload --reload-dir exporter/webapp
 
 # Run on local network with reload on changes
-# uv run uvicorn exporter.webapp.main_ru:app --host 0.0.0.0 --port 8080 --reload --reload-dir exporter/webapp
+# uv run uvicorn exporter.webapp.main_dps:app --host 0.0.0.0 --port 8080 --reload --reload-dir exporter/webapp
 
 
 # TODO make help popup tooltips and a toggle to turn them off

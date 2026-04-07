@@ -32,7 +32,7 @@ import datetime
 
 from sqlalchemy.orm import joinedload
 
-from tools.sbs_table_functions import SBS_table_tools, paragraphs_are_similar
+from tools.sbs_table_functions import SBS_table_tools, paragraphs_are_similar_sbs
 from tools.clean_machine import clean_machine
 
 
@@ -383,7 +383,7 @@ def get_unique_example_2(sbs: SBS):
             current_example_cleaned = clean_machine(current_example)
 
             if current_example_cleaned and class_example_cleaned:
-                if not paragraphs_are_similar(
+                if not paragraphs_are_similar_sbs(
                     class_example_cleaned, current_example_cleaned, 0.7
                 ):
                     if class_example_cleaned in current_example_cleaned:

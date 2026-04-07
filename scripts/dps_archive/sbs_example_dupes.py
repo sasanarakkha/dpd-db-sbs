@@ -37,7 +37,7 @@ def main():
                 for idx2, example2 in enumerate(examples):
                     if idx1 < idx2:
                         if example1 and example2:
-                            if example1 == example2 or paragraphs_are_similar(example1, example2):
+                            if example1 == example2 or paragraphs_are_similar_sbs(example1, example2):
                                 ids_to_save.add(i.id)
 
     with open(dpspth.id_temp_list_path, 'w', newline='') as csvfile:
@@ -55,7 +55,7 @@ def main():
     toc()
 
 
-def paragraphs_are_similar(paragraph1, paragraph2, threshold=threshold):
+def paragraphs_are_similar_sbs(paragraph1, paragraph2, threshold=threshold):
     matcher = SequenceMatcher(None, paragraph1, paragraph2)
     similarity_ratio = matcher.ratio()
     return similarity_ratio >= threshold

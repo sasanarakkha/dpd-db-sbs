@@ -69,7 +69,7 @@ def find_mismatched_examples(mode: str, source: str, dpspth: DPSPaths):
     elif mode == "discourses": 
         base_path = dpspth.discourses_output_dir
         csv_path = os.path.join(base_path, "done", f"{source} done.csv")
-        txt_path = os.path.join(base_path, "suttas", f"combined.txt")
+        txt_path = os.path.join(base_path, "suttas", "combined.txt")
     else:
         print(f"Unknown mode: {mode}")
         return

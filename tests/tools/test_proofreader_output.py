@@ -1,8 +1,6 @@
 """Tests for output generation in proofreader."""
 
 import csv
-import os
-from pathlib import Path
 from tools.proofreader import save_results
 
 def test_save_results(tmp_path):

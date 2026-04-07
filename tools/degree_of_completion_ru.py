@@ -2,7 +2,7 @@ from db.models import DpdHeadword
 from tools.degree_of_completion import degree_of_completion
 
 
-def rus_degree_of_completion(i: DpdHeadword, html=True):
+def degree_of_completion_ru(i: DpdHeadword, html=True):
     """
     Return html styled symbol of a word data degree of completion with normal color for those having ru_meaning.
     the rest is the same as in original degree_of_completion

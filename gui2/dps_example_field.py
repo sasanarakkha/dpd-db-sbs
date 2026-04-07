@@ -680,7 +680,7 @@ class DpsExampleField(ft.Column):
         self.archived_example_index = new_index
         self.page.update()
 
-    def paragraphs_are_similar(self, paragraph1, paragraph2, threshold):
+    def paragraphs_are_similar_sbs(self, paragraph1, paragraph2, threshold):
         """Check if two paragraphs are similar based on a similarity threshold."""
         matcher = SequenceMatcher(None, paragraph1, paragraph2)
         return matcher.ratio() >= threshold
@@ -708,7 +708,7 @@ class DpsExampleField(ft.Column):
                     sbs_example = sbs_examples[example_index]
                     
                     if sbs_example and all(
-                        not self.paragraphs_are_similar(sbs_example, input_ex, 0.9)
+                        not self.paragraphs_are_similar_sbs(sbs_example, input_ex, 0.9)
                         for input_ex in input_examples if input_ex
                     ):
                         self.dps_fields.fields["dps_extra_source"].value = sbs_sources[example_index]

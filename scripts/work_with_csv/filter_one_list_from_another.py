@@ -43,7 +43,7 @@ try:
     print(f"\nSuccessfully saved the filtered vocabulary to:\n{filtered_output_path}")
 
 except FileNotFoundError as e:
-    print(f"\nError: File not found. Please check your file paths.")
+    print("\nError: File not found. Please check your file paths.")
     print(e)
 except Exception as e:
     print(f"\nAn unexpected error occurred: {e}")

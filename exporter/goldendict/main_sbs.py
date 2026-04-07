@@ -29,7 +29,6 @@ from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
 from tools.printer import printer as pr
 from tools.speech_marks import SpeechMarkManager
-from tools.utils import list_into_batches, squash_whitespaces
 from tools.utils_sbs import RenderedSizes, sum_rendered_sizes
 
 

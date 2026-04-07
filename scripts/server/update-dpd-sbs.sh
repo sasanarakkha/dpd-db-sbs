@@ -28,7 +28,7 @@ fi
 uv run exporter/webapp/generate_search_index.py
 
 echo "=== 6. Killing Uvicorn Webapp ==="
-pkill -f "uvicorn exporter.webapp.main_ru:app" || echo "No existing uvicorn process found."
+pkill -f "uvicorn exporter.webapp.main_dps:app" || echo "No existing uvicorn process found."
 
 # Wait a moment for ports to clear
 sleep 2
@@ -39,7 +39,7 @@ mkdir -p logs
 LOG_FILE="logs/$(date '+%Y-%m-%d_%H-%M-%S').uvicorn.log"
 
 echo "=== 7. Starting Uvicorn Webapp ==="
-nohup uv run uvicorn exporter.webapp.main_ru:app --host 0.0.0.0 --port 8081 > "$LOG_FILE" 2>&1 &
+nohup uv run uvicorn exporter.webapp.main_dps:app --host 0.0.0.0 --port 8081 > "$LOG_FILE" 2>&1 &
 
 echo "=== DONE ==="
 echo "App started in background."

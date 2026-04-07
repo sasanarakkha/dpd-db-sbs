@@ -9,7 +9,7 @@ from db.db_helpers import get_db_session
 from db.models import DbInfo, DpdHeadword, FamilyCompound
 from scripts.build.anki_updater import family_updater
 from tools.configger import config_test
-from tools.degree_of_completion_ru import rus_degree_of_completion
+from tools.degree_of_completion_ru import degree_of_completion_ru
 from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
@@ -113,7 +113,7 @@ def compile_cf_html_ru(dpd_db: list[DpdHeadword], cf_dict):
                     ru_html_string += f"<th>{superscripter_uni(i.lemma_1)}</th>"
                     ru_html_string += f"<td><b>{pos}</b></td>"
                     ru_html_string += f"<td>{ru_meaning}</td>"
-                    ru_html_string += f"<td>{rus_degree_of_completion(i)}</td>"
+                    ru_html_string += f"<td>{degree_of_completion_ru(i)}</td>"
                     ru_html_string += "</tr>"
 
                     cf_dict[cf]["html_ru"] = ru_html_string
@@ -125,7 +125,7 @@ def compile_cf_html_ru(dpd_db: list[DpdHeadword], cf_dict):
                                 i.lemma_1,
                                 pos,
                                 ru_meaning,
-                                rus_degree_of_completion(i, html=False),
+                                degree_of_completion_ru(i, html=False),
                             )
                         )
 

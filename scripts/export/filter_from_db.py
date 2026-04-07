@@ -9,7 +9,7 @@ from db.models import DpdHeadword, SBS
 from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths    
 
-from sqlalchemy import and_, or_, not_
+from sqlalchemy import and_, or_
 
 
 pth = ProjectPaths()

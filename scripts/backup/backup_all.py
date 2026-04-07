@@ -13,7 +13,11 @@ from scripts.backup.backup_dpd_headwords_and_roots import (
     backup_dpd_headwords,
     backup_dpd_roots,
 )
-from scripts.backup.backup_ru_sbs import backup_russian, backup_sbs, backup_ru_roots
+from scripts.backup.backup_dps import (
+    backup_roots_ru,
+    backup_ru,
+    backup_sbs,
+)
 
 console = Console()
 
@@ -33,8 +37,8 @@ def backup_all_tables():
 
     backup_dpd_headwords(db_session, pth, dps_headwords_path)
     backup_dpd_roots(db_session, pth, dps_roots_path)
-    backup_russian(db_session, dpspth, dps_ru_path)
-    backup_ru_roots(db_session, dpspth, dps_ru_roots_path)
+    backup_ru(db_session, dpspth, dps_ru_path)
+    backup_roots_ru(db_session, dpspth, dps_ru_roots_path)
     backup_sbs(db_session, dpspth, dps_sbs_path)
 
     db_session.close()

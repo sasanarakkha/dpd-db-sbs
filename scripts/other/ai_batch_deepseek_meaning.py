@@ -3,9 +3,6 @@
 """making ai generated translation into Russian and saving to db using batch requests"""
 
 import os
-import json
-import pandas as pd
-import glob
 
 from typing import List, Dict, Any
 
@@ -26,7 +23,7 @@ from tools.configger import config_read
 
 from tools.paths_dps import DPSPaths
 
-from sqlalchemy import and_, or_, null
+from sqlalchemy import or_, null
 from sqlalchemy.orm import joinedload
 
 

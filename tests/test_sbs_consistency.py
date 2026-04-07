@@ -51,7 +51,6 @@ def test_pat_consistency_logic(in_memory_db):
     assert re.search(r"4", results)
 
 def test_dhp_source_consistency_logic(in_memory_db):
-    from db_tests.sbs_consistency_tests import check_dhp_source_consistency
     # Case 1: Correct - DHP source in headword and SBS dhp_source
     h1 = DpdHeadword(id=1, lemma_1="l1", source_1="DHP100", meaning_1="m1")
     s1 = SBS(id=1, dhp_source="DHP100")
@@ -75,7 +74,6 @@ def test_dhp_source_consistency_logic(in_memory_db):
     assert re.search(r"3", results)
 
 def test_dhp_triplet_consistency_logic(in_memory_db):
-    from db_tests.sbs_consistency_tests import check_dhp_triplet_consistency
     # Case 1: Correct triplet
     s1 = SBS(id=1, dhp_example="ex", dhp_source="DHP100", dhp_sutta="su")
     # Case 2: Missing one of the triplet in SBS (Violation)

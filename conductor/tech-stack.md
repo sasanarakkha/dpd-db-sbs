@@ -50,7 +50,7 @@ Unique files implementing the core DPS & SBS logic:
 Key system components that have been "forked" within the repo to provide Russian-specific versions:
 - **Exporters:** `export_dpd_ru.py`, `grammar_dict_ru.py`, `kindle_exporter_ru.py`.
 - **Database:** `family_compound_ru.py`, `family_root_ru.py`, `help_abbrev_add_to_lookup_ru.py`.
-- **Webapp:** `main_ru.py`, `data_classes_ru.py`.
+- **Webapp:** `main_dps.py`, `data_classes_ru.py`.
 
 ### Unique Paths
 - **`scripts/cl_dps/`:** Custom CLI workflow scripts for Mac/DPS environment.

@@ -193,7 +193,6 @@
     "exporter/deconstructor/deconstructor_exporter_ru.py": "exporter/deconstructor/deconstructor_exporter.py",
     "exporter/goldendict/ru_components/javascript/": "exporter/goldendict/javascript/",
     "exporter/goldendict/ru_components/templates/": "exporter/goldendict/templates/",
-    "exporter/goldendict/data_classes_dps.py": "exporter/goldendict/data_classes.py",
     "exporter/grammar_dict/grammar_dict_ru.py": "exporter/grammar_dict/grammar_dict.py",
     "exporter/kindle/kindle_exporter_ru.py": "exporter/kindle/kindle_exporter.py",
     "exporter/kindle/ru_components/cover/": "exporter/kindle/cover/",
@@ -202,7 +201,6 @@
     "exporter/tbw/tbw_exporter_ru.py": "exporter/tbw/tbw_exporter.py",
     "exporter/tpr/tpr_exporter_ru.py": "exporter/tpr/tpr_exporter.py",
     "exporter/webapp/data_classes_ru.py": "exporter/webapp/data_classes.py",
-    "exporter/webapp/main_ru.py": "exporter/webapp/main.py",
     "exporter/webapp/preloads_ru.py": "exporter/webapp/preloads.py",
     "exporter/webapp/toolkit_ru.py": "exporter/webapp/toolkit.py",
     "exporter/webapp/ru_templates/": "exporter/webapp/templates/",
@@ -215,12 +213,15 @@
   },
   "sbs_copies": {
     "exporter/goldendict/sbs_templates/": "exporter/goldendict/templates/",
-    "exporter/goldendict/data_classes_dps.py": "exporter/goldendict/data_classes.py",
     "exporter/webapp/sbs_templates/": "exporter/webapp/templates/",
-    "scripts/backup/backup_ru_sbs.py": "db/backup_tsv/backup_dpd_headwords_and_roots.py",
-    "scripts/build/db_rebuild_from_tsv_ru_sbs.py": "scripts/build/db_rebuild_from_tsv.py",
     "scripts/fix/character_replacer_sbs.py": "scripts/fix/character_replacer.py",
     "scripts/server/update-dpd-sbs.sh": "scripts/server/update-dpd.sh",
     "tools/utils_sbs.py": "tools/utils.py"
+  },
+  "dps_copies": {
+    "exporter/webapp/main_dps.py": "exporter/webapp/main.py",
+    "exporter/goldendict/data_classes_dps.py": "exporter/goldendict/data_classes.py",
+    "scripts/backup/backup_dps.py": "db/backup_tsv/backup_dpd_headwords_and_roots.py",
+    "scripts/build/db_rebuild_from_tsv_dps.py": "scripts/build/db_rebuild_from_tsv.py"
   }
 }

@@ -5,7 +5,7 @@ import os
 # Ensure the project root is in the path
 sys.path.insert(0, os.path.abspath(os.getcwd()))
 
-from exporter.webapp.main_ru import app
+from exporter.webapp.main_dps import app
 
 
 def test_ru_metrics_endpoint():

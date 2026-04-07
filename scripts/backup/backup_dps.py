@@ -15,21 +15,20 @@ from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
 
 
-
-def backup_ru_sbs():
+def backup_dps():
     pr.tic()
     print("[bright_yellow]backing russian and sbs tables to tsv")
     pth = ProjectPaths()
     dpspth = DPSPaths()
     db_session = get_db_session(pth.dpd_db_path)
-    backup_russian(db_session, dpspth)
+    backup_ru(db_session, dpspth)
     backup_sbs(db_session, dpspth)
-    backup_ru_roots(db_session, dpspth)
+    backup_roots_ru(db_session, dpspth)
     db_session.close()
     pr.toc()
 
 
-def backup_russian(db_session: Session, dpspth: DPSPaths, custom_path: str = ""):
+def backup_ru(db_session: Session, dpspth: DPSPaths, custom_path: str = ""):
     """Backup Russian table to TSV."""
     print("[green]Checking Russian table")
 
@@ -89,7 +88,7 @@ def backup_sbs(db_session: Session, dpspth: DPSPaths, custom_path: str = ""):
             csvwriter.writerow(row)
 
 
-def backup_ru_roots(db_session: Session, dpspth: DPSPaths, custom_path: str = ""):
+def backup_roots_ru(db_session: Session, dpspth: DPSPaths, custom_path: str = ""):
     """Backup Ru columns from the DpdRoot to TSV."""
     print("[green]Checking DpdRoot table")
 
@@ -135,7 +134,7 @@ def backup_ru_roots(db_session: Session, dpspth: DPSPaths, custom_path: str = ""
             csvwriter.writerow(row)
 
 
-def git_commit():
+def git_commit_dps():
     repo = Repo("./")
     index = repo.index
     index.add(
@@ -149,4 +148,4 @@ def git_commit():
 
 
 if __name__ == "__main__":
-    backup_ru_sbs()
+    backup_dps()

@@ -129,7 +129,7 @@
 ---
 
 
-**File**: `scripts/backup/backup_ru_sbs.py`
+**File**: `scripts/backup/backup_dps.py`
 - **Category**: sbs_copy
 - **Sync Rule**: PORT
 - **Local Changes**:
@@ -142,7 +142,7 @@
 ---
 
 
-**File**: `scripts/build/db_rebuild_from_tsv_ru_sbs.py`
+**File**: `scripts/build/db_rebuild_from_tsv_dps.py`
 - **Category**: sbs_copy
 - **Sync Rule**: PORT
 - **Local Changes**:
@@ -197,7 +197,7 @@
 - **Local Changes**:
   1. Target directory `dpd-db-sbs`.
   2. Downloads DB from `sasanarakkha/dpd-db-sbs`.
-  3. Restarts `main_ru:app` on port 8081.
+  3. Restarts `main_dps:app` on port 8081.
 - **Watch For**:
   - Hardcoded port 8081 must match server firewall settings.
 

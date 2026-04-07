@@ -7,7 +7,6 @@ from typing import Any
 from gui2.toolkit import ToolKit
 from exporter.mcp.analyzer import analyze_sentence
 from exporter.mcp.ai_pali_translate import translate_sentence
-from db.models import DpdHeadword, SuttaInfo
 
 class AnalysisRow(ft.Container):
     def __init__(self, word: str, details_list: list[dict[str, Any]], is_component: bool = False, parent_view: "AnalysisView" = None):

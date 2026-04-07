@@ -409,7 +409,7 @@ if __name__ == "__main__":
 
     # --- Default paths for "batch_discourse_inference" ---
     sutta_code = "sn56"
-    discourse_vocab_csv_path = f"shared_data/discourses/vocab/vocab_rest.csv"
+    discourse_vocab_csv_path = "shared_data/discourses/vocab/vocab_rest.csv"
     sutta_text_file_for_discourse = f"shared_data/discourses/suttas/{sutta_code}.txt"
     output_csv_for_discourse = f"shared_data/discourses/output/rest_{sutta_code}_output.csv"
     # --- End Configuration ---

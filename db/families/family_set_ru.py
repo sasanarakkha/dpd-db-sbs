@@ -9,7 +9,7 @@ from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 from tools.superscripter import superscripter_uni
-from tools.degree_of_completion_ru import rus_degree_of_completion
+from tools.degree_of_completion_ru import degree_of_completion_ru
 from tools.tools_for_ru_exporter import (
     make_short_ru_meaning,
     ru_replace_abbreviations,
@@ -99,7 +99,7 @@ def compile_sf_html_ru(sets_db: list[DpdHeadword], sets_dict):
                     ru_html_string += f"<th>{superscripter_uni(i.lemma_1)}</th>"
                     ru_html_string += f"<td><b>{pos}</b></td>"
                     ru_html_string += f"<td>{ru_meaning}</td>"
-                    ru_html_string += f"<td>{rus_degree_of_completion(i)}</td>"
+                    ru_html_string += f"<td>{degree_of_completion_ru(i)}</td>"
                     ru_html_string += "</tr>"
 
                     sets_dict[sf]["html_ru"] = ru_html_string
@@ -110,7 +110,7 @@ def compile_sf_html_ru(sets_db: list[DpdHeadword], sets_dict):
                             i.lemma_1,
                             pos,
                             ru_meaning,
-                            rus_degree_of_completion(i, html=False),
+                            degree_of_completion_ru(i, html=False),
                         )
                     )
 

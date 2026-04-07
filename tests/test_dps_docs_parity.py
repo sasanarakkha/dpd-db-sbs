@@ -72,11 +72,11 @@ class TestDocsParity:
         
         error_msg = ""
         if missing_in_rus:
-            error_msg += f"\n[MISSING] The following files exist in 'docs/' but NOT in 'docs_rus/':\n"
+            error_msg += "\n[MISSING] The following files exist in 'docs/' but NOT in 'docs_rus/':\n"
             error_msg += "\n".join([f"  - {f}" for f in sorted(missing_in_rus)])
             
         if extra_in_rus:
-            error_msg += f"\n\n[EXTRA] The following files exist in 'docs_rus/' but NOT in 'docs/':\n"
+            error_msg += "\n\n[EXTRA] The following files exist in 'docs_rus/' but NOT in 'docs/':\n"
             error_msg += "\n".join([f"  - {f}" for f in sorted(extra_in_rus)])
             error_msg += "\n(Only 'dpd_rus.md' is allowed to be unique in docs_rus/)"
             

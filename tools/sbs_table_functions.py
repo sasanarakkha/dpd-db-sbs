@@ -78,7 +78,7 @@ class SBS_table_tools:
         return ''
 
 
-def paragraphs_are_similar(paragraph1, paragraph2, threshold):
+def paragraphs_are_similar_sbs(paragraph1, paragraph2, threshold):
     matcher = SequenceMatcher(None, paragraph1, paragraph2)
     similarity_ratio = matcher.ratio()
     return similarity_ratio >= threshold

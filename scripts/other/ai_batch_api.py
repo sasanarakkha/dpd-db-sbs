@@ -255,7 +255,7 @@ def save_batch_results(batch_id: str, file_name: str, skip_empty: bool = True) -
                 if processed_count > 0:
                     print(f"✅ Successfully saved {processed_count} translations to {file_path}")
                 else:
-                    print(f"⚠️  No valid translations found to save")
+                    print("⚠️  No valid translations found to save")
                     
                 return ids_and_contents
             else:

@@ -6,7 +6,6 @@ from minify_html import minify
 
 from db.db_helpers import get_db_session
 from db.models import Lookup
-from exporter.goldendict.helpers import TODAY
 from tools.paths_ru import RuPaths
 from tools.configger import config_test
 from tools.css_manager import CSSManager
@@ -25,7 +24,8 @@ from tools.utils import squash_whitespaces
 from exporter.jinja2_env import get_jinja2_env
 from exporter.deconstructor.data_classes import DeconstructorData
 
-class DeconstructorDataRu(DeconstructorData):
+
+class DeconstructorData_ru(DeconstructorData):
     def _generate_header(self, pth: ProjectPaths, jinja_env) -> str:
         header_templ = jinja_env.get_template("deconstructor_header_ru.jinja")
         css_manager = CSSManager()
@@ -33,7 +33,8 @@ class DeconstructorDataRu(DeconstructorData):
         html_header = css_manager.update_style(html_header, "deconstructor")
         return squash_whitespaces(html_header)
 
-class ProgData:
+
+class ProgData_ru:
     """Global variables."""
 
     def __init__(self) -> None:
@@ -51,7 +52,7 @@ class ProgData:
         self.dict_data: list[DictEntry]
 
 
-def make_deconstructor_dict_data(g: ProgData) -> None:
+def make_deconstructor_dict_data(g: ProgData_ru) -> None:
     """Prepare data set for GoldenDict of deconstructions and synonyms."""
 
     pr.green("making deconstructor data list")
@@ -71,8 +72,8 @@ def make_deconstructor_dict_data(g: ProgData) -> None:
     pr.yes(len(deconstructor_db))
 
     for counter, i in enumerate(deconstructor_db):
-        data = DeconstructorDataRu(i, g.pth, jinja_env_header)
-        
+        data = DeconstructorData_ru(i, g.pth, jinja_env_header)
+
         html_string = data.header + minify(template.render(data=data))
 
         # make synonyms list
@@ -97,7 +98,7 @@ def make_deconstructor_dict_data(g: ProgData) -> None:
     pr.yes(len(dict_data))
 
 
-def prepare_and_export_to_gd_mdict(g: ProgData) -> None:
+def prepare_and_export_to_gd_mdict(g: ProgData_ru) -> None:
     """Prepare data to export to GoldenDict using pyglossary."""
 
     dict_info1 = DictInfo(
@@ -165,11 +166,10 @@ def main():
         pr.green("disabled in config.ini")
         return
 
-    g = ProgData()
+    g = ProgData_ru()
     make_deconstructor_dict_data(g)
     prepare_and_export_to_gd_mdict(g)
     pr.toc()
-
 
 if __name__ == "__main__":
     main()

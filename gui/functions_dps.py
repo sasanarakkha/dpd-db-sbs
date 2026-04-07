@@ -591,7 +591,7 @@ def add_word_from_csv(dpspth, window, flag_next_word, completion, lemma_1_curren
     return original_word
 
 
-def paragraphs_are_similar(paragraph1, paragraph2, threshold):
+def paragraphs_are_similar_sbs(paragraph1, paragraph2, threshold):
     """Helper function to check if two paragraphs are similar based on a similarity threshold."""
     matcher = SequenceMatcher(None, paragraph1, paragraph2)
     similarity_ratio = matcher.ratio()
@@ -624,7 +624,7 @@ def take_example_from_archive(dpspth, window, current_id, ex_1, ex_2, ex_3, ex_4
 
                 # Check if the example is unique and not similar to input examples
                 if sbs_example and all(
-                    not paragraphs_are_similar(sbs_example, input_example, threshold)
+                    not paragraphs_are_similar_sbs(sbs_example, input_example, threshold)
                     for input_example in input_examples
                 ):
                     # Update the GUI with the unique example found

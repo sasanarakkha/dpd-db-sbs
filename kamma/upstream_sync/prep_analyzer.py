@@ -3,7 +3,6 @@
 import argparse
 import fnmatch
 import subprocess
-import sys
 from pathlib import Path
 
 from kamma.upstream_sync.registry_helper import (

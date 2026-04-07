@@ -26,7 +26,7 @@ class RuSpellChecker:
         with RuSpellChecker._lock:
             if RuSpellChecker._initialized:
                 return
-        
+
             self.spell = SpellChecker(language="ru")  # Use Russian language
             self.dpspth = DPSPaths()
             self.user_dict = self.dpspth.ru_user_dict_path
@@ -77,36 +77,3 @@ class RuSpellChecker:
                     f.write(f"{word}\n")
 
         return f"Added Russian word '{word}' to dictionary"
-
-
-# Example usage
-if __name__ == "__main__":
-    # Initialize with Russian dictionary
-    checker = RuSpellChecker()
-
-    # Example Russian sentence with mistakes
-    test_sentence = "Это тестовое предложение с некоторыми ошибками."
-
-    # Check spelling and get suggestions
-    misspelled_words = checker.check_sentence(test_sentence)
-
-    # Print results
-    if misspelled_words:
-        print("Misspelled Russian words and suggestions:")
-        for word, suggestions in misspelled_words.items():
-            print(f"- {word}: {', '.join(suggestions)}")
-    else:
-        print("No Russian spelling mistakes found.")
-
-    # Add a custom Russian word to the dictionary
-    print(checker.add_to_ru_dictionary("тестовое"))
-
-    # Check the sentence again
-    misspelled_words = checker.check_sentence(test_sentence)
-    print("\nAfter adding 'тестовое' to Russian dictionary:")
-    if misspelled_words:
-        print("Misspelled Russian words and suggestions:")
-        for word, suggestions in misspelled_words.items():
-            print(f"- {word}: {', '.join(suggestions)}")
-    else:
-        print("No Russian spelling mistakes found.")

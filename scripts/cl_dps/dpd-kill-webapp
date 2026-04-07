@@ -1,1 +1,1 @@
-pkill -f 'uvicorn exporter.webapp.main_ru:app'
+pkill -f 'uvicorn exporter.webapp.main_dps:app'

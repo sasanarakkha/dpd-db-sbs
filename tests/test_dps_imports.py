@@ -25,9 +25,9 @@ class TestDPSImports:
         "exporter.grammar_dict.grammar_dict_ru",
         "exporter.kindle.kindle_exporter_ru",
         "exporter.tpr.tpr_exporter_ru",
-        "exporter.webapp.main_ru",
+        "exporter.webapp.main_dps",
         "gui2.main",
-        "scripts.build.db_rebuild_from_tsv_ru_sbs",
+        "scripts.build.db_rebuild_from_tsv_dps",
     ])
     def test_import_module(self, module_name):
         """Test that the module can be imported successfully."""

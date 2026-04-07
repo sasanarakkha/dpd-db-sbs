@@ -66,7 +66,6 @@ from gui.functions_db import (
     del_syns_if_pos_meaning_changed,
     delete_word,
     edit_word_in_db,
-    fetch_id_or_lemma_1,
     get_family_compound_values,
     get_family_idioms_values,
     get_family_root_values,

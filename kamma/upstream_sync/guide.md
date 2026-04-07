@@ -60,8 +60,9 @@ If `discuss: true`:
 | Category | Key | Description |
 |---|---|---|
 | `modified_upstream_files` | object array | Upstream files where this fork diverges. Each entry: `path`, `discuss` (bool), `discuss_reason`. When `discuss: true`, do NOT port blindly — read `smd.md` first. |
-| `russian_copies` | `shadow: upstream` map | Shadow files that mirror an upstream source with Russian-specific additions. |
-| `sbs_copies` | `shadow: upstream` map | Shadow files that mirror an upstream source with SBS-specific additions. |
+| `russian_copies` | `shadow: upstream` map | Shadow files that mirror an upstream source with Russian-specific additions. Tier 2/3 symbols use `_ru` suffix. |
+| `sbs_copies` | `shadow: upstream` map | Shadow files that mirror an upstream source with SBS-specific additions. Tier 2/3 symbols use `_sbs` suffix. |
+| `dps_copies` | `shadow: upstream` map | Shadow files that serve BOTH Russian and SBS locales. Shared Tier 2/3 symbols may use `_dps`, but RU-only helpers keep `_ru` and SBS-only helpers keep `_sbs`. |
 | `unique_paths` | string array | Files/dirs that exist only in this fork. Never in upstream; never auto-synced. |
 | `no_sync_files` | string array | Paths that must never be overwritten by an upstream sync (fork-only infrastructure). |
 | `ignored_files` | string array | !TODO! (we do not use it at all, I forgot what was the purpose of that list, please analyze and suggest) Paths ignored during sync scanning (build artifacts, local-only dirs). |
@@ -92,12 +93,48 @@ and plan explicitly before touching the file.
 
 ---
 
+## Symbol Naming Policy for Shadow Copies
+
+To maintain namespace isolation and ensure that shadow copies do not accidentally
+collide with or overshadow upstream symbols during synchronization, the following
+naming policy is enforced via `tests/test_namespace_isolation.py`:
+
+### Tier 1 — Identical to Upstream
+- **Rule**: Symbol MUST remain unmarked (exactly matching upstream).
+- **Signal**: Safe to overwrite or update during sync if the logic remains identical.
+
+### Tier 2 — Modified from Upstream
+- **Rule**: Symbol MUST have a clear locale marker matching the registry category. An underscore suffix is preferred, but an existing clear marker already in the symbol name is also valid, such as `RuSpellChecker`, `SBSExporter`, or `DPSPaths`.
+- **Signal**: Check upstream diff carefully before syncing; localized logic is present.
+
+### Tier 3 — New (no upstream counterpart)
+- **Rule**: Symbol MUST have a clear locale marker matching the registry category. Do not add a second marker when the symbol already clearly includes `RU`, `SBS`, or `DPS` in its name.
+- **Signal**: Fork-only feature; no sync required, but must remain isolated.
+
+### DPS File Rule
+- `*_dps.py` means the file serves both locales, not that every helper inside it must end in `_dps`.
+- Use `_dps` only for genuinely shared DPS logic.
+- If a helper works only with Russian data inside a DPS file, keep `_ru` only.
+- If a helper works only with SBS data inside a DPS file, keep `_sbs` only.
+- Never create double markers like `_ru_dps` or `_sbs_dps`.
+
+### Exceptions
+- `main`: Script entry points.
+- `GlobalVars`: whitelisted configuration containers.
+- `RpdData`: keep unmarked because `RPD` already means `Russian Pali Dictionary`; the localization is semantic, not suffix-based.
+- `RuSpellChecker`: keep unmarked because `Ru` already provides a clear Russian locale marker.
+- `is_cyrillic`: keep unmarked because it is a unique helper in the Russian transliteration module and does not need an added locale marker.
+- Webapp route handlers (e.g., `home_page_ru`) when descriptive names are required for API clarity.
+- Python dunder methods (e.g., `__init__`) are NEVER renamed.
+
+---
+
 ## Common Error Patterns
 
 1. **Missing imports after sync** — upstream refactored a module path; shadow still uses old path.
 2. **Duplicate HTML IDs in GoldenDict** — RU/SBS template lost its `ru_`/`sbs_` ID prefix.
 3. **Mako syntax left in Jinja2 template** — `${var}` or `% if` leaked in after a template sync.
-4. **`data_classes_dps.py` divergence** — this file appears in BOTH `russian_copies` AND `sbs_copies`; it must satisfy both.
+4. **`data_classes_dps.py` divergence** — this file is in `dps_copies` (serves both RU and SBS exporters); verify it satisfies both when syncing.
 
 ---
 
@@ -166,8 +203,8 @@ The agent presents `git add` + `git commit` for the user to run manually. Never 
 1. Run `git diff HEAD^` to see what changed in the automated sync.
 2. For each file in `modified_upstream_files` registry entries: run
    `git diff as_upstream -- <path>` to see what upstream has changed.
-3. Cross-reference every changed upstream file against `russian_copies` and
-   `sbs_copies` in registry — list ALL shadow destinations.
+3. Cross-reference every changed upstream file against `russian_copies`,
+   `sbs_copies`, and `dps_copies` in registry — list ALL shadow destinations.
 4. **Triple Shadow Checklist**: Explicitly check `tools/paths.py`,
    `exporter/goldendict/templates/`, `exporter/webapp/templates/`,
    `exporter/goldendict/export_epd.py`. For each, list both shadow destinations.
@@ -315,7 +352,7 @@ The agent presents `git add` + `git commit` for the user to run manually. Never 
 - [ ] `git status` — clean before starting.
 - [ ] `git branch -a | grep as_upstream` — tracking branch exists.
 - [ ] `git diff as_upstream..upstream/main` — review all upstream changes.
-- [ ] Cross-reference changed files against `modified_upstream_files`, `russian_copies`, `sbs_copies` in `registry.json`.
+- [ ] Cross-reference changed files against `modified_upstream_files`, `russian_copies`, `sbs_copies`, `dps_copies` in `registry.json`.
 - [ ] Triple Shadow Checklist: `paths.py`, `goldendict/templates/`, `webapp/templates/`, `export_epd.py`.
 - [ ] For each changed shadow source: read SMD entry, apply PORT strategy.
 - [ ] `uv run pytest tests/test_shadow_parity.py --tb=short -q`
