@@ -289,7 +289,7 @@ The agent presents `git add` + `git commit` for the user to run manually. Never 
 **At the end of a sync run**, write `new_improvements.md` covering:
 - Errors encountered that weren't in `archive_improvements.md`.
 - Patterns discovered about specific files or sync strategies.
-- Corrections to SMD entries (also update `smd.md` directly).
+- Corrections to SMD entries (also update `smd/` directly).
 
 **Periodically**, review `new_improvements.md` and promote valuable entries into
 `archive_improvements.md`, then clear `new_improvements.md`.
@@ -325,3 +325,4 @@ The agent presents `git add` + `git commit` for the user to run manually. Never 
 - [ ] `uv run python3 tests/test_shadow_cleanup.py --dry-run`
 - [ ] **User manually verifies GoldenDict/webapp** — wait for confirmation.
 - [ ] Write `kamma/upstream_sync/new_improvements.md`.
+vements.md`.

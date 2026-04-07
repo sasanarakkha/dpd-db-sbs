@@ -54,7 +54,7 @@ Key system components that have been "forked" within the repo to provide Russian
 
 ### Unique Paths
 - **`scripts/cl_dps/`:** Custom CLI workflow scripts for Mac/DPS environment.
-- **`scripts/rus_exporter/` / `scripts/dps_archive/`:** Maintenance and legacy scripts.
+- **`scripts/ru_exporter/` / `scripts/dps_archive/`:** Maintenance and legacy scripts.
 - **`shared_data/sbs_csvs/` / `shared_data/rus/`:** Source data for localization.
 
 ## Project Management (upstream)

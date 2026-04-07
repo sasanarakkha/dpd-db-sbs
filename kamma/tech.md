@@ -19,8 +19,8 @@ Internal development, with occasional external contributors submitting data via 
 GUI onboarding workflow.
 
 ## Constraints
-- Shadow files (`*_ru.py`, `*_sbs.py`, `*_dps.py`) must maintain strict logic parity
-  with upstream equivalents — no new solutions, only layered localization.
+- **Strict Shadow Parity**: Files in the `strict_shadow` category (`registry.json`) must maintain strict logic parity with upstream equivalents. No new solutions, only layered localization.
+- **Inspired-by Files**: Files in the `inspired_by_upstream` category may diverge from upstream structure but must document the `divergence_reason` in the registry and explain the divergence in their SMD.
 - All changes must pass `ruff check --fix` and `ruff format` before completion.
 - The root directory must stay clean — no temporary scripts or artifacts.
 - Releases are time-boxed to Uposatha days (~monthly).

@@ -97,3 +97,31 @@ This document provides a unified, exhaustive post-mortem of the Upstream Sync Re
 
 ## Summary
 To succeed in future syncs, the agent must act as a **careful translator** rather than an autonomous inventor. It must thoroughly diff upstream changes, translate them into the localized (RU/SBS) context while strictly preserving isolated namespaces, continuously verify with `test_shadow_parity.py`, maintain a clean environment, and unequivocally wait for explicit user sign-off at every major milestone.
+
+## 14. Suggestions from Gemini (April 2026)
+
+### 14.1 Automated Pre-Sync Diff Integration
+**Suggestion:** Formalize the `temp_diff_analyzer.py` script as an official part of Phase 0. Before any planning begins, an automated script should generate a concrete diff of all `modified_upstream_files` and shadow copies against `as_upstream`.
+**Status:** `accepted`
+**Deliverable:** Phase 3a (Process Model: Prep analyzer) and Phase 3d (Test Specifications: Prep analyzer script).
+
+### 14.2 Implement a Namespace Linter
+**Suggestion:** Create a dedicated linter script (`tests/test_namespace_isolation.py`) that uses AST and Regex to enforce prefixing in all files listed in `russian_copies` and `sbs_copies`.
+**Status:** `accepted`
+**Deliverable:** Phase 3d (Test Specifications: `tests/test_namespace_isolation.py`).
+
+### 14.3 Shift from "Shadowing" to "Plugging In" (Where Possible)
+**Suggestion:** Advocate for upstream "hooks" to eliminate the need to shadow and merge core application entry points.
+**Status:** `out-of-scope`
+**Rationale:** Redesigning upstream architecture or adding plugin support is explicitly listed as a non-goal in the thread spec.
+
+### 14.4 Break Down the Monolithic `smd.md`
+**Suggestion:** Fragment `smd.md` into domain-specific files (e.g., `smd_db.md`, `smd_exporter.md`, `smd_scripts.md`) located in a `kamma/upstream_sync/smd/` directory.
+**Status:** `accepted`
+**Deliverable:** Phase 3b (Docs and Templates: Split of `smd.md` into domain-based files).
+
+### 14.5 Automated Template Syntax Enforcement
+**Suggestion:** Add a pre-commit hook or explicit Pytest check that recursively scans all localized template directories for legacy Mako syntax (`${`, `% if`).
+**Status:** `accepted`
+**Deliverable:** Phase 3d (Test Specifications: template syntax drift test).
+

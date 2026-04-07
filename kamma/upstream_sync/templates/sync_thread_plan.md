@@ -11,7 +11,7 @@
 1. Open the upstream source file.
 2. See exactly how upstream implements the broken functionality.
 3. Copy that exact solution into the shadow.
-4. Re-apply ONLY the local changes listed in `kamma/upstream_sync/smd.md` for that file.
+4. Re-apply ONLY the local changes listed in `kamma/upstream_sync/smd/` for that file.
 
 **FORBIDDEN:**
 - Workarounds not present in upstream.

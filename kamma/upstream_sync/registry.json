@@ -1,33 +1,9 @@
 {
-  "folders_to_check": [
-    ".github/workflows/",
-    "db/",
-    "exporter/",
-    "gui2/",
-    "scripts/",
-    "shared_data/",
-    "tools/"
-  ],
   "modified_upstream_files": [
     {
       "path": "db/models.py",
       "discuss": true,
       "discuss_reason": "Adds SBS table (~30 cols), Russian table (~5 cols), Sinhala table, .sbs/.ru/.si relationships on DpdHeadword, root_ru_meaning/sanskrit_root_ru_meaning on DpdRoot, and hybrid properties. Blind porting would silently delete all localized tables and columns."
-    },
-    {
-      "path": "conductor/product-guidelines.md",
-      "discuss": false,
-      "discuss_reason": ""
-    },
-    {
-      "path": "conductor/product.md",
-      "discuss": false,
-      "discuss_reason": ""
-    },
-    {
-      "path": "conductor/tech-stack.md",
-      "discuss": false,
-      "discuss_reason": ""
     },
     {
       "path": "exporter/webapp/data_classes.py",
@@ -70,15 +46,99 @@
       "discuss_reason": "Fork identity and sync policy sections are localized. Blind porting would overwrite fork-specific AI instructions with upstream defaults, breaking sync and shadow-file protocols."
     }
   ],
+  "inspired_by_upstream": {
+    ".github/workflows/ru_release.yml": {
+      "upstream": ".github/workflows/draft_release.yml",
+      "divergence_reason": "Different pipeline logic for RU release lifecycle."
+    },
+    ".github/workflows/ru_release_test.yml": {
+      "upstream": ".github/workflows/draft_release.yml",
+      "divergence_reason": "Different pipeline logic for RU release testing."
+    },
+    ".github/workflows/ru_static.yml": {
+      "upstream": ".github/workflows/static.yml",
+      "divergence_reason": "Different CI configuration for RU static build."
+    },
+    "scripts/bash/generate_components.sh": {
+      "upstream": "scripts/bash/generate_components.py",
+      "divergence_reason": "Language mismatch: Bash vs Python; localized build orchestration."
+    },
+    "scripts/bash/make_dpd.sh": {
+      "upstream": "scripts/bash/makedict.py",
+      "divergence_reason": "Language mismatch: Bash vs Python; localized DPD build logic."
+    },
+    "scripts/bash/make_ru_dpd.sh": {
+      "upstream": "scripts/bash/makedict.py",
+      "divergence_reason": "Language mismatch: Bash vs Python; RU-specific build entry point."
+    },
+    "docs_rus/": {
+      "upstream": "docs/",
+      "divergence_reason": "Content-diverged Russian documentation; not a translation of upstream docs."
+    },
+    "mkdocs_ru.yaml": {
+      "upstream": "mkdocs.yaml",
+      "divergence_reason": "Different build config: different nav structure and RU-specific plugins."
+    },
+    "exporter/goldendict/export_dpd_ru.py": {
+      "upstream": "exporter/goldendict/export_dpd.py",
+      "divergence_reason": "Significant divergence in data structures and RU output logic."
+    },
+    "exporter/goldendict/export_help_ru.py": {
+      "upstream": "exporter/goldendict/export_help.py",
+      "divergence_reason": "Localized help export with RU-specific content structure."
+    },
+    "exporter/goldendict/export_roots_ru.py": {
+      "upstream": "exporter/goldendict/export_roots.py",
+      "divergence_reason": "RU-specific data injection makes mechanical parity impractical."
+    },
+    "exporter/goldendict/export_variant_spelling_ru.py": {
+      "upstream": "exporter/goldendict/export_variant_spelling.py",
+      "divergence_reason": "RU output logic diverges from upstream structure."
+    },
+    "exporter/goldendict/main_ru.py": {
+      "upstream": "exporter/goldendict/main.py",
+      "divergence_reason": "RU-specific dictionary entry point with different build orchestration."
+    },
+    "tools/paths_ru.py": {
+      "upstream": "tools/paths.py",
+      "divergence_reason": "Fundamental path redirection logic for RU build outputs."
+    },
+    "exporter/goldendict/export_dpd_sbs.py": {
+      "upstream": "exporter/goldendict/export_dpd.py",
+      "divergence_reason": "Significant structural divergence for SBS output format."
+    },
+    "exporter/goldendict/export_epd_sbs.py": {
+      "upstream": "exporter/goldendict/export_epd.py",
+      "divergence_reason": "SBS-specific output logic diverges from upstream."
+    },
+    "exporter/goldendict/export_help_sbs.py": {
+      "upstream": "exporter/goldendict/export_help.py",
+      "divergence_reason": "SBS-specific help content structure."
+    },
+    "exporter/goldendict/export_roots_sbs.py": {
+      "upstream": "exporter/goldendict/export_roots.py",
+      "divergence_reason": "SBS data injection makes mechanical parity impractical."
+    },
+    "exporter/goldendict/main_sbs.py": {
+      "upstream": "exporter/goldendict/main.py",
+      "divergence_reason": "SBS-specific dictionary entry point."
+    },
+    "tools/paths_dps.py": {
+      "upstream": "tools/paths.py",
+      "divergence_reason": "Fundamental path redirection for DPS/SBS build outputs."
+    },
+    "tools/fast_api_utils_dps.py": {
+      "upstream": "tools/fast_api_utils.py",
+      "divergence_reason": "DPS-specific FastAPI utilities; architectural divergence from upstream."
+    }
+  },
   "no_sync_files": [
-    "conductor/archive",
-    "conductor/tracks",
-    "conductor/tracks.md",
-    "conductor/templates",
+    "conductor/",
+    "kamma/",
     "exporter/mcp",
     "exporter/archive/"
   ],
-  "ignored_files": [
+  "skip_sync_patterns": [
     "gui2/data/",
     "scripts/archive/",
     "exporter/apple_dictionary/",
@@ -95,21 +155,18 @@
     ".github/workflows/submodules_update.yml",
     ".github/workflows/sync_upstream.yml",
     "scripts/cl_dps/",
-    "scripts/rus_exporter/",
+    "scripts/ru_exporter/",
     "scripts/dps_archive/",
     "db/backup_tsv/ru_roots.tsv",
     "db/backup_tsv/sbs.tsv",
     "db/backup_tsv/russian.tsv",
     "db/families/family_set_ru_update.py",
     "db_tests/sbs_consistency_tests.py",
-    "docs_rus/dpd_rus.md",
     "exporter/goldendict/templates/sbs_example.html",
     "gui2/dps_*",
     "gui2/font_scaling_helper.py",
     "misc/pat",
-    "scripts/bash/*.sh",
     "scripts/change_in_db/",
-    "scripts/export/",
     "scripts/moving/",
     "scripts/other/",
     "scripts/work_with_csv/",
@@ -127,24 +184,15 @@
     "tools/tools_for_ru_exporter.py"
   ],
   "russian_copies": {
-    ".github/workflows/ru_release.yml": ".github/workflows/draft_release.yml",
-    ".github/workflows/ru_release_test.yml": ".github/workflows/draft_release.yml",
-    ".github/workflows/ru_static.yml": ".github/workflows/static.yml",
     "db/families/family_compound_ru.py": "db/families/family_compound.py",
     "db/families/family_idiom_ru.py": "db/families/family_idiom.py",
     "db/families/family_root_ru.py": "db/families/family_root.py",
     "db/families/family_set_ru.py": "db/families/family_set.py",
     "db/families/family_word_ru.py": "db/families/family_word.py",
     "db/lookup/help_abbrev_add_to_lookup_ru.py": "db/lookup/help_abbrev_add_to_lookup.py",
-    "docs_rus/": "docs/",
     "exporter/deconstructor/deconstructor_exporter_ru.py": "exporter/deconstructor/deconstructor_exporter.py",
     "exporter/goldendict/ru_components/javascript/": "exporter/goldendict/javascript/",
     "exporter/goldendict/ru_components/templates/": "exporter/goldendict/templates/",
-    "exporter/goldendict/export_dpd_ru.py": "exporter/goldendict/export_dpd.py",
-    "exporter/goldendict/export_help_ru.py": "exporter/goldendict/export_help.py",
-    "exporter/goldendict/export_roots_ru.py": "exporter/goldendict/export_roots.py",
-    "exporter/goldendict/export_variant_spelling_ru.py": "exporter/goldendict/export_variant_spelling.py",
-    "exporter/goldendict/main_ru.py": "exporter/goldendict/main.py",
     "exporter/goldendict/data_classes_dps.py": "exporter/goldendict/data_classes.py",
     "exporter/grammar_dict/grammar_dict_ru.py": "exporter/grammar_dict/grammar_dict.py",
     "exporter/kindle/kindle_exporter_ru.py": "exporter/kindle/kindle_exporter.py",
@@ -158,41 +206,21 @@
     "exporter/webapp/preloads_ru.py": "exporter/webapp/preloads.py",
     "exporter/webapp/toolkit_ru.py": "exporter/webapp/toolkit.py",
     "exporter/webapp/ru_templates/": "exporter/webapp/templates/",
-    "scripts/bash/generate_components.sh": "scripts/bash/generate_components.py",
-    "scripts/bash/make_dpd.sh": "scripts/bash/makedict.py",
-    "scripts/bash/make_ru_dpd.sh": "scripts/bash/makedict.py",
     "scripts/build/families_to_json_ru.py": "scripts/build/families_to_json.py",
-    "scripts/rus_exporter/config_github_release_dpd_rus.py": "scripts/build/config_github_release.py",
-    "scripts/rus_exporter/ru_config_github_release.py": "scripts/build/config_github_release.py",
-    "scripts/rus_exporter/ru_zip_goldendict_mdict.py": "scripts/build/zip_goldendict_mdict.py",
-    "scripts/rus_exporter/zip_dpd_rus.py": "scripts/build/zip_goldendict_mdict.py",
-    "scripts/rus_exporter/docs_add_indexes.py": "scripts/build/docs_add_indexes.py",
     "shared_data/help_ru/": "shared_data/help/",
     "tools/degree_of_completion_ru.py": "tools/degree_of_completion.py",
-    "tools/paths_ru.py": "tools/paths.py",
     "tools/ru_spelling.py": "tools/spelling.py",
     "tools/translit_ru.py": "tools/translit.py",
-    "tools/version_ru.py": "tools/version.py",
-    "mkdocs_ru.yaml": "mkdocs.yaml"
+    "tools/version_ru.py": "tools/version.py"
   },
   "sbs_copies": {
     "exporter/goldendict/sbs_templates/": "exporter/goldendict/templates/",
-    "exporter/goldendict/export_dpd_sbs.py": "exporter/goldendict/export_dpd.py",
-    "exporter/goldendict/export_epd_sbs.py": "exporter/goldendict/export_epd.py",
-    "exporter/goldendict/export_help_sbs.py": "exporter/goldendict/export_help.py",
-    "exporter/goldendict/export_roots_sbs.py": "exporter/goldendict/export_roots.py",
-    "exporter/goldendict/main_sbs.py": "exporter/goldendict/main.py",
     "exporter/goldendict/data_classes_dps.py": "exporter/goldendict/data_classes.py",
     "exporter/webapp/sbs_templates/": "exporter/webapp/templates/",
     "scripts/backup/backup_ru_sbs.py": "db/backup_tsv/backup_dpd_headwords_and_roots.py",
     "scripts/build/db_rebuild_from_tsv_ru_sbs.py": "scripts/build/db_rebuild_from_tsv.py",
     "scripts/fix/character_replacer_sbs.py": "scripts/fix/character_replacer.py",
-    "scripts/rus_exporter/config_github_release_dpd_sbs.py": "scripts/build/config_github_release.py",
-    "scripts/rus_exporter/zip_dpd_sbs.py": "scripts/build/zip_goldendict_mdict.py",
     "scripts/server/update-dpd-sbs.sh": "scripts/server/update-dpd.sh",
-    "tools/utils_sbs.py": "tools/utils.py",
-    "tools/paths_dps.py": "tools/paths.py",
-    "tools/fast_api_utils_dps.py": "tools/fast_api_utils.py",
-    "scripts/export/dps_anki_updater.py": "scripts/build/anki_updater.py"
+    "tools/utils_sbs.py": "tools/utils.py"
   }
 }

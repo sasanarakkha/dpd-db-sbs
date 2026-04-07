@@ -47,7 +47,7 @@ Entries with `discuss: true` require human review before any port — do not app
 
 ## Shadow Module Descriptions (SMD)
 
-`smd.md` provides per-file context for every registry entry. Before touching any file during a sync, read its SMD entry. If a file has no entry, stop and create one.
+`smd/` provides per-file context for every registry entry. Before touching any file during a sync, read its SMD entry. If a file has no entry, stop and create one.
 
 Each entry contains:
 - **Sync Rule**: `PORT` / `MIRROR_EXACTLY` / `PRESERVE` / `DISCUSS`

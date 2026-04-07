@@ -4,16 +4,21 @@ import re
 import sys
 from pathlib import Path
 
-from kamma.upstream_sync.registry_helper import load_registry
+from kamma.upstream_sync.registry_helper import (
+    load_registry,
+    get_inspired_by_upstream_paths,
+    get_modified_upstream_paths,
+    get_strict_shadow_mappings,
+)
 from tools.printer import printer as pr
 
-# Quality rubric minimums (unless sync_rule is MIRROR_EXACTLY)
+# Quality rubric minimums (unless sync_rule is MIRROR_EXACTLY or inspired_only)
 MIN_LOCAL_CHANGES = 2
 MIN_WATCH_FOR = 1
 
 
 def extract_smd_entries(smd_path: Path) -> dict[str, dict[str, object]]:
-    """Parse smd.md and return a dict keyed by the File path."""
+    """Parse a single SMD file and return a dict keyed by the File path."""
     entries: dict[str, dict[str, object]] = {}
     if not smd_path.exists():
         return entries
@@ -46,23 +51,38 @@ def extract_smd_entries(smd_path: Path) -> dict[str, dict[str, object]]:
     return entries
 
 
+def extract_all_smd_entries(smd_dir: Path) -> dict[str, dict[str, object]]:
+    """Aggregate entries across all .md files in smd_dir."""
+    all_entries: dict[str, dict[str, object]] = {}
+    for smd_file in smd_dir.glob("*.md"):
+        if smd_file.name == "index.md":
+            continue
+        file_entries = extract_smd_entries(smd_file)
+        for path, entry in file_entries.items():
+            if path in all_entries:
+                raise ValueError(
+                    f"Duplicate SMD entry for '{path}' found in {smd_file.name}"
+                )
+            all_entries[path] = entry
+    return all_entries
+
+
 def collect_registry_paths(data: dict[str, object]) -> list[tuple[str, str]]:
     """Return list of (path, category) for every entry in all categories."""
     items: list[tuple[str, str]] = []
 
-    for entry in data.get("modified_upstream_files", []):  # type: ignore[union-attr]
-        if isinstance(entry, dict):
-            path = entry.get("path", "")
-            if isinstance(path, str) and path:
-                items.append((path, "modified_upstream"))
-        elif isinstance(entry, str):
-            items.append((entry, "modified_upstream"))
+    for path in get_modified_upstream_paths(data):
+        items.append((path, "modified_upstream"))
 
-    for shadow in data.get("russian_copies", {}).keys():  # type: ignore[union-attr]
-        items.append((shadow, "russian_copy"))
+    mappings = get_strict_shadow_mappings(data)
+    # We don't have category info in mappings easily, but we can check registry keys
+    russian = data.get("russian_copies", {})
+    for shadow in mappings:
+        category = "russian_copy" if shadow in russian else "sbs_copy"
+        items.append((shadow, category))
 
-    for shadow in data.get("sbs_copies", {}).keys():  # type: ignore[union-attr]
-        items.append((shadow, "sbs_copy"))
+    for path in get_inspired_by_upstream_paths(data):
+        items.append((path, "inspired_by_upstream"))
 
     return items
 
@@ -78,13 +98,18 @@ def check_rubric(
     local_changes = int(entry.get("local_changes_count", 0))  # type: ignore[arg-type]
     watch_for = int(entry.get("watch_for_count", 0))  # type: ignore[arg-type]
 
-    if sync_rule != "MIRROR_EXACTLY":
+    if sync_rule not in ["MIRROR_EXACTLY", "inspired_only"]:
         if local_changes < MIN_LOCAL_CHANGES:
             violations.append(
                 f"  [{category}] {path}: only {local_changes} local-change(s), need {MIN_LOCAL_CHANGES}"
             )
+
+    # Watch For is required for everyone except maybe MIRROR_EXACTLY?
+    # Spec says: "inspired_only still requires Watch For"
+    if sync_rule != "MIRROR_EXACTLY":
         if watch_for < MIN_WATCH_FOR:
             violations.append(f"  [{category}] {path}: missing Watch For section")
+
     return violations
 
 
@@ -92,16 +117,21 @@ def main() -> None:
     pr.tic()
     pr.title("verify_smd_coverage.py")
 
-    smd_path = Path("kamma/upstream_sync/smd.md")
+    smd_dir = Path("kamma/upstream_sync/smd")
     data = load_registry()
 
     pr.green("loading registry")
     all_paths = collect_registry_paths(data)
     pr.yes(f"{len(all_paths)}")
 
-    pr.green("loading smd.md")
-    smd_entries = extract_smd_entries(smd_path)
-    pr.yes(f"{len(smd_entries)} entries")
+    pr.green("loading smd/*.md")
+    try:
+        smd_entries = extract_all_smd_entries(smd_dir)
+        pr.yes(f"{len(smd_entries)} entries")
+    except ValueError as e:
+        pr.no("duplicate")
+        pr.red(str(e))
+        sys.exit(1)
 
     gaps: list[str] = []
     rubric_fails: list[str] = []

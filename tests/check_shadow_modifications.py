@@ -50,7 +50,8 @@ def check_shadows() -> None:
     russian_copies: dict[str, str] = registry.get("russian_copies", {})  # type: ignore[assignment]
     sbs_copies: dict[str, str] = registry.get("sbs_copies", {})  # type: ignore[assignment]
 
-    # Build combined mapping
+    # Build combined mapping for strict shadows only.
+    # inspired_by_upstream entries are excluded as they do not require strict parity.
     all_mappings: list[tuple[str, str, str]] = []
     for shadow, source in russian_copies.items():
         all_mappings.append(("Russian", shadow, source))

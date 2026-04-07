@@ -27,7 +27,7 @@ When a shadow file breaks after sync, the ONLY fix is:
 1. Open the upstream source.
 2. See exactly how upstream implements it.
 3. Copy that exact solution.
-4. Re-apply ONLY the local changes from `smd.md`.
+4. Re-apply ONLY the local changes from `smd/`.
 
 FORBIDDEN: workarounds, alternative imports, try/except papering, restructuring
 differently from upstream. The sources are correct. Broken means sync is incomplete.

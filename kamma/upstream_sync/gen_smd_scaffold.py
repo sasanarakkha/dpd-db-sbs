@@ -2,21 +2,30 @@
 
 import sys
 
-from kamma.upstream_sync.registry_helper import load_registry
+from kamma.upstream_sync.registry_helper import (
+    load_registry,
+    get_modified_upstream_paths,
+    get_strict_shadow_mappings,
+)
 
 
-def make_stub(path: str, category: str) -> str:
+def make_stub(path: str, category: str, divergence_reason: str = "") -> str:
+    sync_rule = "PORT"
+    local_changes = """
+- **Local Changes**:
+  1. TODO: document local change 1
+  2. TODO: document local change 2"""
+
+    if category == "inspired_by_upstream":
+        sync_rule = "inspired_only"
+        local_changes = f"\n- **Divergence Reason**: {divergence_reason}"
+
     return f"""
 **File**: `{path}`
 - **Category**: {category}
-- **Sync Rule**: PORT
-- **Local Changes**:
-  1. TODO: document local change 1
-  2. TODO: document local change 2
+- **Sync Rule**: {sync_rule}{local_changes}
 - **Watch For**:
   - TODO: document sync pitfall
-
----
 """
 
 
@@ -28,18 +37,25 @@ def main() -> None:
     sections: list[str] = []
     count = 0
 
-    for entry in data.get("modified_upstream_files", []):  # type: ignore[union-attr]
-        path = entry["path"] if isinstance(entry, dict) else entry
-        sections.append(make_stub(str(path), "modified_upstream"))
+    for path in get_modified_upstream_paths(data):
+        sections.append(make_stub(path, "modified_upstream"))
         count += 1
 
-    for shadow in data.get("russian_copies", {}).keys():  # type: ignore[union-attr]
-        sections.append(make_stub(shadow, "russian_copy"))
+    mappings = get_strict_shadow_mappings(data)
+    russian = data.get("russian_copies", {})
+    for shadow in mappings:
+        category = "russian_copy" if shadow in russian else "sbs_copy"
+        sections.append(make_stub(shadow, category))
         count += 1
 
-    for shadow in data.get("sbs_copies", {}).keys():  # type: ignore[union-attr]
-        sections.append(make_stub(shadow, "sbs_copy"))
-        count += 1
+    inspired = data.get("inspired_by_upstream", {})
+    if isinstance(inspired, dict):
+        for path, entry in inspired.items():
+            reason = (
+                entry.get("divergence_reason", "") if isinstance(entry, dict) else ""
+            )
+            sections.append(make_stub(path, "inspired_by_upstream", reason))
+            count += 1
 
     _stderr.write(f"gen_smd_scaffold: {count} stubs\n")
     sys.stdout.write("\n".join(sections))

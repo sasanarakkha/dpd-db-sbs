@@ -8,7 +8,7 @@ Canonical upstream sync tooling for the DPD SBS-RU fork.
 |---|---|
 | `registry.json` | Source of truth: all shadow mappings, unique paths, and discussion flags |
 | `registry_helper.py` | Shared Python helpers for loading/querying the registry |
-| `smd.md` | Shadow Module Descriptions — per-file merge guidance for every registry entry |
+| `smd/` | Shadow Module Descriptions — per-file merge guidance for every registry entry |
 | `guide.md` | Process reference: registry categories, merge strategies, sync checklist |
 | `archive_improvements.md` | Accumulated post-mortem lessons from all past sync runs |
 | `new_improvements.md` | Lessons from the most recent sync run (overwritten each cycle) |

@@ -2997,13 +2997,13 @@ ok next one:
 rezipping ru goldendict and mdict
 zipping ru goldendict
 Traceback (most recent call last):
-  File "/Users/deva/Documents/dpd-db/scripts/rus_exporter/ru_zip_goldendict_mdict.py", line 95, in <module>
+  File "/Users/deva/Documents/dpd-db/scripts/ru_exporter/ru_zip_goldendict_mdict.py", line 95, in <module>
     main()
     ~~~~^^
-  File "/Users/deva/Documents/dpd-db/scripts/rus_exporter/ru_zip_goldendict_mdict.py", line 89, in main
+  File "/Users/deva/Documents/dpd-db/scripts/ru_exporter/ru_zip_goldendict_mdict.py", line 89, in main
     zip_goldendict(rupth)
     ~~~~~~~~~~~~~~^^^^^^^
-  File "/Users/deva/Documents/dpd-db/scripts/rus_exporter/ru_zip_goldendict_mdict.py", line 21, in zip_goldendict
+  File "/Users/deva/Documents/dpd-db/scripts/ru_exporter/ru_zip_goldendict_mdict.py", line 21, in zip_goldendict
     and rupth.dpd_variants_goldendict_dir.exists()
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 AttributeError: 'RuPaths' object has no attribute 'dpd_variants_goldendict_dir'. Did you mean: 'dpd_grammar_goldendict_dir'?
