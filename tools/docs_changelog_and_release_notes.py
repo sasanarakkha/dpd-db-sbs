@@ -27,7 +27,7 @@ class ChangelogGenerator:
     """Generate changelog and release notes."""
 
     def __init__(self) -> None:
-        pr.green("initializing")
+        pr.green_tmr("initializing")
         self.pth: ProjectPaths = ProjectPaths()
         self.db_session = get_db_session(self.pth.dpd_db_path)
         self.dpd_db: List[DpdHeadword] = []
@@ -52,14 +52,13 @@ class ChangelogGenerator:
     def _load_data_from_db(self) -> None:
         """Load all necessary data from the database."""
 
-        pr.green("loading db")
+        pr.green_tmr("loading db")
         self.dpd_db = self.db_session.query(DpdHeadword).all()
         self.roots_db = self.db_session.query(DpdRoot).all()
         self.deconstructor_db = (
             self.db_session.query(Lookup).filter(Lookup.deconstructor != "").all()
         )
-        uposatha_count = UposathaManger.read_uposatha_count()
-        self.last_id = str(uposatha_count) if uposatha_count is not None else "0"
+        self.last_id = str(UposathaManger.get_baseline_count())
         self.new_words_db = (
             self.db_session.query(DpdHeadword)
             .filter(DpdHeadword.id > int(self.last_id))
@@ -74,7 +73,7 @@ class ChangelogGenerator:
 
     def _get_dpd_size(self) -> None:
         """Summary of dpd_headwords table"""
-        pr.green("get dpd data")
+        pr.green_tmr("get dpd data")
         total_headwords = len(self.dpd_db)
         total_complete = 0
         total_partially_complete = 0
@@ -117,7 +116,7 @@ class ChangelogGenerator:
 
     def _get_root_size(self) -> None:
         """Summary of root families."""
-        pr.green("get root data")
+        pr.green_tmr("get root data")
         total_roots = len(self.roots_db)
         total_root_families = len(self.root_families)
         total_derived_from_roots = sum(self.root_families.values())
@@ -131,7 +130,7 @@ class ChangelogGenerator:
 
     def _get_deconstructor_size(self) -> None:
         """Summary of deconstructor"""
-        pr.green("get deconstructor data")
+        pr.green_tmr("get deconstructor data")
         total_deconstructions = len(self.deconstructor_db)
         self.line_3_deconstructor = (
             f"{self._format_number(total_deconstructions)} deconstructed compounds"
@@ -140,7 +139,7 @@ class ChangelogGenerator:
 
     def _get_inflection_size(self) -> None:
         """Summarize inflections."""
-        pr.green("get inflection data")
+        pr.green_tmr("get inflection data")
         all_inflection_set: set[str] = set()
         for i in self.dpd_db:
             all_inflection_set.update(i.inflections_list)
@@ -149,7 +148,7 @@ class ChangelogGenerator:
 
     def _get_root_data(self) -> None:
         """Summarize dpd_roots table"""
-        pr.green("get root data")
+        pr.green_tmr("get root data")
         columns = DpdRoot.__table__.columns
         column_names = [c.name for c in columns]
         exceptions = ["root_info", "root_matrix", "created_at", "updated_at"]
@@ -167,7 +166,7 @@ class ChangelogGenerator:
 
     def _get_new_words(self) -> None:
         """New words since the last uposatha day."""
-        pr.green("get new words")
+        pr.green_tmr("get new words")
         new_words_list = sorted(
             [i.lemma_1 for i in self.new_words_db], key=pali_sort_key
         )
@@ -178,7 +177,7 @@ class ChangelogGenerator:
         pr.yes("ok")
 
     def _get_github_issues_list(self) -> None:
-        pr.green("get github issues")
+        pr.green_tmr("get github issues")
         github = Github()
         try:
             repo = github.get_repo("digitalpalidictionary/dpd-db")
@@ -198,7 +197,7 @@ class ChangelogGenerator:
                 sorted(md, key=lambda x: int(x.split("#")[1].split()[0]))
             )
             pr.yes("ok")
-            pr.info(f"fetched all github issues since {since_date}")
+            pr.green(f"fetched all github issues since {since_date}")
         except Exception as e:
             pr.no("no")
             pr.red(f"GitHub not available.\n{e}")
@@ -221,8 +220,8 @@ class ChangelogGenerator:
 - {self.line_6_cells_of_root_data}
 - Pass1 complete: VIN1-4, DN1-3, MN1-3, SN1-5, AN1-11, KN1-5, KN8-9
 - Pass1 in progress: VIN5
-- Pass2 complete: DN1-3, MN1-3, SN1-3
-- Pass2 in progress: SN4
+- Pass2 complete: DN1-3, MN1-3, SN1-4
+- Pass2 in progress: SN5
 - numerous additions and corrections based on user feedback
 """
 
@@ -230,7 +229,7 @@ class ChangelogGenerator:
         github_section = self._get_github_issues_section()
         data_updates_section = self._get_dictionary_data_updates()
         self.release_notes = f"""
-Digital Pāḷi Dictionary is a feature-rich Pāḷi dictionary which is available [online](https://www.dpdict.net/) and in a number of dictionary formats—StarDict, GoldenDict, Apple Dictionary, MDict, DictTango, Kindle, Kobo, ePub, SQLite, and plain text. It can be used in any application which supports these formats. 
+Digital Pāḷi Dictionary is a feature-rich Pāḷi dictionary which is available [online](https://www.dpdict.net/) and in a number of dictionary formats—StarDict, GoldenDict, Apple Dictionary, MDict, DictTango, Kindle, Kobo, ePub, SQLite, and plain text. It can be used in any application which supports these formats.
 
 It is also built into many popular [Pāḷi readers and websites](https://digitalpalidictionary.github.io/tpr.html).
 
@@ -258,17 +257,30 @@ This work is licensed under a <a rel="license" href="https://creativecommons.org
 """
 
     def _update_website_changelog(self) -> None:
-        pr.green("updating website changelog")
-        if self.pth.docs_changelog_md_path.exists():
-            changelog_md = self.pth.docs_changelog_md_path.read_text()
-            find_me = "# Changelog"
-            replace_me = f"# Changelog\n{self.changelog}\n"
-            changelog_updated = changelog_md.replace(find_me, replace_me)
-            self.pth.docs_changelog_md_path.write_text(changelog_updated)
-            pr.yes("ok")
-        else:
+        import re
+
+        pr.green_tmr("updating website changelog")
+        if not self.pth.docs_changelog_md_path.exists():
             pr.no("failed")
             pr.red(f"{self.pth.docs_changelog_md_path} not found")
+            return
+
+        changelog_md = self.pth.docs_changelog_md_path.read_text()
+        date_heading = f"## {self.date}"
+
+        if date_heading in changelog_md:
+            pattern = re.compile(
+                rf"({re.escape(date_heading)}).*?(?=\n## \d{{4}}-\d{{2}}-\d{{2}}|\Z)",
+                re.DOTALL,
+            )
+            changelog_updated = pattern.sub(self.changelog.strip(), changelog_md)
+        else:
+            changelog_updated = changelog_md.replace(
+                "# Changelog", f"# Changelog\n{self.changelog}\n"
+            )
+
+        self.pth.docs_changelog_md_path.write_text(changelog_updated)
+        pr.yes("ok")
 
     def _write_to_file(self) -> None:
         with open(self.pth.release_notes_md_path, "w") as f:
@@ -296,7 +308,7 @@ This work is licensed under a <a rel="license" href="https://creativecommons.org
         if UposathaManger.uposatha_today():
             if self.dpd_db:
                 last_id = self.dpd_db[-1].id
-                UposathaManger.write_uposatha_count(last_id)
+                UposathaManger.rotate_count(last_id)
             self._update_website_changelog()
 
         self._write_to_file()
@@ -310,7 +322,7 @@ This work is licensed under a <a rel="license" href="https://creativecommons.org
 
 def main() -> None:
     pr.tic()
-    pr.title("making release notes and changelog")
+    pr.yellow_title("making release notes and changelog")
     generator = ChangelogGenerator()
     generator.generate()
     pr.toc()

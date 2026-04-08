@@ -286,11 +286,20 @@ class ProjectPaths:
         self.cone_css_path = (
             base_dir / "resources/other-dictionaries/dictionaries/cone/cone.css"
         )
+        self.cpd_css_path = (
+            base_dir / "resources/other-dictionaries/dictionaries/cpd/cpd.css"
+        )
         self.dppn_css_path = (
             base_dir / "resources/other-dictionaries/dictionaries/dppn/dppn.css/"
         )
         self.dpr_css_path = (
             base_dir / "resources/other-dictionaries/dictionaries/dpr/dpr.css/"
+        )
+        self.apte_css_path = (
+            base_dir / "resources/other-dictionaries/dictionaries/apte/apte.css"
+        )
+        self.mw_css_path = (
+            base_dir / "resources/other-dictionaries/dictionaries/mw/mw.css"
         )
         self.whitney_css_path = (
             base_dir / "resources/other-dictionaries/dictionaries/whitney/whitney.css/"
@@ -310,7 +319,7 @@ class ProjectPaths:
         )
         self.cpd_source_path = (
             base_dir
-            / "resources/other-dictionaries/dictionaries/cpd/source/en-critical.json"
+            / "resources/other-dictionaries/dictionaries/cpd/source/cpd_clean.db"
         )
         self.dppn_source_path = (
             base_dir / "resources/other-dictionaries/dictionaries/dppn/source/DPPN.json"
@@ -322,7 +331,24 @@ class ProjectPaths:
             base_dir
             / "resources/other-dictionaries/dictionaries/sin_eng_sin/source/english-sinhala.tab"
         )
-        self.mw_source_path = (
+        self.apte_source_dir = (
+            base_dir
+            / "resources/other-dictionaries/dictionaries/apte/source/web/sqlite"
+        )
+        self.apte_zip_path = (
+            base_dir
+            / "resources/other-dictionaries/dictionaries/apte/source/ap90web1.zip"
+        )
+        self.apte_source_json_path = (
+            base_dir / "resources/other-dictionaries/dictionaries/apte/source/apte.json"
+        )
+        self.mw_source_dir = (
+            base_dir / "resources/other-dictionaries/dictionaries/mw/source/web/sqlite"
+        )
+        self.mw_zip_path = (
+            base_dir / "resources/other-dictionaries/dictionaries/mw/source/mwweb1.zip"
+        )
+        self.mw_source_json_path = (
             base_dir / "resources/other-dictionaries/dictionaries/mw/source/mw.json"
         )
         self.peu_source_path = (
@@ -341,6 +367,7 @@ class ProjectPaths:
         )
 
         # resources/other-dictionaries/build/goldendict
+        self.apte_gd_path = base_dir / "resources/other-dictionaries/build/goldendict/"
         self.bhs_gd_path = base_dir / "resources/other-dictionaries/build/goldendict/"
         self.cone_gd_path = base_dir / "resources/other-dictionaries/build/goldendict/"
         self.cpd_gd_path = base_dir / "resources/other-dictionaries/build/goldendict/"
@@ -397,6 +424,7 @@ class ProjectPaths:
         )
 
         # resources/other-dictionaries/build/mdict
+        self.apte_mdict_path = base_dir / "resources/other-dictionaries/build/mdict/"
         self.bhs_mdict_path = base_dir / "resources/other-dictionaries/build/mdict/"
         self.cone_mdict_path = base_dir / "resources/other-dictionaries/build/mdict/"
         self.cpd_mdict_path = base_dir / "resources/other-dictionaries/build/mdict/"
@@ -482,19 +510,6 @@ class ProjectPaths:
 
         # identity/fonts
         self.fonts_dir = base_dir / "identity/fonts"
-
-        # gui
-        self.pass2_checked_path = base_dir / "gui/pass2_checked.json"
-
-        # gui/stash
-        self.daily_record_path = base_dir / "gui/stash/daily_record"
-        self.example_stash_path = base_dir / "gui/stash/example"
-        self.save_state_path = base_dir / "gui/stash/gui_state"
-        self.stash_dir = base_dir / "gui/stash/"
-        self.stash_path = base_dir / "gui/stash/stash"
-
-        # gui2
-        self.load_example_dump = base_dir / "gui2/find_words_with_examples_dump.json"
 
         # db/inflections/
         self.inflection_templates_path = (
@@ -613,6 +628,13 @@ class ProjectPaths:
         self.docs_abbreviations_md_path = base_dir / "docs/abbreviations.md"
         self.docs_changelog_md_path = base_dir / "docs/changelog.md"
         self.docs_thanks_md_path = base_dir / "docs/thanks.md"
+        self.docs_newsletters_md_path = base_dir / "docs/newsletters.md"
+        self.docs_newsletters_pics_dir = base_dir / "docs/pics/newsletters"
+        self.newsletter_processed_json = (
+            base_dir / "scripts/build/newsletter_processed.json"
+        )
+        self.gmail_credentials_path = base_dir / "credentials.json"
+        self.gmail_token_path = base_dir / "token.json"
 
         # shared_data/deconstructor
         self.decon_manual_corrections = (
@@ -756,7 +778,6 @@ class ProjectPaths:
             self.epub_text_dir,
             self.go_deconstructor_output_dir,
             self.share_dir,
-            self.stash_dir,
             self.temp_dir,
             self.tpr_output_dir,
         ]:

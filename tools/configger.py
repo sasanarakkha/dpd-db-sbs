@@ -60,6 +60,7 @@ DEFAULT_CONFIG = {
         "make_abbrev": "no",
         "tarball_db": "no",
         "make_changelog": "no",
+        "make_newsletter": "no",
         "update_simsapa_db": "no",
         "make_audio_db": "yes",
         "upload_audio_db": "no",
@@ -151,9 +152,9 @@ def print_config_settings(sections_to_print=None) -> None:
         sections_to_print = config.sections()
     for section in sections_to_print:
         if config.has_section(section):
-            pr.info(f"[{section}]")
+            pr.green(f"[{section}]")
             for key, value in config.items(section):
-                pr.info(f"{key} = {value}")
+                pr.green(f"{key} = {value}")
 
 
 if __name__ == "__main__":

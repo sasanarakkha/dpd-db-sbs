@@ -33,6 +33,7 @@ A broken shadow always means the sync is incomplete or inaccurate — not that t
 **Goal**: Establish a baseline, validate the environment, and identify what changed upstream.
 
 1. **Environmental Validation**:
+   - Run `git fetch upstream` — always fetch before any analysis. No need to search for new commits manually; the scripts derive the range from `accepted_sync.json`.
    - Run `uv run python3 kamma/upstream_sync/scripts/validate_registry.py`
    - Run `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py`
    - Ensure `kamma/upstream_sync/accepted_sync.json` points at the last accepted upstream sync.
@@ -43,7 +44,8 @@ A broken shadow always means the sync is incomplete or inaccurate — not that t
 3. **Automated Pull**:
    - Perform the automated sync by running `uv run python3 kamma/upstream_sync/scripts/execute_sync.py <thread_dir>`.
    - Review and add any run-specific exclusions to `<thread_dir>/run_exclusions.txt` before execution if needed.
-   - (Commit 1 gate).
+   - (Commit 1 gate). Message format: `#sync: upstream pull <from>..<to>, <N> files, YYYY-MM-DD`
+   - **Staging rule:** NEVER use `git add -A -- <file list>` — gitignore'd paths will trigger errors. Always use `git add .` which respects `.gitignore` automatically. If you must stage selectively, pre-filter with `git add <file>` one path at a time or check first with `git check-ignore -v <path>`.
 
 ### Stage 2: Analysis (Strategic Planning)
 **Goal**: Determine how to integrate upstream changes into localized files.

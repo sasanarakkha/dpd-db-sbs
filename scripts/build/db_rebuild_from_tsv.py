@@ -8,7 +8,6 @@ import sys
 from pathlib import Path
 from typing import Iterator, List, Tuple
 
-from rich import print
 from sqlalchemy.orm.session import Session
 
 from db.db_helpers import create_db_if_not_exists, get_db_session
@@ -20,7 +19,7 @@ from tools.printer import printer as pr
 
 def main():
     pr.tic()
-    pr.title("rebuilding db from tsvs")
+    pr.yellow_title("rebuilding db from tsvs")
 
     if config_test("regenerate", "db_rebuild", "no"):
         config_update("regenerate", "db_rebuild", "yes")
@@ -28,7 +27,7 @@ def main():
     pth = ProjectPaths()
 
     if pth.dpd_db_path.exists():
-        print("[red]this will destroy your current database!")
+        pr.red("this will destroy your current database!")
         # response = input("are you sure you would like to rebuild the db? [y/n] ")
         # if response != "y":
         #     return
@@ -45,7 +44,7 @@ def main():
     make_pali_word_table_data(pth, db_session)
     make_pali_root_table_data(pth, db_session)
 
-    pr.green("committing to db")
+    pr.green_tmr("committing to db")
     db_session.commit()
     db_session.close()
     pr.yes("ok")
@@ -79,13 +78,11 @@ def get_tsv_files(original_path: Path, base_filename: str) -> List[Path]:
     split_files = sorted(backup_dir.glob(split_pattern))
 
     if split_files:
-        pr.green(f"Found {len(split_files)} split {base_filename} files")
         return split_files
 
     # Fall back to single file format
     single_file = backup_dir / f"{base_filename}.tsv"
     if single_file.exists():
-        pr.green(f"Found single {base_filename} file")
         return [single_file]
 
     return []
@@ -102,8 +99,6 @@ def read_tsv_files(file_paths: List[Path]) -> Iterator[Tuple[List[str], List[str
     columns = None
 
     for file_idx, file_path in enumerate(file_paths):
-        pr.green(f"Reading {file_path.name}")
-
         with open(file_path, "r", newline="") as tsv_file:
             csvreader = csv.reader(tsv_file, delimiter="\t", quotechar='"')
 
@@ -123,7 +118,7 @@ def read_tsv_files(file_paths: List[Path]) -> Iterator[Tuple[List[str], List[str
 def make_pali_word_table_data(pth: ProjectPaths, db_session: Session):
     """Read TSV and return DpdHeadword table data."""
 
-    pr.green("creating DpdHeadword table data")
+    pr.green_tmr("creating DpdHeadword table data")
     counter = 0
 
     headword_files = get_tsv_files(pth.pali_word_path, "dpd_headwords")
@@ -142,7 +137,7 @@ def make_pali_word_table_data(pth: ProjectPaths, db_session: Session):
 def make_pali_root_table_data(pth: ProjectPaths, db_session: Session):
     """Read TSV and return DpdRoot table data."""
 
-    pr.green("creating DpdRoot table data")
+    pr.green_tmr("creating DpdRoot table data")
     counter = 0
 
     root_files = get_tsv_files(pth.pali_root_path, "dpd_roots")

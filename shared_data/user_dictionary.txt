@@ -64,6 +64,7 @@ abyayībhāva
 acc
 accekacīvara
 accessorized
+Acchariyaabbhutasutta
 acchidaṃ
 accompaniments
 accordant
@@ -155,6 +156,7 @@ amra
 amūḷhapaññassa
 ana
 anacchādikata
+analysing
 Anamataggasaṃyuttaṃ
 ānana
 ānanaka
@@ -241,12 +243,14 @@ Ariyavaṃsasutta
 arjuna
 Arjuna
 armspans
+arriver
 Artha
 Arthavan
 articulately
 artificer
 Artocarpus
 Aruṇavā
+Aruṇavatī
 Arundo
 arūpins
 āruppa
@@ -262,11 +266,14 @@ Asaṅkhatasaṃyuttaṃ
 ascertains
 asceticism
 Asclepias syriaca
+ashoka
 Asiatica
 asiaticus
+Asibandhaka
 Asita
 asobhattha
 asobhittha
+asoca
 Asoka
 Asoka's
 assailable
@@ -382,6 +389,7 @@ bha
 Bhaddāli
 Bhaddasārī
 Bhaddekarattasutta
+Bhadraka
 Bhadraka's
 Bhagalpur
 Bhagga
@@ -408,6 +416,8 @@ bho
 Bhoja
 bhū
 Bhūmajaka
+Bhūmija
+Bhūmijasutta
 Bhurja
 bhūvādigaṇa
 biflorus
@@ -443,6 +453,7 @@ bowlfuls
 bowmanship
 Brahma
 Brahmā
+Brahmajālasutta
 Brahman
 Brāhmaṇasaṃyuttaṃ
 brahmanhood
@@ -485,6 +496,7 @@ Calotropis
 Cambodia
 Cambodian
 Campā
+Caṇḍa
 caṇḍāla
 Caṅkī
 Capparis
@@ -523,7 +535,10 @@ champaca
 champaka
 Champaka
 chank
+Channa
 chanter
+Chappāṇakopamasutta
+Chappāṇakopamasutta
 charantia
 charioteering
 charioteering
@@ -539,6 +554,7 @@ chunam
 cicciṭa
 ciliata
 Cinnyris
+Ciravāsī
 circumambulates
 circumambulation
 cit
@@ -569,6 +585,9 @@ cojoined
 Coḷa
 collation
 collyrium
+colour
+colourful
+colouring
 colourist's
 colours
 comm
@@ -643,6 +662,7 @@ Cucumis
 Cūḷanī
 Cūḷaniddesa
 Cūḷapuṇṇamasutta
+Cūḷasuññatasutta
 cūḷavagga
 Cunda
 curādigaṇa
@@ -663,8 +683,10 @@ dakkhati
 dal
 Dalbergia
 Daḷhanemi
+Dāmali
 dandha
 dantā
+Dantabhūmisutta
 dar
 Dārucīriya
 Dārupattika
@@ -718,6 +740,7 @@ deva
 Deva
 deva-king
 Devadaha
+Devadahasutta
 devadattiya
 Devala
 Devānampiyatissa
@@ -762,6 +785,7 @@ disapproves
 discipleship
 discolouration
 discoloured
+discolouring
 discomforted
 discourteousness
 discriminatively
@@ -815,6 +839,7 @@ doorjamb
 doorkeeper
 doorpost
 downcastness
+downslope
 doziness
 DPD
 DPR
@@ -827,6 +852,9 @@ dukkha
 dukkhudraya
 dus
 dustcloth
+Dutiyaejāsutta
+Dutiyajhānapañhāsutta
+Dutiyanatumhākasutta
 duvaṅgika
 dvanda
 dvedhikajātā
@@ -869,6 +897,7 @@ emetic
 emmeshed
 enclitic
 encourager
+endeavoured
 endlessness
 endurer
 Eṇi
@@ -888,6 +917,7 @@ Erythrina
 essenceless
 establisher
 esteeming
+etc
 etc.
 eternalism
 eternalism
@@ -928,6 +958,7 @@ familyless
 father's
 fathomable
 fault-finding
+favourable
 favourite
 favours
 feebleness
@@ -950,7 +981,9 @@ flambeau
 flatterer
 flaviviridis
 flavour
+flavourful
 flavourless
+flavours
 fleshless
 fleshlessness
 fletched
@@ -1024,10 +1057,13 @@ gh
 ghaṃsati
 ghaṭ
 Ghaṭikāra
+Ghaṭīkāra
+Ghosita
 Ghosita's
 Ghoṭamukha
 gi
 gigantea
+Gilānadassanasutta
 Ginginianus
 glabra
 Glabrā
@@ -1036,6 +1072,7 @@ Gmelina
 gnawings
 gnosis
 goatherd's
+Godatta
 Godavar
 Godavari
 Godāvarī
@@ -1082,10 +1119,12 @@ gutturo-palatal
 hā
 hagiography
 hairclip
+Hāliddikānisutta
 halters
 handsomeness
 Happy's
 har
+harbouring
 harmer
 harmlessness
 harmonizes
@@ -1131,6 +1170,7 @@ Holarrhena
 honour
 honoured
 honouring
+honours
 Hoplobatrachus
 Hordeum
 Horner
@@ -1171,6 +1211,7 @@ impercipient
 impersonality
 imperturbable
 impingement
+impingements
 importunate
 imprudently
 iṃsu
@@ -1261,6 +1302,7 @@ Jāliya
 Jambolana
 Jambu
 Janavasabha
+Jantu
 jarjarā
 Jātaka
 Jatakas
@@ -1308,6 +1350,7 @@ Kāliṅga
 Kaliṅgas
 Kāliṅgas
 Kāḷudāyi
+Kāmabhū
 Kamboja
 Kambojans
 kamma
@@ -1392,6 +1435,9 @@ khulu-khulu
 khulukhulu
 khurakāse
 kī
+kilometre
+kilometres
+kiṃsuka
 kinnara
 Kisa
 Kisakas
@@ -1401,6 +1447,7 @@ kiyādigaṇa
 knotless
 Knowledges
 ko
+Kokālika
 Kokanada
 Koḷivisa
 Koliyan
@@ -1442,17 +1489,20 @@ kuṭis
 Kuvera
 Kuvera
 Kuvera's
+kyphotic
 ḷ
 ḷ
 laager
 labh
 Lābhasakkārasaṃyuttaṃ
+labourers
 Lacucha
 Lagopodioides
 Lakkhaṇasaṃyuttaṃ
 lambaste
 lambastes
 Lanka
+Lankan
 lapis lazuli
 latfolia
 latifolia
@@ -1492,6 +1542,7 @@ loc
 locative
 lodhra
 logician
+Lohicca
 Lohicca's
 lomā
 long-tasseled
@@ -1501,6 +1552,7 @@ longifolia
 longum
 loots
 Luffa
+Lumbini
 ṁ
 ṃ
 ṃ-a
@@ -1530,9 +1582,12 @@ Mahācattārīsakasuttaṃ
 Mahāgiri
 Mahāgovinda
 Mahāgovinda's
+Mahaka
+Mahaka's
 mahākappina
 Mahākassapa
 Mahākoṭṭhika
+Mahāli
 Mahāmoggallāna
 Mahāmoggallāna's
 Mahānāma
@@ -1545,6 +1600,7 @@ Mahāsīhanādasutta
 Mahāsudassana
 Mahāsudassana's
 Mahāsudassanasutta
+Mahāsuññatasutta
 Mahāthera
 mahāvagga
 Mahāvaṃsa
@@ -1578,6 +1634,7 @@ Mallas
 malnourishment
 malodorousness
 Mālukya
+Mālukyaputta
 Māluṅkya
 maṃ
 Mamordica
@@ -1587,6 +1644,7 @@ Maṇḍikā
 maned
 Mangifera
 Mangifera
+Maṇicūḷaka
 manifoldness
 mano
 Manonivāraṇasutta
@@ -1640,6 +1698,7 @@ Mettiya
 Michelia
 micropterus
 middlemost
+Migajāla
 Migāra
 Migāra's
 Migāra's
@@ -1790,6 +1849,7 @@ Nāgasa
 nakhā
 Naḷa
 Nālaka
+Nāḷandā
 Naḷeru's
 nāḷi
 nāma
@@ -1800,6 +1860,7 @@ Nanda
 Nātaputta
 Nāṭaputta
 Nātika
+Natumhākasutta
 Nauclea
 Navakanipāta
 ṇaya
@@ -1848,6 +1909,7 @@ non-reactivity
 non-remorse
 nonexistence
 nonexistent
+noninvolvement
 nonoccurrence
 noria
 northeast
@@ -1871,6 +1933,8 @@ occultation
 Ocimum
 octad
 Octandra
+odour
+odours
 offence
 offences
 officinarum
@@ -1904,6 +1968,7 @@ outcaste
 outgrowths
 outlaid
 outshined
+outspeaking
 overestimation
 overgarment
 overindulging
@@ -1925,6 +1990,8 @@ padkos
 paduma-count
 padūsimhā
 Pajjota
+Pajjunna
+Pajjunna's
 Pakuddha
 Pakudha
 Pakudhaka
@@ -1937,14 +2004,17 @@ palmarosa
 palmyra
 paluddho
 pāṇamatipātayato
+Pañcakaṅga
 Pañcakanipāta
 Pañcala
 Pañcālas
 Pañcālī's
 Pañcālī's
 Pañcasālā
+Pañcasikha
 Pañcasikha's
 Pañcattayasutta
+Pañcaverasutta
 pandal
 Paṇḍitaudāyi
 paṇḍuka
@@ -1970,6 +2040,7 @@ Pārāyanavagga
 parentless
 pari
 Parivāra
+Parivārā
 parivāsa
 Pārivāsikakkhandhaka
 pārṣṇi
@@ -1987,6 +2058,8 @@ Pāṭalī
 Pāṭaliputta
 paṭapaṭa
 pāṭha
+Paṭhamaejāsutta
+Paṭhamajhānapañhāsutta
 Pāthika
 Pāthikaputta
 paṭibhastāni
@@ -2036,6 +2109,7 @@ Petavatthu
 petit
 Petrospermum
 ph
+Phagguna
 Phaseolus
 phenomenological
 phoenicea
@@ -2061,6 +2135,7 @@ Pistia
 pistil
 pistils
 Pisum
+piṭ
 Piṭaka
 Piṭakas
 pitbull
@@ -2069,6 +2144,7 @@ pl
 plantlife
 pleasantness
 pleonastic
+ploughman
 Podiceps
 poecilonym
 point-ness
@@ -2163,6 +2239,7 @@ Rāmagāma
 Rāmaputta
 ramosa
 rasa
+Rāsiya
 rat-a-tat
 ratana
 rathareṇu
@@ -2170,6 +2247,7 @@ Raṭṭhapāla
 rattinuṭṭhānadassinā
 readmission
 readmits
+realised
 realizable
 reasoner
 reassociated
@@ -2304,6 +2382,7 @@ samādhi
 Sāmagāma
 Sāmagāmasutta
 samaṇa
+Sāmaṇḍaka
 sāmaṇera
 Samantapāsādikā
 samāpatti
@@ -2312,6 +2391,8 @@ Sāmāvatī
 Sambac
 Sambari
 Sambhava
+Samiddhi
+Samiddhi's
 Sāṃkhya
 Saṃkicca
 Saṃkiti
@@ -2343,6 +2424,7 @@ Sappan
 Sappurisasuttaṃ
 sapwood
 Sarabhū
+Saraca
 Sāratthadīpanīṭīkā
 saravanaṃ
 Sāri
@@ -2369,6 +2451,7 @@ scatteredness
 schismatic
 Scholaris
 scourer
+SCPN
 scrapers
 scrupulousness
 scrutinizer
@@ -2381,6 +2464,7 @@ Sekhasuttaṃ
 Sekhiya
 Sekhuniya's
 Sela
+seldomly
 sellable
 semi-vowel
 Senagiri
@@ -2434,6 +2518,7 @@ Siri
 sirīsa
 sirissa
 Sīva
+Sīvaka
 siyanti
 sk
 sk 
@@ -2455,6 +2540,7 @@ soapberry
 Sobha
 sobhanaka
 socanan'ti
+sodic
 sogandhika-count
 soilless
 sojourning
@@ -2472,11 +2558,13 @@ sorrowlessness
 sotāpanna
 Sotāpattisaṃyuttaṃ
 sourness
+Sovīra
 spellicans
 spillikins
 spinosa
 spiritism
 spirituous
+splendour
 splooshing
 Spondias
 spontaneum
@@ -2605,6 +2693,8 @@ taddhita
 Tadorna
 tajjāri
 tajjārī
+Tāla
+Tālapuṭa
 tamable
 tanādigaṇa
 tapojigucchāvādā
@@ -2730,6 +2820,7 @@ Udaka
 Udāna
 Udaya's
 Udāyi
+Udāyī
 Uddaka
 udgātṛ
 Udumbarikā
@@ -2760,6 +2851,7 @@ unallotted
 unallowable
 unamenable
 unappointed
+unapprehensive
 unarisen
 unaroused
 unarranged
@@ -2787,6 +2879,7 @@ uncleaned
 uncleared
 uncloven
 uncompassionate
+uncompliant
 uncompounded
 unconcealed
 unconceived
@@ -2802,6 +2895,7 @@ uncrowded
 uncrushed
 undeceptive
 undefeatable
+undelighted
 undeluded
 undependability
 underbodice
@@ -2814,6 +2908,7 @@ undispersed
 undistorted
 undistressed
 undrinkable
+unelaborated
 unelided
 unenduring
 unenquired
@@ -2881,6 +2976,7 @@ unpresumed
 unproblematic
 unproduced
 unproficient
+unprofitableness
 unproliferated
 unprompted
 unquantifiable
@@ -2925,6 +3021,7 @@ unsurpassable
 unswept
 untaught
 unthinkingly
+untrainable
 untruthfully
 untwisted
 untwisting
@@ -2943,6 +3040,8 @@ Upāli
 Upamañña
 upasampadā
 upasantapadisso
+Upasena
+Upavāna
 upekkhā
 upholder
 uposatha
@@ -2952,6 +3051,7 @@ uppaṭṭetha
 upphālesi
 uproots
 upsetness
+upslope
 Uraria
 urger
 uruddā
@@ -2973,6 +3073,7 @@ Vacchagotta
 vacillation
 vad
 Vaḍḍhamātar
+Vaḍḍhīsutta
 vagga
 Vaggumudā
 vah
@@ -3030,8 +3131,10 @@ venerable’s
 venerables
 venerates
 venerating
+Vepacitti
 Vepulla
 Verahaccāni
+Verahaccānisutta
 Verañjā
 Veroca
 Vesali
@@ -3060,6 +3163,7 @@ vimānas
 Vimānavatthu
 Vinatā
 vinaya
+vinayadhara
 viññatti
 vinyapiṭaka
 Vipassī
@@ -3142,83 +3246,13 @@ you're
 youthfulness
 zizanioides
 Ziziphus
-Bhūmija
-analysing
-kyphotic
-Acchariyaabbhutasutta
-Cūḷasuññatasutta
-Mahāsuññatasutta
-Dantabhūmisutta
-Bhūmijasutta
-colour
-endeavoured
-downslope
-upslope
-honours
-colourful
-flavourful
-noninvolvement
-harbouring
-kilometre
-vinayadhara
-Lankan
-discolouring
-labourers
-kilometres
-odour
-odours
-favourable
-unapprehensive
-uncompliant
-Ghaṭīkāra
-ploughman
-Dāmali
-Jantu
-Pajjunna's
-Pajjunna
-Aruṇavatī
-untrainable
-SCPN
-Parivārā
-unelaborated
-undelighted
-impingements
-seldomly
-outspeaking
-realised
-Natumhākasutta
-Dutiyanatumhākasutta
-colouring
-splendour
-piṭ
-etc
-Udāyī
-Sovīra
-asoca
-ashoka
-Saraca
-Migajāla
-Samiddhi's
-Samiddhi
-Phagguna
-Channa
-Upavāna
-flavours
-Mālukyaputta
-Nāḷandā
-Ghosita
-Lohicca
-Hāliddikānisutta
-Verahaccānisutta
-Pañcasikha
-Paṭhamaejāsutta
-Dutiyaejāsutta
-Devadahasutta
-Kāmabhū
-kiṃsuka
-Vepacitti
-Chappāṇakopamasutta
-Chappāṇakopamasutta
-arriver
-Pañcakaṅga
-Sīvaka
+Pāṭaliya
+Sabhiya
+Kaccāna
+Khemāsutta
+Jāṇussoṇi
+Nandiya
+Uttiya
+Pāraṅgamasutta
+Vaṅgantaputta
+Kuṇḍaliya

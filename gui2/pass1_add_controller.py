@@ -47,7 +47,7 @@ class Pass1AddController(SandhiOK, SnackBarMixin):
         self.pass1_auto_controller = pass1_auto_controller
 
         self.pass1_books = sutta_central_books
-        self.pass1_books_list = [k for k in self.pass1_books]
+        self.pass1_books_list = ["text"] + [k for k in self.pass1_books]
         self.book_to_process: str | None = None
 
         self.auto_processed_dict: dict[str, dict[str, str]] = {}
@@ -129,7 +129,7 @@ class Pass1AddController(SandhiOK, SnackBarMixin):
         }
         comment = self.ui.dpd_fields.get_field("comment").value or ""
 
-        for field_name in ("meaning_1", "meaning_lit"):
+        for field_name in ("meaning_2", "meaning_lit"):
             value = field_data.get(field_name, "")
             if value:
                 misspelled = self.ui.dpd_fields.spellchecker.check_sentence(value)
@@ -145,6 +145,14 @@ class Pass1AddController(SandhiOK, SnackBarMixin):
 
         # Track if this is a new word or an update for logging purposes
         already_in_db = bool(new_word.id)
+
+        # Check for duplicate id or lemma_1 when adding a new word
+        if not already_in_db:
+            id_value = field_data.get("id", "")
+            word_id = int(id_value) if id_value else None
+            lemma_1_value = field_data.get("lemma_1", "")
+            if not self.ui.dpd_fields.validate_no_duplicates(word_id, lemma_1_value):
+                return
 
         # Check if this is an existing word loaded from history (has an ID)
         if already_in_db:

@@ -6,7 +6,9 @@ Updates the contributor environment:
 3. Download latest dpd.db if a newer version is available
 """
 
+import shutil
 import subprocess
+from datetime import datetime
 from pathlib import Path
 
 import requests
@@ -71,14 +73,28 @@ def check_db_update_available(
         return False, None
 
 
+def backup_database(project_root: Path) -> tuple[bool, str]:
+    """Create a timestamped backup of dpd.db before overwriting."""
+    db_path = project_root / "dpd.db"
+    if not db_path.exists():
+        return False, "no database to backup"
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+    backup_path = project_root / f"dpd.db.{timestamp}.backup"
+    try:
+        shutil.copy2(db_path, backup_path)
+        return True, str(backup_path)
+    except OSError as e:
+        return False, str(e)
+
+
 def update_environment(project_root: Path) -> str:
     """Run the full update process and return a summary."""
     summary_parts: list[str] = []
 
-    pr.title("DPD Contributor Update")
+    pr.yellow_title("DPD Contributor Update")
 
     # Step 1: Pull latest code
-    pr.green("pulling latest code")
+    pr.green_tmr("pulling latest code")
     pull_ok, pull_msg = pull_latest_code(project_root)
     if pull_ok:
         pr.yes("ok")
@@ -89,7 +105,7 @@ def update_environment(project_root: Path) -> str:
         summary_parts.append(f"Code pull failed: {pull_msg}")
 
     # Step 2: Sync dependencies
-    pr.green("syncing dependencies")
+    pr.green_tmr("syncing dependencies")
     if sync_dependencies(project_root):
         pr.yes("ok")
         summary_parts.append("Dependencies: up to date")
@@ -98,12 +114,26 @@ def update_environment(project_root: Path) -> str:
         summary_parts.append("Dependencies: sync failed")
 
     # Step 3: Check for database update and download if available
-    pr.green("checking for database update")
+    pr.green_tmr("checking for database update")
     current_version = config_read("version", "version", default_value="")
     db_available, db_url = check_db_update_available(current_version or "")
     if db_available and db_url:
         pr.yes("new")
-        pr.green("downloading new database")
+
+        # Backup before overwriting
+        pr.green_tmr("backing up current database")
+        backup_ok, backup_msg = backup_database(project_root)
+        if backup_ok:
+            pr.yes("ok")
+            summary_parts.append(f"Backup: {backup_msg}")
+        else:
+            pr.no("failed")
+            summary_parts.append(f"Backup failed: {backup_msg}")
+            summary_parts.append("Database: skipped (backup failed)")
+            pr.green_title("Update complete!")
+            return "\n".join(summary_parts)
+
+        pr.green_tmr("downloading new database")
         from scripts.onboarding.contributor_setup import download_database
 
         db_dest = project_root / "dpd.db"

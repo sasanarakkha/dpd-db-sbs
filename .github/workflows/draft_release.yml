@@ -1,7 +1,10 @@
 name: Draft Release
 
-on: 
+on:
  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build-linux:
@@ -54,7 +57,7 @@ jobs:
       run: uv sync --all-groups
 
     - name: Set up Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         go-version: '1.22.2'
 
@@ -260,7 +263,7 @@ jobs:
     # ----------------------------------------
 
     - name: Upload Apple Dictionary Source
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: apple-dictionary-source
         path: exporter/share/apple_dictionary/
@@ -272,6 +275,18 @@ jobs:
 
     - name: Make Release Notes
       run: uv run python tools/docs_changelog_and_release_notes.py
+
+    - name: Commit updated uposatha count
+      run: |
+        if git diff --quiet tools/uposatha_day.ini; then
+          echo "No changes to uposatha count"
+        else
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add tools/uposatha_day.ini
+          git commit -m "chore: update uposatha count"
+          git push
+        fi
 
     - name: Set Release Date
       id: set_release_date
@@ -293,7 +308,7 @@ jobs:
     # ----------------------------------------
 
     - name: Upload Linux Assets
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: linux-assets
         path: |
@@ -318,7 +333,7 @@ jobs:
 
     steps:
       - name: Download Apple Dictionary Source
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: apple-dictionary-source
           path: ./apple-dictionary-source/
@@ -373,7 +388,7 @@ jobs:
           zip -r dpd-apple.dictionary.zip Digital-Pali-Dictionary.dictionary
 
       - name: Upload Apple Dictionary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: macos-dictionary
           path: build/dpd-apple.dictionary.zip
@@ -386,16 +401,18 @@ jobs:
   create-release:
     needs: [build-linux, build-macos]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Download Linux Assets
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: linux-assets
           path: ./linux-assets/
 
       - name: Download Apple Dictionary
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: macos-dictionary
           path: ./macos-dictionary/

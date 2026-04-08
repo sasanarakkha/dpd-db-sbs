@@ -1,6 +1,6 @@
 {
-  "last_accepted_upstream_sha": "8a015f0da1689880acf7aad1dab2129dfb87417a",
-  "last_accepted_upstream_date": "2026-03-11T10:06:22+08:00",
+  "last_accepted_upstream_sha": "89dcdaf3",
+  "last_accepted_upstream_date": "2026-03-10T21:09:59+05:30",
   "last_accepted_upstream_ref": "upstream/main",
-  "notes": "Last accepted upstream sync before the manifest workflow migration."
+  "notes": "Corrected to upstream SHA (was erroneously set to a local fork commit). Baseline for April 2026 sync."
 }

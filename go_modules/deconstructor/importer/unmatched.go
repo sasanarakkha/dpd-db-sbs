@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 )
 
 type importComponents struct {
@@ -55,22 +56,28 @@ var ic = importComponents{
 }
 
 func MakeUnmatched() {
+	// Wave 1: all independent loaders run in parallel.
+	var wg1 sync.WaitGroup
+	for _, fn := range []func(){
+		makeCstWords, makeBjtWords, makeScWords, makeSyaWords,
+		makeOtherPaliTexts, makeDpdWords, makeSpellingMistakes,
+		makeVariants, makeAbbreviations, makeManualCorrections,
+		makeInflectionExceptions,
+	} {
+		wg1.Add(1)
+		go func(f func()) { defer wg1.Done(); f() }(fn)
+	}
+	wg1.Wait()
 
-	makeCstWords()
-	makeBjtWords()
-	makeScWords()
-	makeSyaWords()
-	makeOtherPaliTexts()
-	makeDpdWords()
-	makeSpellingMistakes()
-	makeVariants()
-	makeAbbreviations()
-	makeManualCorrections()
-
-	makeInflectionExceptions()
+	// Wave 2: requires inflectionExceptions to be ready.
 	makeAllInflections()
-	makeAllInflectionsNoFirst()
-	makeAllInflectionsNoLast()
+
+	// Wave 3: both derivations read allInflections independently.
+	var wg3 sync.WaitGroup
+	wg3.Add(2)
+	go func() { defer wg3.Done(); makeAllInflectionsNoFirst() }()
+	go func() { defer wg3.Done(); makeAllInflectionsNoLast() }()
+	wg3.Wait()
 
 	ic.allWords = tools.MapUnion(ic.cstWords, ic.scWords)
 	ic.allWords = tools.MapUnion(ic.allWords, ic.bjtWords)

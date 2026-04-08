@@ -10,13 +10,14 @@ Download the latest dictionary files from the [GitHub Releases page](https://git
 |------------|----------|
 | **All dictionaries (combined)** | [all-dictionaries-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/all-dictionaries-gd.zip) |
 | Ancient Buddhist Texts Glossary | [abt-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/abt-gd.zip) |
+| Apte Sanskrit-English Dictionary | [apte-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/apte-gd.zip) |
 | Buddhist Hybrid Sanskrit | [bhs-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/bhs-gd.zip) |
 | CST Bold Definitions | [bold-def-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/bold-def-gd.zip) |
 | Critical Pāli Dictionary | [cpd-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/cpd-gd.zip) |
 | Dictionary of Pāli Proper Names | [dppn-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/dppn-gd.zip) |
 | DPR Analysis | [dpr-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/dpr-gd.zip) |
 | Margaret Cone Dictionary | [cone-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/cone-gd.zip) |
-| Monier Williams | [mw-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/mw-gd.zip) |
+| Monier Williams (Cologne) | [mw-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/mw-gd.zip) |
 | Pali English Ultimate | [peu-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/peu-gd.zip) |
 | Simsapa Combined Dictionary | [simsapa-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/simsapa-gd.zip) |
 | Sinhala-English-Sinhala | [sin-eng-sin-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/sin-eng-sin-gd.zip) |
@@ -28,13 +29,14 @@ Download the latest dictionary files from the [GitHub Releases page](https://git
 |------------|----------|
 | **All dictionaries (combined)** | [all-dictionaries-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/all-dictionaries-mdict.zip) |
 | Ancient Buddhist Texts Glossary | [abt-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/abt-mdict.zip) |
+| Apte Sanskrit-English Dictionary | [apte-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/apte-mdict.zip) |
 | Buddhist Hybrid Sanskrit | [bhs-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/bhs-mdict.zip) |
 | CST Bold Definitions | [bold-def-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/bold-def-mdict.zip) |
 | Critical Pāli Dictionary | [cpd-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/cpd-mdict.zip) |
 | Dictionary of Pāli Proper Names | [dppn-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/dppn-mdict.zip) |
 | DPR Analysis | [dpr-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/dpr-mdict.zip) |
 | Margaret Cone Dictionary | [cone-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/cone-mdict.zip) |
-| Monier Williams | [mw-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/mw-mdict.zip) |
+| Monier Williams (Cologne) | [mw-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/mw-mdict.zip) |
 | Pali English Ultimate | [peu-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/peu-mdict.zip) |
 | Simsapa Combined Dictionary | [simsapa-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/simsapa-mdict.zip) |
 | Sinhala-English-Sinhala | [sin-eng-sin-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/sin-eng-sin-mdict.zip) |

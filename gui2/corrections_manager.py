@@ -28,18 +28,13 @@ class CorrectionsManager:
             data_dir = self.corrections_path.parent
             imported_any = False
             for contrib_file in sorted(data_dir.glob("corrections_*.json")):
-                if "corrections_added" in contrib_file.name or "corrections_processed" in contrib_file.name:
+                if "corrections_added" in contrib_file.name:
                     continue
                 try:
                     with open(contrib_file) as f:
                         contrib_data = json.load(f)
                     if contrib_data:
-                        if isinstance(contrib_data, list):
-                            for item in contrib_data:
-                                if isinstance(item, dict) and "id" in item:
-                                    merged[str(item["id"])] = item
-                        elif isinstance(contrib_data, dict):
-                            merged.update(contrib_data)
+                        merged.update(contrib_data)
                         contrib_file.write_text("{}")
                         imported_any = True
                 except (FileNotFoundError, json.JSONDecodeError):

@@ -36,6 +36,14 @@ initial_build_db_and_export_all:
 test:
     uv run pytest tests
 
+# Run database relationship tests
+db-test:
+    uv run python db_tests/db_tests_relationships.py
+
+# Run phonetic changes test
+test-phonetic:
+    uv run python -m db_tests.single.add_phonetic_changes
+
 # Run ruff linter and formatter (excludes archive/ and resources/)
 lint:
     uv run ruff check . --exclude archive --exclude resources
@@ -51,6 +59,9 @@ webapp:
 
 gui:
     uv run python gui2/main.py
+
+gui-reload:
+    uv run flet run gui2/main.py -d
 
 mkdocs:
     uv run mkdocs serve
@@ -138,9 +149,34 @@ audio:
 
 # ===== MAINTENANCE =====
 
+# Propagate CSS across the project
+css:
+    uv run python tools/css_manager.py
+
 # Backup the database to .tsv
 backup:
     uv run python db/backup_tsv/backup_dpd_headwords_and_roots.py
+
+# Enable newsletter scraping
+newsletter-on:
+    uv run python -c "from tools.configger import config_update; config_update('exporter', 'make_newsletter', 'yes')"
+
+# Disable newsletter scraping
+newsletter-off:
+    uv run python -c "from tools.configger import config_update; config_update('exporter', 'make_newsletter', 'no')"
+
+# Scrape newsletters from Gmail and build docs/newsletters.md
+newsletter:
+    uv run python scripts/build/newsletter_scraper.py
+
+# Reprocess all newsletters from scratch
+newsletter-fresh:
+    rm -f scripts/build/newsletter_processed.json
+    uv run python scripts/build/newsletter_scraper.py
+
+# Generate changelog and release notes
+changelog:
+    uv run python tools/docs_changelog_and_release_notes.py
 
 # Update project documentation
 docs-update:
@@ -186,21 +222,37 @@ server-reload:
 cone:
     uv run python scripts/extractor/extract_cone.py
 
-# ===== CPD DICTIONARY IMPORT =====
+# ===== CPD DICTIONARY =====
 
-# Extract CPD entries to TSV (includes comparison)
+# Export CPD dictionary to GoldenDict and MDict
 cpd:
-    uv run python scripts/extractor/extract_cpd.py
+    cd resources/other-dictionaries/ && uv run python dictionaries/cpd/cpd.py && cd ../..
+
+# Scrape CPD website into data/cpd.db
+cpd-scrape:
+    cd resources/other-dictionaries/scrapers/cpd/ && uv run python scraper.py && cd ../../../..
+
+# Clean and normalise cpd.db → cpd_clean.db, then diagnose
+cpd-clean:
+    cd resources/other-dictionaries/scrapers/cpd/ && uv run python clean.py && uv run python diagnose.py && cd ../../../..
+
+# Inject supplementary intro pages into cpd_clean.db
+cpd-extras:
+    cd resources/other-dictionaries/scrapers/cpd/ && uv run python extras.py && cd ../../../..
 
 # ===== CONFIGURATION =====
 
 # Turn off deconstructor premade mode
-nodecon:
+decon-off:
     uv run python -c "from tools.configger import config_update; config_update('deconstructor', 'use_premade', 'yes')"
 
 # Turn on deconstructor premade mode
-decon:
+decon-on:
     uv run python -c "from tools.configger import config_update; config_update('deconstructor', 'use_premade', 'no')"
+
+# Run the Go deconstructor
+decon:
+    go run ./go_modules/deconstructor
 
 # Set data limit to 100
 limit100:

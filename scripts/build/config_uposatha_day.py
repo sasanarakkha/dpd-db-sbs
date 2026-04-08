@@ -12,7 +12,12 @@ def uposatha_day_configger():
     """Updates config.ini to run all features if it's an uposatha day."""
 
     pr.tic()
-    pr.title("uposatha day config")
+    pr.yellow_title("uposatha day config")
+
+    if UposathaManger.day_after_uposatha():
+        config_update("exporter", "make_newsletter", "yes")
+    else:
+        config_update("exporter", "make_newsletter", "no")
 
     if UposathaManger.uposatha_today():
         pr.green_title("updating config.ini")
@@ -29,6 +34,7 @@ def uposatha_day_configger():
         config_update("exporter", "make_deconstructor", "yes")
         config_update("exporter", "make_ebook", "yes")
         config_update("exporter", "make_tpr", "yes")
+        config_update("exporter", "make_mobile", "yes")
         config_update("exporter", "make_tbw", "yes")
         config_update("exporter", "make_pdf", "yes")
         config_update("exporter", "make_txt", "yes")
@@ -41,13 +47,14 @@ def uposatha_day_configger():
         config_update("goldendict", "copy_unzip", "yes")
     else:
         pr.green_title("today is not an uposatha")
+
     pr.toc()
 
 
 def uposatha_day_reset():
     """Reset exporter config to baseline after an uposatha day build."""
     pr.tic()
-    pr.title("uposatha day reset")
+    pr.yellow_title("uposatha day reset")
 
     if not UposathaManger.uposatha_today():
         pr.green_title("today is not an uposatha")
@@ -61,6 +68,7 @@ def uposatha_day_reset():
     config_update("exporter", "make_variants", "no")
     config_update("exporter", "make_ebook", "no")
     config_update("exporter", "make_tpr", "yes")
+    config_update("exporter", "make_mobile", "no")
     config_update("exporter", "make_tbw", "no")
     config_update("exporter", "make_pdf", "no")
     config_update("exporter", "make_txt", "no")

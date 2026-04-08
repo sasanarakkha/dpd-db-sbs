@@ -147,7 +147,7 @@ class DpdFields(PopUpMixin):
             FieldConfig(
                 "meaning_2",
                 multiline=True,
-                on_blur=self._handle_generic_spell_check,
+                field_type="meaning",
             ),
             FieldConfig(
                 "root_key",
@@ -683,6 +683,28 @@ class DpdFields(PopUpMixin):
             field.error_text = None
         self.page.update()
 
+    def validate_no_duplicates(self, word_id: int | None, lemma_1: str) -> bool:
+        """Check if id or lemma_1 already exist in db.
+        Sets error_text on the relevant field and updates the message bar.
+        Returns True if valid (no duplicates), False if duplicates found.
+        """
+        if word_id:
+            if self.db.get_headword_by_id(word_id):
+                id_field = self.get_field("id")
+                id_field.error_text = f"id {word_id} already in db"
+                self.page.update()
+                self.ui.update_message(f"id {word_id} already in db")
+                return False
+
+        if lemma_1 and lemma_1 in self.db.all_lemma_1:
+            lemma_1_field = self.get_field("lemma_1")
+            lemma_1_field.error_text = f"{lemma_1} already in db"
+            self.page.update()
+            self.ui.update_message(f"{lemma_1} already in db")
+            return False
+
+        return True
+
     # --- AUTOMATION ---
 
     def id_submit(self, e: ft.ControlEvent) -> None:
@@ -845,6 +867,7 @@ class DpdFields(PopUpMixin):
             self.page.update()
 
     def compound_type_blur(self, e: ft.ControlEvent):
+        self.page.update()
         compound_construction: DpdCompoundConstructionField = self.get_field(
             "compound_construction"
         )

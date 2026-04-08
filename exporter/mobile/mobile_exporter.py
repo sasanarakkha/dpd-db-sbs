@@ -7,6 +7,8 @@ Keep DB_SCHEMA_VERSION in sync with AppDatabase.requiredDbSchemaVersion in
 lib/database/database.dart. Bump both when the Drift table definitions change.
 """
 
+import argparse
+import json
 import re
 import sqlite3
 import unicodedata
@@ -17,7 +19,6 @@ from tools.configger import config_test
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 from tools.zip_up import zip_up_file
-
 
 # Columns copied as-is from dpd_headwords.
 # Dropped: inflections*, freq_html, derivative, non_root_in_comps, created_at, updated_at
@@ -122,7 +123,7 @@ FAMILY_SET_COLUMNS: list[str] = ["set", "data", "count"]
 
 # Must match AppDatabase.requiredDbSchemaVersion in the Flutter app.
 # Bump when Drift table definitions change (added/removed columns).
-DB_SCHEMA_VERSION: int = 2
+DB_SCHEMA_VERSION: int = 5
 
 # Tables copied verbatim from source db (no html columns in these)
 PASSTHROUGH_TABLES: list[str] = [
@@ -137,7 +138,9 @@ def _strip_diacritics_mobile(text: str) -> str:
     normalized = unicodedata.normalize("NFD", text)
     stripped = "".join(ch for ch in normalized if unicodedata.category(ch) != "Mn")
     result = unicodedata.normalize("NFC", stripped).lower()
-    return re.sub(r"([kgcjtdpb])h", r"\1", result)
+    result = re.sub(r"([kgcjtdpb])h", r"\1", result)
+    result = re.sub(r"([bcdfghjklmnpqrstvwxyz])\1", r"\1", result)
+    return result
 
 
 class GlobalVars:
@@ -183,7 +186,7 @@ def _lemma_clean(lemma_1: str) -> str:
 
 
 def export_headwords(g: GlobalVars, dest: sqlite3.Connection) -> None:
-    pr.green("exporting dpd_headwords")
+    pr.green_tmr("exporting dpd_headwords")
 
     src_col_list = ", ".join(f'"{c}"' for c in HEADWORD_COLUMNS)
     rows = g.src.execute(f"SELECT {src_col_list} FROM dpd_headwords").fetchall()
@@ -215,7 +218,7 @@ def export_headwords(g: GlobalVars, dest: sqlite3.Connection) -> None:
 
 
 def export_roots(g: GlobalVars, dest: sqlite3.Connection) -> None:
-    pr.green("exporting dpd_roots")
+    pr.green_tmr("exporting dpd_roots")
 
     src_col_list = ", ".join(f'"{c}"' for c in ROOT_COLUMNS)
     rows = g.src.execute(f"SELECT {src_col_list} FROM dpd_roots").fetchall()
@@ -246,7 +249,7 @@ def export_roots(g: GlobalVars, dest: sqlite3.Connection) -> None:
 
 
 def export_lookup(g: GlobalVars, dest: sqlite3.Connection) -> None:
-    pr.green("exporting lookup")
+    pr.green_tmr("exporting lookup")
 
     rows = g.src.execute("SELECT * FROM lookup").fetchall()
     if not rows:
@@ -258,7 +261,10 @@ def export_lookup(g: GlobalVars, dest: sqlite3.Connection) -> None:
     col_list = ", ".join(f'"{c}"' for c in dest_cols)
     placeholders = ", ".join(["?"] * len(dest_cols))
 
-    dest.execute(f"CREATE TABLE lookup ({col_list})")
+    # Make lookup_key the primary key — creates an automatic index
+    # and matches the Flutter app's Drift schema definition
+    col_defs = ", ".join(f'"{c}"' for c in dest_cols)
+    dest.execute(f"CREATE TABLE lookup ({col_defs}, PRIMARY KEY (lookup_key))")
     batch = [
         tuple(r[c] for c in orig_cols) + (_strip_diacritics_mobile(r["lookup_key"]),)
         for r in rows
@@ -282,7 +288,7 @@ def copy_passthrough_tables(g: GlobalVars, dest: sqlite3.Connection) -> None:
     src.row_factory = sqlite3.Row
 
     for table in PASSTHROUGH_TABLES:
-        pr.green(f"copying {table}")
+        pr.green_tmr(f"copying {table}")
         schema_row = src.execute(
             f"SELECT sql FROM sqlite_master WHERE type='table' AND name='{table}'"
         ).fetchone()
@@ -324,14 +330,217 @@ def copy_family_tables(g: GlobalVars, dest: sqlite3.Connection) -> None:
         ("family_idiom", FAMILY_IDIOM_COLUMNS),
         ("family_set", FAMILY_SET_COLUMNS),
     ]:
-        pr.green(f"copying {table}")
+        pr.green_tmr(f"copying {table}")
         _copy_selected_columns(src, dest, table, columns)
 
     src.close()
 
 
+def _remove_links(html: str) -> str:
+    html = re.sub(r'<a href="([^"]+)">', r'<span class="blue">', html)
+    html = re.sub(r"</a>", r"</span>", html)
+    return html
+
+
+def _strip_cone_key(key: str) -> str:
+    return re.sub(r"^\d+", "", key)
+
+
+def _canonicalize_cpd_headword(headword: str) -> str:
+    return headword.replace("ṁ", "ṃ")
+
+
+_DESKTOP_CSS_PATTERNS: list[re.Pattern[str]] = [
+    re.compile(r"position\s*:\s*(fixed|absolute)\s*;?", re.IGNORECASE),
+    re.compile(r"cursor\s*:\s*[^;]+;?", re.IGNORECASE),
+    re.compile(r"@font-face\s*\{[^}]*\}", re.IGNORECASE | re.DOTALL),
+    re.compile(r"[^{}]*:hover\s*\{[^}]*\}", re.IGNORECASE),
+    re.compile(
+        r"(input|select|textarea|form)\s*[\.\#\[\{:][^}]*\{[^}]*\}",
+        re.IGNORECASE | re.DOTALL,
+    ),
+    re.compile(
+        r"(input|select|textarea|form)\s*\{[^}]*\}",
+        re.IGNORECASE | re.DOTALL,
+    ),
+    re.compile(r"color\s*:\s*black\s*;?", re.IGNORECASE),
+    re.compile(r"background-color\s*:\s*white\s*;?", re.IGNORECASE),
+]
+
+
+def _sanitize_css(css: str) -> str:
+    for pattern in _DESKTOP_CSS_PATTERNS:
+        css = pattern.sub("", css)
+    return css
+
+
+def export_other_dictionaries(
+    g: GlobalVars, dest: sqlite3.Connection, *, include_cone: bool = False
+) -> None:
+    pr.green_tmr("creating dict tables")
+
+    dest.execute("""
+        CREATE TABLE dict_meta (
+            dict_id TEXT PRIMARY KEY,
+            name TEXT,
+            author TEXT,
+            css TEXT,
+            entry_count INTEGER
+        )
+    """)
+
+    dest.execute("""
+        CREATE TABLE dict_entries (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            dict_id TEXT,
+            word TEXT,
+            word_fuzzy TEXT,
+            definition_html TEXT,
+            definition_plain TEXT
+        )
+    """)
+
+    dest.execute("CREATE INDEX idx_dict_entries_word ON dict_entries (dict_id, word)")
+    dest.execute(
+        "CREATE INDEX idx_dict_entries_fuzzy ON dict_entries (dict_id, word_fuzzy)"
+    )
+
+    pr.yes("ok")
+
+    # --- Cone dictionary ---
+    if include_cone:
+        pr.green_tmr("exporting Cone dictionary")
+
+        with open(g.pth.cone_source_path) as f:
+            cone_dict: dict[str, str] = json.load(f)
+
+        with open(g.pth.cone_css_path) as f:
+            cone_css = _sanitize_css(f.read())
+
+        batch = []
+        for key, html_body in cone_dict.items():
+            html_body = re.sub(
+                r"\s*<p>\s*&nbsp;\s*<br>\s*<br>\s*</p>\s*", "", html_body
+            )
+
+            if "href" in html_body:
+                html_body = _remove_links(html_body)
+
+            html_body = re.sub(
+                r"<!DOCTYPE[^>]*>.*?<body[^>]*>|</body>.*?</html>",
+                "",
+                html_body,
+                flags=re.DOTALL | re.IGNORECASE,
+            )
+
+            word = _strip_cone_key(key)
+            word_fuzzy = _strip_diacritics_mobile(word)
+
+            batch.append(("cone", word, word_fuzzy, html_body, ""))
+
+        dest.executemany(
+            "INSERT INTO dict_entries (dict_id, word, word_fuzzy, definition_html, definition_plain)"
+            " VALUES (?, ?, ?, ?, ?)",
+            batch,
+        )
+
+        dest.execute(
+            "INSERT INTO dict_meta (dict_id, name, author, css, entry_count)"
+            " VALUES (?, ?, ?, ?, ?)",
+            ("cone", "Cone Dictionary of Pāli", "Margaret Cone", cone_css, len(batch)),
+        )
+
+        pr.yes(len(batch))
+    else:
+        pr.green_tmr("skipping Cone dictionary")
+        pr.yes("off")
+
+    # --- CPD (Critical Pali Dictionary) ---
+    pr.green_tmr("exporting CPD")
+
+    if g.pth.cpd_source_path.exists():
+        cpd_css = ""
+        if g.pth.cpd_css_path.exists():
+            cpd_css = _sanitize_css(g.pth.cpd_css_path.read_text())
+
+        cpd_conn = sqlite3.connect(g.pth.cpd_source_path)
+        cpd_rows = cpd_conn.execute(
+            "SELECT headword, html FROM entries ORDER BY id"
+        ).fetchall()
+        cpd_conn.close()
+
+        batch = []
+        for headword, html_body in cpd_rows:
+            word = _canonicalize_cpd_headword(headword)
+            html_body = re.sub(r"<img[^>]*>", "", html_body)
+            word_fuzzy = _strip_diacritics_mobile(word)
+            batch.append(("cpd", word, word_fuzzy, html_body, ""))
+
+        dest.executemany(
+            "INSERT INTO dict_entries (dict_id, word, word_fuzzy, definition_html, definition_plain)"
+            " VALUES (?, ?, ?, ?, ?)",
+            batch,
+        )
+
+        dest.execute(
+            "INSERT INTO dict_meta (dict_id, name, author, css, entry_count)"
+            " VALUES (?, ?, ?, ?, ?)",
+            (
+                "cpd",
+                "Critical Pali Dictionary",
+                "V. Trenckner et al.",
+                cpd_css,
+                len(batch),
+            ),
+        )
+
+        pr.yes(len(batch))
+    else:
+        pr.red("CPD source not found, skipping")
+
+    # --- MW (Monier-Williams from Cologne source) ---
+    pr.green_tmr("exporting Monier Williams")
+
+    if g.pth.mw_source_json_path.exists():
+        with open(g.pth.mw_source_json_path) as f:
+            mw_data: list[dict[str, str]] = json.load(f)
+
+        mw_css = ""
+        if g.pth.mw_css_path.exists():
+            mw_css = _sanitize_css(g.pth.mw_css_path.read_text())
+
+        batch = []
+        for entry in mw_data:
+            word = entry["word"]
+            html_body = entry["definition_html"]
+            word_fuzzy = _strip_diacritics_mobile(word)
+            batch.append(("mw", word, word_fuzzy, html_body, ""))
+
+        dest.executemany(
+            "INSERT INTO dict_entries (dict_id, word, word_fuzzy, definition_html, definition_plain)"
+            " VALUES (?, ?, ?, ?, ?)",
+            batch,
+        )
+
+        dest.execute(
+            "INSERT INTO dict_meta (dict_id, name, author, css, entry_count)"
+            " VALUES (?, ?, ?, ?, ?)",
+            (
+                "mw",
+                "Monier-Williams Sanskrit-English Dictionary",
+                "Monier Monier-Williams",
+                mw_css,
+                len(batch),
+            ),
+        )
+
+        pr.yes(len(batch))
+    else:
+        pr.red("MW source not found, skipping")
+
+
 def write_schema_version(dest: sqlite3.Connection) -> None:
-    pr.green("writing db_schema_version")
+    pr.green_tmr("writing db_schema_version")
     dest.execute(
         "INSERT OR REPLACE INTO db_info (key, value) VALUES (?, ?)",
         ("db_schema_version", str(DB_SCHEMA_VERSION)),
@@ -341,7 +550,7 @@ def write_schema_version(dest: sqlite3.Connection) -> None:
 
 def zip_mobile_db(pth: ProjectPaths) -> None:
     zip_path = pth.dpd_mobile_db_zip_path
-    pr.green("zipping mobile db")
+    pr.green_tmr("zipping mobile db")
     zip_up_file(input_file=pth.dpd_mobile_db_path, output_file=zip_path)
     pr.yes("ok")
     zip_size = zip_path.stat().st_size / 1_000_000
@@ -349,8 +558,12 @@ def zip_mobile_db(pth: ProjectPaths) -> None:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--cone", action="store_true", help="include Cone dictionary")
+    args = parser.parse_args()
+
     pr.tic()
-    pr.title("export mobile db")
+    pr.yellow_title("export mobile db")
 
     if not config_test("exporter", "make_mobile", "yes"):
         pr.green_title("disabled in config.ini")
@@ -371,6 +584,7 @@ def main() -> None:
     export_lookup(g, dest)
     copy_passthrough_tables(g, dest)
     copy_family_tables(g, dest)
+    export_other_dictionaries(g, dest, include_cone=args.cone)
     write_schema_version(dest)
 
     dest.commit()

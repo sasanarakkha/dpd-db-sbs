@@ -1,0 +1,448 @@
+# Upstream Sync Preparation Report
+
+## Upstream Range
+- From: `89dcdaf3`
+- To: `9af5f7eeb5953bf0da660dc4107334e1a0179f8d`
+
+## Registry Validation Status
+OK: Registry is valid.
+
+## SMD Coverage Status
+OK: SMD coverage is complete and rubric-compliant.
+
+## Modified - Tracked Files
+- .gitignore
+- AGENTS.md
+- exporter/webapp/data_classes.py
+- exporter/webapp/static/home.js
+- gui2/main.py
+- gui2/pass2_add_view.py
+- tools/ai_manager.py
+
+## Modified - Shadow Sources
+- `db/backup_tsv/backup_dpd_headwords_and_roots.py` -> shadows: scripts/backup/backup_dps.py
+- `db/families/family_compound.py` -> shadows: db/families/family_compound_ru.py
+- `db/families/family_idiom.py` -> shadows: db/families/family_idiom_ru.py
+- `db/families/family_root.py` -> shadows: db/families/family_root_ru.py
+- `db/families/family_set.py` -> shadows: db/families/family_set_ru.py
+- `db/families/family_word.py` -> shadows: db/families/family_word_ru.py
+- `exporter/deconstructor/deconstructor_exporter.py` -> shadows: exporter/deconstructor/deconstructor_exporter_ru.py
+- `exporter/goldendict/data_classes.py` -> shadows: exporter/goldendict/data_classes_dps.py
+- `exporter/goldendict/templates/dpd_headword.jinja` -> shadows: exporter/goldendict/ru_components/templates/, exporter/goldendict/sbs_templates/
+- `exporter/grammar_dict/grammar_dict.py` -> shadows: exporter/grammar_dict/grammar_dict_ru.py
+- `exporter/kindle/epub/OEBPS/Text/titlepage.xhtml` -> shadows: exporter/kindle/ru_components/epub/
+- `exporter/kindle/kindle_exporter.py` -> shadows: exporter/kindle/kindle_exporter_ru.py
+- `exporter/tbw/tbw_exporter.py` -> shadows: exporter/tbw/tbw_exporter_ru.py
+- `exporter/tpr/tpr_exporter.py` -> shadows: exporter/tpr/tpr_exporter_ru.py
+- `exporter/webapp/data_classes.py` -> shadows: exporter/webapp/data_classes_ru.py
+- `exporter/webapp/templates/home.html` -> shadows: exporter/webapp/ru_templates/, exporter/webapp/sbs_templates/
+- `scripts/build/db_rebuild_from_tsv.py` -> shadows: scripts/build/db_rebuild_from_tsv_dps.py
+- `scripts/build/families_to_json.py` -> shadows: scripts/build/families_to_json_ru.py
+- `scripts/server/update-dpd.sh` -> shadows: scripts/server/update-dpd-sbs.sh
+- `tools/version.py` -> shadows: tools/version_ru.py
+
+## Modified - Inspired Sources
+- `.github/workflows/draft_release.yml` -> inspired: .github/workflows/ru_release.yml, .github/workflows/ru_release_test.yml
+- `docs/changelog.md` -> inspired: docs_rus/
+- `docs/install/dpd_app.md` -> inspired: docs_rus/
+- `docs/newsletters.md` -> inspired: docs_rus/
+- `docs/other_dicts.md` -> inspired: docs_rus/
+- `docs/pics/newsletters/0079f3c0c5b5.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/056e7b1938b9.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/06f8993dd123.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/07dafe5f7a6f.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/0d8715d85771.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/0e9f2c6ba1f5.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/10045bb0a30e.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/147f575b5fce.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/14b624d04bbc.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/14ed000c0067.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/17894ea16950.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/1cb9b8a091ca.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/1ee1757615e9.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/1f4f12b1d3d2.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/20d332623e63.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/2191ae0ffa10.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/23962e8e80ee.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/28cb91703449.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/2ac1f9fe14e0.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/2af5a10e8342.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/2f65d445f59a.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/387f4ebfb3cd.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/42c264849bb7.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/459dd7fa8430.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/4a3355f2f242.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/4fb9061379ff.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/525256690fd2.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/5560bf32b75b.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/558278bdfed1.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/607898326ebc.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/672270c52ab6.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/6eae3ac0899f.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/6ef8b73fb8dd.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/7102413a159b.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/72f07d4ae3cc.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/7404c4cda99a.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/77fa2b9c1b19.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/7c113de715e6.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/8045dba1d380.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/84e9b2f42965.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/85737d5fda74.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/932b4028b257.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/98cb12ebad42.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/99a2eed4080b.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/9ade75ec14aa.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/9d798713d065.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/9e6bb9bd16af.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/9e92e6c743b1.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/a041fa961944.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/a07b6ac94a8e.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/a1811aeebf9a.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/a20464dbf33c.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/a85c22e01495.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/ac5a735cc2b4.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/b0460d72a225.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/b2d4531190af.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/b85e4f089d01.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/ba4a59f3fe28.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/bbec7130eab4.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/bcb7daeb0f14.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/bfd412785d18.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/c208b91a7b80.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/c84adb14337e.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/c89a0de33297.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/cb695aea860f.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/cbb09efcdb6c.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/ccac454db789.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/ce77962dafd3.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/cf0463796001.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/d202da3c6e36.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/d4d7ae3cf597.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/d70dbb18d184.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/dd682f701e6b.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/e1ba1bd4a5bf.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/e3a5c5df0c41.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/e3df447e7d64.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/e703796b1ce7.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/f0f98b202bd0.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/f1b2008d25fa.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/f3c937ed95ed.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/f9214b8a1944.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/fedbe7a4d250.jpg` -> inspired: docs_rus/
+- `docs/technical/project_folder_structure.md` -> inspired: docs_rus/
+- `exporter/goldendict/export_epd.py` -> inspired: exporter/goldendict/export_epd_sbs.py
+- `exporter/goldendict/export_help.py` -> inspired: exporter/goldendict/export_help_ru.py, exporter/goldendict/export_help_sbs.py
+- `exporter/goldendict/export_roots.py` -> inspired: exporter/goldendict/export_roots_ru.py, exporter/goldendict/export_roots_sbs.py
+- `exporter/goldendict/export_variant_spelling.py` -> inspired: exporter/goldendict/export_variant_spelling_ru.py
+- `exporter/goldendict/main.py` -> inspired: exporter/goldendict/main_ru.py, exporter/goldendict/main_sbs.py
+- `mkdocs.yaml` -> inspired: mkdocs_ru.yaml
+- `scripts/bash/makedict.py` -> inspired: scripts/bash/make_dpd.sh, scripts/bash/make_ru_dpd.sh
+- `tools/paths.py` -> inspired: tools/paths_ru.py, tools/paths_dps.py
+
+## Untracked Changes
+- "go_modules/deconstructor/splitters/split_\304\201di.go"
+- "go_modules/deconstructor/splitters/split_p\304\253ti.go"
+- .claude/commands/dpd-newsletter.md
+- .github/workflows/pdf_test.yml
+- .gitmodules
+- archive/db/bold_definitions/extract_bold_definitions.py
+- audio/archive/generate_audio_11_labs.py
+- audio/archive/generate_audio_gtts.py
+- audio/bhashini/bhashini_class.py
+- audio/bhashini/generate_dpd.py
+- audio/db_create.py
+- audio/db_release_download.py
+- audio/db_release_upload.py
+- audio/error_check/delete_silent_files.py
+- audio/error_check/trim_audio.py
+- conductor/archive/apte_cologne_export_20260320/metadata.json
+- conductor/archive/apte_cologne_export_20260320/plan.md
+- conductor/archive/apte_cologne_export_20260320/spec.md
+- conductor/archive/compound_type_tab_20260325/metadata.json
+- conductor/archive/compound_type_tab_20260325/plan.md
+- conductor/archive/compound_type_tab_20260325/spec.md
+- conductor/archive/deconstructor_perf_20260330/metadata.json
+- conductor/archive/deconstructor_perf_20260330/plan.md
+- conductor/archive/deconstructor_perf_20260330/spec.md
+- conductor/archive/mw2_cologne_export_20260320/metadata.json
+- conductor/archive/mw2_cologne_export_20260320/plan.md
+- conductor/archive/mw2_cologne_export_20260320/spec.md
+- conductor/tracks.md
+- conductor/tracks/contributor_onboarding_20260331/metadata.json
+- conductor/tracks/contributor_onboarding_20260331/plan.md
+- conductor/tracks/contributor_onboarding_20260331/spec.md
+- db/backup_tsv/dpd_headwords_part_001.tsv
+- db/backup_tsv/dpd_headwords_part_002.tsv
+- db/backup_tsv/dpd_roots_part_001.tsv
+- db/backup_tsv/sutta_info.tsv
+- db/bold_definitions/extract_bold_definitions.py
+- db/bold_definitions/functions.py
+- db/bold_definitions/search_bold_definitions.py
+- db/bold_definitions/update_bold_definitions_db.py
+- db/epd/epd_to_lookup.py
+- db/families/root_matrix.py
+- db/grammar/grammar_to_lookup.py
+- db/inflections/create_inflection_templates.py
+- db/inflections/generate_inflection_tables.py
+- db/inflections/inflections_to_headwords.py
+- db/inflections/transliterate_inflections.py
+- db/lookup/see.py
+- db/lookup/spelling_mistakes.py
+- db/lookup/transliterate_lookup_table.py
+- db/sanskrit/root_families_sanskrit.tsv
+- db/suttas/dv_catalogue_suttas.py
+- db/suttas/suttas_to_lookup.py
+- db/suttas/suttas_update.py
+- db/variants/add_to_db.py
+- db/variants/main.py
+- db_tests/db_tests_columns.tsv
+- db_tests/db_tests_relationships.py
+- db_tests/single/add_phonetic_changes.py
+- db_tests/single/add_phonetic_changes_vowels.py
+- db_tests/single/add_synonym_variant.py
+- db_tests/single/test_allowable_characters.py
+- db_tests/single/test_bold_example_inflections.py
+- db_tests/single/test_digu.json
+- db_tests/single/test_digu.py
+- db_tests/single/test_gram_in_last_position.py
+- db_tests/single/test_maha_compounds.py
+- db_tests/single/test_maha_exceptions.json
+- db_tests/single/test_neg_compound_exceptions.json
+- db_tests/single/test_sukha_dukkha_finder.py
+- db_tests_gui/add_antonyms_sync_dict.json
+- docs/install/dpd_app.md
+- docs/newsletters.md
+- docs/pics/newsletters/0079f3c0c5b5.jpg
+- docs/pics/newsletters/056e7b1938b9.jpg
+- docs/pics/newsletters/06f8993dd123.jpg
+- docs/pics/newsletters/07dafe5f7a6f.jpg
+- docs/pics/newsletters/0d8715d85771.jpg
+- docs/pics/newsletters/0e9f2c6ba1f5.jpg
+- docs/pics/newsletters/10045bb0a30e.jpg
+- docs/pics/newsletters/147f575b5fce.jpg
+- docs/pics/newsletters/14b624d04bbc.jpg
+- docs/pics/newsletters/14ed000c0067.jpg
+- docs/pics/newsletters/17894ea16950.jpg
+- docs/pics/newsletters/1cb9b8a091ca.jpg
+- docs/pics/newsletters/1ee1757615e9.jpg
+- docs/pics/newsletters/1f4f12b1d3d2.jpg
+- docs/pics/newsletters/20d332623e63.jpg
+- docs/pics/newsletters/2191ae0ffa10.jpg
+- docs/pics/newsletters/23962e8e80ee.jpg
+- docs/pics/newsletters/28cb91703449.jpg
+- docs/pics/newsletters/2ac1f9fe14e0.jpg
+- docs/pics/newsletters/2af5a10e8342.jpg
+- docs/pics/newsletters/2f65d445f59a.jpg
+- docs/pics/newsletters/387f4ebfb3cd.jpg
+- docs/pics/newsletters/42c264849bb7.jpg
+- docs/pics/newsletters/459dd7fa8430.jpg
+- docs/pics/newsletters/4a3355f2f242.jpg
+- docs/pics/newsletters/4fb9061379ff.jpg
+- docs/pics/newsletters/525256690fd2.jpg
+- docs/pics/newsletters/5560bf32b75b.jpg
+- docs/pics/newsletters/558278bdfed1.jpg
+- docs/pics/newsletters/607898326ebc.jpg
+- docs/pics/newsletters/672270c52ab6.jpg
+- docs/pics/newsletters/6eae3ac0899f.jpg
+- docs/pics/newsletters/6ef8b73fb8dd.jpg
+- docs/pics/newsletters/7102413a159b.jpg
+- docs/pics/newsletters/72f07d4ae3cc.jpg
+- docs/pics/newsletters/7404c4cda99a.jpg
+- docs/pics/newsletters/77fa2b9c1b19.jpg
+- docs/pics/newsletters/7c113de715e6.jpg
+- docs/pics/newsletters/8045dba1d380.jpg
+- docs/pics/newsletters/84e9b2f42965.jpg
+- docs/pics/newsletters/85737d5fda74.jpg
+- docs/pics/newsletters/932b4028b257.jpg
+- docs/pics/newsletters/98cb12ebad42.jpg
+- docs/pics/newsletters/99a2eed4080b.jpg
+- docs/pics/newsletters/9ade75ec14aa.jpg
+- docs/pics/newsletters/9d798713d065.jpg
+- docs/pics/newsletters/9e6bb9bd16af.jpg
+- docs/pics/newsletters/9e92e6c743b1.jpg
+- docs/pics/newsletters/a041fa961944.jpg
+- docs/pics/newsletters/a07b6ac94a8e.jpg
+- docs/pics/newsletters/a1811aeebf9a.jpg
+- docs/pics/newsletters/a20464dbf33c.jpg
+- docs/pics/newsletters/a85c22e01495.jpg
+- docs/pics/newsletters/ac5a735cc2b4.jpg
+- docs/pics/newsletters/b0460d72a225.jpg
+- docs/pics/newsletters/b2d4531190af.jpg
+- docs/pics/newsletters/b85e4f089d01.jpg
+- docs/pics/newsletters/ba4a59f3fe28.jpg
+- docs/pics/newsletters/bbec7130eab4.jpg
+- docs/pics/newsletters/bcb7daeb0f14.jpg
+- docs/pics/newsletters/bfd412785d18.jpg
+- docs/pics/newsletters/c208b91a7b80.jpg
+- docs/pics/newsletters/c84adb14337e.jpg
+- docs/pics/newsletters/c89a0de33297.jpg
+- docs/pics/newsletters/cb695aea860f.jpg
+- docs/pics/newsletters/cbb09efcdb6c.jpg
+- docs/pics/newsletters/ccac454db789.jpg
+- docs/pics/newsletters/ce77962dafd3.jpg
+- docs/pics/newsletters/cf0463796001.jpg
+- docs/pics/newsletters/d202da3c6e36.jpg
+- docs/pics/newsletters/d4d7ae3cf597.jpg
+- docs/pics/newsletters/d70dbb18d184.jpg
+- docs/pics/newsletters/dd682f701e6b.jpg
+- docs/pics/newsletters/e1ba1bd4a5bf.jpg
+- docs/pics/newsletters/e3a5c5df0c41.jpg
+- docs/pics/newsletters/e3df447e7d64.jpg
+- docs/pics/newsletters/e703796b1ce7.jpg
+- docs/pics/newsletters/f0f98b202bd0.jpg
+- docs/pics/newsletters/f1b2008d25fa.jpg
+- docs/pics/newsletters/f3c937ed95ed.jpg
+- docs/pics/newsletters/f9214b8a1944.jpg
+- docs/pics/newsletters/fedbe7a4d250.jpg
+- exporter/txt/export_txt.py
+- exporter/variants/variants_exporter.py
+- exporter/webapp/generate_search_index.py
+- exporter/webapp/static/dpd.css
+- exporter/webapp/static/home.css
+- go_modules/deconstructor/README.md
+- go_modules/deconstructor/data/globaldata.go
+- go_modules/deconstructor/data/limits.go
+- go_modules/deconstructor/data/matchdata.go
+- go_modules/deconstructor/data/sandhi_rules.go
+- go_modules/deconstructor/data/sandhi_rules_test.go
+- go_modules/deconstructor/data/stats.go
+- go_modules/deconstructor/importer/importer.go
+- go_modules/deconstructor/importer/unmatched.go
+- go_modules/deconstructor/main.go
+- go_modules/deconstructor/splitters/split_2words.go
+- go_modules/deconstructor/splitters/split_3words.go
+- go_modules/deconstructor/splitters/split_apicaevaiti.go
+- go_modules/deconstructor/splitters/split_lwfb.go
+- go_modules/deconstructor/splitters/split_lwff.go
+- go_modules/deconstructor/splitters/split_recursive.go
+- go_modules/deconstructor/workerpool/workerpool.go
+- go_modules/deconstructor/workerpool/workerpool_test.go
+- go_modules/dpdDb/model.go
+- gui2/ai_search.py
+- gui2/compound_type_tab_view.py
+- gui2/dpd_fields.py
+- gui2/dpd_fields_examples.py
+- gui2/dpd_fields_lists.py
+- gui2/dpd_fields_meaning.py
+- gui2/filter_component.py
+- gui2/filter_tab_view.py
+- gui2/pass1_add_controller.py
+- gui2/pass1_auto_controller.py
+- gui2/pass1_auto_view.py
+- gui2/pass2_auto_control.py
+- gui2/pass2_auto_view.py
+- gui2/user.py
+- identity/css/dpd-css-and-fonts.css
+- identity/css/dpd.css
+- identity/logo/dpd-logo-dark.png
+- justfile
+- kamma/project.md
+- kamma/setup_state.json
+- kamma/tech.md
+- kamma/workflow.md
+- misc/ai agents.md
+- misc/dpd methodology
+- pyproject.toml
+- resources/bw2
+- resources/deconstructor_output
+- resources/dpd-updater-go
+- resources/dpd_submodules
+- resources/fdg_dpd
+- resources/other-dictionaries
+- resources/sc-data
+- resources/tipitaka_translation_db
+- resources/tpr_downloads
+- scripts/add/add_additions_to_db.py
+- scripts/add/add_words_ebts.py
+- scripts/add/add_words_random.py
+- scripts/build/anki_updater.py
+- scripts/build/api_ca_eva_iti_iva_hi.py
+- scripts/build/config_github_release.py
+- scripts/build/config_uposatha_day.py
+- scripts/build/cst4_xml_to_txt.py
+- scripts/build/deconstructor_extract_archive.py
+- scripts/build/deconstructor_output_add_to_db.py
+- scripts/build/ebt_counter.py
+- scripts/build/newsletter_processed.json
+- scripts/build/newsletter_scraper.py
+- scripts/build/root_has_verb_updater.py
+- scripts/build/sanskrit_root_families_updater.py
+- scripts/build/tarball_db.py
+- scripts/build/tarball_deconstructor_output.py
+- scripts/build/transliterate_bjt.py
+- scripts/build/zip_goldendict_mdict.py
+- scripts/build/zip_wxt_extension.py
+- scripts/export/sanskrit_export.py
+- scripts/extractor/_ai_extraction.py
+- scripts/extractor/_load_cone.py
+- scripts/extractor/_load_cpd.py
+- scripts/extractor/_signal_handler.py
+- scripts/extractor/_word_list.py
+- scripts/extractor/extract_cone.py
+- scripts/extractor/extract_cpd.py
+- scripts/find/comm_not_in_decon_finder.py
+- scripts/find/compound_type_wrong.py
+- scripts/find/decon_errors_finder.py
+- scripts/find/deconstruction_finder.py
+- scripts/find/id_lemma_dupe_finder.py
+- scripts/find/lemma_1_dupes.py
+- scripts/find/low_hanging_fruit_finder.py
+- scripts/find/most_common_missing_word_finder.py
+- scripts/find/origin_finder.py
+- scripts/find/sinhala_sanna.py
+- scripts/find/subheadings_finder.py
+- scripts/fix/example_1_2_cleaner.py
+- scripts/fix/family_root_rename.py
+- scripts/fix/family_word_remover.py
+- scripts/fix/fix_synonym_entries.json
+- scripts/fix/fix_synonym_entries.py
+- scripts/fix/meaning_lit_fixer.py
+- scripts/onboarding/contributor_setup.py
+- scripts/onboarding/contributor_update.py
+- scripts/onboarding/launch_gui.py
+- scripts/suttas/bjt/an.py
+- scripts/suttas/bjt/dn.py
+- scripts/suttas/bjt/kn14_jat.py
+- scripts/suttas/bjt/kn1_khp.py
+- scripts/suttas/bjt/kn2_dhp.py
+- scripts/suttas/bjt/kn3_ud.py
+- scripts/suttas/bjt/kn4_iti.py
+- scripts/suttas/bjt/kn5_snp.py
+- scripts/suttas/bjt/kn6_vv.py
+- scripts/suttas/bjt/kn7_pv.py
+- scripts/suttas/bjt/kn8_thag.py
+- scripts/suttas/bjt/kn9_thig.py
+- scripts/suttas/bjt/mn.py
+- scripts/suttas/bjt/sn.py
+- shared_data/deconstructor/checked.csv
+- shared_data/deconstructor/manual_corrections.tsv
+- shared_data/deconstructor/spelling_mistakes.tsv
+- shared_data/deconstructor/variant_readings.tsv
+- shared_data/user_dictionary.txt
+- tools/ai_deepseek_manager.py
+- tools/ai_gemini_manager.py
+- tools/ai_open_router.py
+- tools/all_words_in_dpd.py
+- tools/compound_type_manager.py
+- tools/compound_type_manager.tsv
+- tools/configger.py
+- tools/cst_sc_text_sets.py
+- tools/docs_changelog_and_release_notes.py
+- tools/docs_update_abbreviations.py
+- tools/docs_update_bibliography.py
+- tools/docs_update_thanks.py
+- tools/goldendict_exporter.py
+- tools/kobo_exporter.py
+- tools/mdict_exporter.py
+- tools/phonetic_change_manager.py
+- tools/phonetic_changes.tsv
+- tools/printer.py
+- tools/proofreader.py
+- tools/proofreader.tsv
+- tools/speech_marks.json
+- tools/tarballer.py
+- tools/tipitaka_db.py
+- tools/uposatha_day.ini
+- tools/uposatha_day.py
+- tools/zip_up.py
+- uv.lock

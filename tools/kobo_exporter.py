@@ -26,7 +26,7 @@ class DictVariablesKobo:
 
 
 def write_kobo_file(glos, dict_var: DictVariablesKobo):
-    pr.white("writing kobo file")
+    pr.white_tmr("writing kobo file")
     glos.write(
         filename=str(dict_var.kobo_folder),
         format="Kobo",
@@ -35,7 +35,7 @@ def write_kobo_file(glos, dict_var: DictVariablesKobo):
 
 
 def archive_folder(dict_var: DictVariablesKobo) -> None:
-    pr.white("archiving folder")
+    pr.white_tmr("archiving folder")
     shutil.make_archive(
         str(dict_var.kobo_zip), "zip", dict_var.kobo_folder, base_dir=None
     )
@@ -51,6 +51,9 @@ def export_to_kobo_with_pyglossary(
 
     pr.green_title("exporting to kobo with pyglossary")
     glos = create_glossary(dict_info)
-    glos = add_data(glos, dict_data)
-    write_kobo_file(glos, dict_var)
-    archive_folder(dict_var)
+    try:
+        glos = add_data(glos, dict_data)
+        write_kobo_file(glos, dict_var)
+        archive_folder(dict_var)
+    finally:
+        glos.cleanup()
