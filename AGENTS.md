@@ -75,6 +75,7 @@ Renames/moves are atomic. You MUST:
 3. Run a final verification search to empirically prove zero stale references remain.
 
 ## Project Principles
+- **Docs Sanctity:** `docs/` is upstream-only. Put local docs in `docs_rus/` or `kamma/`.
 - **Strict Parity:** For shadow copies, maintain strict logic parity with upstream. DO NOT introduce new solutions. Emulate upstream implementation exactly, only layering localized UI/data on top.
 - **Templates:** Use standard Jinja2 (`{{ var }}`, `{% if %}`). Legacy Mako syntax (`${var}`, `% if`) is STRICTLY prohibited in localized templates.
 - **Changes:** Must document tech stack changes in `kamma/tech.md` before implementation. Code changes must pass `uv run ruff check --fix` and `uv run ruff format`.

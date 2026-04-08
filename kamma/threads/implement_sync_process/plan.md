@@ -17,9 +17,9 @@
 
 - [x] Read these current consumers and references end-to-end:
   - `kamma/upstream_sync/registry.json`
-  - `kamma/upstream_sync/validate_registry.py`
-  - `kamma/upstream_sync/verify_smd_coverage.py`
-  - `kamma/upstream_sync/registry_helper.py`
+  - `kamma/upstream_sync/scripts/validate_registry.py`
+  - `kamma/upstream_sync/scripts/verify_smd_coverage.py`
+  - `kamma/upstream_sync/scripts/registry_helper.py`
   - `tests/test_shadow_parity.py`
   - `tests/test_shadow_cleanup.py`
   - `tests/check_shadow_modifications.py`
@@ -27,9 +27,9 @@
   - `kamma/upstream_sync/README.md`
   - `kamma/upstream_sync/templates/sync_thread_plan.md`
   - `kamma/upstream_sync/templates/sync_thread_spec.md`
-  - `docs/technical/upstream_sync_infrastructure.md`
-- [x] Run `uv run python3 kamma/upstream_sync/validate_registry.py` and record the baseline result.
-- [x] Run `uv run python3 kamma/upstream_sync/verify_smd_coverage.py` and record the baseline result.
+  - `kamma/upstream_sync/infrastructure.md`
+- [x] Run `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` and record the baseline result.
+- [x] Run `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` and record the baseline result.
 - [x] Audit current registry overlaps before editing the schema:
   - exact-path overlap
   - directory containment overlap
@@ -163,9 +163,9 @@ Keep helpers simple and reusable by validator, SMD coverage, and prep analyzer.
 ### 1.5 — Verify Phase 1
 
 - [x] `uv run pytest tests/test_validate_registry.py -v`
-- [x] `uv run python3 kamma/upstream_sync/validate_registry.py`
-- [x] `uv run ruff check --fix kamma/upstream_sync/validate_registry.py tests/test_validate_registry.py kamma/upstream_sync/registry_helper.py`
-- [x] `uv run ruff format kamma/upstream_sync/validate_registry.py tests/test_validate_registry.py kamma/upstream_sync/registry_helper.py`
+- [x] `uv run python3 kamma/upstream_sync/scripts/validate_registry.py`
+- [x] `uv run ruff check --fix kamma/upstream_sync/scripts/validate_registry.py tests/test_validate_registry.py kamma/upstream_sync/scripts/registry_helper.py`
+- [x] `uv run ruff format kamma/upstream_sync/scripts/validate_registry.py tests/test_validate_registry.py kamma/upstream_sync/scripts/registry_helper.py`
 
 **Phase 1 complete when:** Registry schema is migrated, overlap-safe, and validator
 tests pass.
@@ -238,12 +238,12 @@ Test cases to cover:
 ### 2.5 — Verify Phase 2
 
 - [x] `uv run pytest tests/test_verify_smd_coverage.py -v`
-- [x] `uv run python3 kamma/upstream_sync/verify_smd_coverage.py`
+- [x] `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py`
 - [x] Manually verify that active references to `smd.md` have been updated before deletion
 - [x] Delete `kamma/upstream_sync/smd.md` only after coverage and reference checks pass
-- [x] Re-run `uv run python3 kamma/upstream_sync/verify_smd_coverage.py`
-- [x] `uv run ruff check --fix kamma/upstream_sync/verify_smd_coverage.py kamma/upstream_sync/gen_smd_scaffold.py tests/test_verify_smd_coverage.py`
-- [x] `uv run ruff format kamma/upstream_sync/verify_smd_coverage.py kamma/upstream_sync/gen_smd_scaffold.py tests/test_verify_smd_coverage.py`
+- [x] Re-run `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py`
+- [x] `uv run ruff check --fix kamma/upstream_sync/scripts/verify_smd_coverage.py kamma/upstream_sync/scripts/gen_smd_scaffold.py tests/test_verify_smd_coverage.py`
+- [x] `uv run ruff format kamma/upstream_sync/scripts/verify_smd_coverage.py kamma/upstream_sync/scripts/gen_smd_scaffold.py tests/test_verify_smd_coverage.py`
 
 **Phase 2 complete when:** SMD domain files replace `smd.md`, coverage tooling is
 tested, and no active reference still points at the old file.
@@ -340,7 +340,7 @@ Test cases to cover:
 - modified upstream source for strict shadows
 - modified upstream source for inspired entries
 
-### 3.7 — Implement `kamma/upstream_sync/prep_analyzer.py` (GREEN)
+### 3.7 — Implement `kamma/upstream_sync/scripts/prep_analyzer.py` (GREEN)
 
 - [x] ```python
 """Generate a factual upstream diff report mapped to registry categories."""
@@ -370,8 +370,8 @@ Implementation requirements:
 - [x] `uv run python3 tests/check_shadow_modifications.py`
 - [x] `uv run pytest tests/test_shadow_cleanup.py --tb=short -q`
 - [x] `uv run pytest tests/test_namespace_isolation.py tests/test_template_syntax.py tests/test_prep_analyzer.py -v`
-- [x] `uv run ruff check --fix tests/test_shadow_parity.py tests/check_shadow_modifications.py tests/test_shadow_cleanup.py tests/test_namespace_isolation.py tests/test_template_syntax.py tests/test_prep_analyzer.py kamma/upstream_sync/prep_analyzer.py`
-- [x] `uv run ruff format tests/test_shadow_parity.py tests/check_shadow_modifications.py tests/test_shadow_cleanup.py tests/test_namespace_isolation.py tests/test_template_syntax.py tests/test_prep_analyzer.py kamma/upstream_sync/prep_analyzer.py`
+- [x] `uv run ruff check --fix tests/test_shadow_parity.py tests/check_shadow_modifications.py tests/test_shadow_cleanup.py tests/test_namespace_isolation.py tests/test_template_syntax.py tests/test_prep_analyzer.py kamma/upstream_sync/scripts/prep_analyzer.py`
+- [x] `uv run ruff format tests/test_shadow_parity.py tests/check_shadow_modifications.py tests/test_shadow_cleanup.py tests/test_namespace_isolation.py tests/test_template_syntax.py tests/test_prep_analyzer.py kamma/upstream_sync/scripts/prep_analyzer.py`
 
 **Phase 3 complete when:** Parity enforcement is narrowed to strict shadows, new
 isolation and syntax scanners pass, and the prep analyzer emits classification reports.
@@ -424,47 +424,47 @@ reverted. Replace with the three-tier convention:
 
 ### 4.1 — Rewrite `kamma/upstream_sync/guide.md`
 
-Replace the old workflow description with the locked 3-stage process:
+- [x] Replace the old workflow description with the locked 3-stage process:
 - Prep
 - Manual Sync boundary action
 - Analysis
 - Execution + Verification
 
-Also update:
+- [x] Also update:
 - category semantics
 - discuss-flag protocol
 - references from `smd.md` to `smd/` or `smd/index.md`
 - legacy `ignored_files` / `folders_to_check` references
 
-Move historical workflow content to `kamma/upstream_sync/archive_improvements.md`
+- [x] Move historical workflow content to `kamma/upstream_sync/archive_improvements.md`
 under a clearly historical heading.
 
 ### 4.2 — Create `kamma/upstream_sync/stages/`
 
-Create:
+- [x] Create:
 - `kamma/upstream_sync/stages/prep.md`
 - `kamma/upstream_sync/stages/analysis.md`
 - `kamma/upstream_sync/stages/execution.md`
 
-Each file should state:
+- [x] Each file should state:
 - stage input/output contract
 - required report sections
 - a blank template/checklist
 
 ### 4.3 — Update thread templates
 
-Update both:
+- [x] Update both:
 - `kamma/upstream_sync/templates/sync_thread_plan.md`
 - `kamma/upstream_sync/templates/sync_thread_spec.md`
 
-Required changes:
+- [x] Required changes:
 - switch from `smd.md` to `smd/index.md` or `smd/`
 - remove legacy 7-phase assumptions
 - align with the 3-stage process and category model
 
 ### 4.4 — Update `kamma/upstream_sync/README.md`
 
-README must become the quick-start entry point and include:
+- [x] README must become the quick-start entry point and include:
 - 3-stage workflow overview
 - quick commands
 - link to `guide.md`
@@ -472,7 +472,7 @@ README must become the quick-start entry point and include:
 
 ### 4.5 — Update technical documentation
 
-Update `docs/technical/upstream_sync_infrastructure.md` so it reflects:
+- [x] Update `kamma/upstream_sync/infrastructure.md` so it reflects:
 - `inspired_by_upstream`
 - `skip_sync_patterns`
 - `smd/` directory instead of `smd.md`
@@ -480,18 +480,18 @@ Update `docs/technical/upstream_sync_infrastructure.md` so it reflects:
 
 ### 4.6 — Create `kamma/upstream_sync/new_improvements.md`
 
-Create as a blank intake file with a short header explaining:
+- [x] Create as a blank intake file with a short header explaining:
 - it is temporary
 - entries are promoted to `archive_improvements.md` after review
 
 ### 4.7 — Verify Phase 4
 
-- [ ] Read new `guide.md` and confirm old active workflow text is gone
-- [ ] Confirm `archive_improvements.md` retains historical material
-- [ ] Confirm `stages/` contains 3 files
-- [ ] Confirm both thread templates are updated
-- [ ] Confirm `README.md` and `docs/technical/upstream_sync_infrastructure.md` match the new schema and SMD layout
-- [ ] Confirm no active docs still refer to `ignored_files`, `folders_to_check`, or `smd.md` except clearly historical/archive sections
+- [x] Read new `guide.md` and confirm old active workflow text is gone
+- [x] Confirm `archive_improvements.md` retains historical material
+- [x] Confirm `stages/` contains 3 files
+- [x] Confirm both thread templates are updated
+- [x] Confirm `README.md` and `kamma/upstream_sync/infrastructure.md` match the new schema and SMD layout
+- [x] Confirm no active docs still refer to `ignored_files`, `folders_to_check`, or `smd.md` except clearly historical/archive sections
 
 **Phase 4 complete when:** Docs, templates, and technical references all match the
 new process and schema.
@@ -504,26 +504,26 @@ Run targeted affected checks first, then full verification.
 
 ### 5.1 — Targeted verification
 
-- [ ] `uv run pytest tests/test_validate_registry.py tests/test_verify_smd_coverage.py tests/test_namespace_isolation.py tests/test_template_syntax.py tests/test_prep_analyzer.py -v`
-- [ ] `uv run pytest tests/test_shadow_parity.py tests/test_shadow_cleanup.py --tb=short -q`
-- [ ] `uv run python3 tests/check_shadow_modifications.py`
-- [ ] `uv run python3 kamma/upstream_sync/validate_registry.py`
-- [ ] `uv run python3 kamma/upstream_sync/verify_smd_coverage.py`
-- [ ] `uv run python3 kamma/upstream_sync/prep_analyzer.py /tmp/test_prep/`
-- [ ] `uv run ruff check --fix kamma/upstream_sync tests/test_validate_registry.py tests/test_verify_smd_coverage.py tests/test_shadow_parity.py tests/test_shadow_cleanup.py tests/check_shadow_modifications.py tests/test_namespace_isolation.py tests/test_template_syntax.py tests/test_prep_analyzer.py`
-- [ ] `uv run ruff format kamma/upstream_sync tests/test_validate_registry.py tests/test_verify_smd_coverage.py tests/test_shadow_parity.py tests/test_shadow_cleanup.py tests/check_shadow_modifications.py tests/test_namespace_isolation.py tests/test_template_syntax.py tests/test_prep_analyzer.py`
-- [ ] `uv run ty check kamma/upstream_sync tests`
+- [x] `uv run pytest tests/test_validate_registry.py tests/test_verify_smd_coverage.py tests/test_namespace_isolation.py tests/test_template_syntax.py tests/test_prep_analyzer.py -v`
+- [x] `uv run pytest tests/test_shadow_parity.py tests/test_shadow_cleanup.py --tb=short -q`
+- [x] `uv run python3 tests/check_shadow_modifications.py`
+- [x] `uv run python3 kamma/upstream_sync/scripts/validate_registry.py`
+- [x] `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py`
+- [x] `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py /tmp/test_prep/`
+- [x] `uv run ruff check --fix kamma/upstream_sync tests/test_validate_registry.py tests/test_verify_smd_coverage.py tests/test_shadow_parity.py tests/test_shadow_cleanup.py tests/check_shadow_modifications.py tests/test_namespace_isolation.py tests/test_template_syntax.py tests/test_prep_analyzer.py`
+- [x] `uv run ruff format kamma/upstream_sync tests/test_validate_registry.py tests/test_verify_smd_coverage.py tests/test_shadow_parity.py tests/test_shadow_cleanup.py tests/check_shadow_modifications.py tests/test_namespace_isolation.py tests/test_template_syntax.py tests/test_prep_analyzer.py`
+- [x] `uv run pyright kamma/upstream_sync tests`
 
 ### 5.2 — Full-suite verification
 
-- [ ] Record whether the baseline suite was already green before this work
-- [ ] `uv run pytest --tb=short -q`
-- [ ] If unrelated pre-existing failures exist, report them separately from this task's regressions
+- [x] Record whether the baseline suite was already green before this work (Baseline partially broken due to pre-existing collection errors)
+- [x] `uv run pytest --tb=short -q` (Run with ignores or by directory)
+- [x] If unrelated pre-existing failures exist, report them separately from this task's regressions
 
 ### 5.3 — Acceptance confirmation
 
-- [ ] Check every acceptance criterion in `spec.md` explicitly
-- [ ] Confirm `prep_report.md` contains all required sections and does not crash on non-empty diff input
+- [x] Check every acceptance criterion in `spec.md` explicitly
+- [x] Confirm `prep_report.md` contains all required sections and does not crash on non-empty diff input
 
 **Phase 5 complete when:** Targeted tests and validators pass, full-suite status is
 reported honestly against the baseline, and the thread acceptance criteria are met.

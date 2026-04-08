@@ -22,7 +22,7 @@ done < <(python3 -c '
 import json, os, sys
 registry_path = os.path.join(os.environ["PROJECT_DIR"], "kamma/upstream_sync/registry.json")
 sys.path.insert(0, os.environ["PROJECT_DIR"])
-from kamma.upstream_sync.registry_helper import get_modified_upstream_paths
+from kamma.upstream_sync.scripts.registry_helper import get_modified_upstream_paths
 data = json.load(open(registry_path))
 paths = get_modified_upstream_paths(data) + data["no_sync_files"]
 print("\n".join(paths))

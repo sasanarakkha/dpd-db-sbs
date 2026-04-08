@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """Validate registry.json schema integrity and data quality."""
 
 import json
@@ -81,14 +83,22 @@ def validate_cross_section_overlaps(data: dict[str, object]) -> list[str]:
     errors: list[str] = []
     import fnmatch
 
+    russian_copies = data.get("russian_copies", {})
+    sbs_copies = data.get("sbs_copies", {})
+    inspired = data.get("inspired_by_upstream", {})
+
     sections = {
         "modified_upstream_files": [
             entry["path"] if isinstance(entry, dict) else entry
-            for entry in data.get("modified_upstream_files", [])
+            for entry in data.get("modified_upstream_files", [])  # type: ignore
         ],
-        "russian_copies": list(data.get("russian_copies", {}).keys()),
-        "sbs_copies": list(data.get("sbs_copies", {}).keys()),
-        "inspired_by_upstream": list(data.get("inspired_by_upstream", {}).keys()),
+        "russian_copies": list(russian_copies.keys())
+        if isinstance(russian_copies, dict)
+        else [],
+        "sbs_copies": list(sbs_copies.keys()) if isinstance(sbs_copies, dict) else [],
+        "inspired_by_upstream": list(inspired.keys())
+        if isinstance(inspired, dict)
+        else [],
         "unique_paths": data.get("unique_paths", []),
         "no_sync_files": data.get("no_sync_files", []),
         "skip_sync_patterns": data.get("skip_sync_patterns", []),

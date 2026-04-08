@@ -16,9 +16,10 @@ Russian and SBS localized additions intact.
 - Every changed upstream file reviewed against `registry.json` and classified.
 - All `modified_upstream_files` that changed: sync rule applied (PORT / DISCUSS / PRESERVE).
 - All shadow files whose upstream source changed: PORT strategy applied, SMD local changes verified.
-- All automated tests pass (shadow parity, check modifications, ruff).
+- All inspired files whose upstream source changed: selective improvements backported.
+- All automated tests pass (shadow parity, namespace isolation, syntax drift, prep analyzer).
 - User manually verified GoldenDict/webapp output and confirmed correct.
-- `new_improvements.md` written with this run's learnings.
+- `new_improvements.md` reviewed, valuable items promoted, and then deleted.
 - 3 commits staged and presented (automated pull / manual merges / cleanup).
 
 ## Iron Rule (non-negotiable)
@@ -36,26 +37,27 @@ differently from upstream. The sources are correct. Broken means sync is incompl
 
 | Commit | When | Message |
 |---|---|---|
-| Commit 1 | After automated sync | `sync: automated upstream pull <DATE>` |
-| Commit 2 | After manual merges + user verification | `sync: manual merge resolutions <DATE>` |
-| Commit 3 | After cleanup + final validation | `sync: cleanup and finalization <DATE>` |
+| Commit 1 | After Stage 1 (Prep) | `sync: automated upstream pull <DATE>` |
+| Commit 2 | After Stage 3 (Execution + Manual Verification) | `sync: manual merge resolutions <DATE>` |
+| Commit 3 | After Stage 3 (Cleanup + Final Validation) | `sync: cleanup and finalization <DATE>` |
 
 Each gate requires explicit **"Proceed with Commit N"** from the user.
 
 ## Model Switch Points
 
-| Phase | Model | Reason |
+| Stage | Model | Reason |
 |---|---|---|
-| Phases 0, 1, 3, 5–7 | Auto | Routine execution |
-| Phase 2 (Dynamic Analysis) | PRO | Deep diff analysis, cross-reference all shadows |
-| Phase 4 (Logic Audit) | PRO | Iron Rule compliance verification |
+| Stage 1 (Prep) | Auto | Routine validation and diffing |
+| Stage 2 (Analysis) | PRO | Deep diff analysis, strategic planning, cross-reference |
+| Stage 3 (Execution) | Auto / PRO | Implementation (Auto), Final Logic Audit (PRO) |
 
 ## Key References
 
 | File | Purpose |
 |---|---|
 | `kamma/upstream_sync/registry.json` | What to sync, what to skip, what to discuss |
-| `kamma/upstream_sync/smd.md` | Per-file local changes and sync pitfalls |
-| `kamma/upstream_sync/guide.md` | Merge strategy definitions, manual checklist |
+| `kamma/upstream_sync/smd/index.md` | Per-file local changes and sync pitfalls |
+| `kamma/upstream_sync/guide.md` | 3-stage workflow, merge strategies, naming policy |
 | `kamma/upstream_sync/archive_improvements.md` | Accumulated lessons from past runs |
-| `dynamic_plan.md` (thread-local) | Per-run analysis — created in Phase 2, deleted in Phase 7 |
+| `prep_report.md` (thread-local) | Factual diff of upstream changes |
+| `dynamic_plan.md` (thread-local) | Strategic implementation plan |

@@ -1,8 +1,10 @@
+#!/usr/bin/env python3
+
 """Generate a stub SMD entry for every path in registry.json."""
 
 import sys
 
-from kamma.upstream_sync.registry_helper import (
+from kamma.upstream_sync.scripts.registry_helper import (
     load_registry,
     get_modified_upstream_paths,
     get_strict_shadow_mappings,
@@ -44,7 +46,11 @@ def main() -> None:
     mappings = get_strict_shadow_mappings(data)
     russian = data.get("russian_copies", {})
     for shadow in mappings:
-        category = "russian_copy" if shadow in russian else "sbs_copy"
+        category = (
+            "russian_copy"
+            if isinstance(russian, dict) and shadow in russian
+            else "sbs_copy"
+        )
         sections.append(make_stub(shadow, category))
         count += 1
 

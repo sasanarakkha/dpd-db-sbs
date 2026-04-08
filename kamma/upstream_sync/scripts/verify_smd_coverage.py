@@ -1,10 +1,12 @@
+#!/usr/bin/env python3
+
 """Verify every registry entry has a corresponding SMD section meeting the quality rubric."""
 
 import re
 import sys
 from pathlib import Path
 
-from kamma.upstream_sync.registry_helper import (
+from kamma.upstream_sync.scripts.registry_helper import (
     load_registry,
     get_inspired_by_upstream_paths,
     get_modified_upstream_paths,
@@ -78,7 +80,11 @@ def collect_registry_paths(data: dict[str, object]) -> list[tuple[str, str]]:
     # We don't have category info in mappings easily, but we can check registry keys
     russian = data.get("russian_copies", {})
     for shadow in mappings:
-        category = "russian_copy" if shadow in russian else "sbs_copy"
+        category = (
+            "russian_copy"
+            if isinstance(russian, dict) and shadow in russian
+            else "sbs_copy"
+        )
         items.append((shadow, category))
 
     for path in get_inspired_by_upstream_paths(data):

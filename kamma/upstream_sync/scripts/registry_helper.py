@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """Shared helpers for loading and querying the upstream sync registry."""
 
 from pathlib import Path
