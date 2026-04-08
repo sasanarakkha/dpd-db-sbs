@@ -3,6 +3,9 @@
 > This is the canonical protocol for running `/update-upstream`. For per-file merge
 > guidance, see `smd/index.md`. For accumulated lessons, see `archive_improvements.md`.
 
+All local sync-process documentation must stay inside `kamma/upstream_sync/`. The upstream-owned
+`docs/` tree is not a place for local sync-process instructions.
+
 ---
 
 ## Iron Rule
@@ -32,10 +35,11 @@ A broken shadow always means the sync is incomplete or inaccurate — not that t
 1. **Environmental Validation**:
    - Run `uv run python3 kamma/upstream_sync/scripts/validate_registry.py`
    - Run `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py`
-   - Ensure `as_upstream` branch is up-to-date with the target sync point.
+   - Ensure `kamma/upstream_sync/accepted_sync.json` points at the last accepted upstream sync.
 2. **Factual Diff**:
-   - Run `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py` to generate `prep_report.md`.
-   - Identify all modified, added, and deleted files relative to the registry.
+   - Run `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py <thread_dir>`.
+   - Generate `prep_report.md` and `prep_manifest.json` from the explicit upstream range in `accepted_sync.json`.
+   - Identify all modified, added, and deleted upstream files relative to the registry.
 3. **Automated Pull**:
    - Perform the automated sync (Commit 1 gate).
 
@@ -44,6 +48,7 @@ A broken shadow always means the sync is incomplete or inaccurate — not that t
 
 1. **Dynamic Planning**:
    - Create `dynamic_plan.md` in the thread folder.
+   - Use `prep_manifest.json` as the factual source of changed upstream files and mapped local destinations.
    - For every modified upstream file mapped to a shadow/inspired copy, define the merge strategy.
 2. **Discussion Flags**:
    - Check `discuss` flags in `registry.json`. If `true`, resolve with the user before planning.
@@ -60,8 +65,9 @@ A broken shadow always means the sync is incomplete or inaccurate — not that t
    - Run `uv run python3 tests/check_shadow_modifications.py`.
    - Perform manual verification (GoldenDict/webapp).
 3. **Cleanup**:
-   - Run `uv run pytest tests/test_shadow_cleanup.py` to archive orphans.
+   - Run `uv run python3 tests/test_shadow_cleanup.py --folder <folder> [--apply]` to review or archive orphans.
    - Update `registry.json` and `smd/` to reflect the new state.
+   - Update `accepted_sync.json` only after the sync is accepted and verified.
    - Review the temporary `new_improvements.md`, promote items to `archive_improvements.md`, and delete the file.
 
 ---
@@ -73,6 +79,7 @@ A broken shadow always means the sync is incomplete or inaccurate — not that t
 | `modified_upstream_files` | Upstream files where this fork diverges. Requires manual porting of new features. |
 | `russian_copies` | Shadow files mirroring upstream with Russian additions. Strict parity enforced. |
 | `sbs_copies` | Shadow files mirroring upstream with SBS additions. Strict parity enforced. |
+| `dps_copies` | Shadow files mirroring upstream with DPS additions. Strict parity enforced. |
 | `inspired_by_upstream` | Local files derived from upstream but structurally diverged. No strict parity; backport useful improvements only. |
 | `unique_paths` | Fork-only files/dirs. Never synced. |
 | `no_sync_files` | Infrastructure files that must never be overwritten. |
@@ -105,5 +112,14 @@ Enforced via `tests/test_namespace_isolation.py`:
 
 If a file has `discuss: true` in `registry.json`:
 1. **STOP**. Do not modify.
-2. Present `git diff as_upstream -- <path>` and the `discuss_reason` to the user.
+2. Present the relevant upstream diff from the active Prep range and the `discuss_reason` to the user.
 3. Wait for explicit approval before proceeding.
+
+---
+
+## Sync State Artifacts
+
+- `accepted_sync.json`: durable record of the last accepted upstream SHA, date, and ref.
+- `prep_manifest.json`: Stage 1 machine-readable snapshot of the active upstream range.
+
+These files support the 3-stage workflow. They are not a fourth stage.

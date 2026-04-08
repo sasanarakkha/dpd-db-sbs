@@ -14,9 +14,11 @@
 - [ ] **1.2 Validation**:
   - [ ] `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` — passes.
   - [ ] `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` — passes.
+  - [ ] Review `kamma/upstream_sync/accepted_sync.json` — starting SHA/date/ref are correct.
 - [ ] **1.3 Factual Diff**:
-  - [ ] Run `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py` — generate `prep_report.md`.
+  - [ ] Run `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py <thread_dir>` — generate `prep_report.md` and `prep_manifest.json`.
   - [ ] Review `prep_report.md` for any unexpected changes.
+  - [ ] Review `prep_manifest.json` for path classification and discuss flags.
 - [ ] **1.4 Automated Pull + Commit 1**:
   - [ ] Run automated sync script (`full_sync.sh`).
   - [ ] ⛔ **USER APPROVAL GATE** — STOP. Wait for explicit **"Proceed with Commit 1"**.
@@ -31,7 +33,7 @@
 > ⚡ **MODEL SWITCH**: Ask user to switch to **Higher model** for this stage.
 
 - [ ] **2.1 Change Impact Assessment**:
-  - [ ] Review `prep_report.md`. For each modified source, list all shadow/inspired destinations.
+  - [ ] Review `prep_report.md` and `prep_manifest.json`. For each modified source, list all shadow/inspired destinations.
   - [ ] Review `modified_upstream_files` delta.
 - [ ] **2.2 Discussion Flags**:
   - [ ] For every `discuss: true` entry that changed: STOP, present diff, state reason, wait for decision.
@@ -75,11 +77,13 @@
 ### Cleanup & Finalization (Lower model)
 
 - [ ] **3.7 Orphan Cleanup**:
-  - [ ] `uv run python3 tests/test_shadow_cleanup.py`. Archive or promote orphans.
+  - [ ] `uv run python3 tests/test_shadow_cleanup.py --folder <folder> [--apply]`. Archive or promote orphans.
 - [ ] **3.8 Final Validation**:
   - [ ] Re-run all validators and `verify_smd_coverage.py`.
+  - [ ] `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>`.
   - [ ] `uv run ruff check . && uv run ruff format .`.
 - [ ] **3.9 Commit 3 Gate**:
+  - [ ] Update `kamma/upstream_sync/accepted_sync.json` to the accepted target SHA/date/ref.
   - [ ] Review `kamma/upstream_sync/new_improvements.md` (if it exists) and promote valuable entries to `archive_improvements.md`.
   - [ ] Delete the temporary `kamma/upstream_sync/new_improvements.md` file.
   - [ ] ⛔ **USER APPROVAL GATE** — Wait for explicit **"Proceed with Commit 3"**.

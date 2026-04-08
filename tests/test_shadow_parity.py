@@ -1,3 +1,5 @@
+"""Verify strict shadow copies keep structural parity with their upstream sources."""
+
 import ast
 import json
 from pathlib import Path
@@ -67,7 +69,8 @@ def extract_ast_info(filepath: str) -> dict[str, set[str]] | None:
 WHITELIST = {
     "db/families/family_compound_ru.py": {"functions": ["compile_cf_html"]},
     "db/families/family_idiom_ru.py": {
-        "functions": ["compile_idioms_html", "sync_idiom_numbers_with_family_compound"]
+        "functions": ["compile_idioms_html", "sync_idiom_numbers_with_family_compound"],
+        "imports": ["re"],
     },
     "db/families/family_root_ru.py": {
         "functions": [
@@ -75,17 +78,28 @@ WHITELIST = {
             "make_root_header",
             "make_anki_matrix_data",
             "update_lookup_table",
-        ]
+        ],
+        "imports": [
+            "collections.defaultdict",
+            "db.models.Lookup",
+            "root_info.generate_root_info_html",
+            "root_matrix.generate_root_matrix",
+            "tools.lookup_is_another_value.is_another_value",
+            "tools.pali_sort_key.pali_list_sorter",
+            "tools.update_test_add.update_test_add",
+        ],
     },
     "db/families/family_set_ru.py": {"functions": ["compile_sf_html"]},
     "db/families/family_word_ru.py": {"functions": ["compile_wf_html"]},
     "db/lookup/help_abbrev_add_to_lookup_ru.py": {
         "functions": ["add_abbreviations", "add_help"],
+        "imports": ["tools.tsv_read_write.read_tsv_as_dict"],
         "missing": True,
     },
     "db/rpd/rpd_to_lookup_ru.py": {"missing": True},
     "exporter/deconstructor/deconstructor_exporter_ru.py": {
-        "functions": ["generate_deconstructor_html"]
+        "functions": ["generate_deconstructor_html"],
+        "classes": ["GlobalVars"],
     },
     "exporter/goldendict/export_dpd_ru.py": {
         "imports": [
@@ -158,12 +172,19 @@ WHITELIST = {
         ]
     },
     "exporter/grammar_dict/grammar_dict_ru.py": {
-        "functions": ["generate_grammar_dict"]
+        "functions": ["generate_grammar_dict"],
+        "classes": ["GlobalVars"],
     },
     "exporter/kindle/kindle_exporter_ru.py": {
         "functions": [
             "html_friendly",
             "make_mobi",
+            "parse_args",
+            "render_deconstructor_entry",
+            "render_dpd_xhtml",
+            "render_epd_entry",
+            "render_epd_letter_templ",
+            "render_epd_xhtml",
             "render_abbreviation_entry",
             "render_ebook_entry",
             "render_ebook_letter_templ",
@@ -171,21 +192,72 @@ WHITELIST = {
             "save_content_opf_xhtml",
             "save_title_page_xhtml",
             "zip_epub",
-        ]
+        ],
+        "imports": ["argparse", "exporter.kindle.data_classes.KindleData"],
     },
-    "exporter/tbw/tbw_exporter_ru.py": {"functions": ["generate_tbw_html"]},
-    "exporter/tpr/tpr_exporter_ru.py": {"functions": ["generate_tpr_html"]},
-    "exporter/webapp/data_classes_ru.py": {"classes": ["SpellingData", "VariantData"]},
-    "exporter/webapp/main_dps.py": {"imports": ["exporter.webapp.preloads.load_data"]},
-    "exporter/webapp/preloads_ru.py": {"functions": ["load_data"]},
+    "exporter/tbw/tbw_exporter_ru.py": {
+        "functions": ["generate_tbw_html", "save_js_files_for_tbw"],
+        "classes": ["GlobalVars"],
+    },
+    "exporter/tpr/tpr_exporter_ru.py": {
+        "functions": ["generate_tpr_html"],
+        "imports": ["tools.uposatha_day.UposathaManger"],
+    },
+    "exporter/webapp/data_classes_ru.py": {
+        "classes": ["SpellingData", "VariantData"],
+        "imports": [
+            "tools.configger.config_test",
+            "tools.meaning_construction.make_grammar_line",
+        ],
+    },
+    "exporter/webapp/main_dps.py": {
+        "imports": [
+            "exporter.webapp.preloads.load_data",
+            "tools.translit.auto_translit_to_roman",
+        ],
+        "functions": [
+            "home_page",
+            "db_search_html",
+            "db_search_gd",
+            "db_search_json",
+        ],
+    },
+    "exporter/webapp/preloads_ru.py": {
+        "functions": [
+            "load_data",
+            "make_ascii_to_unicode_dict",
+            "make_headwords_clean_set",
+            "make_roots_count_dict",
+        ],
+        "imports": [
+            "collections.defaultdict",
+            "typing.Dict",
+            "tools.pali_sort_key.pali_list_sorter",
+            "unidecode.unidecode",
+        ],
+    },
     "exporter/webapp/toolkit_ru.py": {
         "functions": [
+            "make_dpd_html",
             "get_dpd_html",
             "get_epd_html",
             "get_help_html",
             "get_root_html",
             "get_variant_spelling_html",
-        ]
+        ],
+        "imports": [
+            "exporter.webapp.data_classes.AbbreviationsData",
+            "exporter.webapp.data_classes.DeconstructorData",
+            "exporter.webapp.data_classes.EpdData",
+            "exporter.webapp.data_classes.GrammarData",
+            "exporter.webapp.data_classes.HeadwordData",
+            "exporter.webapp.data_classes.HelpData",
+            "exporter.webapp.data_classes.ManualVariantData",
+            "exporter.webapp.data_classes.RootsData",
+            "exporter.webapp.data_classes.SeeData",
+            "exporter.webapp.data_classes.SpellingData",
+            "exporter.webapp.data_classes.VariantData",
+        ],
     },
     "scripts/backup/backup_dps.py": {
         "functions": [
@@ -193,6 +265,7 @@ WHITELIST = {
             "backup_dpd_roots",
             "split_tsv_file",
             "backup_dpd_headwords",
+            "git_commit",
         ],
         "imports": ["db.models.DpdHeadword", "pathlib.Path"],
     },
@@ -282,6 +355,6 @@ def test_shadow_copy_parity(shadow, upstream):
         errors.append(f"Missing classes: {missing_classes}")
 
     if errors:
-        print(
+        pytest.fail(
             f"Parity mismatch in {shadow} compared to {upstream}:\n" + "\n".join(errors)
         )

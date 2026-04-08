@@ -11,6 +11,7 @@ All upstream sync assets live in `kamma/upstream_sync/`.
 | File | Purpose |
 |---|---|
 | `registry.json` | Machine-readable map of every file that diverges from upstream |
+| `accepted_sync.json` | Last accepted upstream SHA/date/ref used to anchor Stage 1 |
 | `smd/` | Shadow Module Descriptions (Directory) — per-file merge guidance |
 | `guide.md` | Process reference: category definitions, 3-stage workflow, naming policy |
 | `archive_improvements.md` | Accumulated lessons from all past sync runs |
@@ -20,7 +21,9 @@ All upstream sync assets live in `kamma/upstream_sync/`.
 | `scripts/registry_helper.py` | Shared Python helper to load the registry and extract paths |
 | `scripts/validate_registry.py` | Schema and data-quality validator for `registry.json` |
 | `scripts/verify_smd_coverage.py` | Coverage checker — ensures every registry entry has an SMD entry in `smd/` |
-| `scripts/prep_analyzer.py` | Generates factual diff reports for Stage 1 (Prep) |
+| `scripts/prep_analyzer.py` | Generates factual Stage 1 report and manifest from the accepted sync range |
+| `scripts/finalize_accepted_sync.py` | Advances `accepted_sync.json` from a verified prep manifest |
+| `scripts/sync_runtime.py` | Emits runtime sync metadata for shell automation |
 | `README.md` | Folder-level quick-start |
 
 ---
@@ -34,6 +37,7 @@ All upstream sync assets live in `kamma/upstream_sync/`.
 | `modified_upstream_files` | Files that exist upstream but have local modifications — review carefully on each sync |
 | `russian_copies` | Shadow copies mirroring upstream with Russian additions (Strict parity) |
 | `sbs_copies` | Shadow copies mirroring upstream with SBS additions (Strict parity) |
+| `dps_copies` | Shadow copies mirroring upstream with DPS additions (Strict parity) |
 | `inspired_by_upstream` | Local files derived from upstream but structurally diverged (Selective backporting) |
 | `unique_paths` | Files that exist only in this fork — never sync these from upstream |
 | `no_sync_files` | Infrastructure files to skip entirely during sync |
@@ -77,7 +81,7 @@ Aggregates entries from `smd/*.md` and ensures every registry entry is covered. 
 
 ### `prep_analyzer.py`
 
-Generates `prep_report.md` by analyzing `git diff` against the `as_upstream` branch.
+Generates `prep_report.md` and `prep_manifest.json` by diffing the explicit upstream range from `accepted_sync.json` to the current target upstream ref.
 
 ---
 

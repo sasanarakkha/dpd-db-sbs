@@ -1,0 +1,6 @@
+{
+  "last_accepted_upstream_sha": "8a015f0da1689880acf7aad1dab2129dfb87417a",
+  "last_accepted_upstream_date": "2026-03-11T10:06:22+08:00",
+  "last_accepted_upstream_ref": "upstream/main",
+  "notes": "Last accepted upstream sync before the manifest workflow migration."
+}

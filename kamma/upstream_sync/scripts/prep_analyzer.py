@@ -1,69 +1,93 @@
 #!/usr/bin/env python3
 
-"""Generate a factual upstream diff report mapped to registry categories."""
+"""Generate a factual upstream sync report and manifest from an explicit upstream range."""
 
 import argparse
 import fnmatch
+import json
 import subprocess
 from pathlib import Path
 
 from kamma.upstream_sync.scripts.registry_helper import (
-    load_registry,
-    get_modified_upstream_paths,
-    get_strict_shadow_mappings,
+    AcceptedSyncState,
     get_inspired_by_upstream_mapping,
+    get_modified_upstream_paths,
+    get_shadow_mappings_by_category,
     get_skip_sync_patterns,
+    load_accepted_sync_state,
+    load_registry,
 )
 from kamma.upstream_sync.scripts.validate_registry import validate_registry_core
 from kamma.upstream_sync.scripts.verify_smd_coverage import (
-    extract_all_smd_entries,
-    collect_registry_paths,
     check_rubric,
+    collect_registry_paths,
+    extract_all_smd_entries,
 )
+from tools.printer import printer as pr
+
+type GitChange = tuple[str, str]
+type MappedAction = dict[str, str]
 
 
-def get_git_changes():
-    """Return list of (status, path) from git diff."""
+def resolve_target_upstream_sha(ref: str = "upstream/main") -> str:
+    """Resolve a git ref to a concrete commit SHA."""
     try:
-        # Check if as_upstream exists
-        subprocess.run(
-            ["git", "rev-parse", "as_upstream"], capture_output=True, check=True
-        )
-
         result = subprocess.run(
-            ["git", "diff", "--name-status", "as_upstream", "HEAD"],
+            ["git", "rev-parse", ref],
             capture_output=True,
             text=True,
             check=True,
         )
-        changes = []
-        for line in result.stdout.splitlines():
-            if not line.strip():
-                continue
-            parts = line.split(None, 1)
-            if len(parts) == 2:
-                status = parts[0]
-                path = parts[1]
-                # Handle renames R100 old new
-                if status.startswith("R"):
-                    # We care about the new path
-                    path = path.split(None, 1)[-1]
-                changes.append((status, path))
-        return changes
-    except subprocess.CalledProcessError:
-        return []
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError(f"failed to resolve upstream ref '{ref}'") from exc
+    return result.stdout.strip()
+
+
+def get_upstream_changes(from_sha: str, to_sha: str) -> list[GitChange]:
+    """Return list of changed upstream paths for the explicit sync range."""
+    try:
+        result = subprocess.run(
+            ["git", "diff", "--name-status", from_sha, to_sha],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError(
+            f"failed to diff upstream range '{from_sha}..{to_sha}'"
+        ) from exc
+
+    changes: list[GitChange] = []
+    for line in result.stdout.splitlines():
+        if not line.strip():
+            continue
+        parts = line.split(None, 1)
+        if len(parts) != 2:
+            continue
+        status = parts[0]
+        path = parts[1]
+        if status.startswith("R"):
+            path = path.split(None, 1)[-1]
+        changes.append((status, path))
+    return changes
 
 
 class PrepAnalyzer:
-    def __init__(self, thread_dir):
+    """Build the Stage 1 factual report and machine-readable manifest."""
+
+    def __init__(self, thread_dir: str | Path):
         self.thread_dir = Path(thread_dir)
         self.registry = load_registry()
+        self.accepted_sync: AcceptedSyncState = load_accepted_sync_state()
         self.skip_patterns = get_skip_sync_patterns(self.registry)
         self.modified_upstream = set(get_modified_upstream_paths(self.registry))
-        self.shadow_mappings = get_strict_shadow_mappings(self.registry)
+        self.shadow_mappings_by_category = get_shadow_mappings_by_category(
+            self.registry
+        )
         self.inspired_mappings = get_inspired_by_upstream_mapping(self.registry)
 
-    def is_skipped(self, path):
+    def is_skipped(self, path: str) -> bool:
+        """Return True when the path is outside sync scanning scope."""
         for pattern in self.skip_patterns:
             if pattern.endswith("/") and path.startswith(pattern):
                 return True
@@ -71,27 +95,44 @@ class PrepAnalyzer:
                 return True
         return False
 
-    def run(self):
-        changes = get_git_changes()
+    def run(self) -> None:
+        """Generate the Stage 1 report and manifest in the thread folder."""
+        from_sha = self.accepted_sync["last_accepted_upstream_sha"]
+        if from_sha == "BOOTSTRAP_REQUIRED":
+            raise ValueError("accepted sync state is not bootstrapped")
 
-        tracked_modified = []
-        shadow_sources_modified = []
-        inspired_sources_modified = []
-        untracked = []
-        deleted = []
+        target_ref = self.accepted_sync["last_accepted_upstream_ref"]
+        to_sha = resolve_target_upstream_sha(target_ref)
+        changes = get_upstream_changes(from_sha, to_sha)
 
-        # Invert mappings for source tracking
-        source_to_shadows = {}
-        for shadow, source in self.shadow_mappings.items():
-            if source not in source_to_shadows:
-                source_to_shadows[source] = []
-            source_to_shadows[source].append(shadow)
+        tracked_modified: list[str] = []
+        shadow_sources_modified: list[tuple[str, list[str]]] = []
+        inspired_sources_modified: list[tuple[str, list[str]]] = []
+        untracked: list[str] = []
+        deleted: list[str] = []
+        discuss_paths: list[str] = []
 
-        source_to_inspired = {}
+        source_to_shadows: dict[str, list[MappedAction]] = {}
+        for category, mapping in self.shadow_mappings_by_category.items():
+            for shadow, source in mapping.items():
+                source_to_shadows.setdefault(source, []).append(
+                    {"category": category, "local_path": shadow}
+                )
+
+        source_to_inspired: dict[str, list[MappedAction]] = {}
         for local, source in self.inspired_mappings.items():
-            if source not in source_to_inspired:
-                source_to_inspired[source] = []
-            source_to_inspired[source].append(local)
+            source_to_inspired.setdefault(source, []).append(
+                {"category": "inspired_by_upstream", "local_path": local}
+            )
+
+        discuss_lookup = {
+            entry["path"]
+            for entry in self.registry.get("modified_upstream_files", [])  # type: ignore[union-attr]
+            if isinstance(entry, dict) and entry.get("discuss") is True
+        }
+
+        mapped_actions: dict[str, list[MappedAction]] = {}
+        changed_upstream_paths: set[str] = set()
 
         for status, path in changes:
             if self.is_skipped(path):
@@ -101,61 +142,105 @@ class PrepAnalyzer:
                 deleted.append(path)
                 continue
 
+            changed_upstream_paths.add(path)
+
             if path in self.modified_upstream:
                 tracked_modified.append(path)
+                if path in discuss_lookup:
+                    discuss_paths.append(path)
 
-            # Check if it's a source for any shadows
             found_source = False
-            for src, shadows in source_to_shadows.items():
+
+            for src, actions in source_to_shadows.items():
                 if src.endswith("/") and path.startswith(src):
-                    shadow_sources_modified.append((path, shadows))
+                    shadow_sources_modified.append(
+                        (path, [action["local_path"] for action in actions])
+                    )
+                    mapped_actions[path] = list(actions)
                     found_source = True
                     break
-                elif path == src:
-                    shadow_sources_modified.append((path, shadows))
+                if path == src:
+                    shadow_sources_modified.append(
+                        (path, [action["local_path"] for action in actions])
+                    )
+                    mapped_actions[path] = list(actions)
                     found_source = True
                     break
 
-            for src, inspired in source_to_inspired.items():
+            for src, actions in source_to_inspired.items():
                 if src.endswith("/") and path.startswith(src):
-                    inspired_sources_modified.append((path, inspired))
+                    inspired_sources_modified.append(
+                        (path, [action["local_path"] for action in actions])
+                    )
+                    mapped_actions.setdefault(path, []).extend(actions)
                     found_source = True
                     break
-                elif path == src:
-                    inspired_sources_modified.append((path, inspired))
+                if path == src:
+                    inspired_sources_modified.append(
+                        (path, [action["local_path"] for action in actions])
+                    )
+                    mapped_actions.setdefault(path, []).extend(actions)
                     found_source = True
                     break
 
             if status == "A" or (
                 not found_source and path not in self.modified_upstream
             ):
-                # If it's modified in git but not in our registry, it's "untracked" in our sync sense
                 untracked.append(path)
 
         report = self.generate_report(
-            tracked_modified,
-            shadow_sources_modified,
-            inspired_sources_modified,
-            untracked,
-            deleted,
+            tracked=tracked_modified,
+            shadows=shadow_sources_modified,
+            inspired=inspired_sources_modified,
+            untracked=untracked,
+            deleted=deleted,
+            from_sha=from_sha,
+            to_sha=to_sha,
+        )
+        manifest = self.generate_manifest(
+            from_sha=from_sha,
+            to_sha=to_sha,
+            changed_upstream_paths=sorted(changed_upstream_paths),
+            deleted_upstream_paths=sorted(set(deleted)),
+            mapped_actions=mapped_actions,
+            discuss_paths=sorted(set(discuss_paths)),
         )
 
         self.thread_dir.mkdir(parents=True, exist_ok=True)
         report_path = self.thread_dir / "prep_report.md"
         report_path.write_text(report, encoding="utf-8")
-        print(f"Wrote report to {report_path}")
+        manifest_path = self.thread_dir / "prep_manifest.json"
+        manifest_path.write_text(
+            json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8"
+        )
+        pr.info(f"Wrote report to {report_path}")
+        pr.info(f"Wrote manifest to {manifest_path}")
 
-    def generate_report(self, tracked, shadows, inspired, untracked, deleted):
+    def generate_report(
+        self,
+        tracked: list[str],
+        shadows: list[tuple[str, list[str]]],
+        inspired: list[tuple[str, list[str]]],
+        untracked: list[str],
+        deleted: list[str],
+        from_sha: str,
+        to_sha: str,
+    ) -> str:
+        """Render the human-readable Stage 1 report."""
         lines = ["# Upstream Sync Preparation Report\n"]
+        lines.append("## Upstream Range")
+        lines.append(f"- From: `{from_sha}`")
+        lines.append(f"- To: `{to_sha}`")
+        lines.append("")
 
         lines.append("## Registry Validation Status")
         errors = validate_registry_core(self.registry)
         if not errors:
-            lines.append("✅ Registry is valid.\n")
+            lines.append("OK: Registry is valid.\n")
         else:
-            lines.append("❌ Registry validation errors:")
-            for e in errors:
-                lines.append(f"- {e}")
+            lines.append("FAIL: Registry validation errors:")
+            for error in errors:
+                lines.append(f"- {error}")
             lines.append("")
 
         lines.append("## SMD Coverage Status")
@@ -163,73 +248,93 @@ class PrepAnalyzer:
         try:
             smd_entries = extract_all_smd_entries(smd_dir)
             all_paths = collect_registry_paths(self.registry)
-            gaps = []
-            rubric_fails = []
-            for path, cat in all_paths:
+            gaps: list[str] = []
+            rubric_fails: list[str] = []
+            for path, category in all_paths:
                 if path not in smd_entries:
-                    gaps.append(f"MISSING: {path} [{cat}]")
+                    gaps.append(f"MISSING: {path} [{category}]")
                 else:
-                    fails = check_rubric(path, cat, smd_entries[path])
-                    rubric_fails.extend(fails)
+                    rubric_fails.extend(check_rubric(path, category, smd_entries[path]))
 
             if not gaps and not rubric_fails:
-                lines.append("✅ SMD coverage is complete and rubric-compliant.\n")
+                lines.append("OK: SMD coverage is complete and rubric-compliant.\n")
             else:
                 if gaps:
-                    lines.append("❌ Missing SMD entries:")
-                    for g in gaps:
-                        lines.append(f"- {g}")
+                    lines.append("FAIL: Missing SMD entries:")
+                    for gap in gaps:
+                        lines.append(f"- {gap}")
                 if rubric_fails:
-                    lines.append("⚠️ SMD rubric failures:")
-                    for f in rubric_fails:
-                        lines.append(f"- {f}")
+                    lines.append("WARN: SMD rubric failures:")
+                    for failure in rubric_fails:
+                        lines.append(f"- {failure}")
                 lines.append("")
+        except Exception as exc:
+            lines.append(f"FAIL: Error checking SMD coverage: {exc}\n")
 
-        except Exception as e:
-            lines.append(f"❌ Error checking SMD coverage: {e}\n")
-
-        lines.append("## Modified — Tracked Files")
+        lines.append("## Modified - Tracked Files")
         if tracked:
-            for t in sorted(tracked):
-                lines.append(f"- {t}")
+            for path in sorted(set(tracked)):
+                lines.append(f"- {path}")
         else:
             lines.append("_No tracked files modified._")
         lines.append("")
 
-        lines.append("## Modified — Shadow Sources")
+        lines.append("## Modified - Shadow Sources")
         if shadows:
             for src, shadows_list in sorted(shadows):
-                lines.append(f"- `{src}` → shadows: {', '.join(shadows_list)}")
+                lines.append(f"- `{src}` -> shadows: {', '.join(shadows_list)}")
         else:
             lines.append("_No shadow sources modified._")
         lines.append("")
 
-        lines.append("## Modified — Inspired Sources")
+        lines.append("## Modified - Inspired Sources")
         if inspired:
             for src, inspired_list in sorted(inspired):
-                lines.append(f"- `{src}` → inspired: {', '.join(inspired_list)}")
+                lines.append(f"- `{src}` -> inspired: {', '.join(inspired_list)}")
         else:
             lines.append("_No inspired sources modified._")
         lines.append("")
 
         lines.append("## Untracked Changes")
         if untracked:
-            for u in sorted(untracked):
-                lines.append(f"- {u}")
+            for path in sorted(set(untracked)):
+                lines.append(f"- {path}")
         else:
             lines.append("_No untracked changes._")
         lines.append("")
 
         if deleted:
             lines.append("## Deleted Files")
-            for d in sorted(deleted):
-                lines.append(f"- {d}")
+            for path in sorted(set(deleted)):
+                lines.append(f"- {path}")
             lines.append("")
 
         return "\n".join(lines)
 
+    def generate_manifest(
+        self,
+        from_sha: str,
+        to_sha: str,
+        changed_upstream_paths: list[str],
+        deleted_upstream_paths: list[str],
+        mapped_actions: dict[str, list[MappedAction]],
+        discuss_paths: list[str],
+    ) -> dict[str, object]:
+        """Return the machine-readable Stage 1 manifest."""
+        return {
+            "from_upstream_sha": from_sha,
+            "to_upstream_sha": to_sha,
+            "target_upstream_ref": self.accepted_sync["last_accepted_upstream_ref"],
+            "generated_at": self.accepted_sync["last_accepted_upstream_date"],
+            "changed_upstream_paths": changed_upstream_paths,
+            "deleted_upstream_paths": deleted_upstream_paths,
+            "mapped_actions": mapped_actions,
+            "discuss_paths": discuss_paths,
+        }
 
-def main():
+
+def main() -> None:
+    """Parse arguments and generate the Prep report and manifest."""
     parser = argparse.ArgumentParser()
     parser.add_argument("thread_dir")
     args = parser.parse_args()

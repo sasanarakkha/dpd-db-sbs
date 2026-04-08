@@ -13,6 +13,8 @@ Russian and SBS localized additions intact.
 ## Success Criteria
 
 - Worktree was clean and `as_upstream` branch existed before sync began.
+- `kamma/upstream_sync/accepted_sync.json` was reviewed and used as the starting sync point.
+- Stage 1 produced both `prep_report.md` and `prep_manifest.json`.
 - Every changed upstream file reviewed against `registry.json` and classified.
 - All `modified_upstream_files` that changed: sync rule applied (PORT / DISCUSS / PRESERVE).
 - All shadow files whose upstream source changed: PORT strategy applied, SMD local changes verified.
@@ -56,8 +58,10 @@ Each gate requires explicit **"Proceed with Commit N"** from the user.
 | File | Purpose |
 |---|---|
 | `kamma/upstream_sync/registry.json` | What to sync, what to skip, what to discuss |
+| `kamma/upstream_sync/accepted_sync.json` | Last accepted upstream sync state |
 | `kamma/upstream_sync/smd/index.md` | Per-file local changes and sync pitfalls |
 | `kamma/upstream_sync/guide.md` | 3-stage workflow, merge strategies, naming policy |
 | `kamma/upstream_sync/archive_improvements.md` | Accumulated lessons from past runs |
 | `prep_report.md` (thread-local) | Factual diff of upstream changes |
+| `prep_manifest.json` (thread-local) | Machine-readable upstream range and path mapping |
 | `dynamic_plan.md` (thread-local) | Strategic implementation plan |

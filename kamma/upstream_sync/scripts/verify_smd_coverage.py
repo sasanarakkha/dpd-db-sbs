@@ -7,10 +7,10 @@ import sys
 from pathlib import Path
 
 from kamma.upstream_sync.scripts.registry_helper import (
-    load_registry,
     get_inspired_by_upstream_paths,
     get_modified_upstream_paths,
-    get_strict_shadow_mappings,
+    get_shadow_mappings_by_category,
+    load_registry,
 )
 from tools.printer import printer as pr
 
@@ -76,16 +76,9 @@ def collect_registry_paths(data: dict[str, object]) -> list[tuple[str, str]]:
     for path in get_modified_upstream_paths(data):
         items.append((path, "modified_upstream"))
 
-    mappings = get_strict_shadow_mappings(data)
-    # We don't have category info in mappings easily, but we can check registry keys
-    russian = data.get("russian_copies", {})
-    for shadow in mappings:
-        category = (
-            "russian_copy"
-            if isinstance(russian, dict) and shadow in russian
-            else "sbs_copy"
-        )
-        items.append((shadow, category))
+    for category, mapping in get_shadow_mappings_by_category(data).items():
+        for shadow in mapping:
+            items.append((shadow, category))
 
     for path in get_inspired_by_upstream_paths(data):
         items.append((path, "inspired_by_upstream"))

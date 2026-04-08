@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Checks whether shadow copies of modified upstream sources have been updated since the last sync commit."""
+"""Check whether strict shadow copies were updated when their upstream sources changed."""
 
 import json
 import re
 import subprocess
 import sys
 from pathlib import Path
+
+from kamma.upstream_sync.scripts.registry_helper import get_shadow_mappings_by_category
 
 REGISTRY_PATH = Path("kamma/upstream_sync/registry.json")
 
@@ -47,16 +49,15 @@ def check_shadows() -> None:
     # 2. Shadows modified since the sync commit (including uncommitted)
     local_modified = get_modified_files(f"git diff {sync_commit}^ --name-only")
 
-    russian_copies: dict[str, str] = registry.get("russian_copies", {})  # type: ignore[assignment]
-    sbs_copies: dict[str, str] = registry.get("sbs_copies", {})  # type: ignore[assignment]
-
-    # Build combined mapping for strict shadows only.
-    # inspired_by_upstream entries are excluded as they do not require strict parity.
     all_mappings: list[tuple[str, str, str]] = []
-    for shadow, source in russian_copies.items():
-        all_mappings.append(("Russian", shadow, source))
-    for shadow, source in sbs_copies.items():
-        all_mappings.append(("SBS", shadow, source))
+    category_labels = {
+        "russian_copy": "Russian",
+        "sbs_copy": "SBS",
+        "dps_copy": "DPS",
+    }
+    for category, mappings in get_shadow_mappings_by_category(registry).items():
+        for shadow, source in mappings.items():
+            all_mappings.append((category_labels[category], shadow, source))
 
     unmodified_shadows = []
 

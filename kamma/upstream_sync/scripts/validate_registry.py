@@ -85,6 +85,7 @@ def validate_cross_section_overlaps(data: dict[str, object]) -> list[str]:
 
     russian_copies = data.get("russian_copies", {})
     sbs_copies = data.get("sbs_copies", {})
+    dps_copies = data.get("dps_copies", {})
     inspired = data.get("inspired_by_upstream", {})
 
     sections = {
@@ -96,6 +97,7 @@ def validate_cross_section_overlaps(data: dict[str, object]) -> list[str]:
         if isinstance(russian_copies, dict)
         else [],
         "sbs_copies": list(sbs_copies.keys()) if isinstance(sbs_copies, dict) else [],
+        "dps_copies": list(dps_copies.keys()) if isinstance(dps_copies, dict) else [],
         "inspired_by_upstream": list(inspired.keys())
         if isinstance(inspired, dict)
         else [],
@@ -226,11 +228,17 @@ def validate_registry_core(
         validate_no_duplicates_in_list("sbs_copies keys", list(sbs_copies.keys()))
     )
 
+    dps_copies: dict[str, str] = data.get("dps_copies", {})  # type: ignore[assignment]
+    errors.extend(
+        validate_no_duplicates_in_list("dps_copies keys", list(dps_copies.keys()))
+    )
+
     if repo_root:
         errors.extend(
             validate_shadow_paths_exist("russian_copies", russian_copies, repo_root)
         )
         errors.extend(validate_shadow_paths_exist("sbs_copies", sbs_copies, repo_root))
+        errors.extend(validate_shadow_paths_exist("dps_copies", dps_copies, repo_root))
 
     errors.extend(validate_inspired_by_upstream(data, repo_root))
     errors.extend(validate_skip_sync_patterns(data))

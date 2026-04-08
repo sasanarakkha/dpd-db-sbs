@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Synchronize the local branch from the configured upstream ref while restoring protected local files.
+
 set -euo pipefail # Exit on error, treat unset variables as error, pipeline fails on first error
 
 # Non-interactive script to synchronize sbs-ru branch from as_upstream,
@@ -8,25 +10,28 @@ set -euo pipefail # Exit on error, treat unset variables as error, pipeline fail
 PROJECT_DIR="$(pwd)"
 DATE=$(date +"%d-%m")
 COMMIT_MESSAGE_PREFIX="sync: "
-COMMIT_MESSAGE_SUFFIX=" from as_upstream ($DATE)"
+COMMIT_MESSAGE_SUFFIX=" from accepted upstream ref ($DATE)"
+TARGET_UPSTREAM_REF="$(uv run python3 kamma/upstream_sync/scripts/sync_runtime.py print-target-ref)"
 
 echo "ℹ️ Project directory: $PROJECT_DIR"
+echo "ℹ️ Target upstream ref: $TARGET_UPSTREAM_REF"
+
+# Optional: verify manifest before sync (skip if no thread_dir provided)
+if [ -n "${1:-}" ] && [ -f "$1/prep_manifest.json" ]; then
+    echo "ℹ️ Verifying prep manifest from $1..."
+    if uv run python3 kamma/upstream_sync/scripts/sync_runtime.py verify-manifest "$1"; then
+        echo "✅ Prep manifest verified."
+    else
+        echo "⚠️ Prep manifest verification failed. Proceeding anyway..."
+    fi
+fi
 
 # Read exclusions dynamically from kamma/upstream_sync/registry.json
 echo "ℹ️ Reading exclusions from kamma/upstream_sync/registry.json..."
-export PROJECT_DIR
 EXCLUDE_FILES=()
 while IFS= read -r line; do
     EXCLUDE_FILES+=("$line")
-done < <(python3 -c '
-import json, os, sys
-registry_path = os.path.join(os.environ["PROJECT_DIR"], "kamma/upstream_sync/registry.json")
-sys.path.insert(0, os.environ["PROJECT_DIR"])
-from kamma.upstream_sync.scripts.registry_helper import get_modified_upstream_paths
-data = json.load(open(registry_path))
-paths = get_modified_upstream_paths(data) + data["no_sync_files"]
-print("\n".join(paths))
-')
+done < <(uv run python3 kamma/upstream_sync/scripts/sync_runtime.py print-exclusions)
 
 # Check if we successfully got exclusions
 if [ ${#EXCLUDE_FILES[@]} -eq 0 ]; then
@@ -36,10 +41,10 @@ else
 fi
 
 # Update as_upstream branch
-echo "ℹ️ Updating as_upstream branch to match upstream/main..."
+echo "ℹ️ Updating as_upstream branch to match $TARGET_UPSTREAM_REF..."
 git checkout as_upstream || exit 1
 git fetch upstream || exit 1
-git reset --hard upstream/main || exit 1
+git reset --hard "$TARGET_UPSTREAM_REF" || exit 1
 
 # Switch to sbs-ru and sync
 echo "ℹ️ Switching to sbs-ru branch..."
@@ -87,4 +92,3 @@ git add . || exit 1
 COMMIT_MESSAGE="${COMMIT_MESSAGE_PREFIX}selective update${COMMIT_MESSAGE_SUFFIX}"
 
 echo "✅ Done! Please commit with message: $COMMIT_MESSAGE"
-
