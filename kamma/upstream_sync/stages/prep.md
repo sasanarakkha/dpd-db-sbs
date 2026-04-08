@@ -16,4 +16,5 @@
 - [ ] `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` passes.
 - [ ] `accepted_sync.json` reviewed and bootstrapped.
 - [ ] `scripts/prep_analyzer.py <thread_dir>` executed and outputs reviewed.
+- [ ] `scripts/execute_sync.py <thread_dir>` executed to pull automated changes.
 - [ ] **Commit 1 Gate**: Automated sync performed and approved.

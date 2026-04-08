@@ -41,7 +41,9 @@ A broken shadow always means the sync is incomplete or inaccurate — not that t
    - Generate `prep_report.md` and `prep_manifest.json` from the explicit upstream range in `accepted_sync.json`.
    - Identify all modified, added, and deleted upstream files relative to the registry.
 3. **Automated Pull**:
-   - Perform the automated sync (Commit 1 gate).
+   - Perform the automated sync by running `uv run python3 kamma/upstream_sync/scripts/execute_sync.py <thread_dir>`.
+   - Review and add any run-specific exclusions to `<thread_dir>/run_exclusions.txt` before execution if needed.
+   - (Commit 1 gate).
 
 ### Stage 2: Analysis (Strategic Planning)
 **Goal**: Determine how to integrate upstream changes into localized files.

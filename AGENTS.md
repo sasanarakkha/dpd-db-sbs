@@ -1,6 +1,6 @@
 # Project Rules (from original upstream)
 
-These rules are specific to the dpd-db project. Apply these in addition to your baseline global instructions `~/agents/AGENTS.md`.
+These rules are specific to the dpd-db project. Apply these in addition to your baseline global instructions `~/.claude/CLAUDE.md`.
 
 ## Project Overview
 

@@ -25,6 +25,7 @@ For the full protocol, see **[guide.md](./guide.md)**.
 | `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` | Validate `registry.json` schema and paths. |
 | `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` | Ensure every registry entry has SMD merge guidance. |
 | `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py <thread_dir>` | Generate Stage 1 report and manifest. |
+| `uv run python3 kamma/upstream_sync/scripts/execute_sync.py <thread_dir>` | Robustly execute selective sync from upstream. |
 | `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>` | Advance accepted sync metadata after Stage 3 verification. |
 | `uv run pytest tests/test_shadow_parity.py` | Verify strict shadow parity with upstream. |
 | `uv run pytest tests/test_namespace_isolation.py` | Enforce symbol naming policy on localized files. |

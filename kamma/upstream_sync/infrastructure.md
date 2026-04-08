@@ -22,6 +22,7 @@ All upstream sync assets live in `kamma/upstream_sync/`.
 | `scripts/validate_registry.py` | Schema and data-quality validator for `registry.json` |
 | `scripts/verify_smd_coverage.py` | Coverage checker — ensures every registry entry has an SMD entry in `smd/` |
 | `scripts/prep_analyzer.py` | Generates factual Stage 1 report and manifest from the accepted sync range |
+| `scripts/execute_sync.py` | Robustly executes selective sync from upstream (Stage 1 automation) |
 | `scripts/finalize_accepted_sync.py` | Advances `accepted_sync.json` from a verified prep manifest |
 | `scripts/sync_runtime.py` | Emits runtime sync metadata for shell automation |
 | `README.md` | Folder-level quick-start |
@@ -89,7 +90,7 @@ Generates `prep_report.md` and `prep_manifest.json` by diffing the explicit upst
 
 | Script | Role |
 |---|---|
-| `scripts/bash/full_sync.sh` | Full upstream sync orchestration |
+| `scripts/execute_sync.py` | Robustly executes selective sync from upstream |
 | `tests/test_shadow_parity.py` | Verifies structural parity of strict shadows |
 | `tests/check_shadow_modifications.py` | Checks shadows updated after upstream change |
 | `tests/test_shadow_cleanup.py` | Finds orphaned files |

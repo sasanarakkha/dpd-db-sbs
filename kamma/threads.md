@@ -1,11 +1,11 @@
-# Project Threads
-
-This file lists all major threads for the project. Each thread has its own detailed plan in its respective folder.
+# Kamma Threads Index
 
 ---
 
-## [~] Thread: Implement Upstream Sync Process Improvements
-*Link: [./threads/implement_sync_process/](./threads/implement_sync_process/)*
+## [x] Thread: Implement Sync Ledger / Manifest Workflow
+*Link: [./kamma/threads/implement_sync_ledger_20260408/](./kamma/threads/implement_sync_ledger_20260408/)*
 
 ---
 
+## [x] Thread: Improve Upstream Sync Execution
+*Link: [./kamma/threads/20260408_improve_sync_exec/](./kamma/threads/20260408_improve_sync_exec/)*

@@ -1,0 +1,4 @@
+# Run-specific exclusions for this sync thread.
+# Add one path per line.
+# Example:
+# scripts/dps_archive/some_temp_script.py
