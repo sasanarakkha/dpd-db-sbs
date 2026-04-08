@@ -119,6 +119,7 @@ kamma/upstream_sync/new_improvements.md
 archive
 .roo/
 .agent/
+.kilocode/
 sessions
 gui2/data/*.json
 exporter/goldendict/ru_components/javascript/ru_family_compound_json.js
