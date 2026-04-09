@@ -50,6 +50,7 @@ class HeadwordData:
         show_sbs_data: bool = False,
         show_ru_data: bool = False,
     ):
+        self.construction_summary = i.construction_summary
         self.i = self._convert_newlines(i)
         self.rt = rt
         self.fr = fr
@@ -115,16 +116,16 @@ class HeadwordData:
     @staticmethod
     def _convert_newlines(obj):
         attrs = [
-            "meaning_1",
-            "sanskrit",
+            "construction",
             "phonetic",
             "compound_construction",
-            "commentary",
             "sutta_1",
             "sutta_2",
             "example_1",
             "example_2",
+            "commentary",
             "notes",
+            "link",
         ]
         for attr_name in attrs:
             attr_value = getattr(obj, attr_name, None)

@@ -3,7 +3,6 @@
 """Save latest Russian,ru roots and SBS tables to backup_tsv folder."""
 
 from git import Repo
-from rich import print
 import csv
 
 from sqlalchemy.orm.session import Session
@@ -17,7 +16,7 @@ from tools.paths_dps import DPSPaths
 
 def backup_dps():
     pr.tic()
-    print("[bright_yellow]backing russian and sbs tables to tsv")
+    pr.yellow_title("backing russian and sbs tables to tsv")
     pth = ProjectPaths()
     dpspth = DPSPaths()
     db_session = get_db_session(pth.dpd_db_path)
@@ -30,18 +29,18 @@ def backup_dps():
 
 def backup_ru(db_session: Session, dpspth: DPSPaths, custom_path: str = ""):
     """Backup Russian table to TSV."""
-    print("[green]Checking Russian table")
+    pr.green_tmr("checking Russian table")
 
     # Query the Russian table
     db = db_session.query(Russian).all()
 
     # Check if the table is empty
     if not db:
-        print("[red]Error: The Russian table is empty. Backup aborted.")
+        pr.red("Error: The Russian table is empty. Backup aborted.")
         return
 
     # Proceed with backup if the table is not empty
-    print("[green]Writing Russian table")
+    pr.green_tmr("writing Russian table")
 
     # Use the custom path if provided, otherwise use the default path
     russian_path = custom_path if custom_path else dpspth.russian_path
@@ -60,18 +59,18 @@ def backup_ru(db_session: Session, dpspth: DPSPaths, custom_path: str = ""):
 
 def backup_sbs(db_session: Session, dpspth: DPSPaths, custom_path: str = ""):
     """Backup SBS tables to TSV."""
-    print("[green]Checking SBS table")
+    pr.green_tmr("checking SBS table")
 
     # Query the SBS table
     db = db_session.query(SBS).all()
 
     # Check if the table is empty
     if not db:
-        print("[red]Error: The SBS table is empty. Backup aborted.")
+        pr.red("Error: The SBS table is empty. Backup aborted.")
         return
 
     # Proceed with backup if the table is not empty
-    print("[green]writing SBS table")
+    pr.green_tmr("writing SBS table")
 
     # Use the custom path if provided, otherwise use the default path
     sbs_path = custom_path if custom_path else dpspth.sbs_path
@@ -90,25 +89,25 @@ def backup_sbs(db_session: Session, dpspth: DPSPaths, custom_path: str = ""):
 
 def backup_roots_ru(db_session: Session, dpspth: DPSPaths, custom_path: str = ""):
     """Backup Ru columns from the DpdRoot to TSV."""
-    print("[green]Checking DpdRoot table")
+    pr.green_tmr("checking DpdRoot table")
 
     # Query DpdRoot table
     db = db_session.query(DpdRoot).all()
 
     # Check if the table is empty
     if not db:
-        print("[red]Error: DpdRoot table is empty. Backup aborted.")
+        pr.red("Error: DpdRoot table is empty. Backup aborted.")
         return
 
     # Proceed with backup if the table is not empty
-    print("[green]writing Ru columns from the DpdRoot table")
+    pr.green_tmr("writing Ru columns from the DpdRoot table")
 
     # Check for rows where root.sanskrit_root is not "-" and root_sanskrit_root_ru_meaning is empty
     for record in db:
         if record.sanskrit_root != "-" and not record.sanskrit_root_ru_meaning:
-            print(f"[red]No root_sanskrit_root_ru_meaning: {record}")
+            pr.red(f"No root_sanskrit_root_ru_meaning: {record}")
         if not record.root_ru_meaning:
-            print(f"[red]No root_ru_meaning: {record}")
+            pr.red(f"No root_ru_meaning: {record}")
 
     # Use the custom path if provided, otherwise use the default path
     ru_root_path = custom_path if custom_path else dpspth.ru_root_path

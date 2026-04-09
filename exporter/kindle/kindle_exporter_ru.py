@@ -46,7 +46,7 @@ from exporter.jinja2_env import get_jinja2_env
 
 
 def render_dpd_xhtml_ru(pth: ProjectPaths, rupth: RuPaths):
-    pr.green("querying dpd db")
+    pr.green_tmr("querying dpd db")
     db_session = get_db_session(pth.dpd_db_path)
     dpd_db = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.ru)).all()
     dpd_db = sorted(dpd_db, key=lambda x: pali_sort_key(x.lemma_1))
@@ -95,7 +95,7 @@ def render_dpd_xhtml_ru(pth: ProjectPaths, rupth: RuPaths):
     combined_text_set = cst_text_set | sc_text_set
 
     # words in deconstructor in cst_text_set & sc_text_set
-    pr.green("querying lookup for deconstructor")
+    pr.green_tmr("querying lookup for deconstructor")
     chunk_size = 900
     deconstructor_db = []
 
@@ -112,11 +112,11 @@ def render_dpd_xhtml_ru(pth: ProjectPaths, rupth: RuPaths):
     pr.yes(len(words_in_deconstructor_set))
 
     # all_words_set = cst_text_set + sc_text_set + words in deconstructor compounds
-    pr.green("making all words set")
+    pr.green_tmr("making all words set")
     all_words_set = combined_text_set | words_in_deconstructor_set
     pr.yes(len(all_words_set))
 
-    pr.green("creating inflections dict")
+    pr.green_tmr("creating inflections dict")
     inflections_dict: dict[int, list[str]] = {}
     inflections_counter = 0
     for i in dpd_db:
@@ -161,7 +161,7 @@ def render_dpd_xhtml_ru(pth: ProjectPaths, rupth: RuPaths):
             pr.counter(counter, len(deconstructor_db), i.lookup_key)
 
     # save to xhtml
-    pr.green("saving entries xhtml")
+    pr.green_tmr("saving entries xhtml")
     total = 0
     for counter, (letter, entries) in enumerate(letter_dict.items()):
         ascii_letter = diacritics_cleaner(letter)
@@ -270,7 +270,7 @@ def render_ebook_letter_templ_ru(jinja_env, letter: str, entries: str) -> str:
 
 def save_abbreviations_xhtml_page(rupth: RuPaths, id_counter):
     """Render xhtml of all DPD abbreviations and save as a page."""
-    pr.green("saving abbrev xhtml")
+    pr.green_tmr("saving abbrev xhtml")
     jinja_env = get_jinja2_env("exporter/kindle/ru_components/templates")
     abbreviations_list = read_tsv_dict(rupth.abbreviations_tsv_path)
 
@@ -298,7 +298,7 @@ def render_abbreviation_entry_ru(jinja_env, counter: int, i: dict) -> str:
 
 def save_title_page_xhtml(rupth: RuPaths):
     """Save date and time in title page xhtml."""
-    pr.green("saving titlepage xhtml")
+    pr.green_tmr("saving titlepage xhtml")
     jinja_env = get_jinja2_env("exporter/kindle/ru_components/templates")
     current_datetime = datetime.now()
     date = current_datetime.strftime("%Y-%m-%d")
@@ -313,7 +313,7 @@ def save_title_page_xhtml(rupth: RuPaths):
 
 def save_content_opf_xhtml(rupth: RuPaths, current_datetime):
     """Save date and time in content.opf."""
-    pr.green("saving content.opf")
+    pr.green_tmr("saving content.opf")
     jinja_env = get_jinja2_env("exporter/kindle/ru_components/templates")
     date_time_zulu = current_datetime.strftime("%Y-%m-%dT%H:%M:%SZ")
     template = jinja_env.get_template("ebook_ru_content_opf.jinja")
@@ -325,7 +325,7 @@ def save_content_opf_xhtml(rupth: RuPaths, current_datetime):
 
 def zip_epub(pth: RuPaths):
     """Zip up the epub dir and name it dpd-kindle.epub."""
-    pr.green("zipping up epub")
+    pr.green_tmr("zipping up epub")
     epub_dir_path = Path(pth.epub_dir)
     with ZipFile(pth.dpd_epub_path, "w", ZIP_DEFLATED) as zipf:
         for file_path in epub_dir_path.rglob("*"):
@@ -379,7 +379,7 @@ def html_friendly(text: str):
 
 def render_rpd_xhtml_ru(pth: ProjectPaths, rupth: RuPaths, id_counter: int) -> int:
     """Render RPD entries and save to XHTML files."""
-    pr.green("querying rpd data from lookup table")
+    pr.green_tmr("querying rpd data from lookup table")
     jinja_env = get_jinja2_env("exporter/kindle/ru_components/templates")
     db_session = get_db_session(pth.dpd_db_path)
     lookup_db = db_session.query(Lookup).filter(Lookup.rpd != "").all()
@@ -439,7 +439,7 @@ def render_rpd_xhtml_ru(pth: ProjectPaths, rupth: RuPaths, id_counter: int) -> i
         rpd_letter_dict[first_letter].append(entry)
         id_counter += 1
 
-    pr.green("saving rpd entries xhtml")
+    pr.green_tmr("saving rpd entries xhtml")
     total = 0
     for counter, letter in enumerate(russian_alphabet):
         entries_list = rpd_letter_dict[letter]
@@ -474,7 +474,7 @@ def render_rpd_letter_templ_ru(jinja_env, letter: str, entries: str) -> str:
 
 def main():
     pr.tic()
-    pr.title("rendering dpd for ebook")
+    pr.yellow_title("rendering dpd for ebook")
     if config_test("exporter", "make_ebook", "yes"):
         pth = ProjectPaths()
         rupth = RuPaths()

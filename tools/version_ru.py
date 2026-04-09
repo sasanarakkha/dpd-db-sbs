@@ -95,7 +95,7 @@ def update_db_version(pth, version):
 
 def main():
     pr.tic()
-    pr.title("updating dpd release version")
+    pr.yellow_title("updating dpd release version")
     pth = ProjectPaths()
     version, version_light, version_ru = make_version()
 

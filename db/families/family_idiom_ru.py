@@ -23,13 +23,13 @@ from sqlalchemy.orm import joinedload
 
 def main():
     pr.tic()
-    pr.title("idioms generator (ru)")
+    pr.yellow_title("idioms generator (ru)")
 
     if not (
         config_test("exporter", "make_dpd", "yes")
         or config_test("regenerate", "db_rebuild", "yes")
     ):
-        pr.green_title("disabled in config.ini")
+        pr.green_tmr("disabled in config.ini")
         pr.toc()
         return
 
@@ -53,7 +53,7 @@ def main():
 
 
 def create_idioms_dict(dpd_db):
-    pr.green("extracting idioms and headwords")
+    pr.green_tmr("extracting idioms and headwords")
 
     idioms_dict: dict = {}
     for i in dpd_db:
@@ -73,7 +73,7 @@ def create_idioms_dict(dpd_db):
 
 
 def compile_idioms_html_ru(dpd_db: list[DpdHeadword], idioms_dict):
-    pr.green("compiling html ru")
+    pr.green_tmr("compiling html ru")
 
     for i in dpd_db:
         if i.pos in ["idiom", "sandhi"]:
@@ -117,7 +117,7 @@ def compile_idioms_html_ru(dpd_db: list[DpdHeadword], idioms_dict):
 
 
 def add_idioms_to_db(db_session, idioms_dict):
-    pr.green("adding to db")
+    pr.green_tmr("adding to db")
 
     for idiom in idioms_dict:
         # find in db
@@ -134,7 +134,7 @@ def add_idioms_to_db(db_session, idioms_dict):
 def update_db_cache(db_session, idioms_dict):
     """Update the db_info with idioms_set for use in the exporter."""
 
-    pr.green("adding DbInfo cache item")
+    pr.green_tmr("adding DbInfo cache item")
 
     idioms_set = set()
     for i in idioms_dict:

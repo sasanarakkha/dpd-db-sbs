@@ -63,10 +63,10 @@ class ProgData_ru:
 
 def main():
     pr.tic()
-    pr.title("exporting grammar dictionary (ru)")
+    pr.yellow_title("exporting grammar dictionary (ru)")
 
     if not config_test("exporter", "make_grammar", "yes"):
-        pr.green("disabled in config.ini")
+        pr.green_tmr("disabled in config.ini")
         pr.toc()
         return
 
@@ -84,7 +84,7 @@ def main():
 
 def generate_html_from_lookup(g: ProgData_ru):
     """Generate HTML grammar tables from Lookup table data."""
-    pr.green("querying database")
+    pr.green_tmr("querying database")
 
     lookup_results = (
         g.db_session.query(Lookup)
@@ -94,7 +94,7 @@ def generate_html_from_lookup(g: ProgData_ru):
 
     pr.yes(f"{len(lookup_results)}")
 
-    pr.green("compiling html")
+    pr.green_tmr("compiling html")
 
     # Preload abbreviations dictionary
     load_abbreviations_dict(g.rupth.abbreviations_tsv_path)
@@ -136,7 +136,7 @@ def generate_html_from_lookup(g: ProgData_ru):
 
 def make_data_lists(g: ProgData_ru):
     """Make the data_lists to be consumed by GoldenDict and MDict"""
-    pr.green("making data lists")
+    pr.green_tmr("making data lists")
 
     dict_data: list[DictEntry] = []
     for word, html in g.html_dict.items():

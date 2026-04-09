@@ -19,7 +19,7 @@ from tools.paths_dps import DPSPaths
 
 def main():
     pr.tic()
-    pr.title("populating ru sbs tables from tsvs")
+    pr.yellow_title("populating ru sbs tables from tsvs")
 
     pth = ProjectPaths()
     dpspth = DPSPaths()
@@ -117,7 +117,7 @@ def main():
     make_table_data_sbs(dpspth, db_session)
     make_root_table_data_ru(dpspth, db_session)
 
-    pr.green("committing to db")
+    pr.green_tmr("committing to db")
     db_session.commit()
     db_session.close()
     pr.yes("ok")
@@ -135,13 +135,11 @@ def get_tsv_files(original_path: Path, base_filename: str) -> List[Path]:
     split_files = sorted(backup_dir.glob(split_pattern))
 
     if split_files:
-        pr.green(f"Found {len(split_files)} split {base_filename} files")
         return split_files
 
     # Fall back to single file format
     single_file = backup_dir / f"{base_filename}.tsv"
     if single_file.exists():
-        pr.green(f"Found single {base_filename} file")
         return [single_file]
 
     return []
@@ -158,8 +156,6 @@ def read_tsv_files(file_paths: List[Path]) -> Iterator[Tuple[List[str], List[str
     columns = None
 
     for file_idx, file_path in enumerate(file_paths):
-        pr.green(f"Reading {file_path.name}")
-
         with open(file_path, "r", newline="") as tsv_file:
             csvreader = csv.reader(tsv_file, delimiter="\t", quotechar='"')
 
@@ -178,7 +174,7 @@ def read_tsv_files(file_paths: List[Path]) -> Iterator[Tuple[List[str], List[str
 
 def make_table_data_ru(dpspth: DPSPaths, db_session: Session):
     """Read TSV and return Russian table data."""
-    pr.green("creating Russian table data")
+    pr.green_tmr("creating Russian table data")
     counter = 0
     russian_files = get_tsv_files(dpspth.russian_path, "russian")
     for columns, row in read_tsv_files(russian_files):
@@ -191,7 +187,7 @@ def make_table_data_ru(dpspth: DPSPaths, db_session: Session):
 
 def make_table_data_sbs(dpspth: DPSPaths, db_session: Session):
     """Read TSV and return SBS table data."""
-    pr.green("creating SBS table data")
+    pr.green_tmr("creating SBS table data")
     counter = 0
     sbs_files = get_tsv_files(dpspth.sbs_path, "sbs")
     for columns, row in read_tsv_files(sbs_files):
@@ -204,7 +200,7 @@ def make_table_data_sbs(dpspth: DPSPaths, db_session: Session):
 
 def make_root_table_data_ru(dpspth: DPSPaths, db_session: Session):
     """Read TSV and return ru columns from DpdRoot."""
-    pr.green("filling ru in DpdRoot table")
+    pr.green_tmr("filling ru in DpdRoot table")
     updated_counter = 0
     not_found_in_db_counter = 0
 

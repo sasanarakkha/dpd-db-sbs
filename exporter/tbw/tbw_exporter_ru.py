@@ -28,7 +28,7 @@ from tools.tools_for_ru_exporter import (
 
 class ProgData_ru:
     def __init__(self) -> None:
-        pr.green("setting up data")
+        pr.green_tmr("setting up data")
         self.pth: ProjectPaths = ProjectPaths()
         self.rupth: RuPaths = RuPaths()
         self.db_session = get_db_session(self.pth.dpd_db_path)
@@ -99,7 +99,7 @@ def generate_sc_word_set(g: ProgData_ru):
 def generate_deconstructed_word_set(g: ProgData_ru):
     """make a set of all words in deconstructed compounds"""
 
-    pr.green("making deconstructor splits set")
+    pr.green_tmr("making deconstructor splits set")
     for i in g.deconstructor_db:
         if i.lookup_key in g.word_set:
             g.matched_set.add(i.lookup_key)
@@ -112,7 +112,7 @@ def generate_deconstructed_word_set(g: ProgData_ru):
 def generate_i2h_dict(g: ProgData_ru):
     """make an inflections to headwords dictionary"""
 
-    pr.green("making inflection2headwords dict")
+    pr.green_tmr("making inflection2headwords dict")
     for __counter__, i in enumerate(g.dpd_db):
         inflections = i.inflections_list_all  # include api ca eva iti
         for inflection in inflections:
@@ -130,7 +130,7 @@ def generate_i2h_dict(g: ProgData_ru):
 def sort_i2h_dict(g: ProgData_ru):
     """sort i2h dict by values"""
 
-    pr.green("sorting i2h_dict")
+    pr.green_tmr("sorting i2h_dict")
     for inflection, headwords in g.i2h_dict.items():
         g.i2h_dict[inflection] = pali_list_sorter(headwords)
     pr.yes(len(g.i2h_dict))
@@ -139,7 +139,7 @@ def sort_i2h_dict(g: ProgData_ru):
 def generate_unmatched_word_set(g: ProgData_ru):
     """make a set of unmatched words"""
 
-    pr.green("making set of unmatched words")
+    pr.green_tmr("making set of unmatched words")
     g.unmatched_set = g.word_set - g.matched_set
     pr.yes(len(g.unmatched_set))
 
@@ -147,7 +147,7 @@ def generate_unmatched_word_set(g: ProgData_ru):
 def generate_ebt_headwords_set(g: ProgData_ru):
     """make a set of headwords in ebts"""
 
-    pr.green("making headwords set")
+    pr.green_tmr("making headwords set")
     for __key__, values in g.i2h_dict.items():
         g.headwords_set.update(values)
     pr.yes(len(g.headwords_set))
@@ -156,7 +156,7 @@ def generate_ebt_headwords_set(g: ProgData_ru):
 def generate_dpd_ebt_dict(g: ProgData_ru):
     """make a dict of dpd data - only words in ebts"""
 
-    pr.green("making dpd ebts dict")
+    pr.green_tmr("making dpd ebts dict")
     for i in g.dpd_db:
         if i.lemma_1 in g.headwords_set:
             string = ""
@@ -174,7 +174,7 @@ def generate_dpd_ebt_dict(g: ProgData_ru):
 def generate_deconstructor_dict(g: ProgData_ru):
     """make a dict of all deconstructed compounds"""
 
-    pr.green("making deconstructor dict")
+    pr.green_tmr("making deconstructor dict")
 
     for i in g.deconstructor_db:
         if i.lookup_key not in g.dpd_dict and i.lookup_key in g.word_set:
@@ -187,7 +187,7 @@ def generate_deconstructor_dict(g: ProgData_ru):
 def deconstructor_dict_add_variants(g: ProgData_ru):
     """add variant readings to deconstructor data"""
 
-    pr.green("adding variants")
+    pr.green_tmr("adding variants")
     var_counter = 0
     for i in g.variants_db:
         if i.lookup_key in g.word_set:
@@ -204,7 +204,7 @@ def deconstructor_dict_add_variants(g: ProgData_ru):
 def deconstructor_dict_add_spelling_mistakes(g: ProgData_ru):
     """add spelling mistakes to deconstructor data"""
 
-    pr.green("adding spelling mistakes")
+    pr.green_tmr("adding spelling mistakes")
     spell_counter = 0
     for i in g.spelling_db:
         if i.lookup_key in g.word_set:
@@ -221,7 +221,7 @@ def deconstructor_dict_add_spelling_mistakes(g: ProgData_ru):
 def sort_deconstructor_dict(g: ProgData_ru):
     """sort deconstructor dict"""
 
-    pr.green("sorting deconstructor dict")
+    pr.green_tmr("sorting deconstructor dict")
     g.deconstructor_dict = dict(
         sorted(g.deconstructor_dict.items(), key=lambda x: pali_sort_key(x[0]))
     )
@@ -231,7 +231,7 @@ def sort_deconstructor_dict(g: ProgData_ru):
 def save_js_files_for_fdg(g: ProgData_ru):
     """saving .js files for fdg"""
 
-    pr.green("saving .js files for fdg")
+    pr.green_tmr("saving .js files for fdg")
 
     i2h_json_dump = json.dumps(g.i2h_dict, ensure_ascii=False, indent=2)
     with open(g.pth.fdg_i2h_js_path, "w") as f:
@@ -246,7 +246,7 @@ def save_js_files_for_fdg(g: ProgData_ru):
 
 def main():
     pr.tic()
-    pr.title("export dpd data for TBW and Sutta Central")
+    pr.yellow_title("export dpd data for TBW and Sutta Central")
 
     if not config_test("exporter", "make_tbw", "yes"):
         pr.green_title("disabled in config.ini")

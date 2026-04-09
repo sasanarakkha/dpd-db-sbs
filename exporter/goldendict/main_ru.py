@@ -42,8 +42,8 @@ class GlobalVars:
         self.db_session: Session = get_db_session(self.pth.dpd_db_path)
         self.speech_marks_manager = SpeechMarkManager()
         self.speech_marks = self.speech_marks_manager.get_speech_marks()
-        self.cf_set: set = load_cf_set()
-        self.idioms_set: set = load_idioms_set()
+        self.cf_set: set = load_cf_set()  # type: ignore[assignment]
+        self.idioms_set: set = load_idioms_set()  # type: ignore[assignment]
         self.roots_count_dict = make_roots_count_dict(self.db_session)
         self.rendered_sizes: List[RenderedSizes] = []
         self.data_limit = int(config_read("dictionary", "data_limit") or "0")
@@ -59,7 +59,7 @@ class GlobalVars:
 
 def main():
     pr.tic()
-    pr.title("exporting dpd to goldendict and mdict (ru)")
+    pr.yellow_title("exporting dpd to goldendict and mdict (ru)")
 
     if not config_test("exporter", "make_dpd", "yes"):
         pr.green_title("disabled in config.ini")
@@ -179,7 +179,7 @@ def prepare_export_to_goldendict_mdict(g: GlobalVars) -> None:
 
 
 def write_size_dict(pth: ProjectPaths, size_dict):
-    pr.green("writing size_dict")
+    pr.green_tmr("writing size_dict")
     filename = pth.temp_dir.joinpath("size_dict.tsv")
 
     with open(filename, "w", newline="") as csvfile:

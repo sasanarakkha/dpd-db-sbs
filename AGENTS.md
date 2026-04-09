@@ -20,6 +20,14 @@ Digital Pali Dictionary.
 ## Flet
 - When answering questions about Flet refer to the /resources/flet-docs folder.
 
+## Context7
+Use Context7 MCP (`mcp__plugin_context7_context7__resolve-library-id` + `query-docs`) for up-to-date docs on project libraries:
+- `SQLAlchemy` — ORM, sessions, queries, relationships
+- `Flet` — GUI widgets and layout
+- `FastAPI` — webapp routes and middleware (`exporter/webapp/`)
+- `aksharamukha` — transliteration script names and options
+- `requests` — HTTP client usage
+
 ## GitHub (upstream repository)
 - Unless otherwise specified the repository in question is https://github.com/digitalpalidictionary/dpd-db.
 - **Solve:** Read the specified GitHub issue using `get_issue` and offer solutions. Show code snippets of suggested changes.

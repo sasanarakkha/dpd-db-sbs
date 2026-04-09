@@ -21,13 +21,13 @@ from sqlalchemy.orm import joinedload
 
 def main():
     pr.tic()
-    pr.title("word families generator (ru)")
+    pr.yellow_title("word families generator (ru)")
 
     if not (
         config_test("exporter", "make_dpd", "yes")
         or config_test("regenerate", "db_rebuild", "yes")
     ):
-        pr.green("disabled in config.ini")
+        pr.green_tmr("disabled in config.ini")
         pr.toc()
         return
 
@@ -58,7 +58,7 @@ def main():
 
 
 def make_word_fam_dict(wf_db: list[DpdHeadword]):
-    pr.green("extracting word families")
+    pr.green_tmr("extracting word families")
 
     # create a dict of all word families
     # word: {headwords: [], html: "", }
@@ -86,7 +86,7 @@ def make_word_fam_dict(wf_db: list[DpdHeadword]):
 
 
 def compile_wf_html_ru(wf_db: list[DpdHeadword], wf_dict):
-    pr.green("compiling html ru")
+    pr.green_tmr("compiling html ru")
 
     for __counter__, i in enumerate(wf_db):
         wf = i.family_word
@@ -127,7 +127,7 @@ def compile_wf_html_ru(wf_db: list[DpdHeadword], wf_dict):
 
 
 def add_wf_to_db(db_session, wf_dict):
-    pr.green("adding to db")
+    pr.green_tmr("adding to db")
 
     add_to_db = []
     errors_list = []

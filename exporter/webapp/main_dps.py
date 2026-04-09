@@ -1,4 +1,3 @@
-# Synced with upstream main.py (2026-03-12)
 # -*- coding: utf-8 -*-
 from contextlib import contextmanager
 

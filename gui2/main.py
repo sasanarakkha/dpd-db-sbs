@@ -4,6 +4,7 @@ from pathlib import Path
 
 import flet as ft
 
+from gui2.compound_type_tab_view import CompoundTypeTabView
 from gui2.roots_tab_view import RootsTabView
 from gui2.sandhi_find_replace_view import SandhiFindReplaceView
 from gui2.sandhi_view import SandhiView
@@ -91,6 +92,7 @@ class App:
         self.dps_view: DpsView = DpsView(self.page, self.toolkit)
         self.analysis_view = AnalysisView(self.page, self.toolkit)
         self.roots_view = RootsTabView(self.page, self.toolkit)
+        self.compound_type_view = CompoundTypeTabView(self.page, self.toolkit)
 
         self.build_ui()
 
@@ -111,18 +113,45 @@ class App:
         self.page.open(dialog)
 
     def _on_check_updates(self, e: ft.ControlEvent) -> None:
-        """Handle Update button click."""
-        from scripts.onboarding.contributor_update import update_environment
+        """Handle Update button click with confirmation."""
 
-        summary = update_environment(Path.cwd())
-        dialog = ft.AlertDialog(
-            title=ft.Text("Update Complete"),
-            content=ft.Text(summary),
+        def _run_update(e: ft.ControlEvent) -> None:
+            self.page.close(confirm_dialog)
+            from scripts.onboarding.contributor_update import update_environment
+
+            summary = update_environment(Path.cwd())
+            result_dialog = ft.AlertDialog(
+                title=ft.Text("Update Complete"),
+                content=ft.Text(summary),
+                actions=[
+                    ft.TextButton(
+                        "OK", on_click=lambda _: self.page.close(result_dialog)
+                    ),
+                ],
+            )
+            self.page.open(result_dialog)
+
+        confirm_dialog = ft.AlertDialog(
+            modal=True,
+            title=ft.Text("⚠️ Warning"),
+            content=ft.Text(
+                "This will pull the latest code and may overwrite your "
+                "local dpd.db with the latest release.\n\n"
+                "A backup will be created automatically, but are you sure?"
+            ),
             actions=[
-                ft.TextButton("OK", on_click=lambda _: self.page.close(dialog)),
+                ft.TextButton(
+                    "Cancel",
+                    on_click=lambda _: self.page.close(confirm_dialog),
+                ),
+                ft.TextButton(
+                    "Update",
+                    on_click=_run_update,
+                ),
             ],
+            actions_alignment=ft.MainAxisAlignment.END,
         )
-        self.page.open(dialog)
+        self.page.open(confirm_dialog)
 
     def on_keyboard(self, e: ft.KeyboardEvent) -> None:
         """Handles global keyboard events."""
@@ -138,6 +167,14 @@ class App:
                 self.toolkit.ai_search_popup.close_dialog()
             elif self.toolkit.wordfinder_popup.is_dialog_open():
                 self.toolkit.wordfinder_popup.close_dialog()
+        elif e.key == "S" and e.ctrl:
+            tab = self.tabs.tabs[self.tabs.selected_index]
+            view = tab.content
+            # Ctrl+S saves table changes in tabs that support it
+            if hasattr(view, "_on_save_changes"):
+                view._on_save_changes(None)
+            elif hasattr(view, "_save_changes_clicked"):
+                view._save_changes_clicked(None)
         elif e.key == "Arrow Left" and e.alt:
             if self.tabs.selected_index > 0:
                 self.tabs.selected_index -= 1
@@ -236,6 +273,10 @@ class App:
                 ft.Tab(
                     text="√",
                     content=self.roots_view,
+                ),
+                ft.Tab(
+                    text="CT",
+                    content=self.compound_type_view,
                 ),
             ],
             expand=True,

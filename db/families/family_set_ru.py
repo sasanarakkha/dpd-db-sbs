@@ -2,6 +2,10 @@
 
 """Compile sets save to database (ru)."""
 
+import re
+
+from natsort import natsorted
+
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword, FamilySet
 from tools.configger import config_test
@@ -18,16 +22,76 @@ from tools.tools_for_ru_exporter import (
 
 from sqlalchemy.orm import joinedload
 
+SORT_STRATEGIES: dict[str, list[str]] = {
+    "natsort_prefixes": [
+        "suttas of ",
+        "vaggas of ",
+        "books of the ",
+        "chapters of ",
+        "collections of ",
+        "parts of ",
+    ],
+    "natsort_exact": [
+        "previous Buddhas",
+    ],
+    "bracket_number": [
+        "ordinal numbers",
+        "cardinal numbers",
+    ],
+    "day_order": [
+        "days of the week",
+    ],
+}
+
+DAY_ORDER: dict[str, int] = {
+    "monday": 0,
+    "tuesday": 1,
+    "wednesday": 2,
+    "thursday": 3,
+    "friday": 4,
+    "saturday": 5,
+    "sunday": 6,
+}
+
+
+def _get_sort_strategy(set_name: str) -> str | None:
+    """Return the sort strategy for a set name, or None for default Pāḷi sort."""
+    for prefix in SORT_STRATEGIES["natsort_prefixes"]:
+        if set_name.startswith(prefix):
+            return "natsort"
+    if set_name in SORT_STRATEGIES["natsort_exact"]:
+        return "natsort"
+    if set_name in SORT_STRATEGIES["bracket_number"]:
+        return "bracket_number"
+    if set_name in SORT_STRATEGIES["day_order"]:
+        return "day_order"
+    return None
+
+
+def _extract_bracket_number(meaning_1: str) -> float:
+    """Extract number from brackets in meaning_1.
+    E.g. '(48th)' → 48, '(38)' → 38, '(800 000)' → 800000.
+    """
+    match = re.search(r"\(([0-9 ]+)", meaning_1)
+    if match:
+        return float(match.group(1).replace(" ", ""))
+    return float("inf")
+
+
+def _day_sort_key(meaning_1: str) -> int:
+    """Sort by day of the week order."""
+    return DAY_ORDER.get(meaning_1.strip().lower(), 99)
+
 
 def main():
     pr.tic()
-    pr.title("sets generator (ru)")
+    pr.yellow_title("sets generator (ru)")
 
     if not (
         config_test("exporter", "make_dpd", "yes")
         or config_test("regenerate", "db_rebuild", "yes")
     ):
-        pr.green("disabled in config.ini")
+        pr.green_tmr("disabled in config.ini")
         pr.toc()
         return
 
@@ -51,11 +115,11 @@ def main():
 
 
 def make_sets_dict(sets_db):
-    pr.green("extracting set names")
+    pr.green_tmr("extracting set names")
 
     sets_dict: dict = {}
 
-    for __counter__, i in enumerate(sets_db):
+    for i in sets_db:
         for fs in i.family_set_list:
             if fs == " ":
                 pr.red("ERROR: spaces found please remove!")
@@ -79,50 +143,55 @@ def make_sets_dict(sets_db):
 
 
 def compile_sf_html_ru(sets_db: list[DpdHeadword], sets_dict):
-    pr.green("compiling html ru")
+    pr.green_tmr("compiling html ru")
 
     populate_set_ru_and_check_errors(sets_dict)
 
-    for __counter__, i in enumerate(sets_db):
+    for i in sets_db:
         for sf in i.family_set_list:
             if sf in sets_dict:
                 if i.lemma_1 in sets_dict[sf]["headwords"]:
-                    # rus
-                    if not sets_dict[sf]["html_ru"]:
-                        ru_html_string = "<table class='family'>"
-                    else:
-                        ru_html_string = sets_dict[sf]["html_ru"]
+                    sets_dict[sf].setdefault("items", []).append(i)
 
-                    ru_meaning = make_short_ru_meaning(i, i.ru)
-                    pos = ru_replace_abbreviations(i.pos)
-                    ru_html_string += "<tr>"
-                    ru_html_string += f"<th>{superscripter_uni(i.lemma_1)}</th>"
-                    ru_html_string += f"<td><b>{pos}</b></td>"
-                    ru_html_string += f"<td>{ru_meaning}</td>"
-                    ru_html_string += f"<td>{degree_of_completion_ru(i)}</td>"
-                    ru_html_string += "</tr>"
+    for sf, sf_data in sets_dict.items():
+        items = sf_data.get("items", [])
+        strategy = _get_sort_strategy(sf)
 
-                    sets_dict[sf]["html_ru"] = ru_html_string
+        if strategy == "natsort":
+            items = natsorted(items, key=lambda x: x.meaning_1)
+        elif strategy == "bracket_number":
+            items = sorted(items, key=lambda x: _extract_bracket_number(x.meaning_1))
+        elif strategy == "day_order":
+            items = sorted(items, key=lambda x: _day_sort_key(x.meaning_1))
 
-                    # rus data
-                    sets_dict[sf]["data_ru"].append(
-                        (
-                            i.lemma_1,
-                            pos,
-                            ru_meaning,
-                            degree_of_completion_ru(i, html=False),
-                        )
-                    )
+        ru_html_string = "<table class='family'>"
+        for i in items:
+            ru_meaning = make_short_ru_meaning(i, i.ru)
+            pos = ru_replace_abbreviations(i.pos)
+            ru_html_string += "<tr>"
+            ru_html_string += f"<th>{superscripter_uni(i.lemma_1)}</th>"
+            ru_html_string += f"<td><b>{pos}</b></td>"
+            ru_html_string += f"<td>{ru_meaning}</td>"
+            ru_html_string += f"<td>{degree_of_completion_ru(i)}</td>"
+            ru_html_string += "</tr>"
 
-    for i in sets_dict:
-        sets_dict[i]["html_ru"] += "</table>"
+            sf_data["data_ru"].append(
+                (
+                    i.lemma_1,
+                    pos,
+                    ru_meaning,
+                    degree_of_completion_ru(i, html=False),
+                )
+            )
+        ru_html_string += "</table>"
+        sf_data["html_ru"] = ru_html_string
 
     pr.yes(len(sets_dict))
     return sets_dict
 
 
 def add_sf_to_db(db_session, sets_dict):
-    pr.green("updating db")
+    pr.green_tmr("updating db")
 
     errors_list = []
 

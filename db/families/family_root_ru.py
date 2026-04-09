@@ -27,13 +27,13 @@ from sqlalchemy.orm import joinedload
 
 def main():
     pr.tic()
-    pr.title("root families (ru)")
+    pr.yellow_title("root families (ru)")
 
     if not (
         config_test("exporter", "make_dpd", "yes")
         or config_test("regenerate", "db_rebuild", "yes")
     ):
-        pr.green("disabled in config.ini")
+        pr.green_tmr("disabled in config.ini")
         pr.toc()
         return
 
@@ -72,7 +72,7 @@ def main():
 
 
 def make_roots_family_dict_and_bases_dict(dpd_db):
-    pr.green("extracting root families and bases")
+    pr.green_tmr("extracting root families and bases")
     rf_dict = {}
     bases_dict = {}
     for i in dpd_db:
@@ -109,7 +109,7 @@ def make_roots_family_dict_and_bases_dict(dpd_db):
 
 
 def compile_rf_html_ru(dpd_db: list[DpdHeadword], rf_dict):
-    pr.green("compiling html ru")
+    pr.green_tmr("compiling html ru")
 
     for __counter__, i in enumerate(dpd_db):
         family = i.root_family_key
@@ -167,7 +167,7 @@ def make_root_header_ru(rf_dict, rf):
 
 
 def add_rf_to_db(db_session, rf_dict):
-    pr.green("updating db")
+    pr.green_tmr("updating db")
 
     for rf in rf_dict:
         # find in db
@@ -192,7 +192,7 @@ def add_rf_to_db(db_session, rf_dict):
 def make_anki_data(rf_dict):
     """Create anki_data_list for updating"""
 
-    pr.green("making anki data")
+    pr.green_tmr("making anki data")
 
     anki_data_list = []
 

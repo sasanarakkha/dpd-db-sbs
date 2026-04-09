@@ -37,16 +37,16 @@ class HeadwordData:
         # Only convert specific string columns to avoid triggering lazy loads
         # of relationships and properties through dir(obj) and getattr()
         string_columns = [
-            "meaning_1",
-            "meaning_lit",
-            "meaning_2",
             "construction",
             "phonetic",
             "compound_construction",
-            "commentary",
-            "notes",
+            "sutta_1",
+            "sutta_2",
             "example_1",
             "example_2",
+            "commentary",
+            "notes",
+            "link",
             "ru_meaning",
             "ru_meaning_lit",
             "ru_notes",

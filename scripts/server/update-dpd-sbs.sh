@@ -10,7 +10,7 @@ cd dpd-db-sbs
 echo "Current directory: $(pwd)"
 
 echo "=== 2. Updating Code from GitHub ==="
-git pull
+git pull --no-recurse-submodules
 
 echo "=== 3. Updating Dependencies with uv ==="
 uv sync

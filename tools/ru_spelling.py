@@ -1,4 +1,3 @@
-# Synced with upstream spelling.py (2026-03-12)
 # -*- coding: utf-8 -*-
 import threading
 from spellchecker import SpellChecker

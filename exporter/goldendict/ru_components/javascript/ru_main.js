@@ -35,9 +35,21 @@ function ru_button_click(el) {
 };
 
 if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", ru_loadData);
+    document.addEventListener("DOMContentLoaded", function () {
+        ru_loadData();
+        const gdParams = new URLSearchParams(window.location.search);
+        const gdWord = gdParams.get("word");
+        if (gdWord) {
+            ru_highlightInflections(gdWord.trim());
+        }
+    });
 } else {
     ru_loadData();
+    const gdParams = new URLSearchParams(window.location.search);
+    const gdWord = gdParams.get("word");
+    if (gdWord) {
+        ru_highlightInflections(gdWord.trim());
+    }
 }
 
 function ru_loadData() {
@@ -149,6 +161,46 @@ function ru_loadRootButtonContent(data) {
         }
     })
 };
+
+//// highlight the searched word in the inflection table
+
+function ru_highlightInflections(searchTerm) {
+    if (!searchTerm) return;
+
+    const tempDiv = document.createElement("div");
+    tempDiv.textContent = searchTerm;
+    const normalizedSearch = tempDiv.textContent;
+
+    const inflectionTables = document.querySelectorAll("table.inflection");
+
+    inflectionTables.forEach(function (table) {
+        const cells = table.querySelectorAll("td");
+
+        cells.forEach(function (cell) {
+            const parts = cell.innerHTML.split(/<br\s*\/?>/i);
+            let modified = false;
+
+            const newParts = parts.map(function (part) {
+                const tempElement = document.createElement("div");
+                tempElement.innerHTML = part;
+                const partText = tempElement.textContent || "";
+
+                if (partText === normalizedSearch) {
+                    const span = document.createElement("span");
+                    span.className = "inflection-highlight";
+                    span.textContent = partText;
+                    modified = true;
+                    return span.outerHTML;
+                }
+                return part;
+            });
+
+            if (modified) {
+                cell.innerHTML = newParts.join("<br>");
+            }
+        });
+    });
+}
 
 function ru_superScripter(text) {
     const regex = /\d/g;

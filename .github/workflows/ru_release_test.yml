@@ -1,8 +1,10 @@
 name: Test Russian Draft Release
-# Synced with upstream draft_release.yml (2026-03-12)
 
-on: 
+on:
  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build:
@@ -71,7 +73,7 @@ jobs:
       run: uv sync --all-groups
 
     - name: Set up Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         go-version: '1.22.2'
 
