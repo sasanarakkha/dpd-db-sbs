@@ -3,7 +3,7 @@
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
     <dc:language>ru</dc:language>
     <dc:identifier id="BookId">urn:uuid:6ca06004-ca06-4ca0-ca06-04ca06ca0604</dc:identifier>
-    <meta property="dcterms:modified">2026-04-10T14:50:35Z</meta>
+    <meta property="dcterms:modified">2026-04-10T15:16:17Z</meta>
               <DictionaryOutLanguage>ru</DictionaryOutLanguage>
               <DefaultLookupIndex>Пали</DefaultLookupIndex>
     <dc:title id="title1">Цифровой Словарь Пали</dc:title>

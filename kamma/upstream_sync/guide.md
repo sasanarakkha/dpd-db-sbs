@@ -86,7 +86,16 @@ Each stage runs in its own session. At the end of a stage:
    - Run `uv run python3 tests/test_shadow_cleanup.py --folder <folder> [--apply]` to review or archive orphans.
    - Update `registry.json` and `smd/` to reflect the new state.
    - Run `uv run python tests/smoke_test_sync.py` — re-run after orphan archiving to confirm nothing was broken.
-4. **Full manual verification**
+4. **Template Audit** (every sync):
+   - For each local template dir (`ru_components/templates/`, `sbs_templates/`, `ru_templates/`):
+     - List all `.jinja` and `.html` files.
+     - For each file, `grep -r` the filename across the entire repo (`.py`, `.jinja`, `.html`, `.js`).
+     - Any template with **zero references** is a dead template candidate.
+   - For each dead candidate, check if upstream has a corresponding template in its own `templates/` dir:
+     - If upstream **does not** have an equivalent → the file is likely a local artefact; delete or archive it.
+     - If upstream **does** have an equivalent → investigate: was it replaced by inline rendering? If so, delete the local dead copy.
+   - Document findings and decisions in `handoff.md` before deleting anything.
+5. **Full manual verification**
    - Ask user to verify everything and stay back for feedbacks. after correcting it do not proceed until user explicitly tell - all is good proceed.
 5. **After sync**
    - Update `accepted_sync.json` only after the sync is accepted and verified.

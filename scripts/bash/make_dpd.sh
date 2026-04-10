@@ -39,13 +39,13 @@ while true; do
     esac
 done
 
-uv run python exporter/grammar_dict/grammar_dict.py
+# uv run python exporter/grammar_dict/grammar_dict.py
 
 uv run python exporter/goldendict/main_sbs.py
-uv run python exporter/deconstructor/deconstructor_exporter.py
+# uv run python exporter/deconstructor/deconstructor_exporter.py
 
 uv run python exporter/tpr/tpr_exporter_ru.py
-uv run python exporter/kindle/kindle_exporter.py
+# uv run python exporter/kindle/kindle_exporter.py
 
 uv run python scripts/build/zip_goldendict_mdict.py
 
@@ -55,13 +55,6 @@ uv run python scripts/moving/move_mdict.py
 if [ "$CHOSEN_OPTION" == "1" ]; then
     uv run python scripts/moving/copy_dpdsbs_from_share2sbs.py
 fi
-
-
-git checkout -- pyproject.toml
-
-git checkout -- db/sanskrit/root_families_sanskrit.tsv
-
-git checkout -- shared_data/changed_templates
 
 # If option 1 was not selected, return settings back to default
 if [ "$CHOSEN_OPTION" != "1" ]; then

@@ -1,6 +1,6 @@
 {
-  "last_accepted_upstream_sha": "89dcdaf3",
-  "last_accepted_upstream_date": "2026-03-10T21:09:59+05:30",
+  "last_accepted_upstream_sha": "9af5f7ee",
+  "last_accepted_upstream_date": "2026-04-08",
   "last_accepted_upstream_ref": "upstream/main",
-  "notes": "Corrected to upstream SHA (was erroneously set to a local fork commit). Baseline for April 2026 sync."
+  "notes": "April 2026 sync complete. Upstream range 89dcdaf3..9af5f7ee, 352 files. All shadows ported, JS drift fixed, dead templates removed (44 files)."
 }

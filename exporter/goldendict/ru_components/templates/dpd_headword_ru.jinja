@@ -975,6 +975,13 @@
             </td>
         </tr>
 
+        {% if d.i.meaning_combo_html %}
+        <tr>
+            <th>English</th>
+            <td>{{ d.i.meaning_combo_html }}</td>
+        </tr>
+        {% endif %}
+
         <tr>
             <th>Грамматика</th>
             <td>{{ d.ru_grammar }}</td>

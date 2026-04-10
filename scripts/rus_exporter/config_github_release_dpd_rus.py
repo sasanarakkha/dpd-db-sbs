@@ -26,15 +26,16 @@ def main():
     config_update("dictionary", "data_limit", "0")
 
     config_update("exporter", "make_dpd", "yes")
-    config_update("exporter", "make_grammar", "no")
-    config_update("exporter", "make_deconstructor", "no")
+    config_update("exporter", "make_grammar", "yes")
+    config_update("exporter", "make_deconstructor", "yes")
     config_update("exporter", "make_variants", "no")
-    config_update("exporter", "make_ebook", "no")
+    config_update("exporter", "make_ebook", "yes")
     config_update("exporter", "make_tbw", "yes")
     config_update("exporter", "make_tpr", "yes")
+    config_update("exporter", "tarball_db", "yes")
 
     config_update("anki", "update", "no")
-    config_update("goldendict", "copy_unzip", "no")
+    config_update("goldendict", "copy_unzip", "yes")
 
     pr.toc()
 

@@ -7,7 +7,7 @@ set -e
 git checkout sbs-ru
 
 while true; do
-    echo -ne "\033[1;36m Choose config: (1) RUS-DPD for the server; (2) RUS-DPD for local use (Enter) custom config\033[0m"
+    echo -ne "\033[1;36m Choose config: (1) RUS-DPD full for release; (2) RUS-DPD for local use (Enter) custom config\033[0m"
     read option
     case $option in
         [1]* )
@@ -58,9 +58,3 @@ uv run python exporter/tbw/tbw_exporter_ru.py
 uv run python exporter/tpr/tpr_exporter_ru.py
 
 uv run python scripts/rus_exporter/config_github_local_dpd_sbs.py
-
-git checkout -- pyproject.toml
-
-git checkout -- db/sanskrit/root_families_sanskrit.tsv
-
-git checkout -- shared_data/changed_templates
