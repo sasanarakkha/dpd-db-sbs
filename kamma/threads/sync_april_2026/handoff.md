@@ -1,75 +1,215 @@
 # Handoff: April 2026 Upstream Sync
 
-**Date:** 2026-04-08  
+**Date:** 2026-04-09  
 **Branch:** sbs-ru  
 **Thread dir:** `kamma/threads/sync_april_2026/`
 
-## Status: Stage 1 Complete — Ready for Stage 2 (Analysis)
+---
 
-### What was done this session
+## Overall Status
 
-1. `git fetch upstream` — upstream advanced from `89dcdaf3` → `9af5f7ee`
-2. Fixed `accepted_sync.json` — was pointing at a local fork SHA; corrected to upstream SHA `89dcdaf3`
-3. Updated `guide.md` — added `git fetch upstream` as first step in Environmental Validation
-4. Ran `validate_registry.py` — OK
-5. Ran `verify_smd_coverage.py` — OK (77 entries, no gaps)
-6. Ran `prep_analyzer.py` — generated `prep_report.md` and `prep_manifest.json`
-7. Ran `execute_sync.py` — 352 files changed, all staged, no DB schema changes
-8. **Commit 1 is staged and ready** — user must commit manually
+| Stage | Status |
+|---|---|
+| Stage 1 — Upstream Pull | ✅ committed |
+| Stage 2 — Analysis & Planning | ✅ committed |
+| Stage 3 — Execution (dynamic_plan.md items) | ✅ committed |
+| Stage 3.5 — JS Shadow Catch-up (pre-existing drift) | ✅ committed |
+| Stage 4 — Cleanup & Finalize | ❌ not started — next session |
 
-### Commit 1 (staged, ready to run)
+---
+
+## Stage 1 (committed)
+- Upstream range: `89dcdaf3` → `9af5f7ee` (352 files)
+- Commit: `89d2da1b` — `#sync: upstream pull 89dcdaf3..9af5f7ee, 352 files, 2026-04-08`
+
+## Stage 2 (committed)
+- `dynamic_plan.md`, `handoff.md`, `guide.md`, `smd/root.md` updated
+
+## Stage 3 — All dynamic_plan.md items complete
+
+**Discussion items (resolved):**
+- `.gitignore` — new sorted upstream block + preserved DPS block ✅
+- `AGENTS.md` — added Context7 MCP section ✅
+- `gui2/main.py` — CompoundTypeTabView, confirmation dialog, Ctrl+S ✅
+
+**Group D1 (paths):** No changes needed ✅
+
+**Group A — Russian shadows:**
+- A1–A5: `family_*_ru.py` — all ported ✅
+- A6: `deconstructor_exporter_ru.py` ✅
+- A7: `data_classes_dps.py` ✅
+- A8: `dpd_headword_sbs.jinja` ✅
+- A9: `grammar_dict_ru.py` ✅
+- A10: `titlepage.xhtml` ✅ (no change — date is auto-generated)
+- A11: `kindle_exporter_ru.py` ✅
+- A12: `tbw_exporter_ru.py` ✅
+- A13: `tpr_exporter_ru.py` ✅
+- A14: `exporter/webapp/data_classes.py` ✅
+- A15: `home.html` → toggle buttons ported to `ru_templates/home.html` + `sbs_templates/home.html` ✅
+- A16: `families_to_json_ru.py` ✅
+- A17: `version_ru.py` ✅
+
+**Group B — SBS/DPS shadows:**
+- B1: `update-dpd-sbs.sh` ✅
+- B2: `db_rebuild_from_tsv_dps.py` ✅
+- B3: `backup_dps.py` ✅
+
+**Group C — Tracked modified files:**
+- C1/A14: `exporter/webapp/data_classes.py` ✅
+- C2: `home.js` — `initPanelToggle` function + 2 calls ✅
+- C3: `pass2_add_view.py` — `validate_no_duplicates` check in `_click_add_to_db` ✅
+- C4: `tools/ai_manager.py` — accepted upstream (Stage 1) ✅
+
+**Group D — Inspired sources:**
+- D2: `ru_release.yml`, `ru_release_test.yml` — `setup-go@v6`, `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` ✅
+- D3: `main_ru.py`, `main_sbs.py` — `pr.yellow_title`, `pr.green_tmr`, `type: ignore` ✅
+- D4–D7: `export_epd/help/roots/variant_*` — `pr.green` → `pr.green_tmr` ✅
+- D8: `docs/*` — no action ✅
+- D9: `mkdocs_ru.yaml` — no action (cosmetic indent, upstream-only doc page) ✅
+
+**Verification:**
+- `uv run pytest tests/test_namespace_isolation.py tests/test_shadow_cleanup.py` — 25 passed ✅
+- `uv run python3 tests/check_shadow_modifications.py` — 2 remaining (javascript shadow drift, pre-existing) ⚠️
+
+### Stage 3 commit (all staged, ready)
 
 ```
-git commit -m "#sync: pull upstream 89dcdaf3..9af5f7ee into sbs-ru (stage 1)"
+git commit -m "#sync: port upstream changes to ru/sbs shadows, 2026-04-09"
 ```
 
-### Upstream range
-
-- From: `89dcdaf3` (2026-03-10, "data update")
-- To: `9af5f7ee` (upstream/main HEAD, 2026-04-08)
-
-### Key files to port in Stage 2
-
-**Shadow sources changed (require porting local changes onto new upstream base):**
-- `db/families/family_compound.py` → `family_compound_ru.py`
-- `db/families/family_idiom.py` → `family_idiom_ru.py`
-- `db/families/family_root.py` → `family_root_ru.py`
-- `db/families/family_set.py` → `family_set_ru.py` (134 line delta — largest change)
-- `db/families/family_word.py` → `family_word_ru.py`
-- `exporter/deconstructor/deconstructor_exporter.py` → `deconstructor_exporter_ru.py`
-- `exporter/goldendict/data_classes.py` → `data_classes_dps.py`
-- `exporter/goldendict/templates/dpd_headword.jinja` → `ru_components/templates/`, `sbs_templates/`
-- `exporter/grammar_dict/grammar_dict.py` → `grammar_dict_ru.py`
-- `exporter/kindle/epub/OEBPS/Text/titlepage.xhtml` → `ru_components/epub/`
-- `exporter/kindle/kindle_exporter.py` → `kindle_exporter_ru.py` (24 line delta)
-- `exporter/tbw/tbw_exporter.py` → `tbw_exporter_ru.py` (28 line delta)
-- `exporter/tpr/tpr_exporter.py` → `tpr_exporter_ru.py` (34 line delta)
-- `exporter/webapp/data_classes.py` → `data_classes_ru.py`
-- `exporter/webapp/templates/home.html` → `ru_templates/`, `sbs_templates/`
-- `scripts/build/db_rebuild_from_tsv.py` → `db_rebuild_from_tsv_dps.py` (15 line delta)
-- `scripts/build/families_to_json.py` → `families_to_json_ru.py`
-- `scripts/server/update-dpd.sh` → `update-dpd-sbs.sh`
-- `tools/version.py` → `version_ru.py`
-- `db/backup_tsv/backup_dpd_headwords_and_roots.py` → `scripts/backup/backup_dps.py`
-
-**Tracked modified files (check if local divergences need updating):**
-- `exporter/webapp/data_classes.py` — also has `_ru` shadow above
-- `exporter/webapp/static/home.js`
-- `gui2/main.py`, `gui2/pass2_add_view.py`
-- `tools/ai_manager.py`
-- `.gitignore`, `AGENTS.md`
-
-**Inspired sources** — mostly docs/newsletter images (cosmetic, low priority). Check:
-- `.github/workflows/draft_release.yml` → `ru_release.yml`, `ru_release_test.yml`
-- `tools/paths.py` → `paths_ru.py`, `paths_dps.py` (53 line delta — important)
-- `exporter/goldendict/main.py` → `main_ru.py`, `main_sbs.py`
-
-### How to start Stage 2
-
-Start a new session and run:
+Files staged (38 total):
 ```
-/update-upstream
+.gitignore, AGENTS.md, gui2/main.py, gui2/pass2_add_view.py
+db/families/family_*_ru.py (5 files)
+exporter/deconstructor/deconstructor_exporter_ru.py
+exporter/goldendict/data_classes_dps.py
+exporter/goldendict/export_epd_sbs.py
+exporter/goldendict/export_help_ru.py, export_help_sbs.py
+exporter/goldendict/export_roots_ru.py, export_roots_sbs.py
+exporter/goldendict/export_variant_spelling_ru.py
+exporter/goldendict/main_ru.py, main_sbs.py
+exporter/goldendict/sbs_templates/dpd_headword_sbs.jinja
+exporter/grammar_dict/grammar_dict_ru.py
+exporter/kindle/kindle_exporter_ru.py
+exporter/tbw/tbw_exporter_ru.py
+exporter/tpr/tpr_exporter_ru.py
+exporter/webapp/data_classes.py
+exporter/webapp/ru_templates/home.html
+exporter/webapp/sbs_templates/home.html
+exporter/webapp/static/home.js
+.github/workflows/ru_release.yml, ru_release_test.yml
+scripts/backup/backup_dps.py
+scripts/build/db_rebuild_from_tsv_dps.py
+scripts/build/families_to_json_ru.py
+scripts/server/update-dpd-sbs.sh
+tools/version_ru.py
+kamma/threads/sync_april_2026/handoff.md
 ```
 
-Then tell the agent:
-> "Stage 1 is complete and committed. We are at Stage 2. Thread is `kamma/threads/sync_april_2026/`. Read the handoff at `kamma/threads/sync_april_2026/handoff.md` and `kamma/threads/sync_april_2026/prep_report.md`, then create `dynamic_plan.md`."
+---
+
+## Stage 3.5 — JS Shadow Catch-up (complete)
+
+**Files fixed (staged):**
+- `exporter/webapp/data_classes_ru.py` — updated `string_columns`: removed `meaning_1/lit/2`, added `sutta_1`, `sutta_2`, `link` to match upstream Stage 3 change
+- `exporter/goldendict/ru_components/javascript/ru_main.js` — added `ru_highlightInflections` function (port of upstream `highlightInflections`); updated DOMContentLoaded handler to read `?word=` URL param and call `ru_highlightInflections`
+- `exporter/goldendict/ru_components/templates/dpd_headword_ru.jinja` — fixed `playAudio` → `ru_playAudio` in 3 IPA audio buttons in grammar section
+- `exporter/goldendict/ru_components/javascript/ru_feedback_template.js` — migrated from `<br><br>` to `<p>` tag structure matching upstream; added `progName` to "get updated" section; restructured with consistent upstream paragraph order
+
+**Verification:** 25 passed, 1 skipped; `check_shadow_modifications.py` ✅ clean
+
+**Commit ready:**
+```
+git commit -m "#sync: fix pre-existing shadow drift in JS, jinja, and data_classes_ru, 2026-04-09"
+```
+
+---
+
+## Stage 3.5 — JS Shadow Catch-up (original notes)
+
+**Why this exists:** `check_shadow_modifications.py` flags these as pre-existing drift — the upstream JS files have accumulated changes across multiple previous syncs that were never ported into the local RU shadow copies.
+
+**Files to fix:**
+
+### JS-1. `exporter/goldendict/javascript/feedback_template.js` → `ru_components/javascript/ru_feedback_template.js`
+
+The upstream file (`feedback_template.js`) has been updated significantly. The local shadow (`ru_feedback_template.js`) uses `ru_makeFeedback` (correctly namespaced) with RU-specific content (Russian links, RU forms). The task is to check what changed in the upstream content (links, text, structure) and update the RU shadow to match structurally, keeping RU-localized text/URLs.
+
+**Key local customizations to preserve:**
+- Function name: `ru_makeFeedback` (not `makeFeedback`)
+- Russian feedback form URLs (sasanarakkha GitHub, devamitta docs)
+- Russian UI text
+
+**Approach:** Read both files fully, diff them, identify upstream structural improvements (new links, updated form URLs, removed outdated links), port those into `ru_feedback_template.js` while preserving RU-specific text.
+
+### JS-2. `exporter/goldendict/javascript/main.js` → `ru_components/javascript/ru_main.js`
+
+The upstream `main.js` has evolved (cleaner button click logic, `highlightInflections` function, `playAudio` improvements). The local `ru_main.js` is a namespaced RU shadow with:
+- `ru_button_click`, `ru_loadData`, `ru_loadButtonContent`, `ru_loadRootButtonContent`
+- `ru_superScripter`, `ru_playAudio`
+- Filters for `ru_`-prefixed IDs
+- Russian strings (`"загружается..."`, `"Аудио не найдено"`)
+
+**Key upstream changes to check and port:**
+- `playAudio` error icon changed from SVG cross (lines) to path-based X icon
+- `button_click` close-button selector: upstream uses only `a.dpd-button`, local uses both `a.button` and `a.dpd-button` — local version is correct (more robust), keep it
+- `highlightInflections` function — check if RU shadow has an equivalent; if missing, port it as `ru_highlightInflections`
+- DOMContentLoaded pattern: upstream uses simple `addEventListener("DOMContentLoaded", loadData)`, local uses `readyState` check — local pattern is fine
+
+**Approach:** Read both files fully, diff section by section, port improvements into `ru_main.js` following Iron Rule — only changes that upstream made, preserving all `ru_` namespacing.
+
+### JS-3. `exporter/goldendict/templates/dpd_headword.jinja` → `ru_components/templates/dpd_headword_ru.jinja`
+
+This sync's specific delta (A8) was assessed as "no change needed" — the RU template didn't use `construction_summary`. But the tool still flags it, meaning accumulated drift from **prior syncs** exists in the RU template beyond just this sync's change.
+
+**Approach:** Diff the two files directly. Identify all structural divergences. For each diff chunk: determine if it's an upstream improvement to port, or a local RU customization to preserve (RU-specific attributes, `ru_` HTML IDs, Russian text). Port improvements; keep local additions.
+
+**Key local customizations to preserve:**
+- All `ru_` prefixed HTML IDs
+- RU-specific template blocks and data fields (`.ru`, `.sbs`)
+- Any Russian-language strings in templates
+
+---
+
+### How to start Stage 3.5
+
+Start a new session and say:
+> "Read `kamma/threads/sync_april_2026/handoff.md`. Start Stage 3.5 — fix the 3 pre-existing shadow drift issues: `ru_feedback_template.js`, `ru_main.js`, and `dpd_headword_ru.jinja`."
+
+---
+
+## Stage 4 — Cleanup & Finalize (after 3.5)
+
+**Prerequisites before starting Stage 4:**
+- Stage 3.5 complete (JS shadow files fixed)
+- `tests/smoke_test_sync.py` exists ✅ — created in the `20260409_smoke_test_sync` thread.
+
+**Two test checkpoints — run at BOTH, not just at the end:** - if tests pass at A but fail at B, the cause is the cleanup — not the sync. Without checkpoint A, you can't isolate it.
+
+**Verification**:
+   - Run `uv run pytest` (Full suite, including parity and namespace isolation).
+   - Run `uv run python3 tests/check_shadow_modifications.py`.
+   - Run `uv run python tests/test_namespace_isolation.py` to verify namespace isolation.   
+   - Run `uv run python tests/smoke_test_sync.py` — full pipeline smoke test (mini DB + all exporters + webapp + GUI).
+
+**Cleanup**:
+   - Run `uv run python3 tests/test_shadow_cleanup.py --folder <folder> [--apply]` to review or archive orphans.
+   - Update `registry.json` and `smd/` to reflect the new state.
+   - Run `uv run python tests/smoke_test_sync.py` — re-run after orphan archiving to confirm nothing was broken.
+
+**Full manual verification**
+    - Ask user to verify everything and stay back for feedbacks. after correcting it do not proceed until user explicitly tell - all is good proceed.
+
+**After sync**:
+    - Update `accepted_sync.json` only after the sync is accepted and verified.
+    - Review the temporary `new_improvements.md`, promote items to `archive_improvements.md`, and delete the file.
+    - Update `kamma/upstream_sync/accepted_sync.json` → SHA `9af5f7ee`, date `2026-04-09`
+    - Final commit
+
+---
+
+## Smoke Test — Delivered
+
+`tests/smoke_test_sync.py` is available and added to both Stage 3 and Stage 4 checkpoints in `kamma/upstream_sync/guide.md`.
+
+Run with: `uv run python tests/smoke_test_sync.py`

@@ -2,10 +2,18 @@
 
 ---
 
-## [x] Thread: Implement Sync Ledger / Manifest Workflow
-*Link: [./kamma/threads/implement_sync_ledger_20260408/](./kamma/threads/implement_sync_ledger_20260408/)*
+## [ ] Thread: Repeating Check of Russian against English — Issue #40
+*Link: [./kamma/threads/20260409_repeating_ru_check/](./kamma/threads/20260409_repeating_ru_check/)*
 
 ---
 
-## [x] Thread: Improve Upstream Sync Execution
-*Link: [./kamma/threads/20260408_improve_sync_exec/](./kamma/threads/20260408_improve_sync_exec/)*
+## [ ] Thread: Harden SBS Consistency Tests — Issue #20
+*Link: [./kamma/threads/20260409_sbs_tests_blocking/](./kamma/threads/20260409_sbs_tests_blocking/)*
+
+---
+
+## [~] Thread: Sync with upstream April 2026
+*Link: [./kamma/threads/sync_april_2026/](./kamma/threads/sync_april_2026/)*
+
+---
+

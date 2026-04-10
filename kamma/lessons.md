@@ -1,0 +1,1 @@
+- 2026-04-10 [BEHAVIOR] Use MagicMock for headless GUI initialization tests instead of subprocess.Popen to avoid hanging terminal sessions.

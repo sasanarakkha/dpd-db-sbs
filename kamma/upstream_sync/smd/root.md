@@ -68,8 +68,10 @@
   1. "Localized Rules" section added with fork identity, local model additions, DPS GitHub issue mapping, shadow sync policy, and engineering standards.
   2. `kamma/upstream_sync/registry.json` references replace any upstream paths.
   3. Clean Root Folder Protocol and Shadow Files & Sync Templates sections are fork-specific.
+- **Policy**: Our `CLAUDE.md` keeps a deliberately concise "Project Rules (from original upstream)" section. When upstream adds content to AGENTS.md, do NOT port it verbatim. Instead, review what is genuinely new and not already covered, then write a concise summary of only those additions. Upstream frequently expands documentation with details relevant only to their workflow. Our goal is a short, actionable summary, not a mirror.
 - **Watch For**:
-  - After any upstream AGENTS.md update, manually merge only the "Project Rules (from original upstream)" section — never replace the entire file.
+  - After any upstream AGENTS.md update, review the diff, identify genuinely new rules/tools/workflows, and add a concise summary to the "Project Rules (from original upstream)" section of CLAUDE.md.
+  - Never replace the entire file or the "Localized Rules" section.
   - Fork-local sections must be preserved verbatim.
 
 ---

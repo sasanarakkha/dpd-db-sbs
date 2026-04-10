@@ -27,11 +27,23 @@ A broken shadow always means the sync is incomplete or inaccurate — not that t
 
 ---
 
+## Session Management
+
+Each stage runs in its own session. At the end of a stage:
+1. Save all outputs to the thread folder.
+2. Update `handoff.md` with the current status and what comes next.
+3. Prepare the commit (if applicable) and present it to the user.
+4. Tell the user: "Restart the session. Next time, say: [exact prompt]."
+
+**Within Stage 3**, if the plan has many items, split across sessions. Track progress by item ID (e.g., "completed through A8, next is A9") in `handoff.md`.
+
+---
+
 ## The 3-Stage Sync Workflow
 
 ### Stage 1: Prep (Factual Analysis)
 **Goal**: Establish a baseline, validate the environment, and identify what changed upstream.
-
+<!-- !TODO backup dps first! scripts/backup/backup_dps.py and git add with message "data update"-->
 1. **Environmental Validation**:
    - Run `git fetch upstream` — always fetch before any analysis. No need to search for new commits manually; the scripts derive the range from `accepted_sync.json`.
    - Run `uv run python3 kamma/upstream_sync/scripts/validate_registry.py`
@@ -56,8 +68,9 @@ A broken shadow always means the sync is incomplete or inaccurate — not that t
    - For every modified upstream file mapped to a shadow/inspired copy, define the merge strategy.
 2. **Discussion Flags**:
    - Check `discuss` flags in `registry.json`. If `true`, resolve with the user before planning.
+   - **Discussion flow**: Discuss each flagged item in chat, one at a time. Do not ask the user to edit any file. Once a decision is reached, mark the item `RESOLVED` in `dynamic_plan.md` with the agreed strategy. Only then proceed.
 3. **Draft Plan Review**:
-   - Present the `dynamic_plan.md` to the user for approval.
+   - Present the `dynamic_plan.md` to the user for approval. Say: "Please review and reply with proceed / skip / or any objection for each item."
 
 ### Stage 3: Execution & Verification (Implementation)
 **Goal**: Apply changes, verify integrity, and clean up.
@@ -67,12 +80,17 @@ A broken shadow always means the sync is incomplete or inaccurate — not that t
 2. **Verification**:
    - Run `uv run pytest` (Full suite, including parity and namespace isolation).
    - Run `uv run python3 tests/check_shadow_modifications.py`.
+   - Run `uv run python tests/smoke_test_sync.py` — full pipeline smoke test (mini DB + all exporters + webapp + GUI).
    - Perform manual verification (GoldenDict/webapp).
 3. **Cleanup**:
    - Run `uv run python3 tests/test_shadow_cleanup.py --folder <folder> [--apply]` to review or archive orphans.
    - Update `registry.json` and `smd/` to reflect the new state.
+   - Run `uv run python tests/smoke_test_sync.py` — re-run after orphan archiving to confirm nothing was broken.
+4. **Full manual verification**
+   - Ask user to verify everything and stay back for feedbacks. after correcting it do not proceed until user explicitly tell - all is good proceed.
+5. **After sync**
    - Update `accepted_sync.json` only after the sync is accepted and verified.
-   - Review the temporary `new_improvements.md`, promote items to `archive_improvements.md`, and delete the file.
+   - Review the temporary `new_improvements.md`, promote items after the suggestions for proccess been accepted and implemented, move them to `archive_improvements.md`, and delete the file.
 
 ---
 
