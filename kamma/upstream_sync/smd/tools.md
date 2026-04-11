@@ -113,7 +113,7 @@
 - **Divergence Reason**: DPS-specific FastAPI utilities; architectural divergence from upstream.
 - **Sync Rule**: inspired_only
 - **Local Changes**:
-  1. `start_dpd_server` launches `main_dps:app` on `127.0.0.1:8080`.
+  1. `start_dpd_server` launches `main_ru:app` on `127.0.0.1:8080`.
   2. `request_dpd_server` redirects to `http://127.0.0.1:8080/sbs/`.
 - **Watch For**:
   - Port 8080 is used here, while the server script uses 8081 (likely local vs production).

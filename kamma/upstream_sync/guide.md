@@ -44,6 +44,13 @@ Each stage runs in its own session. At the end of a stage:
 ### Stage 1: Prep (Factual Analysis)
 **Goal**: Establish a baseline, validate the environment, and identify what changed upstream.
 <!-- !TODO backup dps first! scripts/backup/backup_dps.py and git add with message "data update"-->
+0. **Pre-sync Shadow Health Check (MANDATORY GATE)**:
+   - Run `uv run python3 tests/check_shadow_modifications.py`
+   - The output must be **clean** (zero modifications reported) before continuing.
+   - If drift is found: **STOP**. Fix the drifted shadow files first. Commit the fix separately
+     (message: `#pre-sync: fix shadow drift in <filenames>`). Only then proceed to step 1.
+   - Rationale: accumulated shadow drift that slips through one sync becomes a multi-hour
+     remediation in the next sync (see Stage 3.5 in the April 2026 sync thread).
 1. **Environmental Validation**:
    - Run `git fetch upstream` — always fetch before any analysis. No need to search for new commits manually; the scripts derive the range from `accepted_sync.json`.
    - Run `uv run python3 kamma/upstream_sync/scripts/validate_registry.py`

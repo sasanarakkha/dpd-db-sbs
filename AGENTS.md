@@ -66,10 +66,11 @@ Existing tables have extra `*_ru` columns (e.g., `root_ru_meaning`, `html_ru`).
 - **Surgical Logic Layering**: Avoid rewriting core logic in shadow copies. Layer localized changes (RU/SBS) clearly on top of the original structure for easy sync.
 - **Namespace Isolation**:
   - **Tier 1 (Upstream copy)**: Exact upstream name, NO markers.
-  - **Tier 2 (Shadow copy) / Tier 3 (New)**: Add a single locale suffix (`_ru`, `_sbs`). In mixed `*_dps.py` files, use `_dps` ONLY for logic shared by both, or non of them.
+  - **Tier 2 (Shadow copy) / Tier 3 (New)**: Add a single locale suffix (`_ru`, `_sbs`, `-ru`, `-sbs`). In mixed `*_dps.py` files, use `_dps` or `-dps` ONLY for logic shared by both, or non of them.
   - **No Double-Marking**: Never add a suffix if the name already has an intrinsic marker (e.g., `RPD`, `Ru`). Never use both a prefix and a suffix.
   - **HTML IDs**: Always prefix with `ru_`, `sbs_`, or `dps_`.
 - **Clean Codebase**: Prefer modular abstractions. Use modern type hints and pathlib. Remove unused dependencies.
+- **No Inline Scripting**: NEVER use `python -c "..."` or `python3 -c "..."` in Bash. If you need a one-shot script, write it to `temp/<descriptive_name>.py` and run `uv run python temp/<descriptive_name>.py`. Delete the file when done. This rule exists because inline scripts are invisible in code review, cannot be re-run, and cannot be linted.
 
 ## Clean Root Folder Protocol
 - The root directory MUST remain free of temporary scripts, logs, and artifacts.
@@ -81,6 +82,7 @@ Renames/moves are atomic. You MUST:
 1. `grep_search` the old name across the entire repository.
 2. Update all imports, hardcoded paths, scripts, workflows, registries (`kamma/upstream_sync/registry.json`), and docs.
 3. Run a final verification search to empirically prove zero stale references remain.
+4. Stage `registry.json` and all affected `kamma/upstream_sync/smd/*.md` files **in the same commit** as the `git mv`. Never let a rename land in git while its registry/SMD documentation is still in the working tree.
 
 ## Project Principles
 - **Docs Sanctity:** `docs/` is upstream-only. Put local docs in `docs_rus/` or `kamma/`.

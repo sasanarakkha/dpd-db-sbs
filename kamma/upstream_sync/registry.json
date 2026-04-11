@@ -204,6 +204,7 @@
     "exporter/webapp/preloads_ru.py": "exporter/webapp/preloads.py",
     "exporter/webapp/toolkit_ru.py": "exporter/webapp/toolkit.py",
     "exporter/webapp/ru_templates/": "exporter/webapp/templates/",
+    "exporter/webapp/main_ru.py": "exporter/webapp/main.py",
     "scripts/build/families_to_json_ru.py": "scripts/build/families_to_json.py",
     "shared_data/help_ru/": "shared_data/help/",
     "tools/degree_of_completion_ru.py": "tools/degree_of_completion.py",
@@ -215,11 +216,10 @@
     "exporter/goldendict/sbs_templates/": "exporter/goldendict/templates/",
     "exporter/webapp/sbs_templates/": "exporter/webapp/templates/",
     "scripts/fix/character_replacer_sbs.py": "scripts/fix/character_replacer.py",
-    "scripts/server/update-dpd-sbs.sh": "scripts/server/update-dpd.sh",
-    "tools/utils_sbs.py": "tools/utils.py"
+    "tools/utils_sbs.py": "tools/utils.py",
+    "scripts/server/update-dpd-sbs.sh": "scripts/server/update-dpd.sh"
   },
   "dps_copies": {
-    "exporter/webapp/main_dps.py": "exporter/webapp/main.py",
     "exporter/goldendict/data_classes_dps.py": "exporter/goldendict/data_classes.py",
     "scripts/backup/backup_dps.py": "db/backup_tsv/backup_dpd_headwords_and_roots.py",
     "scripts/build/db_rebuild_from_tsv_dps.py": "scripts/build/db_rebuild_from_tsv.py"
