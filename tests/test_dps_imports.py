@@ -25,7 +25,7 @@ class TestDPSImports:
         "exporter.grammar_dict.grammar_dict_ru",
         "exporter.kindle.kindle_exporter_ru",
         "exporter.tpr.tpr_exporter_ru",
-        "exporter.webapp.main_dps",
+        "exporter.webapp.main_ru",
         "gui2.main",
         "scripts.build.db_rebuild_from_tsv_dps",
     ])

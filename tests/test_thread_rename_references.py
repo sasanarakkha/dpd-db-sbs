@@ -4,7 +4,7 @@ from pathlib import Path
 
 
 REPLACED_PATHS = {
-    "exporter/webapp/main_ru.py": "exporter/webapp/main_dps.py",
+    # main_ru.py was renamed back from main_dps.py in April 2026 sync cleanup
     "scripts/backup/backup_ru_sbs.py": "scripts/backup/backup_dps.py",
     "scripts/build/db_rebuild_from_tsv_ru_sbs.py": "scripts/build/db_rebuild_from_tsv_dps.py",
 }

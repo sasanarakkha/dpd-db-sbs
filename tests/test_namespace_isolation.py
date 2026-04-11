@@ -69,7 +69,7 @@ EXCEPTIONS = {
     "GlobalVars",
     "RpdData",
     "is_cyrillic",
-    # main_dps.py routes
+    # main_ru.py routes
     "home_page_ru",
     "home_page_sbs",
     "bold_definitions_page",

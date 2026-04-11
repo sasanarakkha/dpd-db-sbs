@@ -112,14 +112,14 @@ def test_cross_category_overlap_rejected(base_data):
     )
 
 
-def test_dps_copy_overlap_rejected(base_data):
-    base_data["dps_copies"] = {"exporter/webapp/main_dps.py": "exporter/webapp/main.py"}
-    base_data["unique_paths"] = ["exporter/webapp/main_dps.py"]
+def test_russian_copy_overlap_rejected(base_data):
+    base_data["russian_copies"] = {"exporter/webapp/main_ru.py": "exporter/webapp/main.py"}
+    base_data["unique_paths"] = ["exporter/webapp/main_ru.py"]
 
     errors = validate_cross_section_overlaps(base_data)
 
     assert any(
-        "Overlap: 'exporter/webapp/main_dps.py' exists in both dps_copies and unique_paths"
+        "Overlap: 'exporter/webapp/main_ru.py' exists in both russian_copies and unique_paths"
         in e
         for e in errors
     )

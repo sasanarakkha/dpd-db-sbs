@@ -5,10 +5,10 @@ import webbrowser
 
 
 def start_dpd_server():
-    "uvicorn exporter.webapp.main_dps:app --host 127.1.1.1 --port 8080 --reload --reload-dir exporter/webapp"
+    "uvicorn exporter.webapp.main_ru:app --host 127.1.1.1 --port 8080 --reload --reload-dir exporter/webapp"
     command = [
         "uvicorn",
-        "exporter.webapp.main_dps:app",
+        "exporter.webapp.main_ru:app",
         "--host",
         "127.1.1.1",
         "--port",

@@ -16,10 +16,10 @@ def mock_registry():
             {"path": "db/models.py", "discuss": True, "discuss_reason": "Reason"}
         ],
         "russian_copies": {
-            "db/families/family_compound_ru.py": "db/families/family_compound.py"
+            "db/families/family_compound_ru.py": "db/families/family_compound.py",
+            "exporter/webapp/main_ru.py": "exporter/webapp/main.py"
         },
         "sbs_copies": {},
-        "dps_copies": {"exporter/webapp/main_dps.py": "exporter/webapp/main.py"},
         "inspired_by_upstream": {
             "scripts/bash/make_dpd.sh": {
                 "upstream": "scripts/bash/makedict.py",

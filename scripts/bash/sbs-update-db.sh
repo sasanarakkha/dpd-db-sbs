@@ -23,8 +23,8 @@ cp -r /home/django/dpd-db-sbs/env .
 echo "=== Copying start script ==="
 cp /home/django/dpd-db-sbs/start-uvicorn-fastapi.sh .
 
-echo "=== Killing old main_dps:app process ==="
-pkill -f "main_dps:app" || echo "No matching process found"
+echo "=== Killing old main_ru:app process ==="
+pkill -f "main_ru:app" || echo "No matching process found"
 
 echo "Waiting 10 seconds to ensure shutdown…"
 sleep 10

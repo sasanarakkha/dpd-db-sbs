@@ -22,7 +22,7 @@ from exporter.kindle.kindle_exporter_ru import main as kindle_main
 from exporter.tpr.tpr_exporter_ru import main as tpr_main
 
 # Webapp Ru
-from exporter.webapp.main_dps import app as webapp
+from exporter.webapp.main_ru import app as webapp
 
 # Gui2 Main
 from gui2.main import App

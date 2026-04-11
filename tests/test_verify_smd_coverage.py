@@ -74,15 +74,14 @@ def test_check_rubric_strict_requires_min(base_data=None):
     assert any("only 1 local-change(s), need 2" in v for v in violations)
 
 
-def test_collect_registry_paths_includes_dps_copies() -> None:
+def test_collect_registry_paths_includes_russian_copies() -> None:
     data = {
         "modified_upstream_files": [],
-        "russian_copies": {},
+        "russian_copies": {"exporter/webapp/main_ru.py": "exporter/webapp/main.py"},
         "sbs_copies": {},
-        "dps_copies": {"exporter/webapp/main_dps.py": "exporter/webapp/main.py"},
         "inspired_by_upstream": {},
     }
 
     paths = collect_registry_paths(data)
 
-    assert ("exporter/webapp/main_dps.py", "dps_copy") in paths
+    assert ("exporter/webapp/main_ru.py", "russian_copy") in paths

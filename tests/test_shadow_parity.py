@@ -210,7 +210,7 @@ WHITELIST = {
             "tools.meaning_construction.make_grammar_line",
         ],
     },
-    "exporter/webapp/main_dps.py": {
+    "exporter/webapp/main_ru.py": {
         "imports": [
             "exporter.webapp.preloads.load_data",
             "tools.translit.auto_translit_to_roman",

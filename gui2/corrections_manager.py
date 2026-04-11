@@ -28,7 +28,7 @@ class CorrectionsManager:
             data_dir = self.corrections_path.parent
             imported_any = False
             for contrib_file in sorted(data_dir.glob("corrections_*.json")):
-                if "corrections_added" in contrib_file.name:
+                if "corrections_added" in contrib_file.name or "corrections_processed" in contrib_file.name:
                     continue
                 try:
                     with open(contrib_file) as f:

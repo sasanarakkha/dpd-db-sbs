@@ -768,7 +768,7 @@ def phase2() -> bool:
 
 
 def phase3_webapp() -> bool:
-    """Test DPS webapp (main_dps) with FastAPI TestClient under patched ProjectPaths.
+    """Test DPS webapp (main_ru) with FastAPI TestClient under patched ProjectPaths.
 
     Checks:
     - RU home page (/) returns 200 and contains localized UI markers
@@ -776,17 +776,17 @@ def phase3_webapp() -> bool:
     - RU search JSON returns a list with at least one result
     - SBS search JSON returns a list with at least one result
     """
-    pr.yellow_title("=== Phase 3.1: Webapp (main_dps) ===")
+    pr.yellow_title("=== Phase 3.1: Webapp (main_ru) ===")
     try:
         import importlib
 
-        # Clear cached main_dps so module-level ProjectPaths() runs under patch
+        # Clear cached main_ru so module-level ProjectPaths() runs under patch
         for key in list(sys.modules.keys()):
-            if "main_dps" in key or "exporter.webapp" in key:
+            if "main_ru" in key or "exporter.webapp" in key:
                 del sys.modules[key]
 
         with patched_project_paths():
-            webapp_mod = importlib.import_module("exporter.webapp.main_dps")
+            webapp_mod = importlib.import_module("exporter.webapp.main_ru")
             app = webapp_mod.app
 
         from fastapi.testclient import TestClient
