@@ -49,7 +49,10 @@ All tasks follow a strict lifecycle:
 
 Before marking any task complete, verify:
 
-- [ ] All tests pass via `uv run pytest --tb=short -q`.
+- [ ] All tests pass via `uv run pytest tests/test_<thread_name>.py -v`.
+      **NEVER use bare `uv run pytest` without a specific file path —
+      parallel bash calls spawn concurrent processes and cause macOS memory
+      explosions (91 GB+). Enforced by `~/.claude/hooks/guard_pytest.sh`.**
 - [ ] **Structural Integrity**: For all renames/moves, confirmed via `grep` that 100% of references (imports, scripts, workflows, docs) are updated.
 - [ ] Code follows project style guides (see `conductor/code_styleguides/`).
 - [ ] No security vulnerabilities introduced.
@@ -116,8 +119,10 @@ A thread is complete when:
 uv run ruff check .
 uv run ruff format .
 
-# Testing
-uv run pytest
+# Testing — always use targeted file paths in plans and agentic tasks
+uv run pytest tests/test_<specific>.py -v
+# WARNING: bare `uv run pytest` (no file path) is blocked by the
+# PreToolUse guard hook during agentic sessions. Manual use only.
 ```
 
 ## Testing Requirements

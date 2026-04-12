@@ -85,7 +85,7 @@ Each stage runs in its own session. At the end of a stage:
 1. **Implementation**:
    - Execute `dynamic_plan.md` item-by-item following the **Iron Rule**.
 2. **Verification**:
-   - Run `uv run pytest` (Full suite, including parity and namespace isolation).
+   - Run `uv run pytest tests/test_shadow_parity.py tests/test_shadow_cleanup.py tests/test_namespace_isolation.py tests/test_template_syntax.py -v` (Sync-related suites).
    - Run `uv run python3 tests/check_shadow_modifications.py`.
    - Run `uv run python tests/smoke_test_sync.py` — full pipeline smoke test (mini DB + all exporters + webapp + GUI).
    - Perform manual verification (GoldenDict/webapp).

@@ -1,72 +1,54 @@
-# Handoff: Memory Issue Resolution
+# Handoff: mac_memory_issue
 
 ## Status
-- **Phase**: Implementation pending
-- **Date**: 2026-04-10
-- **Priority**: Critical
+VERIFIED COMPLETE. All fixes applied, hook is live and confirmed working.
 
----
+## Summary
+A PreToolUse hook was installed in Claude Code to hard-block bare `uv run pytest`
+calls during agentic sessions. Root cause was parallel bare pytest invocations
+spawning concurrent 1.5 GB processes, causing 91 GB memory pressure on macOS.
 
-## Problem
-
-- `/kamma:2-do` caused 80GB memory explosion on macOS
-- System ran out of memory, process terminated
-- Root cause: async pytest hook spawning 30+ concurrent processes during agentic workflow
-
-### Root Cause Analysis
-1. User has `PostToolUse` hook in `~/.claude/settings.json`
-2. Hook runs `uv run pytest` on every Python file edit
-3. With `async: true`, multiple hook instances run concurrently
-4. `/kamma:2-do` performs 30+ rapid file edits
-5. 30+ concurrent pytest processes × ~3GB each = 90GB total
-
-### Why It Occurred
-- Hook created for local development workflow
-- Works fine in interactive mode (few edits)
-- Agentic workflows (kamma) do 30+ rapid sequential edits
-- Memory accumulation happens only in agentic mode
-
----
-
-## Solution Applied
-
-### Changes Required
-1. **Disable pytest** in hook (line 22 of pytest_on_edit.sh)
-   - Keep only pyright for type checking
-2. **Keep async: true** (safe with lightweight pyright)
-
-### File: ~/.claude/hooks/pytest_on_edit.sh
-```bash
-# BEFORE (line 22):
-PYTEST_OUT=$(uv run pytest --tb=short -q 2>&1)
-
-# AFTER (comment out):
-# PYTEST_OUT=$(uv run pytest --tb=short -q 2>&1)
-```
-
----
+## What was done
+1. **Hard Block (Claude Code)**:
+   - `~/.claude/hooks/guard_pytest.sh` — PreToolUse hook that hard-blocks bare `uv run pytest`. Exits 2 = Claude Code hard block.
+   - `~/.claude/settings.json` — PreToolUse wired to `guard_pytest.sh` for all Bash calls.
+2. **Workflow Documentation**:
+   - `kamma/workflow.md` — Quality Gates and Dev Commands updated with targeted pytest mandates and warnings.
+   - `conductor/workflow.md` — Updated with targeted pytest mandates.
+3. **Repository-Wide Targeted Test Update**:
+   - Performed a full scan of the repository.
+   - Replaced bare `uv run pytest` with targeted file paths in:
+     - `kamma/threads/20260412_vib_rule_workflow/plan.md`
+     - `kamma/threads/20260412_vib_rule_workflow/spec.md`
+     - `kamma/threads/20260411_tpr_index/plan.md`
+     - `kamma/threads/20260409_repeating_ru_check/plan.md`
+     - `kamma/upstream_sync/templates/sync_thread_plan.md`
+     - `kamma/upstream_sync/archive_improvements.md`
+     - `kamma/upstream_sync/stages/execution.md`
+     - `kamma/upstream_sync/README.md`
+     - `kamma/upstream_sync/guide.md`
+4. **Gemini Prevention Plan**:
+   - `kamma/threads/mac_memory_issue/plan_gemini_hook.md` created for if similar memory issues ever occur with Gemini.
 
 ## Verification
+- Hook is **live and confirmed working**: a test Bash call containing `pytest`
+  was intercepted and blocked by the PreToolUse hook in real-time during the
+  verification session (2026-04-12). The hook correctly emitted the block
+  message and exited with code 2.
+- `grep` verification: No remaining unguarded bare `uv run pytest` calls in
+  active plans or sync templates.
 
-After making changes, run `/kamma:2-do` and monitor:
-```bash
-btop
-# or
-top -o mem
-```
+## Keep this thread
+This thread and its plan are kept for reference. If a similar memory issue
+occurs in future (with Claude Code or Gemini), refer to:
+- `plan.md` — step-by-step fix for Claude Code
+- `plan_gemini_hook.md` — preventative plan for Gemini CLI
 
-Expected result: ~6GB max (pyright processes) vs 80-90GB before
-
----
-
-## Open Items
-- [ ] Apply fix to pytest_on_edit.sh
-- [ ] Test with /kamma:2-do
-- [ ] Verify no memory explosion
-
----
-
-## Notes
-- pyright is fast and lightweight (~200MB vs ~3GB for pytest)
-- async: true is safe with pyright
-- If issues persist, fall back to `async: false`
+## Known Errors / Repeated Mistakes (for future reference)
+- **The hook blocks itself**: Attempting to test `guard_pytest.sh` by running
+  a Bash command that contains the word "pytest" (even in an echo/pipe) will
+  trigger the hook on the outer command. Workaround: write the test to a temp
+  `.sh` file first, then invoke it with a command that has no "pytest" string.
+- **exit 2 not exit 1**: Must exit 2 for Claude Code hard block. exit 1 is
+  treated as an error but may not block.
+- **JSON validity**: `~/.claude/settings.json` must be valid JSON after editing.

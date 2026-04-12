@@ -170,7 +170,7 @@ The following workflow was replaced by the 3-stage process (Prep, Analysis, Exec
 
 ### Phase 5 — Testing + Commit 2 gate (Lower model)
 
-1. Run: `uv run pytest --tb=short -q`.
+1. Run: `uv run pytest tests/test_shadow_parity.py tests/test_shadow_cleanup.py tests/test_namespace_isolation.py tests/test_template_syntax.py -v`.
 2. Run: `uv run python3 tests/check_shadow_modifications.py`.
 3. Run: `uv run ruff check . && uv run ruff format .`
 4. Present test results summary to user.
@@ -193,8 +193,8 @@ The following workflow was replaced by the 3-stage process (Prep, Analysis, Exec
 
 ### Phase 7 — Final Verification + Commit 3 gate (Lower model)
 
-1. Re-run: `uv run pytest --tb=short -q`.
-2. Re-run: `uv run pytest tests/test_shadow_parity.py tests/test_shadow_cleanup.py --tb=short -q`.
+1. Run: `uv run pytest tests/test_shadow_parity.py tests/test_shadow_cleanup.py tests/test_namespace_isolation.py tests/test_template_syntax.py -v`.
+2. Re-run: `uv run pytest tests/test_shadow_parity.py tests/test_shadow_cleanup.py tests/test_namespace_isolation.py tests/test_template_syntax.py -v`.
 3. Run: `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py`.
 4. Run: `uv run python3 kamma/upstream_sync/scripts/validate_registry.py`.
 5. Run: `uv run ruff check . && uv run ruff format .`

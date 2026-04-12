@@ -52,7 +52,7 @@ All tasks follow a strict lifecycle:
 
 Before marking any task complete, verify:
 
-- [ ] All tests pass via `uv run pytest --tb=short -q`.
+- [ ] All tests pass via `uv run pytest {file-name}`.
 - [ ] Code follows project style guides (see `conductor/code_styleguides/`).
 - [ ] No security vulnerabilities introduced.
 - [ ] Documentation updated if needed.
@@ -123,8 +123,10 @@ A track is complete when:
 uv run ruff check .
 uv run ruff format .
 
-# Testing
-uv run pytest
+# Testing — always use targeted file paths in plans and agentic tasks
+uv run pytest tests/test_<specific>.py -v
+# WARNING: bare `uv run pytest` (no file path) is blocked by the
+# PreToolUse guard hook during agentic sessions. Manual use only.
 ```
 <!-- LOCAL-END: Development Commands -->
 

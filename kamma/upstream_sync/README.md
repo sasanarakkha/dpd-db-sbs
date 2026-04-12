@@ -14,7 +14,7 @@ Sync operations are executed via Kamma threads using the following stages:
 2.  **Stage 2: Analysis** — Strategic planning and `dynamic_plan.md` creation.
     -   High-model analysis of upstream changes.
 3.  **Stage 3: Execution & Verification** — Implementation, testing, and cleanup.
-    -   `uv run pytest` (Full suite).
+    -   `uv run pytest tests/test_shadow_parity.py tests/test_shadow_cleanup.py tests/test_namespace_isolation.py tests/test_template_syntax.py -v` (Sync-related suites).
 
 For the full protocol, see **[guide.md](./guide.md)**.
 

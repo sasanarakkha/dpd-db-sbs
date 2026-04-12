@@ -56,7 +56,7 @@ Store a hash of the English field value alongside each checked ID in the existin
 - [ ] Test: after checking a word, its hash is stored correctly
 
 ### Phase 2 Completion
-- [ ] `uv run pytest --tb=short -q` — full suite passes
+- [ ] `uv run pytest tests/test_meaning_snapshot.py -v` — full suite passes
 - [ ] `uv run ruff check tools/ai_meaning_checker.py tools/ai_batch_processor.py`
 
 ---

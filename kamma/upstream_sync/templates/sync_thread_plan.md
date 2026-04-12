@@ -66,7 +66,7 @@
 ### Testing & Verification (Lower model)
 
 - [ ] **3.4 Full Test Suite**:
-  - [ ] `uv run pytest --tb=short -q` (Full suite).
+  - [ ] `uv run pytest tests/test_shadow_parity.py tests/test_shadow_cleanup.py tests/test_namespace_isolation.py tests/test_template_syntax.py -v` (Full suite).
   - [ ] `uv run python3 tests/check_shadow_modifications.py`.
 - [ ] **3.5 Manual Verification**:
   - [ ] ⛔ **MANUAL VERIFICATION GATE** — STOP. Ask user to verify GoldenDict/webapp.

@@ -13,7 +13,7 @@
 
 ## Checklist
 - [ ] **Iron Rule** followed for all shadow updates.
-- [ ] `uv run pytest` passes (all suites).
+- [ ] `uv run pytest tests/test_shadow_parity.py tests/test_shadow_cleanup.py tests/test_namespace_isolation.py tests/test_template_syntax.py -v` passes (all sync-related suites).
 - [ ] Namespace isolation verified.
 - [ ] Template syntax verified.
 - [ ] `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>` updates `accepted_sync.json`.
