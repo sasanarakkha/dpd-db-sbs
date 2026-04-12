@@ -45,10 +45,9 @@ class GlobalVars:
 
     def make_dpd_db(self):
         from sqlalchemy.orm import joinedload
+
         dpd_db = (
-            self.db_session.query(DpdHeadword)
-            .options(joinedload(DpdHeadword.ru))
-            .all()
+            self.db_session.query(DpdHeadword).options(joinedload(DpdHeadword.ru)).all()
         )
         dpd_db = sorted(dpd_db, key=lambda x: pali_sort_key(x.lemma_1))
         return dpd_db
@@ -58,7 +57,7 @@ def generate_tpr_data(g: GlobalVars):
     pr.green_tmr("compiling dpd headword data")
     dpd_length = len(g.dpd_db)
     tpr_data_list = []
-    
+
     jinja_env = get_jinja2_env("exporter/tpr/templates")
     template = jinja_env.get_template("tpr_headword_ru.jinja")
 
@@ -66,10 +65,7 @@ def generate_tpr_data(g: GlobalVars):
         # Add helper for template
         i.compound_type_has_digit = bool(re.findall(r"\d", i.compound_type or ""))
 
-        html_string = template.render(
-            i=i, 
-            today=TODAY
-        )
+        html_string = template.render(i=i, today=TODAY)
 
         # Original code did some replacements after rendering
         html_string = html_string.replace("\n", "").replace("    ", "")
@@ -337,6 +333,13 @@ def tpr_updater(g: GlobalVars):
     pr.yes("OK")
 
 
+def update_tpr_download_list(download_list: list[dict], info: dict) -> list[dict]:
+    """Remove existing RU entry if present to avoid duplicates, then append at end."""
+    download_list = [e for e in download_list if e.get("name") != "DPD with Russian"]
+    download_list.append(info)
+    return download_list
+
+
 def copy_zip_to_tpr_downloads(g: GlobalVars):
     pr.green_tmr("updating tpr_downloads")
 
@@ -378,7 +381,7 @@ def copy_zip_to_tpr_downloads(g: GlobalVars):
             "size": f"{filesize} MB",
         }
 
-        download_list[29] = dpd_with_rus_info
+        download_list = update_tpr_download_list(download_list, dpd_with_rus_info)
 
         with open(g.pth.tpr_download_list_path, "w") as f:
             f.write(json.dumps(download_list, indent=4, ensure_ascii=False))

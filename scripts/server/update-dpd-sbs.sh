@@ -10,7 +10,12 @@ cd dpd-db-sbs
 echo "Current directory: $(pwd)"
 
 echo "=== 2. Updating Code from GitHub ==="
-git pull --no-recurse-submodules
+if ! git pull --no-recurse-submodules; then
+    echo "=== 2b. Syncing Submodules (fixing stale state) ==="
+    rm -fr resources/dpd_submodules resources/tipitaka_translation_db
+    git submodule sync
+    git submodule update
+fi
 
 echo "=== 3. Updating Dependencies with uv ==="
 uv sync

@@ -55,6 +55,10 @@ uv run python scripts/build/tarball_db.py
 
 uv run python exporter/tbw/tbw_exporter_ru.py
 
+uv run python scripts/rus_exporter/check_tpr_download_index.py
+
 uv run python exporter/tpr/tpr_exporter_ru.py
+
+uv run python scripts/rus_exporter/check_tpr_download_index.py --skip-reset
 
 uv run python scripts/rus_exporter/config_github_local_dpd_sbs.py
