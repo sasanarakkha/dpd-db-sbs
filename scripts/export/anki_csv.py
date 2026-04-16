@@ -180,11 +180,11 @@ def common_roots(db_session, dpspth):
     # Save the list of field names to a text file
     if dpspth.sbs_anki_style_dir:
         with open(
-            f"{dpspth.sbs_anki_style_dir}/field-list-common-roots.txt", "w"
+            f"{dpspth.sbs_anki_style_dir}/field-list-common-roots.md", "w"
         ) as file:
             file.write("\n".join(columns_names))
         console.print(
-            f"[green] names of the SBS columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the txt"
+            f"[green] names of the SBS columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the.md"
         )
     else:
         console.print("[bold red] sbs_anki_style_dir not found")
@@ -481,10 +481,12 @@ def dhp(dpspth, dpd_db):
 
     # Save the list of field names to a text file
     if dpspth.sbs_anki_style_dir:
-        with open(f"{dpspth.sbs_anki_style_dir}/field-list-dhp.txt", "w") as file:
+        with open(f"{dpspth.sbs_anki_style_dir}/field-list-dhp.md", "w") as file:
+            file.write("# Field List: Dhp\n\n```\n")
             file.write("\n".join(columns_names))
+            file.write("\n```\n")
         console.print(
-            f"[green] names of the DHP columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the txt"
+            f"[green] names of the DHP columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the.md"
         )
     else:
         console.print("[bold red] sbs_anki_style_dir not found")
@@ -590,10 +592,12 @@ def sbs_per(dpspth, dpd_db):
 
     # Save the list of field names to a text file
     if dpspth.sbs_anki_style_dir:
-        with open(f"{dpspth.sbs_anki_style_dir}/field-list-sbs.txt", "w") as file:
+        with open(f"{dpspth.sbs_anki_style_dir}/field-list-sbs.md", "w") as file:
+            file.write("# Field List: Sbs\n\n```\n")
             file.write("\n".join(columns_names))
+            file.write("\n```\n")
         console.print(
-            f"[green] names of the SBS columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the txt"
+            f"[green] names of the SBS columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the.md"
         )
     else:
         console.print("[bold red] sbs_anki_style_dir not found")
@@ -677,10 +681,12 @@ def parittas(dpspth, dpd_db):
 
     # Save the list of field names to a text file
     if dpspth.sbs_anki_style_dir:
-        with open(f"{dpspth.sbs_anki_style_dir}/field-list-parittas.txt", "w") as file:
+        with open(f"{dpspth.sbs_anki_style_dir}/field-list-parittas.md", "w") as file:
+            file.write("# Field List: Parittas\n\n```\n")
             file.write("\n".join(columns_names))
+            file.write("\n```\n")
         console.print(
-            f"[green] names of the Parittas columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the txt"
+            f"[green] names of the Parittas columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the.md"
         )
     else:
         console.print("[bold red] sbs_anki_style_dir not found")
@@ -818,10 +824,12 @@ def dps(dpspth, dpd_db):
 
     # Save the list of field names to a text file
     if dpspth.sbs_anki_style_dir:
-        with open(f"{dpspth.sbs_anki_style_dir}/field-list-dps.txt", "w") as file:
+        with open(f"{dpspth.sbs_anki_style_dir}/field-list-dps.md", "w") as file:
+            file.write("# Field List: Dps\n\n```\n")
             file.write("\n".join(columns_names))
+            file.write("\n```\n")
         console.print(
-            f"[green] names of the DPS columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the txt"
+            f"[green] names of the DPS columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the.md"
         )
     else:
         console.print("[bold red] sbs_anki_style_dir not found")
@@ -1009,11 +1017,11 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
     # Save the list of field names to a text file
     if dpspth.sbs_anki_style_dir:
         with open(
-            f"{dpspth.sbs_anki_style_dir}/field-list-vocab-class.txt", "w"
+            f"{dpspth.sbs_anki_style_dir}/field-list-vocab-class.md", "w"
         ) as file:
             file.write("\n".join(columns_names))
         console.print(
-            f"[green] names of the Class columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the txt"
+            f"[green] names of the Class columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the.md"
         )
     else:
         console.print("[bold red] sbs_anki_style_dir not found")
@@ -1111,11 +1119,11 @@ def suttas(dpspth, dpd_db):
     # Save the list of field names to a text file
     if dpspth.sbs_anki_style_dir:
         with open(
-            f"{dpspth.sbs_anki_style_dir}/field-list-suttas-class.txt", "w"
+            f"{dpspth.sbs_anki_style_dir}/field-list-suttas-class.md", "w"
         ) as file:
             file.write("\n".join(columns_names))
         console.print(
-            f"[green] names of the Suttas columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the txt"
+            f"[green] names of the Suttas columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the.md"
         )
     else:
         console.print("[bold red] sbs_anki_style_dir not found")
@@ -1254,11 +1262,11 @@ def root_phonetic_class(dpspth, dpd_db, unique_sbs_class_values):
     # Save the list of field names to a text file
     if dpspth.sbs_anki_style_dir:
         with open(
-            f"{dpspth.sbs_anki_style_dir}/field-list-roots-class.txt", "w"
+            f"{dpspth.sbs_anki_style_dir}/field-list-roots-class.md", "w"
         ) as file:
             file.write("\n".join(columns_names))
         console.print(
-            f"[green] names of the Root columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the txt"
+            f"[green] names of the Root columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the.md"
         )
     else:
         console.print("[bold red] sbs_anki_style_dir not found")
@@ -1349,7 +1357,7 @@ def vibhanga(dpspth, dpd_db):
     def natural_sort_key(text_to_sort):
         """
         Sorts strings in human order (natural sort).
-        E.g., "file1.txt", "file2.txt", "file10.txt"
+        E.g., "file1.md", "file2.md", "file10.md"
         """
 
         def atoi(text_chunk):
@@ -1382,12 +1390,14 @@ def vibhanga(dpspth, dpd_db):
     # Save the list of field names to a text file
     if dpspth.sbs_anki_style_dir:
         field_file_path = os.path.join(
-            dpspth.sbs_anki_style_dir, "field-list-vibhanga.txt"
+            dpspth.sbs_anki_style_dir, "field-list-vibhanga.md"
         )
         with open(field_file_path, "w") as file:
+            file.write("# Field List: Vibhanga\n\n```\n")
             file.write("\n".join(columns_names))
+            file.write("\n```\n")
         console.print(
-            f"[green] Column names ([bold]{len(columns_names)}[/bold]) saved to the txt"
+            f"[green] Column names ([bold]{len(columns_names)}[/bold]) saved to the.md"
         )
     else:
         console.print("[bold red] sbs_anki_style_dir not found")

@@ -262,28 +262,34 @@ def make_grammar_csvs(excel_file_dir):
     row_count = len(df_sum_gramm)
     print("Number of rows:", row_count)
 
-    sbs_dir = deva_dir / "Documents" / "sasanarakkha" / "study-tools" / "anki-style"
+    sbs_dir = deva_dir / "Documents" / "sasanarakkha" / "study-tools" / "docs/5-anki/field-lists"
 
     if sbs_dir.exists():
         console.print("[bold green]Saving field list to sbs directory.")
 
         # Save the column list of df_sum_abbr to a text file
-        grammar_abbr_path = sbs_dir / "field-list-grammar-abbr.txt"
+        grammar_abbr_path = sbs_dir / "field-list-grammar-abbr.md"
         with open(grammar_abbr_path, "w") as file:
             columns_with_marks = list(df_sum_abbr.columns) + ["marks"]
+            file.write("# Field List: Grammar Abbr\n\n```\n")
             file.write("\n".join(columns_with_marks))
+            file.write("\n```\n")
 
         # Save the column list of df_sum_sandhi to a text file
-        grammar_sandhi_path = sbs_dir / "field-list-grammar-sandhi.txt"
+        grammar_sandhi_path = sbs_dir / "field-list-grammar-sandhi.md"
         with open(grammar_sandhi_path, "w") as file:
             columns_with_marks = list(df_sum_sandhi.columns) + ["marks"]
+            file.write("# Field List: Grammar Sandhi\n\n```\n")
             file.write("\n".join(columns_with_marks))
+            file.write("\n```\n")
 
         # Save the column list of df_sum_gramm to a text file
-        grammar_grammar_path = sbs_dir / "field-list-grammar-gramm.txt"
+        grammar_grammar_path = sbs_dir / "field-list-grammar-gramm.md"
         with open(grammar_grammar_path, "w") as file:
             columns_with_marks = list(df_sum_gramm.columns) + ["marks"]
+            file.write("# Field List: Grammar Gramm\n\n```\n")
             file.write("\n".join(columns_with_marks))
+            file.write("\n```\n")
 
     else:
         console.print("[bold red]Study-tools/anki-style directory does not exist.")

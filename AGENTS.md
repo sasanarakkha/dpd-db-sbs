@@ -1,6 +1,6 @@
 # Project Rules (from original upstream)
 
-These rules are specific to the dpd-db project. Apply these in addition to your baseline global instructions `~/.claude/CLAUDE.md`.
+Apply these in addition to your baseline global instructions `~/.claude/CLAUDE.md`.
 
 ## Project Overview
 
@@ -83,6 +83,9 @@ Renames/moves are atomic. You MUST:
 2. Update all imports, hardcoded paths, scripts, workflows, registries (`kamma/upstream_sync/registry.json`), and docs.
 3. Run a final verification search to empirically prove zero stale references remain.
 4. Stage `registry.json` and all affected `kamma/upstream_sync/smd/*.md` files **in the same commit** as the `git mv`. Never let a rename land in git while its registry/SMD documentation is still in the working tree.
+
+## Economy & Cost Management
+- NEVER re-run batch LLM processing for trivial changes like filename dates or field labels. Use local text manipulation (e.g., regex, rename) instead.
 
 ## Project Principles
 - **Docs Sanctity:** `docs/` is upstream-only. Put local docs in `docs_rus/` or `kamma/`.

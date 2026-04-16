@@ -226,8 +226,12 @@ def sbs_per(df, sbs_ped_link):
 
     if dpspth.sbs_anki_style_dir:
         # Save the list of field names to a text file
-        with open(f"{dpspth.sbs_anki_style_dir}/field-list-sbs.txt", "w") as file:
-            file.write("\n".join(columns_to_keep))
+        with open(f"{dpspth.sbs_anki_style_dir}/field-list-sbs.md", "w") as file:
+            file.write("# Field List: Sbs\n\n```\n")
+            file.write("# Field List: Sbs\n\n```\n")
+            file.write("\n```\n")
+            file.write("\n".join(columns_to_keep)
+            file.write("\n```\n"))
     else:
         console.print("[bold red]no path to sbs_anki_style_dir")
 
@@ -313,8 +317,12 @@ def parittas(df, sbs_ped_link):
 
     if dpspth.sbs_anki_style_dir:
         # Save the list of field names to a text file
-        with open(f"{dpspth.sbs_anki_style_dir}/field-list-parittas.txt", "w") as file:
-            file.write("\n".join(columns_to_keep))
+        with open(f"{dpspth.sbs_anki_style_dir}/field-list-parittas.md", "w") as file:
+            file.write("# Field List: Parittas\n\n```\n")
+            file.write("# Field List: Parittas\n\n```\n")
+            file.write("\n```\n")
+            file.write("\n".join(columns_to_keep)
+            file.write("\n```\n"))
     else:
         console.print("[bold red]no path to sbs_anki_style_dir")
 
@@ -430,8 +438,12 @@ def dps(df, dps_link):
 
     if dpspth.sbs_anki_style_dir:
         # Save the list of field names to a text file
-        with open(f"{dpspth.sbs_anki_style_dir}/field-list-dps.txt", "w") as file:
-            file.write("\n".join(columns_to_keep))
+        with open(f"{dpspth.sbs_anki_style_dir}/field-list-dps.md", "w") as file:
+            file.write("# Field List: Dps\n\n```\n")
+            file.write("# Field List: Dps\n\n```\n")
+            file.write("\n```\n")
+            file.write("\n".join(columns_to_keep)
+            file.write("\n```\n"))
 
     else:
         console.print("[bold red]no path to sbs_anki_style_dir")
@@ -565,8 +577,12 @@ def dhp(df, sbs_ped_link):
 
     if dpspth.sbs_anki_style_dir:
         # Save the list of field names to a text file
-        with open(f"{dpspth.sbs_anki_style_dir}/field-list-dhp.txt", "w") as file:
-            file.write("\n".join(columns_to_keep))
+        with open(f"{dpspth.sbs_anki_style_dir}/field-list-dhp.md", "w") as file:
+            file.write("# Field List: Dhp\n\n```\n")
+            file.write("# Field List: Dhp\n\n```\n")
+            file.write("\n```\n")
+            file.write("\n".join(columns_to_keep)
+            file.write("\n```\n"))
 
     else:
         console.print("[bold red]no path to sbs_anki_style_dir")
@@ -778,7 +794,7 @@ def classes(df, sbs_ped_link):
     if dpspth.sbs_anki_style_dir:
         # Save the list of field names to a text file
         with open(
-            f"{dpspth.sbs_anki_style_dir}/field-list-vocab-class.txt", "w"
+            f"{dpspth.sbs_anki_style_dir}/field-list-vocab-class.md", "w"
         ) as file:
             file.write("\n".join(columns_to_keep))
 
@@ -901,7 +917,7 @@ def suttas_class(df, sbs_ped_link):
     if dpspth.sbs_anki_style_dir:
         # Save the list of field names to a text file
         with open(
-            f"{dpspth.sbs_anki_style_dir}/field-list-suttas-class.txt", "w"
+            f"{dpspth.sbs_anki_style_dir}/field-list-suttas-class.md", "w"
         ) as file:
             file.write("\n".join(columns_to_keep))
 
@@ -1012,7 +1028,7 @@ def root_phonetic_class(df, sbs_ped_link):
     if dpspth.sbs_anki_style_dir:
         # Save the list of field names to a text file
         with open(
-            f"{dpspth.sbs_anki_style_dir}/field-list-roots-class.txt", "w"
+            f"{dpspth.sbs_anki_style_dir}/field-list-roots-class.md", "w"
         ) as file:
             file.write("\n".join(columns_to_keep))
 

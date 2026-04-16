@@ -268,7 +268,7 @@ class DPSPaths:
 
         # .. external
         self.sbs_anki_style_dir = base_dir.joinpath(
-            Path("../sasanarakkha/study-tools/anki-style/")
+            Path("../sasanarakkha/study-tools/docs/5-anki/field-lists")
         )
         self.pali_class_vocab_html_dir = base_dir.joinpath(
             Path("../sasanarakkha/study-tools/pali-class/vocab/")
