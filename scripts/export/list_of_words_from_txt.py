@@ -14,10 +14,10 @@ from tools.cst_sc_text_sets import make_cst_text_list_from_file
 from tools.printer import printer as pr
 
 from db.models import SBS, DpdHeadword
-from sqlalchemy import or_
+from sqlalchemy import and_, func, or_
 
 
-def dps_make_no_field_inflections_set(db_session, fields):
+def dps_make_no_field_inflections_set(db_session, fields: str | list[str]) -> set[str]:
     """
     Generate a set of all inflections in the DPD database where the specified SBS field is not empty.
     """
@@ -25,10 +25,10 @@ def dps_make_no_field_inflections_set(db_session, fields):
     if isinstance(fields, str):
         fields = [fields]
 
-    conditions = [
-        or_(getattr(SBS, field) != "", getattr(SBS, field).isnot(None))
-        for field in fields
-    ]
+    conditions = []
+    for field in fields:
+        column = getattr(SBS, field)
+        conditions.append(and_(column.isnot(None), func.trim(column) != ""))
 
     inflections_db = (
         db_session.query(DpdHeadword)
@@ -149,7 +149,7 @@ if __name__ == "__main__":
     dpspth = DPSPaths()
     db_session = get_db_session(pth.dpd_db_path)
 
-    field_to_check = ["vib_example", "pat_example"]
+    field_to_check = ["vib_source", "pat_source"]
 
     dps_make_words_to_add_list_from_text_no_field(
         pth, dpspth, db_session, field_to_check

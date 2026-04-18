@@ -1,5 +1,45 @@
 [
     {
+        "id": 40072,
+        "lemma_1": "paññāyati 1"
+    },
+    {
+        "id": 41814,
+        "lemma_1": "patirūpa"
+    },
+    {
+        "id": 19205,
+        "lemma_1": "kakkhaḷa 3"
+    },
+    {
+        "id": 47568,
+        "lemma_1": "pharusa 1"
+    },
+    {
+        "id": 52657,
+        "lemma_1": "mitta 1"
+    },
+    {
+        "id": 31979,
+        "lemma_1": "dammi"
+    },
+    {
+        "id": 53878,
+        "lemma_1": "yaṃkiñci"
+    },
+    {
+        "id": 32486,
+        "lemma_1": "diṭṭhigata"
+    },
+    {
+        "id": 18200,
+        "lemma_1": "evaṃvādī"
+    },
+    {
+        "id": 66303,
+        "lemma_1": "vambheti"
+    },
+    {
         "id": 48511,
         "lemma_1": "buddha 1"
     },
@@ -58,45 +98,5 @@
     {
         "id": 10987,
         "lemma_1": "ā"
-    },
-    {
-        "id": 20575,
-        "lemma_1": "kalandakanivāpa"
-    },
-    {
-        "id": 9813,
-        "lemma_1": "asubha 1"
-    },
-    {
-        "id": 23143,
-        "lemma_1": "kolamatta"
-    },
-    {
-        "id": 26542,
-        "lemma_1": "ciṇṇamānatta"
-    },
-    {
-        "id": 17490,
-        "lemma_1": "ekattharaṇapāvuraṇa"
-    },
-    {
-        "id": 65997,
-        "lemma_1": "vattati 2"
-    },
-    {
-        "id": 65996,
-        "lemma_1": "vattati 1"
-    },
-    {
-        "id": 88624,
-        "lemma_1": "dutiya 4"
-    },
-    {
-        "id": 88623,
-        "lemma_1": "paṭippassaddha 2"
-    },
-    {
-        "id": 49930,
-        "lemma_1": "bhikkhusaṅgha"
     }
 ]

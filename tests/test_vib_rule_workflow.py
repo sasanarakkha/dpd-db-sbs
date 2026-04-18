@@ -1,10 +1,15 @@
 """Tests for the Vibhanga rule workflow: word extraction and -pi/-ca clitic handling."""
 
+from io import StringIO
 from unittest.mock import MagicMock, patch
 
 from tools.cst_sc_text_sets import make_cst_text_list_from_file
 from scripts.change_in_db.copy_examples import update_column_for_some_criteria
 from scripts.change_in_db.vib_rule_workflow import (
+    accept_pasted_text,
+    run_rule,
+    get_text_from_clipboard,
+    collect_tty_pasted_text,
     normalize_pat_file,
     strip_variant_readings,
     suggest_next_pat_file,
@@ -105,6 +110,90 @@ def test_strip_variant_readings():
     input_text = "dhammo-pi {variant reading here} vinayo-ca"
     expected = "dhammo-pi  vinayo-ca"
     assert strip_variant_readings(input_text) == expected
+
+
+def test_collect_tty_pasted_text_stops_at_end_marker():
+    """TTY multiline input should stop at a sentinel line and keep previous text."""
+    stdin = StringIO("line 1\nline 2\n__END__\nignored\n")
+
+    assert collect_tty_pasted_text(stdin) == "line 1\nline 2\n"
+
+
+def test_accept_pasted_text_reads_non_tty_stdin(monkeypatch):
+    """Non-TTY stdin should still read the full stream unchanged."""
+    stdin = StringIO("long line 1\nlong line 2\n")
+    monkeypatch.setattr(stdin, "isatty", lambda: False)
+
+    assert accept_pasted_text(stdin) == "long line 1\nlong line 2\n"
+
+
+@patch("scripts.change_in_db.vib_rule_workflow.subprocess.run")
+def test_get_text_from_clipboard_reads_pbpaste(mock_run):
+    """Clipboard import should return pbpaste stdout."""
+    mock_run.return_value.stdout = "clipboard text"
+
+    assert get_text_from_clipboard() == "clipboard text"
+    mock_run.assert_called_once()
+
+
+def test_accept_pasted_text_reads_from_clipboard_choice(monkeypatch):
+    """TTY input should read from clipboard by default on Enter."""
+    stdin = StringIO("\n")
+    monkeypatch.setattr(stdin, "isatty", lambda: True)
+    monkeypatch.setattr(
+        "scripts.change_in_db.vib_rule_workflow.get_text_from_clipboard",
+        lambda: "from clipboard",
+    )
+
+    assert accept_pasted_text(stdin) == "from clipboard"
+
+
+def test_accept_pasted_text_reads_from_terminal_choice(monkeypatch):
+    """TTY input should still allow explicit terminal paste mode."""
+    stdin = StringIO("paste\nline 1\n__END__\n")
+    monkeypatch.setattr(stdin, "isatty", lambda: True)
+
+    assert accept_pasted_text(stdin) == "line 1\n"
+
+
+@patch("scripts.change_in_db.vib_rule_workflow.update_column_for_some_criteria")
+@patch(
+    "scripts.change_in_db.vib_rule_workflow.dps_make_words_to_add_list_from_text_no_field"
+)
+@patch("scripts.change_in_db.vib_rule_workflow.save_progress")
+@patch("scripts.change_in_db.vib_rule_workflow.pr")
+def test_run_rule_prints_saved_content_once(
+    mock_pr,
+    mock_save_progress,
+    mock_extract_words,
+    mock_update_column,
+    monkeypatch,
+    tmp_path,
+):
+    """Save step should print the saved content for the PAT file once."""
+    pat_file = tmp_path / "pc64.txt"
+    text_file = tmp_path / "text.txt"
+    pth = MagicMock()
+    dpspth = MagicMock()
+    dpspth.text_to_add_path = text_file
+    mock_extract_words.return_value = []
+    monkeypatch.setattr(
+        "scripts.change_in_db.vib_rule_workflow.accept_pasted_text",
+        lambda: "line 1\nline 2\n",
+    )
+    monkeypatch.setattr("builtins.input", lambda prompt="": "")
+
+    result = run_rule("VIN2.5.6.10", str(pat_file), pth, dpspth, MagicMock())
+
+    assert result is True
+    assert pat_file.read_text() == "line 1\nline 2"
+    assert text_file.read_text() == "line 1\nline 2"
+    mock_pr.yes.assert_any_call(f"Saved to {pat_file}:")
+    mock_pr.cyan.assert_any_call("line 1\nline 2")
+    assert mock_pr.cyan.call_args_list.count((("line 1\nline 2",), {})) == 1
+    mock_extract_words.assert_called_once_with(
+        pth, dpspth, mock_extract_words.call_args.args[2], ["vib_source", "pat_source"]
+    )
 
 
 def test_suggest_next_pat_file_pc():

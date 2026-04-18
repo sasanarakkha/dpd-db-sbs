@@ -582,7 +582,7 @@ if __name__ == "__main__":
     uvicorn.run(
         "main_ru:app",
         # host="0.0.0.0",
-        host="127.1.1.1",
+        host="127.0.0.1",
         port=8080,
         reload=True,
         reload_dirs=str(pth.webapp_static_dir.parent),

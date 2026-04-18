@@ -1,5 +1,65 @@
 [
     {
+        "id": 19204,
+        "lemma_1": "kakkhaḷa 2"
+    },
+    {
+        "id": 19205,
+        "lemma_1": "kakkhaḷa 3"
+    },
+    {
+        "id": 2823,
+        "lemma_1": "atheyyasattha"
+    },
+    {
+        "id": 2824,
+        "lemma_1": "atheyyasatthasaññī"
+    },
+    {
+        "id": 31607,
+        "lemma_1": "theyyasatthasaññī"
+    },
+    {
+        "id": 43690,
+        "lemma_1": "paripuṇṇavīsativassa"
+    },
+    {
+        "id": 43691,
+        "lemma_1": "paripuṇṇavīsativassasaññī"
+    },
+    {
+        "id": 17326,
+        "lemma_1": "ūnavīsativassasaññī"
+    },
+    {
+        "id": 35489,
+        "lemma_1": "nachādetukāma"
+    },
+    {
+        "id": 48918,
+        "lemma_1": "brahmacariyantarāya"
+    },
+    {
+        "id": 28599,
+        "lemma_1": "jīvitantarāya"
+    },
+    {
+        "id": 20388,
+        "lemma_1": "kammāraha"
+    },
+    {
+        "id": 7077,
+        "lemma_1": "appāṇa 1"
+    },
+    {
+        "id": 7082,
+        "lemma_1": "appāṇasaññī"
+    },
+    {
+        "id": 45363,
+        "lemma_1": "pāṇasaññī"
+    },
+    {
         "id": 48512,
         "lemma_1": "buddha 2"
     },
@@ -18,65 +78,5 @@
     {
         "id": 39516,
         "lemma_1": "paccuddhāraṇasaññī"
-    },
-    {
-        "id": 39515,
-        "lemma_1": "paccuddhāraṇa"
-    },
-    {
-        "id": 6785,
-        "lemma_1": "appaccuddhāraṇasaññī"
-    },
-    {
-        "id": 6784,
-        "lemma_1": "appaccuddhāraṇa"
-    },
-    {
-        "id": 43779,
-        "lemma_1": "paribhaṇḍa 2"
-    },
-    {
-        "id": 636,
-        "lemma_1": "aggaḷa"
-    },
-    {
-        "id": 61801,
-        "lemma_1": "saṃsibbita"
-    },
-    {
-        "id": 88,
-        "lemma_1": "akappakata"
-    },
-    {
-        "id": 20067,
-        "lemma_1": "kappakata"
-    },
-    {
-        "id": 20068,
-        "lemma_1": "kappakatokāsa"
-    },
-    {
-        "id": 11574,
-        "lemma_1": "ādinnasaññī"
-    },
-    {
-        "id": 3960,
-        "lemma_1": "anādinna"
-    },
-    {
-        "id": 3961,
-        "lemma_1": "anādinnasaññī"
-    },
-    {
-        "id": 88844,
-        "lemma_1": "ādinna 2.2"
-    },
-    {
-        "id": 12573,
-        "lemma_1": "āropeti 3"
-    },
-    {
-        "id": 18687,
-        "lemma_1": "opadhika"
     }
 ]

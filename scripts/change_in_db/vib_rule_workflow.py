@@ -5,7 +5,7 @@ For each rule:
 1. Prompt for source value (suggested from last run) and PAT file path; Enter to accept, 'q' to quit.
 2. Accept pasted rule text via stdin (or read existing PAT file); strip {variant readings}.
 3. Save cleaned text to misc/pat/pcXX.txt and temp/text.txt.
-4. Run copy_examples (first pass) — pre-populate vib_example for already-known DB words so they won't appear as false positives.
+4. Run copy_examples (first pass) — pre-populate vib/pat SBS fields for already-known DB words.
 5. Extract unrecognized words (list_of_words_from_txt); print them and save backup TSV.
 6. Pause for GUI entry: user adds new words in gui2 → Pass2Add tab.
 7. Run copy_examples (second pass) — commit newly-added words to DB.
@@ -17,8 +17,10 @@ Usage: uv run python scripts/change_in_db/vib_rule_workflow.py
 
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
+from typing import TextIO
 
 from db.db_helpers import get_db_session
 from scripts.change_in_db.copy_examples import update_column_for_some_criteria
@@ -84,10 +86,55 @@ def strip_variant_readings(text: str) -> str:
     return re.sub(r"\{[^}]+\}", "", text).strip()
 
 
-def accept_pasted_text() -> str:
-    """Read multiline text from stdin until EOF (Ctrl-D)."""
-    pr.green("Paste the rule text below. Press Ctrl-D (EOF) when done:")
-    return sys.stdin.read()
+def collect_tty_pasted_text(stdin: TextIO) -> str:
+    """Read multiline terminal input until EOF or a sentinel line."""
+    lines: list[str] = []
+    while True:
+        try:
+            line = stdin.readline()
+        except KeyboardInterrupt:
+            pr.warning("Input cancelled.")
+            return ""
+
+        if line == "":
+            break
+
+        if line.rstrip("\r\n") == "__END__":
+            break
+
+        lines.append(line)
+    return "".join(lines)
+
+
+def get_text_from_clipboard() -> str:
+    """Read multiline text from the macOS clipboard."""
+    result = subprocess.run(
+        ["pbpaste"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return result.stdout
+
+
+def accept_pasted_text(stdin: TextIO | None = None) -> str:
+    """Read multiline text from stdin until EOF or a sentinel line."""
+    input_stream = stdin or sys.stdin
+
+    if input_stream.isatty():
+        pr.green(
+            "Press Enter to read from clipboard, or type 'paste' for terminal paste mode."
+        )
+        mode = input_stream.readline().strip().lower()
+        if mode in {"", "clip"}:
+            pr.green("Reading rule text from clipboard...")
+            return get_text_from_clipboard()
+
+        pr.green("Paste the rule text below.")
+        pr.green("Finish with Ctrl-D or type __END__ on its own line.")
+        return collect_tty_pasted_text(input_stream)
+
+    return input_stream.read()
 
 
 def run_rule(
@@ -122,12 +169,12 @@ def run_rule(
         Path(pat_file).parent.mkdir(parents=True, exist_ok=True)
         Path(pat_file).write_text(text)
         Path(dpspth.text_to_add_path).write_text(text)
-        pr.yes(f"Text saved to {pat_file} and {dpspth.text_to_add_path}")
+        pr.yes(f"Saved to {pat_file}:")
+        pr.cyan(text)
 
-        # Step 3b — First copy_examples run: pre-populate already-known words
-        # This mirrors step 1 of the original 7-step workflow. Running before word extraction
-        # ensures words already in the DB (with this source) have their vib_example/pat_example
-        # fields filled, so they won't appear as false positives in the word list below.
+        # Step 3b — First copy_examples run: pre-populate already-known words.
+        # Running before word extraction ensures the matching SBS vib/pat fields are copied
+        # for existing DB words before we filter against missing source coverage.
         pr.green(
             f"Pre-populating existing coverage for {source} (first copy_examples run)..."
         )
@@ -136,7 +183,7 @@ def run_rule(
 
     # Step 4 — Extract words (now without false positives from already-covered words)
     words = dps_make_words_to_add_list_from_text_no_field(
-        pth, dpspth, db_session, ["vib_example", "pat_example"]
+        pth, dpspth, db_session, ["vib_source", "pat_source"]
     )
     if words:
         pr.cyan("")
