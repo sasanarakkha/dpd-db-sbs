@@ -1,5 +1,29 @@
 [
     {
+        "id": 49712,
+        "lemma_1": "bhāyati 1"
+    },
+    {
+        "id": 5694,
+        "lemma_1": "antaradhāyati"
+    },
+    {
+        "id": 18514,
+        "lemma_1": "otaritvā"
+    },
+    {
+        "id": 45061,
+        "lemma_1": "paharati"
+    },
+    {
+        "id": 16929,
+        "lemma_1": "ummujjati"
+    },
+    {
+        "id": 46294,
+        "lemma_1": "pivati"
+    },
+    {
         "id": 40072,
         "lemma_1": "paññāyati 1"
     },
@@ -74,29 +98,5 @@
     {
         "id": 18279,
         "lemma_1": "okāsa 2"
-    },
-    {
-        "id": 69928,
-        "lemma_1": "vīriyārambha"
-    },
-    {
-        "id": 6059,
-        "lemma_1": "apacaya"
-    },
-    {
-        "id": 19396,
-        "lemma_1": "kaṭhalā 1"
-    },
-    {
-        "id": 22057,
-        "lemma_1": "kīḷati"
-    },
-    {
-        "id": 56105,
-        "lemma_1": "lobhadhamma"
-    },
-    {
-        "id": 10987,
-        "lemma_1": "ā"
     }
 ]

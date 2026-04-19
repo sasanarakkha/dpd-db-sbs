@@ -178,7 +178,7 @@ def run_rule(
         pr.green(
             f"Pre-populating existing coverage for {source} (first copy_examples run)..."
         )
-        update_column_for_some_criteria(source, "", "vib", "vib", dry_run=False)
+        update_column_for_some_criteria(source, "vib", "vib", dry_run=False)
         pr.yes("Existing words pre-populated.")
 
     # Step 4 — Extract words (now without false positives from already-covered words)
@@ -200,7 +200,7 @@ def run_rule(
 
     # Step 6 — Second copy_examples run: commit newly-added words
     pr.green(f"Applying copy_examples for {source}...")
-    update_column_for_some_criteria(source, "", "vib", "vib", dry_run=False)
+    update_column_for_some_criteria(source, "vib", "vib", dry_run=False)
     pr.yes("DB changes applied.")
 
     # Step 7 — Save progress

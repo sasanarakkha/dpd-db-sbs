@@ -1,5 +1,29 @@
 [
     {
+        "id": 4369,
+        "lemma_1": "anukkhittaka"
+    },
+    {
+        "id": 4370,
+        "lemma_1": "anukkhittakasaññī"
+    },
+    {
+        "id": 14095,
+        "lemma_1": "ukkhittakasaññī"
+    },
+    {
+        "id": 6115,
+        "lemma_1": "apaññatta 1"
+    },
+    {
+        "id": 45756,
+        "lemma_1": "pāraṃ"
+    },
+    {
+        "id": 47986,
+        "lemma_1": "balagga"
+    },
+    {
         "id": 19204,
         "lemma_1": "kakkhaḷa 2"
     },
@@ -54,29 +78,5 @@
     {
         "id": 7082,
         "lemma_1": "appāṇasaññī"
-    },
-    {
-        "id": 45363,
-        "lemma_1": "pāṇasaññī"
-    },
-    {
-        "id": 48512,
-        "lemma_1": "buddha 2"
-    },
-    {
-        "id": 79414,
-        "lemma_1": "paṭisāmeti 2"
-    },
-    {
-        "id": 33599,
-        "lemma_1": "dunnikkhitta"
-    },
-    {
-        "id": 35961,
-        "lemma_1": "nahasādhippāya"
-    },
-    {
-        "id": 39516,
-        "lemma_1": "paccuddhāraṇasaññī"
     }
 ]
