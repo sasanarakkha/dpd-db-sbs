@@ -63,15 +63,14 @@ def test_clitics_order_in_result(tmp_path):
 
 
 @patch("scripts.change_in_db.copy_examples.db_session")
-@patch("scripts.change_in_db.copy_examples.console")
-def test_dry_run_does_not_commit(mock_console, mock_db_session):
+@patch("scripts.change_in_db.copy_examples.pr")
+def test_dry_run_does_not_commit(mock_pr, mock_db_session):
     """Calling update_column_for_some_criteria with dry_run=True must not call db_session.commit()."""
     # Setup mock return values for queries to avoid errors during iteration
     mock_db_session.query.return_value.options.return_value.outerjoin.return_value.filter.return_value.all.return_value = []
 
     update_column_for_some_criteria(
         source_value="VIN2.5.6.10",
-        column_to_update="",
         value_to_update="vib",
         modifier_column_to_copy="vib",
         dry_run=True,
@@ -81,21 +80,18 @@ def test_dry_run_does_not_commit(mock_console, mock_db_session):
     mock_db_session.commit.assert_not_called()
 
     # Verify dry run message was printed
-    mock_console.print.assert_any_call(
-        "[bold yellow]DRY RUN — no changes written to database[/bold yellow]"
-    )
+    mock_pr.amber.assert_any_call("DRY RUN — no changes written to database")
 
 
 @patch("scripts.change_in_db.copy_examples.db_session")
-@patch("scripts.change_in_db.copy_examples.console")
-def test_dry_run_commits_by_default(mock_console, mock_db_session):
+@patch("scripts.change_in_db.copy_examples.pr")
+def test_dry_run_commits_by_default(mock_pr, mock_db_session):
     """Calling update_column_for_some_criteria with dry_run=False (default) must call db_session.commit()."""
     # Setup mock return values for queries to avoid errors during iteration
     mock_db_session.query.return_value.options.return_value.outerjoin.return_value.filter.return_value.all.return_value = []
 
     update_column_for_some_criteria(
         source_value="VIN2.5.6.10",
-        column_to_update="",
         value_to_update="vib",
         modifier_column_to_copy="vib",
         dry_run=False,

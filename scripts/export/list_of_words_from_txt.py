@@ -4,8 +4,6 @@
 Save list of words from text.txt which are not in sbs db
 """
 
-import csv
-
 from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
 from db.db_helpers import get_db_session
@@ -13,15 +11,11 @@ from db.db_helpers import get_db_session
 from tools.cst_sc_text_sets import make_cst_text_list_from_file
 from tools.printer import printer as pr
 
-from db.models import SBS, DpdHeadword
+from db.models import Lookup, SBS, DpdHeadword
 from sqlalchemy import and_, func, or_
 
 
-def dps_make_no_field_inflections_set(db_session, fields: str | list[str]) -> set[str]:
-    """
-    Generate a set of all inflections in the DPD database where the specified SBS field is not empty.
-    """
-
+def make_field_conditions(fields: str | list[str]) -> list:
     if isinstance(fields, str):
         fields = [fields]
 
@@ -29,52 +23,118 @@ def dps_make_no_field_inflections_set(db_session, fields: str | list[str]) -> se
     for field in fields:
         column = getattr(SBS, field)
         conditions.append(and_(column.isnot(None), func.trim(column) != ""))
+    return conditions
 
-    inflections_db = (
-        db_session.query(DpdHeadword)
+
+def make_decon_word_list(deconstruction: list[str]) -> list[str]:
+    """Mirror gui2 deconstructor word splitting for lookup fallback."""
+
+    word_list: list[str] = []
+    for deconstruction_item in deconstruction:
+        words = deconstruction_item.split(" + ")
+        for word in words:
+            word_list.append(word.strip())
+    return sorted(set(word_list), key=lambda x: word_list.index(x))
+
+
+def get_headwords_ids(db_session, word_in_text: str) -> list[int]:
+    """Mirror gui2 DatabaseManager.get_headwords; returns ids only.
+
+    Direct headwords have priority: if headwords_unpack exists, return it without
+    fallback to deconstructor. This matches gui2/database_manager.py:307-335.
+    """
+    lookup_item = (
+        db_session.query(Lookup).filter(Lookup.lookup_key == word_in_text).first()
+    )
+    if not lookup_item:
+        return []
+
+    ids = lookup_item.headwords_unpack
+    if ids:
+        return list(ids)
+
+    return get_headwords_from_deconstructor_ids(db_session, lookup_item)
+
+
+def get_headwords_from_deconstructor_ids(db_session, lookup_item: Lookup) -> list[int]:
+    """Mirror gui2 DatabaseManager.get_headwords_from_deconstructor.
+
+    Recursively resolve deconstructor parts via gui2 priority (direct first).
+    Matches gui2/database_manager.py:337-351.
+    """
+    headwords_list: list[int] = []
+    deconstruction = lookup_item.deconstructor_unpack
+
+    if deconstruction:
+        for word in make_decon_word_list(deconstruction):
+            headwords_list.extend(get_headwords_ids(db_session, word))
+
+    return headwords_list
+
+
+def make_words_with_matching_fields_set(
+    db_session, words: list[str], fields: str | list[str]
+) -> set[str]:
+    """Return text words whose resolved headwords already have the target fields.
+
+    Matches gui2's bulk-filter architecture: precompute covered ids once, then
+    resolve each text word in memory via lookup dict (no per-word DB calls).
+    """
+    conditions = make_field_conditions(fields)
+    unique_words = list(set(words))
+
+    # Bulk fetch 1: all Lookup rows for text words
+    lookup_dict: dict[str, Lookup] = {
+        r.lookup_key: r
+        for r in db_session.query(Lookup)
+        .filter(Lookup.lookup_key.in_(unique_words))
+        .all()
+    }
+
+    # Bulk fetch 2: any decon parts not yet loaded
+    extra_keys: set[str] = set()
+    for r in lookup_dict.values():
+        if not r.headwords_unpack and r.deconstructor_unpack:
+            for part in make_decon_word_list(r.deconstructor_unpack):
+                if part not in lookup_dict:
+                    extra_keys.add(part)
+    if extra_keys:
+        for r in (
+            db_session.query(Lookup).filter(Lookup.lookup_key.in_(extra_keys)).all()
+        ):
+            lookup_dict[r.lookup_key] = r
+
+    # Bulk fetch 3: covered headword ids (one query)
+    covered_ids: set[int] = {
+        row[0]
+        for row in db_session.query(DpdHeadword.id)
         .join(SBS, DpdHeadword.id == SBS.id)
         .filter(or_(*conditions))
         .all()
-    )
+    }
 
-    dps_filtered_inflections_set = set()
-    for i in inflections_db:
-        dps_filtered_inflections_set.update(i.inflections_list)
+    # In-memory resolve + intersect (no DB)
+    def resolve(word: str) -> list[int]:
+        item = lookup_dict.get(word)
+        if not item:
+            return []
+        if item.headwords_unpack:
+            return list(item.headwords_unpack)
+        if not item.deconstructor_unpack:
+            return []
+        ids: list[int] = []
+        for part in make_decon_word_list(item.deconstructor_unpack):
+            ids.extend(resolve(part))
+        return ids
 
-    pr.green_tmr("dps_filtered_inflections_set")
-    pr.yes(len(dps_filtered_inflections_set))
+    covered_words: set[str] = set()
+    for word in unique_words:
+        if any(i in covered_ids for i in resolve(word)):
+            covered_words.add(word)
 
-    return dps_filtered_inflections_set
-
-
-def make_sp_mistakes_list(pth):
-    with open(pth.spelling_mistakes_path) as f:
-        reader = csv.reader(f, delimiter="\t")
-        sp_mistakes_list = [row[0] for row in reader]
-
-    pr.green_tmr("sp_mistakes_list")
-    pr.yes(len(sp_mistakes_list))
-    return sp_mistakes_list
-
-
-def make_variant_list(pth):
-    with open(pth.variant_readings_path) as f:
-        reader = csv.reader(f, delimiter="\t")
-        variant_list = [row[0] for row in reader]
-
-    pr.green_tmr("variant_list")
-    pr.yes(len(variant_list))
-    return variant_list
-
-
-def make_sandhi_ok_list(pth):
-    with open(pth.decon_checked) as f:
-        reader = csv.reader(f, delimiter="\t")
-        sandhi_ok_list = [row[0] for row in reader]
-
-    pr.green_tmr("sandhi_ok_list")
-    pr.yes(len(sandhi_ok_list))
-    return sandhi_ok_list
+    pr.green_tmr("covered_text_words")
+    pr.yes(len(covered_words))
+    return covered_words
 
 
 def dps_make_words_to_add_list_from_text_no_field(
@@ -108,19 +168,13 @@ def dps_make_words_to_add_list_from_text_no_field(
     sc_text_list = []
     original_text_list = list(cst_text_list) + list(sc_text_list)
 
-    # Generate additional lists
-    sp_mistakes_list = make_sp_mistakes_list(pth)
-    variant_list = make_variant_list(pth)
-    sandhi_ok_list = make_sandhi_ok_list(pth)
-
-    all_inflections_set = dps_make_no_field_inflections_set(db_session, fields)
+    covered_words_set = make_words_with_matching_fields_set(
+        db_session, original_text_list, fields
+    )
 
     # Filter the text set
     text_set = set(cst_text_list) | set(sc_text_list)
-    text_set -= set(sandhi_ok_list)
-    text_set -= set(sp_mistakes_list)
-    text_set -= set(variant_list)
-    text_set -= all_inflections_set
+    text_set -= covered_words_set
 
     # Sort based on original order
     text_list = sorted(text_set, key=lambda x: original_text_list.index(x))
@@ -140,6 +194,9 @@ def dps_make_words_to_add_list_from_text_no_field(
             f.write(f"{word}\n")
 
     pr.green(f"Saved to {output_filename}")
+    # print list of those words
+    for word in text_list:
+        pr.amber(word)
 
     return text_list
 

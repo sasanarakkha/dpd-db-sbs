@@ -116,7 +116,7 @@ def update_column_for_some_criteria(
                         )
                     changed = True
                     break
-            
+
             if changed:
                 pr.cyan(f"Updated from sbs_source: {__word__.id} {__word__.lemma_1}")
                 count_changed_sbs += 1
@@ -143,9 +143,11 @@ def update_column_for_some_criteria(
                             )
                         added = True
                         break
-                
+
                 if added:
-                    pr.cyan(f"Added new row & copied from dpd_source: {__word__.id} {__word__.lemma_1}")
+                    pr.cyan(
+                        f"Added new row & copied from dpd_source: {__word__.id} {__word__.lemma_1}"
+                    )
                     count_added += 1
             else:
                 changed = False
@@ -163,20 +165,23 @@ def update_column_for_some_criteria(
                             )
                         changed = True
                         break
-                
+
                 if changed:
-                    pr.cyan(f"Updated from dpd_source: {__word__.id} {__word__.lemma_1}")
+                    pr.cyan(
+                        f"Updated from dpd_source: {__word__.id} {__word__.lemma_1}"
+                    )
                     count_changed += 1
 
     pr.cyan("")
+    pr.green("Total count:")
     if rows_already_have:
-        pr.green(f"Total already have: {len(rows_already_have)}")
+        pr.green(f"already have: {len(rows_already_have)}")
     if count_changed:
-        pr.green(f"Total copied from dpd_source(s): {count_changed}")
+        pr.green(f"copied from dpd_source(s): {count_changed}")
     if count_changed_sbs:
-        pr.green(f"Total copied from sbs_source(s): {count_changed_sbs}")
+        pr.green(f"copied from sbs_source(s): {count_changed_sbs}")
     if count_added:
-        pr.green(f"Total added new row(s): {count_added}")
+        pr.green(f"added new row(s): {count_added}")
     pr.cyan("")
     pr.yes(f"finished for {source_value}")
 
