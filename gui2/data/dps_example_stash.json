@@ -1,12 +1,12 @@
 {
     "dps_shared": {
-        "source": "VIN1.4.3.2",
-        "sutta": "ūnapañcabandhanasikkhāpadaṃ",
-        "example": "abandhan'okāso nāma patto yassa dv'aṅgulā rāji na hoti. bandhan'okāso nāma patto yassa dv'aṅgulā rāji hoti. navo nāma patto viññattiṃ upādāya vuccati."
+        "source": "VIN2.5.7.8",
+        "sutta": "ariṭṭhasikkhāpadaṃ",
+        "example": "yo pana bhikkhu evaṃ vadeyya, tath'āhaṃ bhagavatā dhammaṃ desitaṃ ājānāmi, yathā ye'me antarāyikā dhammā vuttā bhagavatā, te paṭisevato n'ālaṃ antarāyāyā'ti so bhikkhu bhikkhūhi evam'assa vacanīyo, m'āyasmā evaṃ avaca, mā bhagavantaṃ abbhācikkhi, na hi sādhu bhagavato abbhakkhānaṃ, na hi bhagavā evaṃ vadeyya, anekapariyāyen'āvuso, antarāyikā dhammā antarāyikā vuttā bhagavatā, alañ'ca pana te paṭisevato antarāyāyā'ti. evañ'ca [evañ'ca pana] so bhikkhu bhikkhūhi vuccamāno tath'eva paggaṇheyya, so bhikkhu bhikkhūhi yāvatatiyaṃ samanubhāsitabbo tassa paṭinissaggāya."
     },
     "dps_last": {
-        "source": "VIN2.5.6.5",
-        "sutta": "bhiṃsāpanasikkhāpadaṃ",
-        "example": "corakantāraṃ vā vāḷakantāraṃ vā pisācakantāraṃ vā ācikkhati. bhāyeyya vā so na vā bhāyeyya, āpatti pācittiyassa."
+        "source": "VIN2.5.8.7",
+        "sutta": "sañciccasikkhāpadaṃ",
+        "example": "anāpatti na kukkuccaṃ upadahitukāmo ūnavīsativasso maññe tvaṃ upasampanno, vikāle maññe tayā bhuttaṃ, majjaṃ maññe tayā pītaṃ, mātugāmena saddhiṃ raho maññe tayā nisinnaṃ, iṅgha jānāhi, mā te pacchā kukkuccaṃ ahosī'ti bhaṇati, ummattakassa, ādikammikassā'ti."
     }
 }

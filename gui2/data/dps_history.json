@@ -1,5 +1,57 @@
 [
     {
+        "id": 10961,
+        "lemma_1": "ahosi"
+    },
+    {
+        "id": 61869,
+        "lemma_1": "saṃvattati 1"
+    },
+    {
+        "id": 40506,
+        "lemma_1": "paṭinissaṭṭha"
+    },
+    {
+        "id": 5733,
+        "lemma_1": "antarāya"
+    },
+    {
+        "id": 51480,
+        "lemma_1": "marati"
+    },
+    {
+        "id": 22611,
+        "lemma_1": "kusagga"
+    },
+    {
+        "id": 46365,
+        "lemma_1": "pīta 1.1"
+    },
+    {
+        "id": 50827,
+        "lemma_1": "maññe"
+    },
+    {
+        "id": 24726,
+        "lemma_1": "gāthā 1"
+    },
+    {
+        "id": 63836,
+        "lemma_1": "suttanta 1"
+    },
+    {
+        "id": 13334,
+        "lemma_1": "iṅgha"
+    },
+    {
+        "id": 66380,
+        "lemma_1": "varaṃ"
+    },
+    {
+        "id": 43966,
+        "lemma_1": "pariyāpuṇāti"
+    },
+    {
         "id": 49712,
         "lemma_1": "bhāyati 1"
     },
@@ -46,57 +98,5 @@
     {
         "id": 31979,
         "lemma_1": "dammi"
-    },
-    {
-        "id": 53878,
-        "lemma_1": "yaṃkiñci"
-    },
-    {
-        "id": 32486,
-        "lemma_1": "diṭṭhigata"
-    },
-    {
-        "id": 18200,
-        "lemma_1": "evaṃvādī"
-    },
-    {
-        "id": 66303,
-        "lemma_1": "vambheti"
-    },
-    {
-        "id": 48511,
-        "lemma_1": "buddha 1"
-    },
-    {
-        "id": 48512,
-        "lemma_1": "buddha 2"
-    },
-    {
-        "id": 40248,
-        "lemma_1": "paṭikkamana 1"
-    },
-    {
-        "id": 24986,
-        "lemma_1": "gilānātiritta"
-    },
-    {
-        "id": 18687,
-        "lemma_1": "opadhika"
-    },
-    {
-        "id": 10736,
-        "lemma_1": "avītarāga"
-    },
-    {
-        "id": 57828,
-        "lemma_1": "sattāhaṃ"
-    },
-    {
-        "id": 20918,
-        "lemma_1": "kāṇamātusikkhāpada"
-    },
-    {
-        "id": 18279,
-        "lemma_1": "okāsa 2"
     }
 ]
