@@ -105,3 +105,20 @@ list_of_discourses = [
 
 
 sbs_category_list = ["sn12", "sn22", "sn35", "sn43", "sn45", "sn46", "sn47", "sn56", "mn107"]
+
+def recalculate_all_sbs_indices(db_session, db):
+    """Recalculate sbs_index for all entries in the db and commit changes."""
+    console.print("[green]Calculating sbs_index")
+    try:
+        for i in db:
+            if i.sbs:
+                sbs_index_old = i.sbs.sbs_index
+                sbs_index_value = i.sbs.calculate_index()
+                if sbs_index_old != sbs_index_value:
+                    i.sbs.sbs_index = sbs_index_value
+                    console.print(f"[cyan]{i.lemma_1}[/cyan] old index {sbs_index_old} changed to {sbs_index_value}")
+
+        db_session.commit()
+
+    except Exception as e:
+        console.print(f"[bold red]{str(e)}")

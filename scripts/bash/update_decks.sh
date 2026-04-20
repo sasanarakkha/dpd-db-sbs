@@ -17,7 +17,6 @@ while true; do
     fi
     case $yn in
         [Yy]* )
-            uv run python scripts/change_in_db/class_relation.py
             uv run python db_tests/sbs_consistency_tests.py
             uv run python scripts/export/anki_csv.py
             break;;
@@ -38,6 +37,7 @@ while true; do
     case $yn in
         [Yy]* )
             echo -e "\033[1;33m pushing vocab for classes...\033[0m"
+            uv run python scripts/change_in_db/class_relation.py
             uv run python scripts/export/vocab_abbrev_pali_course.py
             cd "$HOME/Documents/dpd-pali-courses"
             git-push
@@ -46,8 +46,6 @@ while true; do
             break;;
     esac
 done
-
-cd "$HOME/Documents/dpd-db/"
 
 # grammar.xlsx - https://docs.google.com/spreadsheets/d/1KV5LmebIQpNyNKl03Pmo_Ti-LNW3IYWB6uc7OfGRGPU/
 
@@ -85,8 +83,53 @@ while true; do
     case $yn in
         [Yy]* )
             echo -e "\033[1;33m generating patimokkha.csv...\033[0m"
-            uv run bash scripts/bash/download_patimokkha.sh
+            cd "$HOME/Documents/sasanarakkha/study-tools/"
+            uv run bash scripts/download_patimokkha.sh
+            cd "$HOME/Documents/dpd-db/"
             uv run bash scripts/bash/make_pat.sh
+            break;;
+        * )
+            break;;
+    esac
+done
+
+while true; do
+    echo -e "\033[1;36m please close Anki Desktop before updating! \033[0m"
+    echo -ne "\033[1;34m need to update SBS Anki collection? \033[0m"
+    read -n 1 -s yn
+    echo
+    if [[ $yn == "q" ]]; then
+        echo -e "\n\033[1;31m Aborted by user.\033[0m"
+        exit 1
+    fi
+    case $yn in
+        [Yy]* )
+            echo -e "\033[1;33m updating SBS Anki collection...\033[0m"
+            uv run python scripts/export/sbs_anki_updater.py
+            break;;
+        * )
+            break;;
+    esac
+done
+
+while true; do
+    echo -e "\033[1;36m open Anki Desktop to review the changes. \033[0m"
+    echo -ne "\033[1;34m satisfied? --!close Anki before!--  (N = revert) (Y = save apkg) \033[0m"
+    read -n 1 -s yn
+    echo
+    if [[ $yn == "q" ]]; then
+        echo -e "\n\033[1;31m Aborted by user.\033[0m"
+        exit 1
+    fi
+    case $yn in
+        [Nn]* )
+            echo -e "\033[1;33m reverting to latest backup...\033[0m"
+            uv run python scripts/export/sbs_anki_revert.py
+            echo -e "\033[1;31m Reverted. Make corrections and re-run update_decks.sh.\033[0m"
+            exit 0;;
+        [Yy]* )
+            echo -e "\033[1;33m saving apkg...\033[0m"
+            uv run python scripts/export/sbs_anki_apkg.py
             break;;
         * )
             break;;
@@ -150,8 +193,10 @@ while true; do
     esac
 done
 
+STUDY_TOOLS_DIR="$HOME/Documents/sasanarakkha/study-tools"
+
 while true; do
-    echo -ne "\033[1;34m need to push individually on GitHub and repeat? \033[0m"
+    echo -ne "\033[1;34m need to push individually on GitHub? \033[0m"
     read -n 1 -s answer
     echo
     if [[ $answer == "q" ]]; then
@@ -160,17 +205,22 @@ while true; do
     fi
     case $answer in
         [Yy]* )
-            echo -e "\033[1;33m Pushing all...\033[0m"
-            uv run bash scripts/bash/push_from_temp.sh  
-            ;;                      # start over
+            while true; do
+                echo -e "\033[1;33m Available assets:\033[0m"
+                bash "$STUDY_TOOLS_DIR/scripts/upload_asset.sh"
+                echo -ne "\033[1;34m Enter filename to upload (or press Enter to finish): \033[0m"
+                read asset_name
+                if [[ -z "$asset_name" ]]; then
+                    break
+                fi
+                bash "$STUDY_TOOLS_DIR/scripts/upload_asset.sh" "$asset_name"
+                echo
+            done
+            break;;
         * )
-            break                    
-            ;;
+            break;;
     esac
 done
-
-
-cd "$HOME/Documents/sasanarakkha/study-tools/temp-push"
 
 while true; do
     echo -ne "\033[1;34m need to push all on GitHub? \033[0m"
@@ -183,7 +233,7 @@ while true; do
     case $yn in
         [Yy]* )
             echo -e "\033[1;33m pushing all...\033[0m"
-            bash github-assets-uploader.sh
+            bash "$STUDY_TOOLS_DIR/scripts/upload.sh"
             break;;
         *  )
             break;;

@@ -9,7 +9,7 @@ set -o pipefail
 
 # move all class materials on the server and GitHub
 
-DOWNLOADS_DIR="$HOME/Downloads"
+ANKI_DECKS_DIR="$HOME/Documents/dpd-db/temp/anki_decks"
 ANKI_CSVS_SRC_BASE_DIR="$HOME/Documents/dpd-db/temp/anki_csvs"
 PALI_CLASS_CSVS_SRC_DIR="$ANKI_CSVS_SRC_BASE_DIR/pali_class"
 TEMP_PUSH_DEST_DIR="$HOME/Documents/sasanarakkha/study-tools/temp-push"
@@ -80,21 +80,21 @@ safe_copy_dir_contents() {
     fi
 }
 
-cd "$DOWNLOADS_DIR" || { echo "Error: Could not cd to $DOWNLOADS_DIR. Exiting."; exit 1; }
+cd "$ANKI_DECKS_DIR" || { echo "Error: Could not cd to $ANKI_DECKS_DIR. Exiting."; exit 1; }
 
 echo "--- Processing APKG files ---"
-safe_copy_file "Vocab Pali Class.apkg" "$TEMP_PUSH_DEST_DIR/vocab-pali-class.apkg" "-X -f"
-safe_copy_file "Vocab Pali Class.apkg" "$FILESRV_BASE_DEST_DIR/Vocab Pali Class.apkg" "-X -f"
-safe_copy_file "Grammar Pali Class.apkg" "$TEMP_PUSH_DEST_DIR/grammar-pali-class.apkg" "-X -f"
-safe_copy_file "Grammar Pali Class.apkg" "$FILESRV_BASE_DEST_DIR/Grammar Pali Class.apkg" "-X -f"
-safe_copy_file "Roots Pali Class.apkg" "$TEMP_PUSH_DEST_DIR/roots-pali-class.apkg" "-X -f"
-safe_copy_file "Roots Pali Class.apkg" "$FILESRV_BASE_DEST_DIR/Roots Pali Class.apkg" "-X -f"
-safe_copy_file "Phonetic Changes Pali Class.apkg" "$TEMP_PUSH_DEST_DIR/phonetic-pali-class.apkg" "-X -f"
-safe_copy_file "Phonetic Changes Pali Class.apkg" "$FILESRV_BASE_DEST_DIR/Phonetic Changes Pali Class.apkg" "-X -f"
-safe_copy_file "Common Roots.apkg" "$TEMP_PUSH_DEST_DIR/common-roots.apkg" "-X -f"
-safe_copy_file "Common Roots.apkg" "$FILESRV_BASE_DEST_DIR/Common Roots.apkg" "-X -f"
-safe_copy_file "Suttas Advanced Pali Class.apkg" "$TEMP_PUSH_DEST_DIR/suttas-advanced-pali-class.apkg" "-X -f"
-safe_copy_file "Suttas Advanced Pali Class.apkg" "$FILESRV_BASE_DEST_DIR/Suttas Advanced Pali Class.apkg" "-X -f"
+safe_copy_file "vocab_pali_class.apkg" "$TEMP_PUSH_DEST_DIR/vocab-pali-class.apkg" "-X -f"
+safe_copy_file "vocab_pali_class.apkg" "$FILESRV_BASE_DEST_DIR/Vocab Pali Class.apkg" "-X -f"
+safe_copy_file "grammar_pali_class.apkg" "$TEMP_PUSH_DEST_DIR/grammar-pali-class.apkg" "-X -f"
+safe_copy_file "grammar_pali_class.apkg" "$FILESRV_BASE_DEST_DIR/Grammar Pali Class.apkg" "-X -f"
+safe_copy_file "roots_pali_class.apkg" "$TEMP_PUSH_DEST_DIR/roots-pali-class.apkg" "-X -f"
+safe_copy_file "roots_pali_class.apkg" "$FILESRV_BASE_DEST_DIR/Roots Pali Class.apkg" "-X -f"
+safe_copy_file "phonetic_changes_pali_class.apkg" "$TEMP_PUSH_DEST_DIR/phonetic-pali-class.apkg" "-X -f"
+safe_copy_file "phonetic_changes_pali_class.apkg" "$FILESRV_BASE_DEST_DIR/Phonetic Changes Pali Class.apkg" "-X -f"
+safe_copy_file "common_roots.apkg" "$TEMP_PUSH_DEST_DIR/common-roots.apkg" "-X -f"
+safe_copy_file "common_roots.apkg" "$FILESRV_BASE_DEST_DIR/Common Roots.apkg" "-X -f"
+safe_copy_file "suttas_advanced_pali_class.apkg" "$TEMP_PUSH_DEST_DIR/suttas-advanced-pali-class.apkg" "-X -f"
+safe_copy_file "suttas_advanced_pali_class.apkg" "$FILESRV_BASE_DEST_DIR/Suttas Advanced Pali Class.apkg" "-X -f"
 
 echo "APKG processing - done"
 

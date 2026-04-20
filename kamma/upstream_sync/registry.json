@@ -181,7 +181,13 @@
     "tools/ai_openai_manager.py",
     "tools/ai_related.py",
     "tools/sbs_table_functions.py",
-    "tools/tools_for_ru_exporter.py"
+    "tools/tools_for_ru_exporter.py",
+    "scripts/export/sbs_anki_updater.py",
+    "scripts/export/sbs_anki_apkg.py",
+    "scripts/export/sbs_anki_deck_config.py",
+    "scripts/export/sbs_anki_collection_verifier.py",
+    "scripts/export/sbs_anki_revert.py",
+    "temp/anki_decks/"
   ],
   "russian_copies": {
     "db/families/family_compound_ru.py": "db/families/family_compound.py",

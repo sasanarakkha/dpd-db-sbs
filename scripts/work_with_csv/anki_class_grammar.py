@@ -27,7 +27,7 @@ console = Console()
 
 def main():
     pr.tic()
-    excel_file_dir = deva_dir / "Downloads" / "grammar.xlsx"
+    excel_file_dir = project_dir / "temp" / "grammar.xlsx"
     # moving_grammar(excel_file_dir)
     make_grammar_csvs(excel_file_dir)
     check_duplicate_ids(excel_file_dir)
@@ -262,7 +262,13 @@ def make_grammar_csvs(excel_file_dir):
     row_count = len(df_sum_gramm)
     print("Number of rows:", row_count)
 
-    sbs_dir = deva_dir / "Documents" / "sasanarakkha" / "study-tools" / "docs/5-anki/field-lists"
+    sbs_dir = (
+        deva_dir
+        / "Documents"
+        / "sasanarakkha"
+        / "study-tools"
+        / "docs/5-anki/field-lists"
+    )
 
     if sbs_dir.exists():
         console.print("[bold green]Saving field list to sbs directory.")

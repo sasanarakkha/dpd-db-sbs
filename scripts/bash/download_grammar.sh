@@ -13,8 +13,7 @@ fi
 
 echo "--- download_grammar Script Started at $(date) ---"
 
-# mkdir -p "$HOME/Downloads"
-cd "$HOME/Downloads"
+cd temp/
 
 grammar=("[grammar](https://docs.google.com/spreadsheets/d/1-iNYm9R86162zFzLd9kraEqNP7DpAFczFMPTVttJSrs/edit?usp=sharing)")
 
@@ -48,3 +47,8 @@ for link in "${grammar[@]}"; do
         exit 1
     fi
 done
+
+# print what is downloaded and where
+echo "Downloaded: $title.xlsx"
+echo "Folder: $(pwd)"
+

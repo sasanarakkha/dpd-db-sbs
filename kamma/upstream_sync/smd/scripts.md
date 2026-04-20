@@ -217,3 +217,55 @@
   - Field names must match the "Pāli" note type in the target Anki collection.
 
 ---
+
+---
+
+**File**: scripts/export/sbs_anki_updater.py
+- **Category**: unique_local
+- **Sync Rule**: SKIP
+- **Local Changes**:
+  1. New script: multi-deck SBS Anki collection updater.
+  2. Orchestrates CSV regeneration (calls `anki_csv`, `anki_class_grammar`, and `pat_for_anki`).
+  3. Uses `sbs_anki_deck_config.py` for per-deck field mapping and routing rules.
+  4. Supports DB-backed headword routing and CSV-driven updates for Grammar and Patimokkha.
+  5. Includes automated Anki collection verification and backup.
+- **Watch For**:
+  - Requires `anki` library.
+  - Field maps may drift if Anki side renames fields.
+
+---
+
+**File**: scripts/export/sbs_anki_apkg.py
+- **Category**: unique_local
+- **Sync Rule**: SKIP
+- **Local Changes**:
+  1. New script: exports 12 SBS decks to `.apkg` files.
+  2. Uses slugs from `sbs_anki_deck_config.py` for output filenames.
+  3. Supports optional scheduling preservation.
+- **Watch For**:
+  - Media inclusion is hardcoded to True.
+
+---
+
+**File**: scripts/export/sbs_anki_deck_config.py
+- **Category**: unique_local
+- **Sync Rule**: SKIP
+- **Local Changes**:
+  1. Central configuration for the SBS Anki pipeline.
+  2. Defines `DeckSpec` with field maps and routing metadata for 12 top-level decks.
+  3. Includes `EXPECTED_COLLECTION` snapshot for automated structure verification.
+- **Watch For**:
+  - This is the source of truth for the SBS Anki note structures.
+
+---
+
+**File**: scripts/export/sbs_anki_collection_verifier.py
+- **Category**: unique_local
+- **Sync Rule**: SKIP
+- **Local Changes**:
+  1. Safety utility to verify Anki collection structure before write operations.
+  2. Compares live note types and fields against the expected configuration.
+- **Watch For**:
+  - Throws `CollectionChangedError` on mismatch to prevent data corruption.
+
+---

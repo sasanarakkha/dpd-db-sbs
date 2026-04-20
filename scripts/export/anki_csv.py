@@ -175,6 +175,18 @@ def common_roots(db_session, dpspth):
     output_path = os.path.join(dpspth.anki_csvs_dir, "pali_class", "common_roots.csv")
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
+        writer.writerow(
+            [
+                "root",
+                "root_group",
+                "root_sign",
+                "root_meaning",
+                "main_verb",
+                "examples",
+                "native",
+                "feedback",
+            ]
+        )
         writer.writerows(rows)
 
     # Save the list of field names to a text file
