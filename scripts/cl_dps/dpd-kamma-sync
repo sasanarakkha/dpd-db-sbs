@@ -5,7 +5,7 @@ set -euo pipefail
 PROJECT_DIR="$HOME/Documents/dpd-db"
 cd "$PROJECT_DIR"
 
-INIT_SCRIPT="scripts/cl_dps/dpd_init_sync.py"
+INIT_SCRIPT="scripts/bash/dpd_init_sync.py"
 
 if [ -f "$INIT_SCRIPT" ]; then
     uv run python3 "$INIT_SCRIPT"
