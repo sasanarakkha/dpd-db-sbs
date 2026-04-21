@@ -1,82 +1,82 @@
 [
     {
+        "id": 23586,
+        "lemma_1": "khalupacchābhattikaṅga"
+    },
+    {
+        "id": 23585,
+        "lemma_1": "khalupacchābhattika"
+    },
+    {
+        "id": 14127,
+        "lemma_1": "ukkhepanīya"
+    },
+    {
+        "id": 14128,
+        "lemma_1": "ukkhepanīyakamma"
+    },
+    {
+        "id": 42536,
+        "lemma_1": "pabbājanīyakamma"
+    },
+    {
+        "id": 37898,
+        "lemma_1": "niyassa"
+    },
+    {
+        "id": 37900,
+        "lemma_1": "niyassakamma"
+    },
+    {
+        "id": 82230,
+        "lemma_1": "tassapāpiyasikākamma"
+    },
+    {
+        "id": 29281,
+        "lemma_1": "tajjanīya 1"
+    },
+    {
+        "id": 29282,
+        "lemma_1": "tajjanīyakamma"
+    },
+    {
+        "id": 17797,
+        "lemma_1": "ekūnavīsatima"
+    },
+    {
+        "id": 17794,
+        "lemma_1": "ekūnavīsa"
+    },
+    {
+        "id": 17789,
+        "lemma_1": "ekūnapaññāsā"
+    },
+    {
+        "id": 17788,
+        "lemma_1": "ekūnapaññāsama"
+    },
+    {
+        "id": 17786,
+        "lemma_1": "ekūnatiṃsā"
+    },
+    {
+        "id": 17782,
+        "lemma_1": "ekūnatiṃsa"
+    },
+    {
+        "id": 17795,
+        "lemma_1": "ekūnavīsati"
+    },
+    {
+        "id": 89253,
+        "lemma_1": "karaṇīya 4"
+    },
+    {
+        "id": 20465,
+        "lemma_1": "karaṇīya 1"
+    },
+    {
         "id": 39450,
         "lemma_1": "paccāgamissati"
-    },
-    {
-        "id": 23099,
-        "lemma_1": "kopetukāma"
-    },
-    {
-        "id": 43910,
-        "lemma_1": "parimoceti"
-    },
-    {
-        "id": 4368,
-        "lemma_1": "anukkhitta"
-    },
-    {
-        "id": 55213,
-        "lemma_1": "rūpappaccaya"
-    },
-    {
-        "id": 70141,
-        "lemma_1": "vūpasameti 2"
-    },
-    {
-        "id": 18839,
-        "lemma_1": "oramati"
-    },
-    {
-        "id": 30503,
-        "lemma_1": "tiṭṭhituṃ"
-    },
-    {
-        "id": 15640,
-        "lemma_1": "upadahitukāma"
-    },
-    {
-        "id": 11329,
-        "lemma_1": "ācāravipatti"
-    },
-    {
-        "id": 32553,
-        "lemma_1": "diṭṭhivipatti"
-    },
-    {
-        "id": 53304,
-        "lemma_1": "mokkhādhippāya"
-    },
-    {
-        "id": 69753,
-        "lemma_1": "viheṭhīyamāna"
-    },
-    {
-        "id": 11286,
-        "lemma_1": "ācaritvā"
-    },
-    {
-        "id": 7760,
-        "lemma_1": "abhidhamma 1"
-    },
-    {
-        "id": 69527,
-        "lemma_1": "vivaṇṇetukāma"
-    },
-    {
-        "id": 31061,
-        "lemma_1": "tulayitabba"
-    },
-    {
-        "id": 26748,
-        "lemma_1": "cintetabba"
-    },
-    {
-        "id": 28328,
-        "lemma_1": "jānitabba"
-    },
-    {
-        "id": 4059,
-        "lemma_1": "anāsitaka"
     }
 ]

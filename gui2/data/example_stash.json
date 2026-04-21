@@ -5,13 +5,13 @@
         "example": "yo hi koci, mārisa, amanusso ... nāgo vā nāgī vā nāgapotako vā nāgapotikā vā nāgamah'āmatto vā nāgapārisajjo vā nāgapacāro vā paduṭṭhacitto bhikkhuṃ vā bhikkhuniṃ vā upāsakaṃ vā upāsikaṃ vā gacchantaṃ vā anugaccheyya, ṭhitaṃ vā upatiṭṭheyya, nisinnaṃ vā upanisīdeyya, nipannaṃ vā upanipajjeyya."
     },
     "last": {
-        "source": "VIN2.5.8.10",
-        "sutta": "chandaṃadatvāgamanasikkhāpadaṃ",
-        "example": "gilāno gacchati, gilānassa karaṇīyena gacchati, uccārena vā passāvena vā pīḷito gacchati, na kammaṃ kopetu'kāmo puna paccāgamissāmī'ti gacchati, ummattakassa, ādikammikassā'ti."
+        "source": "VIN3.9.246",
+        "sutta": "campeyyakkhandhako, adassane ukkhepanīyakammakathā",
+        "example": "hand'assa mayaṃ āpattiyā adassane ukkhepanīyakammaṃ karomā'ti. te tassa āpattiyā adassane ukkhepanīyakammaṃ karonti"
     },
     "stash": {
-        "source": "VIN2.5.6.10",
-        "sutta": "cīvaraapanidhānasikkhāpadaṃ",
-        "example": "anāpatti nahas'ādhippāyo, dunnikkhittaṃ paṭisāmeti, dhammiṃ kathaṃ katvā dassāmī'ti paṭisāmeti, ummattakassa, ādikammikassā'ti."
+        "source": "VIN3.9.241",
+        "sutta": "campeyyakkhandhako, upālipucchākathā",
+        "example": "evañ'ca pana saṅgho sātisāro hoti. yo kho, bhikkhave, samaggo saṅgho amūḷhavinay'ārahassa tajjanīyakammaṃ karoti"
     }
 }

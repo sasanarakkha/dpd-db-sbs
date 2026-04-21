@@ -4,8 +4,8 @@ set -euo pipefail
 
 PROJECT_DIR="$HOME/Documents/dpd-db"
 FILES=(
-    gui2/data/additions.json
-    gui2/data/corrections.json
+    gui2/data/additions_deva.json
+    gui2/data/corrections_deva.json
 )
 
 cd "$PROJECT_DIR"
@@ -30,5 +30,5 @@ git push upstream as_upstream:main
 git checkout sbs-ru
 
 # Empty files
-echo '{}' > gui2/data/additions.json
-echo '{}' > gui2/data/corrections.json
+echo '{}' > gui2/data/additions_deva.json
+echo '{}' > gui2/data/corrections_deva.json

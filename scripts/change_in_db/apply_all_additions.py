@@ -1,31 +1,15 @@
 #!/usr/bin/env python3
 
-"""
-Add all additions from gui2/data/additions.json to the database with new IDs.
-And replace old id with new id in the backup tsvs
-"""
+"""Add all additions from gui2/data/additions.json to the database with new IDs."""
 import json
-import typing
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
-from tools.paths_dps import DPSPaths # For TSV paths
-
-from gui2.additions_manager import AdditionsManager
-from gui2.database_manager import DatabaseManager # For get_next_id and add_word_to_db
+from tools.paths_dps import DPSPaths
+from gui2.database_manager import DatabaseManager
 from gui2.paths import Gui2Paths
-from gui2.toolkit import ToolKit # For type casting
-
-
-class MockToolKit:
-    """A minimal toolkit mock to satisfy manager dependencies."""
-    def __init__(self):
-        self.paths = Gui2Paths()
-        # AdditionsManager and DatabaseManager might need more from toolkit,
-        # but for this script, paths and db_session (handled separately) are key.
-        # If DatabaseManager is used more extensively, it might need more mock attributes.
 
 
 app_pth = ProjectPaths()
@@ -109,24 +93,24 @@ def add_all_additions_with_new_ids():
     """
     Processes all additions from additions.json, assigns new IDs,
     and adds them to the database.
+    Does not modify any JSON files.
     """
-
     pr.title("Starting batch addition of 'additions.json' entries to DB with new IDs...")
 
-    mock_toolkit = MockToolKit()
-    
-    # Initialize DatabaseManager to get next ID and add words
-    # Note: DatabaseManager usually initializes its own db_session.
-    # For this script, we're using the global db_session.
-    # If DatabaseManager methods strictly rely on its internal session,
-    # this might need adjustment or DatabaseManager might need a way to accept an external session.
-    # For get_next_id and add_word_to_db, it should be fine as they use self.db_session.
+    additions_json_path = Gui2Paths().additions_path
+
+    try:
+        with open(additions_json_path) as f:
+            all_additions_to_process = json.load(f)
+    except FileNotFoundError:
+        pr.red(f"File not found: {additions_json_path}")
+        return
+    except json.JSONDecodeError:
+        pr.red(f"Error decoding JSON from {additions_json_path}")
+        return
+
     db_manager = DatabaseManager()
-    db_manager.db_session = db_session # Ensure it uses our script's session
-
-    additions_manager = AdditionsManager(toolkit=typing.cast(ToolKit, mock_toolkit))
-
-    all_additions_to_process = dict(additions_manager.additions_dict)
+    db_manager.db_session = db_session
 
     if not all_additions_to_process:
         pr.red("No additions found in additions.json.")
@@ -137,13 +121,9 @@ def add_all_additions_with_new_ids():
 
     processed_count = 0
     failed_count = 0
-    
-    successful_id_map: dict[str, int] = {} # To store old_id_str: new_id
+    successful_id_map: dict[str, int] = {}
 
     for old_id_str, addition_data in all_additions_to_process.items():
-        # pr.green(f"Processing addition for old ID: {old_id_str}")
-
-        # Check if lemma_1 from addition_data already exists in the database
         lemma_1_to_check = addition_data.get("lemma_1")
         if lemma_1_to_check:
             existing_headword = db_session.query(DpdHeadword).filter(DpdHeadword.lemma_1 == lemma_1_to_check).first()
@@ -157,66 +137,45 @@ def add_all_additions_with_new_ids():
             continue
 
         new_id = db_manager.get_next_id()
-        # pr.info(f"  Old ID: {old_id_str}, New ID: {new_id}")
-
         new_headword = DpdHeadword()
-        
-        # Set the new ID
         setattr(new_headword, "id", new_id)
-        
-        fields_set_log = [f"'id': '{old_id_str}' (original) -> '{new_id}' (assigned)"]
 
         for field_name, value in addition_data.items():
-            if field_name == "id":  # Skip the old 'id' field from the JSON data
+            if field_name in ("id", "comment"):
                 continue
-            if field_name == "comment": # 'comment' is for the addition entry, not DpdHeadword
-                # pr.info(f"  Comment for old ID {old_id_str}: {value}") # Optional: log if needed
-                continue
-
             if hasattr(new_headword, field_name):
-                # Basic type coversion for common fields if they are strings in JSON
-                # but numbers in the model. DpdHeadword model should ideally handle this.
-                # For now, we assume direct assignment is okay or model handles it.
                 try:
-                    # If field is an integer type in model and value is string digit
-                    if field_name in ["ebt_count"] and isinstance(value, str) and value.isdigit(): # Add other int fields if necessary
+                    if field_name in ["ebt_count"] and isinstance(value, str) and value.isdigit():
                         value = int(value)
-                    
                     setattr(new_headword, field_name, value)
-                    fields_set_log.append(f"'{field_name}': '{value}'")
                 except Exception as e:
                     pr.red(f"  Could not set field '{field_name}' to '{value}': {e}")
             else:
                 pr.red(f"  Field '{field_name}' (value: '{value}') from addition data does not exist in DpdHeadword model. Skipping this field.")
-        
+
         try:
             db_session.add(new_headword)
             db_session.commit()
-            # pr.green(f"  Successfully added '{new_headword.lemma_1}' (New ID: {new_id}) to DB.")
-            # pr.info(f"  Fields set: {'; '.join(fields_set_log)}") # Uncomment for detailed log
-            processed_count +=1
-            successful_id_map[old_id_str] = new_id # Add to map for TSV update
+            processed_count += 1
+            successful_id_map[old_id_str] = new_id
         except Exception as e:
             db_session.rollback()
             pr.red(f"  Database commit failed for '{new_headword.lemma_1}' (Old ID: {old_id_str}, New ID: {new_id}): {e}")
             failed_count += 1
-            continue # Skip to next item in all_additions_to_process
+            continue
 
-    pr.yes("done") # After loop
+    pr.yes("done")
 
-    # Update TSV files if any words were successfully added
     if successful_id_map:
-        # pr.title(f"\nUpdating TSV files for {len(successful_id_map)} successfully added words...")
         replace_old_ids_in_tsv_files(successful_id_map)
     else:
-        if not all_additions_to_process: # handles case where all_additions_to_process was empty
-            pass # Message already printed if no additions found
-        elif failed_count == len(all_additions_to_process): # All attempted additions failed
+        if not all_additions_to_process:
+            pass
+        elif failed_count == len(all_additions_to_process):
             pr.red("No words were successfully added to the database. TSV files not updated.")
-        else: # Some other scenario, e.g. all were skipped due to existing lemma_1
+        else:
             pr.info("No new words were committed to the database. TSV files not updated.")
     pr.yes("ok")
-
 
     pr.title("Batch Addition Summary")
     print(f"Total additions attempted: {len(all_additions_to_process)}")
