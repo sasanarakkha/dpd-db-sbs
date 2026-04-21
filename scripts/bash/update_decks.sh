@@ -103,7 +103,8 @@ while true; do
             cd "$HOME/Documents/sasanarakkha/study-tools/"
             uv run bash scripts/download_patimokkha.sh
             cd "$HOME/Documents/dpd-db/"
-            uv run bash scripts/bash/make_pat.sh
+            uv run python scripts/work_with_csv/xlsx2csv.py "$HOME/Documents/sasanarakkha/study-tools/temp/patimokkha.xlsx" "temp/patimokkha_word_by_word.csv" "analysis"
+            uv run python scripts/work_with_csv/pat_for_anki.py
             break;;
         * )
             break;;

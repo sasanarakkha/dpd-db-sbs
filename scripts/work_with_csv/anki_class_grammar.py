@@ -9,25 +9,18 @@ from pathlib import Path
 from tools.paths_dps import DPSPaths
 from tools.paths import ProjectPaths
 
-from tools.printer import Printer as pr
-
-from rich.console import Console
+from tools.printer import printer as pr
 
 dpspth = DPSPaths()
 pth = ProjectPaths()
 
-project_dir: Path = Path.cwd()  # e.g., /Users/deva/Documents/dpd-db
-deva_dir: Path = project_dir.parent.parent  # e.g., /Users/deva
-
-
 current_date = datetime.now().strftime("%m-%d")
-
-console = Console()
 
 
 def main():
     pr.tic()
-    excel_file_dir = project_dir / "temp" / "grammar.xlsx"
+    pr.title("Extracting grammar csvs...")
+    excel_file_dir = pth.temp_dir / "grammar.xlsx"
     # moving_grammar(excel_file_dir)
     make_grammar_csvs(excel_file_dir)
     check_duplicate_ids(excel_file_dir)
@@ -54,7 +47,7 @@ def check_duplicate_ids(excel_file_dir):
                         # Check if the [id] value is already in the dictionary
                         if id_value in id_dict:
                             # If it is, print the [id] value in red
-                            console.print(f"[red]{id_value}[/red]", end=" ")
+                            pr.red(f"{id_value}")
                         else:
                             # If not, add the [id] value to the dictionary
                             id_dict[id_value] = True
@@ -118,7 +111,7 @@ def make_grammar_csvs(excel_file_dir):
     # Now you can access each DataFrame using its sheet name as a key
     # For example, dfs['Sheet1'] will give you the DataFrame for 'Sheet1', and so on.
 
-    console.print("[bold green]extracting df_sum_abbr for class.")
+    pr.green("extracting df_sum_abbr for class.")
 
     # Load abbreviations from TSV, filter out those with capital letters, and add id/pattern columns
     abr_dir = pth.abbreviations_tsv_path
@@ -174,7 +167,7 @@ def make_grammar_csvs(excel_file_dir):
     row_count = len(df_sum_abbr)
     print("Number of rows:", row_count)
 
-    console.print("[bold green]extracting df_sum_sandhi for class.")
+    pr.green("extracting df_sum_sandhi for class.")
 
     # Concatenate the DataFrames and store the result in df_sum_sandhi
     df_sum_sandhi = pd.concat(
@@ -205,7 +198,7 @@ def make_grammar_csvs(excel_file_dir):
     row_count = len(df_sum_sandhi)
     print("Number of rows:", row_count)
 
-    console.print("[bold green]extracting cl_sum_gramm for class.")
+    pr.green("extracting cl_sum_gramm for class.")
 
     # Define which sheets go into the main grammar file
     sheets_for_gramm = [
@@ -262,19 +255,11 @@ def make_grammar_csvs(excel_file_dir):
     row_count = len(df_sum_gramm)
     print("Number of rows:", row_count)
 
-    sbs_dir = (
-        deva_dir
-        / "Documents"
-        / "sasanarakkha"
-        / "study-tools"
-        / "docs/5-anki/field-lists"
-    )
-
-    if sbs_dir.exists():
-        console.print("[bold green]Saving field list to sbs directory.")
+    if dpspth.sbs_anki_style_dir.exists():
+        pr.green("Saving field list to sbs directory.")
 
         # Save the column list of df_sum_abbr to a text file
-        grammar_abbr_path = sbs_dir / "field-list-grammar-abbr.md"
+        grammar_abbr_path = dpspth.sbs_anki_style_dir / "field-list-grammar-abbr.md"
         with open(grammar_abbr_path, "w") as file:
             columns_with_marks = list(df_sum_abbr.columns) + ["marks"]
             file.write("# Field List: Grammar Abbr\n\n```\n")
@@ -282,7 +267,7 @@ def make_grammar_csvs(excel_file_dir):
             file.write("\n```\n")
 
         # Save the column list of df_sum_sandhi to a text file
-        grammar_sandhi_path = sbs_dir / "field-list-grammar-sandhi.md"
+        grammar_sandhi_path = dpspth.sbs_anki_style_dir / "field-list-grammar-sandhi.md"
         with open(grammar_sandhi_path, "w") as file:
             columns_with_marks = list(df_sum_sandhi.columns) + ["marks"]
             file.write("# Field List: Grammar Sandhi\n\n```\n")
@@ -290,7 +275,7 @@ def make_grammar_csvs(excel_file_dir):
             file.write("\n```\n")
 
         # Save the column list of df_sum_gramm to a text file
-        grammar_grammar_path = sbs_dir / "field-list-grammar-gramm.md"
+        grammar_grammar_path = dpspth.sbs_anki_style_dir / "field-list-grammar-gramm.md"
         with open(grammar_grammar_path, "w") as file:
             columns_with_marks = list(df_sum_gramm.columns) + ["marks"]
             file.write("# Field List: Grammar Gramm\n\n```\n")
@@ -298,7 +283,7 @@ def make_grammar_csvs(excel_file_dir):
             file.write("\n```\n")
 
     else:
-        console.print("[bold red]Study-tools/anki-style directory does not exist.")
+        pr.red("Study-tools/anki-style directory does not exist.")
 
 
 if __name__ == "__main__":

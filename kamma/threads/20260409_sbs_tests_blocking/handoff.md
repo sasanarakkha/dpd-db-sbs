@@ -1,3 +1,5 @@
-# check if this is already part of the testing script
+# TODO
 
-sasanarakkha/dpd-db-sbs#8 "find bold related problems in SBS examples"
+- sasanarakkha/dpd-db-sbs#8 "find bold related problems in SBS examples" is it already implemented?
+
+- sbs chapter, pali chant names and eng chant names need to be synced with sbs_index.csv

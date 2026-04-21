@@ -10,7 +10,6 @@ import pandas as pd
 import csv  # For csv.QUOTE_MINIMAL
 from datetime import datetime
 from typing import Any, cast  # For type hinting with pandas
-from rich.console import Console
 from tools.printer import printer as pr
 
 from tools.paths_dps import DPSPaths
@@ -18,8 +17,6 @@ from tools.paths import ProjectPaths
 
 pth = ProjectPaths()
 dpspth = DPSPaths()
-
-console = Console()
 
 
 def process_patimokkha_csv() -> None:
@@ -36,15 +33,15 @@ def process_patimokkha_csv() -> None:
         # If xlsx2csv.py produces comma-separated, use sep=','
         df = pd.read_csv(input_csv_path, sep="\t")
     except FileNotFoundError:
-        console.print(f"[red]Error: Input CSV file not found at '{input_csv_path}'")
+        pr.error(f"Input CSV file not found at '{input_csv_path}'")
         return
     except Exception as e:
-        console.print(f"[red]Error reading CSV '{input_csv_path}': {e}")
+        pr.error(f"Error reading CSV '{input_csv_path}': {e}")
         return
 
     if df.empty:
-        console.print(
-            f"[red]Warning: Input CSV '{input_csv_path}' is empty. Output will be an empty file with headers."
+        pr.warning(
+            f"Input CSV '{input_csv_path}' is empty. Output will be an empty file with headers."
         )
         df_filtered = pd.DataFrame()
     else:
@@ -59,16 +56,16 @@ def process_patimokkha_csv() -> None:
             condition2 = df["meaning"].fillna("").astype(str).str.strip() != ""
             combined_condition = condition1 & condition2
         else:
-            console.print(
-                f"[red]Warning: 'meaning' column not found in '{input_csv_path}'. Filtering only on the first column."
+            pr.warning(
+                f"'meaning' column not found in '{input_csv_path}'. Filtering only on the first column."
             )
             combined_condition = condition1
 
         df_filtered = df[combined_condition].copy()
 
     if df_filtered.empty and not df.empty:
-        console.print(
-            f"[red]No rows found in '{input_csv_path}' matching the filter criteria (first column is '1' AND 'meaning' is not empty). Output will be an empty file with headers."
+        pr.warning(
+            f"No rows found in '{input_csv_path}' matching the filter criteria (first column is '1' AND 'meaning' is not empty). Output will be an empty file with headers."
         )
 
     columns_to_keep: list[str] = [
@@ -138,13 +135,13 @@ def process_patimokkha_csv() -> None:
             else:
                 df_processed.loc[:, "web_link"] = ""
         except Exception as e_sl:
-            console.print(
-                f"[red]Warning: Could not process '{sources_links_path}': {e_sl}. 'web_link' column may be incomplete or empty."
+            pr.warning(
+                f"Could not process '{sources_links_path}': {e_sl}. 'web_link' column may be incomplete or empty."
             )
             df_processed.loc[:, "web_link"] = ""
     else:
-        console.print(
-            f"[red]Warning: Source links file '{sources_links_path}' not found. 'web_link' column will be empty."
+        pr.warning(
+            f"Source links file '{sources_links_path}' not found. 'web_link' column will be empty."
         )
         df_processed.loc[:, "web_link"] = ""
 
@@ -155,15 +152,24 @@ def process_patimokkha_csv() -> None:
         df_processed.to_csv(
             output_csv_path, index=False, sep="\t", quoting=csv.QUOTE_MINIMAL
         )
-        console.print(
-            f"[green]Successfully processed CSV and saved to '{output_csv_path}'"
-        )
+        pr.green(f"Successfully processed CSV and saved to '{output_csv_path}'")
     except Exception as e:
-        console.print(f"[red]Error writing processed CSV to '{output_csv_path}': {e}")
+        pr.error(f"Error writing processed CSV to '{output_csv_path}': {e}")
+
+    if dpspth.sbs_anki_style_dir.exists():
+        pr.green("Saving field list to sbs directory.")
+
+        # Save the column list of df_processed to a text file
+        field_list_path = dpspth.sbs_anki_style_dir / "field-list-pat.md"
+        with open(field_list_path, "w") as file:
+            columns_with_notez = list(df_processed.columns) + ["notez"]
+            file.write("# Field List: Patimokkha\n\n```\n")
+            file.write("\n".join(columns_with_notez))
+            file.write("\n```\n")
 
 
 if __name__ == "__main__":
     pr.tic()
-    console.print("[yellow]Processing patimokkha CSV for Anki...")
+    pr.title("Processing patimokkha CSV for Anki...")
     process_patimokkha_csv()
     pr.toc()

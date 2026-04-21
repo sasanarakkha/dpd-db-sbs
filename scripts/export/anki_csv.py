@@ -16,7 +16,6 @@ Export db into csv for various anki decks
 import csv
 import re
 import os
-from rich.console import Console
 
 from typing import List
 from sqlalchemy import func
@@ -38,8 +37,6 @@ from tools.clean_machine import clean_machine
 
 current_date = datetime.date.today().strftime("%m-%d")
 
-console = Console()
-
 sbs_ped_link = 'Spot a mistake? <a class="link" href="https://docs.google.com/forms/d/e/1FAIpQLScNC5v2gQbBCM3giXfYIib9zrp-WMzwJuf_iVXEMX2re4BFFw/viewform?usp=pp_url&entry.438735500'
 
 dps_link = 'Нашли ошибку? <a class="link" href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500'
@@ -49,7 +46,7 @@ def common_roots(db_session, dpspth):
     """
     Export the most common roots (with at least 50 words) and their most frequent words to a CSV.
     """
-    console.print("[yellow]Exporting most common roots to CSV")
+    pr.yellow_title("Exporting most common roots to CSV")
 
     # Subquery: count headwords per root
     root_counts = (
@@ -190,20 +187,18 @@ def common_roots(db_session, dpspth):
         writer.writerows(rows)
 
     # Save the list of field names to a text file
-    if dpspth.sbs_anki_style_dir:
-        with open(
-            f"{dpspth.sbs_anki_style_dir}/field-list-common-roots.md", "w"
-        ) as file:
-            file.write("\n".join(columns_names))
-        console.print(
-            f"[green] names of the SBS columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the.md"
-        )
+    if dpspth.sbs_anki_style_dir.exists():
+        pr.green("Saving field list to sbs directory.")
+        field_list_path = dpspth.sbs_anki_style_dir / "field-list-common-roots.md"
+        with open(field_list_path, "w") as file:
+            columns_with_marks = columns_names + ["marks"]
+            file.write("# Field List: Common Roots\n\n```\n")
+            file.write("\n".join(columns_with_marks))
+            file.write("\n```\n")
     else:
-        console.print("[bold red] sbs_anki_style_dir not found")
+        pr.red("sbs_anki_style_dir not found")
 
-    console.print(
-        f"[bold green]{len(rows)}[/bold green] roots saved to common_roots.csv"
-    )
+    pr.green(f"{len(rows)} roots saved to common_roots.csv")
 
     # Save ru_common_roots to csv file
     ru_output_path = os.path.join(
@@ -212,9 +207,7 @@ def common_roots(db_session, dpspth):
     with open(ru_output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(ru_rows)
-    console.print(
-        f"[bold green]{len(ru_rows)}[/bold green] Russian root meanings saved to ru_common_roots.csv"
-    )
+    pr.green(f"{len(ru_rows)} Russian root meanings saved to ru_common_roots.csv")
 
 
 def join(*args):
@@ -417,7 +410,7 @@ def get_unique_example_2(sbs: SBS):
 
 def dhp(dpspth, dpd_db):
     """Returns a list of rows for dhp csv."""
-    console.print("[yellow]making dhp csv")
+    pr.yellow_title("making dhp csv")
 
     def _is_needed(i: DpdHeadword) -> bool:
         return bool(i.sbs and i.sbs.dhp_source)
@@ -489,24 +482,23 @@ def dhp(dpspth, dpd_db):
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(sorted_rows)
-    console.print(f"[bold] {len(sorted_rows)}[/bold] [green]rows has been saved to csv")
+    pr.green(f"{len(sorted_rows)} rows has been saved to csv")
 
     # Save the list of field names to a text file
-    if dpspth.sbs_anki_style_dir:
-        with open(f"{dpspth.sbs_anki_style_dir}/field-list-dhp.md", "w") as file:
+    if dpspth.sbs_anki_style_dir.exists():
+        pr.green("Saving field list to sbs directory.")
+        field_list_path = dpspth.sbs_anki_style_dir / "field-list-dhp.md"
+        with open(field_list_path, "w") as file:
             file.write("# Field List: Dhp\n\n```\n")
             file.write("\n".join(columns_names))
             file.write("\n```\n")
-        console.print(
-            f"[green] names of the DHP columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the.md"
-        )
     else:
-        console.print("[bold red] sbs_anki_style_dir not found")
+        pr.red("sbs_anki_style_dir not found")
 
 
 def sbs_per(dpspth, dpd_db):
     """Returns a list of rows for sbs_per csv."""
-    console.print("[yellow]making sbs per csv")
+    pr.yellow_title("making sbs per csv")
 
     def _is_needed(i: DpdHeadword):
         return bool(i.sbs and i.sbs.sbs_index)
@@ -600,24 +592,23 @@ def sbs_per(dpspth, dpd_db):
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(rows_list)
-    console.print(f"[bold] {len(rows_list)}[/bold] [green]rows has been saved to csv")
+    pr.green(f"{len(rows_list)} rows has been saved to csv")
 
     # Save the list of field names to a text file
-    if dpspth.sbs_anki_style_dir:
-        with open(f"{dpspth.sbs_anki_style_dir}/field-list-sbs.md", "w") as file:
-            file.write("# Field List: Sbs\n\n```\n")
+    if dpspth.sbs_anki_style_dir.exists():
+        pr.green("Saving field list to sbs directory.")
+        field_list_path = dpspth.sbs_anki_style_dir / "field-list-sbs.md"
+        with open(field_list_path, "w") as file:
+            file.write("# Field List: SBS Vocab\n\n```\n")
             file.write("\n".join(columns_names))
             file.write("\n```\n")
-        console.print(
-            f"[green] names of the SBS columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the.md"
-        )
     else:
-        console.print("[bold red] sbs_anki_style_dir not found")
+        pr.red("sbs_anki_style_dir not found")
 
 
 def parittas(dpspth, dpd_db):
     """Returns a list of rows for parittas csv."""
-    console.print("[yellow]making parittas csv")
+    pr.yellow_title("making parittas csv")
 
     chant_names = ["Karaṇīya-metta-sutta", "Ratana-sutta", "Maṅgala-sutta"]
 
@@ -689,24 +680,23 @@ def parittas(dpspth, dpd_db):
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(sorted_rows)
-    console.print(f"[bold] {len(sorted_rows)}[/bold] [green]rows has been saved to csv")
+    pr.green(f"{len(sorted_rows)} rows has been saved to csv")
 
     # Save the list of field names to a text file
-    if dpspth.sbs_anki_style_dir:
-        with open(f"{dpspth.sbs_anki_style_dir}/field-list-parittas.md", "w") as file:
+    if dpspth.sbs_anki_style_dir.exists():
+        pr.green("Saving field list to sbs directory.")
+        field_list_path = dpspth.sbs_anki_style_dir / "field-list-parittas.md"
+        with open(field_list_path, "w") as file:
             file.write("# Field List: Parittas\n\n```\n")
             file.write("\n".join(columns_names))
             file.write("\n```\n")
-        console.print(
-            f"[green] names of the Parittas columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the.md"
-        )
     else:
-        console.print("[bold red] sbs_anki_style_dir not found")
+        pr.red("sbs_anki_style_dir not found")
 
 
 def dps(dpspth, dpd_db):
     """Returns a list of rows for dps csv."""
-    console.print("[yellow]making dps csv")
+    pr.yellow_title("making dps csv")
 
     def _is_needed(i: DpdHeadword):
         return bool(
@@ -832,24 +822,23 @@ def dps(dpspth, dpd_db):
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(rows_list)
-    console.print(f"[bold] {len(rows_list)}[/bold] [green]rows has been saved to csv")
+    pr.green(f"{len(rows_list)} rows has been saved to csv")
 
     # Save the list of field names to a text file
-    if dpspth.sbs_anki_style_dir:
-        with open(f"{dpspth.sbs_anki_style_dir}/field-list-dps.md", "w") as file:
+    if dpspth.sbs_anki_style_dir.exists():
+        pr.green("Saving field list to sbs directory.")
+        field_list_path = dpspth.sbs_anki_style_dir / "field-list-dps.md"
+        with open(field_list_path, "w") as file:
             file.write("# Field List: Dps\n\n```\n")
             file.write("\n".join(columns_names))
             file.write("\n```\n")
-        console.print(
-            f"[green] names of the DPS columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the.md"
-        )
     else:
-        console.print("[bold red] sbs_anki_style_dir not found")
+        pr.red("sbs_anki_style_dir not found")
 
 
 def classes(dpspth, dpd_db, unique_sbs_class_values):
     """Returns a list of rows for classes csvs."""
-    console.print("[yellow]making classes csv")
+    pr.yellow_title("making classes csv")
 
     # Ensure the output directory exists
     output_dir = os.path.join(dpspth.anki_csvs_dir, "pali_class", "classes")
@@ -976,9 +965,7 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(all_classes_list)
-    console.print(
-        f"[bold] {len(all_classes_list)}[/bold] [green]rows has been saved to class_all.csv"
-    )
+    pr.green(f"{len(all_classes_list)} rows has been saved to class_all.csv")
 
     # Save ru for all basic classes to csv
     def ru_classes_row(i: DpdHeadword) -> List[str]:
@@ -1027,21 +1014,20 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
         writer.writerows(rows_upcoming)
 
     # Save the list of field names to a text file
-    if dpspth.sbs_anki_style_dir:
-        with open(
-            f"{dpspth.sbs_anki_style_dir}/field-list-vocab-class.md", "w"
-        ) as file:
+    if dpspth.sbs_anki_style_dir.exists():
+        pr.green("Saving field list to sbs directory.")
+        field_list_path = dpspth.sbs_anki_style_dir / "field-list-vocab-class.md"
+        with open(field_list_path, "w") as file:
+            file.write("# Field List: Vocab Class\n\n```\n")
             file.write("\n".join(columns_names))
-        console.print(
-            f"[green] names of the Class columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the.md"
-        )
+            file.write("\n```\n")
     else:
-        console.print("[bold red] sbs_anki_style_dir not found")
+        pr.red("sbs_anki_style_dir not found")
 
 
 def suttas(dpspth, dpd_db):
     """Returns a list of rows for suttas csv."""
-    console.print("[yellow]making suttas csv")
+    pr.yellow_title("making suttas csv")
 
     def _is_needed(i: DpdHeadword):
         return bool(i.sbs and i.sbs.discourses_example)
@@ -1124,26 +1110,23 @@ def suttas(dpspth, dpd_db):
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(rows_total_list)
-    console.print(
-        f"[bold] {len(rows_total_list)}[/bold] [green]rows has been saved to csv"
-    )
+    pr.green(f"{len(rows_total_list)} rows has been saved to csv")
 
     # Save the list of field names to a text file
-    if dpspth.sbs_anki_style_dir:
-        with open(
-            f"{dpspth.sbs_anki_style_dir}/field-list-suttas-class.md", "w"
-        ) as file:
+    if dpspth.sbs_anki_style_dir.exists():
+        pr.green("Saving field list to sbs directory.")
+        field_list_path = dpspth.sbs_anki_style_dir / "field-list-suttas-class.md"
+        with open(field_list_path, "w") as file:
+            file.write("# Field List: Suttas Class\n\n```\n")
             file.write("\n".join(columns_names))
-        console.print(
-            f"[green] names of the Suttas columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the.md"
-        )
+            file.write("\n```\n")
     else:
-        console.print("[bold red] sbs_anki_style_dir not found")
+        pr.red("sbs_anki_style_dir not found")
 
 
 def root_phonetic_class(dpspth, dpd_db, unique_sbs_class_values):
     """Returns a list of rows for root and phonetic csvs."""
-    console.print("[yellow]making root and phonetic  csvs")
+    pr.yellow_title("making root and phonetic csvs")
 
     def root_is_needed(i: DpdHeadword):
         return bool(i.sbs and i.sbs.class_anki and i.rt)
@@ -1248,9 +1231,7 @@ def root_phonetic_class(dpspth, dpd_db, unique_sbs_class_values):
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(rows_total_list)
-    console.print(
-        f"[bold] {len(rows_total_list)}[/bold] [green]rows has been saved to roots_class.csv"
-    )
+    pr.green(f"{len(rows_total_list)} rows has been saved to roots_class.csv")
 
     # Save all phonetic for basic classes to csv
     rows_total = []
@@ -1267,26 +1248,23 @@ def root_phonetic_class(dpspth, dpd_db, unique_sbs_class_values):
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(rows_total_list)
-    console.print(
-        f"[bold] {len(rows_total_list)}[/bold] [green]rows has been saved to phonetic_class.csv"
-    )
+    pr.green(f"{len(rows_total_list)} rows has been saved to phonetic_class.csv")
 
     # Save the list of field names to a text file
-    if dpspth.sbs_anki_style_dir:
-        with open(
-            f"{dpspth.sbs_anki_style_dir}/field-list-roots-class.md", "w"
-        ) as file:
+    if dpspth.sbs_anki_style_dir.exists():
+        pr.green("Saving field list to sbs directory.")
+        field_list_path = dpspth.sbs_anki_style_dir / "field-list-roots-class.md"
+        with open(field_list_path, "w") as file:
+            file.write("# Field List: Roots Class\n\n```\n")
             file.write("\n".join(columns_names))
-        console.print(
-            f"[green] names of the Root columns [/green]([bold]{len(columns_names)}[/bold]) [green]are saved to the.md"
-        )
+            file.write("\n```\n")
     else:
-        console.print("[bold red] sbs_anki_style_dir not found")
+        pr.red("sbs_anki_style_dir not found")
 
 
 def vibhanga(dpspth, dpd_db):
     """Returns a list of rows for vibhanga csv."""
-    console.print("[yellow]making vibhanga csv")
+    pr.yellow_title("making vibhanga csv")
 
     # sources_names = ["VIN1", "VIN2"]
 
@@ -1395,29 +1373,23 @@ def vibhanga(dpspth, dpd_db):
     with open(file_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(sorted_rows_total_list)
-    console.print(
-        f"[bold] {len(sorted_rows_total_list)}[/bold] [green]rows have been saved to csv"
-    )
+    pr.green(f"{len(sorted_rows_total_list)} rows have been saved to csv")
 
     # Save the list of field names to a text file
-    if dpspth.sbs_anki_style_dir:
-        field_file_path = os.path.join(
-            dpspth.sbs_anki_style_dir, "field-list-vibhanga.md"
-        )
-        with open(field_file_path, "w") as file:
+    if dpspth.sbs_anki_style_dir.exists():
+        pr.green("Saving field list to sbs directory.")
+        field_list_path = dpspth.sbs_anki_style_dir / "field-list-vibhanga.md"
+        with open(field_list_path, "w") as file:
             file.write("# Field List: Vibhanga\n\n```\n")
             file.write("\n".join(columns_names))
             file.write("\n```\n")
-        console.print(
-            f"[green] Column names ([bold]{len(columns_names)}[/bold]) saved to the.md"
-        )
     else:
-        console.print("[bold red] sbs_anki_style_dir not found")
+        pr.red("sbs_anki_style_dir not found")
 
 
 def native(dpspth, dpd_db):
     """Returns a list of rows for sbs_rus csv."""
-    console.print("[yellow]making native csvs")
+    pr.yellow_title("making native csvs")
 
     def _is_needed(i: DpdHeadword):
         return bool(
@@ -1452,15 +1424,13 @@ def native(dpspth, dpd_db):
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerows(ru_all_sbs_list)
-    console.print(
-        f"[bold] {len(ru_all_sbs_list)}[/bold] [green]rows has been saved to sbs_rus.csv"
-    )
+    pr.green(f"{len(ru_all_sbs_list)} rows has been saved to sbs_rus.csv")
 
 
 def main():
     """Makes anki csvs."""
     pr.tic()
-    console.print("[bold bright_yellow]exporting csvs for anki")
+    pr.yellow_title("exporting csvs for anki")
 
     pth = ProjectPaths()
     dpspth = DPSPaths()
@@ -1480,7 +1450,7 @@ def main():
     unique_sbs_class_values.sort()
 
     dpd_db = sorted(dpd_db, key=lambda x: pali_sort_key(x.lemma_1))
-    console.print("[green] db has been set up and sorted successfully")
+    pr.green("db has been set up and sorted successfully")
 
     dhp(dpspth, dpd_db)
     sbs_per(dpspth, dpd_db)

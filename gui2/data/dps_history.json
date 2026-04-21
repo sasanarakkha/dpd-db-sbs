@@ -1,5 +1,9 @@
 [
     {
+        "id": 53287,
+        "lemma_1": "meraya"
+    },
+    {
         "id": 89253,
         "lemma_1": "karaṇīya 4"
     },
@@ -94,9 +98,5 @@
     {
         "id": 41814,
         "lemma_1": "patirūpa"
-    },
-    {
-        "id": 19205,
-        "lemma_1": "kakkhaḷa 3"
     }
 ]
