@@ -961,6 +961,9 @@ class DpdHeadword(Base):
     # russian
     ru = relationship("Russian", uselist=False)
 
+    # tamil
+    ta = relationship("Tamil", uselist=False)
+
     # inflection templates
     it: Mapped[InflectionTemplates] = relationship()
 
@@ -1874,6 +1877,16 @@ class Russian(Base):
 
     def __repr__(self) -> str:
         return f"Russian: {self.id} {self.ru_meaning}"
+
+
+class Tamil(Base):
+    __tablename__ = "tamil"
+
+    id: Mapped[int] = mapped_column(ForeignKey("dpd_headwords.id"), primary_key=True)
+    ta_meaning: Mapped[str] = mapped_column(default="")
+
+    def __repr__(self) -> str:
+        return f"Tamil: {self.id} {self.ta_meaning}"
 
 
 class Sinhala(Base):

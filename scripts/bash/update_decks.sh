@@ -8,6 +8,23 @@ cd "$HOME/Documents/dpd-db/"
 
 
 while true; do
+    echo -ne "\033[1;34m !IMPORTANT! did you apply all suggestions from feedback form?! \033[0m"
+    read -n 1 -s yn
+    echo
+    if [[ $yn == "q" ]]; then
+        echo -e "\n\033[1;31m Aborted by user.\033[0m"
+        exit 1
+    fi
+    case $yn in
+        [Yy]* )
+            break;;
+        * )
+            break;;
+    esac
+done
+
+
+while true; do
     echo -ne "\033[1;34m need to make latest csv for anki? \033[0m"
     read -n 1 -s yn
     echo

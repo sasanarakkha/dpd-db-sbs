@@ -3,19 +3,21 @@
 **File**: `db/models.py`
 - **Category**: modified_upstream
 - **Sync Rule**: DISCUSS
-- **Why DISCUSS**: Adds three entire tables (`SBS`, `Russian`, `Sinhala`) plus relationships (`.sbs`, `.ru`) on `DpdHeadword` and extra columns (`root_ru_meaning`, `sanskrit_root_ru_meaning`) on `DpdRoot`. Blind porting would silently delete all localized schema.
+- **Why DISCUSS**: Adds four entire tables (`SBS`, `Russian`, `Tamil`, `Sinhala`) plus relationships (`.sbs`, `.ru`, `.ta`) on `DpdHeadword` and extra columns (`root_ru_meaning`, `sanskrit_root_ru_meaning`) on `DpdRoot`. Blind porting would silently delete all localized schema.
 - **Local Changes**:
   1. `SBS` table (~30 columns) at line ~1655: chant data, class mapping, SBS-specific indices and hybrid properties (`sbs_index`, `sbs_chant_link_1/2`, `sbs_class_link`).
   2. `Russian` table (~5 columns) at line ~1865 with `ru_` prefixed fields.
-  3. `Sinhala` table at line ~1879.
-  4. `.sbs` and `.ru` relationships on `DpdHeadword` (lines ~959, ~962).
-  5. `root_ru_meaning` and `sanskrit_root_ru_meaning` columns on `DpdRoot` (lines ~110-111) and `FamilyRoot` (line ~188).
-  6. `data_ru` JSON pack/unpack helpers on family tables.
-  7. Import of `sbs_table_functions.SBS_table_tools` and `paragraphs_are_similar` (line ~29).
+  3. `Tamil` table (~2 columns) at line ~1879 with `ta_meaning` field for AI-generated Tamil meanings.
+  4. `Sinhala` table at line ~1886.
+  5. `.sbs`, `.ru`, and `.ta` relationships on `DpdHeadword` (lines ~959, ~962, ~965).
+  6. `root_ru_meaning` and `sanskrit_root_ru_meaning` columns on `DpdRoot` (lines ~110-111) and `FamilyRoot` (line ~188).
+  7. `data_ru` JSON pack/unpack helpers on family tables.
+  8. Import of `sbs_table_functions.SBS_table_tools` and `paragraphs_are_similar` (line ~29).
 - **Watch For**:
-  - New upstream columns/relationships on `DpdHeadword` must not overwrite SBS/Russian additions — manually merge, never auto-replace.
+  - New upstream columns/relationships on `DpdHeadword` must not overwrite SBS/Russian/Tamil additions — manually merge, never auto-replace.
   - Upstream renames of base columns require matching updates in SBS hybrid properties that reference them.
   - Any upstream change to `DpdRoot` must preserve `root_ru_meaning`/`sanskrit_root_ru_meaning`.
+  - Tamil table is minimal (only `ta_meaning` for now) and isolated from Russian; no shared logic to break.
   - `paragraphs_are_similar` import from `tools.sbs_table_functions` is DPS-specific — do not remove.
 
 ---

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Save latest Russian,ru roots and SBS tables to backup_tsv folder."""
+"""Save latest Russian, Tamil, SBS, and roots tables to backup_tsv folder."""
 
 from git import Repo
 import csv
@@ -8,7 +8,7 @@ import csv
 from sqlalchemy.orm.session import Session
 
 from db.db_helpers import get_db_session
-from db.models import Russian, SBS, DpdRoot
+from db.models import Russian, SBS, DpdRoot, Tamil
 from tools.printer import printer as pr
 from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
@@ -16,12 +16,13 @@ from tools.paths_dps import DPSPaths
 
 def backup_dps():
     pr.tic()
-    pr.yellow_title("backing russian and sbs tables to tsv")
+    pr.yellow_title("backing russian, sbs, and tamil tables to tsv")
     pth = ProjectPaths()
     dpspth = DPSPaths()
     db_session = get_db_session(pth.dpd_db_path)
     backup_ru(db_session, dpspth)
     backup_sbs(db_session, dpspth)
+    backup_ta(db_session, dpspth)
     backup_roots_ru(db_session, dpspth)
     db_session.close()
     pr.toc()
@@ -84,6 +85,36 @@ def backup_sbs(db_session: Session, dpspth: DPSPaths, custom_path: str = ""):
 
         for i in db:
             row = [getattr(i, column.name) for column in SBS.__mapper__.columns]
+            csvwriter.writerow(row)
+
+
+def backup_ta(db_session: Session, dpspth: DPSPaths, custom_path: str = ""):
+    """Backup Tamil table to TSV."""
+    pr.green_tmr("checking Tamil table")
+
+    # Query the Tamil table
+    db = db_session.query(Tamil).all()
+
+    # Check if the table is empty
+    if not db:
+        pr.red("Error: The Tamil table is empty. Backup aborted.")
+        return
+
+    # Proceed with backup if the table is not empty
+    pr.green_tmr("writing Tamil table")
+
+    # Use the custom path if provided, otherwise use the default path
+    tamil_path = custom_path if custom_path else dpspth.tamil_path
+
+    with open(tamil_path, "w", newline="") as tsvfile:
+        csvwriter = csv.writer(
+            tsvfile, delimiter="\t", quotechar='"', quoting=csv.QUOTE_ALL
+        )
+        column_names = [column.name for column in Tamil.__mapper__.columns]
+        csvwriter.writerow(column_names)
+
+        for i in db:
+            row = [getattr(i, column.name) for column in Tamil.__mapper__.columns]
             csvwriter.writerow(row)
 
 

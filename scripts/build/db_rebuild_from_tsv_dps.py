@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Adding to existing db newly made Russian and SBS tables and modify data in existing Root table, read data from files in backup_tsv folder."""
+"""Adding to existing db newly made Russian, Tamil, and SBS tables and modify data in existing Root table, read data from files in backup_tsv folder."""
 
 import csv
 import sys
@@ -10,7 +10,7 @@ from db.models import DpdHeadword
 from sqlalchemy.orm.session import Session
 
 from db.db_helpers import get_db_session
-from db.models import DpdRoot, Russian, SBS
+from db.models import DpdRoot, Russian, SBS, Tamil
 from tools.printer import printer as pr
 from tools.paths import ProjectPaths
 from pathlib import Path
@@ -28,6 +28,7 @@ def main():
     tsvs_to_check = [
         {"path": dpspth.russian_path, "id_col": "id"},
         {"path": dpspth.sbs_path, "id_col": "id"},
+        {"path": dpspth.tamil_path, "id_col": "id"},
         {"path": dpspth.ru_root_path, "id_col": "root"},
     ]
 
@@ -110,11 +111,32 @@ def main():
         csvwriter = csv.writer(f, delimiter="\t", quotechar='"', quoting=csv.QUOTE_ALL)
         csvwriter.writerows(russian_rows)
 
+    # --- Tamil: print missing, remove silently ---
+    tamil_missing_rows = []
+    tamil_rows = []
+    with open(dpspth.tamil_path, "r", newline="") as f:
+        reader = csv.reader(f, delimiter="\t", quotechar='"')
+        ta_columns = next(reader)
+        tamil_rows.append(ta_columns)
+        for row in reader:
+            if row[0] in pali_word_ids:
+                tamil_rows.append(row)
+            else:
+                tamil_missing_rows.append(row)
+    if tamil_missing_rows:
+        pr.red("IDs in Tamil TSV not found in pali_word_path:")
+        for row in tamil_missing_rows:
+            pr.red("  - " + "\t".join(row))
+    with open(dpspth.tamil_path, "w", newline="") as f:
+        csvwriter = csv.writer(f, delimiter="\t", quotechar='"', quoting=csv.QUOTE_ALL)
+        csvwriter.writerows(tamil_rows)
+
     # Re-read the cleaned data for processing
     db_session = get_db_session(pth.dpd_db_path)
 
     make_table_data_ru(dpspth, db_session)
     make_table_data_sbs(dpspth, db_session)
+    make_table_data_ta(dpspth, db_session)
     make_root_table_data_ru(dpspth, db_session)
 
     pr.green_tmr("committing to db")
@@ -194,6 +216,19 @@ def make_table_data_sbs(dpspth: DPSPaths, db_session: Session):
         # Filter out empty keys that might come from empty column headers
         data = {k: v for k, v in zip(columns, row) if k}
         db_session.add(SBS(**data))
+        counter += 1
+    pr.yes(counter)
+
+
+def make_table_data_ta(dpspth: DPSPaths, db_session: Session):
+    """Read TSV and return Tamil table data."""
+    pr.green_tmr("creating Tamil table data")
+    counter = 0
+    tamil_files = get_tsv_files(dpspth.tamil_path, "tamil")
+    for columns, row in read_tsv_files(tamil_files):
+        # Filter out empty keys that might come from empty column headers
+        data = {k: v for k, v in zip(columns, row) if k}
+        db_session.add(Tamil(**data))
         counter += 1
     pr.yes(counter)
 

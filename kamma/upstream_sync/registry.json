@@ -3,7 +3,7 @@
     {
       "path": "db/models.py",
       "discuss": true,
-      "discuss_reason": "Adds SBS table (~30 cols), Russian table (~5 cols), Sinhala table, .sbs/.ru/.si relationships on DpdHeadword, root_ru_meaning/sanskrit_root_ru_meaning on DpdRoot, and hybrid properties. Blind porting would silently delete all localized tables and columns."
+      "discuss_reason": "Adds SBS table (~30 cols), Russian table (~5 cols), Tamil table (ta_meaning), Sinhala table, .sbs/.ru/.ta/.si relationships on DpdHeadword, root_ru_meaning/sanskrit_root_ru_meaning on DpdRoot, and hybrid properties. Blind porting would silently delete all localized tables and columns."
     },
     {
       "path": "exporter/webapp/data_classes.py",
@@ -160,6 +160,7 @@
     "db/backup_tsv/ru_roots.tsv",
     "db/backup_tsv/sbs.tsv",
     "db/backup_tsv/russian.tsv",
+    "db/backup_tsv/tamil.tsv",
     "db/families/family_set_ru_update.py",
     "db_tests/sbs_consistency_tests.py",
     "exporter/goldendict/templates/sbs_example.html",

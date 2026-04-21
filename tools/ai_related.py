@@ -1,4 +1,3 @@
-
 """Functions for openai"""
 
 import csv
@@ -11,14 +10,13 @@ from rich.prompt import Prompt
 from timeout_decorator import timeout, TimeoutError as TimeoutDecoratorError
 
 from tools.configger import config_test_option, config_read, config_update
-from tools.paths_dps import DPSPaths    
+from tools.paths_dps import DPSPaths
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 
 
 dpspth = DPSPaths()
 pth = ProjectPaths()
-
 
 
 def get_ai_client():
@@ -46,9 +44,11 @@ def load_ai_config():
     """Load API key for specified provider from config or prompt user."""
 
     provider = str(config_read("models", "provider"))
-    
+
     if not config_test_option("apis", provider):
-        api_key = Prompt.ask(f"[yellow]Enter your {provider} API key (or ENTER for None)")
+        api_key = Prompt.ask(
+            f"[yellow]Enter your {provider} API key (or ENTER for None)"
+        )
         if api_key:
             config_update("apis", provider, api_key)
         else:
@@ -65,8 +65,8 @@ def load_translation_examples(dpspth):
     """Load the pos-examples mapping from a TSV file into a dictionary."""
     pos_examples_map = {}
     if dpspth.translation_example_path:
-        with open(dpspth.translation_example_path, 'r', encoding='utf-8') as csvfile:
-            reader = csv.reader(csvfile, delimiter='\t')
+        with open(dpspth.translation_example_path, "r", encoding="utf-8") as csvfile:
+            reader = csv.reader(csvfile, delimiter="\t")
             next(reader)  # Skip header row
             for row in reader:
                 pos, examples = row[0], row[1]
@@ -78,24 +78,18 @@ def load_translation_examples(dpspth):
 def handle_ai_response(client, messages):
     if client is None:
         return None, "client is not initialized."
-    
+
     api_key, provider, model = load_ai_config()
-        
+
     error_string = ""
     try:
         if provider == "openai":
-            response = client.chat.completions.create(
-                model=model,
-                messages=messages
-            )
+            response = client.chat.completions.create(model=model, messages=messages)
             content = response.choices[0].message.content
         elif provider == "deepseek":
             prompt = [{"content": m["content"], "role": m["role"]} for m in messages]
             response = client.request(
-                prompt=prompt,
-                model=model,
-                stream=False,
-                max_tokens=4096
+                prompt=prompt, model=model, stream=False, max_tokens=4096
             )
             content = response
         else:
@@ -106,15 +100,18 @@ def handle_ai_response(client, messages):
         error_string = "Timed out"
     except Exception as e:
         error_string = f"{provider.title()} Error: {e}"
-    
+
     print(error_string)
     return None, error_string
 
 
 def replace_abbreviations(grammar_string):
-
     # Clean the grammar string
-    cleaned_grammar_string = re.sub(r' of [\w\s]+|, pp of [\w\s]+|, prp of [\w\s]+|, ptp of [\w\s]+|, from [\w\s]+|, loc abs|, gen abs|\(.*?\)', '', grammar_string)
+    cleaned_grammar_string = re.sub(
+        r" of [\w\s]+|, pp of [\w\s]+|, prp of [\w\s]+|, ptp of [\w\s]+|, from [\w\s]+|, loc abs|, gen abs|\(.*?\)",
+        "",
+        grammar_string,
+    )
 
     # TODO consider noun, pp of ... remove pp or make it from pp
 
@@ -122,19 +119,24 @@ def replace_abbreviations(grammar_string):
     multi_word_replacements = {}
 
     # Read abbreviations and their full forms into a dictionary
-    with open(pth.abbreviations_tsv_path, 'r', encoding='utf-8') as file:
-        reader = csv.reader(file, delimiter='\t')
+    with open(pth.abbreviations_tsv_path, "r", encoding="utf-8") as file:
+        reader = csv.reader(file, delimiter="\t")
         next(reader)  # skip header
         for row in reader:
-            abbrev, full_form = row[0], row[1].split(',')[0].strip()  # select only the first two columns and split by comma
-            if ' ' in abbrev:
+            abbrev, full_form = (
+                row[0],
+                row[1].split(",")[0].strip(),
+            )  # select only the first two columns and split by comma
+            if " " in abbrev:
                 multi_word_replacements[abbrev] = full_form
             else:
                 replacements[abbrev] = full_form
 
     # First, replace multi-word abbreviations
     for abbrev, full_form in multi_word_replacements.items():
-        cleaned_grammar_string = re.sub(r'\b' + re.escape(abbrev) + r'\b', full_form, cleaned_grammar_string)
+        cleaned_grammar_string = re.sub(
+            r"\b" + re.escape(abbrev) + r"\b", full_form, cleaned_grammar_string
+        )
 
     # Then, replace single-word abbreviations
     words = re.findall(r"[\w'+&]+|[.,!?;]", cleaned_grammar_string)
@@ -143,7 +145,7 @@ def replace_abbreviations(grammar_string):
             words[idx] = replacements[word]
 
     # Join the words back into a string
-    replaced_string = ' '.join(words)
+    replaced_string = " ".join(words)
 
     # debug
     # print(f"{grammar_string} || replaced with || {replaced_string}")
@@ -151,13 +153,13 @@ def replace_abbreviations(grammar_string):
     return replaced_string
 
 
-def generate_messages_for_meaning(lemma_1, grammar, meaning, sentence, translation_example="", synonyms=False):
+def generate_messages_for_meaning(
+    lemma_1, grammar, meaning, sentence, translation_example="", synonyms=False
+):
     """Generate messages for translation."""
 
-    system_content = (
-        "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules."
-    )
-    
+    system_content = "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules."
+
     user_content = f"""
         Translate the English definition of the Pali term into Russian, following these rules:
 
@@ -178,17 +180,20 @@ def generate_messages_for_meaning(lemma_1, grammar, meaning, sentence, translati
 
     if sentence:
         user_content += f"\n- Consider Pali context: {sentence}"
-    
+
     if translation_example:
         user_content += f"\n- Match this example format: {translation_example}"
 
     if synonyms:
-        user_content = user_content.replace("Translate the English definition of the Pali term into Russian", "Provide at least nine (9) distinct Russian synonyms for the English definition of Pali term")
-        
+        user_content = user_content.replace(
+            "Translate the English definition of the Pali term into Russian",
+            "Provide at least nine (9) distinct Russian synonyms for the English definition of Pali term",
+        )
+
     # print(user_content)
     return [
         {"role": "system", "content": system_content},
-        {"role": "user", "content": user_content}
+        {"role": "user", "content": user_content},
     ]
 
 
@@ -196,7 +201,7 @@ def generate_messages_for_notes(lemma_1, grammar, notes):
     """Generate messages for translation."""
 
     system_content = "You are a helpful assistant that translates English text to Russian considering the context."
-    
+
     user_content = f"""
     Translate the English notes into Russian, following these rules:
     - Keep Pali or Sanskrit terms in roman script.
@@ -210,15 +215,15 @@ def generate_messages_for_notes(lemma_1, grammar, notes):
     # print(user_content)
     return [
         {"role": "system", "content": system_content},
-        {"role": "user", "content": user_content}
+        {"role": "user", "content": user_content},
     ]
 
 
 def generate_messages_for_english_meaning(lemma_1, grammar, sentence):
     """Generate messages for translation."""
-    
+
     system_content = "You are a helpful assistant that translates Pali to English considering the context."
-    
+
     user_content = f"""
 
     Given the grammatical and contextual details provided, list at least 8 distinct English synonyms for the specified Pali term. Avoid repeating the same word. In the answer provide only a list of synonyms separated by ';' without any introduction or comments.
@@ -231,15 +236,51 @@ def generate_messages_for_english_meaning(lemma_1, grammar, sentence):
     # print(user_content)
     return [
         {"role": "system", "content": system_content},
-        {"role": "user", "content": user_content}
+        {"role": "user", "content": user_content},
     ]
+
+
+def generate_messages_for_meaning_ta(
+    lemma_1, grammar, meaning, sentence, translation_example=""
+):
+    """Generate messages for Tamil translation of meaning."""
+
+    system_content = "You are a skilled assistant that translates English text to Tamil with grammatical accuracy, contextual relevance, and strict adherence to rules."
+
+    user_content = f"""
+        Translate the English definition of the Pali term into Tamil, following these rules:
+
+        - Translate all bracketed text (e.g., "(gram)" → "(இலக்கணம்)", "(of weather)" → "(வெயிலைப் பற்றி)").
+        - Separate synonyms with `;`.
+        - Match the grammatical structure of the Pali term (noun, verb, etc.).
+        - Use lowercase unless it's a proper noun.
+        - Retain clarifications if any.
+        - Translate idioms to Tamil equivalents.
+        - Ensure no English remains untranslated, including within brackets.
+        - Output only the translation of the Definition, without labels, without any comments, without translation of the Grammar and in one line.
+
+        **Pali Term**: {lemma_1}
+        **Grammar**: {grammar}
+        **Definition**: {meaning}
+    """
+
+    if sentence:
+        user_content += f"\n- Consider Pali context: {sentence}"
+
+    if translation_example:
+        user_content += f"\n- Match this example format: {translation_example}"
+
+    return [
+        {"role": "system", "content": system_content},
+        {"role": "user", "content": user_content},
+    ]
+
+
 def generate_messages_for_meaning_lit(lemma_1, grammar, meaning_lit, ru_meaning=""):
     """Generate messages for literal meaning translation with duplication check."""
-    
-    system_content = (
-        "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules."
-    )
-    
+
+    system_content = "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules."
+
     user_content = f"""
         Translate the English literal definition of the Pali term into Russian, following these rules:
 
@@ -262,5 +303,5 @@ def generate_messages_for_meaning_lit(lemma_1, grammar, meaning_lit, ru_meaning=
     # print(user_content)
     return [
         {"role": "system", "content": system_content},
-        {"role": "user", "content": user_content}
+        {"role": "user", "content": user_content},
     ]

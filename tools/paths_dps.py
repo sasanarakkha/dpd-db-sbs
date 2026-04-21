@@ -160,6 +160,7 @@ class DPSPaths:
         self.ru_root_path = base_dir / "db/backup_tsv/ru_roots.tsv"
         self.russian_path = base_dir / "db/backup_tsv/russian.tsv"
         self.sbs_path = base_dir / "db/backup_tsv/sbs.tsv"
+        self.tamil_path = base_dir / "db/backup_tsv/tamil.tsv"
 
         # temp
         self.temp_dir = base_dir / "temp/"

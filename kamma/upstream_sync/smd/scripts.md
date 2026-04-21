@@ -133,11 +133,13 @@
 - **Category**: sbs_copy
 - **Sync Rule**: PORT
 - **Local Changes**:
-  1. New script: `backup_russian`, `backup_sbs`, and `backup_ru_roots` functions.
-  2. Writes to `russian.tsv`, `sbs.tsv`, and `ru_roots.tsv` in the backup folder.
-  3. Aborts if the `Russian` table is empty (safety check).
+  1. New script: `backup_russian`, `backup_sbs`, `backup_ta`, and `backup_ru_roots` functions.
+  2. Writes to `russian.tsv`, `sbs.tsv`, `tamil.tsv`, and `ru_roots.tsv` in the backup folder.
+  3. Aborts if the `Russian` table is empty (safety check); aborts if `Tamil` table is empty (safety check).
+  4. Tamil backup follows the same TSV structure as Russian and SBS (header row + data rows).
 - **Watch For**:
   - No upstream equivalent. This is critical for data persistence in the fork.
+  - Tamil table will be empty until AI meaning generation is run; empty-check prevents data loss.
 
 ---
 
@@ -147,10 +149,12 @@
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. New script: populates localized tables from TSV.
-  2. Duplicate check on IDs before import.
-  3. Orphaned row check: verifies that all Russian/SBS IDs exist in the main `DpdHeadword` table.
+  2. Duplicate check on IDs before import (Russian, SBS, Tamil).
+  3. Orphaned row check: verifies that all Russian/SBS/Tamil IDs exist in the main `DpdHeadword` table.
+  4. Tamil rebuild helper `make_table_data_ta()` mirrors Russian/SBS pattern: reads TSV, zips columns, filters empty keys, instantiates Tamil rows.
 - **Watch For**:
-  - SBS missing rows prompt for removal; Russian missing rows are removed silently.
+  - SBS missing rows prompt for removal; Russian and Tamil missing rows are removed silently.
+  - Tamil TSV will be empty until after AI meaning generation runs and data is backed up.
 
 ---
 
