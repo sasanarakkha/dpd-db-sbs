@@ -61,11 +61,17 @@ def load_ai_config():
     return api_key, provider, model
 
 
-def load_translation_examples(dpspth):
+def load_translation_examples(dpspth, lang="ru"):
     """Load the pos-examples mapping from a TSV file into a dictionary."""
     pos_examples_map = {}
-    if dpspth.translation_example_path:
-        with open(dpspth.translation_example_path, "r", encoding="utf-8") as csvfile:
+    if lang == "ru":
+        path = dpspth.ru_translation_example_path
+    elif lang == "ta":
+        path = dpspth.ta_translation_example_path
+    else:
+        raise ValueError(f"Unsupported language: {lang}")
+    if path:
+        with open(path, "r", encoding="utf-8") as csvfile:
             reader = csv.reader(csvfile, delimiter="\t")
             next(reader)  # Skip header row
             for row in reader:

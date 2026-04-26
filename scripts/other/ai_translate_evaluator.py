@@ -172,7 +172,7 @@ def build_translation_prompt(
     Returns:
         List of message dicts for AI API.
     """
-    pos_example_map = load_translation_examples(dpspth)
+    pos_example_map = load_translation_examples(dpspth, lang)
     meaning = make_meaning_combo(word)
     example = word.example_1 if word.example_1 else ""
     translation_example = pos_example_map.get(word.pos, "")

@@ -235,7 +235,7 @@ class DpsView(ft.Column, PopUpMixin):
     def _load_translation_examples(self) -> str:
         """Load and format translation examples from CSV file for tooltip display."""
         try:
-            csv_path = self.dpspth.translation_example_path
+            csv_path = self.dpspth.ru_translation_example_path
             if not csv_path.exists():
                 return "Translation examples file not found."
 

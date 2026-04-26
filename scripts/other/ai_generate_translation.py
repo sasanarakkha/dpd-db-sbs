@@ -5,6 +5,7 @@
 import os
 import json
 import glob
+import re
 
 from typing import List, Dict
 
@@ -58,37 +59,51 @@ LANG_CONFIG = {
 }
 
 
-def remove_irrelevant(limit: int):
-    # Query the database to fetch all with removed meaning_1 or empty rows in Russian table
-    db = (
-        db_session.query(DpdHeadword)
-        .join(Russian)
-        .filter(
-            or_(
-                and_(
-                    Russian.id != "",
-                    Russian.ru_meaning_raw == "",
-                    Russian.ru_meaning == "",
-                ),
-                and_(
-                    Russian.id != "",
-                    Russian.ru_meaning == "",
-                    Russian.ru_meaning_raw == "",
-                ),
+def remove_irrelevant(limit: int, lang: str = "ru"):
+    # Query the database to fetch words based on language
+    if lang == "ru":
+        db = (
+            db_session.query(DpdHeadword)
+            .join(Russian)
+            .filter(
+                or_(
+                    and_(
+                        Russian.id != "",
+                        Russian.ru_meaning_raw == "",
+                        Russian.ru_meaning == "",
+                    ),
+                    and_(
+                        Russian.id != "",
+                        Russian.ru_meaning == "",
+                        Russian.ru_meaning_raw == "",
+                    ),
+                )
             )
+            .all()
         )
-        .all()
-    )
+    elif lang == "ta":
+        db = (
+            db_session.query(DpdHeadword)
+            .join(Tamil)
+            .filter(Tamil.ta_meaning != "")
+            .all()
+        )
+        # Filter for those containing Roman characters in ta_meaning
+        db = [word for word in db if re.search(r"[a-zA-Z]", word.ta.ta_meaning)]
+    else:
+        raise ValueError(f"Unsupported language: {lang}")
 
     total_row_count = len(db)
-
     db = db[:limit]
 
-    print(f"Rows filtered for the proccess: {len(db)} / {total_row_count}")
+    print(f"Rows filtered for the process ({lang}): {len(db)} / {total_row_count}")
 
-    # Remove the filtered rows from the Russian table
+    # Remove the filtered rows from the respective table
     for word in db:
-        db_session.delete(word.ru)
+        if lang == "ru":
+            db_session.delete(word.ru)
+        elif lang == "ta":
+            db_session.delete(word.ta)
 
     # Commit the changes
     db_session.commit()
@@ -115,6 +130,10 @@ def filter_words_for_translation(
             .filter(
                 and_(
                     DpdHeadword.meaning_1 != "",
+                    # DpdHeadword.pos == "pr",
+                    # DpdHeadword.pos == "fem",
+                    # DpdHeadword.pos == "nt",
+                    # DpdHeadword.pos == "masc",
                     or_(
                         orm_model.id.is_(null()),
                         getattr(orm_model, lang_cfg["field_name"]).is_(None),
@@ -205,7 +224,7 @@ def filter_words_for_translation(
 
 def create_translation_prompt(word: DpdHeadword, mode, lang: str = "ru") -> Dict:
     """Create a translation prompt for a given word."""
-    pos_example_map = load_translation_examples(dpspth)
+    pos_example_map = load_translation_examples(dpspth, lang=lang)
     meaning = make_meaning_combo(word)
     example = word.example_1 if word.example_1 else ""
     translation_example = pos_example_map.get(word.pos, "")
@@ -237,7 +256,7 @@ def create_translation_prompt(word: DpdHeadword, mode, lang: str = "ru") -> Dict
 
 
 def translate(lemma_1, grammar, pos, meaning, sentence, notes, mode, lang: str = "ru"):
-    pos_example_map = load_translation_examples(dpspth)
+    pos_example_map = load_translation_examples(dpspth, lang=lang)
     translation_example = pos_example_map.get(pos, "")
     grammar = replace_abbreviations(grammar)
 
@@ -402,18 +421,21 @@ def read_exclude_ids_from_json(
 
 
 if __name__ == "__main__":
-    print("Translationg with the help of AI")
+    print("Translating with the help of AI")
 
-    limit: int = 1000000
+    limit: int = 2000
 
-    # remove_irrelevant(limit)
+    lang: str = "ta"
+    # lang: str = "ru"
 
-    # translation_generate("meaning", limit)
+    # remove_irrelevant(limit, lang=lang)
 
-    # translation_generate("note", limit)
+    # translation_generate("meaning", limit, lang=lang)
 
-    make_json("meaning", limit)
+    # translation_generate("note", limit, lang=lang)
 
-    # make_json("note", limit)
+    make_json("meaning", limit, lang=lang)
 
-    # make_json("lit", limit)
+    # make_json("note", limit, lang=lang)
+
+    # make_json("lit", limit, lang=lang)

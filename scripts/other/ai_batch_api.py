@@ -8,7 +8,7 @@ import json
 from tools.ai_related import get_ai_client, print_ai_config
 
 from db.db_helpers import get_db_session
-from db.models import Russian
+from db.models import Russian, Tamil
 from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
 
@@ -347,39 +347,57 @@ def save_processed_ids(ids_and_contents: dict[str, str]) -> None:
         print(f"Error saving processed IDs: {e}")
 
 
-def update_russian_table(ids_and_contents: dict[str, str], file_name_in: str) -> None:
-    print("Updating ru_meaning in db")
+def update_translation_table(
+    ids_and_contents: dict[str, str], file_name_in: str
+) -> None:
+    print("Updating translation in db")
     updated_count: int = 0
     added_count: int = 0
 
-    # Determine which field to update based on file prefix
-    field_to_update = (
-        "ru_meaning_lit" if file_name_in.startswith("lit") else "ru_meaning_raw"
+    # Parse filename to get mode and language
+    # Expected format: {mode}-{lang}-{date}.jsonl
+    parts = file_name_in.split("-")
+    if len(parts) < 2:
+        print(f"❌ Could not parse mode and language from filename: {file_name_in}")
+        return
+
+    mode = parts[0]
+    lang = parts[1]
+
+    # Model and field mapping
+    if lang == "ru":
+        orm_model = Russian
+        field_to_update = "ru_meaning_lit" if mode == "lit" else "ru_meaning_raw"
+    elif lang == "ta":
+        orm_model = Tamil
+        field_to_update = "ta_meaning"
+    else:
+        print(f"❌ Unsupported language: {lang}")
+        return
+
+    print(
+        f"Updating {orm_model.__name__}.{field_to_update} for lang: {lang}, mode: {mode}"
     )
-    field_name = (
-        "ru_meaning_lit" if field_to_update == "ru_meaning_lit" else "ru_meaning_raw"
-    )
-    print(f"Updating {field_name} based on file prefix: {file_name_in}")
 
     skipped_count: int = 0
 
     for id, content in ids_and_contents.items():
         content = content.replace("\n", "")
-        existing_russian = db_session.query(Russian).filter(Russian.id == id).first()
-        if existing_russian:
-            current_value = getattr(existing_russian, field_to_update)
+        existing_record = db_session.query(orm_model).filter(orm_model.id == id).first()
+        if existing_record:
+            current_value = getattr(existing_record, field_to_update)
             if not current_value:  # Only update if field is empty
-                setattr(existing_russian, field_to_update, content)
+                setattr(existing_record, field_to_update, content)
                 updated_count += 1
                 db_session.commit()
             else:
                 skipped_count += 1
         else:
-            # Create new Russian record with the appropriate field set
-            russian_data = {"id": id, field_to_update: content}
-            new_russian = Russian(**russian_data)
+            # Create new record with the appropriate field set
+            record_data = {"id": id, field_to_update: content}
+            new_record = orm_model(**record_data)
             added_count += 1
-            db_session.add(new_russian)
+            db_session.add(new_record)
     db_session.commit()
     print(f"Total updated records: {updated_count}")
     print(f"Total added records: {added_count}")
@@ -392,21 +410,21 @@ def update_russian_table(ids_and_contents: dict[str, str], file_name_in: str) ->
 
 if __name__ == "__main__":
     # Example usage for processing batch results
-    file_name_in = "meaning-2026-04-20-17-20"
-    specific_batch_id = "batch_69e5f05f22ec8190b90c3289777e628b"
+    file_name_in = "meaning-ta-2026-04-26-17-58"
+    specific_batch_id = "batch_69ede1f75678819096f77df2496734e9"
 
     #! Step 1: Upload and create batch
     # upload_and_create_batch(file_name_in)
 
     #! Step 2: Check batch status
-    # check_batch_status(specific_batch_id)
+    check_batch_status(specific_batch_id)
 
     #! Step 3: Download and update results
     # ids_and_contents = save_batch_results(
     #     specific_batch_id, file_name_in, skip_empty=True
     # )
     # if ids_and_contents:
-    #     update_russian_table(ids_and_contents, file_name_in)
+    #     update_translation_table(ids_and_contents, file_name_in)
     # else:
     #     print("⚠️ No valid results to update database")
 
