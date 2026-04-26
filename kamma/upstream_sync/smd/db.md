@@ -23,6 +23,23 @@
 ---
 
 
+**File**: `db/tpd/tpd_to_lookup.py`
+- **Category**: tamil_copy
+- **Sync Rule**: PORT
+- **Shadow of**: `db/epd/epd_to_lookup.py`
+- **Local Changes**:
+  1. Queries `DpdHeadword` with `joinedload(DpdHeadword.ta)` instead of `joinedload(DpdHeadword.sbs/ru)`.
+  2. Iterates `ta_meaning`, splits on `";"`, and indexes each sub-meaning as a lookup key.
+  3. No root processing (Tamil has no root meanings) — headwords only.
+  4. No POS abbreviation replacement (no Tamil abbreviation map exists).
+  5. Stores `(lemma_clean, pos, ta_meaning)` tuples in `Lookup.tpd`.
+- **Watch For**:
+  - If upstream `epd_to_lookup.py` changes its loop or data structure, mirror here.
+  - `db/tpd/__init__.py` is an empty package init; no sync concern.
+
+---
+
+
 **File**: `db/families/family_compound_ru.py`
 - **Category**: russian_copy
 - **Sync Rule**: PORT

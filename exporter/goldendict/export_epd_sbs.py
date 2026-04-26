@@ -12,6 +12,7 @@ from tools.utils import RenderedSizes, default_rendered_sizes, squash_whitespace
 from exporter.jinja2_env import get_jinja2_env
 from exporter.goldendict.data_classes_dps import EpdData
 
+
 class EpdDataSBS(EpdData):
     def __init__(self, lookup_key, html_entries, pth, jinja_env):
         self.lookup_key = lookup_key
@@ -20,10 +21,12 @@ class EpdDataSBS(EpdData):
         self.jinja_env = jinja_env
         self.header = self._generate_header()
 
+
 def generate_epd_html(
     db_session: Session,
     pth: DPSPaths,
     show_ru_data=False,
+    show_ta_data=False,
 ) -> Tuple[List[DictEntry], RenderedSizes]:
     """generate html for english to pali dictionary using lookup table data"""
 
@@ -46,7 +49,7 @@ def generate_epd_html(
         for lemma_clean, pos, meaning_plus_case in epd_entries:
             entry_html = f"<b class='epd'>{lemma_clean}</b> {pos}. {meaning_plus_case}"
             html_entries.append(entry_html)
-        
+
         epd_dict[word] = html_entries
 
     # 2. Process Russian RPD if enabled
@@ -57,9 +60,28 @@ def generate_epd_html(
             rpd_entries = lookup_entry.rpd_unpack
             html_entries = []
             for lemma_clean, pos, meaning_plus_case in rpd_entries:
-                entry_html = f"<b class='epd'>{lemma_clean}</b> {pos}. {meaning_plus_case}"
+                entry_html = (
+                    f"<b class='epd'>{lemma_clean}</b> {pos}. {meaning_plus_case}"
+                )
                 html_entries.append(entry_html)
-            
+
+            if word in epd_dict:
+                epd_dict[word].extend(html_entries)
+            else:
+                epd_dict[word] = html_entries
+
+    # 3. Process Tamil TPD if enabled
+    if show_ta_data:
+        tpd_lookup_db = db_session.query(Lookup).filter(Lookup.tpd != "").all()
+        for lookup_entry in tpd_lookup_db:
+            word = lookup_entry.lookup_key
+            tpd_entries = lookup_entry.tpd_unpack
+            html_entries = []
+            for lemma_clean, pos, meaning_plus_case in tpd_entries:
+                entry_html = (
+                    f"<b class='epd'>{lemma_clean}</b> {pos}. {meaning_plus_case}"
+                )
+                html_entries.append(entry_html)
             if word in epd_dict:
                 epd_dict[word].extend(html_entries)
             else:
@@ -69,7 +91,7 @@ def generate_epd_html(
 
     for word, html_entries in epd_dict.items():
         data = EpdDataSBS(word, html_entries, pth, jinja_env)
-        
+
         html_rendered = template.render(d=data)
 
         # Re-calculate parts for parity

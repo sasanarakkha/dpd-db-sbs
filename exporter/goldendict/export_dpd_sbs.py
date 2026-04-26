@@ -71,6 +71,7 @@ class DpdHeadwordRenderDataBase(TypedDict):
     show_id: bool
     show_sbs_data: bool
     show_ru_data: bool
+    show_ta_data: bool
     show_grammar: bool
 
 
@@ -84,6 +85,7 @@ def render_pali_word_dpd_html(
     render_data: DpdHeadwordRenderData,
     show_sbs_data=False,
     show_ru_data=False,
+    show_ta_data=False,
     show_grammar=False,
 ) -> Tuple[DictEntry, RenderedSizes]:
     rd = render_data
@@ -119,9 +121,11 @@ def render_pali_word_dpd_html(
         show_id=rd["show_id"],
         ru=i.ru,
         sbs=i.sbs,
+        ta=i.ta,
         show_grammar=show_grammar,
         show_sbs_data=show_sbs_data,
         show_ru_data=show_ru_data,
+        show_ta_data=show_ta_data,
     )
 
     template = jinja_env.get_template("dpd_headword_sbs.jinja")
@@ -182,6 +186,7 @@ def _parse_batch_top_level(
     render_data: DpdHeadwordRenderData,
     show_sbs_data: bool,
     show_ru_data: bool,
+    show_ta_data: bool,
     dpd_data_results_list: ListProxy,
     rendered_sizes_results_list: ListProxy,
     show_grammar: bool,
@@ -197,7 +202,7 @@ def _parse_batch_top_level(
 
     res: List[Tuple[DictEntry, RenderedSizes]] = [
         render_pali_word_dpd_html(
-            i, full_render_data, show_sbs_data, show_ru_data, show_grammar
+            i, full_render_data, show_sbs_data, show_ru_data, show_ta_data, show_grammar
         )
         for i in batch
     ]
@@ -216,6 +221,7 @@ def generate_dpd_html(
     idioms_set: set[str],
     show_sbs_data=False,
     show_ru_data=False,
+    show_ta_data=False,
     show_grammar=False,
     data_limit: int = 0,
 ) -> Tuple[List[DictEntry], RenderedSizes]:
@@ -258,6 +264,7 @@ def generate_dpd_html(
             .options(
                 joinedload(DpdHeadword.rt),
                 joinedload(DpdHeadword.ru),
+                joinedload(DpdHeadword.ta),
                 joinedload(DpdHeadword.sbs),
             )
             .order_by(DpdHeadword.lemma_1)
@@ -293,6 +300,7 @@ def generate_dpd_html(
             "show_id": show_id,
             "show_sbs_data": show_sbs_data,
             "show_ru_data": show_ru_data,
+            "show_ta_data": show_ta_data,
             "show_grammar": show_grammar,
         }
 
@@ -305,6 +313,7 @@ def generate_dpd_html(
                     render_data,
                     show_sbs_data,
                     show_ru_data,
+                    show_ta_data,
                     dpd_data_results_list,
                     rendered_sizes_results_list,
                     show_grammar,
@@ -326,4 +335,3 @@ def generate_dpd_html(
     total_sizes = sum_rendered_sizes(rendered_sizes)
 
     return dpd_data_list, total_sizes
-

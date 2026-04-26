@@ -64,6 +64,7 @@ while true; do
             db/bold_definitions/update_bold_definitions_db.py
             scripts/bash/generate_components.sh
             db/rpd/rpd_to_lookup.py
+            db/tpd/tpd_to_lookup.py
             # After setting db_rebuild to "yes" in db_rebuild_from_tsv.py, we change it back after the bash is done.
             python -c "from tools.configger import config_update; config_update('regenerate', 'db_rebuild', 'no')"
             scripts/other/add_combined_view.py

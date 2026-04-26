@@ -22,9 +22,9 @@ GUI onboarding workflow.
 - **Strict Shadow Parity**: Files in the `strict_shadow` category (`registry.json`) must maintain strict logic parity with upstream equivalents. No new solutions, only layered localization.
 - **Namespace Isolation**: Follow the three-tier naming convention for all localized shadow copies:
     - **Tier 1 (Identical)**: Unmarked names (upstream parity).
-    - **Tier 2 (Modified)**: Mandatory locale suffix (`_ru`, `_sbs`, `_dps`).
+    - **Tier 2 (Modified)**: Mandatory locale suffix (`_ru`, `_sbs`, `_dps`, `_ta`).
     - **Tier 3 (New)**: Mandatory locale suffix.
-    - **HTML IDs**: Always use a locale prefix (`ru_`, `sbs_`, `dps_`).
+    - **HTML IDs**: Always use a locale prefix (`ru_`, `sbs_`, `dps_`, `ta_`).
 - **Inspired-by Files**: Files in the `inspired_by_upstream` category may diverge from upstream structure but must document the `divergence_reason` in the registry and explain the divergence in their SMD.
 - All changes must pass `ruff check --fix` and `ruff format` before completion.
 - The root directory must stay clean — no temporary scripts or artifacts.

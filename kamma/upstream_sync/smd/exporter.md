@@ -165,19 +165,20 @@
 
 
 **File**: `exporter/goldendict/data_classes_dps.py`
-- **Category**: russian_copy, sbs_copy
+- **Category**: russian_copy, sbs_copy, tamil_copy
 - **Sync Rule**: PORT
-- **Dual Shadow Note**: This file serves BOTH russian_copies and sbs_copies.
+- **Triple Shadow Note**: This file serves russian_copies, sbs_copies, AND tamil_copies.
 - **Local Changes**:
-  1. `HeadwordData.__init__` accepts `ru: Optional[Russian]`, `sbs: Optional[SBS]`, `show_grammar`, `show_sbs_data`, and `show_ru_data` parameters.
+  1. `HeadwordData.__init__` accepts `ru: Russian | None`, `sbs: SBS | None`, `ta: Tamil | None`, `show_grammar`, `show_sbs_data`, `show_ru_data`, and `show_ta_data` parameters.
   2. Russian fields populated: `ru_pos`, `ru_plus_case`, `ru_meaning`, `ru_summary`, `ru_complete`, `ru_grammar`, `ru_base`, `ru_phonetic`, `ru_inflections_html`.
   3. SBS fields populated: `sbs_meaning`, `sbs_notes`, `sbs_index`, `sbs_class`, and many `needs_*_example` flags.
-  4. `_convert_newlines_ru` replaces `\n, ` with `<br>` in Russian notes.
-  5. `_convert_newlines_sbs` handles newline conversion for ~10 SBS string fields.
-  6. `RpdData` subclass added for Russian EPD entries.
+  4. Tamil: `self.ta` holds the `Tamil` ORM object; `show_ta_data` flag controls rendering.
+  5. `_convert_newlines_ru` replaces `\n, ` with `<br>` in Russian notes.
+  6. `_convert_newlines_sbs` handles newline conversion for ~10 SBS string fields.
+  7. `RpdData` subclass for Russian EPD entries; `TpdData` subclass for Tamil EPD entries (reserved for future `export_tpd.py`).
 - **Watch For**:
-  - Upstream changes to `HeadwordData` constructor or methods must be meticulously merged to preserve BOTH the RU and SBS data layers.
-  - This file is the primary bridge between the DB models and the templates for both localized forks.
+  - Upstream changes to `HeadwordData` constructor or methods must be meticulously merged to preserve ALL three data layers (RU, SBS, Tamil).
+  - This file is the primary bridge between the DB models and the templates for all localized forks.
 
 ---
 
@@ -356,8 +357,10 @@
 - **Local Changes**:
   1. All HTML/Jinja2 templates use `sbs_` prefixed IDs and CSS classes.
   2. Specific templates added: `dpd_headword_sbs.jinja`, `root_headword_sbs.jinja`, `epd_sbs.jinja`, `help_abbrev_sbs.jinja`, `help_help_sbs.jinja`.
+  3. `dpd_headword_sbs.jinja`: Russian block renders when `show_ru_data`; SBS block when `show_sbs_data`; Tamil "தமிழ்" row after SBS block when `show_ta_data and d.ta and d.ta.ta_meaning`.
 - **Watch For**:
   - Never blindly overwrite — meticulous prefix preservation is required.
+  - When upstream adds new grammar table rows, verify the locale rows (RU, SBS, Tamil) are re-applied in order.
 
 ---
 
@@ -367,12 +370,14 @@
 - **Divergence Reason**: Significant structural divergence for SBS output format.
 - **Sync Rule**: inspired_only
 - **Local Changes**:
-  1. `generate_dpd_html` signature adds `dpspth: DPSPaths`, `show_sbs_data`, `show_ru_data`, and `show_grammar` flags.
-  2. Eagerly loads `.rt`, `.ru`, and `.sbs` relationships.
+  1. `generate_dpd_html` signature adds `dpspth: DPSPaths`, `show_sbs_data`, `show_ru_data`, `show_ta_data`, and `show_grammar` flags.
+  2. Eagerly loads `.rt`, `.ru`, `.ta`, and `.sbs` relationships.
   3. Synonyms logic includes a conditional Russian set lookup if `show_ru_data` is true.
-  4. `_parse_batch_top_level` uses `sbs_templates/` and passes the new flags.
+  4. `_parse_batch_top_level` uses `sbs_templates/` and passes all locale flags including `show_ta_data`.
+  5. `DpdHeadwordRenderDataBase` TypedDict includes `show_ta_data: bool`.
 - **Watch For**:
-  - This exporter is more complex than the Russian one because it can optionally include Russian data.
+  - When upstream adds new eager-loaded relationships, also add `.ta` to the joinedload chain.
+  - All locale flags (`show_sbs_data`, `show_ru_data`, `show_ta_data`, `show_grammar`) must be threaded through `render_data`, `_parse_batch_top_level`, and `render_pali_word_dpd_html` in sync.
 
 ---
 
@@ -382,12 +387,14 @@
 - **Divergence Reason**: SBS-specific output logic diverges from upstream.
 - **Sync Rule**: inspired_only
 - **Local Changes**:
-  1. `EpdDataSBS` subclass added to handle combined English and Russian EPD entries.
-  2. `generate_epd_html` accepts `show_ru_data` flag.
-  3. If `show_ru_data` is true, it queries `Lookup.rpd` and merges results into the English EPD dictionary.
-  4. Uses `epd_sbs.jinja` template.
+  1. `EpdDataSBS` subclass added to handle combined English + Russian + Tamil EPD entries.
+  2. `generate_epd_html` accepts `show_ru_data` and `show_ta_data` flags.
+  3. If `show_ru_data` is true, queries `Lookup.rpd` and merges into the EPD dict.
+  4. If `show_ta_data` is true, queries `Lookup.tpd` and merges into the EPD dict.
+  5. Uses `epd_sbs.jinja` template.
 - **Watch For**:
-  - Merged results mean one English/Russian headword can map to both DPD and localized equivalents.
+  - Merged results mean one lookup key can map to DPD + Russian + Tamil equivalents simultaneously.
+  - Adding a new locale lookup follows the same pattern: query `Lookup.<locale>`, iterate entries, merge into `epd_dict`.
 
 ---
 
@@ -425,11 +432,12 @@
 - **Sync Rule**: inspired_only
 - **Local Changes**:
   1. `GlobalVars` adds `dpspth: DPSPaths`.
-  2. Config flags `show_sbs_data`, `show_ru_data`, and `show_grammar` are read from `config.ini` during initialization.
-  3. `prepare_export_to_goldendict_mdict` appends "SBS fork by Devamitta" to the author and description.
-  4. JS paths use `dpspth` and point to `sbs_` prefixed files.
+  2. Config flags `show_sbs_data`, `show_ru_data`, `show_ta_data`, and `show_grammar` are read from `config.ini` during initialization.
+  3. `show_ta_data` is passed to both `generate_dpd_html()` and `generate_epd_html()`.
+  4. `prepare_export_to_goldendict_mdict` appends "SBS fork by Devamitta" to the author and description.
+  5. JS paths use `dpspth` and point to `sbs_` prefixed files.
 - **Watch For**:
-  - This script builds the standard DPD with SBS extensions.
+  - When adding a new locale flag, wire it through `GlobalVars`, `generate_dpd_html`, and `generate_epd_html` — all three must be updated together.
 
 ---
 

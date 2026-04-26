@@ -1,4 +1,4 @@
-from typing import Set, Optional
+from typing import Set
 from db.models import (
     DpdHeadword,
     DpdRoot,
@@ -11,6 +11,7 @@ from db.models import (
     Lookup,
     Russian,
     SBS,
+    Tamil,
 )
 from tools.paths import ProjectPaths
 from tools.meaning_construction import make_grammar_line, make_meaning_combo_html
@@ -44,11 +45,13 @@ class HeadwordData:
         cf_set: Set[str],
         idioms_set: Set[str],
         show_id: bool,
-        ru: Optional[Russian] = None,
-        sbs: Optional[SBS] = None,
+        ru: Russian | None = None,
+        sbs: SBS | None = None,
+        ta: Tamil | None = None,
         show_grammar: bool = False,
         show_sbs_data: bool = False,
         show_ru_data: bool = False,
+        show_ta_data: bool = False,
     ):
         self.construction_summary = i.construction_summary
         self.i = self._convert_newlines(i)
@@ -67,8 +70,13 @@ class HeadwordData:
         self.show_grammar = show_grammar
         self.show_sbs_data = show_sbs_data
         self.show_ru_data = show_ru_data
+        self.show_ta_data = show_ta_data
         self.ru = self._convert_newlines_ru(ru) if ru else None
         self.sbs = self._convert_newlines_sbs(sbs) if sbs else None
+        if ta:
+            self.ta = ta
+        else:
+            self.ta = None
         self.today = TODAY
         self.date = year_month_day_dash()
         self.grammar = make_grammar_line(i)
@@ -246,6 +254,15 @@ class RpdData(EpdData):
     def __init__(self, lookup_entry: Lookup, pth: ProjectPaths, jinja_env):
         super().__init__(lookup_entry, pth, jinja_env)
         self.epd_entries = lookup_entry.rpd_unpack
+        self.html_string = self._generate_html_string()
+
+
+class TpdData(EpdData):
+    """TPD: Tamil Pāḷi Dictionary. Reserved for future export_tpd.py."""
+
+    def __init__(self, lookup_entry: Lookup, pth: ProjectPaths, jinja_env):
+        super().__init__(lookup_entry, pth, jinja_env)
+        self.epd_entries = lookup_entry.tpd_unpack
         self.html_string = self._generate_html_string()
 
 

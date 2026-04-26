@@ -52,6 +52,7 @@ class GlobalVars:
             self.make_mdict: bool = True
         self.show_sbs_data: bool = False
         self.show_ru_data: bool = False
+        self.show_ta_data: bool = False
         self.show_grammar: bool = False
 
         if config_test("dictionary", "show_sbs_data", "yes"):
@@ -59,6 +60,9 @@ class GlobalVars:
 
         if config_test("dictionary", "show_ru_data", "yes"):
             self.show_ru_data: bool = True
+
+        if config_test("dictionary", "show_ta_data", "yes"):
+            self.show_ta_data: bool = True
 
         if config_test("dictionary", "show_grammar", "yes"):
             self.show_grammar: bool = True
@@ -86,6 +90,7 @@ def main():
         g.idioms_set,
         g.show_sbs_data,
         g.show_ru_data,
+        g.show_ta_data,
         g.show_grammar,
         g.data_limit,
     )
@@ -100,7 +105,9 @@ def main():
         variant_spelling_data_list, sizes = generate_variant_spelling_html(g.pth)
         g.rendered_sizes.append(sizes)
 
-        epd_data_list, sizes = generate_epd_html(g.db_session, g.dpspth, g.show_ru_data)
+        epd_data_list, sizes = generate_epd_html(
+            g.db_session, g.dpspth, g.show_ru_data, g.show_ta_data
+        )
         g.rendered_sizes.append(sizes)
 
         help_data_list, sizes = generate_help_html(
@@ -154,22 +161,23 @@ def prepare_export_to_goldendict_mdict(g: GlobalVars) -> None:
     dict_name = "dpd"
 
     dict_var = DictVariables(
-    css_paths=[g.paths.dpd_css_and_fonts_path],
-    js_paths=[
-        g.paths.family_compound_json,
-        g.dpspth.templates_dir / "javascript/sbs_family_compound_template.js",
-        g.paths.family_idiom_json,
-        g.dpspth.templates_dir / "javascript/sbs_family_idiom_template.js",
-        g.paths.family_root_json,
-        g.dpspth.templates_dir / "javascript/sbs_family_root_template.js",
-        g.paths.family_set_json,
-        g.dpspth.templates_dir / "javascript/sbs_family_set_template.js",
-        g.paths.family_word_json,
-        g.dpspth.templates_dir / "javascript/sbs_family_word_template.js",
-        g.dpspth.templates_dir / "javascript/sbs_feedback_template.js",
-        g.dpspth.templates_dir / "javascript/sbs_frequency_template.js",
-        g.dpspth.templates_dir / "main.js",
-        ],        gd_path=g.paths.share_dir,
+        css_paths=[g.paths.dpd_css_and_fonts_path],
+        js_paths=[
+            g.paths.family_compound_json,
+            g.dpspth.templates_dir / "javascript/sbs_family_compound_template.js",
+            g.paths.family_idiom_json,
+            g.dpspth.templates_dir / "javascript/sbs_family_idiom_template.js",
+            g.paths.family_root_json,
+            g.dpspth.templates_dir / "javascript/sbs_family_root_template.js",
+            g.paths.family_set_json,
+            g.dpspth.templates_dir / "javascript/sbs_family_set_template.js",
+            g.paths.family_word_json,
+            g.dpspth.templates_dir / "javascript/sbs_family_word_template.js",
+            g.dpspth.templates_dir / "javascript/sbs_feedback_template.js",
+            g.dpspth.templates_dir / "javascript/sbs_frequency_template.js",
+            g.dpspth.templates_dir / "main.js",
+        ],
+        gd_path=g.paths.share_dir,
         md_path=g.paths.share_dir,
         dict_name=dict_name,
         icon_path=g.paths.dpd_logo_svg,

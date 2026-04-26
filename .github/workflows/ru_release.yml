@@ -199,6 +199,9 @@ jobs:
 
     - name: Add RPD to Lookup Table
       run: uv run python db/rpd/rpd_to_lookup.py
+
+    - name: Add TPD to Lookup Table
+      run: uv run python db/tpd/tpd_to_lookup.py
       
     - name: Test Dealbreakers
       run: uv run python scripts/build/dealbreakers.py
@@ -402,6 +405,24 @@ jobs:
     - name: Zip GoldenDict & Mdict for DPD + SBS
       run: uv run python scripts/rus_exporter/zip_dpd_sbs.py
 
+    - name: Cleanup DPD + SBS Intermediate Files
+      run: |
+        rm -rf exporter/share/dpd/
+        rm -f exporter/share/*.mdx
+        rm -f exporter/share/*.mdd
+
+    - name: Config for DPD + TA
+      run: uv run python scripts/rus_exporter/config_github_release_dpd_ta.py
+
+    - name: Export GoldenDict & MDict for DPD + TA
+      run: |
+        uv run python exporter/goldendict/main_sbs.py
+        echo "=== After GoldenDict for DPD + TA export ==="
+        $HOME/check_disk.sh
+
+    - name: Zip GoldenDict & Mdict for DPD + TA
+      run: uv run python scripts/rus_exporter/zip_dpd_ta.py
+
     # ----------------------------------------
     # Create Draft Release
     # ----------------------------------------
@@ -535,4 +556,24 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: exporter/share/dpd+rus-mdict.zip
         asset_name: dpd+rus-mdict.zip
+        asset_content_type: application/zip
+
+    - name: Upload Asset dpd+ta-goldendict.zip
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: exporter/share/dpd+ta-goldendict.zip
+        asset_name: dpd+ta-goldendict.zip
+        asset_content_type: application/zip
+
+    - name: Upload Asset dpd+ta-mdict.zip
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: exporter/share/dpd+ta-mdict.zip
+        asset_name: dpd+ta-mdict.zip
         asset_content_type: application/zip

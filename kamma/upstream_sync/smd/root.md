@@ -84,8 +84,10 @@
 - **Local Changes**:
   1. Adapted from `draft_release.yml` to build and release Russian dictionary artifacts.
   2. Release targets RU goldendict/mdict outputs; upload destinations are RU-specific GitHub release.
+  3. "Add TPD to Lookup Table" step added after the RPD step (`uv run python db/tpd/tpd_to_lookup.py`).
 - **Watch For**:
   - Upstream changes to release workflow steps (artifact names, upload actions) need mirroring here.
+  - The TPD step must remain after RPD and before dealbreakers.
 
 ---
 
@@ -97,6 +99,7 @@
 - **Local Changes**:
   1. Test/dry-run variant of `ru_release.yml` — validates RU release build without publishing.
   2. Adapted from `draft_release.yml` with test-mode flags.
+  3. "Add TPD to Lookup Table" step added after the RPD step — mirrors `ru_release.yml`.
 - **Watch For**:
   - Keep in sync with `ru_release.yml` — divergence causes test/prod environment drift.
 

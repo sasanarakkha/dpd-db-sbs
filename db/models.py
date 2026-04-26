@@ -249,6 +249,7 @@ class Lookup(Base):
     abbrev: Mapped[str] = mapped_column(default="")
     epd: Mapped[str] = mapped_column(default="")
     rpd: Mapped[str] = mapped_column(default="")
+    tpd: Mapped[str] = mapped_column(default="")
     other: Mapped[str] = mapped_column(default="")
     sinhala: Mapped[str] = mapped_column(default="")
     devanagari: Mapped[str] = mapped_column(default="")
@@ -419,6 +420,17 @@ class Lookup(Base):
             return json.loads(self.rpd)
         else:
             return []
+
+    # tpd pack unpack
+
+    def tpd_pack(self, list: list[tuple[str, str, str]]) -> None:
+        self.tpd = json.dumps(list, ensure_ascii=False, indent=1)
+
+    @property
+    def tpd_unpack(self) -> list[tuple[str, str, str]]:
+        if self.tpd:
+            return json.loads(self.tpd)
+        return []
 
     # pack unpack sinhala
 

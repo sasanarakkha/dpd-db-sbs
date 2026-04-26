@@ -1,5 +1,20 @@
 # SMD: SCRIPTS
 
+**File**: `scripts/bash/rebuild_db.sh`
+- **Category**: unique_local
+- **Sync Rule**: SKIP
+- **Local Changes**:
+  1. Interactive Bash script for rebuilding the DPS database from scratch or from backup TSVs.
+  2. Runs the full DPS-specific build sequence: backup, restore, component generation, lookup population (EPD, RPD, TPD), and GoldenDict export.
+  3. `db/tpd/tpd_to_lookup.py` runs after `db/rpd/rpd_to_lookup.py` to populate `Lookup.tpd`.
+  4. Hardcoded checkout of `sbs-ru` branch at startup; uses `backup_dps.py` for data safety.
+- **Watch For**:
+  - When adding a new lookup script, add it here after its counterpart (RPD → TPD order).
+  - No upstream equivalent — this is entirely fork-local.
+
+---
+
+
 **File**: `scripts/bash/generate_components.sh`
 - **Category**: inspired_by_upstream
 - **Divergence Reason**: Language mismatch: Bash vs Python; localized build orchestration.
@@ -191,6 +206,31 @@
   2. Flattened structure (same as `zip_dpd_rus.py`).
 - **Watch For**:
   - Ensure it packages the state *after* an SBS export.
+
+---
+
+
+**File**: `scripts/rus_exporter/config_github_release_dpd_ta.py`
+- **Category**: unique_local
+- **Sync Rule**: SKIP
+- **Local Changes**:
+  1. Sets `show_ta_data="yes"`, `show_ru_data="no"`, `show_sbs_data="no"`.
+  2. Enables only `make_dpd`; disables grammar, deconstructor, variants, ebook.
+  3. Uses `main_sbs.py` (not `main_ru.py` or `main.py`) to export the Tamil dictionary.
+- **Watch For**:
+  - If `show_ta_data` config key is renamed, update here and in the SBS workflow steps.
+
+---
+
+
+**File**: `scripts/rus_exporter/zip_dpd_ta.py`
+- **Category**: unique_local
+- **Sync Rule**: SKIP
+- **Local Changes**:
+  1. Packages the upstream GoldenDict dir into `dpd+ta-goldendict.zip` and MDict files into `dpd+ta-mdict.zip`.
+  2. Mirrors `zip_dpd_sbs.py` pattern exactly.
+- **Watch For**:
+  - Ensure it runs after a Tamil export (`main_sbs.py` with `show_ta_data=yes`).
 
 ---
 

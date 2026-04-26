@@ -1016,6 +1016,13 @@
             </tr>
         {% endif %}
 
+        {% if d.show_ta_data and d.ta and d.ta.ta_meaning %}
+        <tr>
+            <th>தமிழ்</th>
+            <td>{{ d.ta.ta_meaning }}</td>
+        </tr>
+        {% endif %}
+
         <tr>
             <th>Grammar</th>
             <td>{{ d.grammar }}</td>

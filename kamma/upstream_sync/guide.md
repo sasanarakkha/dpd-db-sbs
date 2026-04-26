@@ -118,6 +118,7 @@ Each stage runs in its own session. At the end of a stage:
 | `russian_copies` | Shadow files mirroring upstream with Russian additions. Strict parity enforced. |
 | `sbs_copies` | Shadow files mirroring upstream with SBS additions. Strict parity enforced. |
 | `dps_copies` | Shadow files mirroring upstream with DPS additions. Strict parity enforced. |
+| `tamil_copies` | Shadow files mirroring upstream with Tamil additions. Strict parity enforced. Primary shadow: `db/tpd/tpd_to_lookup.py` → `db/epd/epd_to_lookup.py`. |
 | `inspired_by_upstream` | Local files derived from upstream but structurally diverged. No strict parity; backport useful improvements only. |
 | `unique_paths` | Fork-only files/dirs. Never synced. |
 | `no_sync_files` | Infrastructure files that must never be overwritten. |
@@ -140,9 +141,11 @@ Every entry must define a `Sync Rule` (`PORT`, `MIRROR_EXACTLY`, `PRESERVE`, `DI
 Enforced via `tests/test_namespace_isolation.py`:
 
 1. **Tier 1 — Identical to Upstream**: No locale marker. Keep upstream name exactly.
-2. **Tier 2 — Modified from Upstream**: Locale suffix only (`_ru`, `_sbs`, or `_dps`). Never use both a prefix and a suffix.
+2. **Tier 2 — Modified from Upstream**: Locale suffix only (`_ru`, `_sbs`, `_dps`, or `_ta`). Never use both a prefix and a suffix.
 3. **Tier 3 — New (no upstream counterpart)**: Use descriptive name + locale suffix.
-4. **HTML IDs**: Always prefix with locale (`ru_`, `sbs_`, `dps_`).
+4. **HTML IDs**: Always prefix with locale (`ru_`, `sbs_`, `dps_`, `ta_`).
+
+**Locale flags** (in `config.ini [dictionary]`): `show_ru_data`, `show_sbs_data`, `show_ta_data` — each threads through the same call chain via `main_sbs.py`.
 
 ---
 

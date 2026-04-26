@@ -39,6 +39,7 @@ All upstream sync assets live in `kamma/upstream_sync/`.
 | `russian_copies` | Shadow copies mirroring upstream with Russian additions (Strict parity) |
 | `sbs_copies` | Shadow copies mirroring upstream with SBS additions (Strict parity) |
 | `dps_copies` | Shadow copies mirroring upstream with DPS additions (Strict parity) |
+| `tamil_copies` | Shadow copies mirroring upstream with Tamil additions (Strict parity) |
 | `inspired_by_upstream` | Local files derived from upstream but structurally diverged (Selective backporting) |
 | `unique_paths` | Files that exist only in this fork — never sync these from upstream |
 | `no_sync_files` | Infrastructure files to skip entirely during sync |

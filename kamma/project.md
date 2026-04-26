@@ -15,7 +15,8 @@ top without diverging from core upstream logic.
 ## Who it is for
 - Russian-speaking Dhamma practitioners and Pāḷi students
 - Students following the SBS curriculum
-- Contributors verifying and enriching Russian and SBS data
+- Tamil-speaking scholars
+- Contributors verifying and enriching Russian, SBS and Tamil data
 
 ## One-off or ongoing
 Ongoing. Releases follow the Buddhist lunar calendar (full moon Uposatha, ~monthly).
@@ -36,3 +37,4 @@ Upstream sync runs continuously: upstream dpd-db/main → local `as_upstream` br
 - Russian and SBS tables are consistent with their source repositories
 - Exports generate without error and render correctly in target platforms
 - Each Uposatha release ships without regression
+ Uposatha release ships without regression

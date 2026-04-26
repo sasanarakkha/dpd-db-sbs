@@ -188,7 +188,8 @@
     "scripts/export/sbs_anki_deck_config.py",
     "scripts/export/sbs_anki_collection_verifier.py",
     "scripts/export/sbs_anki_revert.py",
-    "temp/anki_decks/"
+    "temp/anki_decks/",
+    "scripts/bash/rebuild_db.sh"
   ],
   "russian_copies": {
     "db/families/family_compound_ru.py": "db/families/family_compound.py",
@@ -214,6 +215,8 @@
     "exporter/webapp/main_ru.py": "exporter/webapp/main.py",
     "scripts/build/families_to_json_ru.py": "scripts/build/families_to_json.py",
     "shared_data/help_ru/": "shared_data/help/",
+    "db/rpd/rpd_to_lookup.py": "db/epd/epd_to_lookup.py",
+    "exporter/goldendict/export_rpd.py": "exporter/goldendict/export_epd.py",
     "tools/degree_of_completion_ru.py": "tools/degree_of_completion.py",
     "tools/ru_spelling.py": "tools/spelling.py",
     "tools/translit_ru.py": "tools/translit.py",
@@ -230,5 +233,8 @@
     "exporter/goldendict/data_classes_dps.py": "exporter/goldendict/data_classes.py",
     "scripts/backup/backup_dps.py": "db/backup_tsv/backup_dpd_headwords_and_roots.py",
     "scripts/build/db_rebuild_from_tsv_dps.py": "scripts/build/db_rebuild_from_tsv.py"
+  },
+  "tamil_copies": {
+    "db/tpd/tpd_to_lookup.py": "db/epd/epd_to_lookup.py"
   }
 }

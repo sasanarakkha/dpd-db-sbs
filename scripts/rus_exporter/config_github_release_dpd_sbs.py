@@ -22,6 +22,7 @@ def main():
     config_update("dictionary", "show_id", "no")
     config_update("dictionary", "show_sbs_data", "yes")
     config_update("dictionary", "show_ru_data", "no")
+    config_update("dictionary", "show_ta_data", "no")
     config_update("dictionary", "show_grammar", "no")
     config_update("dictionary", "data_limit", "0")
 
@@ -30,6 +31,9 @@ def main():
     config_update("exporter", "make_deconstructor", "no")
     config_update("exporter", "make_variants", "no")
     config_update("exporter", "make_ebook", "no")
+    config_update("exporter", "make_tbw", "no")
+    config_update("exporter", "make_tpr", "no")
+    config_update("exporter", "tarball_db", "no")
 
     config_update("anki", "update", "no")
     config_update("goldendict", "copy_unzip", "no")

@@ -44,6 +44,7 @@ For the full protocol, see **[guide.md](./guide.md)**.
 - `modified_upstream_files`: Direct divergences (Manual porting).
 - `russian_copies` / `sbs_copies`: Strict shadows (Parity enforced).
 - `dps_copies`: Strict DPS shadows (Parity enforced).
+- `tamil_copies`: Strict Tamil shadows (Parity enforced).
 - `inspired_by_upstream`: Structural divergences (Selective backporting).
 - `unique_paths`: Fork-only files (No sync).
 - `skip_sync_patterns`: Ignored paths.
