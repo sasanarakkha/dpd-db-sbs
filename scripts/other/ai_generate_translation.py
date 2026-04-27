@@ -129,11 +129,8 @@ def filter_words_for_translation(
             .outerjoin(orm_model, DpdHeadword.id == orm_model.id)
             .filter(
                 and_(
-                    DpdHeadword.meaning_1 != "",
-                    # DpdHeadword.pos == "pr",
-                    # DpdHeadword.pos == "fem",
-                    # DpdHeadword.pos == "nt",
-                    # DpdHeadword.pos == "masc",
+                    # DpdHeadword.meaning_1 != "",
+                    or_(DpdHeadword.meaning_1 != "", DpdHeadword.meaning_2 != ""),
                     or_(
                         orm_model.id.is_(null()),
                         getattr(orm_model, lang_cfg["field_name"]).is_(None),
@@ -423,10 +420,10 @@ def read_exclude_ids_from_json(
 if __name__ == "__main__":
     print("Translating with the help of AI")
 
-    limit: int = 2000
+    limit: int = 7000
 
-    lang: str = "ta"
-    # lang: str = "ru"
+    # lang: str = "ta"
+    lang: str = "ru"
 
     # remove_irrelevant(limit, lang=lang)
 

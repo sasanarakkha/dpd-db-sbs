@@ -62,7 +62,13 @@ def check_batch_list() -> None:
         try:
             batches = client.batches.list()
             for batch in batches:
-                print(f"Batch ID: {batch.id}, Status: {batch.status}")
+                status_msg = f"Batch ID: {batch.id}, Status: {batch.status}"
+                if batch.request_counts:
+                    counts = serialize_request_counts(batch.request_counts)
+                    status_msg += (
+                        f", Progress: {counts.get('completed')}/{counts.get('total')}"
+                    )
+                print(status_msg)
         except Exception as e:
             print("An error occurred while retrieving batch list:", str(e))
 
@@ -78,7 +84,15 @@ def check_batch_status(batch_id: str) -> object | None:
     def _openai_check_batch_status(client, batch_id: str) -> object | None:
         try:
             batch_info = client.batches.retrieve(batch_id=batch_id)
-            print(f"Batch ID: {batch_info.id}, Status: {batch_info.status}")
+            status_msg = f"Batch ID: {batch_info.id}, Status: {batch_info.status}"
+            if batch_info.request_counts:
+                counts = serialize_request_counts(batch_info.request_counts)
+                status_msg += (
+                    f", Progress: {counts.get('completed')}/{counts.get('total')}"
+                )
+                if counts.get("failed", 0) > 0:
+                    status_msg += f", Failed: {counts.get('failed')}"
+            print(status_msg)
             return batch_info
         except Exception as e:
             print(
@@ -410,8 +424,8 @@ def update_translation_table(
 
 if __name__ == "__main__":
     # Example usage for processing batch results
-    file_name_in = "meaning-ta-2026-04-26-17-58"
-    specific_batch_id = "batch_69ede1f75678819096f77df2496734e9"
+    file_name_in = "meaning-ru-2026-04-27-20-20"
+    specific_batch_id = "batch_69ef54b97ab481908fd0d0ba80dc6cc4"
 
     #! Step 1: Upload and create batch
     # upload_and_create_batch(file_name_in)
@@ -427,11 +441,3 @@ if __name__ == "__main__":
     #     update_translation_table(ids_and_contents, file_name_in)
     # else:
     #     print("⚠️ No valid results to update database")
-
-    # Alternative: Download with empty responses included (not recommended)
-    # ids_and_contents = save_batch_results(specific_batch_id, file_name_in, skip_empty=False)
-
-    # Other useful commands:
-    # check_batch_list()
-    # print_batch_info(specific_batch_id)
-    # cancel_batch(specific_batch_id)
