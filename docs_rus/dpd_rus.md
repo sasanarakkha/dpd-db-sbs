@@ -6,7 +6,7 @@
 
 ## DPD+RUS содержит пять различных словарей
 
-### Словарь Палийского языка на анлийский
+### Словарь Палийского языка на анлийском
 
 ![gear icon](pics/features/1pali2english_d.png#only-dark)  
 ![gear icon](pics/features/1pali2english_l.png#only-light)

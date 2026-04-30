@@ -375,7 +375,7 @@ jobs:
         done
 
     # ----------------------------------------
-    # Export DPD + RUS and DPD + SBS
+    # Export DPD + RUS and DPD + SBS and DPD + TA
     # ----------------------------------------
 
     - name: Export GoldenDict & MDict for DPD + RUS

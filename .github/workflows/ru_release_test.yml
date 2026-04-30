@@ -298,7 +298,7 @@ jobs:
       run: uv run python exporter/tpr/tpr_exporter_ru.py
 
     # ----------------------------------------
-    # Export DPD + RUS and DPD + SBS
+    # Export DPD + RUS and DPD + SBS and DPD + TA
     # ----------------------------------------
 
     - name: Export GoldenDict & MDict for DPD + RUS
