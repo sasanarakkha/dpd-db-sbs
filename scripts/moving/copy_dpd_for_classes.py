@@ -3,6 +3,8 @@
 from pathlib import Path
 import shutil
 from tools.printer import printer as pr
+from tools.configger import config_read
+
 
 pr.tic()
 
@@ -15,15 +17,7 @@ deva_dir: Path = project_dir.parent.parent  # HOME
 # ---------- Source paths ----------
 
 # tipitaka db source
-tp_db_src: Path = (
-    deva_dir
-    / "Library"
-    / "Containers"
-    / "org.americanmonk.tpp"
-    / "Data"
-    / "Documents"
-    / "tipitaka_pali.db"
-)
+tpr_db_path = config_read("tpr", "db_path")
 
 # dpd goldendict source folder
 share_dir: Path = project_dir / "exporter" / "share"
@@ -51,11 +45,11 @@ dest_dir.mkdir(parents=True, exist_ok=True)
 
 # ---------- Copy tipitaka db ----------
 
-if tp_db_src.exists():
-    shutil.copy2(tp_db_src, tp_db_dest)
+if tpr_db_path:
+    shutil.copy2(tpr_db_path, tp_db_dest)
     print("\033[1;32m tipitaka_pali.db copied successfully \033[0m")
 else:
-    print(f"\033[1;31m Missing tipitaka db: {tp_db_src} \033[0m")
+    print(f"\033[1;31m Missing tipitaka db: {tpr_db_path} \033[0m")
 
 # ---------- Copy dpd goldendict folder ----------
 

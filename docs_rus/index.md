@@ -12,7 +12,7 @@ DPD - это богатый возможностями словарь Палий
 
 Часть информации в словаре была переведена автоматически и еще не корректировалась вручную, [свяжитесь с нами](contact.md) если хотите поучаствовать в процессе.
 
-Вот удобное руководство по некоторым [возможностям](features.md), доступным в DPD.
+Вот удобное руководство по некоторым [возможностям](features/index.md), доступным в DPD.
 
 Прежде всего, вам нужно установить и настроить GoldenDict, DictTango или MDict на вашем устройстве ([Win](install/win.md) / [Mac](install/mac.md) / [iOS](install/ios.md) / [Linux](install/linux.md) / [Android](install/android_dicttango.md)) или [обновить](install/update.md) раз в месяц, если вы уже установили их.
 
@@ -28,4 +28,6 @@ DPD - это богатый возможностями словарь Палий
 
 Цифровой Пали Словарь распространяется под [лицензией Атрибуция-Некоммерчески 4.0 Всемирная](http://creativecommons.org/licenses/by-nc/4.0/deed.ru).
 
-<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" /></a><br />
+<a rel="license noopener noreferrer" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">
+  <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" />
+</a><br />

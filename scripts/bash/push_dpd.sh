@@ -88,6 +88,7 @@ while true; do
         [Yy]* )
             echo -e "\033[1;33m Unzipping to local goldendict...\033[0m"
             scripts/moving/unzip_dpd_to_gd.py
+            scripts/bash/manual_update_mac_dict.sh
             break;;
         * )
             break;;
