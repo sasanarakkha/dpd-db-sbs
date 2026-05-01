@@ -142,7 +142,7 @@ class DpdFields(PopUpMixin):
             ),
             FieldConfig(
                 "meaning_lit",
-                on_blur=self._handle_generic_spell_check,
+                field_type="meaning",
             ),
             FieldConfig(
                 "meaning_2",
@@ -255,11 +255,19 @@ class DpdFields(PopUpMixin):
             ),
             FieldConfig(
                 "variant",
-                on_change=self.synonym_variant_check,
+                on_change=self.variant_field_change,
                 on_blur=self.variant_blur,
             ),
-            FieldConfig("var_phonetic", on_blur=self.clean_pali_field),
-            FieldConfig("var_text", on_blur=self.clean_pali_field),
+            FieldConfig(
+                "var_phonetic",
+                on_change=self.clean_pali_field,
+                on_blur=self.clean_pali_field,
+            ),
+            FieldConfig(
+                "var_text",
+                on_change=self.clean_pali_field,
+                on_blur=self.clean_pali_field,
+            ),
             FieldConfig(
                 "commentary", field_type="commentary", on_focus=self.commentary_focus
             ),
@@ -744,7 +752,7 @@ class DpdFields(PopUpMixin):
                     meaning_lit_field.update()
                     self.page.update()
                 elif lemma_clean.endswith("vagga"):
-                    meaning_lit_field.value = "chapter on "
+                    meaning_lit_field.value = "section on "
                     meaning_lit_field.update()
                     self.page.update()
 
@@ -1092,24 +1100,24 @@ class DpdFields(PopUpMixin):
         self.page.update()
 
     def root_base_submit(self, e: ft.ControlEvent) -> None:
-        """Get root_base from db."""
+        """Get root_base from db, filtered by root_sign."""
 
         field, value = self.get_event_field_and_value(e)
 
-        # show all possible bases
         root_key = self.get_field("root_key").value
-        if root_key:
-            field.value = self.db.get_next_root_base(root_key)
+        root_sign = self.get_field("root_sign").value
+        if root_key and root_sign:
+            field.value = self.db.get_next_root_base(root_key, root_sign)
             self.page.update()
             field.focus()
 
     def family_root_submit(self, e: ft.ControlEvent) -> None:
         field, value = self.get_event_field_and_value(e)
 
-        # show all possible bases
         root_key = self.get_field("root_key").value
         if root_key:
-            field.value = self.db.get_next_family_root(root_key)
+            construction = self.get_field("construction").value or ""
+            field.value = self.db.get_next_family_root(root_key, construction)
             self.page.update()
             field.focus()
 
@@ -1259,9 +1267,12 @@ class DpdFields(PopUpMixin):
 
     def synonym_field_change(self, e: ft.ControlEvent) -> None:
         """Clean text and check for duplicates in variant field."""
-        # First clean the field
         self.clean_pali_field(e)
-        # Then check for duplicates
+        self.synonym_variant_check(e)
+
+    def variant_field_change(self, e: ft.ControlEvent) -> None:
+        """Clean text and check for duplicates in synonym field."""
+        self.clean_pali_field(e)
         self.synonym_variant_check(e)
 
     def synonym_focus(self, e: ft.ControlEvent) -> None:
@@ -1334,10 +1345,6 @@ class DpdFields(PopUpMixin):
 
     def variant_blur(self, e: ft.ControlEvent) -> None:
         self.clean_pali_field(e)
-        field, value = self.get_event_field_and_value(e)
-        var_text_field = self.get_field("var_text")
-        var_text_field.value = value
-        var_text_field.update()
         self.page.update()
 
     def construction_focus(self, e: ft.ControlEvent) -> None:

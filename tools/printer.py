@@ -218,30 +218,6 @@ class Printer:
         print(f"[cyan]{message}")
         self._log(logging.INFO, "comment", message, type="comment")
 
-    def title(self, message: str) -> None:
-        """Print bright yellow title and start timer."""
-        print(f"[bright_yellow]{message}")
-        self.bip()
-        self._log(logging.INFO, "title", message, type="title")
-
-    def info(self, message: str) -> None:
-        """Print informational cyan message."""
-
-        print(f"[cyan]{message}")
-        self._log(logging.INFO, "info", message, type="info")
-
-    def warning(self, message: str) -> None:
-        """Print amber warning message."""
-
-        print(f"[yellow]{message}")
-        self._log(logging.WARNING, "warning", message, type="warning")
-
-    def error(self, message: str) -> None:
-        """Print red error message."""
-
-        print(f"[red]{message}")
-        self._log(logging.ERROR, "error", message, type="error")
-
 
 # Create singleton instance with optional log file
 printer = Printer(Path("dpd_operations.log"))

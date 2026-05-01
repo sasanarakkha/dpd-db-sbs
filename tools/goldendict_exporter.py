@@ -360,18 +360,34 @@ def delete_original(dict_var: DictVariables):
         pr.red(str(e))
 
 
-def write_to_slob(glos: Glossary, dict_var: DictVariables) -> None:
-    """Write to slob format files."""
+def write_to_slob(
+    dict_info: DictInfo,
+    dict_var: DictVariables,
+    dict_data: list[DictEntry],
+) -> None:
+    """Write to slob format using a fresh glossary instance."""
 
-    pr.white_tmr("writing slob file")
-    glos.write(
-        filename=str(dict_var.slob_path_name),
-        format="Aard2Slob",
-        compression="",  # "", "bz2", "zlib", "lzma2"
-        content_type="text/html; charset=utf-8",
-        word_title=True,
-    )
-    pr.yes("ok")
+    pr.green_title("writing slob file")
+    if dict_var.slob_path_name.exists():
+        dict_var.slob_path_name.unlink()
+
+    glos = create_glossary(dict_info)
+    try:
+        glos = add_css(glos, dict_var)
+        glos = add_js(glos, dict_var)
+        glos = add_fonts(glos, dict_var)
+        glos = add_data(glos, dict_data)
+        pr.white_tmr("writing slob file")
+        glos.write(
+            filename=str(dict_var.slob_path_name),
+            format="Aard2Slob",
+            compression="",
+            content_type="text/html; charset=utf-8",
+            word_title=True,
+        )
+        pr.yes("ok")
+    finally:
+        glos.cleanup()
 
 
 def export_to_goldendict_with_pyglossary(
@@ -414,6 +430,6 @@ def export_to_goldendict_with_pyglossary(
             delete_original(dict_var)
 
         if include_slob:
-            write_to_slob(glos, dict_var)
+            write_to_slob(dict_info, dict_var, dict_data)
     finally:
         glos.cleanup()

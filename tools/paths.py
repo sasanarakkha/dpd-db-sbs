@@ -35,6 +35,7 @@ class ProjectPaths:
 
         # audio
         self.dpd_audio_db_path = base_dir / "audio/db/dpd_audio.db"
+        self.dpd_audio_index_tsv_path = base_dir / "audio/db/dpd_audio_index.tsv"
         self.dpd_audio_mp3_dir = base_dir / "audio/mp3s"
         self.dpd_audio_male1_dir = base_dir / "audio/mp3s/Kannada_kn-m4_Neutral_0.85"
         self.dpd_audio_male2_dir = base_dir / "audio/mp3s/Kannada_kn-m1_Neutral_0.85"
@@ -88,6 +89,9 @@ class ProjectPaths:
 
         # shared_data/help/
         self.abbreviations_tsv_path = base_dir / "shared_data/help/abbreviations.tsv"
+        self.abbreviations_other_tsv_path = (
+            base_dir / "shared_data/help/abbreviations_other.tsv"
+        )
         self.bibliography_tsv_path = base_dir / "shared_data/help/bibliography.tsv"
         self.help_tsv_path = base_dir / "shared_data/help/help.tsv"
         self.thanks_tsv_path = base_dir / "shared_data/help/thanks.tsv"
@@ -143,6 +147,7 @@ class ProjectPaths:
         self.dpd_epub_path = base_dir / "exporter/share/dpd-kindle.epub"
         self.dpd_goldendict_dir = base_dir / "exporter/share/dpd/"
         self.dpd_goldendict_zip_path = base_dir / "exporter/share/dpd-goldendict.zip"
+        self.dpd_slob_zip_path = base_dir / "exporter/share/dpd-slob.zip"
         self.dpd_grammar_goldendict_dir = base_dir / "exporter/share/dpd-grammar/"
         self.dpd_mdict_zip_path = base_dir / "exporter/share/dpd-mdict.zip"
         self.dpd_mobi_path = base_dir / "exporter/share/dpd-kindle.mobi"
@@ -480,6 +485,8 @@ class ProjectPaths:
         self.template_root = "root.html"
         self.template_abbreviations_summary = "abbreviations_summary.html"
         self.template_abbreviations = "abbreviations.html"
+        self.template_abbreviations_other_summary = "abbreviations_other_summary.html"
+        self.template_abbreviations_other = "abbreviations_other.html"
         self.template_deconstructor_summary = "deconstructor_summary.html"
         self.template_deconstructor = "deconstructor.html"
         self.template_grammar_summary = "grammar_summary.html"
@@ -741,11 +748,11 @@ class ProjectPaths:
         self.sukha_dukkha_finder_path = (
             base_dir / "db_tests/single/test_sukha_dukkha_finder.json"
         )
-        self.syn_var_exceptions_old_path = (
-            base_dir / "db_tests/single/add_synonym_variant_exceptions"
-        )
         self.syn_var_exceptions_path = (
             base_dir / "db_tests/single/add_synonym_variant.json"
+        )
+        self.add_phonetic_variants_exceptions_path = (
+            base_dir / "db_tests/single/add_phonetic_variants.json"
         )
         self.wf_exceptions_list = (
             base_dir / "db_tests/single/add_word_family_exceptions"

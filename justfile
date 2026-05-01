@@ -44,6 +44,26 @@ db-test:
 test-phonetic:
     uv run python -m db_tests.single.add_phonetic_changes
 
+# Add single-meaning synonyms interactively
+add-synonyms-single:
+    uv run python db_tests/single/add_synonym_variant_single.py
+
+# Add multi-meaning synonyms and variants interactively
+add-synonyms-multi:
+    uv run python db_tests/single/add_synonym_variant_multi.py
+
+# Find and remove or re-assign wrong synonym relationships
+add-synonyms-del:
+    uv run python db_tests/single/add_synonym_variant_del.py
+
+# Find and add phonetic variant pairs to the database
+add-variants-phonetic:
+    uv run python db_tests/single/add_phonetic_variants.py
+
+# Process unclassified variant field entries interactively
+variants-processor:
+    uv run python scripts/find/variants_process.py
+
 # Run ruff linter and formatter (excludes archive/ and resources/)
 lint:
     uv run ruff check . --exclude archive --exclude resources
@@ -146,6 +166,14 @@ find_comm:
 # Generate missing audio files
 audio:
     uv run python audio/bhashini/generate_dpd.py
+
+# Upload audio database release
+audio-upload:
+    uv run python audio/db_release_upload.py
+
+# Download latest audio database release
+audio-download:
+    uv run python audio/db_release_download.py
 
 # ===== MAINTENANCE =====
 
@@ -253,6 +281,10 @@ decon-on:
 # Run the Go deconstructor
 decon:
     go run ./go_modules/deconstructor
+
+# Run the Go frequency tables
+freq:
+    go run ./go_modules/frequency
 
 # Set data limit to 100
 limit100:

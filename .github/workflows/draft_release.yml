@@ -52,7 +52,10 @@ jobs:
 
     - name: Install uv
       run: curl -LsSf https://astral.sh/uv/install.sh | sh
-    
+
+    - name: Install Slob Linux dependencies
+      run: sudo apt-get update && sudo apt-get install -y build-essential libicu-dev icu-devtools pkg-config
+     
     - name: Install dependencies
       run: uv sync --all-groups
 
@@ -151,6 +154,9 @@ jobs:
     - name: Run EBT Counter
       run: uv run python scripts/build/ebt_counter.py
 
+    - name: Update Bold Definitions
+      run: uv run python db/bold_definitions/update_bold_definitions_db.py
+
     - name: Add EPD to Lookup Table
       run: uv run python db/epd/epd_to_lookup.py
       
@@ -161,8 +167,8 @@ jobs:
     # Download Audio Database
     # ----------------------------------------
 
-    - name: Download Audio Database
-      run: uv run python audio/db_release_download.py
+    - name: Download Audio Index
+      run: uv run python audio/index_release_download.py
 
     # ----------------------------------------
     # Exporter
@@ -185,14 +191,6 @@ jobs:
       run: |
         uv run python exporter/goldendict/main.py
         echo "=== After GoldenDict export ==="
-        $HOME/check_disk.sh
-
-    - name: Delete Audio Database to free space
-      run: |
-        echo "=== Before deleting audio DB ==="
-        $HOME/check_disk.sh
-        rm -rf ${{ github.workspace }}/audio/db/dpd_audio.db
-        echo "=== After deleting audio DB ==="
         $HOME/check_disk.sh
 
     - name: Export Deconstructor
@@ -313,6 +311,7 @@ jobs:
         name: linux-assets
         path: |
           exporter/share/dpd-goldendict.zip
+          exporter/share/dpd-slob.zip
           exporter/share/dpd-mdict.zip
           exporter/share/dpd-kindle.epub
           exporter/share/dpd-kindle.mobi
@@ -427,6 +426,7 @@ jobs:
           prerelease: false
           files: |
             ./linux-assets/dpd-goldendict.zip
+            ./linux-assets/dpd-slob.zip
             ./linux-assets/dpd-mdict.zip
             ./linux-assets/dpd-kindle.epub
             ./linux-assets/dpd-kindle.mobi

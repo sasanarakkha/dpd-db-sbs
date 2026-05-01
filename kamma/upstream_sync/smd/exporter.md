@@ -382,6 +382,23 @@
 ---
 
 
+**File**: `exporter/goldendict/export_rpd.py`
+- **Category**: russian_copy
+- **Sync Rule**: PORT
+- **Shadow of**: `exporter/goldendict/export_epd.py`
+- **Local Changes**:
+  1. `generate_epd_html` accepts additional `rupth: RuPaths` parameter.
+  2. Uses `ru_components/templates` Jinja2 env instead of `templates`.
+  3. Uses `rpd_ru.jinja` template instead of `epd.jinja`.
+  4. Queries `Lookup.rpd` instead of `Lookup.epd`.
+  5. Uses `RpdData` from `data_classes_dps` instead of `EpdData` from `data_classes`.
+- **Watch For**:
+  - If upstream `export_epd.py` changes `generate_epd_html` signature, rendering logic, or size tracking, mirror here.
+  - `rupth` parameter must always be threaded through all callers (currently `main_ru.py`).
+
+---
+
+
 **File**: `exporter/goldendict/export_epd_sbs.py`
 - **Category**: inspired_by_upstream
 - **Divergence Reason**: SBS-specific output logic diverges from upstream.

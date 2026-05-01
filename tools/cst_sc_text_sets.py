@@ -352,17 +352,16 @@ def make_cst_text_list_from_file(
             return words_list
 
     if add_hyphenated_parts:
-        # Build a new list to avoid mutating words_list during iteration,
-        # which can cause index drift and silently skip words.
-        expanded: list[str] = []
-        for word in words_list:
+        for index, word in enumerate(words_list):
             if "-" in word:
-                # add the joined form (no dash), then each individual part
-                expanded.append(word.replace("-", ""))
-                expanded.extend(word.split("-"))
-            else:
-                expanded.append(word)
-        words_list = expanded
+                # remove the dash and add the clean word back into the list
+                words_list[index] = word.replace("-", "")
+
+                # split on dashes and add each split back into the list
+                # in the correct order
+                hyphenated_words = word.split("-")
+                for h_word in hyphenated_words.__reversed__():
+                    words_list.insert(index + 1, h_word)
 
     if dedupe is True:
         exists = []

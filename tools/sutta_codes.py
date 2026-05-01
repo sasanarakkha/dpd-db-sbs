@@ -34,9 +34,23 @@ def make_list_of_sutta_codes(su: SuttaInfo) -> list[str]:
     sutta_codes_set.add(su.dpd_code)
     if "-" in su.dpd_code:
         sutta_codes_set.update(generate_range_of_sutta_codes(su.dpd_code))
-    sutta_codes_set.add(su.sc_code)
-    if "-" in su.sc_code:
-        sutta_codes_set.update(generate_range_of_sutta_codes(su.sc_code))
+
+    # vagga/saṃyutta rows inherit sc_code from their anchor sutta, so adding it
+    # would pollute e.g. SN1.1 with the saṃyutta and saṃyuttapāḷi headwords
+    if not su.is_vagga and not su.is_samyutta:
+        sutta_codes_set.add(su.sc_code)
+        if "-" in su.sc_code:
+            sutta_codes_set.update(generate_range_of_sutta_codes(su.sc_code))
+
+        # THAG/THIG (SuttaCentral prefix) → TH/THI (DPD prefix) synthetic alias
+        _sc_prefix_map = {"THAG": "TH", "THIG": "THI"}
+        for sc_prefix, dpd_prefix in _sc_prefix_map.items():
+            if su.sc_code.startswith(sc_prefix):
+                synthetic = dpd_prefix + su.sc_code[len(sc_prefix) :]
+                sutta_codes_set.add(synthetic)
+                if "-" in synthetic:
+                    sutta_codes_set.update(generate_range_of_sutta_codes(synthetic))
+                break
 
     return pali_list_sorter(sutta_codes_set)
 

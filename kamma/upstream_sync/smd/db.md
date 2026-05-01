@@ -40,6 +40,23 @@
 ---
 
 
+**File**: `db/rpd/rpd_to_lookup.py`
+- **Category**: russian_copy
+- **Sync Rule**: PORT
+- **Shadow of**: `db/epd/epd_to_lookup.py`
+- **Local Changes**:
+  1. Queries `DpdHeadword` with `joinedload(DpdHeadword.ru)` to access Russian data.
+  2. `compile_headwords_data` iterates `ru.ru_meaning` instead of `meaning_1`; applies `ru_replace_abbreviations` for POS.
+  3. `make_clean_meaning_list` performs Russian-specific text cleanup (removes `??`, Cyrillic patterns like `т\.д\.`, brackets, extra spaces).
+  4. `compile_roots_data` uses `root_ru_meaning` split on `", "` and stores `"корень"` as the POS label.
+  5. Stores tuples in `Lookup.rpd` instead of `Lookup.epd`.
+- **Watch For**:
+  - If upstream `epd_to_lookup.py` changes its loop, root processing, or `update_test_add` usage, mirror the structural change here.
+  - `db/rpd/__init__.py` is an empty package init; no sync concern.
+
+---
+
+
 **File**: `db/families/family_compound_ru.py`
 - **Category**: russian_copy
 - **Sync Rule**: PORT

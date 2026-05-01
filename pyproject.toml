@@ -78,6 +78,7 @@ tools = [
     "google-auth-httplib2>=0.2.0",
     "google-auth-oauthlib>=1.3.0",
     "markdownify>=1.2.2",
+    "pyicu>=2.16.2",
 ]
 
 [tool.hatch.build.targets.sdist]
@@ -93,7 +94,7 @@ build-backend = "hatchling.build"
 [tool.pyright]
 pythonVersion = "3.13"
 typeCheckingMode = "basic"
-exclude = ["gui2", "tools/writemdict", "tests"]
+exclude = ["gui2", "tools/writemdict", "tests", "tools/cst_source_sutta_example.py"]
 
 [tool.ruff]
 target-version = "py313"
