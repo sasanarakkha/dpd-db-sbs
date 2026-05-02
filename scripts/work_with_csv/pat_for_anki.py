@@ -33,14 +33,14 @@ def process_patimokkha_csv() -> None:
         # If xlsx2csv.py produces comma-separated, use sep=','
         df = pd.read_csv(input_csv_path, sep="\t")
     except FileNotFoundError:
-        pr.error(f"Input CSV file not found at '{input_csv_path}'")
+        pr.red(f"Input CSV file not found at '{input_csv_path}'")
         return
     except Exception as e:
-        pr.error(f"Error reading CSV '{input_csv_path}': {e}")
+        pr.red(f"Error reading CSV '{input_csv_path}': {e}")
         return
 
     if df.empty:
-        pr.warning(
+        pr.amber(
             f"Input CSV '{input_csv_path}' is empty. Output will be an empty file with headers."
         )
         df_filtered = pd.DataFrame()
@@ -56,7 +56,7 @@ def process_patimokkha_csv() -> None:
             condition2 = df["meaning"].fillna("").astype(str).str.strip() != ""
             combined_condition = condition1 & condition2
         else:
-            pr.warning(
+            pr.amber(
                 f"'meaning' column not found in '{input_csv_path}'. Filtering only on the first column."
             )
             combined_condition = condition1
@@ -64,7 +64,7 @@ def process_patimokkha_csv() -> None:
         df_filtered = df[combined_condition].copy()
 
     if df_filtered.empty and not df.empty:
-        pr.warning(
+        pr.amber(
             f"No rows found in '{input_csv_path}' matching the filter criteria (first column is '1' AND 'meaning' is not empty). Output will be an empty file with headers."
         )
 
@@ -135,12 +135,12 @@ def process_patimokkha_csv() -> None:
             else:
                 df_processed.loc[:, "web_link"] = ""
         except Exception as e_sl:
-            pr.warning(
+            pr.amber(
                 f"Could not process '{sources_links_path}': {e_sl}. 'web_link' column may be incomplete or empty."
             )
             df_processed.loc[:, "web_link"] = ""
     else:
-        pr.warning(
+        pr.amber(
             f"Source links file '{sources_links_path}' not found. 'web_link' column will be empty."
         )
         df_processed.loc[:, "web_link"] = ""
@@ -154,7 +154,7 @@ def process_patimokkha_csv() -> None:
         )
         pr.green(f"Successfully processed CSV and saved to '{output_csv_path}'")
     except Exception as e:
-        pr.error(f"Error writing processed CSV to '{output_csv_path}': {e}")
+        pr.red(f"Error writing processed CSV to '{output_csv_path}': {e}")
 
     if dpspth.sbs_anki_style_dir.exists():
         pr.green("Saving field list to sbs directory.")
@@ -170,6 +170,6 @@ def process_patimokkha_csv() -> None:
 
 if __name__ == "__main__":
     pr.tic()
-    pr.title("Processing patimokkha CSV for Anki...")
+    pr.green_title("Processing patimokkha CSV for Anki...")
     process_patimokkha_csv()
     pr.toc()

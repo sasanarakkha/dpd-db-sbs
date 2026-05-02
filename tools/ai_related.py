@@ -37,7 +37,7 @@ def print_ai_config():
     """Load model and provider from config and print them."""
     provider = str(config_read("models", "provider"))
     model = config_read("models", f"{provider}")
-    pr.info(f"DPS uses {provider} model {model}")
+    pr.green(f"DPS uses {provider} model {model}")
 
 
 def load_ai_config():

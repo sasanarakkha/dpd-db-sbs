@@ -65,7 +65,7 @@ def zip_mdict(pth: ProjectPaths):
 
 def main():
     pr.tic()
-    pr.title("zipping dpd-rus for goldendict and mdict")
+    pr.green_title("zipping dpd-rus for goldendict and mdict")
     pth = ProjectPaths()
     zip_goldendict(pth)
     zip_mdict(pth)

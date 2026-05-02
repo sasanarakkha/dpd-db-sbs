@@ -22,7 +22,7 @@ def load_id_map_from_additions_added(gui_paths: Gui2Paths) -> dict[str, int]:
     Loads an ID map from the additions_added.json file.
     The map is from old_id (id_add) to new_id (id).
     """
-    pr.title(f"Loading ID map from {gui_paths.additions_added_path}")
+    pr.green_title(f"Loading ID map from {gui_paths.additions_added_path}")
     id_map: dict[str, int] = {}
     try:
         with open(gui_paths.additions_added_path, 'r', encoding='utf-8') as f:
@@ -52,7 +52,7 @@ def replace_old_ids_in_tsv_files(id_map: dict[str, int]):
     Replaces old IDs with new IDs in specified TSV files.
     id_map: A dictionary mapping old_id_str to new_id (int).
     """
-    pr.title("Replacing old IDs in TSV files (russian.tsv, sbs.tsv)...")
+    pr.green_title("Replacing old IDs in TSV files (russian.tsv, sbs.tsv)...")
 
     if not id_map:
         pr.red("ID map is empty. No TSV files to update.")
@@ -95,7 +95,7 @@ def add_all_additions_with_new_ids():
     and adds them to the database.
     Does not modify any JSON files.
     """
-    pr.title("Starting batch addition of 'additions.json' entries to DB with new IDs...")
+    pr.green_title("Starting batch addition of 'additions.json' entries to DB with new IDs...")
 
     additions_json_path = Gui2Paths().additions_path
 
@@ -174,10 +174,10 @@ def add_all_additions_with_new_ids():
         elif failed_count == len(all_additions_to_process):
             pr.red("No words were successfully added to the database. TSV files not updated.")
         else:
-            pr.info("No new words were committed to the database. TSV files not updated.")
+            pr.green("No new words were committed to the database. TSV files not updated.")
     pr.yes("ok")
 
-    pr.title("Batch Addition Summary")
+    pr.green_title("Batch Addition Summary")
     print(f"Total additions attempted: {len(all_additions_to_process)}")
     print(f"Successfully prepared and (attempted) to add to DB: {processed_count}")
     print(f"Failed during preparation or DB commit: {failed_count}")
@@ -189,7 +189,7 @@ def process_additions_added_and_update_tsvs():
     """
     Loads ID map from additions_added.json and updates TSV files.
     """
-    pr.title("Processing additions_added.json and updating TSVs...")
+    pr.green_title("Processing additions_added.json and updating TSVs...")
     pr.red("find a way to track which been replaced, maybe mark them in addition_added.")
     return
 
@@ -201,7 +201,7 @@ def process_additions_added_and_update_tsvs():
     else:
         pr.red("No ID map loaded or map is empty, TSV files will not be updated.")
     pr.yes("ok")
-    pr.title("Finished processing additions_added.json.")
+    pr.green_title("Finished processing additions_added.json.")
 
 
 def main():

@@ -182,7 +182,7 @@ class ElevenLabsManager:
 
 def main():
     pr.tic()
-    pr.title("generating audio files")
+    pr.green_title("generating audio files")
     vox_manager = VoxManager()
     eleven_labs_manager = ElevenLabsManager()
 

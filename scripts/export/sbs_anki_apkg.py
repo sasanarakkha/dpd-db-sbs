@@ -62,7 +62,7 @@ def main(output_dir: str | None = None, with_scheduling: bool = False) -> None:
                 exporter.exportInto(output_path)
                 pr.yes(f"saved to {output_path}")
             else:
-                pr.warning(f"Deck '{deck_name}' not found in collection")
+                pr.amber(f"Deck '{deck_name}' not found in collection")
 
     finally:
         col.close()

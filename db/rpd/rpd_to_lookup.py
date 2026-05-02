@@ -21,7 +21,7 @@ from tools.tools_for_ru_exporter import (
 
 class GlobalVars:
     pr.tic()
-    pr.title("generating rpd data for lookup table")
+    pr.green_title("generating rpd data for lookup table")
     pr.green("making global data")
     pth: ProjectPaths = ProjectPaths()
     db_session: Session = get_db_session(pth.dpd_db_path)

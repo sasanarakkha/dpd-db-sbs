@@ -280,7 +280,7 @@ def printer(g: GlobalVars, message):
 
 
 def main():
-    pr.title("test bold in examples are real inflections")
+    pr.green_title("test bold in examples are real inflections")
 
     g = GlobalVars()
 

@@ -84,7 +84,7 @@ def zip_mdict(rupth: RuPaths):
 
 def main():
     pr.tic()
-    pr.title("rezipping ru goldendict and mdict")
+    pr.green_title("rezipping ru goldendict and mdict")
     rupth = RuPaths()
     zip_goldendict(rupth)
     zip_mdict(rupth)

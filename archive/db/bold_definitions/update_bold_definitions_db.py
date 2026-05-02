@@ -12,7 +12,7 @@ from tools.tsv_read_write import read_tsv_dot_dict
 
 def main():
     pr.tic()
-    pr.title("adding bold definitions to db")
+    pr.green_title("adding bold definitions to db")
     pth = ProjectPaths()
 
     pr.green("reading tsv")

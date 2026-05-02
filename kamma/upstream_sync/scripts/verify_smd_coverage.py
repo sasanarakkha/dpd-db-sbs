@@ -114,7 +114,7 @@ def check_rubric(
 
 def main() -> None:
     pr.tic()
-    pr.title("verify_smd_coverage.py")
+    pr.green_title("verify_smd_coverage.py")
 
     smd_dir = Path("kamma/upstream_sync/smd")
     data = load_registry()
@@ -154,9 +154,9 @@ def main() -> None:
             pr.red(g)
 
     if rubric_fails:
-        pr.warning("\nRubric failures (entries need enrichment):")
+        pr.amber("\nRubric failures (entries need enrichment):")
         for f in rubric_fails:
-            pr.warning(f)
+            pr.amber(f)
 
     if gaps:
         pr.toc()

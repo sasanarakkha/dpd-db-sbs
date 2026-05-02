@@ -339,7 +339,7 @@ def update_deck(
             if note.mid != target_mid:
                 target_model = col.models.get(target_mid)
                 if target_model is None:
-                    pr.warning(
+                    pr.amber(
                         f"Model id {target_mid} not found for deck '{target_deck_name}'"
                     )
                     return False
@@ -456,7 +456,7 @@ def update_from_db(
                 stats.deleted += 1
                 if top_level in stats.deck_stats:
                     stats.deck_stats[top_level]["deleted"] += 1
-                pr.warning(f"deleted {item['note'].fields[0]} from {item['deck']}")
+                pr.amber(f"deleted {item['note'].fields[0]} from {item['deck']}")
 
         if counter % 5000 == 0:
             pr.counter(counter, len(db), i.lemma_1)
@@ -507,7 +507,7 @@ def update_from_csv(
                         stats.updated += 1
                         stats.deck_stats[top_level]["updated"] += 1
                     except Exception as e:
-                        pr.warning(f"Failed to update note id={note.id}: {e}")
+                        pr.amber(f"Failed to update note id={note.id}: {e}")
             else:
                 if deck_config.creates_new_notes:
                     pr.green(f"creating new note for {key_value}")
@@ -543,7 +543,7 @@ def delete_stale_csv_notes(
             stats.deleted += 1
             if top_level in stats.deck_stats:
                 stats.deck_stats[top_level]["deleted"] += 1
-            pr.warning(f"deleted '{key}' from {top_level}")
+            pr.amber(f"deleted '{key}' from {top_level}")
 
 
 def _natural_sort_key(s: str) -> list[int | str]:

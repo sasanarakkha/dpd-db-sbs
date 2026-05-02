@@ -13,7 +13,7 @@ from tools.printer import printer as pr
 
 
 def main():
-    pr.title("searching bold definitions")
+    pr.green_title("searching bold definitions")
     bold_definitions_db = fetch_db()
     request_search_terms(bold_definitions_db)
 

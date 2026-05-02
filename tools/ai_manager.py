@@ -51,27 +51,27 @@ class AIManager:
 
         if config_read("apis", "openrouter"):
             self.providers["openrouter"] = OpenRouterManager()
-            pr.info("openrouter initialized")
+            pr.green("openrouter initialized")
         else:
-            pr.warning("OpenRouter API key not found, manager not initialized.")
+            pr.amber("OpenRouter API key not found, manager not initialized.")
 
         if config_read("apis", "deepseek"):
             self.providers["deepseek"] = DeepseekManager()
-            pr.info("deepseek initialized")
+            pr.green("deepseek initialized")
         else:
-            pr.warning("DeepSeek API key not found, manager not initialized.")
+            pr.amber("DeepSeek API key not found, manager not initialized.")
 
         if config_read("apis", "gemini"):
             self.providers["gemini"] = GeminiManager()
-            pr.info("gemini initialized")
+            pr.green("gemini initialized")
         else:
-            pr.warning("Gemini API key not found, manager not initialized.")
+            pr.amber("Gemini API key not found, manager not initialized.")
 
         if config_read("apis", "openai"):
             self.providers["openai"] = OpenAIManager()
-            pr.info("openai initialized")
+            pr.green("openai initialized")
         else:
-            pr.warning("OpenAI API key not found, manager not initialized.")
+            pr.amber("OpenAI API key not found, manager not initialized.")
 
         self.last_request_time: float = 0
         self.min_delay_seconds: float = 5
@@ -129,7 +129,7 @@ class AIManager:
             wait_time = model_delay - elapsed_since_last
 
             if wait_time > 0:
-                pr.info(f"RATE LIMITING for {model_key} - {wait_time:.2f}s")
+                pr.green(f"RATE LIMITING for {model_key} - {wait_time:.2f}s")
                 time.sleep(wait_time)
 
             # Update last request time for this model
@@ -144,7 +144,7 @@ class AIManager:
 
             start_time = time.monotonic()
             self.last_request_time = start_time
-            pr.info(f"REQUEST {provider_name} - {model_name}")
+            pr.green(f"REQUEST {provider_name} - {model_name}")
 
             try:
                 ai_response = provider.request(
@@ -162,23 +162,23 @@ class AIManager:
                     status_message = (
                         f"SUCCESS in {duration:.2f}s. {ai_response.status_message}"
                     )
-                    pr.info(status_message)
+                    pr.green(status_message)
                     return AIResponse(
                         content=ai_response.content,
                         status_message=status_message,
                     )
                 else:
                     status_message = f"ERROR in {duration:.2f}s."
-                    pr.warning(status_message)
-                    pr.error(ai_response.status_message)
+                    pr.amber(status_message)
+                    pr.red(ai_response.status_message)
             except Exception as e:
                 duration = time.monotonic() - start_time
                 status_message = f"ERROR in {duration:.2f}s"
-                pr.error(status_message)
-                pr.error(str(e))
+                pr.red(status_message)
+                pr.red(str(e))
 
         final_failure_message = "All AI providers failed."
-        pr.error(final_failure_message)
+        pr.red(final_failure_message)
         return AIResponse(content=None, status_message=final_failure_message)
 
 
@@ -191,47 +191,47 @@ if __name__ == "__main__":
 
     # -----------------------------------------
 
-    pr.info("\n--- Testing Default Preferences ---")
+    pr.green("\n--- Testing Default Preferences ---")
     default_response = ai_manager.request(
         prompt=prompt,
         prompt_sys=sys_prompt,
     )
-    pr.info(f"Content: {default_response.content}")
-    pr.info(f"Status: {default_response.status_message}")
+    pr.green(f"Content: {default_response.content}")
+    pr.green(f"Status: {default_response.status_message}")
 
     # -----------------------------------------
 
-    pr.info("\n--- Testing OpenRouter ---")
+    pr.green("\n--- Testing OpenRouter ---")
     open_router_response = ai_manager.request(
         prompt=prompt,
         prompt_sys=sys_prompt,
         provider_preference="openrouter",
         model="xiaomi/mimo-v2-flash:free",
     )
-    pr.info(f"Status: {open_router_response.status_message}")
-    pr.info(f"Content: {open_router_response.content}")
+    pr.green(f"Status: {open_router_response.status_message}")
+    pr.green(f"Content: {open_router_response.content}")
 
     # -----------------------------------------
 
-    pr.info("\n--- Testing OpenAI ---")
+    pr.green("\n--- Testing OpenAI ---")
     openai_response = ai_manager.request(
         prompt=prompt,
         prompt_sys=sys_prompt,
         provider_preference="openai",
         model="gpt-4o-mini",
     )
-    pr.info(f"Content: {openai_response.content}")
-    pr.info(f"Status: {openai_response.status_message}")
+    pr.green(f"Content: {openai_response.content}")
+    pr.green(f"Status: {openai_response.status_message}")
 
     # -----------------------------------------
 
-    pr.info("\n--- Testing Grounded Request ---")
+    pr.green("\n--- Testing Grounded Request ---")
     grounded_prompt = "Whats the weather in Kandy, Sri Lanka today?"
     grounded_response = ai_manager.request(
         prompt=grounded_prompt,
         grounding=True,
     )
-    pr.info(f"Content: {grounded_response.content}")
-    pr.info(f"Status: {grounded_response.status_message}")
+    pr.green(f"Content: {grounded_response.content}")
+    pr.green(f"Status: {grounded_response.status_message}")
 
     # -----------------------------------------

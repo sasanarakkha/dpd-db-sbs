@@ -27,7 +27,7 @@ class DpsExampleStashManager:
                 if loaded := json.load(f):
                     self.stash_data = loaded if isinstance(loaded, dict) else {}
         except (json.JSONDecodeError, Exception) as e:
-            pr.error(f"Error loading DPS stash {self._stash_path}: {e}")
+            pr.red(f"Error loading DPS stash {self._stash_path}: {e}")
             self.stash_data = {}
 
     def _save(self) -> None:
@@ -37,7 +37,7 @@ class DpsExampleStashManager:
             with open(self._stash_path, "w", encoding="utf-8") as f:
                 json.dump(self.stash_data, f, indent=4, ensure_ascii=False)
         except Exception as e:
-            pr.error(f"Error saving DPS stash {self._stash_path}: {e}")
+            pr.red(f"Error saving DPS stash {self._stash_path}: {e}")
 
     def stash(self, key: str, fields_dict: dict[str, str]) -> None:
         """Stash data into specified slot."""

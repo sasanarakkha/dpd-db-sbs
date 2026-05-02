@@ -213,8 +213,8 @@ class PrepAnalyzer:
         manifest_path.write_text(
             json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8"
         )
-        pr.info(f"Wrote report to {report_path}")
-        pr.info(f"Wrote manifest to {manifest_path}")
+        pr.green(f"Wrote report to {report_path}")
+        pr.green(f"Wrote manifest to {manifest_path}")
 
     def generate_report(
         self,

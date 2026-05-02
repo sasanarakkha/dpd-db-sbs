@@ -17,7 +17,7 @@ def main():
     """Export Ven. Ānandajoti's edit of DPPN to Goldendict"""
 
     pr.tic()
-    pr.title("exporting DPPN")
+    pr.green_title("exporting DPPN")
 
     pr.green("preparing data")
     pth = ProjectPaths()

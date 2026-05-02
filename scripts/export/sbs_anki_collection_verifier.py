@@ -67,7 +67,7 @@ def verify_sbs_collection(col: Collection) -> bool:
 
     if not EXPECTED_COLLECTION:
         generate_report(live_structure)
-        pr.warning(
+        pr.amber(
             "Collection snapshot not set — review report and populate EXPECTED_COLLECTION in deck_config"
         )
         return False

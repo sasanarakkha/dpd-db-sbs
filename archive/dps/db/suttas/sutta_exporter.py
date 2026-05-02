@@ -50,7 +50,7 @@ class SuttaEntry:
 class SuttaExporter:
     def __init__(self):
         pr.tic()
-        pr.title("exporting sutta information")
+        pr.green_title("exporting sutta information")
         self.pth = ProjectPaths()
         # TODO always fetch the latest from GoogleDocs
         self.sutta_file_path = Path("db/suttas/suttas.tsv")  # TODO add to ProjectPaths

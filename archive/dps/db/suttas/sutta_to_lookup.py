@@ -112,7 +112,7 @@ def print_results(g: GlobalVars) -> None:
 
 def main() -> None:
     pr.tic()
-    pr.title("add sutta codes to lookup table")
+    pr.green_title("add sutta codes to lookup table")
     g: GlobalVars = GlobalVars()
     make_sutta_info_dict(g)
     add_to_lookup_table(g)

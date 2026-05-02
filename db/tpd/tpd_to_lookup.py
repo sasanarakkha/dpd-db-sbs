@@ -16,7 +16,7 @@ from tools.update_test_add import update_test_add
 
 class GlobalVars:
     pr.tic()
-    pr.title("generating tpd data for lookup table")
+    pr.green_title("generating tpd data for lookup table")
     pr.green("making global data")
     pth: ProjectPaths = ProjectPaths()
     db_session: Session = get_db_session(pth.dpd_db_path)

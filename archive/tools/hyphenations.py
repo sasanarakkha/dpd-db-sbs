@@ -42,9 +42,9 @@ class HyphenationFileManager:
             self.save_hyphenations_dict()
             print(f"updated hyphenations with {pure_word}: {hyphenated_word}")
         elif pure_word and pure_word in self.hyphenations_dict:
-            pr.error(f"{hyphenated_word} already exists.")
+            pr.red(f"{hyphenated_word} already exists.")
         else:
-            pr.error(f"empty word: {pure_word}")
+            pr.red(f"empty word: {pure_word}")
 
 
 if __name__ == "__main__":

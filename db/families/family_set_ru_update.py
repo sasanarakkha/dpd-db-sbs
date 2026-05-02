@@ -16,7 +16,7 @@ from tools.tools_for_ru_exporter import read_set_ru_from_tsv
 
 def main():
     pr.tic()
-    pr.title("Updating missing sets_ru with AI")
+    pr.green_title("Updating missing sets_ru with AI")
 
     pth = ProjectPaths()
     rupth = RuPaths()
@@ -47,9 +47,9 @@ def main():
         return
 
     for fs in missing_sets:
-        pr.info(f"Missing: {fs}")
+        pr.green(f"Missing: {fs}")
 
-    pr.info(f"Found {len(missing_sets)} missing sets to translate.")
+    pr.green(f"Found {len(missing_sets)} missing sets to translate.")
     
     ai_manager = AIManager()
     
@@ -59,7 +59,7 @@ def main():
     
     response = ai_manager.request(prompt=prompt, prompt_sys=sys_prompt)
     if not response.content:
-        pr.error("AI response failed or empty")
+        pr.red("AI response failed or empty")
         return
         
     translated_lines = [line.strip() for line in response.content.split("\n") if line.strip()]
@@ -78,8 +78,8 @@ def main():
     # Sometimes AI might output an intro sentence or summary. We should filter them out 
     # if it's glaring, but usually sys_prompt and repetition handles it well.
     if len(cleaned_lines) != len(missing_sets):
-        pr.error(f"Translation lines mismatch: {len(cleaned_lines)} translated vs {len(missing_sets)} missing.")
-        pr.info(f"AI response:\n{response.content}")
+        pr.red(f"Translation lines mismatch: {len(cleaned_lines)} translated vs {len(missing_sets)} missing.")
+        pr.green(f"AI response:\n{response.content}")
         return
         
     # Update dictionary

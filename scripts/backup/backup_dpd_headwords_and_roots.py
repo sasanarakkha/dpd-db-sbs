@@ -17,7 +17,7 @@ from tools.printer import printer as pr
 
 def backup_dpd_headwords_and_roots(pth: ProjectPaths):
     pr.tic()
-    pr.title("backing headword and roots tables to tsv")
+    pr.green_title("backing headword and roots tables to tsv")
     db_session = get_db_session(pth.dpd_db_path)
     backup_dpd_headwords(db_session, pth)
     backup_dpd_roots(db_session, pth)

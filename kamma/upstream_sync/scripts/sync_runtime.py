@@ -40,13 +40,13 @@ def verify_manifest(thread_dir: str) -> int:
     manifest_path = get_prep_manifest_path(thread_dir)
     try:
         manifest = load_prep_manifest(manifest_path)
-        pr.info(f"Manifest verified: {manifest.get('to_upstream_sha', 'unknown')}")
+        pr.green(f"Manifest verified: {manifest.get('to_upstream_sha', 'unknown')}")
         return 0
     except FileNotFoundError:
-        pr.error(f"Manifest not found: {manifest_path}")
+        pr.red(f"Manifest not found: {manifest_path}")
         return 1
     except ValueError as exc:
-        pr.error(f"Manifest invalid: {exc}")
+        pr.red(f"Manifest invalid: {exc}")
         return 1
 
 
@@ -70,7 +70,7 @@ def main() -> int:
     if args.command == "verify-manifest":
         return verify_manifest(args.thread_dir)
 
-    pr.error(f"Unknown command: {args.command}")
+    pr.red(f"Unknown command: {args.command}")
     return 1
 
 

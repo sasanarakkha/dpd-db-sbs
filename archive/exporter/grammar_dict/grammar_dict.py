@@ -45,7 +45,7 @@ class GlobalVars:
 
 def main():
     pr.tic()
-    pr.title("exporting grammar dictionary")
+    pr.green_title("exporting grammar dictionary")
 
     if not config_test("exporter", "make_grammar", "yes"):
         pr.green("disabled in config.ini")

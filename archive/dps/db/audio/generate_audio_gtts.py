@@ -87,7 +87,7 @@ class TtsManager:
 
 def main():
     pr.tic()
-    pr.title("generating tts files")
+    pr.green_title("generating tts files")
     tts = TtsManager()
 
     for word in tts.all_words_dict:

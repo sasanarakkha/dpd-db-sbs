@@ -19,7 +19,7 @@ current_date = datetime.now().strftime("%m-%d")
 
 def main():
     pr.tic()
-    pr.title("Extracting grammar csvs...")
+    pr.green_title("Extracting grammar csvs...")
     excel_file_dir = pth.temp_dir / "grammar.xlsx"
     # moving_grammar(excel_file_dir)
     make_grammar_csvs(excel_file_dir)

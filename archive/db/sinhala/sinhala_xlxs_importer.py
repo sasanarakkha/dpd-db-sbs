@@ -15,7 +15,7 @@ from tools.printer import printer as pr
 
 def main():
     pr.tic()
-    pr.title("import sinhala xlsx to database")
+    pr.green_title("import sinhala xlsx to database")
 
     pth = ProjectPaths()
     db_session = get_db_session(pth.dpd_db_path)

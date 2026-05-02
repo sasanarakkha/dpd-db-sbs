@@ -91,7 +91,7 @@ def add_apicaevaiti_to_inflections(g: ProgData):
 
 def main():
     pr.tic()
-    pr.title("adding api ca eva iti to inflections and lookup table")
+    pr.green_title("adding api ca eva iti to inflections and lookup table")
     g = ProgData()
     make_apicaeveiti_dict(g)
     add_apicaevaiti_to_inflections(g)

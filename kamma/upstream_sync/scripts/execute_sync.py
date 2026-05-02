@@ -52,7 +52,7 @@ class GitContext:
         """Try to restore the repository to its original branch."""
         current = self._get_current_branch()
         if current != self.original_branch:
-            pr.warning(f"Restoring to original branch: {self.original_branch}")
+            pr.amber(f"Restoring to original branch: {self.original_branch}")
             subprocess.run(["git", "checkout", self.original_branch], check=False)
 
 
@@ -61,7 +61,7 @@ def run_git(args: list[str], check: bool = True) -> subprocess.CompletedProcess:
     try:
         return subprocess.run(args, capture_output=True, text=True, check=check)
     except subprocess.CalledProcessError as e:
-        pr.error(f"Git command failed: {' '.join(args)}")
+        pr.red(f"Git command failed: {' '.join(args)}")
         if e.stderr:
             pr.red(f"Error output: {e.stderr.strip()}")
         raise GitError(f"Command failed: {' '.join(args)}") from e
@@ -97,11 +97,11 @@ def get_run_specific_exclusions(thread_dir: Optional[str]) -> list[str]:
 
 def execute_sync(thread_dir: Optional[str], dry_run: bool = False) -> int:
     """Orchestrate the selective sync process."""
-    pr.title("execute_sync.py")
+    pr.green_title("execute_sync.py")
     
     context = GitContext()
     if context.is_dirty:
-        pr.warning("Working tree is dirty. Proceed with caution.")
+        pr.amber("Working tree is dirty. Proceed with caution.")
 
     try:
         # 1. Discover target ref
@@ -114,7 +114,7 @@ def execute_sync(thread_dir: Optional[str], dry_run: bool = False) -> int:
         if thread_dir:
             pr.green("verifying manifest")
             if verify_manifest(thread_dir) != 0:
-                pr.warning("Manifest verification failed. Proceeding anyway...")
+                pr.amber("Manifest verification failed. Proceeding anyway...")
             else:
                 pr.yes("ok")
 
@@ -125,10 +125,10 @@ def execute_sync(thread_dir: Optional[str], dry_run: bool = False) -> int:
         all_exclusions = sorted(list(set(permanent + run_specific)))
         pr.yes(f"{len(all_exclusions)} paths")
         if run_specific:
-            pr.info(f"Included {len(run_specific)} run-specific exclusions.")
+            pr.green(f"Included {len(run_specific)} run-specific exclusions.")
 
         if dry_run:
-            pr.info("Dry run: skipping actual git operations.")
+            pr.green("Dry run: skipping actual git operations.")
             return 0
 
         # 4. Update as_upstream
@@ -193,13 +193,13 @@ def execute_sync(thread_dir: Optional[str], dry_run: bool = False) -> int:
                 subprocess.run(["bash", str(assertions_script), sbs_ru_original_sha], check=True)
                 pr.yes("ok")
             except subprocess.CalledProcessError:
-                pr.warning("Sync assertions failed. Check output above.")
+                pr.amber("Sync assertions failed. Check output above.")
 
-        pr.info("✅ Sync execution complete. Ready for Stage 2 (Analysis).")
+        pr.green("✅ Sync execution complete. Ready for Stage 2 (Analysis).")
         return 0
 
     except Exception as e:
-        pr.error(f"Sync failed: {e}")
+        pr.red(f"Sync failed: {e}")
         context.restore_original_state()
         return 1
 

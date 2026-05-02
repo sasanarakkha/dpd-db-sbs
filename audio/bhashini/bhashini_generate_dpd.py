@@ -20,7 +20,7 @@ def test_word_length(word: str, length: int) -> bool:
 
 
 def main():
-    pr.title("bashini tts")
+    pr.green_title("bashini tts")
 
     pr.green("loading data")
     pth = ProjectPaths()

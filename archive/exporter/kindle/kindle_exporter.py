@@ -571,7 +571,7 @@ def render_epd_letter_templ(pth: ProjectPaths, letter: str, entries: str) -> str
 
 def main():
     pr.tic()
-    pr.title("rendering dpd for ebook")
+    pr.green_title("rendering dpd for ebook")
     if config_test("exporter", "make_ebook", "yes"):
         pth = ProjectPaths()
         id_counter: int = render_dpd_xhtml(pth)

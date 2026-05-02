@@ -19,7 +19,7 @@ def apply_all_corrections_from_json():
     Processes all corrections from corrections.json and applies them to the database.
     Does not modify any JSON files.
     """
-    pr.title("Starting batch application of corrections from JSON...")
+    pr.green_title("Starting batch application of corrections from JSON...")
 
     corrections_json_path = Gui2Paths().corrections_path
 
@@ -82,7 +82,7 @@ def apply_all_corrections_from_json():
             pr.red(f"  No actual field changes for headword ID {word_id} ({db_entry.lemma_1}).")
 
     pr.yes("ok")
-    pr.title("Batch Correction Summary")
+    pr.green_title("Batch Correction Summary")
     print(f"Total corrections attempted: {len(all_corrections_to_process)}")
     print(f"Successfully processed and updated in DB: {processed_count}")
     print(f"Failed or skipped: {failed_count}")

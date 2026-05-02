@@ -55,7 +55,7 @@ def get_available_models(provider: str, api_key: str | None) -> List[str]:
     """Fetch available models for the given provider."""
     models = []
     if not api_key:
-        pr.error(f"API key missing for provider: {provider}")
+        pr.red(f"API key missing for provider: {provider}")
         return []
 
     if provider == "openai":
@@ -67,7 +67,7 @@ def get_available_models(provider: str, api_key: str | None) -> List[str]:
             models = [m.id for m in response.data]
             models.sort()
         except Exception as e:
-            pr.error(f"Failed to fetch OpenAI models: {e}")
+            pr.red(f"Failed to fetch OpenAI models: {e}")
     elif provider == "openrouter":
         try:
             response = requests.get(
@@ -79,9 +79,9 @@ def get_available_models(provider: str, api_key: str | None) -> List[str]:
             models = [m["id"] for m in data["data"]]
             models.sort()
         except Exception as e:
-            pr.error(f"Failed to fetch OpenRouter models: {e}")
+            pr.red(f"Failed to fetch OpenRouter models: {e}")
     else:
-        pr.warning(f"Model discovery not implemented for provider: {provider}")
+        pr.amber(f"Model discovery not implemented for provider: {provider}")
     return models
 
 
@@ -187,7 +187,7 @@ def build_translation_prompt(
             word.lemma_1, grammar, meaning, example, translation_example
         )
     else:
-        pr.error(f"Unsupported language: {lang}")
+        pr.red(f"Unsupported language: {lang}")
         return []
 
 
@@ -226,11 +226,11 @@ def process_sequential_batch(
 ):
     """Submit, poll, and download results for each model one by one."""
     for model_name in shortlist:
-        pr.info(f"--- Starting Sequential Batch for: {model_name} ---")
+        pr.green(f"--- Starting Sequential Batch for: {model_name} ---")
 
         # 1. Create and Upload
         jsonl_path = create_batch_jsonl(model_name, sample, dpspth, lang)
-        pr.info(f"Created batch file: {jsonl_path.name}")
+        pr.green(f"Created batch file: {jsonl_path.name}")
 
         with open(jsonl_path, "rb") as file_file:
             batch_input_file = client.files.create(file=file_file, purpose="batch")
@@ -243,7 +243,7 @@ def process_sequential_batch(
             metadata={"description": f"eval batch for {model_name}"},
         )
         batch_id = batch_response.id
-        pr.info(f"Batch created. ID: {batch_id}")
+        pr.green(f"Batch created. ID: {batch_id}")
 
         # 3. Polling
         while True:
@@ -251,17 +251,17 @@ def process_sequential_batch(
             status = batch_status.status
 
             if status == "completed":
-                pr.info(f"Batch {batch_id} completed!")
+                pr.green(f"Batch {batch_id} completed!")
                 break
             elif status in ["failed", "cancelled", "expired"]:
-                pr.error(f"Batch {batch_id} failed with status: {status}")
+                pr.red(f"Batch {batch_id} failed with status: {status}")
                 return
 
             # Print progress
             counts = batch_status.request_counts
             completed = counts.completed if counts else 0
             total = counts.total if counts else 0
-            pr.info(f"  Status: {status} ({completed}/{total} requests)...")
+            pr.green(f"  Status: {status} ({completed}/{total} requests)...")
             time.sleep(30)  # Wait 30 seconds before next check
 
         # 4. Download and Parse
@@ -335,7 +335,7 @@ def main():
     db_session = get_db_session(pth.dpd_db_path)
 
     api_key, provider, current_model = load_ai_config()
-    pr.info(f"Active provider: {provider}")
+    pr.green(f"Active provider: {provider}")
 
     # Mode selection
     import argparse
@@ -370,20 +370,20 @@ def main():
     args = parser.parse_args()
 
     if args.list:
-        pr.info(f"Fetching models for {provider}...")
+        pr.green(f"Fetching models for {provider}...")
         models = get_available_models(provider, api_key)
         for m in models:
             print(m)
-        pr.info(
+        pr.green(
             "\nNOTE: You can copy this list to an external AI (like Claude or GPT-4o) to get recommendations."
         )
-        pr.info(
+        pr.green(
             "External recommendations are ADVISORY ONLY. Use the chosen models with --eval to see empirical results."
         )
         return
 
     if args.prompt:
-        pr.info(f"Fetching models for {provider} to generate recommendation prompt...")
+        pr.green(f"Fetching models for {provider} to generate recommendation prompt...")
         models = get_available_models(provider, api_key)
         model_list_str = "\n".join(f"- {m}" for m in models)
 
@@ -455,7 +455,7 @@ Please provide a brief justification for each recommendation.
 {model_list_str}
 """
         else:
-            pr.error(f"Unsupported language: {args.lang}")
+            pr.red(f"Unsupported language: {args.lang}")
             return
 
         print("\n" + "=" * 40 + " EXTERNAL AI PROMPT " + "=" * 40)
@@ -465,10 +465,10 @@ Please provide a brief justification for each recommendation.
 
     if args.eval:
         shortlist = args.eval
-        pr.info(f"Evaluating models: {shortlist}")
+        pr.green(f"Evaluating models: {shortlist}")
 
         sample = select_evaluation_sample(db_session, lang=args.lang, limit=args.limit)
-        pr.info(f"Selected sample size: {len(sample)} words")
+        pr.green(f"Selected sample size: {len(sample)} words")
 
         ai_manager = AIManager()
         # Initialize results structure with word info
@@ -491,15 +491,15 @@ Please provide a brief justification for each recommendation.
             )
         else:
             if args.batch:
-                pr.warning(
+                pr.amber(
                     "Batch API is only supported for OpenAI. Falling back to one-by-one."
                 )
 
             # Process per model, then per word
             for model_name in shortlist:
-                pr.info(f"Starting model: {model_name}")
+                pr.green(f"Starting model: {model_name}")
                 for word in sample:
-                    pr.info(f"  Processing: {word.lemma_1} ({word.pos})")
+                    pr.green(f"  Processing: {word.lemma_1} ({word.pos})")
 
                     messages = build_translation_prompt(word, dpspth, args.lang)
 
@@ -530,17 +530,17 @@ Please provide a brief justification for each recommendation.
         raw_file = output_dir / f"eval_raw_{provider}_{ts}.json"
         with open(raw_file, "w", encoding="utf-8") as f:
             json.dump(results, f, ensure_ascii=False, indent=2)
-        pr.info(f"Raw results saved to {raw_file}")
+        pr.green(f"Raw results saved to {raw_file}")
 
         # Save Markdown report
         md_report = generate_markdown_report(results, provider, shortlist, args.lang)
         md_file = output_dir / f"eval_report_{provider}_{ts}.md"
         with open(md_file, "w", encoding="utf-8") as f:
             f.write(md_report)
-        pr.info(f"Markdown report saved to {md_file}")
+        pr.green(f"Markdown report saved to {md_file}")
 
     else:
-        pr.warning(
+        pr.amber(
             "No action specified. Use --list to see models or --eval [models...] to run evaluation."
         )
 

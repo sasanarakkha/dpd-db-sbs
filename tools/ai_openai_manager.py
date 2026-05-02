@@ -15,14 +15,14 @@ class OpenAIManager:
         self.api_key = config_read("apis", api_key_name)
         self.api_key_name = api_key_name  # Store for messages
         if not self.api_key:
-            pr.warning(f"OpenAI API key '{api_key_name}' not found in config.ini")
+            pr.amber(f"OpenAI API key '{api_key_name}' not found in config.ini")
             self.client = None
             return
 
         try:
             self.client = OpenAI(api_key=self.api_key)
         except Exception as e:
-            pr.error(f"Failed to initialize OpenAI client: {e}")
+            pr.red(f"Failed to initialize OpenAI client: {e}")
             self.client = None
 
     def request(
@@ -127,22 +127,22 @@ class OpenAIManager:
 
 
 if __name__ == "__main__":
-    pr.info("--- Testing OpenAIManager ---")
+    pr.green("--- Testing OpenAIManager ---")
     openai_manager = OpenAIManager()
 
     test_prompt = "Explain the concept of recursion in programming in simple terms."
     test_sys_prompt = "You are a helpful teaching assistant."
 
-    pr.info(f"Sending request with prompt: '{test_prompt}'")
+    pr.green(f"Sending request with prompt: '{test_prompt}'")
     ai_response = openai_manager.request(
         prompt=test_prompt,
         prompt_sys=test_sys_prompt,
         model="gpt-4o-mini",
     )
 
-    pr.info(f"OpenAI request status: {ai_response.status_message}")
+    pr.green(f"OpenAI request status: {ai_response.status_message}")
     if ai_response.content:
-        pr.info("Response received:")
-        pr.info(ai_response.content)
+        pr.green("Response received:")
+        pr.green(ai_response.content)
     else:
-        pr.warning("OpenAI request content was None.")
+        pr.amber("OpenAI request content was None.")

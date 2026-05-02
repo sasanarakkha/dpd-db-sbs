@@ -54,7 +54,7 @@ def main():
             pr.red(f"Failed to reset submodule: {e}")
             sys.exit(1)
     elif args.skip_reset:
-        pr.warning("Skipping reset: checking current local state...")
+        pr.amber("Skipping reset: checking current local state...")
 
     json_path = submodule_path / "download_source_files" / "download_list.json"
     if not json_path.exists():
@@ -80,7 +80,7 @@ def main():
     elif ru_idx == last_idx:
         pr.yes(f"DPD with Russian is the last entry (index {ru_idx}) — OK")
     else:
-        pr.warning(
+        pr.amber(
             f"DPD with Russian is at {ru_idx}, last is {last_idx}. Run exporter/tpr/tpr_exporter_ru.py to fix."
         )
 

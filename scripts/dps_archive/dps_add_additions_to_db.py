@@ -10,7 +10,7 @@ from tools.tsv_read_write import read_tsv_dot_dict
 
 
 def add_to_db_keeping_id():
-    pr.title("add additions to db keeping id")
+    pr.green_title("add additions to db keeping id")
 
     pth = ProjectPaths()
     db_session = get_db_session(pth.dpd_db_path)

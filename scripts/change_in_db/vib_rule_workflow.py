@@ -93,7 +93,7 @@ def collect_tty_pasted_text(stdin: TextIO) -> str:
         try:
             line = stdin.readline()
         except KeyboardInterrupt:
-            pr.warning("Input cancelled.")
+            pr.amber("Input cancelled.")
             return ""
 
         if line == "":
@@ -159,7 +159,7 @@ def run_rule(
         else:
             text = accept_pasted_text()
             if not text.strip():
-                pr.warning("No text provided. Skipping.")
+                pr.amber("No text provided. Skipping.")
                 return True
 
         # Step 2 — Clean

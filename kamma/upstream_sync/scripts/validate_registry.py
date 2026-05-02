@@ -261,7 +261,7 @@ def validate_registry_core(
 
 def main() -> None:
     pr.tic()
-    pr.title("validate_registry.py")
+    pr.green_title("validate_registry.py")
 
     registry_path = Path("kamma/upstream_sync/registry.json")
     if not registry_path.exists():
@@ -279,7 +279,7 @@ def main() -> None:
 
     if all_warnings:
         for w in all_warnings:
-            pr.warning(w)
+            pr.amber(w)
 
     if all_errors:
         pr.red(f"\n{len(all_errors)} error(s) found:")

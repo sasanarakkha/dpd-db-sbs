@@ -149,7 +149,7 @@ Any comments you want to make about your choices can be included in that. Use pl
 
 def main():
     pr.tic()
-    pr.title("Auto-complete")
+    pr.green_title("Auto-complete")
     AutoSuggestController(9142)
     # save_path = Path("temp/autocomplete_after.tsv")
     # save_path.write_text(str(response.text))
