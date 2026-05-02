@@ -351,27 +351,3 @@ def add_thanks(pth: DPSPaths, header: str) -> List[DictEntry]:
     help_data_list.append(res)
 
     return help_data_list
-
-
-def render_abbrev_templ(
-    pth: DPSPaths,
-    i: Abbreviation,
-    show_ru_data=False,
-) -> str:
-    """render html of abbreviations"""
-
-    abbrev_templ = Template(filename=str(pth.abbrev_templ_path))
-
-    return str(abbrev_templ.render(i=i, show_ru_data=show_ru_data))
-
-
-def render_help_templ(
-    pth: DPSPaths,
-    i: Help,
-    show_ru_data=False,
-) -> str:
-    """render html of help"""
-
-    help_templ = Template(filename=str(pth.help_templ_path))
-
-    return str(help_templ.render(i=i, show_ru_data=show_ru_data))

@@ -353,25 +353,3 @@ def add_thanks(rupth: RuPaths, header: str) -> List[DictEntry]:
     help_data_list.append(res)
 
     return help_data_list
-
-
-def render_abbrev_templ(
-    rupth: RuPaths,
-    i: Abbreviation,
-) -> str:
-    """render html of abbreviations"""
-
-    abbrev_templ = Template(filename=str(rupth.abbrev_templ_path))
-
-    return str(abbrev_templ.render(i=i))
-
-
-def render_help_templ(
-    rupth: RuPaths,
-    i: Help,
-) -> str:
-    """render html of help"""
-
-    help_templ = Template(filename=str(rupth.help_templ_path))
-
-    return str(help_templ.render(i=i))

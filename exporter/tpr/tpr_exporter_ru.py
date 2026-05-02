@@ -333,7 +333,7 @@ def tpr_updater(g: GlobalVars):
     pr.yes("OK")
 
 
-def update_tpr_download_list(download_list: list[dict], info: dict) -> list[dict]:
+def update_tpr_download_list_ru(download_list: list[dict], info: dict) -> list[dict]:
     """Remove existing RU entry if present to avoid duplicates, then append at end."""
     download_list = [e for e in download_list if e.get("name") != "DPD with Russian"]
     download_list.append(info)
@@ -381,7 +381,7 @@ def copy_zip_to_tpr_downloads(g: GlobalVars):
             "size": f"{filesize} MB",
         }
 
-        download_list = update_tpr_download_list(download_list, dpd_with_rus_info)
+        download_list = update_tpr_download_list_ru(download_list, dpd_with_rus_info)
 
         with open(g.pth.tpr_download_list_path, "w") as f:
             f.write(json.dumps(download_list, indent=4, ensure_ascii=False))

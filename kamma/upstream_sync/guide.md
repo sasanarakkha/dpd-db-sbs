@@ -136,6 +136,19 @@ Every entry must define a `Sync Rule` (`PORT`, `MIRROR_EXACTLY`, `PRESERVE`, `DI
 
 ---
 
+## Sync Scope
+
+This fork supports **four locales**: Russian (`_ru`), SBS (`_sbs`), DPS (`_dps`), and Tamil (`_ta`).
+**ALL four locales are always in scope.** "Pre-existing" namespace isolation failures, ruff errors,
+or test failures in ANY locale are NOT acceptable and MUST be fixed, not deferred.
+
+- Shadow copy failures (ruff errors, unused imports, dead code) in `*_ru.py`, `*_sbs.py`, `*_dps.py`
+  files are in scope regardless of when they were introduced.
+- Tamil symbols (`_ta`, `ta_`, etc.) in `_dps` files are valid and the test enforces them — fix
+  violations, never whitelist them.
+
+---
+
 ## Symbol Naming Policy
 
 Enforced via `tests/test_namespace_isolation.py`:
@@ -144,6 +157,11 @@ Enforced via `tests/test_namespace_isolation.py`:
 2. **Tier 2 — Modified from Upstream**: Locale suffix only (`_ru`, `_sbs`, `_dps`, or `_ta`). Never use both a prefix and a suffix.
 3. **Tier 3 — New (no upstream counterpart)**: Use descriptive name + locale suffix.
 4. **HTML IDs**: Always prefix with locale (`ru_`, `sbs_`, `dps_`, `ta_`).
+5. **Intrinsic semantic markers** (e.g., `RpdData`, `TpdData`): allowed without added suffix — listed
+   in `EXCEPTIONS` in `test_namespace_isolation.py`. Do not add to exceptions without clear justification.
+
+**DPS files (`*_dps.py`)** may contain Tamil-specific symbols with `_ta` marker — the test accepts
+`_dps`, `_ru`, `_sbs`, and `_ta` as valid markers for these files.
 
 **Locale flags** (in `config.ini [dictionary]`): `show_ru_data`, `show_sbs_data`, `show_ta_data` — each threads through the same call chain via `main_sbs.py`.
 

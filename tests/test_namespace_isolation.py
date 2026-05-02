@@ -51,11 +51,14 @@ def has_valid_marker_for_file(name: str, expected_marker: str, shadow: str) -> b
     if expected_marker != "_dps":
         return has_expected_locale_marker(name, expected_marker)
 
-    # In DPS files, locale-specific helpers should keep only their own RU/SBS marker.
+    # In DPS files, locale-specific helpers keep only their own locale marker.
+    # Tamil (_ta) is a valid locale in DPS files alongside RU and SBS.
+    ta_tokens = ("_ta", "ta_", "Ta", "TA", "Tamil")
     return (
         has_expected_locale_marker(name, "_dps")
         or has_expected_locale_marker(name, "_ru")
         or has_expected_locale_marker(name, "_sbs")
+        or any(token in name for token in ta_tokens)
     )
 
 
@@ -68,6 +71,7 @@ EXCEPTIONS = {
     "main",
     "GlobalVars",
     "RpdData",
+    "TpdData",  # Tamil Pali Dictionary Data — intrinsic semantic marker like RpdData
     "is_cyrillic",
     # main_ru.py routes
     "home_page_ru",
