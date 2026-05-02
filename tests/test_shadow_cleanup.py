@@ -71,7 +71,7 @@ def load_codebase_contents(skip_paths: set[str]) -> dict[str, str]:
 
 def main() -> None:
     pr.tic()
-    pr.title("test_shadow_cleanup.py")
+    pr.green_title("test_shadow_cleanup.py")
 
     parser = argparse.ArgumentParser(
         description="Find and optionally archive orphaned original files."
@@ -94,7 +94,7 @@ def main() -> None:
     dry_run = not args.apply
 
     if dry_run:
-        pr.warning("DRY RUN — pass --apply to archive files")
+        pr.amber("DRY RUN — pass --apply to archive files")
 
     if not REGISTRY_PATH.exists():
         pr.no(f"Registry not found at {REGISTRY_PATH}")
@@ -107,7 +107,9 @@ def main() -> None:
     )  # type: ignore[operator]
     russian_copies: dict[str, str] = registry.get("russian_copies", {})  # type: ignore[assignment]
     sbs_copies: dict[str, str] = registry.get("sbs_copies", {})  # type: ignore[assignment]
-    all_shadows_map: dict[str, str] = {**russian_copies, **sbs_copies}
+    dps_copies: dict[str, str] = registry.get("dps_copies", {})  # type: ignore[assignment]
+    tamil_copies: dict[str, str] = registry.get("tamil_copies", {})  # type: ignore[assignment]
+    all_shadows_map: dict[str, str] = {**russian_copies, **sbs_copies, **dps_copies, **tamil_copies}
 
     scan_folder = args.folder
     if not scan_folder:
@@ -124,11 +126,15 @@ def main() -> None:
         ["ls-tree", "-r", "HEAD", "--name-only", scan_folder]
     )
 
+    shadow_dirs: list[str] = [k for k in all_shadows_map if k.endswith("/")]
+
     orphans: list[str] = []
     for f in current_files:
         if is_excluded(f, no_sync):
             continue
         if f in all_shadows_map:
+            continue
+        if any(f.startswith(d) for d in shadow_dirs):
             continue
         if is_localized(f):
             continue
@@ -175,11 +181,11 @@ def main() -> None:
                 shadow_usages[s] = s_usages
 
         if direct_usages or shadow_usages:
-            pr.warning(f"MANUAL INVESTIGATION REQUIRED: {orphan}")
+            pr.amber(f"MANUAL INVESTIGATION REQUIRED: {orphan}")
             if direct_usages:
-                pr.warning(f"  original referenced in: {direct_usages}")
+                pr.amber(f"  original referenced in: {direct_usages}")
             for s, usages in shadow_usages.items():
-                pr.warning(f"  shadow {s} referenced in: {usages}")
+                pr.amber(f"  shadow {s} referenced in: {usages}")
         else:
             archive_base = (
                 Path("scripts/dps_archive")
@@ -188,7 +194,7 @@ def main() -> None:
             )
             dest = archive_base / orphan
             if dry_run:
-                pr.warning(f"[DRY RUN] would archive: {orphan} -> {dest}")
+                pr.amber(f"[DRY RUN] would archive: {orphan} -> {dest}")
             else:
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 orphan_path = Path(orphan)
