@@ -4,7 +4,7 @@
 
 from db.db_helpers import get_db_session
 from db.models import Lookup
-from tools.configger import config_test
+from tools.configger import config_read, config_test
 from tools.goldendict_exporter import DictInfo, DictVariables, DictEntry
 from tools.goldendict_exporter import export_to_goldendict_with_pyglossary
 from tools.mdict_exporter import export_to_mdict
@@ -43,6 +43,8 @@ class ProgData_ru:
             self.make_mdict = True
         else:
             self.make_mdict = False
+
+        self.make_slob = config_read("goldendict", "make_slob", "no") == "yes"
 
         self.pth = ProjectPaths()
         self.rupth = RuPaths()
@@ -177,7 +179,9 @@ def prepare_gd_mdict_and_export(g: ProgData_ru):
         delete_original=False,
     )
 
-    export_to_goldendict_with_pyglossary(dict_info, dict_vars, g.dict_data)
+    export_to_goldendict_with_pyglossary(
+        dict_info, dict_vars, g.dict_data, include_slob=g.make_slob
+    )
 
     if g.make_mdict:
         export_to_mdict(dict_info, dict_vars, g.dict_data)

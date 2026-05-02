@@ -1,5 +1,8 @@
 <!-- summary -->
 
+{% set is_vagga = d.su.is_vagga if d.su else false %}
+{% set is_samyutta = d.su.is_samyutta if d.su else false %}
+
 <h3 class="dpd" id="{{ d.i.lemma_1_ }}">{{d.i.lemma_1}}</h3>
 <div class="dpd summary">
     <p>
@@ -22,7 +25,7 @@
 
     {% if d.i.needs_sutta_info_button %}
     <a class="dpd-button" name="sutta-info-button" data-target="sutta_info_{{d.i.lemma_1_}}">
-        сутта</a>
+        {% if is_samyutta %}saṃyutta{% elif is_vagga %}vagga{% else %}сутта{% endif %}</a>
     {% endif %}
 
     {% if d.i.needs_grammar_button %}
@@ -130,7 +133,7 @@
         </tr>
         {% endif %}
 
-        {% if d.su.cst_vagga %}
+        {% if d.su.cst_vagga and not is_samyutta %}
         <tr>
             <th>
                 Вагга
@@ -141,7 +144,7 @@
         </tr>
         {% endif %}
 
-        {% if d.su.cst_sutta %}
+        {% if d.su.cst_sutta and not is_vagga and not is_samyutta %}
         <tr>
             <th>
                 Сутта
@@ -281,7 +284,7 @@
 
         <!-- sutta central -->
 
-        {% if d.su.sc_code %}
+        {% if d.su.sc_code or d.su.sc_book or d.su.sc_vagga %}
         <tr>
             <th class="heading" colspan="2">
                 SuttaCentral (SC)
@@ -311,7 +314,7 @@
         </tr>
         {% endif %}
 
-        {% if d.su.sc_vagga %}
+        {% if d.su.sc_vagga and not is_samyutta %}
         <tr>
             <th>
                 Вагга
@@ -322,7 +325,7 @@
         </tr>
         {% endif %}
 
-        {% if d.su.sc_sutta %}
+        {% if d.su.sc_sutta and not is_vagga and not is_samyutta %}
         <tr>
             <th>
                 Сутта
@@ -333,7 +336,7 @@
         </tr>
         {% endif %}
 
-        {% if d.su.sc_eng_sutta %}
+        {% if d.su.sc_eng_sutta and not is_vagga and not is_samyutta %}
         <tr>
             <th>
                 Название
@@ -344,7 +347,7 @@
         </tr>
         {% endif %}
 
-        {% if d.su.sc_blurb %}
+        {% if d.su.sc_blurb and not is_vagga and not is_samyutta %}
         <tr>
             <th>
                 Описание
@@ -355,13 +358,19 @@
         </tr>
         {% endif %}
 
-        {% if d.su.sc_card_link %}
+        {% if d.su.sc_card_link or d.su.sc_vagga_link %}
         <tr>
             <th>
                 Ссылки
             </th>
             <td>
-                {% if d.su.sc_code %}
+                {% if is_vagga and d.su.sc_vagga_link %}
+                <a href="{{ d.su.sc_vagga_link }}" target="_blank">SC Vagga Card</a>,
+                <a href="{{ d.su.sc_pali_link }}" target="_blank">Текст на Пали</a>,
+                <a href="{{ d.su.sc_eng_link }}" target="_blank">Перевод на английский</a>
+                {% elif is_samyutta and d.su.sc_vagga_link %}
+                <a href="{{ d.su.sc_vagga_link }}" target="_blank">SC Saṃyutta Card</a>
+                {% elif d.su.sc_code %}
                 <a href="{{ d.su.sc_card_link }}" target="_blank">Карточка сутты</a>,
                 <a href="{{ d.su.sc_pali_link }}" target="_blank">Текст на Пали</a>,
                 <a href="{{ d.su.sc_eng_link }}" target="_blank">Перевод на английский</a>
@@ -425,7 +434,7 @@
         </tr>
         {% endif %}
 
-        {% if d.su.bjt_sutta_code %}
+        {% if d.su.bjt_sutta_code or d.su.bjt_piṭaka or d.su.bjt_nikāya or d.su.bjt_major_section or d.su.bjt_book or d.su.bjt_minor_section or d.su.bjt_vagga %}
         <tr>
             <th class="heading" colspan="2">
                 Buddha Jayanti Tipiṭaka (BJT)
@@ -499,7 +508,7 @@
         </tr>
         {% endif %}
 
-        {% if d.su.bjt_vagga %}
+        {% if d.su.bjt_vagga and not is_samyutta %}
         <tr>
             <th>
                 Вагга
@@ -510,7 +519,7 @@
         </tr>
         {% endif %}
 
-        {% if d.su.bjt_sutta %}
+        {% if d.su.bjt_sutta and not is_vagga and not is_samyutta %}
         <tr>
             <th>
                 Сутта
@@ -626,6 +635,8 @@
         {% endif %}
 
         <!-- DV catalogue -->
+
+        {% if not is_vagga and not is_samyutta %}
 
         {% if d.su.dv_exists %}
         <tr>
@@ -900,6 +911,8 @@
         </tr>
         {% endif %}
 
+        {% endif %}
+
         <!-- {% if d.su.dv_partial_parallels_all %}
         <tr>
             <th>
@@ -1035,12 +1048,29 @@
             <th>Синоним</th>
             <td>{{d.i.synonym}}</td>
         </tr>
-        {% endif %} {% if d.i.variant %}
+        {% endif %}
+
+        {% if d.i.variant and not d.i.var_phonetic and not d.i.var_text %}
         <tr>
             <th>Вариант</th>
             <td>{{d.i.variant}}</td>
         </tr>
         {% endif %}
+
+        {% if d.i.var_phonetic %}
+        <tr>
+            <th>Phonetic Variant</th>
+            <td>{{d.i.var_phonetic}}</td>
+        </tr>
+        {% endif %}
+
+        {% if d.i.var_text %}
+        <tr>
+            <th>Textual Variant</th>
+            <td>{{d.i.var_text}}</td>
+        </tr>
+        {% endif %}
+
         {% if d.i.commentary and d.i.commentary !="-" %}
         <tr>
             <th>Комментарий</th>

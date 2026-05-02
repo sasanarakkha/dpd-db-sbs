@@ -2,6 +2,7 @@ import difflib
 import re
 import time
 
+from sqlalchemy import or_
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import joinedload
 
@@ -9,6 +10,7 @@ from db.db_helpers import get_db_session
 from db.models import DpdHeadword, DpdRoot, FamilyRoot, Lookup
 from exporter.webapp.data_classes_ru import (
     AbbreviationsData,
+    AbbreviationsOtherData,
     DeconstructorData,
     RpdData,
     GrammarData,
@@ -64,7 +66,12 @@ def make_dpd_html_ru(
 
                     lookup_results = (
                         db_session.query(Lookup)
-                        .filter(Lookup.lookup_key.ilike(q))
+                        .filter(
+                            or_(
+                                Lookup.lookup_key.ilike(q),
+                                Lookup.lookup_key.ilike(q + "."),
+                            )
+                        )
                         .all()
                     )
 
@@ -210,6 +217,16 @@ def make_dpd_html_ru(
                                     pth.template_spelling
                                 ).render(d=d)
 
+                            # abbreviations other
+                            if lookup_result.abbrev_other:
+                                d = AbbreviationsOtherData(lookup_result)
+                                summary_html += templates.get_template(
+                                    pth.template_abbreviations_other_summary
+                                ).render(d=d)
+                                dpd_html += templates.get_template(
+                                    pth.template_abbreviations_other
+                                ).render(d=d)
+
                     # the two cases below search directly in the DpdHeadwords table
                     elif q.isnumeric():  # eg 78654
                         search_term = int(q)
@@ -274,7 +291,9 @@ def make_dpd_html_ru(
         q = q.casefold()
 
         lookup_results = (
-            db_session.query(Lookup).filter(Lookup.lookup_key.ilike(q)).all()
+            db_session.query(Lookup)
+            .filter(or_(Lookup.lookup_key.ilike(q), Lookup.lookup_key.ilike(q + ".")))
+            .all()
         )
 
         # Check manual variants from TSV first
@@ -396,6 +415,16 @@ def make_dpd_html_ru(
                         rupth.template_rpd_summary
                     ).render(d=d)
                     dpd_html += templates.get_template(rupth.template_rpd).render(d=d)
+
+                # abbreviations other
+                if lookup_result.abbrev_other:
+                    d = AbbreviationsOtherData(lookup_result)
+                    summary_html += templates.get_template(
+                        pth.template_abbreviations_other_summary
+                    ).render(d=d)
+                    dpd_html += templates.get_template(
+                        pth.template_abbreviations_other
+                    ).render(d=d)
 
         # the two cases below search directly in the DpdHeadwords table
 

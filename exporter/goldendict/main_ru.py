@@ -54,6 +54,8 @@ class GlobalVars:
         if config_test("dictionary", "make_mdict", "yes"):
             self.make_mdict: bool = True
 
+        self.make_slob = config_read("goldendict", "make_slob", "no") == "yes"
+
         self.paths = self.rupth
 
 
@@ -143,22 +145,23 @@ def prepare_export_to_goldendict_mdict(g: GlobalVars) -> None:
     dict_name = "ru-dpd"
 
     dict_var = DictVariables(
-    css_paths=[g.paths.dpd_css_and_fonts_path],
-    js_paths=[
-        g.paths.family_compound_json,
-        g.paths.family_compound_template_js,
-        g.paths.family_idiom_json,
-        g.paths.family_idiom_template_js,
-        g.paths.family_root_json,
-        g.paths.family_root_template_js,
-        g.paths.family_set_json,
-        g.paths.family_set_template_js,
-        g.paths.family_word_json,
-        g.paths.family_word_template_js,
-        g.paths.feedback_template_js,
-        g.paths.frequency_template_js,
-        g.paths.main_js_path,
-        ],        gd_path=g.paths.share_dir,
+        css_paths=[g.paths.dpd_css_and_fonts_path],
+        js_paths=[
+            g.paths.family_compound_json,
+            g.paths.family_compound_template_js,
+            g.paths.family_idiom_json,
+            g.paths.family_idiom_template_js,
+            g.paths.family_root_json,
+            g.paths.family_root_template_js,
+            g.paths.family_set_json,
+            g.paths.family_set_template_js,
+            g.paths.family_word_json,
+            g.paths.family_word_template_js,
+            g.paths.feedback_template_js,
+            g.paths.frequency_template_js,
+            g.paths.main_js_path,
+        ],
+        gd_path=g.paths.share_dir,
         md_path=g.paths.share_dir,
         dict_name=dict_name,
         icon_path=g.paths.dpd_logo_svg,
@@ -171,7 +174,7 @@ def prepare_export_to_goldendict_mdict(g: GlobalVars) -> None:
         dict_info,
         dict_var,
         g.dict_data,
-        # include_slob=True,
+        include_slob=g.make_slob,
     )
 
     if g.make_mdict and g.data_limit == 0:

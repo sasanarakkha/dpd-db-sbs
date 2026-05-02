@@ -50,6 +50,9 @@ class GlobalVars:
         self.make_mdict: bool = False
         if config_test("dictionary", "make_mdict", "yes"):
             self.make_mdict: bool = True
+
+        self.make_slob = config_read("goldendict", "make_slob", "no") == "yes"
+
         self.show_sbs_data: bool = False
         self.show_ru_data: bool = False
         self.show_ta_data: bool = False
@@ -190,7 +193,7 @@ def prepare_export_to_goldendict_mdict(g: GlobalVars) -> None:
         dict_info,
         dict_var,
         g.dict_data,
-        # include_slob=True,
+        include_slob=g.make_slob,
     )
 
     if g.make_mdict and g.data_limit == 0:

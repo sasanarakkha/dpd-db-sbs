@@ -92,7 +92,7 @@ WHITELIST = {
     "db/families/family_set_ru.py": {"functions": ["compile_sf_html"]},
     "db/families/family_word_ru.py": {"functions": ["compile_wf_html"]},
     "db/lookup/help_abbrev_add_to_lookup_ru.py": {
-        "functions": ["add_abbreviations", "add_help"],
+        "functions": ["add_abbreviations", "add_help", "add_abbreviations_other"],
         "imports": ["tools.tsv_read_write.read_tsv_as_dict"],
         "missing": True,
     },
@@ -121,6 +121,9 @@ WHITELIST = {
             "tools.utils.RenderedSizes",
             "tools.utils.default_rendered_sizes",
         ]
+    },
+    "exporter/goldendict/export_rpd.py": {
+        "imports": ["exporter.goldendict.data_classes.EpdData"]
     },
     "exporter/goldendict/export_help_ru.py": {
         "imports": [
@@ -255,6 +258,7 @@ WHITELIST = {
             "exporter.webapp.data_classes.ManualVariantData",
             "exporter.webapp.data_classes.RootsData",
             "exporter.webapp.data_classes.SeeData",
+            "exporter.webapp.data_classes.AbbreviationsOtherData",
             "exporter.webapp.data_classes.SpellingData",
             "exporter.webapp.data_classes.VariantData",
         ],

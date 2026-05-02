@@ -12,7 +12,11 @@ from tools.printer import printer as pr
 from tools.tsv_read_write import read_tsv_dict, read_tsv_dot_dict
 from tools.utils import RenderedSizes, default_rendered_sizes, squash_whitespaces
 from exporter.jinja2_env import get_jinja2_env
-from exporter.goldendict.data_classes_dps import AbbreviationsData, HelpData
+from exporter.goldendict.data_classes_dps import (
+    AbbrevOtherData,
+    AbbreviationsData,
+    HelpData,
+)
 
 
 class Abbreviation:
@@ -86,8 +90,57 @@ def generate_help_html(
     help_data_list.extend(thanks)
     size_dict["help"] += len(str(thanks))
 
+    abbrev_other = add_abbrev_other_html(rupth, jinja_env)
+    help_data_list.extend(abbrev_other)
+    size_dict["help"] += len(str(abbrev_other))
+
     pr.yes(len(help_data_list))
     return help_data_list, size_dict
+
+
+def add_abbrev_other_html(
+    rupth: RuPaths,
+    jinja_env,
+) -> list[DictEntry]:
+    help_data_list: list[DictEntry] = []
+
+    rows = read_tsv_dict(rupth.abbreviations_other_tsv_path)
+
+    grouped: dict[str, list[dict[str, str]]] = {}
+    for row in rows:
+        key = row["abbreviation"]
+        if not key:
+            continue
+        grouped.setdefault(key, []).append(
+            {
+                "source": row["source"],
+                "meaning": row["meaning"],
+                "notes": row["notes"],
+            }
+        )
+
+    template = jinja_env.get_template("help_abbrev_other_ru.jinja")
+
+    for abbreviation, entries in grouped.items():
+        data = AbbrevOtherData(abbreviation, entries, jinja_env)
+        html_rendered = template.render(d=data)
+
+        header = data.header
+        body_start = html_rendered.find("<body>")
+        body = html_rendered[body_start:]
+
+        final_html = squash_whitespaces(header) + minify(body)
+
+        help_data_list.append(
+            DictEntry(
+                word=abbreviation,
+                definition_html=final_html,
+                definition_plain="",
+                synonyms=[],
+            )
+        )
+
+    return help_data_list
 
 
 def add_abbrev_html(
@@ -115,7 +168,7 @@ def add_abbrev_html(
     for i in items:
         data = AbbreviationsData(i, jinja_env)
         header = data.header
-        
+
         template = jinja_env.get_template("help_abbrev_ru.jinja")
         content = template.render(i=i)
 
@@ -188,7 +241,6 @@ def add_help_html(
         help_data_list.append(res)
 
     return help_data_list
-
 
 
 def add_bibliography(rupth: RuPaths, header: str) -> List[DictEntry]:

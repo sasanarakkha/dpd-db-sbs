@@ -2,7 +2,7 @@
 
 import json
 import re
-from functools import cached_property
+from functools import cached_property, lru_cache
 from typing import List, Optional
 
 from aksharamukha import transliterate
@@ -247,6 +247,7 @@ class Lookup(Base):
     grammar: Mapped[str] = mapped_column(default="")
     help: Mapped[str] = mapped_column(default="")
     abbrev: Mapped[str] = mapped_column(default="")
+    abbrev_other: Mapped[str] = mapped_column(default="")
     epd: Mapped[str] = mapped_column(default="")
     rpd: Mapped[str] = mapped_column(default="")
     tpd: Mapped[str] = mapped_column(default="")
@@ -390,6 +391,17 @@ class Lookup(Base):
             return json.loads(self.abbrev)
         else:
             return {}
+
+    # abbreviations_other pack unpack
+
+    def abbrev_other_pack(self, data: list[dict[str, str]]) -> None:
+        self.abbrev_other = json.dumps(data, ensure_ascii=False)
+
+    @property
+    def abbrev_other_unpack(self) -> list[dict[str, str]]:
+        if self.abbrev_other:
+            return json.loads(self.abbrev_other)
+        return []
 
     # epd pack unpack
 
@@ -866,6 +878,117 @@ class SuttaInfo(Base):
         else:
             return None
 
+    @cached_property
+    def is_samyutta(self) -> bool:
+        if not (self.dpd_sutta and self.dpd_code):
+            return False
+        if "." in self.dpd_code or "-" in self.dpd_code:
+            return False
+        base = re.sub(r" \d+$", "", self.dpd_sutta)
+        return base.endswith("saṃyutta")
+
+    @cached_property
+    def is_vagga(self) -> bool:
+        names = [self.dpd_sutta, self.dpd_sutta_var]
+        if any("vagga" in name or "vaggo" in name for name in names if name):
+            return True
+        return "-" in self.dpd_code and bool(
+            self.cst_vagga or self.sc_vagga or self.bjt_vagga
+        )
+
+    @cached_property
+    def sc_vagga_link(self) -> str | None:
+        import unicodedata
+
+        book_code = self.sc_book_code
+        if not book_code:
+            return None
+
+        if book_code.lower() == "dhp":
+            return f"https://suttacentral.net/{self.dpd_code.lower()}"
+
+        if book_code.lower() == "sn" and self.is_samyutta:
+            m = re.match(r"^SN(\d+)$", self.dpd_code, re.IGNORECASE)
+            if m:
+                n = int(m.group(1))
+                _sn_vagga_map = [
+                    (range(1, 12), "sagathavaggasamyutta"),
+                    (range(12, 22), "nidanavaggasamyutta"),
+                    (range(22, 35), "khandhavaggasamyutta"),
+                    (range(35, 45), "salayatanavaggasamyutta"),
+                    (range(45, 57), "mahavaggasamyutta"),
+                ]
+                for rng, slug in _sn_vagga_map:
+                    if n in rng:
+                        return f"https://suttacentral.net/pitaka/sutta/linked/sn/sn-{slug}/sn{n}"
+            return None
+
+        if book_code.lower() == "sn" and self.dpd_sutta.endswith("saṃyuttapāḷi"):
+            samyutta_name = self.dpd_sutta.removesuffix("pāḷi")
+            slug = "".join(
+                c
+                for c in unicodedata.normalize("NFD", samyutta_name)
+                if unicodedata.category(c) != "Mn"
+            ).lower()
+            return f"https://suttacentral.net/pitaka/sutta/linked/sn/sn-{slug}"
+
+        if book_code.lower() == "mn" and self.dpd_sutta.endswith("paṇṇāsapāḷi"):
+            pannasa_name = self.dpd_sutta.removesuffix("pāḷi")
+            slug = "".join(
+                c
+                for c in unicodedata.normalize("NFD", pannasa_name)
+                if unicodedata.category(c) != "Mn"
+            ).lower()
+            return f"https://suttacentral.net/pitaka/sutta/middle/mn/mn-{slug}"
+
+        if book_code.lower() == "dn" and self.dpd_sutta.endswith("vaggapāḷi"):
+            vagga_name = self.dpd_sutta.removesuffix("pāḷi")
+            slug = "".join(
+                c
+                for c in unicodedata.normalize("NFD", vagga_name)
+                if unicodedata.category(c) != "Mn"
+            ).lower()
+            return f"https://suttacentral.net/dn-{slug}"
+
+        if not self.sc_vagga:
+            return None
+
+        vagga_name = re.sub(r"^\d+\.\s*", "", self.sc_vagga)
+
+        slug = "".join(
+            c
+            for c in unicodedata.normalize("NFD", vagga_name)
+            if unicodedata.category(c) != "Mn"
+        ).lower()
+
+        m = re.match(r"^([A-Za-z]+)(\d+)\.(\d+)", self.dpd_code)
+        if m:
+            prefix = f"{m.group(1)}{m.group(2)}".lower()
+        else:
+            prefix = book_code.lower()
+
+        return f"https://suttacentral.net/{prefix}-{slug}"
+
+
+@lru_cache(maxsize=1)
+def _load_sutta_alias_map() -> dict[str, str]:
+    """Return a dict mapping every sutta name (canonical + aliases) to its canonical dpd_sutta key."""
+    from db.db_helpers import get_db_session
+    from tools.paths import ProjectPaths
+
+    pth = ProjectPaths()
+    with get_db_session(pth.dpd_db_path) as db:
+        rows = db.query(SuttaInfo.dpd_sutta, SuttaInfo.dpd_sutta_var).all()
+    result: dict[str, str] = {}
+    for dpd_sutta, dpd_sutta_var in rows:
+        result[dpd_sutta] = dpd_sutta
+        if dpd_sutta_var:
+            for alias in dpd_sutta_var.split(";"):
+                alias = alias.strip()
+                if alias:
+                    result[alias] = dpd_sutta
+    return result
+
 
 class DpdHeadword(Base):
     __tablename__ = "dpd_headwords"
@@ -980,7 +1103,16 @@ class DpdHeadword(Base):
     it: Mapped[InflectionTemplates] = relationship()
 
     # sutta info
-    su: Mapped[SuttaInfo] = relationship()
+    @cached_property
+    def su(self) -> "SuttaInfo | None":
+        alias_map = _load_sutta_alias_map()
+        canonical = alias_map.get(self.lemma_1)
+        if canonical is None:
+            return None
+        db_session = object_session(self)
+        if db_session is None:
+            return None
+        return db_session.get(SuttaInfo, canonical)
 
     @hybrid_property
     def root_family_key(self):  # type:ignore
@@ -1237,7 +1369,7 @@ class DpdHeadword(Base):
             return []
 
     @cached_property
-    def freq_data_unpack(self) -> dict[str, int]:
+    def freq_data_unpack(self) -> dict[str, str | list[int]]:
         if self.freq_data:
             return json.loads(self.freq_data)
         else:
@@ -1439,13 +1571,13 @@ class DpdHeadword(Base):
         return bool(self.family_word)
 
     @cached_property
-    def cf_set(self) -> set[str]:
+    def cf_set(self) -> frozenset[str]:
         from tools.cache_load import load_cf_set
 
         return load_cf_set()
 
     @cached_property
-    def idioms_set(self) -> set[str]:
+    def idioms_set(self) -> frozenset[str]:
         from tools.cache_load import load_idioms_set
 
         return load_idioms_set()

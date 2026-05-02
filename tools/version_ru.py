@@ -14,7 +14,7 @@ from tools.printer import printer as pr
 
 
 major = 0
-minor = 3
+minor = 4
 
 
 def printer(key, value):

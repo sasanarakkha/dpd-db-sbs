@@ -61,6 +61,9 @@ jobs:
     - name: Install dictzip
       run: sudo apt-get update && sudo apt-get install -y dictzip
 
+    - name: Install Slob Linux dependencies
+      run: sudo apt-get install -y build-essential libicu-dev icu-devtools pkg-config
+
     - name: Set up Python
       uses: actions/setup-python@v6
       with:
@@ -194,6 +197,9 @@ jobs:
     - name: Run EBT Counter
       run: uv run python scripts/build/ebt_counter.py
 
+    - name: Update Bold Definitions
+      run: uv run python db/bold_definitions/update_bold_definitions_db.py
+
     - name: Add EPD to Lookup Table
       run: uv run python db/epd/epd_to_lookup.py
 
@@ -213,8 +219,8 @@ jobs:
     # Download Audio Database
     # ----------------------------------------
 
-    - name: Download Audio Database
-      run: uv run python audio/db_release_download.py
+    - name: Download Audio Index
+      run: uv run python audio/index_release_download.py
 
     # ----------------------------------------
     # Exporter
