@@ -96,6 +96,39 @@ This document provides a unified, exhaustive post-mortem of the Upstream Sync Re
 - **Namespace Isolation**: Ensure unique prefixes for all global variables and element IDs to facilitate easier collaboration and multi-dictionary support.
 
 
+## 14. Session Sizing and Hard Stops
+**Issue:** Sessions grew too large with no enforced split point. Agents completed multiple heavy stages in one session, causing context bloat, degraded output quality, and the user needing to manually interrupt mid-session.
+**Recommendation:**
+- **Hard stop after every Stage** — always end the session after completing Stage 1, 2, or 3. Never roll two stages into one session.
+- **Hard stop after every 5 items in Stage 3** — even within a stage, split frequently to keep context clean.
+- Hard stop procedure: update `handoff.md` → state exact restart prompt → STOP. Do not continue.
+
+## 15. Mandatory Model Switch at Stage Boundaries
+**Issue:** In the 2026-05-02 sync, the agent ran all stages in the same model (PRO) without ever prompting the user to switch. Stage 3 execution is mechanical and wastes expensive PRO capacity; planning stages need PRO precision. The agent never once asked for a model switch.
+**Recommendation:**
+- **Stage 2 (Analysis):** Agent must stop and tell the user to switch to PRO before beginning strategic planning.
+- **Stage 3 (Execution):** Agent must stop and tell the user to switch to FAST before beginning mechanical implementation.
+- These instructions are now codified in `guide.md` under `## Model Switch Protocol`. The agent must not skip them.
+
+## 16. Pre-Sync API Health Check
+**Issue:** In the 2026-05-02 sync, 188 Printer API violations (`pr.title()`, `pr.info()`, `pr.warning()`, `pr.error()` — non-existent methods) were present in the codebase before the sync began. They were not caught until Stage 3 manual verification, causing a large unplanned fix mid-session.
+**Recommendation:**
+- Run `uv run ruff check tools/ scripts/ db/ exporter/ --select F821,E999 --quiet` in Stage 1 Environmental Validation to catch dead-code and API violations before sync begins.
+- Pre-existing failures are in scope — fix them in a separate commit before the sync commits.
+
+## 18. PRO → FAST Handoff Quality Gate
+**Issue:** The planning model (PRO) produced `dynamic_plan.md` entries that contained vague instructions like "check X", "verify Y", "determine the correct approach" — deferring analysis to the execution model (FAST). FAST is not equipped for strategic reasoning; this caused errors, invented solutions, and Iron Rule violations during Stage 3.
+**Recommendation:**
+- `dynamic_plan.md` must be written as if the executing agent has **zero context and zero judgment**. Every item must provide: exact file path, exact anchor string or line reference, exact code to insert/replace/delete, and a verification command.
+- Before handing off to FAST, PRO must self-check: *"Could a mechanical executor complete every item without opening any file not explicitly listed in the plan?"* If no — expand the plan first.
+- FAST must never be asked to analyze, judge, or discover. If FAST finds itself reasoning about "what the right approach is", the plan was insufficient — it must stop and flag the gap rather than guess.
+
+## 17. Scope Discipline and Out-of-Scope Directories
+**Issue:** In the 2026-05-02 sync, the agent repeatedly accessed the `gui/` folder despite it being explicitly excluded from sync scope. It even added `"gui/"` to `unique_paths` in the registry — which had to be manually reverted.
+**Recommendation:**
+- `gui/` and `docs/` are permanently out of sync scope. Never run `test_shadow_cleanup.py` against them. Never add them to `unique_paths`. Never modify files inside them during a sync session.
+- The guide now has an explicit `## Sync Scope` note. Consult it at the start of every stage.
+
 ---
 
 ## Historical: Legacy 7-Phase Workflow (Pre-April 2026)

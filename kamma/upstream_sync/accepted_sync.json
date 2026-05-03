@@ -1,6 +1,6 @@
 {
-  "last_accepted_upstream_sha": "9af5f7ee",
-  "last_accepted_upstream_date": "2026-04-08",
+  "last_accepted_upstream_sha": "44a8a005",
+  "last_accepted_upstream_date": "2026-05-02",
   "last_accepted_upstream_ref": "upstream/main",
-  "notes": "April 2026 sync complete. Upstream range 89dcdaf3..9af5f7ee, 352 files. All shadows ported, JS drift fixed, dead templates removed (44 files)."
+  "notes": "May 2026 sync complete. Upstream range 9af5f7ee..44a8a005, 133 files. All shadows ported, legacy HTML templates archived (replaced by Jinja2 upstream), codebase-wide Printer API fix (188 occurrences)."
 }

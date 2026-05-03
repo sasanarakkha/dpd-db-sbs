@@ -16,6 +16,7 @@ nav:
     - Варианты текста: "features/variants.md"
   - Установка:
     - "install/index.md"
+    - DPD Приложение: "install/dpd_app.md"
     - Windows: "install/win.md"
     - Android: "install/android_dicttango.md"
     - Mac: "install/mac.md"
@@ -66,6 +67,8 @@ nav:
   - Литература: "bibliography.md"
   - Благодарности: "thanks.md"
   - Контакты: "contact.md"
+  - Changelog: "changelog.md"
+  - Новостные рассылки: "newsletters.md"
   - Лицензия: "license.md"  
   - Язык Пали: "pali_notes/index.md"
   - Для разработчиков:

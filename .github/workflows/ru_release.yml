@@ -338,7 +338,7 @@ jobs:
       shell: bash
       run: |
         declare -A submodules=(
-          ["resources/fdg_dpd"]="fdg https://github.com/o28o/dictPlugin.git"
+          ["resources/fdg_dpd"]="fdg https://github.com/dhammagift/dictPlugin.git"
           ["resources/tpr_downloads"]="tpr https://github.com/bksubhuti/tpr_downloads"
         )
 

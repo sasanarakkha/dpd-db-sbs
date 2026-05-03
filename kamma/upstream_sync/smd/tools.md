@@ -110,12 +110,15 @@
 
 **File**: `tools/fast_api_utils_dps.py`
 - **Category**: inspired_by_upstream
+- **Shadow of**: `tools/fast_api_utils.py`
 - **Divergence Reason**: DPS-specific FastAPI utilities; architectural divergence from upstream.
 - **Sync Rule**: inspired_only
 - **Local Changes**:
-  1. `start_dpd_server` launches `main_ru:app` on `127.0.0.1:8080`.
+  1. `start_dpd_server` launches `main_ru:app` on `127.0.0.1:8080` (GUI internal startup port).
   2. `request_dpd_server` redirects to `http://127.0.0.1:8080/sbs/`.
 - **Watch For**:
-  - Port 8080 is used here, while the server script uses 8081 (likely local vs production).
+  - Port split is intentional: `8080` = GUI-initiated internal server; `8081` = standalone `main_ru.py` server. Do not collapse them.
+  - `127.0.0.1` is the correct local Mac development address — never replace it with `0.0.0.0` or `localhost`.
+  - When upstream `fast_api_utils.py` adds new server helpers or changes the startup API, evaluate whether the DPS equivalent needs a matching `_dps` variant. Do not blindly port — this file is `inspired_only`.
 
 ---

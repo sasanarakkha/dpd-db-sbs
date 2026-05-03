@@ -35,11 +35,48 @@ Each stage runs in its own session. At the end of a stage:
 3. Prepare the commit (if applicable) and present it to the user.
 4. Tell the user: "Restart the session. Next time, say: [exact prompt]."
 
-**Within Stage 3**, if the plan has many items, split across sessions. Track progress by item ID (e.g., "completed through A8, next is A9") in `handoff.md`.
+**Within Stage 3**, if the plan has many items, split across sessions. Track progress by item ID (e.g., "completed through A8, next is A9") in `handoff.md`. Similarly, **within Stage 4.B**, if there are many files to translate, split after every 5 files.
+
+**Hard Stop Triggers (mandatory session split):**
+- After completing any full Stage (1, 2, 3, 4, or 5) — always split.
+- After every 5 implementation items in Stage 3 — split.
+- After every 5 translation files in Stage 4.B — split.
+- If context feels stale or responses feel repetitive — split immediately.
+
+Hard stop procedure: update `handoff.md` → state the exact restart prompt → STOP. Do not continue in the same session.
+
+**Pre-Authorized Commands:**
+All commands listed in this guide (`uv run`, `grep`, `find`, `git diff`, `git log`, `ruff`, `pytest`, `python temp/`) are pre-authorized for the entire sync session. Write all ad-hoc logic to `temp/<name>.py` and run via `uv run python temp/<name>.py`. Never use inline `python -c "..."`. Delete temp files when done.
 
 ---
 
-## The 3-Stage Sync Workflow
+## Model Switch Protocol
+
+**MANDATORY MODEL SWITCH TRIGGERS — never skip these:**
+
+| Transition | Recommended model | Instruction to give user |
+|---|---|---|
+| End of Stage 1, before Stage 2 | PRO (smart) | "Please switch to PRO model. Restart. Next prompt: [exact prompt]." |
+| End of Stage 2, before Stage 3 | FAST (execution) | "Please switch to FAST model. Restart. Next prompt: [exact prompt]." |
+| End of Stage 3, before Stage 4 | PRO (smart) | "Please switch to PRO model. Restart. Next prompt: [exact prompt]." |
+| End of Stage 4.A, before Stage 4.B | FAST (execution) | "Please switch to FAST model. Restart. Next prompt: [exact prompt]." |
+
+- **Stage 1 (Prep)** — any model; lightweight validation and scripted analysis.
+- **Stage 2 (Analysis)** — PRO model; strategic planning, resolve `discuss` flags, draft `dynamic_plan.md`.
+- **Stage 3 (Execution)** — FAST model; mechanical implementation item-by-item per the plan.
+- **Stage 4.A (Docs Analysis)** — PRO model; read parity report, sample existing translations for terminology, draft `docs_translation_plan.md`.
+- **Stage 4.B (Docs Translation)** — FAST model; execute `docs_translation_plan.md` file-by-file — translate or update each file, then commit.
+- **Stage 5 (Verification + After-sync)** — any model; manual verification, update `accepted_sync.json`.
+
+**Handoff quality gate (PRO → FAST, Stage 2 → 3):** Before switching to FAST for Stage 3, PRO must verify that `dynamic_plan.md` passes this test: *"Could a mechanical executor complete every item without reading any file not explicitly referenced in the plan?"* If the answer is no, expand the plan before handing off. FAST must never be asked to analyze, judge, or discover — only execute.
+
+**Handoff quality gate (PRO → FAST, Stage 4.A → 4.B):** Before switching to FAST for Stage 4.B, PRO must verify that `docs_translation_plan.md` includes: (1) a terminology glossary, (2) per-file instructions specifying source path, target path, and whether it's a full translation or a targeted update, (3) explicit rules for what to keep untranslated (Pali terms, product names, image paths, code blocks, URLs). FAST must never decide what to translate — only execute the plan.
+
+**The agent MUST stop at the end of each Stage and explicitly state the model switch instruction before ending the session. Never begin Stage 2, 3, 4, or 5 in the same session that completed the previous stage.**
+
+---
+
+## The 5-Stage Sync Workflow
 
 ### Stage 1: Prep (Factual Analysis)
 **Goal**: Establish a baseline, validate the environment, and identify what changed upstream.
@@ -73,6 +110,12 @@ Each stage runs in its own session. At the end of a stage:
    - Create `dynamic_plan.md` in the thread folder.
    - Use `prep_manifest.json` as the factual source of changed upstream files and mapped local destinations.
    - For every modified upstream file mapped to a shadow/inspired copy, define the merge strategy.
+   - **Plan quality requirement (MANDATORY before handing off to Stage 3):** `dynamic_plan.md` must be self-contained enough for a mechanical executor with zero context and zero judgment. Every item must include:
+     - Exact file path(s) to edit.
+     - Exact anchor string or line reference to locate the change point.
+     - Exact code to insert, replace, or delete (literal, not paraphrased).
+     - Verification command to confirm the change landed correctly.
+   - If any item says "figure out X", "determine Y", or "check Z" — the plan is incomplete. PRO must resolve those before handing off.
 2. **Discussion Flags**:
    - Check `discuss` flags in `registry.json`. If `true`, resolve with the user before planning.
    - **Discussion flow**: Discuss each flagged item in chat, one at a time. Do not ask the user to edit any file. Once a decision is reached, mark the item `RESOLVED` in `dynamic_plan.md` with the agreed strategy. Only then proceed.
@@ -102,11 +145,38 @@ Each stage runs in its own session. At the end of a stage:
      - If upstream **does not** have an equivalent → the file is likely a local artefact; delete or archive it.
      - If upstream **does** have an equivalent → investigate: was it replaced by inline rendering? If so, delete the local dead copy.
    - Document findings and decisions in `handoff.md` before deleting anything.
-5. **Full manual verification**
-   - Ask user to verify everything and stay back for feedbacks. after correcting it do not proceed until user explicitly tell - all is good proceed.
-5. **After sync**
+
+### Stage 4: Docs Translation Parity (Analysis → Execution)
+**Goal**: Ensure `docs_rus/` is a complete, up-to-date Russian translation of `docs/`.
+
+`docs/` is upstream-owned and accepted verbatim during sync. `docs_rus/` is the maintained Russian translation — every file in `docs/` must have a counterpart in `docs_rus/` (except `docs_rus/dpd_rus.md`, `docs_rus/contributing/rus_collaboration.md`, and `docs_rus/technical/dpd_headwords_table_ru.md` which are local-only). Never add local content to `docs/`.
+
+**No-translate files (symlink pattern):** Some `docs/` files do not need Russian translation (e.g. `changelog.md` — mostly Pāḷi data and GitHub issue numbers). For these, the canonical approach is a symlink: `docs_rus/changelog.md → ../docs/changelog.md`. The symlink satisfies the parity check (file exists), MkDocs follows it at build time, and the file stays permanently in sync with no maintenance. The parity check script detects symlinks and skips staleness checks for them. To add a new no-translate file, create the symlink and add its name to `NO_TRANSLATE` in `check_docs_parity.py`.
+
+**Stage 4.A — Analysis (PRO model)**:
+1. Run `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir>` → produces `docs_parity_report.md`.
+2. Read 3–5 existing `docs_rus/` files to build a terminology glossary (key EN → RU mappings specific to DPD: headword, inflection template, root family, deconstructor, lookup, etc.).
+3. For each stale file listed in the report: run `git diff <accepted_sha> HEAD -- docs/<file>` to capture the exact diff.
+4. Write `docs_translation_plan.md` in the thread folder containing:
+   - **Terminology glossary** — EN → RU pairs extracted from existing translations.
+   - **Translation rules** — keep Pali terms as-is; keep image paths, code blocks, and URLs unchanged; translate heading text and alt text; keep HTML anchor IDs unchanged.
+   - **Per-file tasks** — for each missing file: source path, target path, "full translation". For each stale file: source path, target path, the exact diff, "update only changed sections".
+5. Present `docs_translation_plan.md` to user for approval.
+
+**Stage 4.B — Translation (FAST model)**:
+1. Read `docs_translation_plan.md` — do not read any other file not referenced there.
+2. Execute file-by-file in order: missing files first (create + translate), stale files second (targeted update).
+3. After all files are written, update `mkdocs_ru.yaml` nav if any new files were added.
+4. Prepare commit: `#docs: translate/update docs_rus/ for sync <from>..<to>`.
+
+### Stage 5: Verification & After-sync
+**Goal**: Final human verification and close out the sync record.
+
+1. **Full manual verification**
+   - Ask user to verify everything and stay back for feedback. After correcting it, do not proceed until user explicitly says "all is good, proceed."
+2. **After sync**
    - Update `accepted_sync.json` only after the sync is accepted and verified.
-   - Review the temporary `new_improvements.md`, promote items after the suggestions for proccess been accepted and implemented, move them to `archive_improvements.md`, and delete the file.
+   - Review the temporary `new_improvements.md`, promote accepted items to `archive_improvements.md`, and delete the file.
 
 ---
 

@@ -121,14 +121,16 @@
 
 **File**: `docs_rus/`
 - **Category**: inspired_by_upstream
-- **Divergence Reason**: Content-diverged Russian documentation; not a translation of upstream docs.
-- **Sync Rule**: inspired_only
+- **Divergence Reason**: Maintained Russian translation of `docs/`; not a code shadow — content is translated, not mirrored.
+- **Sync Rule**: inspired_only (translation is done by agent in Stage 4, not automated copy)
 - **Local Changes**:
   1. Complete Russian translation of the `docs/` directory: features, install, webapp, integrations, contributing, technical sections.
   2. Served by `mkdocs_ru.yaml`; deployed to `devamitta.github.io/dpd.rus/`.
+  3. Three local-only files with no `docs/` counterpart: `dpd_rus.md`, `contributing/rus_collaboration.md`, `technical/dpd_headwords_table_ru.md`.
 - **Watch For**:
-  - No automated sync with English docs — all new upstream pages must be translated and added manually.
-  - Navigation structure must be kept in sync with `mkdocs_ru.yaml`.
+  - Translation parity is checked and updated in Stage 4 of every sync — see `guide.md`.
+  - Navigation structure in `mkdocs_ru.yaml` must be updated when new files are added.
+  - Do NOT add local content to `docs/` — use `docs_rus/` or `kamma/` instead.
 
 ---
 

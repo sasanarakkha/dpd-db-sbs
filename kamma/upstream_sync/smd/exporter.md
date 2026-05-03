@@ -308,6 +308,7 @@
 - **Watch For**:
   - This file serves as the main entry point for the Russian webapp (port 8081).
   - It maintains a dual-mode (RU at root, SBS at `/sbs`).
+  - `127.0.0.1` is the correct local Mac development address — never replace it with `0.0.0.0` or `localhost`.
 
 ---
 
