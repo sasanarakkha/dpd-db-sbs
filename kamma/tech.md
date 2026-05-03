@@ -26,6 +26,7 @@ GUI onboarding workflow.
     - **Tier 3 (New)**: Mandatory locale suffix.
     - **HTML IDs**: Always use a locale prefix (`ru_`, `sbs_`, `dps_`, `ta_`).
 - **Inspired-by Files**: Files in the `inspired_by_upstream` category may diverge from upstream structure but must document the `divergence_reason` in the registry and explain the divergence in their SMD.
+- **Upstream Sync Workflow**: All sync operations MUST follow the 5-Stage workflow defined in `kamma/upstream_sync/guide.md`. This includes Stage 4 (Docs Translation Parity) which ensures `docs_rus/` stays in sync with `docs/` using the `check_docs_parity.py` tool.
 - All changes must pass `ruff check --fix` and `ruff format` before completion.
 - The root directory must stay clean — no temporary scripts or artifacts.
 - **No Inline Scripting**: NEVER use `python -c "..."` or `python3 -c "..."` in Bash. If you need a one-shot script, write it to `temp/<descriptive_name>.py` and run `uv run python temp/<descriptive_name>.py`. Delete the file when done.
