@@ -92,6 +92,17 @@ Renames/moves are atomic. You MUST:
 - **Strict Parity:** For shadow copies, maintain strict logic parity with upstream. DO NOT introduce new solutions. Emulate upstream implementation exactly, only layering localized UI/data on top.
 - **Templates:** Use standard Jinja2 (`{{ var }}`, `{% if %}`). Legacy Mako syntax (`${var}`, `% if`) is STRICTLY prohibited in localized templates.
 - **Changes:** Must document tech stack changes in `kamma/tech.md` before implementation. Code changes must pass `uv run ruff check --fix` and `uv run ruff format`.
+
+## Pre-Completion Validation (MANDATORY)
+
+**Before reporting ANY Python code changes as complete, run ALL of:**
+
+1. `uv run ruff check --fix <file>`
+2. `uv run ruff format <file>`
+3. `uv run pyright <file>`
+4. `uv run pytest tests/test_<feature>.py -v` (for affected tests)
+
+**Do NOT report completion until all checks pass.** This is non-negotiable. Do not skip or defer these. Type safety is mandatory, not optional.
 - **Verification:** Write tests for accurate data output (not UI components). Readme MUST be updated.
 - **Research:** Always perform Google Search for framework/OS quirks.
 - **Sync Tracking:** Only track and update exporters in the sync registry that contain localized data (Russian, SBS, or DPS-specific).

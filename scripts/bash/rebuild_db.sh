@@ -69,6 +69,7 @@ while true; do
             python -c "from tools.configger import config_update; config_update('regenerate', 'db_rebuild', 'no')"
             scripts/other/add_combined_view.py
             scripts/change_in_db/apply_all_corrections.py
+            scripts/change_in_db/update_yojana_km.py
             exporter/goldendict/main_sbs.py
             break;;
         * )
