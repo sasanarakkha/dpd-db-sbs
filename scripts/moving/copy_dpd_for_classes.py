@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# copy tipitaka_pali.db, dpd goldendict folder, and bash script to the for_classes server folder.
+
+import sys
 from pathlib import Path
 import shutil
 from tools.printer import printer as pr
@@ -40,8 +43,9 @@ dest_dir: Path = (
 tp_db_dest: Path = dest_dir / "tipitaka_pali.db"
 dpd_goldendict_dest: Path = dest_dir / "dpd"
 
-# Ensure destination directory exists
-dest_dir.mkdir(parents=True, exist_ok=True)
+if not dest_dir.exists():
+    pr.no(f"destination not found: {dest_dir}")
+    sys.exit(1)
 
 # ---------- Copy tipitaka db ----------
 

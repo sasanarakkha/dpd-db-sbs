@@ -29,9 +29,9 @@ safe_copy_file() {
     
     local dest_dir
     dest_dir=$(dirname "$dest_file")
-    if ! mkdir -p "$dest_dir"; then
-        echo "Error: Could not create destination directory '$dest_dir'. Skipping copy of '$src_file'."
-        return 1 # This will cause script to exit due to set -e
+    if [ ! -d "$dest_dir" ]; then
+        echo "Error: Destination directory '$dest_dir' does not exist. Stopping."
+        exit 1
     fi
 
     # Switched to rsync for potentially better handling of metadata with network shares on macOS.
@@ -62,9 +62,9 @@ safe_copy_dir_contents() {
         return 0
     fi
 
-    if ! mkdir -p "$dest_dir"; then
-        echo "Error: Could not create destination directory '$dest_dir'. Skipping copy of '$src_dir' contents."
-        return 1 # This will cause script to exit
+    if [ ! -d "$dest_dir" ]; then
+        echo "Error: Destination directory '$dest_dir' does not exist. Stopping."
+        exit 1
     fi
     
     # Using rsync to copy directory contents.
@@ -79,6 +79,15 @@ safe_copy_dir_contents() {
         return 1 # This will cause script to exit
     fi
 }
+
+if [ ! -d "$FILESRV_BASE_DEST_DIR" ]; then
+    echo "Error: Fileserver directory not found: $FILESRV_BASE_DEST_DIR. Stopping."
+    exit 1
+fi
+if [ ! -d "$FILESRV_CSVS_DEST_DIR" ]; then
+    echo "Error: Fileserver directory not found: $FILESRV_CSVS_DEST_DIR. Stopping."
+    exit 1
+fi
 
 cd "$ANKI_DECKS_DIR" || { echo "Error: Could not cd to $ANKI_DECKS_DIR. Exiting."; exit 1; }
 

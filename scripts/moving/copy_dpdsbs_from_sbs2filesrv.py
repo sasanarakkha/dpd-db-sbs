@@ -2,6 +2,7 @@
 
 # copy dpd-sbs golden dict, mdict from Download to the fileserver.   
 
+import sys
 from pathlib import Path
 from datetime import date
 import shutil
@@ -31,6 +32,11 @@ kd_dir: Path = software_dir / "Ebook Readers Dictionary"
 dpd_zip_src: Path = share_sbs_dir / "dpd.zip"
 dpd_mdict_src_mdx: Path = share_sbs_dir / "dpd-mdict.mdx"
 dpd_mdict_src_mdd: Path = share_sbs_dir / "dpd-mdict.mdd"
+
+for dest in [gd_dir, md_dir]:
+    if not dest.exists():
+        pr.no(f"destination not found: {dest}")
+        sys.exit(1)
 
 # unzip dpd
 if dpd_zip_src.exists():

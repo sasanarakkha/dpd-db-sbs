@@ -2,6 +2,7 @@
 
 # unzip dpd-sbs golden dict, mdict from Download to the fileserver.   
 
+import sys
 from pathlib import Path
 from datetime import date
 from zipfile import ZipFile
@@ -25,6 +26,11 @@ md_dir: Path = software_dir / "MDict" / "dpd"
 
 dpd_goldendict_src: Path = downloads_dir / "dpd+sbs-goldendict.zip"
 dpd_mdict_src: Path = downloads_dir / "dpd+sbs-mdict.zip"
+
+for dest in [gd_dir, md_dir]:
+    if not dest.exists():
+        pr.no(f"destination not found: {dest}")
+        sys.exit(1)
 
 # dpd_goldendict unzip to the specified directory
 if dpd_goldendict_src.exists():

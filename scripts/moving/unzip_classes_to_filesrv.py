@@ -2,6 +2,7 @@
 
 # unzip pali classes from Download to the fileserver.   
 
+import sys
 from pathlib import Path
 from datetime import date
 from zipfile import ZipFile
@@ -27,6 +28,10 @@ beginner_pdfs_src: Path = downloads_dir / "beginner_pali_course_pdfs.zip"
 intermediate_docs_src: Path = downloads_dir / "intermediate_pali_course_docx.zip"
 intermediate_pdfs_src: Path = downloads_dir / "intermediate_pali_course_pdfs.zip"
 
+for dest in [beginner_dir, intermediate_dir]:
+    if not dest.exists():
+        pr.no(f"destination not found: {dest}")
+        sys.exit(1)
 
 # unzip beginner
 if beginner_docs_src.exists():

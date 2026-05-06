@@ -2,6 +2,7 @@
 
 # unzip dpd golden dict, mdict and pdf from local folder Download to the fileserver. And copy kindle and kobo versions as well. 
 
+import sys
 from pathlib import Path
 from datetime import date
 from zipfile import ZipFile
@@ -35,6 +36,11 @@ dpd_kindle_epub_dest: Path = kd_dir / "dpd-kindle.epub"
 dpd_kobo_src: Path = downloads_dir / "dpd-kobo.zip"
 dpd_kobo_dest: Path = kd_dir / "dpd-kobo.zip"
 dpd_pdf_src: Path = downloads_dir / "dpd-pdf.zip"
+
+for dest in [gd_dir, md_dir, kd_dir]:
+    if not dest.exists():
+        pr.no(f"destination not found: {dest}")
+        sys.exit(1)
 
 # dpd_goldendict unzip to the specified directory
 if dpd_goldendict_src.exists():

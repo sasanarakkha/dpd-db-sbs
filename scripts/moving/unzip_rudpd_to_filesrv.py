@@ -2,6 +2,7 @@
 
 # unzip rudpd from download folder to the fileserver. And copy mdx and kindl versions as well. 
 
+import sys
 from pathlib import Path
 from datetime import date
 from zipfile import ZipFile
@@ -37,6 +38,11 @@ dpd_kindle_epub_src: Path = downloads_dir / "ru-dpd-kindle.epub"
 # Destination file paths for Kindle files
 dpd_kindle_mobi_dest: Path = kd_dir / "ru-dpd-kindle.mobi"
 dpd_kindle_epub_dest: Path = kd_dir / "ru-dpd-kindle.epub"
+
+for dest in [gd_dir, md_dir, kd_dir]:
+    if not dest.exists():
+        pr.no(f"destination not found: {dest}")
+        sys.exit(1)
 
 # Unzip ru-dpd-goldendict
 if dpd_src.exists():
