@@ -1,5 +1,9 @@
 [
     {
+        "id": 1,
+        "lemma_1": "a 1.1"
+    },
+    {
         "id": 23586,
         "lemma_1": "khalupacchābhattikaṅga"
     },
@@ -74,9 +78,5 @@
     {
         "id": 20465,
         "lemma_1": "karaṇīya 1"
-    },
-    {
-        "id": 39450,
-        "lemma_1": "paccāgamissati"
     }
 ]

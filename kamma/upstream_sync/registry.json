@@ -31,11 +31,6 @@
       "discuss_reason": ""
     },
     {
-      "path": "tools/ai_manager.py",
-      "discuss": false,
-      "discuss_reason": ""
-    },
-    {
       "path": ".gitignore",
       "discuss": true,
       "discuss_reason": "Contains DPS-specific exclusions for local build artifacts, Russian export outputs, and SBS data paths. Blind porting would re-track files that must remain untracked in this fork."

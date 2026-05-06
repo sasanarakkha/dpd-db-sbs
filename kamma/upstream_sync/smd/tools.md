@@ -1,16 +1,5 @@
 # SMD: TOOLS
 
-**File**: `tools/ai_manager.py`
-- **Category**: modified_upstream
-- **Sync Rule**: PORT
-- **Local Changes**:
-  1. No significant localized additions found — this file appears to be nearly identical to upstream. Track for future localized AI processing hooks.
-  2. Monitor for any DPS-specific AI batch processing logic that may be added.
-- **Watch For**:
-  - If upstream restructures AI manager interfaces, verify DPS AI tools (`tools/ai_batch_processor.py`, `tools/ai_openai_manager.py`) still import correctly.
-
----
-
 
 **File**: `tools/degree_of_completion_ru.py`
 - **Category**: russian_copy

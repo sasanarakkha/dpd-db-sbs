@@ -126,7 +126,7 @@ def main():
     # Save processed IDs
     if newly_processed:
         with open(processed_file, "w") as f:
-            json.dump(sorted(list(processed_ids)), f, indent=4)
+            json.dump(sorted([int(id_val) for id_val in processed_ids]), f, indent=4)
         print(
             f"\nSaved {len(newly_processed)} newly processed IDs to {processed_file}."
         )

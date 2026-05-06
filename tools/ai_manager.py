@@ -1,8 +1,31 @@
+import json
 import time
+from pathlib import Path
 from typing import Any, NamedTuple, Optional
 
 from tools.configger import config_read
 from tools.printer import printer as pr
+
+AI_MODELS_PATH = Path("tools/ai_models.json")
+
+
+def _load_models_from_json() -> dict[str, list[tuple[str, str, int]]]:
+    """Load model lists from tools/ai_models.json."""
+    try:
+        data = json.loads(AI_MODELS_PATH.read_text())
+        return {
+            "default": [
+                (m["provider"], m["model"], m["delay"])
+                for m in data.get("default_models", [])
+            ],
+            "grounded": [
+                (m["provider"], m["model"], m["delay"])
+                for m in data.get("grounded_models", [])
+            ],
+        }
+    except (FileNotFoundError, json.JSONDecodeError, KeyError) as e:
+        pr.red(f"Failed to load {AI_MODELS_PATH}: {e}")
+        return {"default": [], "grounded": []}
 
 
 class AIResponse(NamedTuple):
@@ -20,34 +43,24 @@ class AIResponse(NamedTuple):
 
 
 class AIManager:
-    # Ordered list of (provider, model, delay_seconds) tuples as fallback defaults
-    DEFAULT_MODELS: list[tuple[str, str, int]] = [
-        # gemini
-        ("gemini", "gemini-2.5-flash", 12),
-        ("gemini", "gemini-2.5-flash-lite", 6),
-        # openrouter
-        # ("openrouter", "google/gemini-2.5-flash-001", 5),
-        # ("openrouter", "qwen/qwen-turbo", 5),
-        # ("openrouter", "mistralai/mistral-7b-instruct-v0.1", 5),
-        ("openrouter", "deepseek/deepseek-v3.2", 5),
-        ("openrouter", "openrouter/aurora-alpha", 5),
-        # openai
-        ("openai", "gpt-5.1", 5),
-        ("openai", "gpt-5-mini", 5),
-    ]
-
-    # Grounded models for internet searches
-    GROUNDED_MODELS = [
-        ("gemini", "gemini-2.5-flash", 6),
-    ]
-
     def __init__(self):
+        models = _load_models_from_json()
+        self.DEFAULT_MODELS: list[tuple[str, str, int]] = models["default"]
+        self.GROUNDED_MODELS: list[tuple[str, str, int]] = models["grounded"]
+
         self.providers: dict[str, Any] = {}
 
+        from tools.ai_claude_manager import ClaudeManager
         from tools.ai_deepseek_manager import DeepseekManager
+        from tools.ai_gpt_manager import GptManager
         from tools.ai_gemini_manager import GeminiManager
         from tools.ai_open_router import OpenRouterManager
-        from tools.ai_openai_manager import OpenAIManager
+
+        self.providers["claude"] = ClaudeManager()
+        pr.green("claude initialized")
+
+        self.providers["codex"] = GptManager()
+        pr.green("codex initialized")
 
         if config_read("apis", "openrouter"):
             self.providers["openrouter"] = OpenRouterManager()
@@ -67,16 +80,23 @@ class AIManager:
         else:
             pr.amber("Gemini API key not found, manager not initialized.")
 
-        if config_read("apis", "openai"):
-            self.providers["openai"] = OpenAIManager()
-            pr.green("openai initialized")
-        else:
-            pr.amber("OpenAI API key not found, manager not initialized.")
+        pr.green(
+            f"loaded {len(self.DEFAULT_MODELS)} default models, {len(self.GROUNDED_MODELS)} grounded models"
+        )
 
         self.last_request_time: float = 0
         self.min_delay_seconds: float = 5
         # NEW: Track last request time per model for model-specific rate limiting
         self.model_last_request: dict[str, float] = {}
+
+    def reload_models(self) -> None:
+        """Reload model lists from tools/ai_models.json."""
+        models = _load_models_from_json()
+        self.DEFAULT_MODELS = models["default"]
+        self.GROUNDED_MODELS = models["grounded"]
+        pr.green(
+            f"reloaded {len(self.DEFAULT_MODELS)} default models, {len(self.GROUNDED_MODELS)} grounded models"
+        )
 
     def _get_model_delay(self, provider: str, model: str) -> float:
         """Get delay for specific model, with fallback to global delay."""
@@ -102,8 +122,8 @@ class AIManager:
         provider_preference and model are not specified.
         Returns an AIResponse object.
         """
-        # NEW: Model-specific rate limiting
         models_to_try = []
+        errors: list[str] = []
 
         # Use a grounded model for internet searches
         if grounding:
@@ -168,16 +188,18 @@ class AIManager:
                         status_message=status_message,
                     )
                 else:
-                    status_message = f"ERROR in {duration:.2f}s."
+                    status_message = f"{provider_name}/{model_name} ERROR in {duration:.2f}s: {ai_response.status_message}"
                     pr.amber(status_message)
-                    pr.red(ai_response.status_message)
+                    errors.append(status_message)
             except Exception as e:
                 duration = time.monotonic() - start_time
-                status_message = f"ERROR in {duration:.2f}s"
+                status_message = (
+                    f"{provider_name}/{model_name} ERROR in {duration:.2f}s: {e}"
+                )
                 pr.red(status_message)
-                pr.red(str(e))
+                errors.append(status_message)
 
-        final_failure_message = "All AI providers failed."
+        final_failure_message = "All AI providers failed. " + " | ".join(errors)
         pr.red(final_failure_message)
         return AIResponse(content=None, status_message=final_failure_message)
 
@@ -210,18 +232,6 @@ if __name__ == "__main__":
     )
     pr.green(f"Status: {open_router_response.status_message}")
     pr.green(f"Content: {open_router_response.content}")
-
-    # -----------------------------------------
-
-    pr.green("\n--- Testing OpenAI ---")
-    openai_response = ai_manager.request(
-        prompt=prompt,
-        prompt_sys=sys_prompt,
-        provider_preference="openai",
-        model="gpt-4o-mini",
-    )
-    pr.green(f"Content: {openai_response.content}")
-    pr.green(f"Status: {openai_response.status_message}")
 
     # -----------------------------------------
 

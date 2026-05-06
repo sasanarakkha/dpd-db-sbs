@@ -18,16 +18,15 @@ from tools.date_and_time import year_month_day_hour_minute_dash
 
 from tools.ai_related import (
     load_translation_examples,
-    handle_ai_response,
     replace_abbreviations,
-    get_ai_client,
     generate_messages_for_meaning,
     generate_messages_for_notes,
     generate_messages_for_meaning_lit,
     generate_messages_for_meaning_ta,
     load_ai_config,
-    print_ai_config,
 )
+from tools.ai_manager import AIManager
+from tools.printer import printer as pr
 
 from tools.paths_dps import DPSPaths
 
@@ -40,6 +39,7 @@ dpspth = DPSPaths()
 db_session = get_db_session(pth.dpd_db_path)
 date = year_month_day_hour_minute_dash()
 
+ai_manager = AIManager()
 api_key, provider, model = load_ai_config()
 
 # Language routing configuration for meaning mode
@@ -252,7 +252,9 @@ def create_translation_prompt(word: DpdHeadword, mode, lang: str = "ru") -> Dict
     }
 
 
-def translate(lemma_1, grammar, pos, meaning, sentence, notes, mode, lang: str = "ru"):
+def translate(
+    lemma_1, grammar, pos, meaning, sentence, notes, mode, lang: str = "ru"
+) -> str | None:
     pos_example_map = load_translation_examples(dpspth, lang=lang)
     translation_example = pos_example_map.get(pos, "")
     grammar = replace_abbreviations(grammar)
@@ -276,26 +278,20 @@ def translate(lemma_1, grammar, pos, meaning, sentence, notes, mode, lang: str =
     else:
         raise ValueError(f"Invalid mode: {mode}")
 
-    # Get appropriate client and handle response
-    client = get_ai_client()
-    print_ai_config()
-    suggestion, error_string = handle_ai_response(client, messages)
-    if error_string:
-        print(error_string)
-    elif suggestion:
-        # Ensure suggestion is treated as a string
-        suggestion_str = suggestion.get("content", "") if suggestion else ""
-
-        if mode == "meaning":
-            return suggestion_str
-
-        elif mode == "lit":
-            return suggestion_str
-
-        elif mode == "note":
-            return f"[пер. ИИ] {suggestion_str}"
-        else:
-            raise ValueError(f"Invalid mode: {mode}")
+    sys_content = messages[0]["content"]
+    user_content = messages[1]["content"]
+    response = ai_manager.request(prompt=user_content, prompt_sys=sys_content)
+    if response.content is None:
+        pr.red(response.status_message)
+        return None
+    if mode == "meaning":
+        return response.content
+    elif mode == "lit":
+        return response.content
+    elif mode == "note":
+        return f"[пер. ИИ] {response.content}"
+    else:
+        raise ValueError(f"Invalid mode: {mode}")
 
 
 def save_prompts_to_json(prompts: List[Dict], filename):
@@ -351,11 +347,9 @@ def translation_generate(mode, limit: int, lang: str = "ru"):
 
                 print(f"{word.id}, {word.ebt_count} {word.lemma_1} {meaning_result}")
 
-                with open(
-                    f"{dpspth.ai_translated_dir}/{model}-{lang}.tsv",
-                    "a",
-                    encoding="utf-8",
-                ) as file:
+                tsv_path = dpspth.ai_translated_dir / f"{model}-{lang}.tsv"
+                tsv_path.parent.mkdir(parents=True, exist_ok=True)
+                with open(tsv_path, "a", encoding="utf-8") as file:
                     file.write(f"{word.id}\t{word.lemma_1}\t{meaning_result}\n")
 
             elif mode == "lit":
@@ -420,18 +414,18 @@ def read_exclude_ids_from_json(
 if __name__ == "__main__":
     print("Translating with the help of AI")
 
-    limit: int = 7000
+    limit: int = 1
 
     # lang: str = "ta"
     lang: str = "ru"
 
     # remove_irrelevant(limit, lang=lang)
 
-    # translation_generate("meaning", limit, lang=lang)
+    translation_generate("meaning", limit, lang=lang)
 
     # translation_generate("note", limit, lang=lang)
 
-    make_json("meaning", limit, lang=lang)
+    # make_json("meaning", limit, lang=lang)
 
     # make_json("note", limit, lang=lang)
 

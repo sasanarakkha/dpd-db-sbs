@@ -283,7 +283,7 @@ class DpdExampleField(ft.Column):
         self.text_field.update()
 
     # --- Toggle Visibility Handling ---
-    def _toggle_tools_visibility(self, e: ft.ControlEvent):
+    def _toggle_tools_visibility(self, e: ft.ControlEvent | None):
         """Toggles the visibility of the search and action rows."""
         are_visible = not self._search_row.visible
         self._search_row.visible = are_visible
