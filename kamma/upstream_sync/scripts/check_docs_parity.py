@@ -21,7 +21,7 @@ EXPECTED_LOCAL_ONLY: set[str] = {
     "technical/dpd_headwords_table_ru.md",
 }
 
-# docs/ files that are mirrored via symlink — no translation needed, skip staleness checks
+# docs/ files that are mirrored via redirect — no translation needed, skip staleness checks
 NO_TRANSLATE: set[str] = {
     "changelog.md",
     "newsletters.md",
@@ -59,19 +59,12 @@ def collect_md_files(directory: Path) -> set[str]:
     return {str(p.relative_to(directory)) for p in directory.rglob("*.md")}
 
 
-def collect_symlinked_files(directory: Path) -> set[str]:
-    """Return relative paths of .md files that are symlinks in docs_rus/."""
-    return {
-        str(p.relative_to(directory)) for p in directory.rglob("*.md") if p.is_symlink()
-    }
-
-
 def write_report(
     thread_dir: Path,
     sha: str,
     missing: list[str],
     stale: list[str],
-    symlinked: list[str],
+    no_translate: list[str],
     unique_local: list[str],
 ) -> None:
     lines: list[str] = [
@@ -111,16 +104,16 @@ def write_report(
     else:
         lines.append("None.")
 
-    if symlinked:
+    if no_translate:
         lines += [
             "",
-            "## Symlinked (No-translate) Files",
+            "## No-translate Files (HTML Redirect)",
             "",
-            "Files mirrored via symlink — no translation needed, always in sync:",
+            "Files mirrored via HTML redirect — no translation needed:",
             "",
         ]
-        for f in symlinked:
-            lines.append(f"- `docs_rus/{f}` → symlink to `docs/{f}`")
+        for f in no_translate:
+            lines.append(f"- `docs_rus/{f}` (redirect)")
 
     lines += [
         "",
@@ -144,7 +137,6 @@ def run_parity_check(thread_dir: Path | None) -> None:
 
     en_files = collect_md_files(DOCS_EN)
     ru_files = collect_md_files(DOCS_RU)
-    symlinked = collect_symlinked_files(DOCS_RU)
     changed = get_docs_changed_since(sha)
 
     missing: list[str] = sorted(f for f in en_files if f not in ru_files)
@@ -152,7 +144,11 @@ def run_parity_check(thread_dir: Path | None) -> None:
         f for f in en_files if f in changed and f in ru_files and f not in NO_TRANSLATE
     )
     unique_local: list[str] = sorted(f for f in ru_files if f not in en_files)
-    symlinked_list: list[str] = sorted(symlinked)
+
+    # Collect no-translate files (symlinks OR files in NO_TRANSLATE)
+    no_translate_list: list[str] = sorted(
+        f for f in ru_files if f in NO_TRANSLATE or (DOCS_RU / f).is_symlink()
+    )
 
     if missing:
         pr.no(f"{len(missing)} missing translations")
@@ -168,10 +164,12 @@ def run_parity_check(thread_dir: Path | None) -> None:
     else:
         pr.yes("no stale translations")
 
-    if symlinked_list:
-        pr.green(f"{len(symlinked_list)} symlinked no-translate files (informational)")
-        for f in symlinked_list:
-            pr.green(f"  SYMLINK  docs_rus/{f}")
+    if no_translate_list:
+        pr.green(f"{len(no_translate_list)} no-translate files (informational)")
+        for f in no_translate_list:
+            p = DOCS_RU / f
+            type_str = "SYMLINK " if p.is_symlink() else "REDIRECT"
+            pr.green(f"  {type_str}  docs_rus/{f}")
 
     if unique_local:
         pr.green(f"{len(unique_local)} unique local files (informational)")
@@ -179,7 +177,7 @@ def run_parity_check(thread_dir: Path | None) -> None:
             pr.green(f"  LOCAL    docs_rus/{f}")
 
     if thread_dir:
-        write_report(thread_dir, sha, missing, stale, symlinked_list, unique_local)
+        write_report(thread_dir, sha, missing, stale, no_translate_list, unique_local)
 
 
 def main() -> None:

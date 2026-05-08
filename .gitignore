@@ -67,6 +67,7 @@ exporter/kindle/epub/OEBPS/Text/[0-9]*_*.xhtml
 exporter/kindle/epub/OEBPS/Text/abbreviations.xhtml
 exporter/kindle/epub/OEBPS/Text/epd_*.xhtml
 exporter/mcp/output/*
+exporter/mcp/input/*
 exporter/pdf/typst_data_lite.typ
 exporter/share/
 exporter/tester/fonts/

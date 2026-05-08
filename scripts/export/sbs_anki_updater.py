@@ -308,7 +308,7 @@ def update_note_values_csv(note: Note, row: dict, deck_config: DeckSpec) -> bool
                 note[field_name] = str(value) if value is not None else ""
             except Exception as e:
                 pr.red(
-                    f"Error producing field '{field_name}' for row {row.get('pali_1', row.get('id', 'unknown'))}: {e}"
+                    f"Error producing field '{field_name}' for row {row.get('pali', row.get('id', 'unknown'))}: {e}"
                 )
 
     return note.fields != old_fields

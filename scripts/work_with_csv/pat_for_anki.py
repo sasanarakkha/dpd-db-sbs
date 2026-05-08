@@ -69,7 +69,7 @@ def process_patimokkha_csv() -> None:
         )
 
     columns_to_keep: list[str] = [
-        "pali_1",
+        "pali",
         "pos",
         "grammar",
         "case",
@@ -104,8 +104,8 @@ def process_patimokkha_csv() -> None:
     df_processed.loc[:, "test"] = datetime.today().strftime("%m-%d")
     df_processed.loc[:, "order"] = range(1, len(df_processed) + 1)
 
-    if "pali_1" in df_processed.columns and not df_processed["pali_1"].empty:
-        df_processed.loc[:, "feedback"] = df_processed["pali_1"].apply(
+    if "pali" in df_processed.columns and not df_processed["pali"].empty:
+        df_processed.loc[:, "feedback"] = df_processed["pali"].apply(
             lambda pali_word: f'Spot a mistake? <a class="link" href="https://docs.google.com/forms/d/e/1FAIpQLSdG6zKDtlwibtrX-cbKVn4WmIs8miH4VnuJvb7f94plCDKJyA/viewform?usp=pp_url&entry.438735500={pali_word if pd.notna(pali_word) else ""}&entry.1433863141=Anki">Fix it here</a>.'
         )
     else:

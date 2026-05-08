@@ -10,7 +10,7 @@
 
 Откройте кнопку **Меню** на странице списка словарей.
 
-![Dictionary List Menu](../pics/dicttango/6_dictionary_list_menu.jpg)
+![Dictionary List Menu](../pics/dicttango/dict-list-menu.jpg)
 
 Выберите **Добавить онлайн-словарь**.
 

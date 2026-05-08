@@ -151,7 +151,7 @@ All commands listed in this guide (`uv run`, `grep`, `find`, `git diff`, `git lo
 
 `docs/` is upstream-owned and accepted verbatim during sync. `docs_rus/` is the maintained Russian translation — every file in `docs/` must have a counterpart in `docs_rus/` (except `docs_rus/dpd_rus.md`, `docs_rus/contributing/rus_collaboration.md`, and `docs_rus/technical/dpd_headwords_table_ru.md` which are local-only). Never add local content to `docs/`.
 
-**No-translate files (symlink pattern):** Some `docs/` files do not need Russian translation (e.g. `changelog.md` — mostly Pāḷi data and GitHub issue numbers). For these, the canonical approach is a symlink: `docs_rus/changelog.md → ../docs/changelog.md`. The symlink satisfies the parity check (file exists), MkDocs follows it at build time, and the file stays permanently in sync with no maintenance. The parity check script detects symlinks and skips staleness checks for them. To add a new no-translate file, create the symlink and add its name to `NO_TRANSLATE` in `check_docs_parity.py`.
+**No-translate files (HTML redirect pattern):** Some `docs/` files do not need Russian translation (e.g. `changelog.md` — mostly Pāḷi data and GitHub issue numbers). For these, the canonical approach is an HTML meta-redirect file: `docs_rus/file.md` redirects to an external URL. This satisfies the parity check (file exists) and MkDocs correctly handles it during build. Add such files to `NO_TRANSLATE` in `check_docs_parity.py` to skip staleness checks.
 
 **Stage 4.A — Analysis (PRO model)**:
 1. Run `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir>` → produces `docs_parity_report.md`.

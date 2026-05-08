@@ -23,13 +23,13 @@ DictTango использует файлы MDict, и предлагает гор�
 
 Скачайте и установите DictTango из [Google Play Store](https://play.google.com/store/apps/details?id=cn.jimex.dict&pcampaignid=web_share) или [APKPure](https://m.apkpure.com/dicttango/cn.jimex.dict)
 
-![google play store](../pics/dicttango/play_store.jpg)
+![google play store](../pics/dicttango/play-store.jpg)
 
 ### Скачать DPD
 
 Скачайте последнюю версию **ru-dpd-mdict.zip** с [Github](https://github.com/sasanarakkha/dpd-db-sbs/releases/latest/)
 
-![github mdict](../pics/dicttango/github-mdict.png)
+![github mdict](../pics/dicttango/github-mdict.jpg)
 
 ### Скопируйте файлы DPD в папку DictTango
 
@@ -37,31 +37,31 @@ DictTango использует файлы MDict, и предлагает гор�
 
 Откройте приложение DictTango и нажмите **значок меню** в правом верхнем углу
 
-![меню dicttango](../pics/dicttango/4_menu.jpg)
+![меню dicttango](../pics/dicttango/menu-button.jpg)
 
 Нажмите на **Список словарей**
 
-![список словарей](../pics/dicttango/5_dictionary_list.jpg)
+![список словарей](../pics/dicttango/manage-dicts.jpg)
 
 Нажмите на **значок меню** в правом верхнем углу списка словарей
 
-![меню списка словарей](../pics/dicttango/6_dictionary_list_menu.jpg)
+![меню списка словарей](../pics/dicttango/dict-list-menu.jpg)
 
 Нажмите **Копировать с SD карты**
 
-![копировать с sd карты](../pics/dicttango/7_copy_from_sd_card.jpg)
+![копировать с sd карты](../pics/dicttango/Screenshot_2023-12-26-15-47-25-267_cn.jimex.dict-edit.jpg)
 
 **Выберите** (**Select**) 6 файлов RU-DPD в файловом менеджере Android
 
-![выбрать файлы](../pics/dicttango/8_select.jpg)
+![выбрать файлы](../pics/dicttango/Screenshot_2023-12-26-15-48-45-606_cn.jimex.dict-edit.jpg)
 
 Выберите **Dictionaries Folder** (**Папка словарей**) как папку назначения
 
-![папка словарей](../pics/dicttango/9_dictionaries_folder.jpg)
+![папка словарей](../pics/dicttango/dictionary-folder.jpg)
 
 Нажмите **Скопировать сюда**
 
-![копировать сюда](../pics/dicttango/10_copy_here.jpg)
+![копировать сюда](../pics/dicttango/Screenshot_2023-12-26-16-14-19-639_cn.jimex.dict-edit.jpg)
 
 
 ## Показать все записи
@@ -70,31 +70,31 @@ DictTango использует файлы MDict, и предлагает гор�
 
 Нажмите **кнопку меню** в правом верхнем углу.
 
-![кнопка меню](../pics/dicttango/4_menu.jpg)
+![кнопка меню](../pics/dicttango/menu-button.jpg)
 
 Выберите **Группа словарей**.
 
-![группа словарей](../pics/dicttango/dictionary_group.jpg)
+![группа словарей](../pics/dicttango/dictionary-group.jpg)
 
 Выберите **Default Group** (**Группа по умолчанию**).
 
-![группа по умолчанию](../pics/dicttango/default_group.jpg)
+![группа по умолчанию](../pics/dicttango/default-group.jpg)
 
 Нажмите **Управление словарями**
 
-![словарь по умолчанию](../pics/dicttango/default_group_dictionaries.jpg)
+![словарь по умолчанию](../pics/dicttango/default-group-checkboxes.jpg)
 
 **Длительное нажатие**, чтобы выбрать любой словарь, затем нажмите **Выбрать все**
 
-![выбрать все](../pics/dicttango/default_group_select_all.jpg)
+![выбрать все](../pics/dicttango/select-dicts.jpg)
 
 Нажмите **Более** в правом нижнем углу.
 
-![еще](../pics/dicttango/default_group_more.jpg)
+![еще](../pics/dicttango/more.jpg)
 
 Нажмите на **Автоматическое развертывание**
 
-![авторазвертывание](../pics/dicttango/dictionary_group_auto_expand.jpg)
+![авторазвертывание](../pics/dicttango/auto-expand.jpg)
 
 Вот и все. Теперь вы увидите все записи из всех словарей.
 
@@ -105,11 +105,11 @@ DictTango использует файлы MDict, и предлагает гор�
 
 Нажмите **Кнопку режима сортировки** в правом верхнем углу
 
-![кнопка режима сортировки](../pics/dicttango/sorting_mode_button.jpg)
+![кнопка режима сортировки](../pics/dicttango/sort-up-down.jpg)
 
 **Длительное нажатие и перетаскивание**, или нажмите **стрелки**, чтобы изменить порядок словарей.
 
-![режим сортировки](../pics/dicttango/sorting_mode.jpg)
+![режим сортировки](../pics/dicttango/sort-up-down2.jpg)
 
 
 ## Темный режим
@@ -118,7 +118,7 @@ DictTango использует файлы MDict, и предлагает гор�
 
 Нажмите **кнопку меню** в правом верхнем углу.
 
-![кнопка меню](../pics/dicttango/4_menu.jpg)
+![кнопка меню](../pics/dicttango/menu-button.jpg)
 
 Нажмите на **Настройки**
 
@@ -126,7 +126,7 @@ DictTango использует файлы MDict, и предлагает гор�
 
 И выберите предпочитаемый темный режим.
 
-![темный режим](../pics/dicttango/dark_mode.jpg)
+![темный режим](../pics/dicttango/dark-mode.jpg)
 
 Приложение перезапустится в темном режиме.
 
@@ -140,11 +140,11 @@ DictTango использует файлы MDict, и предлагает гор�
 
 Нажмите на **DictTango**
 
-![меню android](../pics/dicttango/android_menu.jpg)
+![меню android](../pics/dicttango/android-menu.jpg)
 
 Все соответствующие записи словаря будут отображены
 
-![открыть в mdict](../pics/dicttango/android_opened.jpg)
+![открыть в mdict](../pics/dicttango/open-word-in-dict.jpg)
 
 Оказавшись в DictTango, просто **однократно нажмите** на любое слово, чтобы открыть его.
 
@@ -155,7 +155,7 @@ DictTango использует файлы MDict, и предлагает гор�
 
 **Нажмите на значок изменения размера** в правом нижнем углу.
 
-![значок изменения размера](../pics/dicttango/resize.jpg)
+![значок изменения размера](../pics/dicttango/display-size.jpg)
 
 Перетащите **ползунок** вверх и вниз, чтобы изменить размер шрифта.
 
@@ -167,4 +167,4 @@ DictTango использует файлы MDict, и предлагает гор�
 Вот хороший выбор [дополнительных словарей на Пали и санскрите](other_dicts.md) для установки на ваше устройство Android.
 
 
-Наслаждайтесь чтением на Пали с этим отличным приложением для Android!
+Наслаждайтесь чтением на Пали с этим отличным приложением для Android!ndroid!oid!!oid!oid!

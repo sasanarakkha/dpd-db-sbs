@@ -48,6 +48,7 @@ uv run python "$PROJECT_DIR/tools/ask.py" "please close Anki Desktop before upda
 response=$(uv run python "$PROJECT_DIR/tools/ask.py" "need to update SBS Anki collection?") || exit 1
 if [[ $response == "y" ]]; then
     uv run python scripts/export/sbs_anki_updater.py
+    uv run python scripts/export/sbs_anki_templates.py
 fi
 
 uv run python "$PROJECT_DIR/tools/ask.py" "open Anki Desktop to review the changes." > /dev/null || exit 1

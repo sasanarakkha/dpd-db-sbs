@@ -770,7 +770,7 @@ DECKS: list[DeckSpec] = [
         slug="pali_patimokkha_word_by_word",
         source="csv",
         field_map={
-            "pali": lambda row: row.get("pali_1", ""),
+            "pali": lambda row: row.get("pali", ""),
             "pos": lambda row: row.get("pos", ""),
             "grammar": lambda row: row.get("grammar", ""),
             "case": lambda row: row.get("case", ""),
