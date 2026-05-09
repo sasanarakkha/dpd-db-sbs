@@ -63,9 +63,13 @@
   1. JavaScript components for Russian GoldenDict export; mirrors upstream `templates/javascript/`.
   2. All GoldenDict JS object names use `rudata_` prefix (e.g., `rudata_family_compound`) to avoid namespace collisions.
   3. Loader classes and global variables prefixed with `ru_`.
+  4. `ru_main.js` click listener has `target_id.startsWith("ru_")` filter and `event.stopImmediatePropagation()` — prevents the upstream DPD click handler from double-toggling when both SBS and RU dicts are open.
+  5. `ru_loadButtonContent()`: `family_root` block wraps `makeFamilyRootHtml` in `if (fr !== undefined)` guard — upstream omits this guard and crashes when `family_root_json` has no entry for a given key.
 - **Watch For**:
   - Upstream JS logic changes must be mirrored with the `ru_` prefix preserved.
   - Coordinate with `scripts/build/families_to_json_ru.py` which generates these files.
+  - **`stopImmediatePropagation` (item 4)** — upstream does NOT have this; never remove it from the RU listener.
+  - **`fr !== undefined` guard (item 5)** — upstream omits it in `loadButtonContent`; always keep it in `ru_loadButtonContent`.
 
 ---
 
@@ -77,9 +81,11 @@
 - **Local Changes**:
   1. All HTML/Jinja2 templates use `ru_` prefixed IDs, CSS classes, and JS calls (e.g., `ru_load_js()`).
   2. Specific templates added: `dpd_headword_ru.jinja`, `root_headword_ru.jinja`, `help_abbrev_ru.jinja`, `help_help_ru.jinja`, `deconstructor_ru.jinja`.
+  3. Script loading in `dpd_header.jinja` and `root_header.jinja` uses a sequential `onload`-chaining IIFE instead of the upstream's parallel `forEach`. This ensures `ru_main.js` only executes after all JSON data files have finished loading, preventing a race condition when both SBS and RU dicts are open simultaneously in GoldenDict. **Must be preserved on every sync.**
 - **Watch For**:
   - Structural changes in upstream templates must be ported while meticulously preserving the `ru_` prefixes.
   - Missing templates in this directory will cause exporter failures.
+  - **Sequential script loading (item 3)** — if upstream changes its `dpd_header.jinja` loader block, do NOT copy the parallel `forEach` into the RU version. Apply the equivalent change to the RU sequential IIFE pattern instead.
 
 ---
 
@@ -359,9 +365,13 @@
   1. All HTML/Jinja2 templates use `sbs_` prefixed IDs and CSS classes.
   2. Specific templates added: `dpd_headword_sbs.jinja`, `root_headword_sbs.jinja`, `epd_sbs.jinja`, `help_abbrev_sbs.jinja`, `help_help_sbs.jinja`.
   3. `dpd_headword_sbs.jinja`: Russian block renders when `show_ru_data`; SBS block when `show_sbs_data`; Tamil "தமிழ்" row after SBS block when `show_ta_data and d.ta and d.ta.ta_meaning`.
+  4. `main.js` click listener: filters on `target_id.startsWith("sbs_")` and calls `sbs_button_click` — plus `event.stopImmediatePropagation()` to prevent the upstream DPD click handler from double-toggling the same element.
+  5. `sbs_loadButtonContent()`: `family_root` block wraps `sbs_makeFamilyRootHtml` in `if (fr !== undefined)` guard — prevents a TypeError crash when the JSON data has no entry for a given key.
 - **Watch For**:
   - Never blindly overwrite — meticulous prefix preservation is required.
   - When upstream adds new grammar table rows, verify the locale rows (RU, SBS, Tamil) are re-applied in order.
+  - **`stopImmediatePropagation` (item 4)** — upstream does NOT have this; always preserve it in the SBS listener.
+  - **`fr !== undefined` guard (item 5)** — upstream omits it in `loadButtonContent`; always keep it in `sbs_loadButtonContent`.
 
 ---
 

@@ -91,13 +91,13 @@
         var els2load = document.getElementsByClassName("ru_load_js");
         if (typeof ru_js_already_loaded === "undefined") {
             var ru_js_already_loaded = true;
-            var elsArray = Array.from(els2load);
-            elsArray.forEach(el => { 
+            (function ru_load_next(scripts) {
+                if (!scripts.length) return;
                 var s = document.createElement("script");
-                var elName = el.getAttribute("href");
-                s.src = elName;
+                s.src = scripts[0];
+                s.onload = function() { ru_load_next(scripts.slice(1)); };
                 document.head.appendChild(s);
-            });
+            })(Array.from(els2load).map(function(el) { return el.getAttribute("href"); }));
         };
     </script>
 

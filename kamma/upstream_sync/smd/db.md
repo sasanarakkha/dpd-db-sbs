@@ -82,6 +82,7 @@
 - **Watch For**:
   - Upstream idiom auto-sync logic is removed; if upstream changes the numbering scheme, Russian fork won't inherit it.
   - Update-in-place vs. delete-insert may diverge on new idiom entries — verify counts after sync.
+  - **No `update_db_cache()` function** — a historical RU-only `update_db_cache()` overwrote the shared `idioms_set` DB cache with an unfiltered set (all words, no `count > 0` filter), causing the idiom button to appear on entries with no RU idiom translations. It was removed in May 2026. If upstream ever adds a cache-update step, do NOT port it; the RU version must not have it.
 
 ---
 
