@@ -2,10 +2,8 @@
 
 """Compile idioms and save to database (ru)."""
 
-import json
-
 from db.db_helpers import get_db_session
-from db.models import DbInfo, DpdHeadword, FamilyIdiom
+from db.models import DpdHeadword, FamilyIdiom
 from tools.configger import config_test
 from tools.degree_of_completion_ru import degree_of_completion_ru
 from tools.pali_sort_key import pali_sort_key
@@ -47,7 +45,6 @@ def main():
     idioms_dict = create_idioms_dict(dpd_db)
     idioms_dict = compile_idioms_html_ru(dpd_db, idioms_dict)
     add_idioms_to_db(db_session, idioms_dict)
-    update_db_cache(db_session, idioms_dict)
 
     pr.toc()
 
@@ -127,27 +124,6 @@ def add_idioms_to_db(db_session, idioms_dict):
             idiom_data.data_ru_pack(idioms_dict[idiom]["data_ru"])
             db_session.add(idiom_data)
 
-    db_session.commit()
-    pr.yes("ok")
-
-
-def update_db_cache(db_session, idioms_dict):
-    """Update the db_info with idioms_set for use in the exporter."""
-
-    pr.green_tmr("adding DbInfo cache item")
-
-    idioms_set = set()
-    for i in idioms_dict:
-        idioms_set.add(i)
-
-    idioms_set_cache = db_session.query(DbInfo).filter_by(key="idioms_set").first()
-
-    if not idioms_set_cache:
-        idioms_set_cache = DbInfo()
-
-    idioms_set_cache.key = "idioms_set"
-    idioms_set_cache.value = json.dumps(list(idioms_set), ensure_ascii=False, indent=1)
-    db_session.add(idioms_set_cache)
     db_session.commit()
     pr.yes("ok")
 
