@@ -8,6 +8,7 @@ document.addEventListener("click", function (event) {
     if (target_id && target_id.startsWith("sbs_")) {
         sbs_button_click(target);
         event.preventDefault();
+        event.stopImmediatePropagation();
     }
   }
 });
@@ -107,11 +108,13 @@ function sbs_loadButtonContent(data) {
 
   if (data.family_root != "" && typeof family_root_json !== "undefined") {
     const fr = family_root_json[data.family_root];
-    const familyRootHtml = sbs_makeFamilyRootHtml(data, fr, "lemma");
-    const familyRootElement = document.getElementById(
-      `sbs_family_root_${lemmaTag}`
-    );
-    if (familyRootElement) familyRootElement.innerHTML = familyRootHtml;
+    if (fr !== undefined) {
+      const familyRootHtml = sbs_makeFamilyRootHtml(data, fr, "lemma");
+      const familyRootElement = document.getElementById(
+        `sbs_family_root_${lemmaTag}`
+      );
+      if (familyRootElement) familyRootElement.innerHTML = familyRootHtml;
+    }
   }
 
   //// family idioms

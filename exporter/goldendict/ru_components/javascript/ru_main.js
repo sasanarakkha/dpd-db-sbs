@@ -6,6 +6,7 @@ document.addEventListener("click", function (event) {
         if (target_id && target_id.startsWith("ru_")) {
             ru_button_click(target);
             event.preventDefault();
+            event.stopImmediatePropagation();
         }
     }
 });
@@ -103,9 +104,11 @@ function ru_loadButtonContent(data) {
         && typeof ru_family_root_json !== "undefined"
     ) {
         const fr = ru_family_root_json[data.family_root];
-        const familyRootHtml = ru_makeFamilyRootHtml(fr, data, "lemma");
-        const familyRootElement = document.getElementById(`ru_family_root_${lemmaTag}`);
-        if (familyRootElement) familyRootElement.innerHTML = familyRootHtml;
+        if (fr !== undefined) {
+            const familyRootHtml = ru_makeFamilyRootHtml(fr, data, "lemma");
+            const familyRootElement = document.getElementById(`ru_family_root_${lemmaTag}`);
+            if (familyRootElement) familyRootElement.innerHTML = familyRootHtml;
+        }
     };
 
     //// family idioms
