@@ -36,6 +36,7 @@ def main():
     config_update("exporter", "tarball_db", "yes")
     config_update("exporter", "make_tbw", "yes")
     config_update("exporter", "make_tpr", "yes")
+    config_update("exporter", "make_sc_ru", "yes")
 
     config_update("anki", "update", "no")
     config_update("goldendict", "copy_unzip", "no")

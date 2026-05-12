@@ -55,6 +55,7 @@ DEFAULT_CONFIG = {
         "make_mobile": "no",
         "make_ebook": "no",
         "make_tbw": "no",
+        "make_sc_ru": "no",
         "make_pdf": "no",
         "make_txt": "no",
         "make_abbrev": "no",
