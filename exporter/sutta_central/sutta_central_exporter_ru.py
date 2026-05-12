@@ -1,0 +1,297 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Export DPD Russian translations for Sutta Central in the following format:
+A list of dictionaries containing basic definitions
+1. pos (Russian abbreviation) 2. Russian meaning html 3. construction
+```
+[
+  {
+    "entry": "dhammaṁ",
+    "definition": [
+      "dhammo: сущ. <b>учение; закон; принцип</b> [dhamma]"
+    ]
+  },
+]
+```
+
+Only human-translated entries (ru_meaning field) are included by default.
+Use --with-ai to also include AI-translated entries (ru_meaning_raw).
+Use --with-eng-fallback to also include headwords with no Russian translation
+(falls back to English meaning_combo).
+"""
+
+import argparse
+from json import dump
+
+from rich import print
+from sqlalchemy.orm.session import Session
+
+from db.db_helpers import get_db_session
+from db.models import DpdHeadword, Lookup
+from tools.configger import config_test
+from tools.cst_sc_text_sets import make_sc_text_set
+from tools.meaning_construction import make_meaning_combo
+from tools.pali_sort_key import pali_sort_key
+from tools.pali_text_files import sc_texts
+from tools.paths import ProjectPaths
+from tools.printer import printer as pr
+from tools.tools_for_ru_exporter import ru_replace_abbreviations
+
+DEBUG = False
+
+
+class SuttaCentralExporterRu:
+    pth: ProjectPaths = ProjectPaths()
+    db_session: Session = get_db_session(pth.dpd_db_path)
+
+    sc_books_list = [
+        "vin1",
+        "vin2",
+        "vin3",
+        "vin4",
+        "vin5",
+        "dn1",
+        "dn2",
+        "dn3",
+        "mn1",
+        "mn2",
+        "mn3",
+        "sn1",
+        "sn2",
+        "sn3",
+        "sn4",
+        "sn5",
+        "an1",
+        "an2",
+        "an3",
+        "an4",
+        "an5",
+        "an6",
+        "an7",
+        "an8",
+        "an9",
+        "an10",
+        "an11",
+        "kn1",
+        "kn2",
+        "kn3",
+        "kn4",
+        "kn5",
+        "kn6",
+        "kn7",
+        "kn8",
+        "kn9",
+        "kn10",
+        "kn11",
+        "kn12",
+        "kn13",
+        "kn14",
+        "kn15",
+        "kn16",
+        "kn17",
+        "kn18",
+        "kn19",
+        "kn20",
+    ]
+
+    sc_word_set: set[str]
+
+    lookup_db: list[Lookup] = []
+    lookup_dict: dict[str, Lookup] = {}
+
+    headword_db: list[DpdHeadword] = []
+    headword_dict: dict[int, DpdHeadword] = {}
+
+    sc_dict: dict[str, list[tuple[str, str]]] = {}
+    sc_dict_compiled: list[dict] = []
+    no_entries_list: list[str] = []
+
+    def __init__(self, with_ai: bool = False, with_eng_fallback: bool = False):
+        self.with_ai = with_ai
+        self.with_eng_fallback = with_eng_fallback
+
+        pr.yellow_title("exporting for sutta central (russian)")
+
+        self.sc_word_set = make_sc_text_set(
+            self.pth,
+            self.sc_books_list,
+            niggahita="ṃ",
+            add_hyphenated_parts=True,
+        )
+        self.sc_word_set = set(word for word in self.sc_word_set if word.strip())
+
+        self.make_lookup_dict()
+        self.make_headwords_dict()
+        self.make_sc_dict()
+        self.compile_sc_dict()
+        self.save_sc_dict()
+        if DEBUG:
+            self.print_sc_dict()
+            self.print_no_entries()
+
+    def make_sc_books_list(self):
+        """A list of SC books which have associated text files."""
+        pr.green_tmr("making sc books list")
+        for book, files in sc_texts.items():
+            if files:
+                self.sc_books_list.append(book)
+        pr.yes(len(self.sc_books_list))
+
+    def make_lookup_dict(self):
+        """Make a dict of the lookup table for quick reference."""
+
+        pr.green_tmr("making lookup dict")
+
+        self.lookup_db = self.db_session.query(Lookup).all()
+        for i in self.lookup_db:
+            self.lookup_dict[i.lookup_key] = i
+
+        pr.yes(len(self.lookup_dict))
+
+    def make_headwords_dict(self):
+        """Make a dict of the headwords table for quick reference."""
+
+        pr.green_tmr("making headwords dict")
+
+        headword_db = self.db_session.query(DpdHeadword).all()
+        self.headword_db = sorted(headword_db, key=lambda x: pali_sort_key(x.lemma_1))
+        for i in self.headword_db:
+            self.headword_dict[i.id] = i
+
+        pr.yes(len(self.headword_dict))
+
+    def make_sc_dict(self):
+        """Match words in SC texts to dictionary headwords."""
+        pr.green_tmr("making sc dict")
+
+        for word in self.sc_word_set:
+            if word in self.lookup_dict:
+                self.sc_dict[word] = []
+                lookup_entry = self.lookup_dict[word]
+                if lookup_entry.headwords:
+                    ids = lookup_entry.headwords_unpack
+                    for id in ids:
+                        if id in self.headword_dict:
+                            headword = self.headword_dict[id]
+                            entry: str | None = self.make_sc_headword_entry(headword)
+                            if entry is not None:
+                                self.sc_dict[word].append((headword.lemma_1, entry))
+                if lookup_entry.deconstructor:
+                    deconstructions = lookup_entry.deconstructor_unpack
+                    for deconstruction in deconstructions:
+                        self.sc_dict[word].append(("", deconstruction))
+                        break  # only one
+
+        pr.yes(len(self.sc_dict))
+
+    def make_sc_headword_entry(self, headword: DpdHeadword) -> str | None:
+        """Return a Russian definition string, or None if no eligible translation."""
+        if headword.ru and headword.ru.ru_meaning:
+            meaning = f"<b>{headword.ru.ru_meaning}</b>"
+            if headword.ru.ru_meaning_lit:
+                meaning += f"; досл. {headword.ru.ru_meaning_lit}"
+        elif headword.ru and headword.ru.ru_meaning_raw and self.with_ai:
+            meaning = f"<i>[пер. ИИ]</i> {headword.ru.ru_meaning_raw}"
+        elif self.with_eng_fallback:
+            meaning = make_meaning_combo(headword)
+        else:
+            return None
+
+        pos_ru = ru_replace_abbreviations(headword.pos, "gram")
+        entry = f"{pos_ru}. {meaning}"
+        if headword.construction_summary:
+            entry += f" [{headword.construction_summary}]"
+        return entry
+
+    def print_sc_dict(self):
+        for count, i in enumerate(self.sc_dict):
+            if count > 100:
+                break
+            else:
+                print(i, self.sc_dict[i])
+        print(len(self.sc_dict))
+
+    def compile_sc_dict(self):
+        """Compile the entries into SC format."""
+
+        pr.green_tmr("compiling sc dict")
+
+        sc_word_set_sorted = sorted(self.sc_word_set)
+
+        for word in sc_word_set_sorted:
+            entries = self.sc_dict.get(word, None)
+            if entries:
+                entries_sorted = sorted(entries, key=lambda x: pali_sort_key(x[0]))
+                sc_entry = {"entry": self.flip(word), "definition": []}
+                for entry in entries_sorted:
+                    headword, definition = entry
+                    if headword:
+                        sc_entry["definition"].append(
+                            f"{self.flip(headword)}: {self.flip(definition)}"
+                        )
+                    else:
+                        sc_entry["definition"].append(self.flip(definition))
+                self.sc_dict_compiled.append(sc_entry)
+            else:
+                self.no_entries_list.append(word)
+
+        pr.yes(len(self.sc_dict_compiled))
+
+    def flip(self, text: str):
+        """Sutta Central uses `ṁ` instead of `ṃ`."""
+        if "ṃ" in text:
+            return text.replace("ṃ", "ṁ")
+        else:
+            return text
+
+    def print_no_entries(self):
+        for i in self.no_entries_list:
+            print(i)
+        print(len(self.no_entries_list))
+
+    def save_sc_dict(self):
+        """Save to JSON."""
+
+        pr.green_tmr("saving sc dict")
+        self.pth.sc_pli2ru_dpd_json.parent.mkdir(parents=True, exist_ok=True)
+        with open(self.pth.sc_pli2ru_dpd_json, "w") as f:
+            dump(self.sc_dict_compiled, f, ensure_ascii=False, indent=2)
+        pr.yes("OK")
+
+
+def main():
+    pr.tic()
+
+    if not config_test("exporter", "make_tbw", "yes"):
+        pr.green_title("disabled in config.ini")
+        pr.toc()
+        return
+
+    parser = argparse.ArgumentParser(
+        description="Export DPD Russian translations for Sutta Central"
+    )
+    parser.add_argument(
+        "--with-ai",
+        action="store_true",
+        default=False,
+        help="Include AI-translated entries (ru_meaning_raw)",
+    )
+    parser.add_argument(
+        "--with-eng-fallback",
+        action="store_true",
+        default=False,
+        help="Include headwords with no Russian translation (falls back to English)",
+    )
+    args = parser.parse_args()
+
+    SuttaCentralExporterRu(
+        with_ai=args.with_ai,
+        with_eng_fallback=args.with_eng_fallback,
+    )
+    pr.toc()
+
+
+if __name__ == "__main__":
+    main()
