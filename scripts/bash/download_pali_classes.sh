@@ -15,10 +15,11 @@ mkdir -p "$HOME/Downloads/Pali_classes"
 cd "$HOME/Downloads/Pali_classes"
 
 Class_links=(
-    "https://github.com/digitalpalidictionary/dpd-pali-courses/releases/latest/download/beginner_pali_course_docx.zip"
+    "https://github.com/digitalpalidictionary/dpd-pali-courses/releases/latest/download/beginner_pali_course_exercises_docx.zip"
     "https://github.com/digitalpalidictionary/dpd-pali-courses/releases/latest/download/beginner_pali_course_pdfs.zip"
-    "https://github.com/digitalpalidictionary/dpd-pali-courses/releases/latest/download/intermediate_pali_course_docx.zip"
+    "https://github.com/digitalpalidictionary/dpd-pali-courses/releases/latest/download/intermediate_pali_course_exercises_docx.zip"
     "https://github.com/digitalpalidictionary/dpd-pali-courses/releases/latest/download/intermediate_pali_course_pdfs.zip"
+    "https://github.com/digitalpalidictionary/dpd-pali-courses/releases/latest/download/website_offline.zip"
 )
 
 # Loop through the list of links and download them
@@ -29,5 +30,3 @@ done
 
 # print success message
 echo -e "\033[0;32mAll files downloaded successfully.\033[0m"
-
-

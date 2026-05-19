@@ -132,6 +132,7 @@ archive
 .agent/
 .kilocode/
 sessions
+exporter/mcp/reports
 exporter/goldendict/ru_components/javascript/ru_family_compound_json.js
 exporter/goldendict/ru_components/javascript/ru_family_idiom_json.js
 exporter/goldendict/ru_components/javascript/ru_family_root_json.js
