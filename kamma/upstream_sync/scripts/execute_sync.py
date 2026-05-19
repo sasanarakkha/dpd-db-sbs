@@ -4,7 +4,6 @@
 
 import argparse
 import subprocess
-import sys
 from pathlib import Path
 from typing import Optional
 
@@ -81,7 +80,7 @@ def get_run_specific_exclusions(thread_dir: Optional[str]) -> list[str]:
     """Load run-specific exclusions from thread_dir/run_exclusions.txt."""
     if not thread_dir:
         return []
-    
+
     exclusions_path = Path(thread_dir) / "run_exclusions.txt"
     if not exclusions_path.exists():
         return []
@@ -98,7 +97,7 @@ def get_run_specific_exclusions(thread_dir: Optional[str]) -> list[str]:
 def execute_sync(thread_dir: Optional[str], dry_run: bool = False) -> int:
     """Orchestrate the selective sync process."""
     pr.green_title("execute_sync.py")
-    
+
     context = GitContext()
     if context.is_dirty:
         pr.amber("Working tree is dirty. Proceed with caution.")
@@ -152,19 +151,29 @@ def execute_sync(thread_dir: Optional[str], dry_run: bool = False) -> int:
         pr.green("restoring excluded files")
         restored_count = 0
         removed_count = 0
-        
+
         # Batch restore for existing files
         for path in all_exclusions:
             # Check if file existed in original sbs-ru state
             check_result = subprocess.run(
                 ["git", "rev-parse", "--verify", f"{sbs_ru_original_sha}:{path}"],
                 capture_output=True,
-                check=False
+                check=False,
             )
-            
+
             if check_result.returncode == 0:
                 # File existed, restore it
-                run_git(["git", "restore", "--source", sbs_ru_original_sha, "--staged", "--worktree", path])
+                run_git(
+                    [
+                        "git",
+                        "restore",
+                        "--source",
+                        sbs_ru_original_sha,
+                        "--staged",
+                        "--worktree",
+                        path,
+                    ]
+                )
                 restored_count += 1
             else:
                 # File did not exist in sbs-ru, if it exists now (from as_upstream), remove it
@@ -173,11 +182,12 @@ def execute_sync(thread_dir: Optional[str], dry_run: bool = False) -> int:
                     # If it's a directory, rm -rf
                     if Path(path).is_dir():
                         import shutil
+
                         shutil.rmtree(path)
                     else:
                         Path(path).unlink(missing_ok=True)
                     removed_count += 1
-        
+
         pr.yes(f"restored {restored_count}, removed {removed_count}")
 
         # 7. Final staging
@@ -190,7 +200,9 @@ def execute_sync(thread_dir: Optional[str], dry_run: bool = False) -> int:
         if assertions_script.exists():
             pr.green("running sync assertions")
             try:
-                subprocess.run(["bash", str(assertions_script), sbs_ru_original_sha], check=True)
+                subprocess.run(
+                    ["bash", str(assertions_script), sbs_ru_original_sha], check=True
+                )
                 pr.yes("ok")
             except subprocess.CalledProcessError:
                 pr.amber("Sync assertions failed. Check output above.")
@@ -206,10 +218,18 @@ def execute_sync(thread_dir: Optional[str], dry_run: bool = False) -> int:
 
 def main() -> int:
     """Parse CLI arguments and execute the sync."""
-    parser = argparse.ArgumentParser(description="Execute selective sync from upstream.")
-    parser.add_argument("thread_dir", nargs="?", help="Path to the current sync thread directory")
-    parser.add_argument("--dry-run", action="store_true", help="Show what would be done without modifying the repository")
-    
+    parser = argparse.ArgumentParser(
+        description="Execute selective sync from upstream."
+    )
+    parser.add_argument(
+        "thread_dir", nargs="?", help="Path to the current sync thread directory"
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show what would be done without modifying the repository",
+    )
+
     args = parser.parse_args()
     return execute_sync(args.thread_dir, args.dry_run)
 

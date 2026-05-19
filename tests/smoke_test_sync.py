@@ -3,9 +3,7 @@
 import atexit
 import importlib
 import importlib.util
-import os
 import re
-import signal
 import subprocess
 import sys
 from contextlib import contextmanager
@@ -593,7 +591,6 @@ def _check_ru_js_files() -> bool:
 
 def _check_no_mako_in_templates() -> bool:
     """Grep ru_templates/ and sbs_templates/ for Mako '${' syntax — must find none."""
-    import subprocess
 
     template_dirs = [
         "exporter/webapp/ru_templates",
@@ -912,7 +909,6 @@ def phase3_gui() -> bool:
     except Exception as exc:
         pr.no(f"GUI launch error: {exc}")
         return False
-
 
 
 # ─── Phase 4: Cleanup & guide update ─────────────────────────────────────────

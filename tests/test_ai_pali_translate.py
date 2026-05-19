@@ -1,9 +1,14 @@
 from unittest.mock import MagicMock, patch
-from exporter.mcp.ai_pali_translate import merge_ai_selections, translate_sentence
+
+from exporter.mcp.translate_core import (
+    merge_ai_selections,
+    pre_match_db_examples,
+    translate_sentence,
+)
 
 
 def test_merge_simple_selection():
-    """Test merging a simple top-level selection."""
+    """Test merging a simple top-level selection via scores map."""
     analysis_data = [
         {
             "word": "buddho",
@@ -27,31 +32,29 @@ def test_merge_simple_selection():
     ai_response = {
         "translation": "The Buddha",
         "literal_translation": "Awakened One",
-        "analysis": [
-            {
-                "word": "buddho",
-                "selected_key": "123_0",
-                "contextual_meaning": "The Awakened One (nom sg)",
+        "scores": {
+            "123_0": {
+                "score": 10,
+                "contextual_meaning": "The Awakened One",
                 "selected_pos": "masc",
-            }
-        ],
+            },
+            "123_1": {"score": 2},
+        },
     }
 
     result = merge_ai_selections(analysis_data, ai_response)
 
     assert result["translation"] == "The Buddha"
     assert result["literal_translation"] == "Awakened One"
-
-    # Check selected flag and adjusted values
     word_data = result["analysis"][0]["data"]
-    assert word_data[0]["selected"] is True
-    assert word_data[0]["meaning_combo"] == "The Awakened One (nom sg)"
-    assert word_data[0]["pos"] == "masc"
-    assert word_data[1].get("selected") is None or word_data[1]["selected"] is False
+    assert word_data[0]["ai_score"] == 10
+    assert word_data[0]["meaning_combo"] == "The Awakened One"
+    assert word_data[0]["selected_pos"] == "masc"
+    assert word_data[1]["ai_score"] == 2
 
 
 def test_merge_component_selection():
-    """Test merging selections for compound components."""
+    """Test merging scores for compound components."""
     analysis_data = [
         {
             "word": "compoundword",
@@ -60,13 +63,11 @@ def test_merge_component_selection():
                     "key": "999_0",
                     "lemma": "compound",
                     "components": [
-                        [  # Component 1 options
-                            {"key": "10_0", "lemma": "part1", "grammar": "opt1"},
-                            {"key": "10_1", "lemma": "part1", "grammar": "opt2"},
+                        [
+                            {"key": "10_0", "lemma": "part1"},
+                            {"key": "10_1", "lemma": "part1"},
                         ],
-                        [  # Component 2 options
-                            {"key": "20_0", "lemma": "part2", "grammar": "optA"}
-                        ],
+                        [{"key": "20_0", "lemma": "part2"}],
                     ],
                 }
             ],
@@ -75,35 +76,29 @@ def test_merge_component_selection():
 
     ai_response = {
         "translation": "Compound Word",
-        "analysis": [
-            {
-                "word": "compoundword",
-                "selected_key": "999_0",
-                "components": [
-                    {"word": "part1", "selected_key": "10_1"},
-                    {"word": "part2", "selected_key": "20_0"},
-                ],
-            }
-        ],
+        "literal_translation": "",
+        "scores": {
+            "999_0": {"score": 10},
+            "10_1": {"score": 10, "contextual_meaning": "part one chosen"},
+            "10_0": {"score": 3},
+            "20_0": {"score": 10},
+        },
     }
 
     result = merge_ai_selections(analysis_data, ai_response)
 
     main_entry = result["analysis"][0]["data"][0]
-    assert main_entry["selected"] is True
-
-    # Check component 1
+    assert main_entry["ai_score"] == 10
     comp1_opts = main_entry["components"][0]
-    assert comp1_opts[0].get("selected") is None
-    assert comp1_opts[1]["selected"] is True
-
-    # Check component 2
+    assert comp1_opts[0]["ai_score"] == 3
+    assert comp1_opts[1]["ai_score"] == 10
+    assert comp1_opts[1]["meaning_combo"] == "part one chosen"
     comp2_opts = main_entry["components"][1]
-    assert comp2_opts[0]["selected"] is True
+    assert comp2_opts[0]["ai_score"] == 10
 
 
 def test_merge_deconstruction_selection():
-    """Test merging selections for deconstructions with AI-provided meanings."""
+    """Test merging a decon_ key with AI-provided contextual_meaning."""
     analysis_data = [
         {
             "word": "vihareyyan'ti",
@@ -111,18 +106,9 @@ def test_merge_deconstruction_selection():
                 {
                     "key": "decon_vihareyyan'ti_0",
                     "id": "",
-                    "pali": "vihareyyan'ti",
                     "pos": "sandhi/compound",
                     "meaning_combo": "[Deconstructed]",
-                    "components": [
-                        [
-                            {
-                                "key": "69661_0",
-                                "lemma": "viharati",
-                                "grammar": "opt 1st sg",
-                            }
-                        ]
-                    ],
+                    "components": [[{"key": "69661_0", "lemma": "viharati"}]],
                 }
             ],
         }
@@ -130,52 +116,116 @@ def test_merge_deconstruction_selection():
 
     ai_response = {
         "translation": "I would dwell thus",
-        "analysis": [
-            {
-                "word": "vihareyyan'ti",
-                "selected_key": "decon_vihareyyan'ti_0",
+        "literal_translation": "",
+        "scores": {
+            "decon_vihareyyan'ti_0": {
+                "score": 10,
                 "contextual_meaning": "I would dwell thus",
                 "selected_pos": "sandhi",
-                "components": [
-                    {
-                        "word": "vihareyyaṃ",
-                        "selected_key": "69661_0",
-                        "contextual_meaning": "I would dwell",
-                    }
-                ],
-            }
-        ],
+            },
+            "69661_0": {"score": 10, "contextual_meaning": "I would dwell"},
+        },
     }
 
     result = merge_ai_selections(analysis_data, ai_response)
 
     entry = result["analysis"][0]["data"][0]
-    assert entry["selected"] is True
+    assert entry["ai_score"] == 10
     assert entry["meaning_combo"] == "I would dwell thus"
-    assert entry["pos"] == "sandhi"
-
+    assert entry["selected_pos"] == "sandhi"
     comp_entry = entry["components"][0][0]
-    assert comp_entry["selected"] is True
+    assert comp_entry["ai_score"] == 10
     assert comp_entry["meaning_combo"] == "I would dwell"
 
 
+def test_merge_missing_score_defaults_to_zero():
+    """Options not in scores map get ai_score=0."""
+    analysis_data = [
+        {
+            "word": "test",
+            "data": [
+                {"key": "1_0"},
+                {"key": "1_1"},
+            ],
+        }
+    ]
+    ai_response = {
+        "translation": "",
+        "literal_translation": "",
+        "scores": {"1_0": {"score": 7}},
+    }
+    result = merge_ai_selections(analysis_data, ai_response)
+    data = result["analysis"][0]["data"]
+    assert data[0]["ai_score"] == 7
+    assert data[1]["ai_score"] == 0
+
+
+def test_pre_match_db_examples_source_1():
+    """Options whose source_1 matches verse_source get ai_score=10 and db_example_match=True."""
+    analysis = [
+        {
+            "word": "susamāhito",
+            "data": [
+                {"key": "64447_default", "source_1": "DHP5", "source_2": ""},
+                {"key": "64446_default", "source_1": "DHP10", "source_2": ""},
+            ],
+        }
+    ]
+    pre_match_db_examples(analysis, "DHP10")
+    data = analysis[0]["data"]
+    assert data[0].get("ai_score", 0) == 0
+    assert "db_example_match" not in data[0]
+    assert data[1]["ai_score"] == 10
+    assert data[1]["db_example_match"] is True
+
+
+def test_pre_match_db_examples_source_2():
+    """Match also works via source_2."""
+    analysis = [
+        {
+            "word": "damma",
+            "data": [
+                {"key": "99_default", "source_1": "DHP1", "source_2": "DHP10"},
+            ],
+        }
+    ]
+    pre_match_db_examples(analysis, "DHP10")
+    assert analysis[0]["data"][0]["ai_score"] == 10
+    assert analysis[0]["data"][0]["db_example_match"] is True
+
+
+def test_pre_match_db_examples_no_match():
+    """Options with no matching source are untouched."""
+    analysis = [
+        {
+            "word": "test",
+            "data": [{"key": "1_0", "source_1": "MN1", "source_2": ""}],
+        }
+    ]
+    pre_match_db_examples(analysis, "DHP10")
+    assert "ai_score" not in analysis[0]["data"][0]
+    assert "db_example_match" not in analysis[0]["data"][0]
+
+
 def test_translate_sentence_flow():
-    """Test the full pipeline with mocked AI call."""
+    """Test the full pipeline with mocked AI and DB calls."""
     mock_session = MagicMock()
+    analysis_stub = [
+        {"word": "test", "data": [{"key": "1_0", "source_1": "", "source_2": ""}]}
+    ]
+    ai_json = '{"translation": "Test", "literal_translation": "lit", "scores": {"1_0": {"score": 10}}}'
 
-    # Mock analyze_sentence to return valid data
-    with patch("exporter.mcp.ai_pali_translate.analyze_sentence") as mock_analyze:
-        mock_analyze.return_value = [{"word": "test", "data": [{"key": "1_0"}]}]
+    with patch(
+        "exporter.mcp.translate_core.analyze_sentence", return_value=analysis_stub
+    ):
+        mock_manager = MagicMock()
+        mock_response = MagicMock()
+        mock_response.content = ai_json
+        mock_manager.request.return_value = mock_response
 
-        # Mock OpenRouterManager
-        with patch("exporter.mcp.ai_pali_translate.OpenRouterManager") as MockManager:
-            mock_instance = MockManager.return_value
-            # Set attributes on the returned object from request()
-            mock_response = MagicMock()
-            mock_response.content = '{"translation": "Test", "analysis": [{"word": "test", "selected_key": "1_0"}]}'
-            mock_instance.request.return_value = mock_response
+        result = translate_sentence(
+            "test sentence", mock_session, ai_manager=mock_manager, verse_source="DHP1"
+        )
 
-            result = translate_sentence("test sentence", mock_session)
-
-            assert result["translation"] == "Test"
-            assert result["analysis"][0]["data"][0]["selected"] is True
+        assert result["translation"] == "Test"
+        assert result["analysis"][0]["data"][0]["ai_score"] == 10

@@ -171,7 +171,7 @@ class AIManager:
                     prompt=prompt,
                     prompt_sys=prompt_sys,
                     model=model_name,
-                    timeout=60.0,
+                    timeout=30.0,
                     grounding=grounding,
                     **kwargs,
                 )

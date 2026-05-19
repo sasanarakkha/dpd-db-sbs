@@ -1,16 +1,22 @@
-# inference.py
-import os
+"""Extract sentences for Pali words using AI models."""
+
 import json
+from pathlib import Path
 import pandas as pd
 
-from tools.file_utils import search_pali_in_csv, load_exercise_data_from_file, load_discourse_sutta_data
+from tools.file_utils import (
+    search_pali_in_csv,
+    load_exercise_data_from_file,
+    load_discourse_sutta_data,
+)
 from tools.ai_llm_factory import LLMFactory
 from tools.configger import config_read
+from tools.printer import printer as pr
 
 
 # --- DeepSeek Caching Configuration ---
 # Define the directory for DeepSeek API context caching
-DEEPSEEK_CACHE_DIR = "shared_data/deepseek_cache"
+DEEPSEEK_CACHE_DIR = Path("shared_data/deepseek_cache")
 # --- End DeepSeek Caching Configuration ---
 
 # --- Prompt Definitions ---
@@ -205,195 +211,225 @@ For the given Pali word: "{pali}" with ID: "{id}", using the provided `exercise_
 """
 
 
-def run_batch_class_inference(vocab_csv_path, exercise_text_file_path, output_csv_path, provider:str):
+def run_batch_class_inference(
+    vocab_csv_path, exercise_text_file_path, output_csv_path, provider: str
+):
     """Runs batch inference using provider."""
-    print(f"\n--- Running Batch {provider.upper()} Class Inference ---")
-    print(f"Vocab: {vocab_csv_path}, Exercise File: {exercise_text_file_path}, Output: {output_csv_path}")
+    pr.green_title(f"Batch {provider.upper()} Class Inference")
+    pr.white(f"Vocab: {vocab_csv_path}")
+    pr.white(f"Exercise File: {exercise_text_file_path}")
+    pr.white(f"Output: {output_csv_path}")
 
     try:
         vocab_df = pd.read_csv(vocab_csv_path)
     except FileNotFoundError:
-        print(f"Error: Vocab file not found at {vocab_csv_path}")
-        return
-    
-    exercise_data_content = load_exercise_data_from_file(exercise_text_file_path)
-    if not exercise_data_content:
-        print(f"Could not load exercise data. Aborting batch {provider.upper()} inference.")
+        pr.red(f"Error: Vocab file not found at {vocab_csv_path}")
         return
 
+    pr.green_tmr("loading exercise data")
+    exercise_data_content = load_exercise_data_from_file(exercise_text_file_path)
+    if not exercise_data_content:
+        pr.no("failed")
+        return
+    pr.yes("ok")
+
+    pr.green_tmr("preparing batch input")
     batch_input_for_llm = []
-    if 'pali' not in vocab_df.columns or 'id' not in vocab_df.columns:
-        print(f"Warning: '{vocab_csv_path}' might be missing 'pali' or 'id' columns. Attempting to proceed or use fallback.")
-        if 'pali' in vocab_df.columns:
-            print("Attempting to find IDs using search_pali_in_csv as 'id' column is missing or for verification...")
+    if "pali" not in vocab_df.columns or "id" not in vocab_df.columns:
+        pr.amber(
+            f"Warning: '{vocab_csv_path}' might be missing 'pali' or 'id' columns."
+        )
+        if "pali" in vocab_df.columns:
             for pali_word in vocab_df["pali"]:
                 search_result = search_pali_in_csv(pali_word, vocab_csv_path)
-                if search_result["id"] != -1 :
-                    batch_input_for_llm.append({
-                        "pali": search_result["pali"],
-                        "id": str(search_result["id"]),
-                        "exercise": exercise_data_content
-                    })
-                else:
-                    print(f"Skipping '{pali_word}' for batch as it was not found by search_pali_in_csv.")
+                if search_result["id"] != -1:
+                    batch_input_for_llm.append(
+                        {
+                            "pali": search_result["pali"],
+                            "id": str(search_result["id"]),
+                            "exercise": exercise_data_content,
+                        }
+                    )
         else:
-            print(f"Error: '{vocab_csv_path}' must contain at least a 'pali' column for batch processing.")
+            pr.red(
+                f"Error: '{vocab_csv_path}' must contain at least a 'pali' column for batch processing."
+            )
             return
     else:
         for _, row in vocab_df.iterrows():
-            batch_input_for_llm.append({
-                "pali": row["pali"],
-                "id": str(row["id"]),
-                "exercise": exercise_data_content
-            })
+            batch_input_for_llm.append(
+                {
+                    "pali": row["pali"],
+                    "id": str(row["id"]),
+                    "exercise": exercise_data_content,
+                }
+            )
+    pr.yes(len(batch_input_for_llm))
 
     if not batch_input_for_llm:
-        print("No valid data for batch processing after preparing inputs.")
+        pr.red("No valid data for batch processing.")
         return
-    
+
     # --- LLM Initialization ---
+    pr.green_tmr("initializing LLM")
     api_key = config_read("apis", provider)
     if not api_key:
-        print(f"Error: API key for {provider.upper()} not found in config. Aborting.")
+        pr.no("API key not found")
         return
 
-    llm_instance = LLMFactory(provider, "langchain", "deepseek-chat" if provider == "deepseek" else "gpt-4o-mini", api_key, 0.7).get_llm() # type: ignore
+    llm_instance = LLMFactory(
+        provider,
+        "langchain",
+        "deepseek-chat" if provider == "deepseek" else "gpt-4o-mini",
+        api_key,
+        0.7,
+    ).get_llm()  # type: ignore
+    pr.yes("ok")
 
-    print(f"Prepared {len(batch_input_for_llm)} items for {provider.upper()} batch processing.")
-    
+    pr.green_tmr(f"batch processing with {provider.upper()}")
     batch_results_raw = llm_instance.batch_processing(
-        SYSTEM_PROMPT_UNIFIED,
-        USER_PROMPT_UNIFIED_BATCH_TEMPLATE,
-        batch_input_for_llm
+        SYSTEM_PROMPT_UNIFIED, USER_PROMPT_UNIFIED_BATCH_TEMPLATE, batch_input_for_llm
     )
+    pr.yes(len(batch_results_raw))
 
     parsed_results = []
     for res_text in batch_results_raw:
-        # res_text is already a dictionary from llm_instance.batch_processing
-        if isinstance(res_text, dict): 
-            original_input = next((item for item in batch_input_for_llm if item['pali'] == res_text.get('pali')), None)
-            if original_input and 'id' not in res_text: # Use res_text here
-                 res_text['id'] = original_input['id'] # Modify res_text directly
-            parsed_results.append(res_text) # Append res_text
+        if isinstance(res_text, dict):
+            original_input = next(
+                (
+                    item
+                    for item in batch_input_for_llm
+                    if item["pali"] == res_text.get("pali")
+                ),
+                None,
+            )
+            if original_input and "id" not in res_text:
+                res_text["id"] = original_input["id"]
+            parsed_results.append(res_text)
         else:
-            # This case might indicate an unexpected return type from batch_processing
-            parsed_results.append({"error": "unexpected_response_type", "original_data": res_text})
+            parsed_results.append(
+                {"error": "unexpected_response_type", "original_data": res_text}
+            )
 
     df_results = pd.DataFrame(parsed_results)
-    
-    os.makedirs(os.path.dirname(output_csv_path), exist_ok=True)
-    df_results.to_csv(output_csv_path, index=False, encoding="utf-8")
-    print(f"{provider.upper()} batch results saved to {output_csv_path}")
+
+    output_path = Path(output_csv_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    df_results.to_csv(output_path, index=False, encoding="utf-8")
+    pr.summary(f"{provider.upper()} results", output_csv_path)
 
 
-def run_batch_discourse_inference(vocab_csv_path, sutta_text_file_path, output_csv_path, provider: str):
+def run_batch_discourse_inference(
+    vocab_csv_path, sutta_text_file_path, output_csv_path, provider: str
+):
     """Runs batch inference for a discourse text using provider."""
-    print(f"\n--- Running Batch {provider.upper()} Discourse Inference ---")
-    print(f"Vocab: {vocab_csv_path}, Sutta File: {sutta_text_file_path}, Output: {output_csv_path}")
+    pr.green_title(f"Batch {provider.upper()} Discourse Inference")
+    pr.white(f"Vocab: {vocab_csv_path}")
+    pr.white(f"Sutta File: {sutta_text_file_path}")
+    pr.white(f"Output: {output_csv_path}")
 
     try:
         vocab_df = pd.read_csv(vocab_csv_path)
-        if 'pali' not in vocab_df.columns or 'id' not in vocab_df.columns:
-            print(f"Error: Vocab CSV '{vocab_csv_path}' must contain 'pali' and 'id' columns.")
+        if "pali" not in vocab_df.columns or "id" not in vocab_df.columns:
+            pr.red(
+                f"Error: Vocab CSV '{vocab_csv_path}' must contain 'pali' and 'id' columns."
+            )
             return
     except FileNotFoundError:
-        print(f"Error: Vocab file not found at {vocab_csv_path}")
+        pr.red(f"Error: Vocab file not found at {vocab_csv_path}")
         return
     except Exception as e:
-        print(f"Error reading vocab CSV '{vocab_csv_path}': {e}")
+        pr.red(f"Error reading vocab CSV '{vocab_csv_path}': {e}")
         return
 
+    pr.green_tmr("loading sutta data")
     sutta_data_list = load_discourse_sutta_data(sutta_text_file_path)
     if not sutta_data_list:
-        print(f"Could not load or parse sutta data from {sutta_text_file_path}. Aborting.")
+        pr.no("failed")
         return
-    
+    pr.yes("ok")
+
     # Convert the list of sutta objects to a JSON string to pass to the LLM
     exercise_data_json_str = json.dumps(sutta_data_list, ensure_ascii=False)
 
+    pr.green_tmr("preparing batch input")
     batch_input_for_llm = []
     for _, row in vocab_df.iterrows():
-        batch_input_for_llm.append({
-            "pali": str(row["pali"]),
-            "id": str(row["id"]),
-            "exercise_data": exercise_data_json_str # Pass the structured JSON string
-        })
+        batch_input_for_llm.append(
+            {
+                "pali": str(row["pali"]),
+                "id": str(row["id"]),
+                "exercise_data": exercise_data_json_str,
+            }
+        )
+    pr.yes(len(batch_input_for_llm))
 
     if not batch_input_for_llm:
-        print("No valid data for batch processing after preparing inputs.")
+        pr.red("No valid data for batch processing.")
         return
-    
+
     # Initialize LLM instance based on provider
+    pr.green_tmr("initializing LLM")
     api_key = config_read("apis", provider)
     if not api_key:
-        print(f"Error: API key for {provider.upper()} not found in config. Aborting.")
+        pr.no("API key not found")
         return
-    
-    llm_instance = LLMFactory(provider, "langchain", "deepseek-chat" if provider == "deepseek" else "gpt-4o-mini", api_key, 0.7).get_llm() # type: ignore
 
-    print(f"Prepared {len(batch_input_for_llm)} items for {provider.upper()} batch discourse processing.")
-    
+    llm_instance = LLMFactory(
+        provider,
+        "langchain",
+        "deepseek-chat" if provider == "deepseek" else "gpt-4o-mini",
+        api_key,
+        0.7,
+    ).get_llm()  # type: ignore
+    pr.yes("ok")
+
+    pr.green_tmr(f"batch processing with {provider.upper()}")
     batch_results_raw = llm_instance.batch_processing(
         SYSTEM_PROMPT_DISCOURSE,
         USER_PROMPT_DISCOURSE_BATCH_TEMPLATE,
-        batch_input_for_llm
+        batch_input_for_llm,
     )
+    pr.yes(len(batch_results_raw))
 
     parsed_results = []
     for i, res_text_dict in enumerate(batch_results_raw):
-        # res_text_dict should already be a dictionary from llm_instance.batch_processing
-        # which internally calls parse_llm_response on the raw LLM output for each item.
         if isinstance(res_text_dict, dict):
-            # Ensure 'id' and 'pali' from the original request are present if not returned by LLM
-            # (though the SYSTEM_PROMPT_DISCOURSE asks LLM to return them)
-            if 'id' not in res_text_dict and i < len(batch_input_for_llm):
-                res_text_dict['id'] = batch_input_for_llm[i]['id']
-            if 'pali' not in res_text_dict and i < len(batch_input_for_llm):
-                res_text_dict['pali'] = batch_input_for_llm[i]['pali']
+            if "id" not in res_text_dict and i < len(batch_input_for_llm):
+                res_text_dict["id"] = batch_input_for_llm[i]["id"]
+            if "pali" not in res_text_dict and i < len(batch_input_for_llm):
+                res_text_dict["pali"] = batch_input_for_llm[i]["pali"]
             parsed_results.append(res_text_dict)
         else:
-            # Fallback for unexpected response type
-            error_id = batch_input_for_llm[i]['id'] if i < len(batch_input_for_llm) else "unknown_id"
-            error_pali = batch_input_for_llm[i]['pali'] if i < len(batch_input_for_llm) else "unknown_pali"
-            parsed_results.append({
-                "id": error_id,
-                "pali": error_pali,
-                "error": "unexpected_response_type_from_llm",
-                "original_data": str(res_text_dict)
-            })
-
+            error_id = (
+                batch_input_for_llm[i]["id"]
+                if i < len(batch_input_for_llm)
+                else "unknown_id"
+            )
+            error_pali = (
+                batch_input_for_llm[i]["pali"]
+                if i < len(batch_input_for_llm)
+                else "unknown_pali"
+            )
+            parsed_results.append(
+                {
+                    "id": error_id,
+                    "pali": error_pali,
+                    "error": "unexpected_response_type_from_llm",
+                    "original_data": str(res_text_dict),
+                }
+            )
 
     df_results = pd.DataFrame(parsed_results)
-    
-    # Ensure output directory exists
-    os.makedirs(os.path.dirname(output_csv_path), exist_ok=True)
-    df_results.to_csv(output_csv_path, index=False, encoding="utf-8")
-    print(f"{provider.upper()} batch discourse results saved to {output_csv_path}")
 
-
+    output_path = Path(output_csv_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    df_results.to_csv(output_path, index=False, encoding="utf-8")
+    pr.summary(f"{provider.upper()} results", output_csv_path)
 
 
 if __name__ == "__main__":
-    # --- Script Usage Guide ---
-    #
-    # This script can now be run directly.
-    # You'll need to configure the `task_to_run` variable and the
-    # corresponding file paths below.
-    #
-    # Example for Batch Class Inference:
-    # task_to_run = "batch_class_inference"
-    # vocab_csv_for_batch = "path/to/your/vocab.csv"
-    # exercise_file_for_batch = "path/to/your/exercise.txt"
-    # output_csv_for_batch = "path/to/your/output_batch.csv"
-    #
-    # Example for Batch Discourse Inference:
-    # task_to_run = "batch_discourse_inference"
-    # discourse_vocab_csv_path = "path/to/your/discourse_vocab.csv"
-    # sutta_text_file_for_discourse = "path/to/your/sutta.txt"
-    # output_csv_for_discourse = "path/to/your/output_discourse.csv"
-    # --- End Script Usage Guide ---
-
-    # --- Configuration for direct script run ---
+    pr.tic()
     # Choose which task to run by uncommenting one of the following:
     task_to_run = "batch_class_inference"
     # task_to_run = "batch_discourse_inference"
@@ -404,24 +440,37 @@ if __name__ == "__main__":
     # --- Default paths for "batch_class_inference" ---
     class_num = "29"
     vocab_csv_for_batch = f"shared_data/pali_class/vocab/vocab_class_{class_num}.csv"
-    exercise_file_for_batch = f"shared_data/pali_class/exercises/exercises_class_{class_num}.txt"
-    output_csv_for_batch = f"shared_data/pali_class/output/class_{class_num}_output2.csv" 
+    exercise_file_for_batch = (
+        f"shared_data/pali_class/exercises/exercises_class_{class_num}.txt"
+    )
+    output_csv_for_batch = (
+        f"shared_data/pali_class/output/class_{class_num}_output2.csv"
+    )
 
     # --- Default paths for "batch_discourse_inference" ---
     sutta_code = "sn56"
     discourse_vocab_csv_path = "shared_data/discourses/vocab/vocab_rest.csv"
     sutta_text_file_for_discourse = f"shared_data/discourses/suttas/{sutta_code}.txt"
-    output_csv_for_discourse = f"shared_data/discourses/output/rest_{sutta_code}_output.csv"
+    output_csv_for_discourse = (
+        f"shared_data/discourses/output/rest_{sutta_code}_output.csv"
+    )
     # --- End Configuration ---
 
     # Ensure cache directory exists
-    os.makedirs(DEEPSEEK_CACHE_DIR, exist_ok=True)
+    DEEPSEEK_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
     if task_to_run == "batch_class_inference":
-        run_batch_class_inference(vocab_csv_for_batch, exercise_file_for_batch, output_csv_for_batch, provider)
+        run_batch_class_inference(
+            vocab_csv_for_batch, exercise_file_for_batch, output_csv_for_batch, provider
+        )
     elif task_to_run == "batch_discourse_inference":
-        run_batch_discourse_inference(discourse_vocab_csv_path, sutta_text_file_for_discourse, output_csv_for_discourse, provider)
+        run_batch_discourse_inference(
+            discourse_vocab_csv_path,
+            sutta_text_file_for_discourse,
+            output_csv_for_discourse,
+            provider,
+        )
     else:
-        print(f"Unknown task: {task_to_run}. Please set 'task_to_run' to 'batch_class_inference' or 'batch_discourse_inference'.")
+        pr.red(f"Unknown task: {task_to_run}")
 
-    print("\n--- Script Finished ---")
+    pr.toc()

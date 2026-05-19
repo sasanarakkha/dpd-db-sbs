@@ -61,6 +61,7 @@ from gui.functions import (
     unstasher,
 )
 from gui.functions_daily_record import daily_record_update
+from gui.functions_dps import edit_corrections
 from gui.functions_db import (
     copy_word_from_db,
     del_syns_if_pos_meaning_changed,
@@ -146,7 +147,6 @@ def main():
         words_to_add_list = []
 
     flags: Flags = Flags()
-    archived_example_index = 0
     if username == "primary_user":
         get_next_ids(db_session, window)
     else:

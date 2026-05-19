@@ -15,6 +15,9 @@ from db.db_helpers import get_db_session
 from db_tests.single.test_allowable_characters import (
     test_allowable_characters_gui,
 )
+from db_tests.single.sbs_test_allowable_characters import (
+    test_allowable_characters_gui_dps,
+)
 from gui.functions import (
     Flags,
     add_sandhi_correction,
@@ -1247,7 +1250,7 @@ def main():
                 save_gui_state(pth, values, words_to_add_list)
                 window["messages"].update(value="saved gui state", text_color="green")
             elif username == "deva":
-                backup_ru_sbs()
+                backup_dps()
             break
 
         elif event == "load_example_button":
