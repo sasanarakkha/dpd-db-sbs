@@ -51,15 +51,43 @@ def bold_component_in_token(
     component_pali: str,
     headword_id: int,
     db_session: Session,
+    is_first_component: bool = False,
 ) -> str:
     """Bold component_pali within apos_token using actual inflections from DpdHeadword.
 
+    For first component of a compound: bold only the component itself.
+    For later components: bold from component start to end of token.
+
     Strategy (in order):
-    1. Try any inflection from DpdHeadword(headword_id).inflections; bold to end of token.
+    0. Exact match wins — component_pali directly found in apos_token.
+    1. Try any inflection from DpdHeadword(headword_id).inflections; bold appropriately.
     2. For sandhi (apostrophe in token): bold left or right side.
     3. Direct substring match.
     4. Fallback: bold the whole token.
     """
+    # 0. Exact match wins — prioritise the headword's own form over inflections
+    if component_pali in apos_token:
+        if "'" in apos_token:
+            left, _, right = apos_token.partition("'")
+            if component_pali in left:
+                idx = left.index(component_pali)
+                return left[:idx] + "<b>" + left[idx:] + "</b>'" + right
+            else:
+                idx = right.index(component_pali)
+                return left + "'<b>" + right[:idx] + component_pali + "</b>"
+        else:
+            idx = apos_token.index(component_pali)
+            if is_first_component:
+                return (
+                    apos_token[:idx]
+                    + "<b>"
+                    + component_pali
+                    + "</b>"
+                    + apos_token[idx + len(component_pali) :]
+                )
+            else:
+                return apos_token[:idx] + "<b>" + apos_token[idx:] + "</b>"
+
     # 1. Try inflections from database
     try:
         headword = db_session.query(DpdHeadword).filter_by(id=headword_id).first()
@@ -79,29 +107,59 @@ def bold_component_in_token(
                                 idx = right.index(inflection)
                                 return left + "'<b>" + right[:idx] + inflection + "</b>"
                         else:
-                            # No sandhi: bold from inflection to end of token
+                            # No sandhi: for first component, bold exact inflection; otherwise bold to end
                             idx = apos_token.index(inflection)
-                            return apos_token[:idx] + "<b>" + apos_token[idx:] + "</b>"
+                            if is_first_component:
+                                return (
+                                    apos_token[:idx]
+                                    + "<b>"
+                                    + inflection
+                                    + "</b>"
+                                    + apos_token[idx + len(inflection) :]
+                                )
+                            else:
+                                return (
+                                    apos_token[:idx] + "<b>" + apos_token[idx:] + "</b>"
+                                )
     except Exception:
         pass  # Fall back to heuristics if DB lookup fails
 
     # 2. Direct match (fallback if inflections not found)
     if component_pali in apos_token:
-        return apos_token.replace(component_pali, f"<b>{component_pali}</b>", 1)
+        # For first component, bold only the exact component; otherwise bold to end
+        if is_first_component:
+            return apos_token.replace(component_pali, f"<b>{component_pali}</b>", 1)
+        else:
+            idx = apos_token.index(component_pali)
+            return apos_token[:idx] + "<b>" + apos_token[idx:] + "</b>"
 
     # 3. Strip final ṃ and try
     pali_no_m = component_pali.rstrip("ṃ")
     if len(pali_no_m) > 1 and pali_no_m in apos_token:
-        return apos_token.replace(pali_no_m, f"<b>{pali_no_m}</b>", 1)
+        # For first component, bold only the stripped form; otherwise bold to end
+        if is_first_component:
+            return apos_token.replace(pali_no_m, f"<b>{pali_no_m}</b>", 1)
+        else:
+            idx = apos_token.index(pali_no_m)
+            return apos_token[:idx] + "<b>" + apos_token[idx:] + "</b>"
 
     # 4. Stem match: strip trailing short vowel, bold from stem position
     stem = component_pali.rstrip("aāiīuūeo")
     if len(stem) > 1 and stem in apos_token:
         idx = apos_token.index(stem)
-        end = min(idx + len(component_pali), len(apos_token))
-        return (
-            apos_token[:idx] + "<b>" + apos_token[idx:end] + "</b>" + apos_token[end:]
-        )
+        if is_first_component:
+            # For first component, bold only up to len(component_pali)
+            end = min(idx + len(component_pali), len(apos_token))
+            return (
+                apos_token[:idx]
+                + "<b>"
+                + apos_token[idx:end]
+                + "</b>"
+                + apos_token[end:]
+            )
+        else:
+            # For later component, bold to end of token
+            return apos_token[:idx] + "<b>" + apos_token[idx:] + "</b>"
 
     # 5. Apostrophe-split: bold left or right side
     if "'" in apos_token:
@@ -115,37 +173,52 @@ def bold_component_in_token(
     return f"<b>{apos_token}</b>"
 
 
+def bold_word_toplevel(apos_token: str) -> str:
+    """Bold the entire token for a top-level (non-component) word."""
+    return f"<b>{apos_token}</b>"
+
+
 def bold_word_in_verse(
     verse_text: str,
     apos_token: str,
     component_pali: str,
     headword_id: int,
     db_session: Session,
+    is_first_component: bool = False,
+    is_top_level: bool = False,
 ) -> str:
     """Bold component_pali in apos_token, then replace apos_token in verse_text."""
-    bolded_token = bold_component_in_token(
-        apos_token, component_pali, headword_id, db_session
-    )
+    if is_top_level:
+        bolded_token = bold_word_toplevel(apos_token)
+    else:
+        bolded_token = bold_component_in_token(
+            apos_token, component_pali, headword_id, db_session, is_first_component
+        )
     escaped_token = re.escape(apos_token)
     pattern = rf"(?<![a-zA-Zāīūḍḷṅñṇṃśṣ])({escaped_token})(?![a-zA-Zāīūḍḷṅñṇṃśṣ])"
     return re.sub(pattern, bolded_token, verse_text)
 
 
 def collect_all_ids(
-    option: dict[str, Any], word_in_verse: str
-) -> list[tuple[int, str, str]]:
-    """Recursively collect (headword_id, component_pali, word_in_verse) from an option tree.
+    option: dict[str, Any], word_in_verse: str, component_index: int = 0, depth: int = 0
+) -> list[tuple[int, str, str, bool, bool]]:
+    """Recursively collect (headword_id, component_pali, word_in_verse, is_first_component, is_top_level) from an option tree.
 
     Traverses all nested components. Skips decon_ keys and empty IDs at every level.
+    is_first_component is True if this component is the first in a child compound (depth > 0 and component_index == 0).
+    is_top_level is True for entries at depth=0 (standalone top-level words, not compound parts).
     """
-    results: list[tuple[int, str, str]] = []
+    results: list[tuple[int, str, str, bool, bool]] = []
 
     hw_id = option.get("id")
     key = option.get("key", "")
     pali = option.get("pali", word_in_verse)
 
+    # Only set is_first=True for first component of child compounds, not top-level
+    is_first = component_index == 0 and depth > 0
+    is_top_level = depth == 0
     if hw_id and not key.startswith("decon_"):
-        results.append((int(hw_id), pali, word_in_verse))
+        results.append((int(hw_id), pali, word_in_verse, is_first, is_top_level))
 
     should_recurse = (
         option.get("compound_type", "")
@@ -153,11 +226,16 @@ def collect_all_ids(
         or key.startswith("decon_")
     )
     if should_recurse:
-        for comp_list in option.get("components", []):
+        components_list = option.get("components", [])
+        for i, comp_list in enumerate(components_list):
             if not comp_list:
                 continue
             best_comp = max(comp_list, key=lambda x: x.get("ai_score", 0))
-            results.extend(collect_all_ids(best_comp, word_in_verse))
+            results.extend(
+                collect_all_ids(
+                    best_comp, word_in_verse, component_index=i, depth=depth + 1
+                )
+            )
 
     return results
 
@@ -240,8 +318,18 @@ def main() -> None:
                 # Locate this token's apostrophe form in the verse text
                 apos_word = find_token_in_apos_verse(word, verse_text)
 
-                for headword_id, component_pali, _word_in_verse in all_entries:
+                for (
+                    headword_id,
+                    component_pali,
+                    _word_in_verse,
+                    is_first_component,
+                    is_top_level,
+                ) in all_entries:
                     if headword_id in updated_in_verse:
+                        skipped_count += 1
+                        continue
+
+                    if component_pali not in apos_word.replace("'", ""):
                         skipped_count += 1
                         continue
 
@@ -252,7 +340,13 @@ def main() -> None:
                         continue
 
                     example = bold_word_in_verse(
-                        verse_text, apos_word, component_pali, headword_id, db_session
+                        verse_text,
+                        apos_word,
+                        component_pali,
+                        headword_id,
+                        db_session,
+                        is_first_component,
+                        is_top_level,
                     )
 
                     if args.dry_run:

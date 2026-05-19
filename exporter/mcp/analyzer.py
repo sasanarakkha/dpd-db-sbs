@@ -1,3 +1,4 @@
+import re
 from typing import Any
 from sqlalchemy.orm import Session
 from db.models import DpdHeadword, Lookup
@@ -146,6 +147,81 @@ def is_pos_compatible(hw_pos: str, grammar_pos: str, grammar_string: str = "") -
     return False
 
 
+def get_in_comp_forms(inflections_html: str) -> set[str]:
+    """Extract all forms from the 'in comps' row of inflections_html."""
+    match = re.search(r"in comps</th>(.*?)</tr>", inflections_html, re.DOTALL)
+    if not match:
+        return set()
+    cell_html = re.sub(r"<br\s*/?>", " ", match.group(1))
+    clean = re.sub(r"<[^>]+>", "", cell_html)
+    return {f.strip() for f in clean.split() if f.strip()}
+
+
+def get_grammar_from_inflections_html(form: str, headword: DpdHeadword) -> str | None:
+    """
+    Extract grammar description from headword's inflections_html for a given form.
+
+    Parses the HTML table to find the form (which may be split by HTML tags)
+    and extracts the title attribute from its containing <td> element.
+    Example: yogasmā in yoga's inflections_html → "masc abl sg of yoga"
+    """
+    if not headword.inflections_html:
+        return None
+
+    html = headword.inflections_html
+    # Build pattern to match form with HTML tags possibly interspersed
+    form_with_tags = "".join(f"{char}(?:<[^>]*>)*" for char in form)
+    match_form = re.search(form_with_tags, html)
+
+    if not match_form:
+        return None
+
+    # Found the form; now work backwards to find its containing <td title='...'>
+    pos = match_form.start()
+    text_before = html[:pos]
+    last_td = text_before.rfind("<td")
+
+    if last_td < 0:
+        return None
+
+    # Extract the <td> tag opening
+    td_end = html.find(">", last_td)
+    td_tag = html[last_td : td_end + 1]
+
+    # Extract title attribute
+    title_match = re.search(r"title='([^']*)'", td_tag)
+    if title_match:
+        grammar_part = title_match.group(1)
+        return f"{grammar_part} of {headword.lemma_clean}"
+
+    return None
+
+
+def search_inflections_for_form(form: str, db_session: Session) -> DpdHeadword | None:
+    """
+    Find which headword has this form in its inflections.
+
+    ⚠️ ONLY FOR COMPOUND PARTS: Called from get_components_from_construction()
+    when a compound part has no Lookup entry but is marked as inflected.
+    Never used in normal word analysis flow.
+
+    Example: yogasmā → yoga 1 (ID 54211)
+
+    Simply searches all headwords' existing inflections_list (no guessing).
+    """
+    headwords = (
+        db_session.query(DpdHeadword)
+        .filter(DpdHeadword.inflections_html.is_not(None))
+        .all()
+    )
+
+    for hw in headwords:
+        if form in hw.inflections_list:
+            return hw
+
+    return None
+
+
 def is_stem_compatible(grammar_string: str) -> bool:
     """Check if a grammar string represents a stem or uninflected form."""
     g = grammar_string.lower()
@@ -159,6 +235,28 @@ def is_stem_compatible(grammar_string: str) -> bool:
             return False
 
     return True
+
+
+def _strip_bold(text: str | None) -> str:
+    if not text:
+        return ""
+    return re.sub(r"</?b>", "", text)
+
+
+def _is_neg_kammadhāraya_components(
+    compound_type: str, components: list[list[dict[str, Any]]]
+) -> bool:
+    """True if components are na + X where X is not itself a compound."""
+    if compound_type.lower() != "kammadhāraya":
+        return False
+    if len(components) < 2 or not components[0]:
+        return False
+    first_pali = components[0][0].get("pali", "").replace("- ", "").strip()
+    if first_pali != "na":
+        return False
+    second_opts = components[1] if len(components) > 1 else []
+    # Exception: if ANY reading of X is itself a compound → do not suppress
+    return not any(bool(o.get("compound_type", "")) for o in second_opts)
 
 
 def get_word_details(
@@ -206,17 +304,28 @@ def get_word_details(
         if is_compound_part and not is_inflected_part:
             # Stem Filter: Check if this headword is a valid stem for the token
             is_valid_stem = False
-            if grammar_list:
-                for i, (g_lemma, g_pos, g_gram) in enumerate(grammar_list):
-                    if g_lemma == hw.lemma_clean and is_stem_compatible(g_gram):
+
+            # If found in Lookup table, accept as valid stem (Lookup is authoritative)
+            if lookup_entry:
+                is_valid_stem = True
+            else:
+                # Fallback: check inflections_html only if NOT found in Lookup
+                if grammar_list:
+                    for i, (g_lemma, g_pos, g_gram) in enumerate(grammar_list):
+                        if g_lemma == hw.lemma_clean and is_stem_compatible(g_gram):
+                            is_valid_stem = True
+                            break
+
+                if not is_valid_stem and hw.lemma_clean == token:
+                    is_valid_stem = True
+
+                if not is_valid_stem and not grammar_list:
+                    is_valid_stem = True
+
+                # Check if token is an "in comps" form in the headword's inflection table
+                if not is_valid_stem and hw.inflections_html:
+                    if token in get_in_comp_forms(hw.inflections_html):
                         is_valid_stem = True
-                        break
-
-            if not is_valid_stem and hw.lemma_clean == token:
-                is_valid_stem = True
-
-            if not is_valid_stem and not grammar_list:
-                is_valid_stem = True
 
             if not is_valid_stem:
                 continue
@@ -236,6 +345,10 @@ def get_word_details(
                 "compound_construction": hw.compound_construction,
                 "root_key": root_combo(hw),
                 "construction": hw.construction_summary,
+                "example_1": _strip_bold(hw.example_1),
+                "source_1": hw.source_1 or "",
+                "example_2": _strip_bold(hw.example_2),
+                "source_2": hw.source_2 or "",
                 "components": [],
             }
             # Recursive component check
@@ -285,6 +398,10 @@ def get_word_details(
                     is_compound_part=is_sub_comp,
                     force_inflected=force_inflected,
                 )
+                if _is_neg_kammadhāraya_components(
+                    hw.compound_type, entry["components"]
+                ):
+                    entry["components"] = []
             word_details.append(entry)
             continue
 
@@ -343,6 +460,8 @@ def get_word_details(
                 is_compound_part=is_sub_comp,
                 force_inflected=force_inflected,
             )
+            if _is_neg_kammadhāraya_components(hw.compound_type, hw_components):
+                hw_components = []
 
         # We need to match the Headword to the Grammar entry.
         # Usually matching by lemma_clean is safest.
@@ -369,6 +488,10 @@ def get_word_details(
                             "compound_construction": hw.compound_construction,
                             "root_key": root_combo(hw),
                             "construction": hw.construction_summary,
+                            "example_1": _strip_bold(hw.example_1),
+                            "source_1": hw.source_1 or "",
+                            "example_2": _strip_bold(hw.example_2),
+                            "source_2": hw.source_2 or "",
                             "components": hw_components,
                         }
                         word_details.append(entry)
@@ -389,6 +512,10 @@ def get_word_details(
                     "compound_construction": hw.compound_construction,
                     "root_key": root_combo(hw),
                     "construction": hw.construction_summary,
+                    "example_1": _strip_bold(hw.example_1),
+                    "source_1": hw.source_1 or "",
+                    "example_2": _strip_bold(hw.example_2),
+                    "source_2": hw.source_2 or "",
                     "components": hw_components,
                 }
                 word_details.append(entry)
@@ -435,6 +562,10 @@ def get_word_details(
                     "compound_construction": hw.compound_construction,
                     "root_key": root_combo(hw),
                     "construction": hw.construction_summary,
+                    "example_1": _strip_bold(hw.example_1),
+                    "source_1": hw.source_1 or "",
+                    "example_2": _strip_bold(hw.example_2),
+                    "source_2": hw.source_2 or "",
                     "components": hw_components,
                 }
                 word_details.append(entry)
@@ -467,7 +598,7 @@ def get_components_from_construction(
     grammatical: bool = False,
     is_compound_part: bool = False,
     force_inflected: bool = False,
-) -> list[dict[str, Any]]:
+) -> list[list[dict[str, Any]]]:
     """Helper to break down a construction string into component details."""
     components = []
     parts = construction.split(" + ")
@@ -497,20 +628,59 @@ def get_components_from_construction(
                 # We need to save all possible option so AI can pick which is better
                 components.append(part_details_list)
             else:
-                # If no details found, just add the word itself as a placeholder (wrapped in a list)
-                components.append(
-                    [
-                        {
-                            "key": f"missing_{clean_part}",
-                            "id": "",
-                            "pali": clean_part,
-                            "pos": "",
-                            "grammar": "in comp",
-                            "meaning_combo": "",
-                            "construction": "",
-                        }
-                    ]
-                )
+                # Fallback: if inflected part has no lookup, search inflections
+                fallback_hw = None
+                if is_inflected:
+                    fallback_hw = search_inflections_for_form(clean_part, db_session)
+
+                if fallback_hw:
+                    # Found in inflections: create entry from the base headword
+                    score, completeness = get_completeness(fallback_hw)
+                    # Extract grammar from headword's inflections_html
+                    grammar_str = get_grammar_from_inflections_html(
+                        clean_part, fallback_hw
+                    )
+                    if not grammar_str:
+                        grammar_str = f"inflected form of {fallback_hw.lemma_clean}"
+                    components.append(
+                        [
+                            {
+                                "key": f"{fallback_hw.id}_inflection",
+                                "id": fallback_hw.id,
+                                "lemma": fallback_hw.lemma_1,
+                                "degree_of_completion": completeness,
+                                "score": score,
+                                "pali": clean_part,
+                                "pos": fallback_hw.pos,
+                                "grammar": grammar_str,
+                                "meaning_combo": fallback_hw.meaning_combo,
+                                "compound_type": fallback_hw.compound_type,
+                                "compound_construction": fallback_hw.compound_construction,
+                                "root_key": root_combo(fallback_hw),
+                                "construction": fallback_hw.construction_summary,
+                                "example_1": _strip_bold(fallback_hw.example_1),
+                                "source_1": fallback_hw.source_1 or "",
+                                "example_2": _strip_bold(fallback_hw.example_2),
+                                "source_2": fallback_hw.source_2 or "",
+                                "components": [],
+                            }
+                        ]
+                    )
+                else:
+                    # If no details found and no inflection match, add placeholder
+                    components.append(
+                        [
+                            {
+                                "key": f"missing_{clean_part}",
+                                "id": "",
+                                "pali": clean_part,
+                                "pos": "",
+                                "grammar": "in comp",
+                                "meaning_combo": "",
+                                "construction": "",
+                            }
+                        ]
+                    )
     return components
 
 

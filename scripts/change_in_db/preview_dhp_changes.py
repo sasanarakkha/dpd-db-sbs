@@ -136,14 +136,29 @@ def main() -> None:
                 all_entries = collect_all_ids(best_option, word)
                 apos_word = find_token_in_apos_verse(word, verse_text)
 
-                for headword_id, component_pali, _word_in_verse in all_entries:
+                for (
+                    headword_id,
+                    component_pali,
+                    _word_in_verse,
+                    is_first_component,
+                    is_top_level,
+                ) in all_entries:
                     if headword_id in updated_ids:
+                        continue
+
+                    if component_pali not in apos_word.replace("'", ""):
                         continue
 
                     sbs = sbs_map.get(headword_id)
                     status = "SKIP" if sbs and sbs.dhp_example else "NEW"
                     proposed_example = bold_word_in_verse(
-                        verse_text, apos_word, component_pali, headword_id, db_session
+                        verse_text,
+                        apos_word,
+                        component_pali,
+                        headword_id,
+                        db_session,
+                        is_first_component,
+                        is_top_level,
                     )
 
                     proposed_changes_rows.append(
