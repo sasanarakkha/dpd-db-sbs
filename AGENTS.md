@@ -71,6 +71,7 @@ Existing tables have extra `*_ru` columns (e.g., `root_ru_meaning`, `html_ru`).
   - **HTML IDs**: Always prefix with `ru_`, `sbs_`, or `dps_`.
 - **Clean Codebase**: Prefer modular abstractions. Use modern type hints and pathlib. Remove unused dependencies.
 - **No Inline Scripting**: NEVER use `python -c "..."` or `python3 -c "..."` in Bash. If you need a one-shot script, write it to `temp/<descriptive_name>.py` and run `uv run python temp/<descriptive_name>.py`. Delete the file when done. This rule exists because inline scripts are invisible in code review, cannot be re-run, and cannot be linted.
+- **UI Migrations**: When migrating UI or logging (e.g., to `printer.py`), perform a "runtime sweep" to catch undefined variables (`NameError`) in callbacks or rarely-triggered code paths.
 
 ## Clean Root Folder Protocol
 - The root directory MUST remain free of temporary scripts, logs, and artifacts.
