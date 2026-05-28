@@ -1,13 +1,15 @@
+"""Verify AI translation merge helpers and mocked translation flow."""
+
 from unittest.mock import MagicMock, patch
 
-from exporter.mcp.translate_core import (
+from exporter.analysis.translate_core import (
     merge_ai_selections,
     pre_match_db_examples,
     translate_sentence,
 )
 
 
-def test_merge_simple_selection():
+def test_merge_simple_selection() -> None:
     """Test merging a simple top-level selection via scores map."""
     analysis_data = [
         {
@@ -53,7 +55,7 @@ def test_merge_simple_selection():
     assert word_data[1]["ai_score"] == 2
 
 
-def test_merge_component_selection():
+def test_merge_component_selection() -> None:
     """Test merging scores for compound components."""
     analysis_data = [
         {
@@ -97,7 +99,7 @@ def test_merge_component_selection():
     assert comp2_opts[0]["ai_score"] == 10
 
 
-def test_merge_deconstruction_selection():
+def test_merge_deconstruction_selection() -> None:
     """Test merging a decon_ key with AI-provided contextual_meaning."""
     analysis_data = [
         {
@@ -138,7 +140,7 @@ def test_merge_deconstruction_selection():
     assert comp_entry["meaning_combo"] == "I would dwell"
 
 
-def test_merge_missing_score_defaults_to_zero():
+def test_merge_missing_score_defaults_to_zero() -> None:
     """Options not in scores map get ai_score=0."""
     analysis_data = [
         {
@@ -160,8 +162,8 @@ def test_merge_missing_score_defaults_to_zero():
     assert data[1]["ai_score"] == 0
 
 
-def test_pre_match_db_examples_source_1():
-    """Options whose source_1 matches verse_source get ai_score=10 and db_example_match=True."""
+def test_pre_match_db_examples_source_1() -> None:
+    """Options whose source_1 matches verse_source get preselected."""
     analysis = [
         {
             "word": "susamāhito",
@@ -179,7 +181,7 @@ def test_pre_match_db_examples_source_1():
     assert data[1]["db_example_match"] is True
 
 
-def test_pre_match_db_examples_source_2():
+def test_pre_match_db_examples_source_2() -> None:
     """Match also works via source_2."""
     analysis = [
         {
@@ -194,7 +196,7 @@ def test_pre_match_db_examples_source_2():
     assert analysis[0]["data"][0]["db_example_match"] is True
 
 
-def test_pre_match_db_examples_no_match():
+def test_pre_match_db_examples_no_match() -> None:
     """Options with no matching source are untouched."""
     analysis = [
         {
@@ -207,7 +209,7 @@ def test_pre_match_db_examples_no_match():
     assert "db_example_match" not in analysis[0]["data"][0]
 
 
-def test_translate_sentence_flow():
+def test_translate_sentence_flow() -> None:
     """Test the full pipeline with mocked AI and DB calls."""
     mock_session = MagicMock()
     analysis_stub = [
@@ -216,7 +218,7 @@ def test_translate_sentence_flow():
     ai_json = '{"translation": "Test", "literal_translation": "lit", "scores": {"1_0": {"score": 10}}}'
 
     with patch(
-        "exporter.mcp.translate_core.analyze_sentence", return_value=analysis_stub
+        "exporter.analysis.translate_core.analyze_sentence", return_value=analysis_stub
     ):
         mock_manager = MagicMock()
         mock_response = MagicMock()

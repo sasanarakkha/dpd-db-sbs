@@ -1,5 +1,5 @@
 import json
-from exporter.mcp.analyzer import analyze_sentence
+from exporter.analysis.analyzer import analyze_sentence
 from db.db_helpers import get_db_session
 from tools.paths import ProjectPaths
 

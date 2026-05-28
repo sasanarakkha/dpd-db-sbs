@@ -3,12 +3,13 @@
 import argparse
 import json
 import sys
-from pathlib import Path
+
 from db.db_helpers import get_db_session
+from exporter.analysis.paths import ensure_analysis_dirs
+from exporter.analysis.translate_core import translate_sentence
 from tools.ai_manager import AIManager
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
-from exporter.mcp.translate_core import translate_sentence
 
 
 def main():
@@ -28,10 +29,9 @@ def main():
     args = parser.parse_args()
 
     book = args.book
-    input_path = Path("exporter/mcp/input") / f"{book}.json"
-    output_dir = Path("exporter/mcp/output")
-    output_dir.mkdir(parents=True, exist_ok=True)
-    output_path = output_dir / f"{book}_analysis.json"
+    analysis_dirs = ensure_analysis_dirs()
+    input_path = analysis_dirs.input_dir / f"{book}.json"
+    output_path = analysis_dirs.output_dir / f"{book}_analysis.json"
 
     if not input_path.exists():
         pr.no(f"Input file not found: {input_path}")

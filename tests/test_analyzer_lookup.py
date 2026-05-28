@@ -2,7 +2,7 @@ import json
 from db.db_helpers import get_db_session
 from db.models import Lookup
 from tools.paths import ProjectPaths
-from exporter.mcp.analyzer import analyze_sentence
+from exporter.analysis.analyzer import analyze_sentence
 
 
 def test_analyzer_lookup():

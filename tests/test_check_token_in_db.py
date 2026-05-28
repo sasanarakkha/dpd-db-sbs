@@ -1,4 +1,4 @@
-from exporter.mcp.analyzer import get_word_details
+from exporter.analysis.analyzer import get_word_details
 from db.db_helpers import get_db_session
 from tools.paths import ProjectPaths
 from db.models import Lookup

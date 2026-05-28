@@ -1,9 +1,13 @@
+"""Analyze Pali sentences against DPD lookup and headword data."""
+
 import re
 from typing import Any
+
 from sqlalchemy.orm import Session
+
 from db.models import DpdHeadword, Lookup
-from tools.pali_alphabet import pali_alphabet
 from tools.clean_machine import clean_machine
+from tools.pali_alphabet import pali_alphabet
 
 suffixes = {
     "tta",
@@ -64,6 +68,10 @@ exceptions_comp = {
 }
 
 sandhi_particles = {" + api", " + ca", " + eva", " + iti", " + iva", " + hi"}
+
+KAMMADHARAYA_FILTER_WORDS: frozenset[str] = frozenset(
+    {"eva", "iva", "iti", "etassa", "viya"}
+)
 
 case_keywords = {
     "nom",
@@ -259,6 +267,22 @@ def _is_neg_kammadhāraya_components(
     return not any(bool(o.get("compound_type", "")) for o in second_opts)
 
 
+def _normalize_kammadharaya_construction(comp_construction: str) -> str:
+    """Convert descriptive kammadhāraya comp_construction (no '+') to '+'-joined parts.
+
+    Filters copula/filler words (eva, iva, iti, etassa, viya) from position 1+.
+    E.g. "paññā eva āvudha" → "paññā + āvudha"
+    No-op when '+' is already present.
+    """
+    if "+" in comp_construction:
+        return comp_construction
+    words = comp_construction.split()
+    if not words:
+        return comp_construction
+    filtered = [words[0]] + [w for w in words[1:] if w not in KAMMADHARAYA_FILTER_WORDS]
+    return " + ".join(filtered)
+
+
 def get_word_details(
     token: str,
     db_session: Session,
@@ -268,9 +292,6 @@ def get_word_details(
     is_inflected_part: bool = True,
 ) -> list[dict[str, Any]]:
     """Helper to get word details for a given token, generating specific options based on lookup grammar."""
-    if token == "sati":
-        print(f"DEBUG: get_word_details('sati', is_inflected_part={is_inflected_part})")
-
     lookup_entry = db_session.query(Lookup).filter(Lookup.lookup_key == token).first()
     if not lookup_entry or not lookup_entry.headwords:
         return []
@@ -376,7 +397,12 @@ def get_word_details(
                     for x in ["abyayībhāva", "tappurisa", "digu", "kammadhāraya"]
                 ):
                     if hw.compound_construction:
-                        breakdown_source = hw.compound_construction
+                        if "kammadhāraya" in ct:
+                            breakdown_source = _normalize_kammadharaya_construction(
+                                hw.compound_construction
+                            )
+                        else:
+                            breakdown_source = hw.compound_construction
                 else:
                     # Fallback/Default behavior
                     if hw.compound_construction:
@@ -434,7 +460,12 @@ def get_word_details(
                 x in ct for x in ["abyayībhāva", "tappurisa", "digu", "kammadhāraya"]
             ):
                 if hw.compound_construction:
-                    breakdown_source = hw.compound_construction
+                    if "kammadhāraya" in ct:
+                        breakdown_source = _normalize_kammadharaya_construction(
+                            hw.compound_construction
+                        )
+                    else:
+                        breakdown_source = hw.compound_construction
             else:
                 # Fallback/Default behavior
                 if hw.compound_construction:
@@ -447,11 +478,6 @@ def get_word_details(
             # Sandhi and Comp VB are treated as inflected contexts
             if "sandhi" in hw.grammar or is_comp_vb:
                 force_inflected = True
-
-            if "ānāpānassati" in hw.lemma_1:
-                print(f"DEBUG: Analyzing components for {hw.lemma_1}")
-                print(f"  grammar: '{hw.grammar}'")
-                print(f"  force_inflected: {force_inflected}")
 
             hw_components = get_components_from_construction(
                 breakdown_source,
@@ -528,19 +554,11 @@ def get_word_details(
             if grammar_list:
                 for i, (g_lemma, g_pos, g_gram) in enumerate(grammar_list):
                     if g_lemma == hw.lemma_clean and is_stem_compatible(g_gram):
-                        if token == "sati":
-                            print(
-                                f"DEBUG: Accepted stem {hw.lemma_clean} for {token} via grammar: {g_gram}"
-                            )
                         is_valid_stem = True
                         break
 
             # Additional check: if lemma matches token, it's highly likely a valid stem usage
             if not is_valid_stem and hw.lemma_clean == token:
-                if token == "sati":
-                    print(
-                        f"DEBUG: Accepted stem {hw.lemma_clean} for {token} via strict lemma match"
-                    )
                 is_valid_stem = True
 
             # Fallback: if no grammar list at all exists in lookup for this token, assume valid

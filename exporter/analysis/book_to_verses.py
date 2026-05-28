@@ -3,7 +3,8 @@
 import argparse
 import json
 import re
-from pathlib import Path
+
+from exporter.analysis.paths import ensure_analysis_dirs
 from tools.cst_source_sutta_example import find_cst_source_sutta_example
 from tools.pali_alphabet import pali_alphabet
 from tools.paths import ProjectPaths
@@ -126,9 +127,7 @@ def main():
             verse["speech_mark_options"] = speech_mark_options
         verses_data.append(verse)
 
-    # Ensure output directory exists
-    output_dir = Path("exporter/mcp/input")
-    output_dir.mkdir(parents=True, exist_ok=True)
+    output_dir = ensure_analysis_dirs().input_dir
     output_path = output_dir / f"{book}.json"
 
     # Write JSON

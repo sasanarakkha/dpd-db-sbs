@@ -5,8 +5,8 @@ from pathlib import Path
 from typing import Any
 
 from gui2.toolkit import ToolKit
-from exporter.mcp.analyzer import analyze_sentence
-from exporter.mcp.ai_pali_translate import translate_sentence
+from exporter.analysis.analyzer import analyze_sentence
+from exporter.analysis.ai_pali_translate import translate_sentence
 
 
 class AnalysisRow(ft.Container):
@@ -454,7 +454,7 @@ class AnalysisView(ft.Column):
 
         try:
             from tools.ai_open_router import OpenRouterManager
-            from exporter.mcp.ai_pali_translate import build_system_prompt
+            from exporter.analysis.ai_pali_translate import build_system_prompt
 
             # Construct a context that only contains the SELECTED options
             # to force the AI to follow user choices.

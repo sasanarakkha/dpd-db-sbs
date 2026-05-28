@@ -8,13 +8,14 @@ import traceback
 from datetime import datetime
 from pathlib import Path
 
-from tools.paths import ProjectPaths
 from db.db_helpers import get_db_session
-from tools.ai_manager import AIManager
-from exporter.mcp.translate_core import (
-    translate_sentence,
+from exporter.analysis.paths import ensure_analysis_dirs
+from exporter.analysis.translate_core import (
     generate_markdown_report,
+    translate_sentence,
 )
+from tools.ai_manager import AIManager
+from tools.paths import ProjectPaths
 
 
 def _save_markdown(report: str, sentence: str, output_dir: Path) -> Path:
@@ -27,7 +28,7 @@ def _save_markdown(report: str, sentence: str, output_dir: Path) -> Path:
 
 def _mode_verse(book: str, verse_num: str, output_dir: Path) -> None:
     """Load an already-analysed verse from the batch JSON and render it to markdown."""
-    analysis_path = Path("exporter/mcp/output") / f"{book}_analysis.json"
+    analysis_path = ensure_analysis_dirs().output_dir / f"{book}_analysis.json"
     if not analysis_path.exists():
         print(f"Error: analysis file not found: {analysis_path}")
         sys.exit(1)
@@ -98,8 +99,7 @@ def main() -> None:
     parser.add_argument("--verse", help="Verse number to render (e.g., DHP1)")
     args = parser.parse_args()
 
-    output_dir = Path(__file__).parent / "output"
-    output_dir.mkdir(exist_ok=True)
+    output_dir = ensure_analysis_dirs().output_dir
 
     if args.book and args.verse:
         _mode_verse(args.book, args.verse, output_dir)

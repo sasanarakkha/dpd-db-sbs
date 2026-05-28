@@ -4,14 +4,14 @@
 
 ## Phase 1: Robust Python Analyzer (Stage 1)
 - [x] Task: Make use of `tests/test_analyze_sentence.py` with a comprehensive suite of Pāḷi sentences covering various grammatical structures (compounds, sandhi, inflections).
-- [x] Task: Make use of `exporter/mcp/analyzer.py` to ensure it deterministically returns all grammatical possibilities in the standard JSON structure.
+- [x] Task: Make use of `exporter/analysis/analyzer.py` to ensure it deterministically returns all grammatical possibilities in the standard JSON structure.
 - [x] Task: Run regression tests and verify output against manual expectations. The output is stored in `temp/debug_analysis_dump.json` it is a huge json file and on this stage we would need to read it a lot, so better to use flash model for reading huge debug files.
 - [~] Task: **User Approval Gate:** Present Stage 1 results to the user for explicit sign-off before proceeding.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Robust Python Analyzer (Stage 1)' (Protocol in workflow.md)
 
 ## Phase 2: Hybrid AI Translation (Stage 2)
 - [x] Task: Make use of `tests/test_ai_pali_translate.py` to test the "Safe Merge" logic (mocking the AI response).
-- [x] Task: Make use of `exporter/mcp/ai_pali_translate.py` to implement the "Safe Merge" pattern:
+- [x] Task: Make use of `exporter/analysis/ai_pali_translate.py` to implement the "Safe Merge" pattern:
     - [x] Define the strict lightweight JSON schema for the AI response (translation + option indices).
     - [x] Implement the Python logic to merge AI selections into the master analyzer JSON.
 - [x] Task: Integrate the actual LLM call (using existing API keys) to populate the lightweight response.

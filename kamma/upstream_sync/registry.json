@@ -131,6 +131,7 @@
     "conductor/",
     "kamma/",
     "exporter/mcp",
+    "exporter/analysis",
     "exporter/archive/"
   ],
   "skip_sync_patterns": [
