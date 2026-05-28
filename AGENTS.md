@@ -107,3 +107,6 @@ Renames/moves are atomic. You MUST:
 - **Verification:** Write tests for accurate data output (not UI components). Readme MUST be updated.
 - **Research:** Always perform Google Search for framework/OS quirks.
 - **Sync Tracking:** Only track and update exporters in the sync registry that contain localized data (Russian, SBS, or DPS-specific).
+
+## Kamma Thread Exceptions
+- `kamma/threads/20260506_mcp_pali_analysis` is a feedback-loop thread. Do not archive or finalize it unless it has a `review.md` with a `PASSED` verdict and the user has explicitly confirmed all issues are resolved.

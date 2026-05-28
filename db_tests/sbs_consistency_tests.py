@@ -20,21 +20,9 @@ def run_sbs_consistency_tests() -> int:
     db_session = get_db_session(pth.dpd_db_path)
 
     results_list: list[tuple[str, str | None, int, str]] = []
-    soft_checks = [
-        "pat_consistency",
-        "dhp_source_consistency",
-        "discourses_source_prefix",
-        "discourses_source_full",
-    ]
 
-    def run_one(name, func, is_soft=None):
-        if is_soft is None:
-            is_soft = name in soft_checks
-
-        if is_soft:
-            pr.white_tmr(name.replace("_", " "))
-        else:
-            pr.green_tmr(name.replace("_", " "))
+    def run_one(name, func):
+        pr.green_tmr(name.replace("_", " "))
 
         res = func(db_session)
         results_list.append(res)
@@ -46,10 +34,7 @@ def run_sbs_consistency_tests() -> int:
             pr.no(count)
 
         if count > 0:
-            if is_soft:
-                pr.amber(f"solution: {res[3]}")
-            else:
-                pr.red(f"solution: {res[3]}")
+            pr.red(f"solution: {res[3]}")
             if res[1]:
                 pr.white(res[1])
         pr.white("")
@@ -103,9 +88,7 @@ def run_sbs_consistency_tests() -> int:
     run_one("sbs_index_mapping", check_sbs_index_mapping)
     run_one("class_translation_uniqueness", check_class_translation_uniqueness)
 
-    total_errors = sum(
-        count for name, _, count, _ in results_list if name not in soft_checks
-    )
+    total_errors = sum(count for _, _, count, _ in results_list)
 
     if total_errors > 0:
         pr.red(f"SBS consistency tests FAILED with {total_errors} total errors.")
@@ -206,9 +189,7 @@ def _check_field_regex(
     return (name, regex_results(results), len(results), solution)
 
 
-# ============================================================
-# TRIPLET CHECKS (example/source/sutta must be all-or-none)
-# ============================================================
+# ==== TRIPLET CHECKS ====
 
 
 def check_dhp_triplet_consistency(
@@ -393,9 +374,7 @@ def check_pat_consistency(db_session: Session) -> tuple[str, str | None, int, st
     )
 
 
-# ============================================================
-# FORMATTING (bold tags, capitals, spacing)
-# ============================================================
+# ==== FORMATTING ====
 
 
 def check_bold_tags_field(
@@ -467,9 +446,8 @@ def check_example_spacing_fullstop_edge_field(
     )
 
 
-# ============================================================
-# SOURCE VALIDATION
-# ============================================================
+# ==== SOURCE VALIDATION ====
+# MARKER: add full-source validations below (issue #20)
 
 
 def check_discourses_source_prefix(
@@ -538,9 +516,7 @@ def check_source_has_space_field(
     )
 
 
-# ============================================================
-# CROSS-REFERENCE (inter-table / inter-row consistency)
-# ============================================================
+# ==== CROSS-REFERENCE ====
 
 
 def check_dhp_source_consistency(
@@ -571,18 +547,11 @@ def check_dhp_source_consistency(
 
 def check_sbs_index_mapping(db_session: Session) -> tuple[str, str | None, int, str]:
     """Check sbs_index.csv mapping."""
-    import csv
-    from tools.paths_dps import DPSPaths
+    from tools.sbs_table_functions import SBS_table_tools
 
-    dpspth = DPSPaths()
-    valid_mappings = set()
+    sbs_tools = SBS_table_tools()
     try:
-        with open(dpspth.sbs_index_path, "r", encoding="utf-8") as csvfile:
-            reader = csv.DictReader(csvfile, delimiter="\t")
-            for row in reader:
-                valid_mappings.add(
-                    (row["pali_chant"], row["english_chant"], row["chapter"])
-                )
+        valid_mappings = sbs_tools.load_valid_mappings()
     except Exception as e:
         return "sbs_index_mapping", None, 0, f"Error: {e}"
 
@@ -682,7 +651,9 @@ def check_example_capital_letters(
     return [check_example_capital_letters_field(db_session, f) for f in EXAMPLE_FIELDS]
 
 
-def check_example_spacing(db_session: Session) -> list[tuple[str, str | None, int, str]]:
+def check_example_spacing(
+    db_session: Session,
+) -> list[tuple[str, str | None, int, str]]:
     """Compatibility wrapper for all example fields."""
     results = []
     for f in EXAMPLE_FIELDS:

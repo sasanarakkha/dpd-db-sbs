@@ -39,6 +39,48 @@ class SBS_table_tools:
                     chant_link_map[chant] = link
         return chant_link_map
 
+    def fetch_sbs_index(self, pali_chant: str) -> tuple[str, str] | None:
+        """Return (english_chant, chapter) for exact pali_chant match, or None."""
+        if not dpspth.sbs_index_path:
+            return None
+        with open(dpspth.sbs_index_path, encoding="utf-8") as f:
+            reader = csv.DictReader(f, delimiter="\t")
+            for row in reader:
+                if row["pali_chant"] == pali_chant:
+                    return row["english_chant"], row["chapter"]
+        return None
+
+    def load_valid_chants(self) -> list[str]:
+        """Return all pali_chant values from sbs_index.csv."""
+        if not dpspth.sbs_index_path:
+            return []
+        with open(dpspth.sbs_index_path, encoding="utf-8") as f:
+            reader = csv.DictReader(f, delimiter="\t")
+            return [row["pali_chant"] for row in reader]
+
+    def load_valid_mappings(self) -> set[tuple[str, str, str]]:
+        """Return set of (pali_chant, english_chant, chapter) from sbs_index.csv."""
+        if not dpspth.sbs_index_path:
+            return set()
+        mappings: set[tuple[str, str, str]] = set()
+        with open(dpspth.sbs_index_path, encoding="utf-8") as f:
+            reader = csv.DictReader(f, delimiter="\t")
+            for row in reader:
+                mappings.add((row["pali_chant"], row["english_chant"], row["chapter"]))
+        return mappings
+
+    def find_closest_chant(
+        self, pali_chant: str, threshold: float = 0.8
+    ) -> tuple[str, float] | None:
+        """Return (best_matching_pali_chant, ratio) above threshold, or None."""
+        best: tuple[str, float] | None = None
+        for candidate in self.load_valid_chants():
+            ratio = SequenceMatcher(None, pali_chant, candidate).ratio()
+            if ratio >= threshold:
+                if best is None or ratio > best[1]:
+                    best = (candidate, ratio)
+        return best
+
     def load_class_link_map(self):
         """Load the class-link mapping from a TSV file into a dictionary."""
         class_link_map = {}

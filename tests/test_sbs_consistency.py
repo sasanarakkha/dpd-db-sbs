@@ -486,7 +486,23 @@ def test_run_returns_exit_code(in_memory_db):
             exit_code = run_sbs_consistency_tests()
             assert exit_code == 0
 
-            # Case 2: Injected error
+            # Case 2: Soft-check failures must still block the runner.
+            s1 = SBS(
+                id=1,
+                discourses_example="<b>ex</b>",
+                discourses_source="SN12.99",
+                discourses_sutta="su",
+            )
+            in_memory_db.add(s1)
+            in_memory_db.commit()
+
+            exit_code = run_sbs_consistency_tests()
+            assert exit_code == 1
+
+            in_memory_db.delete(s1)
+            in_memory_db.commit()
+
+            # Case 3: Injected hard error
             s1 = SBS(id=1, dhp_example="ex", dhp_source="so", dhp_sutta="")
             in_memory_db.add(s1)
             in_memory_db.commit()
