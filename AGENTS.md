@@ -42,6 +42,7 @@ For full table & column documentation, you MUST read `docs/technical/dpd_headwor
 
 ## Tools/printer.py
 Use `from tools.printer import printer as pr` for colored terminal output and timing. See `tools/printer.py` for the full API. If initialized with a log file path, operations log to TSV.
+- Use `icecream` (`from icecream import ic`) for debug output, not `print()`.
 
 # Localized Rules (local fork)
 
@@ -107,6 +108,3 @@ Renames/moves are atomic. You MUST:
 - **Verification:** Write tests for accurate data output (not UI components). Readme MUST be updated.
 - **Research:** Always perform Google Search for framework/OS quirks.
 - **Sync Tracking:** Only track and update exporters in the sync registry that contain localized data (Russian, SBS, or DPS-specific).
-
-## Kamma Thread Exceptions
-- `kamma/threads/20260506_mcp_pali_analysis` is a feedback-loop thread. Do not archive or finalize it unless it has a `review.md` with a `PASSED` verdict and the user has explicitly confirmed all issues are resolved.
