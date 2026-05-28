@@ -9,8 +9,11 @@ from sqlalchemy.orm import Session
 
 from db.db_helpers import get_db_session
 from db.models import SBS
-from exporter.mcp.translate_core import generate_markdown_report, translate_sentence
-from scripts.change_in_db.fill_dhp_examples import (
+from exporter.analysis.translate_core import (
+    generate_markdown_report,
+    translate_sentence,
+)
+from exporter.analysis.example_bolding import (
     bold_word_in_verse,
     collect_all_ids,
     find_token_in_apos_verse,
@@ -34,8 +37,8 @@ def main() -> None:
     args = parser.parse_args()
 
     book = args.book
-    input_path = Path("exporter/mcp/input") / f"{book}.json"
-    analysis_path = Path("exporter/mcp/output") / f"{book}_analysis.json"
+    input_path = Path("exporter/analysis/input") / f"{book}.json"
+    analysis_path = Path("exporter/analysis/output") / f"{book}_analysis.json"
 
     if not input_path.exists():
         pr.no(f"Input file not found: {input_path}")
@@ -99,7 +102,7 @@ def main() -> None:
     try:
         sbs_map: dict[int, SBS] = {sbs.id: sbs for sbs in db_session.query(SBS).all()}
 
-        reports_dir = Path("exporter/mcp/reports")
+        reports_dir = Path("exporter/analysis/reports")
         reports_dir.mkdir(parents=True, exist_ok=True)
 
         for verse in analysis_results:
@@ -144,9 +147,6 @@ def main() -> None:
                     is_top_level,
                 ) in all_entries:
                     if headword_id in updated_ids:
-                        continue
-
-                    if component_pali not in apos_word.replace("'", ""):
                         continue
 
                     sbs = sbs_map.get(headword_id)

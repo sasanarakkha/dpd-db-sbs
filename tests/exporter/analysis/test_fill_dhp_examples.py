@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy.orm import Session
 
 from db.db_helpers import get_db_session
-from scripts.change_in_db.fill_dhp_examples import (
+from exporter.analysis.example_bolding import (
     bold_component_in_token,
     bold_word_in_verse,
     bold_word_toplevel,
