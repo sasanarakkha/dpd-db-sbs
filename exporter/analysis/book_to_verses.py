@@ -5,48 +5,25 @@ import json
 import re
 
 from exporter.analysis.paths import ensure_analysis_dirs
+from gui2.dpd_fields_functions import clean_example
 from tools.cst_source_sutta_example import find_cst_source_sutta_example
-from tools.pali_alphabet import pali_alphabet
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 from tools.speech_marks import SpeechMarkManager
 
 
+def apply_speech_marks_to_text(
+    text: str, smm: SpeechMarkManager
+) -> tuple[str, dict[str, list[str]]]:
+    """Apply GUI example speech-mark cleaning to passage text."""
+    return clean_example(text, smm), {}
+
+
 def _apply_speech_marks_verse(
     text: str, smm: SpeechMarkManager
 ) -> tuple[str, dict[str, list[str]]]:
-    """Apply speech marks to verse text.
-
-    Single-variant words are substituted in-place.
-    Multi-variant words are kept bare and recorded in options dict.
-    Returns (processed_text, options).
-    """
-    pali_alphabet_string = "".join(pali_alphabet)
-    splits = re.split(f"([^{pali_alphabet_string}])", text)
-
-    options: dict[str, list[str]] = {}
-
-    for i, word in enumerate(splits):
-        if not word:
-            continue
-        variants = smm.get_variants(word)
-        if not variants:
-            continue
-        if len(variants) == 1:
-            splits[i] = variants[0]
-        else:
-            options[word] = variants
-
-    processed = "".join(splits)
-
-    # Same post-processing as replace_speech_marks (minus // joining for multi-variant)
-    processed = processed.replace("ṁ", "ṃ")
-    processed = re.sub(r"\[[^\]]*\]", "", processed)
-    processed = re.sub(r" +", " ", processed)
-    processed = re.sub(r"^\d*\. ", "", processed)
-    processed = processed.replace(" ,", ",").replace(" .", ".").strip()
-
-    return processed, options
+    """Apply speech marks to verse text."""
+    return apply_speech_marks_to_text(text, smm)
 
 
 def main():

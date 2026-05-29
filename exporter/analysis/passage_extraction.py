@@ -38,7 +38,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "code",
         nargs="?",
-        help="Sutta/gāthā code, e.g. AN3.12, SN12.3, DHP1, SNP1.",
+        help="Sutta/gāthā code, e.g. AN3.12, SN12.3, DHP1, UD12, ITI37, SNP1.",
     )
     return parser.parse_args()
 
@@ -49,7 +49,9 @@ def main() -> None:
     args = parse_args()
     code = (
         args.code
-        or input("Enter a sutta/gāthā code (e.g. AN3.12, SN12.3, DHP1): ").strip()
+        or input(
+            "Enter a sutta/gāthā code (e.g. AN3.12, SN12.3, DHP1, UD12, ITI37): "
+        ).strip()
     )
     if not code:
         pr.red("No code entered.")

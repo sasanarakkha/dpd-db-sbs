@@ -5,7 +5,6 @@ import re
 from pathlib import Path
 
 from db.db_helpers import get_db_session
-from exporter.analysis.book_to_verses import _apply_speech_marks_verse
 from exporter.analysis.paths import ensure_analysis_dirs
 from exporter.analysis.passage_extraction import format_extraction_report
 from exporter.analysis.translate_core import (
@@ -16,7 +15,6 @@ from tools.ai_manager import AIManager
 from exporter.analysis.passage_by_code import PassageResult, get_passage_by_code
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
-from tools.speech_marks import SpeechMarkManager
 
 
 _ANALYSIS_DIRS = ensure_analysis_dirs()
@@ -121,6 +119,18 @@ def _file_mode() -> tuple[str, str]:
     return chosen.read_text(encoding="utf-8").strip(), chosen.stem
 
 
+def _print_translation_progress(source: str, event: str) -> None:
+    """Print timed progress for local JSON analysis and AI analysis stages."""
+    if event == "json_start":
+        pr.green_tmr("Building analysis JSON")
+    elif event == "json_done":
+        pr.yes("done")
+    elif event == "ai_start":
+        pr.green_tmr(f"Analyzing {source!r}")
+    elif event == "ai_done":
+        pr.yes("done")
+
+
 def main() -> None:
     paths = ProjectPaths()
     if not paths.dpd_db_path.exists():
@@ -132,7 +142,7 @@ def main() -> None:
     pr.green("=" * 50)
 
     raw_code = input(
-        "\nEnter a sutta/gāthā code (e.g. DHP12, TH134, SNP3, SN12.3, AN3.12),\n"
+        "\nEnter a sutta/gāthā code (e.g. DHP12, UD12, ITI37, TH134, SNP3, SN12.3, AN3.12),\n"
         "or press Enter to analyze a text file: "
     ).strip()
 
@@ -149,24 +159,19 @@ def main() -> None:
 
         source = result.source
         paragraphs = result.paragraphs
-        is_verse = result.is_verse
-
         if len(paragraphs) > 1:
             passage, suffix = _select_passage(result)
             source = source + suffix
         else:
             passage = paragraphs[0]
 
-        if is_verse:
-            smm = SpeechMarkManager(paths)
-            passage, speech_mark_options = _apply_speech_marks_verse(passage, smm)
     else:
         passage, source = _file_mode()
 
     db_session = get_db_session(paths.dpd_db_path)
     ai_manager = AIManager()
+    ai_debug: dict = {}
 
-    pr.green_tmr(f"Analyzing {source!r}")
     try:
         merged = translate_sentence(
             passage,
@@ -174,10 +179,11 @@ def main() -> None:
             ai_manager,
             verse_source=source,
             speech_mark_options=speech_mark_options,
+            progress=lambda event: _print_translation_progress(source, event),
+            debug=ai_debug,
         )
     finally:
         db_session.close()
-    pr.yes("done")
 
     report = generate_markdown_report(merged, passage, verse_id=source)
     report_path = _REPORTS_DIR / f"{source}_study.md"
@@ -186,6 +192,10 @@ def main() -> None:
     json_path = _OUTPUT_DIR / f"{source}_study.json"
     json_path.write_text(
         json.dumps(merged, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    debug_path = _OUTPUT_DIR / f"{source}_ai_debug.json"
+    debug_path.write_text(
+        json.dumps(ai_debug, ensure_ascii=False, indent=2), encoding="utf-8"
     )
 
     pr.green("")

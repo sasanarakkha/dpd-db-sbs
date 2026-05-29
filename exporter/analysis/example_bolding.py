@@ -10,6 +10,60 @@ from tools.speech_marks import SpeechMarkManager
 from tools.speech_marks_replacement import replace_speech_marks
 
 
+def _get_db_inflections(
+    headword_id: int,
+    db_session: Session,
+) -> list[str]:
+    """Return database inflections for a headword, longest forms first."""
+    try:
+        headword = db_session.query(DpdHeadword).filter_by(id=headword_id).first()
+    except Exception:
+        return []
+    if not headword:
+        return []
+
+    inflections = {
+        inflection
+        for inflection in headword.inflections_list
+        if inflection and inflection.strip()
+    }
+    return sorted(inflections, key=len, reverse=True)
+
+
+def _verse_tokens(verse_text: str) -> list[str]:
+    """Return word-like tokens from verse text, preserving apostrophes."""
+    tokens: list[str] = []
+    token_chars: list[str] = []
+    for char in verse_text:
+        if char.isalpha() or char == "'":
+            token_chars.append(char)
+            continue
+        if token_chars:
+            tokens.append("".join(token_chars))
+            token_chars = []
+    if token_chars:
+        tokens.append("".join(token_chars))
+    return tokens
+
+
+def _find_verse_token_from_inflections(
+    verse_text: str,
+    inflections: list[str],
+) -> str | None:
+    """Find the first verse token containing a database inflection."""
+    for token in _verse_tokens(verse_text):
+        for inflection in inflections:
+            if inflection in token:
+                return token
+    return None
+
+
+def _matches_full_left_side(component_pali: str, left_side: str) -> bool:
+    """Return true when left_side is an inflected spelling of component_pali."""
+    endings = "aāiīuūeoṃ"
+    return component_pali.rstrip(endings) == left_side.rstrip(endings)
+
+
 def strip_bold_tags(text: str) -> str:
     """Remove <b> and </b> tags from text."""
     return re.sub(r"</?b>", "", text)
@@ -57,23 +111,93 @@ def bold_component_in_token(
     within its sub-compound may still have a suffix in the full verse token.
 
     Strategy (in order):
-    0. Exact match wins — component_pali directly found in apos_token.
-    1. Try any inflection from DpdHeadword(headword_id).inflections; bold appropriately.
+    0. Try database inflections from DpdHeadword(headword_id), longest first.
+    1. Try component_pali directly found in apos_token.
     2. For sandhi (apostrophe in token): bold left or right side.
     3. Direct substring match.
     4. Fallback: bold the whole token.
     """
 
-    # 0. Exact match wins — prioritise the headword's own form over inflections
+    # 0. Prefer database inflections, longest first.
+    inflections = _get_db_inflections(headword_id, db_session)
+    for inflection in inflections:
+        if inflection in apos_token:
+            if "'" in apos_token:
+                left, _, right = apos_token.partition("'")
+                if inflection in left:
+                    idx = left.index(inflection)
+                    end = idx + len(inflection)
+                    if (
+                        is_first_component
+                        and idx == 0
+                        and end < len(left)
+                        and _matches_full_left_side(component_pali, left)
+                    ):
+                        return "<b>" + left + "</b>'" + right
+                    return (
+                        left[:idx]
+                        + "<b>"
+                        + left[idx:end]
+                        + "</b>"
+                        + left[end:]
+                        + "'"
+                        + right
+                    )
+                else:
+                    idx = right.index(inflection)
+                    end = idx + len(inflection)
+                    return (
+                        left
+                        + "'"
+                        + right[:idx]
+                        + "<b>"
+                        + right[idx:end]
+                        + "</b>"
+                        + right[end:]
+                    )
+            else:
+                idx = apos_token.index(inflection)
+                end = idx + len(inflection)
+                has_suffix = end < len(apos_token)
+                if is_first_component or has_suffix:
+                    return (
+                        apos_token[:idx]
+                        + "<b>"
+                        + inflection
+                        + "</b>"
+                        + apos_token[end:]
+                    )
+                else:
+                    return apos_token[:idx] + "<b>" + apos_token[idx:] + "</b>"
+
+    # 1. Exact match fallback.
     if component_pali in apos_token:
         if "'" in apos_token:
             left, _, right = apos_token.partition("'")
             if component_pali in left:
                 idx = left.index(component_pali)
-                return left[:idx] + "<b>" + left[idx:] + "</b>'" + right
+                end = idx + len(component_pali)
+                return (
+                    left[:idx]
+                    + "<b>"
+                    + left[idx:end]
+                    + "</b>"
+                    + left[end:]
+                    + "'"
+                    + right
+                )
             else:
                 idx = right.index(component_pali)
-                return left + "'<b>" + right[:idx] + component_pali + "</b>"
+                end = idx + len(component_pali)
+                return (
+                    left
+                    + "'"
+                    + right[:idx]
+                    + "<b>"
+                    + right[idx:end]
+                    + "</b>"
+                    + right[end:]
+                )
         else:
             idx = apos_token.index(component_pali)
             end = idx + len(component_pali)
@@ -89,44 +213,16 @@ def bold_component_in_token(
             else:
                 return apos_token[:idx] + "<b>" + apos_token[idx:] + "</b>"
 
-    # 1. Try inflections from database
-    try:
-        headword = db_session.query(DpdHeadword).filter_by(id=headword_id).first()
-        if headword:
-            inflections = headword.inflections_list
-            if inflections:
-                # Search for any inflection in the token
-                for inflection in inflections:
-                    if inflection in apos_token:
-                        # Handle sandhi: if apostrophe exists, bold only the relevant part
-                        if "'" in apos_token:
-                            left, _, right = apos_token.partition("'")
-                            if inflection in left:
-                                idx = left.index(inflection)
-                                return left[:idx] + "<b>" + left[idx:] + "</b>'" + right
-                            else:
-                                idx = right.index(inflection)
-                                return left + "'<b>" + right[:idx] + inflection + "</b>"
-                        else:
-                            idx = apos_token.index(inflection)
-                            end = idx + len(inflection)
-                            has_suffix = end < len(apos_token)
-                            if is_first_component or has_suffix:
-                                return (
-                                    apos_token[:idx]
-                                    + "<b>"
-                                    + inflection
-                                    + "</b>"
-                                    + apos_token[end:]
-                                )
-                            else:
-                                return (
-                                    apos_token[:idx] + "<b>" + apos_token[idx:] + "</b>"
-                                )
-    except Exception:
-        pass  # Fall back to heuristics if DB lookup fails
+    # 2. Apostrophe-split fallback for sandhi where no database inflection matches
+    if "'" in apos_token:
+        left, _, right = apos_token.partition("'")
+        pali_no_m = component_pali.rstrip("ṃ")
+        pali_norm = pali_no_m.rstrip("aāiīuūeo")
+        if pali_norm and (left.startswith(pali_norm) or pali_norm.startswith(left)):
+            return f"<b>{left}</b>'{right}"
+        return f"{left}'<b>{right}</b>"
 
-    # 2. Direct match (fallback if inflections not found)
+    # 3. Direct match (fallback if inflections not found)
     if component_pali in apos_token:
         idx = apos_token.index(component_pali)
         end = idx + len(component_pali)
@@ -136,7 +232,7 @@ def bold_component_in_token(
         else:
             return apos_token[:idx] + "<b>" + apos_token[idx:] + "</b>"
 
-    # 3. Strip final ṃ and try
+    # 4. Strip final ṃ and try
     pali_no_m = component_pali.rstrip("ṃ")
     if len(pali_no_m) > 1 and pali_no_m in apos_token:
         idx = apos_token.index(pali_no_m)
@@ -147,7 +243,7 @@ def bold_component_in_token(
         else:
             return apos_token[:idx] + "<b>" + apos_token[idx:] + "</b>"
 
-    # 4. Stem match: strip trailing short vowel, bold from stem position
+    # 5. Stem match: strip trailing short vowel, bold from stem position
     stem = component_pali.rstrip("aāiīuūeo")
     if len(stem) > 1 and stem in apos_token:
         idx = apos_token.index(stem)
@@ -163,14 +259,6 @@ def bold_component_in_token(
             )
         else:
             return apos_token[:idx] + "<b>" + apos_token[idx:] + "</b>"
-
-    # 5. Apostrophe-split: bold left or right side
-    if "'" in apos_token:
-        left, _, right = apos_token.partition("'")
-        pali_norm = pali_no_m.rstrip("aāiīuūeo")
-        if pali_norm and (left.startswith(pali_norm) or pali_norm.startswith(left)):
-            return f"<b>{left}</b>'{right}"
-        return f"{left}'<b>{right}</b>"
 
     # 6. Fallback: bold whole token
     return f"<b>{apos_token}</b>"
@@ -191,6 +279,12 @@ def bold_word_in_verse(
     is_top_level: bool = False,
 ) -> str:
     """Bold component_pali in apos_token, then replace apos_token in verse_text."""
+    if apos_token not in _verse_tokens(verse_text):
+        inflections = _get_db_inflections(headword_id, db_session)
+        verse_token = _find_verse_token_from_inflections(verse_text, inflections)
+        if verse_token:
+            apos_token = verse_token
+
     if is_top_level:
         bolded_token = bold_word_toplevel(apos_token)
     else:

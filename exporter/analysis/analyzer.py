@@ -111,6 +111,44 @@ def tokenize_sentence(sentence: str) -> list[str]:
     return tokens
 
 
+def _has_particle_deconstructor(lookup_entry: Lookup) -> bool:
+    """Return true when a lookup row has a deconstructor ending in a common particle."""
+    if not lookup_entry.deconstructor:
+        return False
+
+    for deconstruction in lookup_entry.deconstructor_unpack:
+        clean_deconstruction = re.sub(r" \[.+", "", deconstruction)
+        if any(clean_deconstruction.endswith(particle) for particle in sandhi_particles):
+            return True
+    return False
+
+
+def _is_real_sandhi_option(option: dict[str, Any]) -> bool:
+    """Return true for whole-token sandhi headword options."""
+    return option.get("pos") == "sandhi" or "sandhi" in option.get("grammar", "")
+
+
+def _is_direct_grammar_option(option: dict[str, Any]) -> bool:
+    """Return true for options produced from lookup grammar, not fallback headwords."""
+    key = str(option.get("key", ""))
+    return "_" in key and not key.endswith("_default") and not key.endswith("_inflection")
+
+
+def _filter_particle_lookup_headwords(
+    headword_details: list[dict[str, Any]],
+    lookup_entry: Lookup,
+) -> list[dict[str, Any]]:
+    """Remove synthetic particle-expanded headwords while preserving real candidates."""
+    if not _has_particle_deconstructor(lookup_entry):
+        return headword_details
+
+    return [
+        option
+        for option in headword_details
+        if _is_real_sandhi_option(option) or _is_direct_grammar_option(option)
+    ]
+
+
 def is_pos_compatible(hw_pos: str, grammar_pos: str, grammar_string: str = "") -> bool:
     """Check if the Headword POS is compatible with the Lookup Grammar POS."""
     # Normalize
@@ -361,6 +399,7 @@ def get_word_details(
                 "pali": token,
                 "pos": hw.pos,
                 "grammar": "",  # No grammar for compound parts
+                "meaning_1": hw.meaning_1,
                 "meaning_combo": hw.meaning_combo,
                 "compound_type": hw.compound_type,
                 "compound_construction": hw.compound_construction,
@@ -509,6 +548,7 @@ def get_word_details(
                             "pali": token,
                             "pos": g_pos,
                             "grammar": f"{g_gram} of {g_lemma}",
+                            "meaning_1": hw.meaning_1,
                             "meaning_combo": hw.meaning_combo,
                             "compound_type": hw.compound_type,
                             "compound_construction": hw.compound_construction,
@@ -533,6 +573,7 @@ def get_word_details(
                     "pali": token,
                     "pos": hw.pos,
                     "grammar": hw.grammar,
+                    "meaning_1": hw.meaning_1,
                     "meaning_combo": hw.meaning_combo,
                     "compound_type": hw.compound_type,
                     "compound_construction": hw.compound_construction,
@@ -575,6 +616,7 @@ def get_word_details(
                     "pali": token,
                     "pos": hw.pos,
                     "grammar": "",  # Stems don't show grammar
+                    "meaning_1": hw.meaning_1,
                     "meaning_combo": hw.meaning_combo,
                     "compound_type": hw.compound_type,
                     "compound_construction": hw.compound_construction,
@@ -671,6 +713,7 @@ def get_components_from_construction(
                                 "pali": clean_part,
                                 "pos": fallback_hw.pos,
                                 "grammar": grammar_str,
+                                "meaning_1": fallback_hw.meaning_1,
                                 "meaning_combo": fallback_hw.meaning_combo,
                                 "compound_type": fallback_hw.compound_type,
                                 "compound_construction": fallback_hw.compound_construction,
@@ -740,27 +783,16 @@ def analyze_sentence(
                 headword_details = get_word_details(
                     effective_key, db_session, grammatical=grammatical
                 )
+                filtered_headword_details = _filter_particle_lookup_headwords(
+                    headword_details,
+                    lookup_entry,
+                )
 
-                # Special Check: If deconstructor has particle sandhi (e.g. "word + api")
-                # and NO headword is "sandhi", then these headwords are likely just the base word
-                # added by scripts/build/api_ca_eva_iti_iva_hi.py and should be skipped.
-                skip_headwords = False
-                if lookup_entry.deconstructor:
-                    has_sandhi_headword = any(
-                        item["pos"] == "sandhi" for item in headword_details
-                    )
-                    if not has_sandhi_headword:
-                        decons = lookup_entry.deconstructor_unpack
-                        for d in decons:
-                            if any(d.endswith(p) for p in sandhi_particles):
-                                skip_headwords = True
-                                break
-
-                if not skip_headwords:
-                    word_data.extend(headword_details)
+                if filtered_headword_details:
+                    word_data.extend(filtered_headword_details)
 
                     # Collect constructions from sandhi headwords
-                    for item in headword_details:
+                    for item in filtered_headword_details:
                         if item["pos"] == "sandhi" and item["construction"]:
                             existing_constructions.add(item["construction"])
 

@@ -1,11 +1,15 @@
 """Retrieve a CST passage by sutta/gāthā code, returning paragraphs and metadata."""
 
+import json
 import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from bs4.element import Tag
 
+from exporter.analysis.paths import ensure_analysis_dirs
+from gui2.dpd_fields_functions import clean_example as clean_gui_example
 from tools.cst_source_sutta_example import (
     GlobalData,
     an_anguttara_nikaya,
@@ -15,6 +19,8 @@ from tools.cst_source_sutta_example import (
     mn_majjhima_nikaya,
     sn_samyutta_nikaya,
 )
+from tools.paths import ProjectPaths
+from tools.speech_marks import SpeechMarkManager
 
 
 @dataclass
@@ -27,6 +33,8 @@ class PassageResult:
 
 PREFIX_TO_BOOKS: dict[str, list[str]] = {
     "DHP": ["kn2"],
+    "UD": ["kn3"],
+    "ITI": ["kn4"],
     "TH": ["kn8"],
     "THI": ["kn9"],
     "SNP": ["kn5"],
@@ -36,7 +44,8 @@ PREFIX_TO_BOOKS: dict[str, list[str]] = {
     # AN is handled dynamically: nipāta N -> file "anN"
 }
 
-VERSE_PREFIXES: frozenset[str] = frozenset({"DHP", "TH", "THI", "SNP"})
+VERSE_PREFIXES: frozenset[str] = frozenset({"DHP", "ITI", "SNP", "TH", "THI", "UD"})
+_VERSE_INDEX_DIR: Path = ensure_analysis_dirs().input_dir
 
 
 def _get_an_books(number: str) -> list[str]:
@@ -91,6 +100,31 @@ def _clean_prose_paragraph(text: str) -> str:
     return re.sub(r"^\d+\.\s*", "", paragraph)
 
 
+def _get_indexed_verse(book: str, source_code: str) -> PassageResult | None:
+    """Return an indexed verse passage if a prebuilt book JSON contains the source."""
+    index_path = _VERSE_INDEX_DIR / f"{book}.json"
+    if not index_path.exists():
+        return None
+
+    verses = json.loads(index_path.read_text(encoding="utf-8"))
+    for verse in verses:
+        if verse.get("num") != source_code:
+            continue
+
+        text = verse.get("text", "").strip()
+        if not text:
+            return None
+
+        return PassageResult(
+            source=source_code,
+            vagga=verse.get("vagga", ""),
+            paragraphs=_apply_speech_marks_to_paragraphs([text]),
+            is_verse=True,
+        )
+
+    return None
+
+
 def _find_prose_paragraphs(book: str, source_code: str) -> tuple[str, list[str]]:
     """Return full CST prose paragraphs for a source code."""
     prefix_match = re.match(r"^[A-Z]+", source_code)
@@ -124,6 +158,12 @@ def _find_prose_paragraphs(book: str, source_code: str) -> tuple[str, list[str]]
     return vagga, paragraphs
 
 
+def _apply_speech_marks_to_paragraphs(paragraphs: list[str]) -> list[str]:
+    """Apply apostrophe and hyphen speech marks to passage paragraphs."""
+    smm = SpeechMarkManager(ProjectPaths())
+    return [clean_gui_example(paragraph, smm) for paragraph in paragraphs]
+
+
 def get_passage_by_code(code: str) -> PassageResult:
     """Retrieve the passage(s) for a sutta/gāthā code.
 
@@ -139,6 +179,10 @@ def get_passage_by_code(code: str) -> PassageResult:
 
     if is_verse:
         book = books[0]
+        indexed_verse = _get_indexed_verse(book, source_code)
+        if indexed_verse is not None:
+            return indexed_verse
+
         all_examples = find_cst_source_sutta_example(book, ".")
         matching = [e for e in all_examples if e.source == source_code]
         if not matching:
@@ -154,7 +198,10 @@ def get_passage_by_code(code: str) -> PassageResult:
         if not gathas:  # defensive: rare single-line verse
             gathas = [max((e.example.strip() for e in matching), key=len)]
         return PassageResult(
-            source=source_code, vagga=vagga, paragraphs=gathas, is_verse=True
+            source=source_code,
+            vagga=vagga,
+            paragraphs=_apply_speech_marks_to_paragraphs(gathas),
+            is_verse=True,
         )
 
     # Prose path: scan books in order, stop at first book that yields matches
@@ -164,7 +211,10 @@ def get_passage_by_code(code: str) -> PassageResult:
             continue
 
         return PassageResult(
-            source=source_code, vagga=vagga, paragraphs=paragraphs, is_verse=False
+            source=source_code,
+            vagga=vagga,
+            paragraphs=_apply_speech_marks_to_paragraphs(paragraphs),
+            is_verse=False,
         )
 
     raise ValueError(f"No examples found for {source_code!r} in books {books!r}")
