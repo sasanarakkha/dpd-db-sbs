@@ -1,5 +1,37 @@
 [
     {
+        "id": 16054,
+        "lemma_1": "upalāpeti 1"
+    },
+    {
+        "id": 89414,
+        "lemma_1": "kappa 1.9"
+    },
+    {
+        "id": 37570,
+        "lemma_1": "nibbāna 2"
+    },
+    {
+        "id": 37569,
+        "lemma_1": "nibbāna 1"
+    },
+    {
+        "id": 62840,
+        "lemma_1": "siṅghāṭaka 1"
+    },
+    {
+        "id": 63703,
+        "lemma_1": "sujāta 1"
+    },
+    {
+        "id": 60789,
+        "lemma_1": "sammā 2"
+    },
+    {
+        "id": 55594,
+        "lemma_1": "laddhā"
+    },
+    {
         "id": 53287,
         "lemma_1": "meraya"
     },
@@ -66,37 +98,5 @@
     {
         "id": 43966,
         "lemma_1": "pariyāpuṇāti"
-    },
-    {
-        "id": 49712,
-        "lemma_1": "bhāyati 1"
-    },
-    {
-        "id": 5694,
-        "lemma_1": "antaradhāyati"
-    },
-    {
-        "id": 18514,
-        "lemma_1": "otaritvā"
-    },
-    {
-        "id": 45061,
-        "lemma_1": "paharati"
-    },
-    {
-        "id": 16929,
-        "lemma_1": "ummujjati"
-    },
-    {
-        "id": 46294,
-        "lemma_1": "pivati"
-    },
-    {
-        "id": 40072,
-        "lemma_1": "paññāyati 1"
-    },
-    {
-        "id": 41814,
-        "lemma_1": "patirūpa"
     }
 ]

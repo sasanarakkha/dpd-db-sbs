@@ -76,6 +76,7 @@
 - Do not append issue history, issue queues, task markers, or session results to this plan.
 - Stop after the issue is complete and suggest starting a new session for the next issue.
 - Do not begin another unrelated fix in the same session unless the user explicitly overrides the one-issue rule.
+- When preparing a manual commit for work from this thread, include issue `#197` in the commit message.
 
 ## Final Loop Completion
 - Only use this section when the user says all `exporter/analysis/` issues are resolved.

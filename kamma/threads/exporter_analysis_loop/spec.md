@@ -1,7 +1,7 @@
 # Spec: exporter_analysis_feedback_loop
 
 ## GitHub issue
-(none provided)
+#197
 
 ## Overview
 Create an ongoing Kamma feedback-loop thread for fixing issues in the Pāḷi analyzer scripts under `exporter/analysis/`.
@@ -89,6 +89,7 @@ Related helper files may be touched only when required by the issue:
   - no `sys.path` hacks
   - no `.env` or `.ini` edits
   - no commits unless explicitly requested
+- Any commit prepared for this thread must reference issue `#197` in the commit message.
 - Keep Kamma history useful but concise.
 - `handoff.md` must include a dedicated section for errors, issues, and repeated mistakes.
 
