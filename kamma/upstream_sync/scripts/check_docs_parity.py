@@ -64,6 +64,15 @@ def find_unexpected_local_files(unique_local: list[str]) -> list[str]:
     return sorted(f for f in unique_local if f not in EXPECTED_LOCAL_ONLY)
 
 
+def display_report_path(report_path: Path) -> Path:
+    """Return a concise display path for report output."""
+    resolved = report_path.resolve()
+    try:
+        return resolved.relative_to(ROOT)
+    except ValueError:
+        return resolved
+
+
 def write_report(
     thread_dir: Path,
     sha: str,
@@ -145,7 +154,7 @@ def write_report(
 
     report_path = thread_dir / "docs_parity_report.md"
     report_path.write_text("\n".join(lines) + "\n")
-    pr.green(f"Report written → {report_path.resolve().relative_to(ROOT)}")
+    pr.green(f"Report written → {display_report_path(report_path)}")
 
 
 def run_parity_check(thread_dir: Path | None) -> int:

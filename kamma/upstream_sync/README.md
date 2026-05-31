@@ -8,7 +8,7 @@ docs under upstream-owned `docs/`.
 ## Quick Start: The 5-Stage Model-Split Workflow
 
 Sync operations are executed via Kamma threads. Each stage ends with a hard stop, a fresh-session
-handoff, and an explicit model switch when needed.
+handoff, and an explicit model switch when needed. Stage 4 has two model-bound substages.
 
 1.  **Stage 1: FAST Prep** — factual diffing, scripted validation, and automated upstream pull.
     -   `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py <thread_dir>`
@@ -16,10 +16,11 @@ handoff, and an explicit model switch when needed.
     -   Interpret FAST outputs, resolve `discuss` flags, and write a literal execution plan.
 3.  **Stage 3: FAST Execution & Verification** — implementation, testing, and cleanup.
     -   `uv run pytest tests/test_shadow_parity.py tests/test_shadow_cleanup.py tests/test_namespace_isolation.py tests/test_template_syntax.py -v` (Sync-related suites).
-4.  **Stage 4.A: ADVANCED Docs Analysis** — docs parity analysis and `docs_translation_plan.md`.
+4.  **Stage 4: Docs Translation Parity**
+    -   **Stage 4.A: ADVANCED Docs Analysis** — docs parity analysis and `docs_translation_plan.md`.
     -   Read FAST-produced `docs_parity_report.md`; do not run commands in ADVANCED.
-5.  **Stage 4.B: FAST Docs Translation** — execute the approved docs translation plan.
-6.  **Stage 5: ADVANCED Verification & After-sync** — decide acceptance after user verification.
+    -   **Stage 4.B: FAST Docs Translation** — execute the approved docs translation plan.
+5.  **Stage 5: ADVANCED Verification & After-sync** — decide acceptance after user verification.
 
 FAST performs mechanical work only. ADVANCED performs analysis and planning only. If either model
 needs the other responsibility, it must update `handoff.md`, write an exact restart prompt, and stop.

@@ -146,6 +146,8 @@ ADVANCED must stop when mechanical work is needed: broad file reading, command e
 
 ## The 5-Stage Sync Workflow
 
+Stage 4 is split into two model-bound substages: ADVANCED analysis and FAST translation execution.
+
 ### Stage 1: Prep (FAST Factual Collection)
 **Goal**: Establish a baseline, validate the environment, and identify what changed upstream.
 **Owner**: FAST only.
