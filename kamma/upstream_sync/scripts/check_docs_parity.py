@@ -206,7 +206,15 @@ def write_report(
 
 
 def run_parity_check(thread_dir: Path | None) -> int:
-    sha, to_ref = load_docs_sync_range(thread_dir)
+    try:
+        sha, to_ref = load_docs_sync_range(thread_dir)
+    except FileNotFoundError as exc:
+        pr.red(f"Manifest not found: {exc}")
+        return 1
+    except ValueError as exc:
+        pr.red(f"Manifest invalid: {exc}")
+        return 1
+
     pr.green_title(f"Docs parity check ({sha} -> {to_ref})")
 
     en_files = collect_md_files(DOCS_EN)

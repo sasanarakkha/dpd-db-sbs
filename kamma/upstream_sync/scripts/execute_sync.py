@@ -4,7 +4,8 @@
 
 import argparse
 import subprocess
-from pathlib import Path
+from collections.abc import Iterable
+from pathlib import Path, PurePosixPath
 
 from kamma.upstream_sync.scripts.registry_helper import (
     get_modified_upstream_paths,
@@ -65,6 +66,26 @@ def run_git(args: list[str], check: bool = True) -> subprocess.CompletedProcess:
         raise GitError(f"Command failed: {' '.join(args)}") from e
 
 
+def validate_repo_relative_paths(paths: Iterable[str], label: str) -> list[str]:
+    """Validate git pathspecs that may later be restored or removed."""
+    validated: list[str] = []
+    for index, path in enumerate(paths):
+        item_label = f"{label}[{index}]"
+        if not path.strip():
+            raise ValueError(f"{item_label} must be a non-empty path")
+        if path != path.strip():
+            raise ValueError(f"{item_label} must not contain surrounding whitespace")
+        if "\\" in path:
+            raise ValueError(f"{item_label} must use forward slashes")
+        posix_path = PurePosixPath(path)
+        if posix_path.is_absolute() or path.startswith("~"):
+            raise ValueError(f"{item_label} must be a repo-relative path")
+        if ".." in posix_path.parts:
+            raise ValueError(f"{item_label} must stay inside the repository")
+        validated.append(path)
+    return validated
+
+
 def get_permanent_exclusions() -> list[str]:
     """Load permanent exclusions from registry.json."""
     registry = load_registry()
@@ -72,7 +93,7 @@ def get_permanent_exclusions() -> list[str]:
     exclusions = get_modified_upstream_paths(registry)
     if isinstance(no_sync_files, list):
         exclusions.extend(path for path in no_sync_files if isinstance(path, str))
-    return exclusions
+    return validate_repo_relative_paths(exclusions, "permanent exclusions")
 
 
 def get_run_specific_exclusions(thread_dir: str | None) -> list[str]:
@@ -90,7 +111,7 @@ def get_run_specific_exclusions(thread_dir: str | None) -> list[str]:
             line = line.strip()
             if line and not line.startswith("#"):
                 exclusions.append(line)
-    return exclusions
+    return validate_repo_relative_paths(exclusions, "run-specific exclusions")
 
 
 def execute_sync(thread_dir: str | None, dry_run: bool = False) -> int:

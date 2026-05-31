@@ -5,11 +5,16 @@ from pathlib import Path
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
+import pytest
+
 from kamma.upstream_sync.scripts.check_docs_parity import find_unexpected_local_files
 from kamma.upstream_sync.scripts.check_docs_parity import get_docs_changed_since
 from kamma.upstream_sync.scripts.check_docs_parity import load_docs_sync_range
 from kamma.upstream_sync.scripts.check_docs_parity import run_parity_check
 from kamma.upstream_sync.scripts.check_docs_parity import write_report
+
+FULL_OLD_SHA = "a" * 40
+FULL_NEW_SHA = "b" * 40
 
 
 def write_valid_manifest(thread_dir: Path) -> None:
@@ -17,8 +22,8 @@ def write_valid_manifest(thread_dir: Path) -> None:
     (thread_dir / "prep_manifest.json").write_text(
         json.dumps(
             {
-                "from_upstream_sha": "oldsha123",
-                "to_upstream_sha": "newsha456",
+                "from_upstream_sha": FULL_OLD_SHA,
+                "to_upstream_sha": FULL_NEW_SHA,
                 "target_upstream_ref": "upstream/main",
                 "generated_at": "2026-05-31T00:00:00+08:00",
                 "changed_upstream_paths": ["docs/example.md"],
@@ -48,8 +53,8 @@ def test_load_docs_sync_range_uses_thread_manifest(tmp_path: Path) -> None:
 
     from_ref, to_ref = load_docs_sync_range(tmp_path)
 
-    assert from_ref == "oldsha123"
-    assert to_ref == "newsha456"
+    assert from_ref == FULL_OLD_SHA
+    assert to_ref == FULL_NEW_SHA
 
 
 @patch("kamma.upstream_sync.scripts.check_docs_parity.subprocess.run")
@@ -58,7 +63,7 @@ def test_get_docs_changed_since_uses_explicit_end_ref(
 ) -> None:
     mock_run.return_value.stdout = "docs/example.md\n"
 
-    changed = get_docs_changed_since("oldsha123", "newsha456")
+    changed = get_docs_changed_since(FULL_OLD_SHA, FULL_NEW_SHA)
 
     assert changed == {"example.md"}
     mock_run.assert_called_once()
@@ -66,8 +71,8 @@ def test_get_docs_changed_since_uses_explicit_end_ref(
         "git",
         "diff",
         "--name-only",
-        "oldsha123",
-        "newsha456",
+        FULL_OLD_SHA,
+        FULL_NEW_SHA,
         "--",
         "docs/",
     ]
@@ -94,8 +99,18 @@ def test_run_parity_check_uses_thread_manifest_range(
 
     assert result == 0
     mock_collect.assert_called()
-    mock_changed.assert_called_once_with("oldsha123", "newsha456")
-    assert mock_write_report.call_args.kwargs["to_ref"] == "newsha456"
+    mock_changed.assert_called_once_with(FULL_OLD_SHA, FULL_NEW_SHA)
+    assert mock_write_report.call_args.kwargs["to_ref"] == FULL_NEW_SHA
+
+
+def test_run_parity_check_reports_missing_thread_manifest(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    result = run_parity_check(tmp_path)
+
+    captured = capsys.readouterr()
+    assert result == 1
+    assert "Manifest not found" in captured.out
 
 
 def test_write_report_accepts_external_thread_dir(tmp_path: Path) -> None:

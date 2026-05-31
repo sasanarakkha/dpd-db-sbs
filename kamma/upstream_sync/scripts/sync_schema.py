@@ -2,7 +2,11 @@
 
 """Define typed schema objects for upstream sync metadata JSON files."""
 
+import re
 from dataclasses import dataclass
+
+BOOTSTRAP_SHA_SENTINEL = "BOOTSTRAP_REQUIRED"
+FULL_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 
 
 def _as_object(raw: object, label: str) -> dict[str, object]:
@@ -19,6 +23,19 @@ def _required_string(data: dict[str, object], field: str) -> str:
         raise ValueError(f"field '{field}' must be a string")
     if not value.strip():
         raise ValueError(f"field '{field}' must be a non-empty string")
+    return value
+
+
+def _required_full_sha(
+    data: dict[str, object], field: str, allow_bootstrap: bool = False
+) -> str:
+    value = _required_string(data, field)
+    if allow_bootstrap and value == BOOTSTRAP_SHA_SENTINEL:
+        return value
+    if not FULL_SHA_RE.fullmatch(value):
+        raise ValueError(
+            f"field '{field}' must be a full 40-character lowercase git SHA"
+        )
     return value
 
 
@@ -86,8 +103,8 @@ class AcceptedSyncState:
         """Validate and parse an accepted sync state JSON object."""
         data = _as_object(raw, "accepted sync state")
         return cls(
-            last_accepted_upstream_sha=_required_string(
-                data, "last_accepted_upstream_sha"
+            last_accepted_upstream_sha=_required_full_sha(
+                data, "last_accepted_upstream_sha", allow_bootstrap=True
             ),
             last_accepted_upstream_date=_required_string(
                 data, "last_accepted_upstream_date"
@@ -165,8 +182,8 @@ class PrepManifest:
     def from_raw(cls, raw: object) -> "PrepManifest":
         """Validate and parse a prep_manifest.json object."""
         data = _as_object(raw, "prep manifest")
-        from_upstream_sha = _required_string(data, "from_upstream_sha")
-        to_upstream_sha = _required_string(data, "to_upstream_sha")
+        from_upstream_sha = _required_full_sha(data, "from_upstream_sha")
+        to_upstream_sha = _required_full_sha(data, "to_upstream_sha")
         target_upstream_ref = _required_string(data, "target_upstream_ref")
         generated_at = _required_string(data, "generated_at")
         changed_upstream_paths = _string_list(data, "changed_upstream_paths")

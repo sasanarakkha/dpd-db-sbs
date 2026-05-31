@@ -10,27 +10,42 @@ from kamma.upstream_sync.scripts.sync_schema import (
     RegistryData,
 )
 
+FULL_OLD_SHA = "a" * 40
+FULL_NEW_SHA = "b" * 40
+
 
 def test_accepted_sync_state_from_raw_valid_with_notes() -> None:
     state = AcceptedSyncState.from_raw(
         {
-            "last_accepted_upstream_sha": "abc123",
+            "last_accepted_upstream_sha": FULL_OLD_SHA,
             "last_accepted_upstream_date": "2026-05-31T12:00:00+08:00",
             "last_accepted_upstream_ref": "upstream/main",
             "notes": "verified baseline",
         }
     )
 
-    assert state.last_accepted_upstream_sha == "abc123"
+    assert state.last_accepted_upstream_sha == FULL_OLD_SHA
     assert state.last_accepted_upstream_date == "2026-05-31T12:00:00+08:00"
     assert state.last_accepted_upstream_ref == "upstream/main"
     assert state.notes == "verified baseline"
     assert state.to_json() == {
-        "last_accepted_upstream_sha": "abc123",
+        "last_accepted_upstream_sha": FULL_OLD_SHA,
         "last_accepted_upstream_date": "2026-05-31T12:00:00+08:00",
         "last_accepted_upstream_ref": "upstream/main",
         "notes": "verified baseline",
     }
+
+
+def test_accepted_sync_state_accepts_bootstrap_sentinel() -> None:
+    state = AcceptedSyncState.from_raw(
+        {
+            "last_accepted_upstream_sha": "BOOTSTRAP_REQUIRED",
+            "last_accepted_upstream_date": "BOOTSTRAP_REQUIRED",
+            "last_accepted_upstream_ref": "upstream/main",
+        }
+    )
+
+    assert state.last_accepted_upstream_sha == "BOOTSTRAP_REQUIRED"
 
 
 @pytest.mark.parametrize(
@@ -46,7 +61,7 @@ def test_accepted_sync_state_from_raw_valid_with_notes() -> None:
         ),
         (
             {
-                "last_accepted_upstream_sha": "abc123",
+                "last_accepted_upstream_sha": FULL_OLD_SHA,
                 "last_accepted_upstream_date": 20260531,
                 "last_accepted_upstream_ref": "upstream/main",
             },
@@ -54,7 +69,7 @@ def test_accepted_sync_state_from_raw_valid_with_notes() -> None:
         ),
         (
             {
-                "last_accepted_upstream_sha": "abc123",
+                "last_accepted_upstream_sha": FULL_OLD_SHA,
                 "last_accepted_upstream_date": "2026-05-31T12:00:00+08:00",
                 "last_accepted_upstream_ref": " ",
             },
@@ -62,12 +77,20 @@ def test_accepted_sync_state_from_raw_valid_with_notes() -> None:
         ),
         (
             {
-                "last_accepted_upstream_sha": "abc123",
+                "last_accepted_upstream_sha": FULL_OLD_SHA,
                 "last_accepted_upstream_date": "2026-05-31T12:00:00+08:00",
                 "last_accepted_upstream_ref": "upstream/main",
                 "notes": ["not", "a", "string"],
             },
             "field 'notes' must be a string",
+        ),
+        (
+            {
+                "last_accepted_upstream_sha": "abc123",
+                "last_accepted_upstream_date": "2026-05-31T12:00:00+08:00",
+                "last_accepted_upstream_ref": "upstream/main",
+            },
+            "field 'last_accepted_upstream_sha' must be a full 40-character lowercase git SHA",
         ),
     ],
 )
@@ -141,8 +164,8 @@ def test_mapped_action_from_raw_rejects_invalid_payload(
 
 def valid_manifest_payload() -> dict[str, object]:
     return {
-        "from_upstream_sha": "oldsha",
-        "to_upstream_sha": "newsha",
+        "from_upstream_sha": FULL_OLD_SHA,
+        "to_upstream_sha": FULL_NEW_SHA,
         "target_upstream_ref": "upstream/main",
         "generated_at": "2026-05-31T12:00:00+08:00",
         "changed_upstream_paths": ["db/models.py"],
@@ -164,8 +187,8 @@ def valid_manifest_payload() -> dict[str, object]:
 def test_prep_manifest_from_raw_valid_with_current_fields() -> None:
     manifest = PrepManifest.from_raw(valid_manifest_payload())
 
-    assert manifest.from_upstream_sha == "oldsha"
-    assert manifest.to_upstream_sha == "newsha"
+    assert manifest.from_upstream_sha == FULL_OLD_SHA
+    assert manifest.to_upstream_sha == FULL_NEW_SHA
     assert manifest.target_upstream_ref == "upstream/main"
     assert manifest.changed_upstream_paths == ["db/models.py"]
     assert manifest.deleted_upstream_paths == ["old.py"]
@@ -190,6 +213,10 @@ def test_prep_manifest_from_raw_valid_with_current_fields() -> None:
         (
             lambda payload: payload.pop("mapped_actions"),
             "missing required field 'mapped_actions'",
+        ),
+        (
+            lambda payload: payload.__setitem__("to_upstream_sha", "newsha"),
+            "field 'to_upstream_sha' must be a full 40-character lowercase git SHA",
         ),
         (
             lambda payload: payload["changed_upstream_paths"].append(123),

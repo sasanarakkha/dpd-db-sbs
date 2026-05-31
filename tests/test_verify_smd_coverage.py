@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 from kamma.upstream_sync.scripts.verify_smd_coverage import (
     check_category_alignment,
+    check_unregistered_smd_entries,
     collect_registry_paths,
     extract_all_smd_entries,
     extract_smd_entries,
@@ -132,6 +133,28 @@ def test_check_category_alignment_rejects_smd_registry_mismatch() -> None:
     assert violations == [
         "  [dps_copy] scripts/backup/backup_dps.py: SMD category is 'sbs_copy'"
     ]
+
+
+def test_check_unregistered_smd_entries_rejects_stale_entry() -> None:
+    violations = check_unregistered_smd_entries(
+        [("db/models.py", "modified_upstream")],
+        {
+            "db/models.py": {
+                "category": "modified_upstream",
+                "sync_rule": "DISCUSS",
+                "local_changes_count": 2,
+                "watch_for_count": 1,
+            },
+            "stale/path.py": {
+                "category": "modified_upstream",
+                "sync_rule": "PORT",
+                "local_changes_count": 2,
+                "watch_for_count": 1,
+            },
+        },
+    )
+
+    assert violations == ["  UNREGISTERED: stale/path.py"]
 
 
 def test_project_smd_does_not_document_unique_local_paths() -> None:

@@ -112,6 +112,19 @@ def check_category_alignment(
     return violations
 
 
+def check_unregistered_smd_entries(
+    registry_items: list[tuple[str, str]],
+    smd_entries: dict[str, dict[str, object]],
+) -> list[str]:
+    """Return SMD entries that no longer correspond to sync registry paths."""
+    registered_paths = {path for path, _category in registry_items}
+    return [
+        f"  UNREGISTERED: {path}"
+        for path in sorted(smd_entries)
+        if path not in registered_paths
+    ]
+
+
 def check_rubric(
     path: str,
     category: str,
@@ -160,6 +173,7 @@ def main() -> None:
 
     gaps: list[str] = []
     category_fails: list[str] = []
+    unregistered_fails: list[str] = []
     rubric_fails: list[str] = []
 
     for path, category in all_paths:
@@ -169,12 +183,16 @@ def main() -> None:
             fails = check_rubric(path, category, smd_entries[path])
             rubric_fails.extend(fails)
     category_fails.extend(check_category_alignment(all_paths, smd_entries))
+    unregistered_fails.extend(check_unregistered_smd_entries(all_paths, smd_entries))
 
     pr.green("coverage gaps")
     pr.yes("none") if not gaps else pr.no(f"{len(gaps)}")
 
     pr.green("category mismatches")
     pr.yes("none") if not category_fails else pr.no(f"{len(category_fails)}")
+
+    pr.green("unregistered smd entries")
+    pr.yes("none") if not unregistered_fails else pr.no(f"{len(unregistered_fails)}")
 
     pr.green("rubric failures")
     pr.yes("none") if not rubric_fails else pr.no(f"{len(rubric_fails)}")
@@ -189,12 +207,17 @@ def main() -> None:
         for f in category_fails:
             pr.red(f)
 
+    if unregistered_fails:
+        pr.red("\nUnregistered SMD entries:")
+        for f in unregistered_fails:
+            pr.red(f)
+
     if rubric_fails:
         pr.amber("\nRubric failures (entries need enrichment):")
         for f in rubric_fails:
             pr.amber(f)
 
-    if gaps or category_fails:
+    if gaps or category_fails or unregistered_fails:
         pr.toc()
         sys.exit(1)
 

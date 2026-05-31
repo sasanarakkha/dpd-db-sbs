@@ -8,6 +8,9 @@ import pytest
 
 from kamma.upstream_sync.scripts.prep_analyzer import PrepAnalyzer
 
+FULL_OLD_SHA = "a" * 40
+FULL_NEW_SHA = "b" * 40
+
 
 @pytest.fixture
 def mock_registry():
@@ -39,7 +42,7 @@ def mock_registry():
 @pytest.fixture
 def accepted_sync_state() -> dict[str, str]:
     return {
-        "last_accepted_upstream_sha": "oldsha123",
+        "last_accepted_upstream_sha": FULL_OLD_SHA,
         "last_accepted_upstream_date": "2026-04-08",
         "last_accepted_upstream_ref": "upstream/main",
     }
@@ -60,7 +63,7 @@ def test_prep_analyzer_report_generation(
 ) -> None:
     mock_load.return_value = mock_registry
     mock_state.return_value = accepted_sync_state
-    mock_target.return_value = "newsha456"
+    mock_target.return_value = FULL_NEW_SHA
     mock_changes.return_value = [
         ("M", "db/models.py"),  # Tracked modified
         ("M", "db/families/family_compound.py"),  # Shadow source modified
@@ -111,8 +114,8 @@ def test_prep_analyzer_report_generation(
     assert "## Untracked Changes" not in content
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    assert manifest["from_upstream_sha"] == "oldsha123"
-    assert manifest["to_upstream_sha"] == "newsha456"
+    assert manifest["from_upstream_sha"] == FULL_OLD_SHA
+    assert manifest["to_upstream_sha"] == FULL_NEW_SHA
     assert manifest["discuss_paths"] == ["db/models.py"]
     assert manifest["changed_upstream_paths"] == [
         "db/epd/epd_to_lookup.py",
@@ -180,7 +183,7 @@ def test_prep_analyzer_treats_renames_as_delete_and_add(
 ) -> None:
     mock_load.return_value = mock_registry
     mock_state.return_value = accepted_sync_state
-    mock_target.return_value = "newsha456"
+    mock_target.return_value = FULL_NEW_SHA
     mock_changes.return_value = [
         ("R100", "db/families/deleted_source.py db/families/family_compound.py")
     ]

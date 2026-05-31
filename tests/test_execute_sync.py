@@ -12,6 +12,7 @@ from kamma.upstream_sync.scripts.execute_sync import (
     execute_sync,
     get_permanent_exclusions,
     get_run_specific_exclusions,
+    validate_repo_relative_paths,
 )
 
 
@@ -82,6 +83,27 @@ class TestExecuteSync(unittest.TestCase):
 
         exclusions = get_run_specific_exclusions(str(self.thread_dir))
         self.assertEqual(exclusions, ["path/to/file1", "path/to/file2"])
+
+    def test_get_run_specific_exclusions_rejects_unsafe_path(self):
+        exclusions_file = self.thread_dir / "run_exclusions.txt"
+        exclusions_file.write_text("../outside\n", encoding="utf-8")
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "run-specific exclusions\\[0\\] must stay inside the repository",
+        ):
+            get_run_specific_exclusions(str(self.thread_dir))
+
+    def test_validate_repo_relative_paths_rejects_absolute_and_parent_paths(self):
+        with self.assertRaisesRegex(
+            ValueError, "test paths\\[0\\] must be a repo-relative path"
+        ):
+            validate_repo_relative_paths(["/tmp/outside"], "test paths")
+
+        with self.assertRaisesRegex(
+            ValueError, "test paths\\[0\\] must stay inside the repository"
+        ):
+            validate_repo_relative_paths(["../outside"], "test paths")
 
     @patch("kamma.upstream_sync.scripts.execute_sync.load_registry")
     def test_get_permanent_exclusions(self, mock_load_registry):

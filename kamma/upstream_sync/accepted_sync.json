@@ -1,5 +1,5 @@
 {
-  "last_accepted_upstream_sha": "44a8a005",
+  "last_accepted_upstream_sha": "44a8a00556cce9bd3874a94efb5dfaceaaf20a66",
   "last_accepted_upstream_date": "2026-05-02",
   "last_accepted_upstream_ref": "upstream/main",
   "notes": "May 2026 sync complete. Upstream range 9af5f7ee..44a8a005, 133 files. All shadows ported, legacy HTML templates archived (replaced by Jinja2 upstream), codebase-wide Printer API fix (188 occurrences)."

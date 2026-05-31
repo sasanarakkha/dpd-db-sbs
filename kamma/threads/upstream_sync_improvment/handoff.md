@@ -79,6 +79,17 @@ model-boundary aware, and better validated for RU/SBS/DPS/Tamil localized files.
   `kamma/upstream_sync/smd/scripts.md`.
 - `tests/smoke_test_sync.py` now isolates config writes to
   `temp/smoke_config.ini`; it no longer mutates `config.ini`.
+- Accepted sync and prep manifest SHA fields now require full 40-character
+  lowercase git SHAs; `BOOTSTRAP_REQUIRED` remains allowed only for accepted
+  sync bootstrap state. `accepted_sync.json` was updated from `44a8a005` to
+  `44a8a00556cce9bd3874a94efb5dfaceaaf20a66`.
+- SMD coverage now fails on SMD entries not backed by sync-relevant registry
+  paths. Obsolete SMD entries for `no_sync_files` and `unique_paths` inventory
+  were removed so coverage is exactly 67 registry-backed entries.
+- `execute_sync.py` now rejects absolute, parent-traversal, backslash, blank,
+  and whitespace-padded exclusion paths before they can be restored or removed.
+- `check_docs_parity.py <thread_dir>` now reports missing or invalid
+  `prep_manifest.json` cleanly instead of tracebacking.
 
 ## Main Files
 
@@ -149,6 +160,25 @@ focused upstream-sync suite reported 127 passed. The live command
 until the two prior-sync warnings listed under Current State are either ported
 or recorded in the reviewed no-op ledger.
 
+Most recent validation for full-SHA, SMD stale-entry, exclusion-path, and docs
+manifest-error hardening:
+
+```fish
+uv run ruff check --fix kamma/upstream_sync/scripts/check_docs_parity.py kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/sync_schema.py kamma/upstream_sync/scripts/verify_smd_coverage.py tests/test_check_docs_parity.py tests/test_execute_sync.py tests/test_finalize_accepted_sync.py tests/test_prep_analyzer.py tests/test_sync_schema.py tests/test_sync_state.py tests/test_verify_smd_coverage.py
+uv run ruff format kamma/upstream_sync/scripts/check_docs_parity.py kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/sync_schema.py kamma/upstream_sync/scripts/verify_smd_coverage.py tests/test_check_docs_parity.py tests/test_execute_sync.py tests/test_finalize_accepted_sync.py tests/test_prep_analyzer.py tests/test_sync_schema.py tests/test_sync_state.py tests/test_verify_smd_coverage.py
+uv run pyright kamma/upstream_sync/scripts/check_docs_parity.py kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/sync_schema.py kamma/upstream_sync/scripts/verify_smd_coverage.py tests/test_check_docs_parity.py tests/test_execute_sync.py tests/test_finalize_accepted_sync.py tests/test_prep_analyzer.py tests/test_sync_schema.py tests/test_sync_state.py tests/test_verify_smd_coverage.py
+uv run --with pyrefly pyrefly check --min-severity warn kamma/upstream_sync/scripts/check_docs_parity.py kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/sync_schema.py kamma/upstream_sync/scripts/verify_smd_coverage.py tests/test_check_docs_parity.py tests/test_execute_sync.py tests/test_finalize_accepted_sync.py tests/test_prep_analyzer.py tests/test_sync_schema.py tests/test_sync_state.py tests/test_verify_smd_coverage.py
+uv run pytest tests/test_sync_schema.py tests/test_sync_state.py tests/test_prep_analyzer.py tests/test_execute_sync.py tests/test_finalize_accepted_sync.py tests/test_validate_registry.py tests/test_verify_smd_coverage.py tests/test_check_docs_parity.py tests/test_upstream_sync_docs_policy.py tests/test_registry_category_naming.py tests/test_check_shadow_modifications.py -q
+uv run python3 kamma/upstream_sync/scripts/validate_registry.py
+uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py
+uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py
+git diff --check -- kamma/upstream_sync/accepted_sync.json kamma/upstream_sync/scripts/check_docs_parity.py kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/sync_schema.py kamma/upstream_sync/scripts/verify_smd_coverage.py kamma/upstream_sync/smd/root.md kamma/upstream_sync/smd/scripts.md tests/test_check_docs_parity.py tests/test_execute_sync.py tests/test_finalize_accepted_sync.py tests/test_prep_analyzer.py tests/test_sync_schema.py tests/test_sync_state.py tests/test_verify_smd_coverage.py
+```
+
+Result: all passed. The focused upstream-sync suite reported 135 passed.
+Standalone docs parity passed. `verify_smd_coverage.py` now reports 67
+registry paths and 67 SMD entries, with no unregistered SMD entries.
+
 ## Mistakes To Avoid
 
 - Do not preserve stale external protocol paths. The old `~/agents/...` path was
@@ -175,6 +205,14 @@ or recorded in the reviewed no-op ledger.
 - Do not rely only on `discuss_paths` as the pre-execution hard stop.
   `blocker_paths` must also be empty before `execute_sync.py` runs.
 - `check_docs_parity.py` must handle report dirs outside the repo.
+- Accepted sync and prep manifest SHAs must stay full-length 40-character
+  lowercase SHAs. Do not reintroduce short SHA fixtures in sync-state tests.
+- Do not add SMD entries for paths outside sync-relevant registry categories.
+  `unique_paths` and `no_sync_files` are intentionally not SMD-covered.
+- Keep `execute_sync.py` exclusion paths repo-relative; never allow absolute
+  paths or `..` traversal in `run_exclusions.txt` or registry exclusions.
+- `check_docs_parity.py <thread_dir>` should fail cleanly if the thread
+  manifest is missing or malformed; do not let the traceback return.
 - Do not add reviewed no-op ledger entries without inspecting the upstream diff
   and getting an explicit acceptance decision. If the user says no action is
   needed but gives no specific reason, use this exact reason:
@@ -200,6 +238,9 @@ or recorded in the reviewed no-op ledger.
 - The separate review's recommended hardening was implemented: manifest
   `blocker_paths`, direct `as_upstream` pinning, full-SHA finalization, and
   Stage 5 finalization wording.
+- The later standalone review hardening was implemented except for the two live
+  shadow warnings: full-SHA schema enforcement, stale SMD entry rejection,
+  repo-relative sync exclusion validation, and clean docs manifest errors.
 - The typed-hardening thread was finalized and archived at
   `kamma/archive/20260531_upstream_sync_typed_hardening`.
 - This legacy thread directory currently exists as a compact handoff location.
@@ -220,6 +261,10 @@ or recorded in the reviewed no-op ledger.
 - No agent-side git commit was made.
 - User manual review may still be needed for any uncommitted working-tree
   changes.
+- Current uncommitted working-tree changes from this improvement touch
+  `kamma/upstream_sync/accepted_sync.json`, four upstream-sync scripts, two SMD
+  files, and focused tests for sync schema/state, prep analyzer, execute sync,
+  finalize accepted sync, SMD coverage, and docs parity.
 
 ## Errors, Issues, and Repeated Mistakes
 
@@ -233,6 +278,12 @@ or recorded in the reviewed no-op ledger.
   changes.
 - The live shadow check failure is expected while
   `reviewed_shadow_noops.json` is empty and the two warnings remain unported.
+- Red phase was confirmed for this hardening: new tests initially failed on
+  missing `check_unregistered_smd_entries` and `validate_repo_relative_paths`.
+- Stricter SMD validation exposed 12 obsolete SMD entries for non-sync targets;
+  those entries were removed, not reclassified into the registry.
+- `tests/test_sync_state.py` also needed full-SHA fixtures after schema
+  enforcement; otherwise the broader focused suite would fail.
 - Existing untracked/dirty `resources/*` entries remain unrelated and were not
   touched.
 - Keep future handoff updates short. This file is summary context, not a
@@ -241,6 +292,7 @@ or recorded in the reviewed no-op ledger.
 ## Recent Recommended Commit Messages
 
 ```text
+#sync tooling: harden sync metadata validators
 #sync tooling: add reviewed shadow noop ledger
 #sync docs: clarify unique cleanup inventory
 #sync tooling: block unsafe prep paths and pin upstream ref

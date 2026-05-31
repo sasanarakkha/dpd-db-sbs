@@ -13,13 +13,17 @@ from kamma.upstream_sync.scripts.registry_helper import (
 )
 from kamma.upstream_sync.scripts.sync_runtime import verify_manifest
 
+FULL_OLD_SHA = "a" * 40
+FULL_NEW_SHA = "b" * 40
+FULL_OTHER_SHA = "c" * 40
+
 
 def test_load_accepted_sync_state_valid(tmp_path: Path) -> None:
     state_path = tmp_path / "accepted_sync.json"
     state_path.write_text(
         json.dumps(
             {
-                "last_accepted_upstream_sha": "abc123def456",
+                "last_accepted_upstream_sha": FULL_OLD_SHA,
                 "last_accepted_upstream_date": "2026-04-08",
                 "last_accepted_upstream_ref": "upstream/main",
                 "notes": "baseline",
@@ -30,7 +34,7 @@ def test_load_accepted_sync_state_valid(tmp_path: Path) -> None:
 
     state = load_accepted_sync_state(state_path)
 
-    assert state["last_accepted_upstream_sha"] == "abc123def456"
+    assert state["last_accepted_upstream_sha"] == FULL_OLD_SHA
     assert state["last_accepted_upstream_ref"] == "upstream/main"
 
 
@@ -40,7 +44,7 @@ def test_load_accepted_sync_state_valid(tmp_path: Path) -> None:
         ({}, "missing required field 'last_accepted_upstream_sha'"),
         (
             {
-                "last_accepted_upstream_sha": "abc123",
+                "last_accepted_upstream_sha": FULL_OLD_SHA,
                 "last_accepted_upstream_date": "2026-04-08",
             },
             "missing required field 'last_accepted_upstream_ref'",
@@ -55,11 +59,19 @@ def test_load_accepted_sync_state_valid(tmp_path: Path) -> None:
         ),
         (
             {
-                "last_accepted_upstream_sha": "abc123",
+                "last_accepted_upstream_sha": FULL_OLD_SHA,
                 "last_accepted_upstream_date": 20260408,
                 "last_accepted_upstream_ref": "upstream/main",
             },
             "field 'last_accepted_upstream_date' must be a string",
+        ),
+        (
+            {
+                "last_accepted_upstream_sha": "abc123",
+                "last_accepted_upstream_date": "2026-04-08",
+                "last_accepted_upstream_ref": "upstream/main",
+            },
+            "field 'last_accepted_upstream_sha' must be a full 40-character lowercase git SHA",
         ),
     ],
 )
@@ -83,8 +95,8 @@ def test_load_prep_manifest_valid(tmp_path: Path) -> None:
     manifest_path.write_text(
         json.dumps(
             {
-                "from_upstream_sha": "oldsha123",
-                "to_upstream_sha": "newsha456",
+                "from_upstream_sha": FULL_OLD_SHA,
+                "to_upstream_sha": FULL_NEW_SHA,
                 "target_upstream_ref": "upstream/main",
                 "generated_at": "2026-04-08T10:00:00+08:00",
                 "changed_upstream_paths": ["db/models.py"],
@@ -98,7 +110,7 @@ def test_load_prep_manifest_valid(tmp_path: Path) -> None:
 
     manifest = load_prep_manifest(manifest_path)
 
-    assert manifest["to_upstream_sha"] == "newsha456"
+    assert manifest["to_upstream_sha"] == FULL_NEW_SHA
     assert manifest["target_upstream_ref"] == "upstream/main"
 
 
@@ -108,8 +120,8 @@ def test_load_prep_manifest_valid(tmp_path: Path) -> None:
         ({}, "missing required field 'from_upstream_sha'"),
         (
             {
-                "from_upstream_sha": "oldsha123",
-                "to_upstream_sha": "newsha456",
+                "from_upstream_sha": FULL_OLD_SHA,
+                "to_upstream_sha": FULL_NEW_SHA,
                 "target_upstream_ref": "upstream/main",
                 "generated_at": "2026-04-08",
                 "changed_upstream_paths": "db/models.py",
@@ -121,7 +133,7 @@ def test_load_prep_manifest_valid(tmp_path: Path) -> None:
         ),
         (
             {
-                "from_upstream_sha": "oldsha123",
+                "from_upstream_sha": FULL_OLD_SHA,
                 "to_upstream_sha": "",
                 "target_upstream_ref": "upstream/main",
                 "generated_at": "2026-04-08",
@@ -193,8 +205,8 @@ def test_load_prep_manifest_rejects_invalid_mapped_actions(
 
 def test_build_and_write_accepted_sync_state(tmp_path: Path) -> None:
     manifest: dict[str, object] = {
-        "from_upstream_sha": "oldsha123",
-        "to_upstream_sha": "newsha456",
+        "from_upstream_sha": FULL_OLD_SHA,
+        "to_upstream_sha": FULL_NEW_SHA,
         "target_upstream_ref": "upstream/main",
         "generated_at": "2026-04-08T10:00:00+08:00",
         "changed_upstream_paths": [],
@@ -213,7 +225,7 @@ def test_build_and_write_accepted_sync_state(tmp_path: Path) -> None:
     write_accepted_sync_state(state_path, state)
 
     written = load_accepted_sync_state(state_path)
-    assert written["last_accepted_upstream_sha"] == "newsha456"
+    assert written["last_accepted_upstream_sha"] == FULL_NEW_SHA
     assert written["last_accepted_upstream_date"] == "2026-04-09T12:00:00+08:00"
     assert written["last_accepted_upstream_ref"] == "upstream/main"
 
@@ -227,8 +239,8 @@ def write_manifest(thread_dir: Path, payload: dict[str, object]) -> None:
 
 def valid_manifest_payload() -> dict[str, object]:
     return {
-        "from_upstream_sha": "oldsha123",
-        "to_upstream_sha": "newsha456",
+        "from_upstream_sha": FULL_OLD_SHA,
+        "to_upstream_sha": FULL_NEW_SHA,
         "target_upstream_ref": "upstream/main",
         "generated_at": "2026-04-08T10:00:00+08:00",
         "changed_upstream_paths": [],
@@ -265,7 +277,7 @@ def test_verify_manifest_rejects_accepted_state_mismatch(tmp_path: Path) -> None
     result = verify_manifest(
         str(tmp_path),
         accepted_sync_state={
-            "last_accepted_upstream_sha": "different",
+            "last_accepted_upstream_sha": FULL_OTHER_SHA,
             "last_accepted_upstream_date": "2026-04-08",
             "last_accepted_upstream_ref": "upstream/main",
         },
@@ -277,7 +289,7 @@ def test_verify_manifest_rejects_accepted_state_mismatch(tmp_path: Path) -> None
 def test_verify_manifest_rejects_target_sha_mismatch(tmp_path: Path) -> None:
     write_manifest(tmp_path, valid_manifest_payload())
 
-    result = verify_manifest(str(tmp_path), target_sha="newer_upstream_sha")
+    result = verify_manifest(str(tmp_path), target_sha=FULL_OTHER_SHA)
 
     assert result == 1
 
