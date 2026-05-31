@@ -64,6 +64,7 @@ Existing tables have extra `*_ru` columns (e.g., `root_ru_meaning`, `html_ru`).
 - "Shadow" (`*_ru.py`, `*_sbs.py`, `*_dps.py`) or "unique" files MUST have corresponding registry entries in `kamma/upstream_sync/` (specifically `registry.json` and `guide.md`). This registry MUST always be kept up-to-date.
 
 ## Engineering Standards
+- **Request Scope Discipline:** Only implement the change explicitly requested by the user. Do not make adjacent improvements, cleanups, restorations, formatting changes, or "while here" fixes unless the user asked for them. If an unrequested change seems useful, necessary, or safer, stop and ask before implementing it.
 - **Surgical Logic Layering**: Avoid rewriting core logic in shadow copies. Layer localized changes (RU/SBS) clearly on top of the original structure for easy sync.
 - **Namespace Isolation**:
   - **Tier 1 (Upstream copy)**: Exact upstream name, NO markers.
@@ -102,9 +103,10 @@ Renames/moves are atomic. You MUST:
 1. `uv run ruff check --fix <file>`
 2. `uv run ruff format <file>`
 3. `uv run pyright <file>`
-4. `uv run pytest tests/test_<feature>.py -v` (for affected tests)
+4. `uv run --with pyrefly pyrefly check --min-severity warn <file>`
+5. `uv run pytest tests/test_<feature>.py -v` (for affected tests)
 
-**Do NOT report completion until all checks pass.** This is non-negotiable. Do not skip or defer these. Type safety is mandatory, not optional.
+**Do NOT report completion until all checks pass.** This is non-negotiable. Do not skip or defer these. Pyrefly warnings count as failures unless explicitly approved by the user. Type safety is mandatory, not optional.
 - **Verification:** Write tests for accurate data output (not UI components). Readme MUST be updated.
 - **Research:** Always perform Google Search for framework/OS quirks.
 - **Sync Tracking:** Only track and update exporters in the sync registry that contain localized data (Russian, SBS, or DPS-specific).

@@ -36,10 +36,18 @@ from tools.clean_machine import clean_machine
 
 
 current_date = datetime.date.today().strftime("%m-%d")
+current_date_year = datetime.date.today().strftime("%y-%m-%d")
 
 sbs_ped_link = 'Spot a mistake? <a class="link" href="https://docs.google.com/forms/d/e/1FAIpQLScNC5v2gQbBCM3giXfYIib9zrp-WMzwJuf_iVXEMX2re4BFFw/viewform?usp=pp_url&entry.438735500'
 
 dps_link = 'Нашли ошибку? <a class="link" href="https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500'
+
+
+def get_common_root_examples(root_example: str, main_verb: str) -> str:
+    """Get comma-separated root examples, excluding the main verb."""
+    examples = [example.strip() for example in root_example.split(",")]
+    examples = [example for example in examples if example and example != main_verb]
+    return ", ".join(examples)
 
 
 def common_roots(db_session, dpspth):
@@ -62,14 +70,18 @@ def common_roots(db_session, dpspth):
     roots_db = (
         db_session.query(DpdRoot, root_counts.c.root_count)
         .join(root_counts, DpdRoot.root == root_counts.c.root)
-        .filter(root_counts.c.root_count >= 50)
+        .filter(DpdRoot.root_has_verb == "･")
+        .filter(DpdRoot.root_example != "")
+        # .filter(root_counts.c.root_count >= 20)
         .order_by(root_counts.c.root_count.desc())
-        .limit(200)
+        # .limit(400)
         .all()
     )
 
     columns_names = [
         "root",
+        "root_clean",
+        "sanskrit_root",
         "root_group",
         "root_sign",
         "root_meaning",
@@ -79,20 +91,10 @@ def common_roots(db_session, dpspth):
         "feedback",
     ]
 
-    # Filter for unique root_clean
-    seen_roots = set()
-    roots_db_unique = []
-    for root_obj, count in roots_db:
-        if root_obj.root_clean not in seen_roots:
-            seen_roots.add(root_obj.root_clean)
-            roots_db_unique.append((root_obj, count))
-    roots_db = roots_db_unique
-
     rows = []
     ru_rows = []
     for root_obj, _ in roots_db:
         root = root_obj.root
-        exclude_pos = ["adj", "imperf", "perf", "opt", "fut", "cond", "ind"]
 
         # --- Find main_verb ---
         main_verb_obj = (
@@ -111,51 +113,15 @@ def common_roots(db_session, dpspth):
         # if not main_verb:
         #     print(f"for {root} no main verb")
 
-        words_query = (
-            db_session.query(DpdHeadword)
-            .filter(DpdHeadword.root_key == root)
-            .filter(DpdHeadword.example_2 != "")
-            .filter(~DpdHeadword.pos.in_(exclude_pos))
-            .filter(~DpdHeadword.stem.contains("!"))
-            .order_by(DpdHeadword.ebt_count.desc())
-            .all()
-        )
-
-        exclude_lemma = [
-            "paṭhamaṃ",
-            "thera",
-            "ṭhita",
-            "ṭha",
-            "ṭhā",
-            "añña",
-            "aññā",
-        ]
-        unique_lemma_clean = set()
-        unique_stems = set()
-        unique_words = []
-        for w in words_query:
-            if (
-                w.lemma_clean
-                and w.lemma_clean != main_verb
-                and w.lemma_clean not in unique_lemma_clean
-                and w.lemma_clean not in exclude_lemma
-                and w.stem not in unique_stems
-                and w.derived_from not in unique_lemma_clean
-            ):
-                unique_lemma_clean.add(w.lemma_clean)
-                unique_stems.add(w.stem)
-                unique_words.append(w)
-                if w.derived_from:
-                    exclude_lemma.append(w.derived_from)
-            if len(unique_words) == 5:
-                break
-        examples = ", ".join([w.lemma_clean for w in unique_words])
+        examples = get_common_root_examples(root_obj.root_example, main_verb)
 
         root_clean = re.sub(r" \d*$", "", str(root))
-        feedback = f"""{sbs_ped_link}={root_clean}&entry.1433863141=common-roots-{current_date}">Fix it here.</a>"""
+        feedback = f"""{sbs_ped_link}={root_clean}&entry.1433863141=common-roots-{current_date_year}">Fix it here.</a>"""
 
         row = [
+            root_obj.root,
             root_obj.root_clean,
+            root_obj.sanskrit_root,
             root_obj.root_group,
             root_obj.root_sign,
             root_obj.root_meaning,
@@ -166,7 +132,7 @@ def common_roots(db_session, dpspth):
         ]
         rows.append([x if x is not None else "" for x in row])
 
-        ru_row = [root_obj.root_clean, root_obj.root_ru_meaning]
+        ru_row = [root_obj.root, root_obj.root_ru_meaning]
         ru_rows.append([x if x is not None else "" for x in ru_row])
 
     output_path = os.path.join(dpspth.anki_csvs_dir, "pali_class", "common_roots.csv")
@@ -175,6 +141,8 @@ def common_roots(db_session, dpspth):
         writer.writerow(
             [
                 "root",
+                "root_clean",
+                "sanskrit_root",
                 "root_group",
                 "root_sign",
                 "root_meaning",
@@ -206,6 +174,20 @@ def common_roots(db_session, dpspth):
     )
     with open(ru_output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
+        writer.writerow(
+            [
+                "root",
+                "root_clean",
+                "sanskrit_root",
+                "root_group",
+                "root_sign",
+                "root_meaning",
+                "main_verb",
+                "examples",
+                "native",
+                "feedback",
+            ]
+        )
         writer.writerows(ru_rows)
     pr.green(f"{len(ru_rows)} Russian root meanings saved to ru_common_roots.csv")
 
@@ -232,15 +214,15 @@ def none_to_empty(values: List):
 def get_feedback(i: DpdHeadword, deck_name):
     """Get the feedback link for a given deck."""
     if deck_name == "dps":
-        return f"""{dps_link}={i.lemma_1}&entry.1433863141={deck_name.upper()}-{current_date}">Пожалуйста сообщите.</a>"""
+        return f"""{dps_link}={i.lemma_1}&entry.1433863141={deck_name.upper()}-{current_date_year}">Пожалуйста сообщите.</a>"""
     else:
-        return f"""{sbs_ped_link}={i.lemma_1}&entry.1433863141={deck_name.upper()}-{current_date}">Fix it here.</a>"""
+        return f"""{sbs_ped_link}={i.lemma_1}&entry.1433863141={deck_name.upper()}-{current_date_year}">Fix it here.</a>"""
 
 
 def get_root_info(i: DpdHeadword):
     """Get all root data with keys from a DpdHeadword object."""
     if i.rt is not None:
-        root_key = re.sub(r" \d*$", "", str(i.root_key))
+        root_key = re.sub(r" \d*$", "", i.root_key)
 
     return [
         i.rt.sanskrit_root if i.rt else None,
@@ -618,12 +600,8 @@ def parittas(dpspth, dpd_db):
                 i.sbs.sbs_chant_pali_1,
                 i.sbs.sbs_chant_pali_2,
             ]
-            return bool(
-                any(
-                    chant_name in source
-                    for source in sources
-                    for chant_name in chant_names
-                )
+            return any(
+                chant_name in source for source in sources for chant_name in chant_names
             )
 
     columns_names = [
@@ -649,7 +627,7 @@ def parittas(dpspth, dpd_db):
 
     def parittas_row(i: DpdHeadword, chant_names) -> List[str]:
         if i.rt is not None:
-            root_key = re.sub(r" \d*$", "", str(i.root_key))
+            root_key = re.sub(r" \d*$", "", i.root_key)
         fields = [
             i.id,
             i.lemma_1,
@@ -771,7 +749,7 @@ def dps(dpspth, dpd_db):
             example = i.example_1.replace("\n", "<br>")
 
         if i.rt is not None:
-            root_key = re.sub(r" \d*$", "", str(i.root_key))
+            root_key = re.sub(r" \d*$", "", i.root_key)
 
         fields = [
             i.id,
