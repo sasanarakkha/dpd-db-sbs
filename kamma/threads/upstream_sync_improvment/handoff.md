@@ -100,6 +100,10 @@ model-boundary aware, and better validated for RU/SBS/DPS/Tamil localized files.
   small localized backups.
 - SMD guidance now documents both no-op rules so future syncs do not attempt to
   port those date/time or chunking-only upstream changes.
+- Standalone docs-hygiene cleanup was implemented after review: the guide now
+  pre-authorizes `rg` instead of `grep`/`find`, `archive_improvements.md` is
+  explicitly historical-only, `stages/` is marked legacy Stage 1-3 reference
+  material, and the empty `kamma/upstream_sync/suggestions.md` file was deleted.
 
 ## Main Files
 
@@ -211,6 +215,27 @@ upstream-sync suite reported 140 passed with one third-party aksharamukha
 deprecation warning. Reviewed no-op/SMD tests reported 17 passed. The live
 shadow modification check is now clean.
 
+Most recent validation for standalone docs-hygiene cleanup:
+
+```fish
+uv run pytest tests/test_upstream_sync_docs_policy.py -q
+uv run ruff check --fix tests/test_upstream_sync_docs_policy.py
+uv run ruff format tests/test_upstream_sync_docs_policy.py
+uv run pyright tests/test_upstream_sync_docs_policy.py
+uv run --with pyrefly pyrefly check --min-severity warn tests/test_upstream_sync_docs_policy.py
+uv run pytest tests/test_sync_schema.py tests/test_sync_state.py tests/test_prep_analyzer.py tests/test_execute_sync.py tests/test_finalize_accepted_sync.py tests/test_validate_registry.py tests/test_verify_smd_coverage.py tests/test_check_docs_parity.py tests/test_upstream_sync_docs_policy.py tests/test_registry_category_naming.py tests/test_check_shadow_modifications.py -q
+uv run python3 kamma/upstream_sync/scripts/validate_registry.py
+uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py
+uv run python3 tests/check_shadow_modifications.py
+rg "suggestions\\.md" kamma AGENTS.md
+git diff --check -- kamma/upstream_sync tests/test_upstream_sync_docs_policy.py
+```
+
+Result: red phase confirmed first with 4 expected docs-policy failures, then all
+checks passed. The focused docs-policy test reported 17 passed; the broader
+focused upstream-sync suite reported 142 passed. The final `rg` search returned
+no active `suggestions.md` references outside the policy test.
+
 ## Mistakes To Avoid
 
 - Do not preserve stale external protocol paths. The old `~/agents/...` path was
@@ -259,6 +284,13 @@ shadow modification check is now clean.
   already diverged.
 - Avoid complex multiline `rg` regexes for verification; use simple literal
   searches when possible.
+- Do not treat `archive_improvements.md` as active protocol. It is historical
+  only; canonical sync instructions are in `guide.md`, `templates/`, and `smd/`.
+- Do not reintroduce `kamma/upstream_sync/suggestions.md`; use temporary
+  `new_improvements.md` during active syncs and then promote accepted lessons to
+  `archive_improvements.md`.
+- Keep active guide search-command wording aligned with project rules: use
+  `rg`, not `grep` or `find`.
 - Preserve unrelated dirty/untracked `resources/*` entries unless the user
   explicitly asks to handle them.
 
@@ -287,17 +319,17 @@ shadow modification check is now clean.
   entries.
 - The smoke sync test now uses temporary config isolation. Do not reintroduce
   writes to `config.ini`.
+- Standalone sync review found no architectural redesign needed. Only the
+  approved docs-hygiene cleanup was implemented.
 - No agent-side git commit was made.
 - User manual review may still be needed for any uncommitted working-tree
   changes.
 - Current uncommitted working-tree changes from this standalone review touch
-  `kamma/upstream_sync/scripts/execute_sync.py`,
-  `kamma/upstream_sync/scripts/verify_smd_coverage.py`,
-  `kamma/upstream_sync/reviewed_shadow_noops.json`,
-  `kamma/upstream_sync/smd/exporter.md`,
-  `kamma/upstream_sync/smd/scripts.md`,
-  `tests/test_execute_sync.py`,
-  `tests/test_verify_smd_coverage.py`, and this handoff.
+  `kamma/upstream_sync/archive_improvements.md`,
+  `kamma/upstream_sync/guide.md`,
+  `kamma/upstream_sync/infrastructure.md`,
+  deleted `kamma/upstream_sync/suggestions.md`,
+  `tests/test_upstream_sync_docs_policy.py`, and this handoff.
 
 ## Errors, Issues, and Repeated Mistakes
 
@@ -326,10 +358,15 @@ shadow modification check is now clean.
   touched.
 - Keep future handoff updates short. This file is summary context, not a
   transcript.
+- Red phase was confirmed for the standalone docs-hygiene cleanup: the new
+  docs-policy assertions first failed on active `grep`/`find` wording, missing
+  historical-only archive wording, missing legacy `stages/` label, and the
+  still-present empty `suggestions.md` file.
 
 ## Recent Recommended Commit Messages
 
 ```text
+#sync docs: simplify upstream sync guidance
 #sync tooling: harden exclusions and document reviewed noops
 #sync tooling: harden sync metadata validators
 #sync tooling: add reviewed shadow noop ledger

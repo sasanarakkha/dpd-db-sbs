@@ -18,7 +18,7 @@ All upstream sync assets live in `kamma/upstream_sync/`.
 | `archive_improvements.md` | Accumulated lessons from all past sync runs |
 | `new_improvements.md` | A strictly temporary intake file generated during an active sync run. After its contents are reviewed and promoted to `archive_improvements.md`, the file MUST be deleted. It is ignored by git. |
 | `templates/` | `plan.md` / `spec.md` starters for new sync kamma threads |
-| `stages/` | Stage-specific contracts and checklists with FAST/ADVANCED ownership |
+| `stages/` | Legacy Stage 1-3 reference checklists; `guide.md` and `templates/` are canonical for current 5-stage syncs |
 | `scripts/registry_helper.py` | Shared Python helper to load the registry and extract paths |
 | `scripts/validate_registry.py` | Schema and data-quality validator for `registry.json` |
 | `scripts/verify_smd_coverage.py` | Coverage checker — ensures every sync-relevant registry entry has an SMD entry in `smd/` |

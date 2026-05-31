@@ -1,5 +1,9 @@
 # Upstream Sync Rehearsal: Comprehensive Improvement Analysis
 
+> Historical record only. Current canonical instructions live in `guide.md`,
+> `templates/`, and `smd/`; obsolete names or phase labels below are not active
+> protocol.
+
 This document provides a unified, exhaustive post-mortem of the Upstream Sync Rehearsal sessions. It identifies friction points, logic gaps, and systemic failures encountered during the process to ensure future synchronizations are more robust, efficient, and maintainable.
 
 ## 1. Deep Upstream Diff Analysis Before Modifying Shadow Copies

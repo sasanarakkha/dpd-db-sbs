@@ -15,6 +15,8 @@ def test_guide_has_no_stale_backup_todo_or_grep_command() -> None:
 
     assert "TODO backup dps" not in guide
     assert "grep -r" not in guide
+    assert "`grep`" not in guide
+    assert "`find`" not in guide
     assert "use `rg`" in guide
 
 
@@ -159,6 +161,30 @@ def test_archive_scope_note_supersedes_stale_docs_exclusion() -> None:
         "upstream-owned and accepted verbatim, while `docs_rus/` is handled by "
         "Stage 4 Docs Translation Parity."
     ) in archive
+
+
+def test_archive_improvements_is_marked_historical_only() -> None:
+    archive = Path("kamma/upstream_sync/archive_improvements.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert "Historical record only." in archive
+    assert "Current canonical instructions live in `guide.md`" in archive
+
+
+def test_infrastructure_marks_stage_docs_as_legacy_reference() -> None:
+    infrastructure = Path("kamma/upstream_sync/infrastructure.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert (
+        "Legacy Stage 1-3 reference checklists; `guide.md` and `templates/` "
+        "are canonical for current 5-stage syncs"
+    ) in infrastructure
+
+
+def test_empty_suggestions_file_is_not_kept() -> None:
+    assert not Path("kamma/upstream_sync/suggestions.md").exists()
 
 
 def test_docs_define_single_category_dps_shadow_policy() -> None:
