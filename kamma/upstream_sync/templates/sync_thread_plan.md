@@ -16,17 +16,20 @@
   - [ ] `uv run ruff check tools/ scripts/ db/ exporter/ --select F821,E999 --quiet` — catches undefined names and syntax/API breakage before sync work begins.
   - [ ] Review `kamma/upstream_sync/accepted_sync.json` — starting SHA/date/ref are present.
 - [ ] **1.2 Pre-sync Shadow Health Check**:
-  - [ ] `uv run python3 tests/check_shadow_modifications.py` — output is clean.
+  - [ ] `uv run python3 tests/check_shadow_modifications.py` — output is clean, or every warning has an exact ADVANCED-reviewed entry in `kamma/upstream_sync/reviewed_shadow_noops.json`.
+  - [ ] If the user confirms a warning is intentionally a no-op but gives no specific reason, use this reason exactly: "User reviewed and confirmed this upstream change does not need to be ported to the shadow."
 - [ ] **1.3 Validation**:
   - [ ] `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` — passes.
   - [ ] `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` — passes.
 - [ ] **1.4 Factual Diff**:
   - [ ] `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py <thread_dir>` — generates `prep_report.md` and `prep_manifest.json`.
   - [ ] If `prep_manifest.json.discuss_paths` is non-empty, stop before `execute_sync.py`.
+  - [ ] If `prep_manifest.json.blocker_paths` is non-empty, STOP before `execute_sync.py`.
   - [ ] Record unexpected command failures exactly in `handoff.md`.
 - [ ] **1.5 Automated Pull + Commit 1 Gate**:
   - [ ] Review `<thread_dir>/run_exclusions.txt` if needed.
   - [ ] `uv run python3 kamma/upstream_sync/scripts/execute_sync.py <thread_dir>`.
+  - [ ] Confirm `as_upstream` was pinned directly to the verified manifest SHA.
   - [ ] Prepare commit message only: `#sync: upstream pull <from>..<to>, <N> files, YYYY-MM-DD`.
 
 **FAST must stop and request ADVANCED if** registry errors require policy interpretation, a `discuss: true` path changed, a new upstream file needs classification, or command output is ambiguous.
@@ -144,6 +147,7 @@
 - [ ] Ask user for manual GoldenDict/webapp verification.
 - [ ] Wait for explicit user confirmation: `all is good, proceed`.
 - [ ] Decide whether `accepted_sync.json` may be advanced.
+- [ ] If accepted, write exact FAST handoff instructions to run `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>`.
 - [ ] If final mechanical edits are needed, write exact FAST instructions and stop.
 - [ ] Review `kamma/upstream_sync/new_improvements.md` if it exists; promote accepted items to `archive_improvements.md` by FAST handoff if edits are needed.
 - [ ] Prepare final commit message only after acceptance.

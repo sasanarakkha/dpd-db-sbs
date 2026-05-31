@@ -154,6 +154,7 @@ class PrepAnalyzer:
         inspired_sources_modified: list[tuple[str, list[str]]] = []
         untracked: list[str] = []
         deleted: list[str] = []
+        blocker_paths: list[str] = []
         discuss_paths: list[str] = []
 
         source_to_shadows: dict[str, list[SourceAction]] = {}
@@ -192,6 +193,7 @@ class PrepAnalyzer:
 
             if status == "D":
                 deleted.append(path)
+                blocker_paths.append(path)
                 for src, actions in source_to_shadows.items():
                     if src.endswith("/") and path.startswith(src):
                         mapped_actions[path] = self.build_mapped_actions(actions, path)
@@ -262,6 +264,8 @@ class PrepAnalyzer:
                 not found_source and path not in self.modified_upstream
             ):
                 untracked.append(path)
+                if status == "A" and not found_source:
+                    blocker_paths.append(path)
 
         report = self.generate_report(
             tracked=tracked_modified,
@@ -269,6 +273,7 @@ class PrepAnalyzer:
             inspired=inspired_sources_modified,
             untracked=untracked,
             deleted=deleted,
+            blockers=sorted(set(blocker_paths)),
             from_sha=from_sha,
             to_sha=to_sha,
         )
@@ -277,6 +282,7 @@ class PrepAnalyzer:
             to_sha=to_sha,
             changed_upstream_paths=sorted(changed_upstream_paths),
             deleted_upstream_paths=sorted(set(deleted)),
+            blocker_paths=sorted(set(blocker_paths)),
             mapped_actions=mapped_actions,
             discuss_paths=sorted(set(discuss_paths)),
         )
@@ -298,6 +304,7 @@ class PrepAnalyzer:
         inspired: list[tuple[str, list[str]]],
         untracked: list[str],
         deleted: list[str],
+        blockers: list[str],
         from_sha: str,
         to_sha: str,
     ) -> str:
@@ -384,6 +391,17 @@ class PrepAnalyzer:
                 lines.append(f"- {path}")
             lines.append("")
 
+        lines.append("## Stage 1 Blocker Paths")
+        if blockers:
+            lines.append(
+                "Resolve these paths before running `execute_sync.py`; rerun prep after registry/SMD or run-specific scope changes."
+            )
+            for path in blockers:
+                lines.append(f"- {path}")
+        else:
+            lines.append("_No Stage 1 blockers._")
+        lines.append("")
+
         return "\n".join(lines)
 
     def generate_manifest(
@@ -392,6 +410,7 @@ class PrepAnalyzer:
         to_sha: str,
         changed_upstream_paths: list[str],
         deleted_upstream_paths: list[str],
+        blocker_paths: list[str],
         mapped_actions: dict[str, list[MappedAction]],
         discuss_paths: list[str],
     ) -> dict[str, object]:
@@ -403,6 +422,7 @@ class PrepAnalyzer:
             "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
             "changed_upstream_paths": changed_upstream_paths,
             "deleted_upstream_paths": deleted_upstream_paths,
+            "blocker_paths": blocker_paths,
             "mapped_actions": mapped_actions,
             "discuss_paths": discuss_paths,
         }

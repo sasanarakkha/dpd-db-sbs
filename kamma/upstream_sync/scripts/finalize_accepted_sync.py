@@ -17,11 +17,24 @@ from kamma.upstream_sync.scripts.registry_helper import (
 from kamma.upstream_sync.scripts.sync_runtime import verify_manifest
 from tools.printer import printer as pr
 
+DEFAULT_ACCEPTANCE_NOTES = "Accepted after Stage 5 verification."
+
 
 def resolve_commit_date(commit_sha: str) -> str:
     """Resolve the upstream commit date for the accepted target SHA."""
     result = subprocess.run(
         ["git", "show", "-s", "--format=%cI", commit_sha],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return result.stdout.strip()
+
+
+def resolve_commit_sha(commit_ref: str) -> str:
+    """Resolve the accepted target ref to a full commit SHA."""
+    result = subprocess.run(
+        ["git", "rev-parse", commit_ref],
         capture_output=True,
         text=True,
         check=True,
@@ -39,6 +52,7 @@ def finalize_accepted_sync(thread_dir: str, state_path: Path, notes: str) -> int
             thread_dir,
             accepted_sync_state=accepted_sync_state,
             allow_discuss=False,
+            allow_blockers=False,
         )
         != 0
     ):
@@ -52,8 +66,13 @@ def finalize_accepted_sync(thread_dir: str, state_path: Path, notes: str) -> int
     manifest = load_prep_manifest(manifest_path)
     pr.yes("ok")
 
+    pr.green("resolving full upstream sha")
+    full_sha = resolve_commit_sha(str(manifest["to_upstream_sha"]))
+    manifest["to_upstream_sha"] = full_sha
+    pr.yes(full_sha)
+
     pr.green("resolving upstream date")
-    commit_date = resolve_commit_date(str(manifest["to_upstream_sha"]))
+    commit_date = resolve_commit_date(full_sha)
     pr.yes("ok")
 
     pr.green("writing accepted sync")
@@ -71,7 +90,7 @@ def main() -> int:
     """Parse arguments and update accepted sync metadata from a thread manifest."""
     parser = argparse.ArgumentParser()
     parser.add_argument("thread_dir")
-    parser.add_argument("--notes", default="Accepted after Stage 3 verification.")
+    parser.add_argument("--notes", default=DEFAULT_ACCEPTANCE_NOTES)
     parser.add_argument(
         "--state-path",
         default=str(get_accepted_sync_path()),

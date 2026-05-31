@@ -40,6 +40,38 @@ def test_guide_stops_before_execute_sync_when_discuss_paths_exist() -> None:
     ) in guide
 
 
+def test_guide_and_plan_stop_before_execute_sync_when_blocker_paths_exist() -> None:
+    guide = Path("kamma/upstream_sync/guide.md").read_text(encoding="utf-8")
+    plan = Path("kamma/upstream_sync/templates/sync_thread_plan.md").read_text(
+        encoding="utf-8"
+    )
+
+    required = (
+        "If `prep_manifest.json.blocker_paths` is non-empty, STOP before "
+        "`execute_sync.py`."
+    )
+    assert required in guide
+    assert required in plan
+
+
+def test_stage_five_finalization_is_fast_mechanical_handoff() -> None:
+    plan = Path("kamma/upstream_sync/templates/sync_thread_plan.md").read_text(
+        encoding="utf-8"
+    )
+    guide = Path("kamma/upstream_sync/guide.md").read_text(encoding="utf-8")
+    command = "uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>"
+
+    assert f"If accepted, run `{command}`." not in plan
+    assert (
+        f"If accepted, write exact FAST handoff instructions to run `{command}`."
+        in plan
+    )
+    assert (
+        f"If accepted, write exact FAST handoff instructions to run `{command}`."
+        in guide
+    )
+
+
 def test_stage_1_requires_api_health_check() -> None:
     guide = Path("kamma/upstream_sync/guide.md").read_text(encoding="utf-8")
     plan = Path("kamma/upstream_sync/templates/sync_thread_plan.md").read_text(
@@ -69,6 +101,51 @@ def test_smd_coverage_wording_matches_checker_scope() -> None:
     assert "Verify sync-relevant registry entries" in checker
     assert "every registry entry has" not in readme
     assert "every registry entry has" not in infrastructure
+
+
+def test_unique_paths_are_documented_as_cleanup_inventory_not_sync_targets() -> None:
+    readme = Path("kamma/upstream_sync/README.md").read_text(encoding="utf-8")
+    infrastructure = Path("kamma/upstream_sync/infrastructure.md").read_text(
+        encoding="utf-8"
+    )
+    guide = Path("kamma/upstream_sync/guide.md").read_text(encoding="utf-8")
+
+    expected = "cleanup inventory, not sync targets"
+    assert expected in readme
+    assert expected in infrastructure
+    assert expected in guide
+
+
+def test_reviewed_shadow_noop_ledger_is_documented() -> None:
+    readme = Path("kamma/upstream_sync/README.md").read_text(encoding="utf-8")
+    infrastructure = Path("kamma/upstream_sync/infrastructure.md").read_text(
+        encoding="utf-8"
+    )
+    guide = Path("kamma/upstream_sync/guide.md").read_text(encoding="utf-8")
+    plan = Path("kamma/upstream_sync/templates/sync_thread_plan.md").read_text(
+        encoding="utf-8"
+    )
+    ledger = Path("kamma/upstream_sync/reviewed_shadow_noops.json")
+
+    assert ledger.exists()
+    assert "reviewed_shadow_noops.json" in readme
+    assert "reviewed_shadow_noops.json" in infrastructure
+    assert "reviewed_shadow_noops.json" in guide
+    assert "reviewed_shadow_noops.json" in plan
+
+
+def test_reviewed_shadow_noop_default_user_reason_is_documented() -> None:
+    guide = Path("kamma/upstream_sync/guide.md").read_text(encoding="utf-8")
+    plan = Path("kamma/upstream_sync/templates/sync_thread_plan.md").read_text(
+        encoding="utf-8"
+    )
+    reason = (
+        "User reviewed and confirmed this upstream change does not need to be ported "
+        "to the shadow."
+    )
+
+    assert reason in guide
+    assert reason in plan
 
 
 def test_archive_scope_note_supersedes_stale_docs_exclusion() -> None:

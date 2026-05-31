@@ -155,8 +155,10 @@ Stage 4 is split into two model-bound substages: ADVANCED analysis and FAST tran
 0. **Pre-sync Shadow Health Check (MANDATORY GATE)**:
    - Run `uv run python3 tests/check_shadow_modifications.py`
    - The output must be **clean** (zero modifications reported) before continuing.
-   - If drift is found: **STOP**. Fix the drifted shadow files first. Commit the fix separately
-     (message: `#pre-sync: fix shadow drift in <filenames>`). Only then proceed to step 1.
+   - If drift is found: **STOP**. Inspect the upstream diff and either fix the drifted shadow files first
+     (message: `#pre-sync: fix shadow drift in <filenames>`) or, if ADVANCED confirms the change is intentionally irrelevant to the shadow, add an exact entry to `kamma/upstream_sync/reviewed_shadow_noops.json` and rerun the check.
+   - A reviewed no-op entry must include the exact `sync_commit`, `source`, `shadow`, full `changed_paths` list, and a concrete `reason`. Do not use `unique_paths` for shadow no-ops.
+   - If the user confirms the warning is intentionally a no-op but gives no specific reason, use this reason exactly: "User reviewed and confirmed this upstream change does not need to be ported to the shadow."
    - Rationale: accumulated shadow drift that slips through one sync becomes a multi-hour
      remediation in the next sync (see Stage 3.5 in the April 2026 sync thread).
 1. **Environmental Validation**:
@@ -170,9 +172,12 @@ Stage 4 is split into two model-bound substages: ADVANCED analysis and FAST tran
    - Generate `prep_report.md` and `prep_manifest.json` from the explicit upstream range in `accepted_sync.json`.
    - Identify all modified, added, and deleted upstream files relative to the registry.
    - If `prep_manifest.json.discuss_paths` is non-empty, STOP before `execute_sync.py`.
+   - If `prep_manifest.json.blocker_paths` is non-empty, STOP before `execute_sync.py`.
+     Resolve by updating registry/SMD or run-specific scope, then rerun prep.
 3. **Automated Pull**:
    - Perform the automated sync by running `uv run python3 kamma/upstream_sync/scripts/execute_sync.py <thread_dir>`.
    - Review and add any run-specific exclusions to `<thread_dir>/run_exclusions.txt` before execution if needed.
+   - `execute_sync.py` pins `as_upstream` directly to the verified manifest SHA without switching branches.
    - (Commit 1 gate). Message format: `#sync: upstream pull <from>..<to>, <N> files, YYYY-MM-DD`
    - **Staging rule:** NEVER use `git add -A -- <file list>` — gitignore'd paths will trigger errors. Always use `git add .` which respects `.gitignore` automatically. If you must stage selectively, pre-filter with `git add <file>` one path at a time or check first with `git check-ignore -v <path>`.
 
@@ -261,7 +266,7 @@ The script reads `<thread_dir>/prep_manifest.json` and reports docs changes from
 1. **Full manual verification**
    - Ask user to verify everything and stay back for feedback. After correcting it, do not proceed until user explicitly says "all is good, proceed."
 2. **After sync**
-   - Update `accepted_sync.json` only after the sync is accepted and verified.
+   - If accepted, write exact FAST handoff instructions to run `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>`.
    - Review the temporary `new_improvements.md`, promote accepted items to `archive_improvements.md`, and delete the file.
 
 ---
@@ -276,7 +281,7 @@ The script reads `<thread_dir>/prep_manifest.json` and reports docs changes from
 | `dps_copies` | Shadow files mirroring upstream with shared DPS fork additions. Strict parity enforced. `dps_copies` is the single category for mixed/shared fork shadows and for local upstream shadows that are not cleanly Russian-only, SBS-only, or Tamil-only. |
 | `tamil_copies` | Shadow files mirroring upstream with Tamil additions. Strict parity enforced. Primary shadow: `db/tpd/tpd_to_lookup.py` → `db/epd/epd_to_lookup.py`. |
 | `inspired_by_upstream` | Local files derived from upstream but structurally diverged. No strict parity; backport useful improvements only. |
-| `unique_paths` | Fork-only files/dirs. Never synced. |
+| `unique_paths` | Fork-only cleanup inventory, not sync targets; no SMD entry required. |
 | `no_sync_files` | Infrastructure files that must never be overwritten. |
 | `skip_sync_patterns` | Upstream-owned or irrelevant paths excluded from Stage 1 analysis only. They are still synced unless also listed in `no_sync_files`. |
 
@@ -335,6 +340,7 @@ If a file has `discuss: true` in `registry.json`:
 ## Sync State Artifacts
 
 - `accepted_sync.json`: durable record of the last accepted upstream SHA, date, and ref.
-- `prep_manifest.json`: Stage 1 machine-readable snapshot of the active upstream range.
+- `prep_manifest.json`: Stage 1 machine-readable snapshot of the active upstream range, including `blocker_paths` that must be resolved before automated pull.
+- `reviewed_shadow_noops.json`: durable ledger of reviewed upstream shadow changes that intentionally needed no local edit. Entries are exact to the upstream-pull commit and changed path set, so future upstream changes to the same source still get flagged.
 
 These files support the 5-stage workflow. They are not a separate stage.

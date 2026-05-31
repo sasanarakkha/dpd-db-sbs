@@ -1,5 +1,7 @@
 """Verify SMD coverage checks include every upstream sync registry category."""
 
+from pathlib import Path
+
 import pytest
 from kamma.upstream_sync.scripts.verify_smd_coverage import (
     check_category_alignment,
@@ -130,3 +132,14 @@ def test_check_category_alignment_rejects_smd_registry_mismatch() -> None:
     assert violations == [
         "  [dps_copy] scripts/backup/backup_dps.py: SMD category is 'sbs_copy'"
     ]
+
+
+def test_project_smd_does_not_document_unique_local_paths() -> None:
+    entries = extract_all_smd_entries(Path("kamma/upstream_sync/smd"))
+    unique_local_entries = [
+        path
+        for path, entry in entries.items()
+        if entry.get("category") == "unique_local"
+    ]
+
+    assert unique_local_entries == []

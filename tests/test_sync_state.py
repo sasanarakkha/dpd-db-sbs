@@ -233,6 +233,7 @@ def valid_manifest_payload() -> dict[str, object]:
         "generated_at": "2026-04-08T10:00:00+08:00",
         "changed_upstream_paths": [],
         "deleted_upstream_paths": [],
+        "blocker_paths": [],
         "mapped_actions": {},
         "discuss_paths": [],
     }
@@ -244,6 +245,16 @@ def test_verify_manifest_rejects_discuss_paths_for_execution(tmp_path: Path) -> 
     write_manifest(tmp_path, payload)
 
     result = verify_manifest(str(tmp_path), allow_discuss=False)
+
+    assert result == 1
+
+
+def test_verify_manifest_rejects_blocker_paths_for_execution(tmp_path: Path) -> None:
+    payload = valid_manifest_payload()
+    payload["blocker_paths"] = ["new_unmapped.py"]
+    write_manifest(tmp_path, payload)
+
+    result = verify_manifest(str(tmp_path), allow_blockers=False)
 
     assert result == 1
 

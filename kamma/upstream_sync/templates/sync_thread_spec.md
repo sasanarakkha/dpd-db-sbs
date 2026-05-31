@@ -18,6 +18,7 @@ SBS, DPS, and Tamil localized additions.
 - FAST performed only mechanical work: commands, scripted checks, factual reports, literal edits, tests, and approved translation execution.
 - ADVANCED performed only analysis and planning: risk classification, strategy, `discuss` resolution, plan writing, and acceptance decisions.
 - Every changed upstream file was reviewed against `registry.json` and classified in `dynamic_plan.md`.
+- Any changed upstream source with no shadow edit is either ported before sync or recorded with an exact reviewed no-op in `kamma/upstream_sync/reviewed_shadow_noops.json`.
 - All changed `modified_upstream_files` have an explicit PORT, DISCUSS, or PRESERVE decision.
 - All shadow files whose upstream source changed have an explicit plan item or documented no-op reason.
 - All inspired files whose upstream source changed have an explicit backport decision or documented skip reason.

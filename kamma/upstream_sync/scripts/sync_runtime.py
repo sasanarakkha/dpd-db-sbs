@@ -44,6 +44,7 @@ def verify_manifest(
     accepted_sync_state: AcceptedSyncState | None = None,
     target_sha: str | None = None,
     allow_discuss: bool = True,
+    allow_blockers: bool = True,
 ) -> int:
     """Verify a prep manifest exists and is valid."""
     manifest_path = get_prep_manifest_path(thread_dir)
@@ -78,6 +79,15 @@ def verify_manifest(
         if not allow_discuss and discuss_paths:
             pr.red("Manifest contains discuss paths. Stop before automated pull:")
             for path in discuss_paths:
+                pr.red(f"  {path}")
+            return 1
+        blocker_paths = manifest["blocker_paths"]
+        if not isinstance(blocker_paths, list):
+            pr.red("Manifest invalid: blocker_paths must be a list")
+            return 1
+        if not allow_blockers and blocker_paths:
+            pr.red("Manifest contains blocker paths. Resolve before automated pull:")
+            for path in blocker_paths:
                 pr.red(f"  {path}")
             return 1
         pr.green(f"Manifest verified: {manifest.get('to_upstream_sha', 'unknown')}")

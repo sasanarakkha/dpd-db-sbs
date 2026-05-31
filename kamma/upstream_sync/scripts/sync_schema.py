@@ -48,6 +48,12 @@ def _string_list(data: dict[str, object], field: str) -> list[str]:
     return items
 
 
+def _optional_string_list(data: dict[str, object], field: str) -> list[str]:
+    if field not in data:
+        return []
+    return _string_list(data, field)
+
+
 def _string_mapping(data: dict[str, object], field: str) -> dict[str, str]:
     if field not in data:
         raise ValueError(f"missing required field '{field}'")
@@ -151,6 +157,7 @@ class PrepManifest:
     generated_at: str
     changed_upstream_paths: list[str]
     deleted_upstream_paths: list[str]
+    blocker_paths: list[str]
     discuss_paths: list[str]
     mapped_actions: dict[str, list[MappedAction]]
 
@@ -164,6 +171,7 @@ class PrepManifest:
         generated_at = _required_string(data, "generated_at")
         changed_upstream_paths = _string_list(data, "changed_upstream_paths")
         deleted_upstream_paths = _string_list(data, "deleted_upstream_paths")
+        blocker_paths = _optional_string_list(data, "blocker_paths")
         discuss_paths = _string_list(data, "discuss_paths")
         return cls(
             from_upstream_sha=from_upstream_sha,
@@ -172,6 +180,7 @@ class PrepManifest:
             generated_at=generated_at,
             changed_upstream_paths=changed_upstream_paths,
             deleted_upstream_paths=deleted_upstream_paths,
+            blocker_paths=blocker_paths,
             discuss_paths=discuss_paths,
             mapped_actions=cls._mapped_actions(data),
         )
@@ -207,6 +216,7 @@ class PrepManifest:
             "generated_at": self.generated_at,
             "changed_upstream_paths": self.changed_upstream_paths,
             "deleted_upstream_paths": self.deleted_upstream_paths,
+            "blocker_paths": self.blocker_paths,
             "mapped_actions": {
                 path: [action.to_json() for action in actions]
                 for path, actions in self.mapped_actions.items()

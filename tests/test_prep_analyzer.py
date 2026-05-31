@@ -69,6 +69,7 @@ def test_prep_analyzer_report_generation(
         ("M", "db/epd/epd_to_lookup.py"),  # Tamil source modified
         ("M", "scripts/bash/makedict.py"),  # Inspired source modified
         ("M", "new_file.py"),  # Untracked
+        ("A", "new_unmapped.py"),  # New upstream file needing classification
         ("D", "db/families/deleted_source.py"),  # Deleted shadow source
         ("D", "deleted_file.py"),  # Deleted
         ("M", "tests/ignore_me.py"),  # Skipped
@@ -120,11 +121,17 @@ def test_prep_analyzer_report_generation(
         "exporter/webapp/main.py",
         "exporter/webapp/templates/components/card.jinja",
         "new_file.py",
+        "new_unmapped.py",
         "scripts/bash/makedict.py",
     ]
     assert manifest["deleted_upstream_paths"] == [
         "db/families/deleted_source.py",
         "deleted_file.py",
+    ]
+    assert manifest["blocker_paths"] == [
+        "db/families/deleted_source.py",
+        "deleted_file.py",
+        "new_unmapped.py",
     ]
 
     mapped = manifest["mapped_actions"]

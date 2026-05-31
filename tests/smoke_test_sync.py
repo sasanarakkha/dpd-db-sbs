@@ -1,15 +1,15 @@
 """Smoke test for the full DPS sync pipeline — exercises DB build, exporters, webapp, Anki, and GUI."""
 
-import atexit
+import configparser
 import importlib
 import importlib.util
 import re
 import subprocess
 import sys
+from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
 from types import ModuleType
-from typing import Generator
 
 from db.db_helpers import create_db_if_not_exists, create_tables, get_db_session
 from db.models import (
@@ -30,7 +30,7 @@ from scripts.build.db_rebuild_from_tsv_dps import (
     make_root_table_data_ru,
     read_tsv_files as dps_read_tsv_files,
 )
-from tools.configger import config_read, config_update
+from tools import configger
 from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
 from tools.printer import printer as pr
@@ -38,6 +38,7 @@ from tools.printer import printer as pr
 # ─── Constants ────────────────────────────────────────────────────────────────
 
 MINI_DB_PATH = Path("temp/smoke_dpd.db")
+SMOKE_CONFIG_PATH = Path("temp/smoke_config.ini")
 ROW_LIMIT = 2000
 
 # ─── Result tracking ──────────────────────────────────────────────────────────
@@ -60,50 +61,52 @@ def record(label: str, passed: bool | None) -> None:
 
 # ─── Config isolation ─────────────────────────────────────────────────────────
 
-_CONFIG_KEYS: list[tuple[str, str]] = [
-    ("dictionary", "data_limit"),
-    ("dictionary", "make_mdict"),
-    ("regenerate", "db_rebuild"),
-    ("exporter", "make_dpd"),
-    ("exporter", "make_grammar"),
-    ("exporter", "make_deconstructor"),
-    ("exporter", "make_ebook"),
-    ("exporter", "make_tpr"),
-    ("exporter", "make_tbw"),
-    ("goldendict", "copy_unzip"),
-    ("anki", "db_path"),
-]
-_saved_config: dict[tuple[str, str], str | None] = {}
+
+def _clone_config(source: configparser.ConfigParser) -> configparser.ConfigParser:
+    """Return a writable copy of the loaded project config."""
+    clone = configparser.ConfigParser()
+    clone.read_dict({"DEFAULT": dict(source.defaults())})
+    for section in source.sections():
+        clone.add_section(section)
+        for option, value in source.items(section, raw=True):
+            clone.set(section, option, value)
+    return clone
 
 
-def save_config() -> None:
-    """Snapshot current config values."""
-    for key in _CONFIG_KEYS:
-        _saved_config[key] = config_read(key[0], key[1])
+@contextmanager
+def isolated_config() -> Generator[None, None, None]:
+    """Patch configger so smoke-test config updates never write config.ini."""
+    original_config = configger.config
+    original_config_write = configger.config_write
+    isolated = _clone_config(original_config)
 
+    def write_smoke_config() -> None:
+        SMOKE_CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with SMOKE_CONFIG_PATH.open("w", encoding="utf-8") as file:
+            isolated.write(file)
 
-def restore_config() -> None:
-    """Restore config to snapshotted values."""
-    for (section, option), value in _saved_config.items():
-        if value is not None:
-            config_update(section, option, value, silent=True)
-
-
-atexit.register(restore_config)
+    configger.config = isolated
+    configger.config_write = write_smoke_config
+    try:
+        yield
+    finally:
+        configger.config = original_config
+        configger.config_write = original_config_write
+        SMOKE_CONFIG_PATH.unlink(missing_ok=True)
 
 
 def set_smoke_config() -> None:
     """Set config values needed by the smoke test."""
-    config_update("dictionary", "data_limit", str(ROW_LIMIT), silent=True)
-    config_update("dictionary", "make_mdict", "no", silent=True)
-    config_update("regenerate", "db_rebuild", "yes", silent=True)
-    config_update("exporter", "make_dpd", "yes", silent=True)
-    config_update("exporter", "make_grammar", "yes", silent=True)
-    config_update("exporter", "make_deconstructor", "yes", silent=True)
-    config_update("exporter", "make_ebook", "yes", silent=True)
-    config_update("exporter", "make_tpr", "yes", silent=True)
-    config_update("exporter", "make_tbw", "yes", silent=True)
-    config_update("goldendict", "copy_unzip", "no", silent=True)
+    configger.config_update("dictionary", "data_limit", str(ROW_LIMIT), silent=True)
+    configger.config_update("dictionary", "make_mdict", "no", silent=True)
+    configger.config_update("regenerate", "db_rebuild", "yes", silent=True)
+    configger.config_update("exporter", "make_dpd", "yes", silent=True)
+    configger.config_update("exporter", "make_grammar", "yes", silent=True)
+    configger.config_update("exporter", "make_deconstructor", "yes", silent=True)
+    configger.config_update("exporter", "make_ebook", "yes", silent=True)
+    configger.config_update("exporter", "make_tpr", "yes", silent=True)
+    configger.config_update("exporter", "make_tbw", "yes", silent=True)
+    configger.config_update("goldendict", "copy_unzip", "no", silent=True)
 
 
 # ─── ProjectPaths monkey-patch ────────────────────────────────────────────────
@@ -159,7 +162,7 @@ def _build_mini_db() -> bool:
                 if k not in ("user_id", "created_at", "updated_at")
             }
             db_session.add(DpdHeadword(**data))
-            loaded_ids.add(str(row[0]))
+            loaded_ids.add(row[0])
             hw_count += 1
         pr.yes(hw_count)
 
@@ -856,7 +859,7 @@ def phase3_anki() -> bool | None:
     since this is a mini DB limitation, not a code defect.
     """
     pr.yellow_title("=== Phase 3.2: Anki updater ===")
-    anki_path_str = config_read("anki", "db_path", "")
+    anki_path_str = configger.config_read("anki", "db_path", "")
     anki_path = Path(anki_path_str) if anki_path_str else None
     if not anki_path or not anki_path.exists():
         pr.cyan("  Anki DB not configured — skipping")
@@ -867,7 +870,7 @@ def phase3_anki() -> bool | None:
     smoke_anki = Path("temp/smoke_anki.anki2")
     try:
         shutil.copy2(anki_path, smoke_anki)
-        config_update("anki", "db_path", str(smoke_anki), silent=True)
+        configger.config_update("anki", "db_path", str(smoke_anki), silent=True)
 
         with patched_project_paths():
             import importlib
@@ -884,7 +887,7 @@ def phase3_anki() -> bool | None:
         pr.cyan(f"  Anki skipped (mini DB has no matching notes): {exc}")
         return None
     finally:
-        config_update("anki", "db_path", anki_path_str, silent=True)
+        configger.config_update("anki", "db_path", anki_path_str, silent=True)
         if smoke_anki.exists():
             smoke_anki.unlink()
 
@@ -929,24 +932,23 @@ def main() -> None:
     pr.tic()
     pr.yellow_title("DPS Sync Smoke Test")
 
-    save_config()
     try:
-        set_smoke_config()
+        with isolated_config():
+            set_smoke_config()
 
-        phase0_static()
+            phase0_static()
 
-        ok1 = phase1()
-        if ok1:
-            phase2()
-        else:
-            record("Phase 2 (skipped — Phase 1 failed)", None)
+            ok1 = phase1()
+            if ok1:
+                phase2()
+            else:
+                record("Phase 2 (skipped — Phase 1 failed)", None)
 
-        record("3.1 webapp", phase3_webapp())
-        record("3.2 anki", phase3_anki())
-        record("3.3 gui", phase3_gui())
+            record("3.1 webapp", phase3_webapp())
+            record("3.2 anki", phase3_anki())
+            record("3.3 gui", phase3_gui())
 
     finally:
-        restore_config()
         cleanup_temp()
 
     pr.yellow_title("=== Summary ===")

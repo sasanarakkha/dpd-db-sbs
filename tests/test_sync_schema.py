@@ -147,6 +147,7 @@ def valid_manifest_payload() -> dict[str, object]:
         "generated_at": "2026-05-31T12:00:00+08:00",
         "changed_upstream_paths": ["db/models.py"],
         "deleted_upstream_paths": ["old.py"],
+        "blocker_paths": ["new_unmapped.py"],
         "discuss_paths": ["db/models.py"],
         "mapped_actions": {
             "db/models.py": [
@@ -168,8 +169,10 @@ def test_prep_manifest_from_raw_valid_with_current_fields() -> None:
     assert manifest.target_upstream_ref == "upstream/main"
     assert manifest.changed_upstream_paths == ["db/models.py"]
     assert manifest.deleted_upstream_paths == ["old.py"]
+    assert manifest.blocker_paths == ["new_unmapped.py"]
     assert manifest.discuss_paths == ["db/models.py"]
     assert manifest.mapped_actions["db/models.py"][0].category == "russian_copy"
+    assert manifest.to_json()["blocker_paths"] == ["new_unmapped.py"]
     assert manifest.to_json()["mapped_actions"] == {
         "db/models.py": [
             {
@@ -223,6 +226,16 @@ def test_prep_manifest_from_raw_rejects_invalid_payload(
 
     with pytest.raises(ValueError, match=expected_error):
         PrepManifest.from_raw(payload)
+
+
+def test_prep_manifest_from_raw_accepts_legacy_payload_without_blockers() -> None:
+    payload = valid_manifest_payload()
+    payload.pop("blocker_paths")
+
+    manifest = PrepManifest.from_raw(payload)
+
+    assert manifest.blocker_paths == []
+    assert manifest.to_json()["blocker_paths"] == []
 
 
 def valid_registry_payload() -> dict[str, object]:

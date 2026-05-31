@@ -37,6 +37,7 @@ For the full protocol, see **[guide.md](./guide.md)**.
 | `uv run python3 kamma/upstream_sync/scripts/execute_sync.py <thread_dir>` | Robustly execute selective sync from upstream. |
 | `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>` | Advance accepted sync metadata after Stage 5 acceptance. |
 | `uv run pytest tests/test_shadow_parity.py` | Verify strict shadow parity with upstream. |
+| `uv run python3 tests/check_shadow_modifications.py` | Verify changed upstream sources have matching shadow edits or reviewed no-op entries. |
 | `uv run pytest tests/test_namespace_isolation.py` | Enforce symbol naming policy on localized files. |
 | `uv run pytest tests/test_template_syntax.py` | Detect legacy Mako syntax in Jinja2 templates. |
 
@@ -44,6 +45,7 @@ For the full protocol, see **[guide.md](./guide.md)**.
 
 - **[guide.md](./guide.md)**: Canonical process reference and naming policy.
 - **[accepted_sync.json](./accepted_sync.json)**: Last accepted upstream sync point.
+- **[reviewed_shadow_noops.json](./reviewed_shadow_noops.json)**: Exact reviewed no-op ledger for changed upstream sources that intentionally need no shadow edit.
 - **[smd/index.md](./smd/index.md)**: Per-file merge guidance (Sync Metadata).
 - **[registry.json](./registry.json)**: Source of truth for file mappings and categories.
 - **[archive_improvements.md](./archive_improvements.md)**: Accumulated lessons from past runs. (Note: `new_improvements.md` is a strictly temporary file used during syncs and must not be committed).
@@ -55,5 +57,5 @@ For the full protocol, see **[guide.md](./guide.md)**.
 - `dps_copies`: Strict DPS fork shadows (Parity enforced). `dps_copies` is the single category for mixed/shared fork shadows, including local upstream shadows that combine Russian, SBS, Tamil, or general DPS behavior.
 - `tamil_copies`: Strict Tamil shadows (Parity enforced).
 - `inspired_by_upstream`: Structural divergences (Selective backporting).
-- `unique_paths`: Fork-only files (No sync).
+- `unique_paths`: Fork-only cleanup inventory, not sync targets; no SMD entry required.
 - `skip_sync_patterns`: Upstream-owned or irrelevant paths excluded from Stage 1 analysis only; still synced unless also listed in `no_sync_files`.

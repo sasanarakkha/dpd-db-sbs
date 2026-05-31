@@ -5,30 +5,139 @@ import json
 import re
 import subprocess
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
 from kamma.upstream_sync.scripts.registry_helper import get_shadow_mappings_by_category
 
 REGISTRY_PATH = Path("kamma/upstream_sync/registry.json")
+NOOP_LEDGER_PATH = Path("kamma/upstream_sync/reviewed_shadow_noops.json")
 
 
-def get_modified_files(command: str) -> set[str]:
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+@dataclass(frozen=True)
+class ReviewedShadowNoop:
+    """A reviewed upstream shadow change that intentionally needs no local edit."""
+
+    sync_commit: str
+    source: str
+    shadow: str
+    changed_paths: frozenset[str]
+    reason: str
+
+
+def get_modified_files(command: list[str]) -> set[str]:
+    result = subprocess.run(command, capture_output=True, text=True, check=False)
     return set(filter(None, result.stdout.split("\n")))
 
 
 def get_last_sync_commit() -> str:
     result = subprocess.run(
-        "git log --grep='sync:' --oneline -n 1",
-        shell=True,
+        [
+            "git",
+            "log",
+            "--grep=#sync: upstream pull",
+            "--format=%H",
+            "-n",
+            "1",
+        ],
         capture_output=True,
         text=True,
+        check=False,
     )
     if result.stdout:
-        match = re.match(r"^([a-f0-9]+)", result.stdout.strip())
+        match = re.match(r"^([a-f0-9]+)$", result.stdout.strip())
         if match:
             return match.group(1)
     return "HEAD^"
+
+
+def require_string(entry: dict[str, object], field: str, label: str) -> str:
+    """Read a required non-empty string field from a no-op ledger entry."""
+    value = entry.get(field)
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"{label}: field '{field}' must be a non-empty string")
+    return value
+
+
+def require_string_list(entry: dict[str, object], field: str, label: str) -> list[str]:
+    """Read a required non-empty string list field from a no-op ledger entry."""
+    value = entry.get(field)
+    if not isinstance(value, list):
+        raise ValueError(f"{label}: field '{field}' must be a list")
+
+    paths: list[str] = []
+    for index, item in enumerate(value):
+        if not isinstance(item, str) or not item.strip():
+            raise ValueError(
+                f"{label}: field '{field}[{index}]' must be a non-empty string"
+            )
+        paths.append(item)
+
+    if not paths:
+        raise ValueError(f"{label}: field '{field}' must not be empty")
+    if len(set(paths)) != len(paths):
+        raise ValueError(f"{label}: field '{field}' must not contain duplicates")
+    return paths
+
+
+def load_reviewed_shadow_noops(
+    path: Path = NOOP_LEDGER_PATH,
+) -> list[ReviewedShadowNoop]:
+    """Load and validate reviewed shadow no-op entries."""
+    if not path.exists():
+        return []
+
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(raw, list):
+        raise ValueError("reviewed shadow no-op ledger must be a JSON list")
+
+    noops: list[ReviewedShadowNoop] = []
+    seen: set[tuple[str, str, str, frozenset[str]]] = set()
+    for index, item in enumerate(raw):
+        label = f"reviewed_shadow_noops[{index}]"
+        if not isinstance(item, dict):
+            raise ValueError(f"{label}: entry must be an object")
+
+        entry: dict[str, object] = item
+        sync_commit = require_string(entry, "sync_commit", label)
+        source = require_string(entry, "source", label)
+        shadow = require_string(entry, "shadow", label)
+        changed_paths = frozenset(require_string_list(entry, "changed_paths", label))
+        reason = require_string(entry, "reason", label)
+
+        key = (sync_commit, source, shadow, changed_paths)
+        if key in seen:
+            raise ValueError(f"{label}: duplicate reviewed no-op entry")
+        seen.add(key)
+
+        noops.append(
+            ReviewedShadowNoop(
+                sync_commit=sync_commit,
+                source=source,
+                shadow=shadow,
+                changed_paths=changed_paths,
+                reason=reason,
+            )
+        )
+    return noops
+
+
+def is_reviewed_noop(
+    noops: list[ReviewedShadowNoop],
+    sync_commit: str,
+    source: str,
+    shadow: str,
+    changed_paths: list[str],
+) -> bool:
+    """Return True only when a reviewed no-op exactly matches this warning."""
+    changed_path_set = frozenset(changed_paths)
+    return any(
+        noop.sync_commit == sync_commit
+        and noop.source == source
+        and noop.shadow == shadow
+        and noop.changed_paths == changed_path_set
+        for noop in noops
+    )
 
 
 def check_shadows() -> None:
@@ -37,17 +146,24 @@ def check_shadows() -> None:
         sys.exit(1)
 
     registry: dict[str, object] = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+    try:
+        reviewed_noops = load_reviewed_shadow_noops(NOOP_LEDGER_PATH)
+    except ValueError as exc:
+        print(f"Error: {NOOP_LEDGER_PATH}: {exc}")
+        sys.exit(1)
 
     sync_commit = get_last_sync_commit()
     print(f"ℹ️  Checking modifications relative to sync commit: {sync_commit}")
 
     # 1. Upstream sources modified in the sync commit
     upstream_modified = get_modified_files(
-        f"git show --name-only --format='' {sync_commit}"
+        ["git", "show", "--name-only", "--format=", sync_commit]
     )
 
     # 2. Shadows modified since the sync commit (including uncommitted)
-    local_modified = get_modified_files(f"git diff {sync_commit}^ --name-only")
+    local_modified = get_modified_files(
+        ["git", "diff", f"{sync_commit}^", "--name-only"]
+    )
 
     all_mappings: list[tuple[str, str, str]] = []
     category_labels = {
@@ -85,7 +201,13 @@ def check_shadows() -> None:
                 if shadow in local_modified:
                     shadow_is_modified = True
 
-            if not shadow_is_modified:
+            if not shadow_is_modified and not is_reviewed_noop(
+                reviewed_noops,
+                sync_commit=sync_commit,
+                source=source,
+                shadow=shadow,
+                changed_paths=modified_source_files,
+            ):
                 unmodified_shadows.append(
                     {
                         "category": category,

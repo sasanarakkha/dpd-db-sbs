@@ -12,6 +12,7 @@ All upstream sync assets live in `kamma/upstream_sync/`.
 |---|---|
 | `registry.json` | Machine-readable map of every file that diverges from upstream |
 | `accepted_sync.json` | Last accepted upstream SHA/date/ref used to anchor Stage 1 |
+| `reviewed_shadow_noops.json` | Exact reviewed no-op ledger for changed upstream sources that intentionally need no shadow edit |
 | `smd/` | Shadow Module Descriptions (Directory) — per-file merge guidance |
 | `guide.md` | Process reference: category definitions, 5-stage workflow, model responsibilities, naming policy |
 | `archive_improvements.md` | Accumulated lessons from all past sync runs |
@@ -41,7 +42,7 @@ All upstream sync assets live in `kamma/upstream_sync/`.
 | `dps_copies` | Shadow copies mirroring upstream with shared DPS fork additions (Strict parity). `dps_copies` is the single category for mixed/shared fork shadows. |
 | `tamil_copies` | Shadow copies mirroring upstream with Tamil additions (Strict parity) |
 | `inspired_by_upstream` | Local files derived from upstream but structurally diverged (Selective backporting) |
-| `unique_paths` | Files that exist only in this fork — never sync these from upstream |
+| `unique_paths` | Fork-only cleanup inventory, not sync targets; no SMD entry required |
 | `no_sync_files` | Infrastructure files to skip entirely during sync |
 | `skip_sync_patterns` | Upstream-owned or irrelevant paths excluded from Stage 1 analysis only; still synced unless also listed in `no_sync_files` |
 
@@ -109,7 +110,7 @@ Generates `prep_report.md` and `prep_manifest.json` by diffing the explicit upst
 |---|---|
 | `scripts/execute_sync.py` | Robustly executes selective sync from upstream |
 | `tests/test_shadow_parity.py` | Verifies structural parity of strict shadows |
-| `tests/check_shadow_modifications.py` | Checks shadows updated after upstream change |
+| `tests/check_shadow_modifications.py` | Checks shadows updated after upstream change, unless an exact reviewed no-op entry exists in `reviewed_shadow_noops.json` |
 | `tests/test_shadow_cleanup.py` | Finds orphaned files |
 | `tests/test_namespace_isolation.py` | Enforces symbol naming policy |
 | `tests/test_template_syntax.py` | Detects legacy Mako syntax |

@@ -131,10 +131,11 @@ def execute_sync(thread_dir: str | None, dry_run: bool = False) -> int:
                     accepted_sync_state=state,
                     target_sha=target_sha,
                     allow_discuss=False,
+                    allow_blockers=False,
                 )
                 != 0
             ):
-                pr.red("Manifest verification failed. Stop before checkout/reset.")
+                pr.red("Manifest verification failed. Stop before checkout.")
                 return 1
             else:
                 pr.yes("ok")
@@ -152,18 +153,16 @@ def execute_sync(thread_dir: str | None, dry_run: bool = False) -> int:
             pr.green("Dry run: skipping actual git operations.")
             return 0
 
-        # 4. Update as_upstream
-        pr.green("updating as_upstream")
-        run_git(["git", "checkout", "as_upstream"])
-        run_git(["git", "reset", "--hard", target_sha])
-        pr.yes("ok")
-
-        # 5. Switch to sbs-ru and sync
-        pr.green("switching to sbs-ru")
-        run_git(["git", "checkout", "sbs-ru"])
+        # 4. Record original state and pin as_upstream without branch switching
+        pr.green("recording original sbs-ru sha")
         sbs_ru_original_sha = run_git(["git", "rev-parse", "HEAD"]).stdout.strip()
+        pr.yes(sbs_ru_original_sha)
+
+        pr.green("updating as_upstream")
+        run_git(["git", "update-ref", "refs/heads/as_upstream", target_sha])
         pr.yes("ok")
 
+        # 5. Sync upstream-tracked paths into the current sbs-ru worktree
         pr.green("performing checkout from as_upstream")
         run_git(["git", "checkout", "as_upstream", "--", "."])
         pr.yes("ok")

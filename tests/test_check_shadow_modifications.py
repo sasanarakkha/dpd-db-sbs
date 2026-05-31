@@ -1,10 +1,33 @@
 """Verify shadow-modification checks include every strict-shadow category."""
 
+import importlib.util
+import json
+import subprocess
+from pathlib import Path
+from types import ModuleType
+from unittest.mock import MagicMock
+
+import pytest
+
 from kamma.upstream_sync.scripts.registry_helper import get_shadow_mappings_by_category
 
 
+def load_shadow_modification_script() -> ModuleType:
+    """Load the shadow modification script as a testable module."""
+    script_path = Path("tests/check_shadow_modifications.py")
+    spec = importlib.util.spec_from_file_location(
+        "check_shadow_modifications_script",
+        script_path,
+    )
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Unable to load {script_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def test_get_shadow_mappings_by_category_includes_dps() -> None:
-    data = {
+    data: dict[str, object] = {
         "russian_copies": {"a_ru.py": "a.py"},
         "sbs_copies": {"a_sbs.py": "a.py"},
         "dps_copies": {"a_dps.py": "a.py"},
@@ -15,3 +38,172 @@ def test_get_shadow_mappings_by_category_includes_dps() -> None:
     assert mappings["russian_copy"] == {"a_ru.py": "a.py"}
     assert mappings["sbs_copy"] == {"a_sbs.py": "a.py"}
     assert mappings["dps_copy"] == {"a_dps.py": "a.py"}
+
+
+def test_get_last_sync_commit_uses_latest_upstream_pull(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = load_shadow_modification_script()
+    mock_run = MagicMock()
+    mock_run.return_value = subprocess.CompletedProcess(
+        args=[],
+        returncode=0,
+        stdout="cc60ac42abcdef\n",
+        stderr="",
+    )
+    monkeypatch.setattr(module.subprocess, "run", mock_run)
+
+    commit = module.get_last_sync_commit()
+
+    assert commit == "cc60ac42abcdef"
+    mock_run.assert_called_once_with(
+        [
+            "git",
+            "log",
+            "--grep=#sync: upstream pull",
+            "--format=%H",
+            "-n",
+            "1",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
+def test_get_modified_files_runs_git_without_shell(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = load_shadow_modification_script()
+    mock_run = MagicMock()
+    mock_run.return_value = subprocess.CompletedProcess(
+        args=[],
+        returncode=0,
+        stdout="db/models.py\n\nexporter/webapp/main.py\n",
+        stderr="",
+    )
+    monkeypatch.setattr(module.subprocess, "run", mock_run)
+
+    files = module.get_modified_files(
+        ["git", "show", "--name-only", "--format=", "abc123"]
+    )
+
+    assert files == {"db/models.py", "exporter/webapp/main.py"}
+    mock_run.assert_called_once_with(
+        ["git", "show", "--name-only", "--format=", "abc123"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
+def test_reviewed_noop_requires_exact_match(tmp_path: Path) -> None:
+    module = load_shadow_modification_script()
+    ledger_path = tmp_path / "reviewed_shadow_noops.json"
+    ledger_path.write_text(
+        json.dumps(
+            [
+                {
+                    "sync_commit": "abc123",
+                    "source": "source/",
+                    "shadow": "shadow/",
+                    "changed_paths": ["source/a.py", "source/b.py"],
+                    "reason": "Reviewed and intentionally not ported.",
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    noops = module.load_reviewed_shadow_noops(ledger_path)
+
+    assert module.is_reviewed_noop(
+        noops,
+        sync_commit="abc123",
+        source="source/",
+        shadow="shadow/",
+        changed_paths=["source/b.py", "source/a.py"],
+    )
+    assert not module.is_reviewed_noop(
+        noops,
+        sync_commit="abc123",
+        source="source/",
+        shadow="shadow/",
+        changed_paths=["source/a.py", "source/c.py"],
+    )
+    assert not module.is_reviewed_noop(
+        noops,
+        sync_commit="future456",
+        source="source/",
+        shadow="shadow/",
+        changed_paths=["source/a.py", "source/b.py"],
+    )
+
+
+def test_reviewed_noop_rejects_missing_reason(tmp_path: Path) -> None:
+    module = load_shadow_modification_script()
+    ledger_path = tmp_path / "reviewed_shadow_noops.json"
+    ledger_path.write_text(
+        json.dumps(
+            [
+                {
+                    "sync_commit": "abc123",
+                    "source": "source/",
+                    "shadow": "shadow/",
+                    "changed_paths": ["source/a.py"],
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="reason"):
+        module.load_reviewed_shadow_noops(ledger_path)
+
+
+def test_check_shadows_skips_reviewed_noop(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    module = load_shadow_modification_script()
+    registry_path = tmp_path / "registry.json"
+    ledger_path = tmp_path / "reviewed_shadow_noops.json"
+    registry_path.write_text(
+        json.dumps(
+            {
+                "russian_copies": {"shadow/": "source/"},
+                "sbs_copies": {},
+                "dps_copies": {},
+                "tamil_copies": {},
+            }
+        ),
+        encoding="utf-8",
+    )
+    ledger_path.write_text(
+        json.dumps(
+            [
+                {
+                    "sync_commit": "abc123",
+                    "source": "source/",
+                    "shadow": "shadow/",
+                    "changed_paths": ["source/a.py"],
+                    "reason": "Reviewed and intentionally not ported.",
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(module, "REGISTRY_PATH", registry_path)
+    monkeypatch.setattr(module, "NOOP_LEDGER_PATH", ledger_path)
+    monkeypatch.setattr(module, "get_last_sync_commit", lambda: "abc123")
+    monkeypatch.setattr(
+        module,
+        "get_modified_files",
+        MagicMock(side_effect=[{"source/a.py"}, set()]),
+    )
+
+    with pytest.raises(SystemExit) as exc_info:
+        module.check_shadows()
+
+    assert exc_info.value.code == 0
