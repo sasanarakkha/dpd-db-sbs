@@ -90,6 +90,16 @@ model-boundary aware, and better validated for RU/SBS/DPS/Tamil localized files.
   and whitespace-padded exclusion paths before they can be restored or removed.
 - `check_docs_parity.py <thread_dir>` now reports missing or invalid
   `prep_manifest.json` cleanly instead of tracebacking.
+- `execute_sync.py` now also rejects option-like exclusion paths and git
+  pathspec metacharacters, preserves raw `run_exclusions.txt` whitespace for
+  validation, and passes restored/removed paths after `--`.
+- `verify_smd_coverage.py` now rejects unknown SMD `Sync Rule` values.
+- The two prior-sync shadow warnings are now exact reviewed no-op entries:
+  RU Kindle titlepage update date/time is local-build metadata, and DPS backup
+  TSVs intentionally do not mirror upstream chunk splitting because they are
+  small localized backups.
+- SMD guidance now documents both no-op rules so future syncs do not attempt to
+  port those date/time or chunking-only upstream changes.
 
 ## Main Files
 
@@ -155,10 +165,9 @@ git diff --check -- kamma/upstream_sync/README.md kamma/upstream_sync/guide.md k
 ```
 
 Result: all passed. Focused no-op/doc/smoke tests reported 29 passed. Broader
-focused upstream-sync suite reported 127 passed. The live command
-`uv run python3 tests/check_shadow_modifications.py` intentionally still fails
-until the two prior-sync warnings listed under Current State are either ported
-or recorded in the reviewed no-op ledger.
+focused upstream-sync suite reported 127 passed. At that time, the live command
+`uv run python3 tests/check_shadow_modifications.py` still failed until the two
+prior-sync warnings were either ported or recorded in the reviewed no-op ledger.
 
 Most recent validation for full-SHA, SMD stale-entry, exclusion-path, and docs
 manifest-error hardening:
@@ -178,6 +187,29 @@ git diff --check -- kamma/upstream_sync/accepted_sync.json kamma/upstream_sync/s
 Result: all passed. The focused upstream-sync suite reported 135 passed.
 Standalone docs parity passed. `verify_smd_coverage.py` now reports 67
 registry paths and 67 SMD entries, with no unregistered SMD entries.
+
+Most recent validation for exclusion-path/SMD-rule hardening and reviewed
+shadow no-op documentation:
+
+```fish
+uv run pytest tests/test_execute_sync.py tests/test_verify_smd_coverage.py -q
+uv run ruff check --fix kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/verify_smd_coverage.py tests/test_execute_sync.py tests/test_verify_smd_coverage.py
+uv run ruff format kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/verify_smd_coverage.py tests/test_execute_sync.py tests/test_verify_smd_coverage.py
+uv run pyright kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/verify_smd_coverage.py tests/test_execute_sync.py tests/test_verify_smd_coverage.py
+uv run --with pyrefly pyrefly check --min-severity warn kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/verify_smd_coverage.py tests/test_execute_sync.py tests/test_verify_smd_coverage.py
+uv run pytest tests/test_sync_schema.py tests/test_sync_state.py tests/test_prep_analyzer.py tests/test_execute_sync.py tests/test_finalize_accepted_sync.py tests/test_validate_registry.py tests/test_verify_smd_coverage.py tests/test_check_docs_parity.py tests/test_upstream_sync_docs_policy.py tests/test_registry_category_naming.py tests/test_check_shadow_modifications.py tests/test_smoke_test_sync.py -q
+uv run python3 kamma/upstream_sync/scripts/validate_registry.py
+uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py
+uv run python3 tests/check_shadow_modifications.py
+uv run pytest tests/test_check_shadow_modifications.py tests/test_verify_smd_coverage.py -q
+git diff --check -- kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/verify_smd_coverage.py tests/test_execute_sync.py tests/test_verify_smd_coverage.py kamma/upstream_sync/reviewed_shadow_noops.json kamma/upstream_sync/smd/exporter.md kamma/upstream_sync/smd/scripts.md
+```
+
+Result: all passed. Red phase was confirmed first for the new execute-sync and
+SMD-rule tests. Focused hardening tests reported 27 passed; broader
+upstream-sync suite reported 140 passed with one third-party aksharamukha
+deprecation warning. Reviewed no-op/SMD tests reported 17 passed. The live
+shadow modification check is now clean.
 
 ## Mistakes To Avoid
 
@@ -210,7 +242,8 @@ registry paths and 67 SMD entries, with no unregistered SMD entries.
 - Do not add SMD entries for paths outside sync-relevant registry categories.
   `unique_paths` and `no_sync_files` are intentionally not SMD-covered.
 - Keep `execute_sync.py` exclusion paths repo-relative; never allow absolute
-  paths or `..` traversal in `run_exclusions.txt` or registry exclusions.
+  paths, `..` traversal, backslashes, surrounding whitespace, leading `-`, or
+  git pathspec metacharacters in `run_exclusions.txt` or registry exclusions.
 - `check_docs_parity.py <thread_dir>` should fail cleanly if the thread
   manifest is missing or malformed; do not let the traceback return.
 - Do not add reviewed no-op ledger entries without inspecting the upstream diff
@@ -219,9 +252,9 @@ registry paths and 67 SMD entries, with no unregistered SMD entries.
   `User reviewed and confirmed this upstream change does not need to be ported to the shadow.`
 - Do not use `unique_paths` for shadow no-op decisions. `unique_paths` is only
   cleanup inventory and is outside the monthly shadow sync process.
-- Do not mark the current two shadow warnings reviewed without reviewing their
-  upstream diffs; the checker exposed prior-sync decisions that were not yet
-  recorded.
+- Do not add or modify reviewed shadow no-op entries without reviewing the
+  upstream diff and recording the exact reason. The current two prior-sync
+  warnings were reviewed and recorded with explicit user approval.
 - Patch against current file text. A past patch failed because docs wording had
   already diverged.
 - Avoid complex multiline `rg` regexes for verification; use simple literal
@@ -238,33 +271,33 @@ registry paths and 67 SMD entries, with no unregistered SMD entries.
 - The separate review's recommended hardening was implemented: manifest
   `blocker_paths`, direct `as_upstream` pinning, full-SHA finalization, and
   Stage 5 finalization wording.
-- The later standalone review hardening was implemented except for the two live
-  shadow warnings: full-SHA schema enforcement, stale SMD entry rejection,
-  repo-relative sync exclusion validation, and clean docs manifest errors.
+- The later standalone review hardening was implemented: full-SHA schema
+  enforcement, stale SMD entry rejection, stricter sync exclusion validation,
+  unknown SMD rule rejection, clean docs manifest errors, and reviewed no-op
+  handling for the two prior-sync shadow warnings.
 - The typed-hardening thread was finalized and archived at
   `kamma/archive/20260531_upstream_sync_typed_hardening`.
 - This legacy thread directory currently exists as a compact handoff location.
   Do not assume `spec.md` or `plan.md` exist here; inspect the directory first.
-- `reviewed_shadow_noops.json` exists and is intentionally empty until a human
-  reviewed no-port decision is recorded.
-- The live shadow modification check currently fails on two prior-sync warnings:
-  `exporter/kindle/epub/` to `exporter/kindle/ru_components/epub/` for
-  `exporter/kindle/epub/OEBPS/Text/titlepage.xhtml`, and
-  `db/backup_tsv/backup_dpd_headwords_and_roots.py` to
-  `scripts/backup/backup_dps.py` for
-  `db/backup_tsv/backup_dpd_headwords_and_roots.py`.
-- These warnings are linked in `registry.json`; they are not unique-path cleanup
-  items. Resolve them by porting the upstream change or adding exact reviewed
-  no-op entries after review.
+- `reviewed_shadow_noops.json` contains two reviewed entries from sync commit
+  `cc60ac42a91339f3e5c7c515aaa7c17610410b06`: RU Kindle titlepage date/time
+  is locally generated, and DPS backup TSVs intentionally do not use upstream
+  chunk splitting because the localized backups are small.
+- The live shadow modification check is clean after those reviewed no-op
+  entries.
 - The smoke sync test now uses temporary config isolation. Do not reintroduce
   writes to `config.ini`.
 - No agent-side git commit was made.
 - User manual review may still be needed for any uncommitted working-tree
   changes.
-- Current uncommitted working-tree changes from this improvement touch
-  `kamma/upstream_sync/accepted_sync.json`, four upstream-sync scripts, two SMD
-  files, and focused tests for sync schema/state, prep analyzer, execute sync,
-  finalize accepted sync, SMD coverage, and docs parity.
+- Current uncommitted working-tree changes from this standalone review touch
+  `kamma/upstream_sync/scripts/execute_sync.py`,
+  `kamma/upstream_sync/scripts/verify_smd_coverage.py`,
+  `kamma/upstream_sync/reviewed_shadow_noops.json`,
+  `kamma/upstream_sync/smd/exporter.md`,
+  `kamma/upstream_sync/smd/scripts.md`,
+  `tests/test_execute_sync.py`,
+  `tests/test_verify_smd_coverage.py`, and this handoff.
 
 ## Errors, Issues, and Repeated Mistakes
 
@@ -276,10 +309,15 @@ registry paths and 67 SMD entries, with no unregistered SMD entries.
   the previous upstream sync. They were not fixed in this scope because the user
   asked for the no-op recording mechanism and handoff update, not porting those
   changes.
-- The live shadow check failure is expected while
-  `reviewed_shadow_noops.json` is empty and the two warnings remain unported.
+- The two prior-sync shadow warnings were reviewed with upstream diffs and
+  recorded as exact no-op entries after user confirmation. The live shadow
+  check now passes.
 - Red phase was confirmed for this hardening: new tests initially failed on
   missing `check_unregistered_smd_entries` and `validate_repo_relative_paths`.
+- Red phase was confirmed for the latest hardening: new tests initially failed
+  on padded `run_exclusions.txt` path acceptance, missing leading-`-` and
+  pathspec rejection, missing `--` path separation for restore, and missing
+  unknown SMD rule rejection.
 - Stricter SMD validation exposed 12 obsolete SMD entries for non-sync targets;
   those entries were removed, not reclassified into the registry.
 - `tests/test_sync_state.py` also needed full-SHA fixtures after schema
@@ -292,6 +330,7 @@ registry paths and 67 SMD entries, with no unregistered SMD entries.
 ## Recent Recommended Commit Messages
 
 ```text
+#sync tooling: harden exclusions and document reviewed noops
 #sync tooling: harden sync metadata validators
 #sync tooling: add reviewed shadow noop ledger
 #sync docs: clarify unique cleanup inventory

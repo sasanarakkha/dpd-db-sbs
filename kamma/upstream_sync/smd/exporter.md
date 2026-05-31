@@ -240,8 +240,10 @@
 - **Local Changes**:
   1. Russian-language EPUB structural files (OEBPS/content.opf, titlepage.xhtml).
   2. Metadata (title, creator, language="ru") set to Russian fork values.
+  3. `titlepage.xhtml` update date/time is generated locally for the Russian Kindle build; upstream date/time-only changes are intentionally not ported.
 - **Watch For**:
   - Navigation entries in `content.opf` must match the generated letter files.
+  - Do not sync upstream `titlepage.xhtml` update date/time into the Russian shadow; only port structural or metadata changes.
 
 ---
 

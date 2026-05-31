@@ -69,6 +69,7 @@ def run_git(args: list[str], check: bool = True) -> subprocess.CompletedProcess:
 def validate_repo_relative_paths(paths: Iterable[str], label: str) -> list[str]:
     """Validate git pathspecs that may later be restored or removed."""
     validated: list[str] = []
+    git_pathspec_chars = set("*?[]")
     for index, path in enumerate(paths):
         item_label = f"{label}[{index}]"
         if not path.strip():
@@ -77,6 +78,12 @@ def validate_repo_relative_paths(paths: Iterable[str], label: str) -> list[str]:
             raise ValueError(f"{item_label} must not contain surrounding whitespace")
         if "\\" in path:
             raise ValueError(f"{item_label} must use forward slashes")
+        if path.startswith("-"):
+            raise ValueError(f"{item_label} must not start with '-'")
+        if any(char in path for char in git_pathspec_chars):
+            raise ValueError(
+                f"{item_label} must not contain git pathspec metacharacters"
+            )
         posix_path = PurePosixPath(path)
         if posix_path.is_absolute() or path.startswith("~"):
             raise ValueError(f"{item_label} must be a repo-relative path")
@@ -108,8 +115,8 @@ def get_run_specific_exclusions(thread_dir: str | None) -> list[str]:
     exclusions = []
     with exclusions_path.open("r", encoding="utf-8") as f:
         for line in f:
-            line = line.strip()
-            if line and not line.startswith("#"):
+            line = line.rstrip("\n\r")
+            if line.strip() and not line.lstrip().startswith("#"):
                 exclusions.append(line)
     return validate_repo_relative_paths(exclusions, "run-specific exclusions")
 
@@ -212,6 +219,7 @@ def execute_sync(thread_dir: str | None, dry_run: bool = False) -> int:
                         sbs_ru_original_sha,
                         "--staged",
                         "--worktree",
+                        "--",
                         path,
                     ]
                 )
@@ -219,7 +227,17 @@ def execute_sync(thread_dir: str | None, dry_run: bool = False) -> int:
             else:
                 # File did not exist in sbs-ru, if it exists now (from as_upstream), remove it
                 if Path(path).exists():
-                    run_git(["git", "rm", "-r", "--cached", "--ignore-unmatch", path])
+                    run_git(
+                        [
+                            "git",
+                            "rm",
+                            "-r",
+                            "--cached",
+                            "--ignore-unmatch",
+                            "--",
+                            path,
+                        ]
+                    )
                     # If it's a directory, rm -rf
                     if Path(path).is_dir():
                         import shutil

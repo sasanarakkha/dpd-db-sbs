@@ -85,6 +85,18 @@ def test_check_rubric_strict_requires_min() -> None:
     assert any("only 1 local-change(s), need 2" in v for v in violations)
 
 
+def test_check_rubric_rejects_unknown_sync_rule() -> None:
+    entry: dict[str, object] = {
+        "sync_rule": "COPY_MAYBE",
+        "local_changes_count": 2,
+        "watch_for_count": 1,
+    }
+
+    violations = check_rubric("path", "category", entry)
+
+    assert violations == ["  [category] path: unknown Sync Rule 'COPY_MAYBE'"]
+
+
 def test_collect_registry_paths_includes_russian_copies() -> None:
     data: dict[str, object] = {
         "modified_upstream_files": [],

@@ -78,11 +78,21 @@ class TestExecuteSync(unittest.TestCase):
     def test_get_run_specific_exclusions_with_file(self):
         exclusions_file = self.thread_dir / "run_exclusions.txt"
         exclusions_file.write_text(
-            "path/to/file1\n# comment\n  path/to/file2  \n\n", encoding="utf-8"
+            "path/to/file1\n# comment\npath/to/file2\n\n", encoding="utf-8"
         )
 
         exclusions = get_run_specific_exclusions(str(self.thread_dir))
         self.assertEqual(exclusions, ["path/to/file1", "path/to/file2"])
+
+    def test_get_run_specific_exclusions_rejects_padded_path(self):
+        exclusions_file = self.thread_dir / "run_exclusions.txt"
+        exclusions_file.write_text("  path/to/file  \n", encoding="utf-8")
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "run-specific exclusions\\[0\\] must not contain surrounding whitespace",
+        ):
+            get_run_specific_exclusions(str(self.thread_dir))
 
     def test_get_run_specific_exclusions_rejects_unsafe_path(self):
         exclusions_file = self.thread_dir / "run_exclusions.txt"
@@ -104,6 +114,17 @@ class TestExecuteSync(unittest.TestCase):
             ValueError, "test paths\\[0\\] must stay inside the repository"
         ):
             validate_repo_relative_paths(["../outside"], "test paths")
+
+    def test_validate_repo_relative_paths_rejects_option_like_and_globs(self):
+        with self.assertRaisesRegex(
+            ValueError, "test paths\\[0\\] must not start with '-'"
+        ):
+            validate_repo_relative_paths(["--cached"], "test paths")
+
+        with self.assertRaisesRegex(
+            ValueError, "test paths\\[0\\] must not contain git pathspec metacharacters"
+        ):
+            validate_repo_relative_paths(["exporter/**/*.py"], "test paths")
 
     @patch("kamma.upstream_sync.scripts.execute_sync.load_registry")
     def test_get_permanent_exclusions(self, mock_load_registry):
@@ -234,6 +255,59 @@ class TestExecuteSync(unittest.TestCase):
         self.assertNotIn(
             (["git", "reset", "--hard", "newsha456"],),
             [call.args for call in mock_run_git.call_args_list],
+        )
+
+    @patch("kamma.upstream_sync.scripts.execute_sync.subprocess.run")
+    @patch("kamma.upstream_sync.scripts.execute_sync.Path.exists", return_value=False)
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_registry")
+    @patch("kamma.upstream_sync.scripts.execute_sync.verify_manifest", return_value=0)
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_accepted_sync_state")
+    @patch("kamma.upstream_sync.scripts.execute_sync.run_git")
+    @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
+    def test_execute_sync_uses_path_separator_for_restore(
+        self,
+        mock_context_class,
+        mock_run_git,
+        mock_load_state,
+        mock_verify_manifest,
+        mock_load_registry,
+        mock_path_exists,
+        mock_subprocess_run,
+    ):
+        context = MagicMock()
+        context.is_dirty = False
+        context.original_branch = "sbs-ru"
+        mock_context_class.return_value = context
+        mock_load_state.return_value = {"last_accepted_upstream_ref": "upstream/main"}
+        mock_load_registry.return_value = {
+            "modified_upstream_files": [{"path": "db/models.py"}],
+            "no_sync_files": [],
+        }
+        mock_run_git.side_effect = [
+            MagicMock(stdout=""),
+            MagicMock(stdout="newsha456\n"),
+            MagicMock(stdout="localsha789\n"),
+            MagicMock(stdout=""),
+            MagicMock(stdout=""),
+            MagicMock(stdout=""),
+            MagicMock(stdout=""),
+        ]
+        mock_subprocess_run.return_value = MagicMock(returncode=0)
+
+        result = execute_sync(str(self.thread_dir))
+
+        self.assertEqual(result, 0)
+        mock_run_git.assert_any_call(
+            [
+                "git",
+                "restore",
+                "--source",
+                "localsha789",
+                "--staged",
+                "--worktree",
+                "--",
+                "db/models.py",
+            ]
         )
 
     @patch("kamma.upstream_sync.scripts.execute_sync.subprocess.run")

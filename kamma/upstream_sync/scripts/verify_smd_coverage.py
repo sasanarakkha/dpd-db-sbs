@@ -17,6 +17,7 @@ from tools.printer import printer as pr
 # Quality rubric minimums (unless sync_rule is MIRROR_EXACTLY or inspired_only)
 MIN_LOCAL_CHANGES = 2
 MIN_WATCH_FOR = 1
+VALID_SYNC_RULES = {"PORT", "MIRROR_EXACTLY", "PRESERVE", "DISCUSS", "inspired_only"}
 
 
 def extract_smd_entries(smd_path: Path) -> dict[str, dict[str, object]]:
@@ -135,6 +136,9 @@ def check_rubric(
     sync_rule = str(entry.get("sync_rule", ""))
     local_changes = int(entry.get("local_changes_count", 0))  # type: ignore[arg-type]
     watch_for = int(entry.get("watch_for_count", 0))  # type: ignore[arg-type]
+
+    if sync_rule not in VALID_SYNC_RULES:
+        violations.append(f"  [{category}] {path}: unknown Sync Rule '{sync_rule}'")
 
     if sync_rule not in ["MIRROR_EXACTLY", "inspired_only"]:
         if local_changes < MIN_LOCAL_CHANGES:

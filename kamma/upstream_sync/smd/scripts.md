@@ -72,9 +72,11 @@
   2. Writes to `russian.tsv`, `sbs.tsv`, `tamil.tsv`, and `ru_roots.tsv` in the backup folder.
   3. Aborts if the `Russian` table is empty (safety check); aborts if `Tamil` table is empty (safety check).
   4. Tamil backup follows the same TSV structure as Russian and SBS (header row + data rows).
+  5. Does not mirror upstream `split_tsv_file()` chunking; DPS localized backup TSVs are small and are intentionally kept as single files.
 - **Watch For**:
   - No upstream equivalent. This is critical for data persistence in the fork.
   - Tamil table will be empty until AI meaning generation is run; empty-check prevents data loss.
+  - Do not port upstream chunk-size/header behavior from `split_tsv_file()` unless DPS backup TSVs become large enough to require splitting.
 
 ---
 
