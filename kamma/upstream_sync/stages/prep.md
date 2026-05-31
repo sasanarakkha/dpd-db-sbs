@@ -20,6 +20,7 @@
 - [ ] `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` passes.
 - [ ] `accepted_sync.json` reviewed and bootstrapped.
 - [ ] `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py <thread_dir>` executed.
+- [ ] `prep_manifest.json.discuss_paths` checked; if non-empty, stop before `execute_sync.py`.
 - [ ] `uv run python3 kamma/upstream_sync/scripts/execute_sync.py <thread_dir>` executed.
 - [ ] Commit 1 message prepared for manual review.
 

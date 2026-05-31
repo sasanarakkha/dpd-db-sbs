@@ -13,6 +13,7 @@ from kamma.upstream_sync.scripts.registry_helper import (
     load_prep_manifest,
     write_accepted_sync_state,
 )
+from kamma.upstream_sync.scripts.sync_runtime import verify_manifest
 from tools.printer import printer as pr
 
 
@@ -27,21 +28,17 @@ def resolve_commit_date(commit_sha: str) -> str:
     return result.stdout.strip()
 
 
-def main() -> int:
-    """Parse arguments and update accepted sync metadata from a thread manifest."""
-    parser = argparse.ArgumentParser()
-    parser.add_argument("thread_dir")
-    parser.add_argument("--notes", default="Accepted after Stage 3 verification.")
-    parser.add_argument(
-        "--state-path",
-        default=str(get_accepted_sync_path()),
-    )
-    args = parser.parse_args()
-
-    manifest_path = get_prep_manifest_path(args.thread_dir)
-    state_path = Path(args.state_path)
-
+def finalize_accepted_sync(thread_dir: str, state_path: Path, notes: str) -> int:
+    """Verify the prep manifest, then advance accepted upstream sync metadata."""
     pr.green_title("finalize_accepted_sync.py")
+    pr.green("verifying prep manifest")
+    if verify_manifest(thread_dir, allow_discuss=False) != 0:
+        pr.red("Manifest verification failed. accepted_sync.json was not updated.")
+        return 1
+    pr.yes("ok")
+
+    manifest_path = get_prep_manifest_path(thread_dir)
+
     pr.green("loading prep manifest")
     manifest = load_prep_manifest(manifest_path)
     pr.yes("ok")
@@ -54,11 +51,29 @@ def main() -> int:
     state = build_accepted_sync_state(
         manifest=manifest,
         upstream_commit_date=commit_date,
-        notes=args.notes,
+        notes=notes,
     )
     write_accepted_sync_state(state_path, state)
     pr.yes("ok")
     return 0
+
+
+def main() -> int:
+    """Parse arguments and update accepted sync metadata from a thread manifest."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument("thread_dir")
+    parser.add_argument("--notes", default="Accepted after Stage 3 verification.")
+    parser.add_argument(
+        "--state-path",
+        default=str(get_accepted_sync_path()),
+    )
+    args = parser.parse_args()
+
+    return finalize_accepted_sync(
+        thread_dir=args.thread_dir,
+        state_path=Path(args.state_path),
+        notes=args.notes,
+    )
 
 
 if __name__ == "__main__":

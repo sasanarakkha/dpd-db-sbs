@@ -21,6 +21,7 @@
   - [ ] `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` — passes.
 - [ ] **1.4 Factual Diff**:
   - [ ] `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py <thread_dir>` — generates `prep_report.md` and `prep_manifest.json`.
+  - [ ] If `prep_manifest.json.discuss_paths` is non-empty, stop before `execute_sync.py`.
   - [ ] Record unexpected command failures exactly in `handoff.md`.
 - [ ] **1.5 Automated Pull + Commit 1 Gate**:
   - [ ] Review `<thread_dir>/run_exclusions.txt` if needed.
@@ -97,7 +98,8 @@
 **Owner**: ADVANCED only. Analyze docs parity and write a translation plan. Do not bulk translate.
 
 - [ ] **4.A.1 Parity Report**:
-  - [ ] Use the FAST output from `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir>` or request FAST to run it if missing.
+  - [ ] Read the FAST output from `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir>` or request FAST to run it if missing.
+  - [ ] Use FAST-provided `git diff <accepted_sha> HEAD -- docs/<file>` output for each stale file; request FAST if missing.
 - [ ] **4.A.2 Terminology and Scope**:
   - [ ] Read 3-5 existing `docs_rus/` files to build a terminology glossary.
   - [ ] For each stale file, capture the exact upstream diff.

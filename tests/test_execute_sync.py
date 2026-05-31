@@ -2,6 +2,7 @@
 
 import unittest
 import shutil
+import subprocess
 import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -99,6 +100,13 @@ class TestExecuteSync(unittest.TestCase):
         self.assertEqual(len(exclusions), 3)
 
     @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
+    def test_execute_sync_requires_thread_dir(self, mock_context_class):
+        result = execute_sync(None)
+
+        self.assertEqual(result, 1)
+        mock_context_class.assert_not_called()
+
+    @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
     def test_execute_sync_rejects_dirty_working_tree(self, mock_context_class):
         context = MagicMock()
         context.is_dirty = True
@@ -157,10 +165,12 @@ class TestExecuteSync(unittest.TestCase):
     @patch("kamma.upstream_sync.scripts.execute_sync.verify_manifest", return_value=0)
     @patch("kamma.upstream_sync.scripts.execute_sync.load_accepted_sync_state")
     @patch("kamma.upstream_sync.scripts.execute_sync.run_git")
+    @patch("kamma.upstream_sync.scripts.execute_sync.Path.exists", return_value=False)
     @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
     def test_execute_sync_resets_to_manifest_sha(
         self,
         mock_context_class,
+        mock_path_exists,
         mock_run_git,
         mock_load_state,
         mock_verify_manifest,
@@ -197,6 +207,50 @@ class TestExecuteSync(unittest.TestCase):
             allow_discuss=False,
         )
         mock_run_git.assert_any_call(["git", "reset", "--hard", "newsha456"])
+
+    @patch("kamma.upstream_sync.scripts.execute_sync.subprocess.run")
+    @patch("kamma.upstream_sync.scripts.execute_sync.Path.exists", return_value=True)
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_registry")
+    @patch("kamma.upstream_sync.scripts.execute_sync.verify_manifest", return_value=0)
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_accepted_sync_state")
+    @patch("kamma.upstream_sync.scripts.execute_sync.run_git")
+    @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
+    def test_execute_sync_fails_when_assertions_fail(
+        self,
+        mock_context_class,
+        mock_run_git,
+        mock_load_state,
+        mock_verify_manifest,
+        mock_load_registry,
+        mock_path_exists,
+        mock_subprocess_run,
+    ):
+        context = MagicMock()
+        context.is_dirty = False
+        context.original_branch = "sbs-ru"
+        mock_context_class.return_value = context
+        mock_load_state.return_value = {"last_accepted_upstream_ref": "upstream/main"}
+        mock_load_registry.return_value = {
+            "modified_upstream_files": [],
+            "no_sync_files": [],
+        }
+        mock_run_git.side_effect = [
+            MagicMock(stdout=""),
+            MagicMock(stdout="newsha456\n"),
+            MagicMock(stdout=""),
+            MagicMock(stdout=""),
+            MagicMock(stdout=""),
+            MagicMock(stdout="localsha789\n"),
+            MagicMock(stdout=""),
+            MagicMock(stdout=""),
+        ]
+        mock_subprocess_run.side_effect = subprocess.CalledProcessError(
+            1, ["bash", "scripts/bash/dpd-sync-assertions.sh", "localsha789"]
+        )
+
+        result = execute_sync(str(self.thread_dir))
+
+        self.assertEqual(result, 1)
 
 
 if __name__ == "__main__":

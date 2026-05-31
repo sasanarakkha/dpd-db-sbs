@@ -8,10 +8,31 @@ from pathlib import Path
 
 from tools.printer import printer as pr
 
+REQUIRED_TOP_LEVEL_SECTIONS = [
+    "modified_upstream_files",
+    "russian_copies",
+    "sbs_copies",
+    "dps_copies",
+    "tamil_copies",
+    "inspired_by_upstream",
+    "unique_paths",
+    "no_sync_files",
+    "skip_sync_patterns",
+]
+
 
 def load_registry(registry_path: Path) -> dict[str, object]:
     with registry_path.open("r") as f:
         return json.load(f)  # type: ignore[no-any-return]
+
+
+def validate_required_top_level_sections(data: dict[str, object]) -> list[str]:
+    """Validate that every registry category is explicitly present."""
+    return [
+        f"registry: missing required top-level section '{section}'"
+        for section in REQUIRED_TOP_LEVEL_SECTIONS
+        if section not in data
+    ]
 
 
 def validate_modified_upstream_files(data: dict[str, object]) -> list[str]:
@@ -267,6 +288,7 @@ def validate_registry_core(
     if "folders_to_check" in data:
         errors.append("'folders_to_check' is no longer valid")
 
+    errors.extend(validate_required_top_level_sections(data))
     errors.extend(validate_modified_upstream_files(data))
 
     unique_paths = data.get("unique_paths", [])

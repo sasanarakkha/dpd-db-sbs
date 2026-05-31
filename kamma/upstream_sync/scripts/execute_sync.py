@@ -97,6 +97,10 @@ def execute_sync(thread_dir: str | None, dry_run: bool = False) -> int:
     """Orchestrate the selective sync process."""
     pr.green_title("execute_sync.py")
 
+    if not thread_dir:
+        pr.red("Thread directory is required so prep_manifest.json can be verified.")
+        return 1
+
     context = GitContext()
     if context.is_dirty:
         pr.red("Working tree is dirty. Commit or stash changes before sync.")
@@ -222,7 +226,8 @@ def execute_sync(thread_dir: str | None, dry_run: bool = False) -> int:
                 )
                 pr.yes("ok")
             except subprocess.CalledProcessError:
-                pr.amber("Sync assertions failed. Check output above.")
+                pr.red("Sync assertions failed. Check output above.")
+                return 1
 
         pr.green("✅ Sync execution complete. Ready for Stage 2 (Analysis).")
         return 0

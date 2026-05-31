@@ -150,7 +150,6 @@ ADVANCED must stop when mechanical work is needed: broad file reading, command e
 **Goal**: Establish a baseline, validate the environment, and identify what changed upstream.
 **Owner**: FAST only.
 **FAST must stop and request ADVANCED if** registry errors need policy interpretation, new files need classification, a `discuss: true` file changed, command output is ambiguous, or it cannot decide whether something is local, upstream-only, skipped, unique, or shadow.
-<!-- !TODO backup dps first! scripts/backup/backup_dps.py and git add with message "data update"-->
 0. **Pre-sync Shadow Health Check (MANDATORY GATE)**:
    - Run `uv run python3 tests/check_shadow_modifications.py`
    - The output must be **clean** (zero modifications reported) before continuing.
@@ -167,6 +166,7 @@ ADVANCED must stop when mechanical work is needed: broad file reading, command e
    - Run `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py <thread_dir>`.
    - Generate `prep_report.md` and `prep_manifest.json` from the explicit upstream range in `accepted_sync.json`.
    - Identify all modified, added, and deleted upstream files relative to the registry.
+   - If `prep_manifest.json.discuss_paths` is non-empty, STOP before `execute_sync.py`.
 3. **Automated Pull**:
    - Perform the automated sync by running `uv run python3 kamma/upstream_sync/scripts/execute_sync.py <thread_dir>`.
    - Review and add any run-specific exclusions to `<thread_dir>/run_exclusions.txt` before execution if needed.
@@ -213,7 +213,7 @@ ADVANCED must stop when mechanical work is needed: broad file reading, command e
 4. **Template Audit** (every sync):
    - For each local template dir (`ru_components/templates/`, `sbs_templates/`, `ru_templates/`):
      - List all `.jinja` and `.html` files.
-     - For each file, `grep -r` the filename across the entire repo (`.py`, `.jinja`, `.html`, `.js`).
+     - For each file, use `rg` to search the filename across the entire repo (`.py`, `.jinja`, `.html`, `.js`).
      - Any template with **zero references** is a dead template candidate.
    - For each dead candidate, check if upstream has a corresponding template in its own `templates/` dir:
      - If upstream **does not** have an equivalent → the file is likely a local artefact; delete or archive it.
@@ -228,9 +228,11 @@ ADVANCED must stop when mechanical work is needed: broad file reading, command e
 **No-translate files (HTML redirect pattern):** Some `docs/` files do not need Russian translation (e.g. `changelog.md` — mostly Pāḷi data and GitHub issue numbers). For these, the canonical approach is an HTML meta-redirect file: `docs_rus/file.md` redirects to an external URL. This satisfies the parity check (file exists) and MkDocs correctly handles it during build. Add such files to `NO_TRANSLATE` in `check_docs_parity.py` to skip staleness checks.
 
 **Stage 4.A — Analysis (ADVANCED model)**:
-1. Run `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir>` → produces `docs_parity_report.md`.
+FAST must run `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir>` before handing off to Stage 4.A.
+
+1. Read `docs_parity_report.md`.
 2. Read 3–5 existing `docs_rus/` files to build a terminology glossary (key EN → RU mappings specific to DPD: headword, inflection template, root family, deconstructor, lookup, etc.).
-3. For each stale file listed in the report: run `git diff <accepted_sha> HEAD -- docs/<file>` to capture the exact diff.
+3. For each stale file listed in the report, use the FAST-provided `git diff <accepted_sha> HEAD -- docs/<file>` output. If the diff is missing, stop and request FAST.
 4. Write `docs_translation_plan.md` in the thread folder containing:
    - **Terminology glossary** — EN → RU pairs extracted from existing translations.
    - **Translation rules** — keep Pali terms as-is; keep image paths, code blocks, and URLs unchanged; translate heading text and alt text; keep HTML anchor IDs unchanged.

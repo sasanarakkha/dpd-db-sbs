@@ -237,3 +237,177 @@ Recommended commit message:
 ```text
 #sync tooling: block stale manifests and discuss pulls
 ```
+
+
+Session 4
+
+## Scope
+
+Implemented the approved follow-up upstream-sync improvements after separate review:
+- Add pre-sync DPS localization backup to `scripts/cl_dps/dpd-kamma-sync`.
+- Auto-commit only the generated DPS backup TSV files from that wrapper.
+- Preserve the prohibition on agents committing manually; the commit is now script behavior requested by the user.
+- Report mapped shadow/inspired actions for deleted upstream source files in Stage 1 manifests.
+- Require `execute_sync.py` to receive a thread directory so `prep_manifest.json` validation cannot be skipped.
+- Enforce all required top-level sections in `registry.json`, including `tamil_copies`.
+- Remove stale backup TODO from the canonical guide now that the wrapper handles backup.
+- Replace stale `grep -r` guide wording with `rg`.
+
+## Files Changed
+
+- `scripts/cl_dps/dpd-kamma-sync`
+  - Runs `uv run python3 scripts/backup/backup_dps.py` before initializing the Kamma sync thread.
+  - Aborts if staged changes already exist.
+  - Stages and commits only:
+    - `db/backup_tsv/russian.tsv`
+    - `db/backup_tsv/sbs.tsv`
+    - `db/backup_tsv/tamil.tsv`
+    - `db/backup_tsv/ru_roots.tsv`
+  - Uses commit message `backup dps data`.
+  - Continues to run `scripts/bash/dpd_init_sync.py` after backup handling.
+- `kamma/upstream_sync/scripts/prep_analyzer.py`
+  - Deleted upstream paths now still check strict-shadow and inspired mappings.
+  - If a deleted upstream source maps to local RU/SBS/DPS/Tamil/inspired paths, the deleted source is included in `mapped_actions`.
+- `kamma/upstream_sync/scripts/execute_sync.py`
+  - Fails immediately when called without `thread_dir`.
+  - Prevents real sync execution without manifest verification.
+- `kamma/upstream_sync/scripts/validate_registry.py`
+  - Added `REQUIRED_TOP_LEVEL_SECTIONS`.
+  - Added validation that every required registry section is explicitly present.
+- `kamma/upstream_sync/guide.md`
+  - Removed stale hidden DPS backup TODO.
+  - Replaced `grep -r` template-audit wording with `rg`.
+- `tests/test_prep_analyzer.py`
+  - Added coverage for deleted upstream source files with mapped local shadows.
+- `tests/test_execute_sync.py`
+  - Added coverage that `execute_sync(None)` fails before `GitContext` is created.
+- `tests/test_validate_registry.py`
+  - Added `tamil_copies` to the base fixture.
+  - Added coverage for missing required top-level registry sections.
+- `tests/test_upstream_sync_docs_policy.py`
+  - Added guard against reintroducing the stale backup TODO or `grep -r` wording.
+
+## Test Evidence
+
+Initial RED phase:
+- `uv run pytest tests/test_prep_analyzer.py tests/test_execute_sync.py tests/test_validate_registry.py -v`
+  - Failed exactly on the missing expected behaviors:
+    - deleted mapped source missing from `mapped_actions`;
+    - `execute_sync(None)` still created `GitContext`;
+    - missing `tamil_copies` was not rejected.
+
+Passed after implementation:
+- `uv run pytest tests/test_prep_analyzer.py tests/test_execute_sync.py tests/test_validate_registry.py -v` — 29 passed.
+- `uv run ruff check --fix kamma/upstream_sync/scripts/prep_analyzer.py kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/validate_registry.py tests/test_prep_analyzer.py tests/test_execute_sync.py tests/test_validate_registry.py tests/test_upstream_sync_docs_policy.py` — passed.
+- `uv run ruff format kamma/upstream_sync/scripts/prep_analyzer.py kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/validate_registry.py tests/test_prep_analyzer.py tests/test_execute_sync.py tests/test_validate_registry.py tests/test_upstream_sync_docs_policy.py` — 7 files left unchanged.
+- `uv run pyright kamma/upstream_sync/scripts/prep_analyzer.py kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/validate_registry.py tests/test_prep_analyzer.py tests/test_execute_sync.py tests/test_validate_registry.py tests/test_upstream_sync_docs_policy.py` — 0 errors, 0 warnings, 0 informations.
+- `uv run --with pyrefly pyrefly check --min-severity warn kamma/upstream_sync/scripts/prep_analyzer.py kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/validate_registry.py tests/test_prep_analyzer.py tests/test_execute_sync.py tests/test_validate_registry.py tests/test_upstream_sync_docs_policy.py` — 0 errors, 3 suppressed.
+- `uv run pytest tests/test_prep_analyzer.py tests/test_execute_sync.py tests/test_validate_registry.py tests/test_upstream_sync_docs_policy.py -v` — 31 passed.
+- `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` — passed.
+- `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` — passed.
+- `git diff --check -- scripts/cl_dps/dpd-kamma-sync kamma/upstream_sync/scripts/prep_analyzer.py kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/validate_registry.py kamma/upstream_sync/guide.md tests/test_prep_analyzer.py tests/test_execute_sync.py tests/test_validate_registry.py tests/test_upstream_sync_docs_policy.py` — passed.
+
+## Errors, Issues, and Repeated Mistakes
+
+- User clarified that autonomous agent commits remain prohibited, but scripts intentionally developed for user workflows may run `git commit` when their behavior is explicit and reviewed.
+- The backup wrapper now commits backup TSV files itself; no agent-side commit was made during this session.
+- Existing unrelated dirty/untracked resources remain untouched:
+  - `resources/*`
+- Existing local change from this session remains unstaged:
+  - `scripts/cl_dps/dpd-kamma-sync`
+  - `kamma/upstream_sync/guide.md`
+  - `kamma/upstream_sync/scripts/prep_analyzer.py`
+  - `kamma/upstream_sync/scripts/execute_sync.py`
+  - `kamma/upstream_sync/scripts/validate_registry.py`
+  - `tests/test_prep_analyzer.py`
+  - `tests/test_execute_sync.py`
+  - `tests/test_validate_registry.py`
+  - `tests/test_upstream_sync_docs_policy.py`
+  - `kamma/threads/upstream_sync_improvment/handoff.md`
+
+## Current State
+
+Session 4 implementation and validation are complete. No git commit was made by the agent.
+
+Recommended commit message:
+
+```text
+#sync tooling: strengthen pre-sync backup and manifests
+```
+
+
+Session 5
+
+## Scope
+
+Implemented the approved follow-up safeguards from the separate upstream-sync review:
+- Keep the DPS backup wrapper commit message as `backup dps data`.
+- Make `execute_sync.py` fail if post-sync assertions fail.
+- Make `finalize_accepted_sync.py` verify the prep manifest before advancing `accepted_sync.json`.
+- Clarify that Stage 4.A ADVANCED reads FAST-produced docs parity evidence instead of running commands.
+- Clarify that Stage 1 stops before `execute_sync.py` when `prep_manifest.json.discuss_paths` is non-empty.
+
+No git commit was made.
+
+## Files Changed
+
+- `kamma/threads/upstream_sync_improvment/handoff.md`
+  - Corrected Session 4 backup wrapper commit message to `backup dps data`.
+  - Added this Session 5 handoff.
+- `kamma/upstream_sync/scripts/execute_sync.py`
+  - Returns failure when `scripts/bash/dpd-sync-assertions.sh` exits nonzero.
+- `kamma/upstream_sync/scripts/finalize_accepted_sync.py`
+  - Added `finalize_accepted_sync()` helper.
+  - Calls `verify_manifest(thread_dir, allow_discuss=False)` before loading the manifest or writing `accepted_sync.json`.
+- `kamma/upstream_sync/guide.md`
+  - Added explicit Stage 1 stop before `execute_sync.py` if `prep_manifest.json.discuss_paths` is non-empty.
+  - Moved Stage 4.A command execution responsibility to FAST and made ADVANCED consume `docs_parity_report.md` and FAST-provided diffs.
+- `kamma/upstream_sync/README.md`
+  - Updated quick-start Stage 4.A wording to say ADVANCED reads FAST-produced parity output.
+- `kamma/upstream_sync/stages/prep.md`
+  - Added the discuss-path stop check to the Stage 1 checklist.
+- `kamma/upstream_sync/templates/sync_thread_plan.md`
+  - Added the discuss-path stop check.
+  - Clarified Stage 4.A reads FAST output and requests FAST if diffs are missing.
+- `tests/test_execute_sync.py`
+  - Added coverage for assertion-script failure returning nonzero.
+  - Mocked assertion-script absence in the normal success-path test.
+- `tests/test_finalize_accepted_sync.py`
+  - New focused test proving finalization refuses invalid manifests and does not write accepted state.
+- `tests/test_upstream_sync_docs_policy.py`
+  - Added guards for Stage 4.A command ownership and discuss-path stop wording.
+
+## Test Evidence
+
+Initial RED phase:
+- `uv run pytest tests/test_execute_sync.py::TestExecuteSync::test_execute_sync_fails_when_assertions_fail tests/test_finalize_accepted_sync.py tests/test_upstream_sync_docs_policy.py::test_guide_keeps_stage_4a_command_execution_with_fast tests/test_upstream_sync_docs_policy.py::test_guide_stops_before_execute_sync_when_discuss_paths_exist -v`
+  - Failed during collection because `finalize_accepted_sync()` did not exist yet.
+
+Passed after implementation:
+- `uv run pytest tests/test_execute_sync.py::TestExecuteSync::test_execute_sync_fails_when_assertions_fail tests/test_finalize_accepted_sync.py tests/test_upstream_sync_docs_policy.py::test_guide_keeps_stage_4a_command_execution_with_fast tests/test_upstream_sync_docs_policy.py::test_guide_stops_before_execute_sync_when_discuss_paths_exist -v` — 4 passed.
+- `uv run pytest tests/test_execute_sync.py tests/test_finalize_accepted_sync.py tests/test_sync_state.py tests/test_upstream_sync_docs_policy.py tests/test_prep_analyzer.py tests/test_validate_registry.py tests/test_check_docs_parity.py tests/test_verify_smd_coverage.py -v` — 57 passed.
+- `uv run ruff check --fix kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/finalize_accepted_sync.py tests/test_execute_sync.py tests/test_finalize_accepted_sync.py tests/test_upstream_sync_docs_policy.py` — passed.
+- `uv run ruff format kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/finalize_accepted_sync.py tests/test_execute_sync.py tests/test_finalize_accepted_sync.py tests/test_upstream_sync_docs_policy.py` — 5 files left unchanged.
+- `uv run pyright kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/finalize_accepted_sync.py tests/test_execute_sync.py tests/test_finalize_accepted_sync.py tests/test_upstream_sync_docs_policy.py` — 0 errors, 0 warnings, 0 informations.
+- `uv run --with pyrefly pyrefly check --min-severity warn kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/finalize_accepted_sync.py tests/test_execute_sync.py tests/test_finalize_accepted_sync.py tests/test_upstream_sync_docs_policy.py` — 0 errors.
+- `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` — passed.
+- `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` — passed.
+- `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py` — passed.
+- `git diff --check -- kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/finalize_accepted_sync.py tests/test_execute_sync.py tests/test_finalize_accepted_sync.py tests/test_upstream_sync_docs_policy.py kamma/upstream_sync/guide.md kamma/upstream_sync/README.md kamma/upstream_sync/stages/prep.md kamma/upstream_sync/templates/sync_thread_plan.md kamma/threads/upstream_sync_improvment/handoff.md` — passed.
+
+## Errors, Issues, and Repeated Mistakes
+
+- Existing success-path `execute_sync` test accidentally ran the real `scripts/bash/dpd-sync-assertions.sh`. After assertion failures became fatal, this surfaced as a test failure. Fixed the test harness by mocking `Path.exists()` to make the assertion script absent in that success-path unit test.
+- The larger suggestion to replace `checkout as_upstream` + `reset --hard` was intentionally not implemented because it is a broader behavioral rewrite and not the simplest safe fix for this pass.
+- Existing unrelated dirty/untracked resources remain untouched:
+  - `resources/*`
+
+## Current State
+
+Session 5 implementation and validation are complete. No git commit was made by the agent.
+
+Recommended commit message:
+
+```text
+#sync tooling: tighten sync finalization gates
+```

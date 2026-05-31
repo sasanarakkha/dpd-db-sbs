@@ -19,6 +19,7 @@ def base_data():
         "russian_copies": {},
         "sbs_copies": {},
         "dps_copies": {},
+        "tamil_copies": {},
         "inspired_by_upstream": {},
         "unique_paths": [],
         "no_sync_files": [],
@@ -102,6 +103,14 @@ def test_folders_to_check_rejected(base_data):
     base_data["folders_to_check"] = ["dir/"]
     errors = validate_registry_core(base_data)
     assert any("'folders_to_check' is no longer valid" in e for e in errors)
+
+
+def test_missing_required_top_level_section_rejected(base_data):
+    del base_data["tamil_copies"]
+
+    errors = validate_registry_core(base_data)
+
+    assert "registry: missing required top-level section 'tamil_copies'" in errors
 
 
 def test_cross_category_overlap_rejected(base_data):

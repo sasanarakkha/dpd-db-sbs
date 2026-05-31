@@ -1,11 +1,39 @@
 #!/bin/bash
-# Initialize a new upstream sync kamma thread and register it in kamma/threads.md.
+# Back up DPS localization tables, then initialize a new upstream sync kamma thread.
 set -euo pipefail
 
 PROJECT_DIR="$HOME/Documents/dpd-db"
 cd "$PROJECT_DIR"
 
+BACKUP_SCRIPT="scripts/backup/backup_dps.py"
 INIT_SCRIPT="scripts/bash/dpd_init_sync.py"
+BACKUP_FILES=(
+    db/backup_tsv/russian.tsv
+    db/backup_tsv/sbs.tsv
+    db/backup_tsv/tamil.tsv
+    db/backup_tsv/ru_roots.tsv
+)
+BACKUP_COMMIT_MESSAGE="backup dps data"
+
+if [ -f "$BACKUP_SCRIPT" ]; then
+    if ! git diff --cached --quiet; then
+        echo "❌ Error: staged changes already exist. Commit or unstage them before running this script."
+        exit 1
+    fi
+
+    uv run python3 "$BACKUP_SCRIPT"
+
+    if git diff --quiet -- "${BACKUP_FILES[@]}"; then
+        echo "DPS backup complete. No backup TSV changes to commit."
+    else
+        git add "${BACKUP_FILES[@]}"
+        git commit -m "$BACKUP_COMMIT_MESSAGE"
+        echo "DPS backup committed: $BACKUP_COMMIT_MESSAGE"
+    fi
+else
+    echo "❌ Error: $BACKUP_SCRIPT not found in $PROJECT_DIR"
+    exit 1
+fi
 
 if [ -f "$INIT_SCRIPT" ]; then
     uv run python3 "$INIT_SCRIPT"

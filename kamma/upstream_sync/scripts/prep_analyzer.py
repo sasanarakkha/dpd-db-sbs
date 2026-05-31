@@ -141,6 +141,21 @@ class PrepAnalyzer:
 
             if status == "D":
                 deleted.append(path)
+                for src, actions in source_to_shadows.items():
+                    if src.endswith("/") and path.startswith(src):
+                        mapped_actions[path] = list(actions)
+                        break
+                    if path == src:
+                        mapped_actions[path] = list(actions)
+                        break
+
+                for src, actions in source_to_inspired.items():
+                    if src.endswith("/") and path.startswith(src):
+                        mapped_actions.setdefault(path, []).extend(actions)
+                        break
+                    if path == src:
+                        mapped_actions.setdefault(path, []).extend(actions)
+                        break
                 continue
 
             changed_upstream_paths.add(path)

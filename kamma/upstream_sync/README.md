@@ -17,7 +17,7 @@ handoff, and an explicit model switch when needed.
 3.  **Stage 3: FAST Execution & Verification** — implementation, testing, and cleanup.
     -   `uv run pytest tests/test_shadow_parity.py tests/test_shadow_cleanup.py tests/test_namespace_isolation.py tests/test_template_syntax.py -v` (Sync-related suites).
 4.  **Stage 4.A: ADVANCED Docs Analysis** — docs parity analysis and `docs_translation_plan.md`.
-    -   `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir>`
+    -   Read FAST-produced `docs_parity_report.md`; do not run commands in ADVANCED.
 5.  **Stage 4.B: FAST Docs Translation** — execute the approved docs translation plan.
 6.  **Stage 5: ADVANCED Verification & After-sync** — decide acceptance after user verification.
 

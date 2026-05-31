@@ -17,6 +17,7 @@ def mock_registry():
         ],
         "russian_copies": {
             "db/families/family_compound_ru.py": "db/families/family_compound.py",
+            "db/families/deleted_source_ru.py": "db/families/deleted_source.py",
             "exporter/webapp/main_ru.py": "exporter/webapp/main.py",
         },
         "sbs_copies": {},
@@ -66,6 +67,7 @@ def test_prep_analyzer_report_generation(
         ("M", "db/epd/epd_to_lookup.py"),  # Tamil source modified
         ("M", "scripts/bash/makedict.py"),  # Inspired source modified
         ("M", "new_file.py"),  # Untracked
+        ("D", "db/families/deleted_source.py"),  # Deleted shadow source
         ("D", "deleted_file.py"),  # Deleted
         ("M", "tests/ignore_me.py"),  # Skipped
     ]
@@ -115,11 +117,19 @@ def test_prep_analyzer_report_generation(
         "new_file.py",
         "scripts/bash/makedict.py",
     ]
+    assert manifest["deleted_upstream_paths"] == [
+        "db/families/deleted_source.py",
+        "deleted_file.py",
+    ]
 
     mapped = manifest["mapped_actions"]
     assert (
         mapped["db/families/family_compound.py"][0]["local_path"]
         == "db/families/family_compound_ru.py"
+    )
+    assert (
+        mapped["db/families/deleted_source.py"][0]["local_path"]
+        == "db/families/deleted_source_ru.py"
     )
     assert mapped["exporter/webapp/main.py"][0]["category"] == "russian_copy"
     assert mapped["db/epd/epd_to_lookup.py"][0]["category"] == "tamil_copy"
