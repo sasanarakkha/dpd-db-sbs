@@ -29,57 +29,127 @@ A broken shadow always means the sync is incomplete or inaccurate — not that t
 
 ## Session Management
 
-Each stage runs in its own session. At the end of a stage:
-1. Save all outputs to the thread folder.
-2. Update `handoff.md` with the current status and what comes next.
-3. Prepare the commit (if applicable) and present it to the user.
-4. Tell the user: "Restart the session. Next time, say: [exact prompt]."
+Each stage runs in its own fresh session. The chat history is never the source of truth; the thread
+folder is. At every hard stop, the current agent must save enough state for the next fresh session to
+continue from files only.
 
-**Within Stage 3**, if the plan has many items, split across sessions. Track progress by item ID (e.g., "completed through A8, next is A9") in `handoff.md`. Similarly, **within Stage 4.B**, if there are many files to translate, split after every 5 files.
+**Required hard-stop artifacts:**
+- `<thread_dir>/handoff.md`
+- The current stage output:
+  - Stage 1: `prep_report.md` and `prep_manifest.json`
+  - Stage 2: `dynamic_plan.md`
+  - Stage 3: updated execution status and command/test evidence in `handoff.md`
+  - Stage 4.A: `docs_parity_report.md` and `docs_translation_plan.md`
+  - Stage 4.B: translation execution status in `handoff.md`
+  - Stage 5: verification/finalization notes in `handoff.md`
+- `<thread_dir>/stage_state.json` only when a script or later session needs machine-readable state.
 
-**Hard Stop Triggers (mandatory session split):**
-- After completing any full Stage (1, 2, 3, 4, or 5) — always split.
-- After every 5 implementation items in Stage 3 — split.
-- After every 5 translation files in Stage 4.B — split.
-- If context feels stale or responses feel repetitive — split immediately.
+**`handoff.md` must include:**
+- Current stage and owner model (`FAST` or `ADVANCED`).
+- Completed work.
+- Exact commands already run.
+- Exact outputs or failures summarized.
+- Files changed.
+- Open decisions.
+- Errors, issues, and repeated mistakes.
+- Next model to use.
+- Exact restart prompt for a fresh session.
+- Explicit instruction: "Do not continue in this session."
 
-Hard stop procedure: update `handoff.md` → state the exact restart prompt → STOP. Do not continue in the same session.
+**Hard Stop Triggers (mandatory fresh-session split):**
+- After completing any full Stage (1, 2, 3, 4.A, 4.B, or 5).
+- When FAST needs analysis, planning, judgment, or conflict resolution.
+- When ADVANCED needs mechanical editing, command execution, file copying, formatting, testing, or bulk research.
+- After every 5 implementation items in Stage 3.
+- After every 5 translation files in Stage 4.B.
+- If output is too large, context feels stale, failures repeat, state becomes unclear, or the agent is relying on memory instead of files.
+
+Hard stop procedure: save artifacts -> update `handoff.md` -> state the exact restart prompt and required model -> STOP. Do not continue in the same session.
+
+**Fresh restart prompt template:**
+
+```text
+Switch to <FAST|ADVANCED>. Start a fresh session.
+
+Continue upstream sync thread: <thread_dir>.
+First read:
+1. <thread_dir>/handoff.md
+2. kamma/upstream_sync/guide.md
+3. <stage-specific file>
+
+Your task:
+<exact next task>
+
+Do not perform <forbidden model responsibility>.
+Stop if <specific stop condition>.
+```
 
 **Pre-Authorized Commands:**
 All commands listed in this guide (`uv run`, `grep`, `find`, `git diff`, `git log`, `ruff`, `pytest`, `python temp/`) are pre-authorized for the entire sync session. Write all ad-hoc logic to `temp/<name>.py` and run via `uv run python temp/<name>.py`. Never use inline `python -c "..."`. Delete temp files when done.
 
 ---
 
-## Model Switch Protocol
+## Model Responsibility Contract
+
+The sync workflow is split by responsibility, not convenience.
+
+**FAST model owns mechanical work only:**
+- Run commands and scripted checks.
+- Read files named by the protocol or current plan.
+- Generate factual reports.
+- Apply literal edits from an approved plan.
+- Run formatting and tests.
+- Record exact failures.
+
+FAST must stop when it needs to decide strategy, classify risk, interpret ambiguous failures, resolve conflicts, choose between alternatives, or edit beyond the literal plan.
+
+**ADVANCED model owns analysis and planning only:**
+- Interpret FAST outputs.
+- Classify risk and impact.
+- Resolve `discuss` items with the user.
+- Decide port/preserve/skip/translate strategy.
+- Write self-contained execution plans.
+- Review evidence and decide whether the sync is ready for user verification.
+
+ADVANCED must stop when mechanical work is needed: broad file reading, command execution, copying files, applying merges, formatting, testing, or bulk translation.
+
+**Boundary examples:**
+- FAST finds a missing anchor in `dynamic_plan.md` -> stop and hand off to ADVANCED.
+- FAST sees a test failure that is not explicitly covered by the plan -> stop and hand off to ADVANCED.
+- ADVANCED decides a shadow must be updated -> write exact instructions, then stop and hand off to FAST.
+- ADVANCED sees docs need translation -> write `docs_translation_plan.md`, then stop and hand off to FAST.
 
 **MANDATORY MODEL SWITCH TRIGGERS — never skip these:**
 
 | Transition | Recommended model | Instruction to give user |
 |---|---|---|
-| End of Stage 1, before Stage 2 | PRO (smart) | "Please switch to PRO model. Restart. Next prompt: [exact prompt]." |
+| End of Stage 1, before Stage 2 | ADVANCED | "Please switch to ADVANCED model. Restart. Next prompt: [exact prompt]." |
 | End of Stage 2, before Stage 3 | FAST (execution) | "Please switch to FAST model. Restart. Next prompt: [exact prompt]." |
-| End of Stage 3, before Stage 4 | PRO (smart) | "Please switch to PRO model. Restart. Next prompt: [exact prompt]." |
+| End of Stage 3, before Stage 4.A | ADVANCED | "Please switch to ADVANCED model. Restart. Next prompt: [exact prompt]." |
 | End of Stage 4.A, before Stage 4.B | FAST (execution) | "Please switch to FAST model. Restart. Next prompt: [exact prompt]." |
+| End of Stage 4.B, before Stage 5 | ADVANCED | "Please switch to ADVANCED model. Restart. Next prompt: [exact prompt]." |
 
-- **Stage 1 (Prep)** — any model; lightweight validation and scripted analysis.
-- **Stage 2 (Analysis)** — PRO model; strategic planning, resolve `discuss` flags, draft `dynamic_plan.md`.
+- **Stage 1 (Prep)** — FAST model; factual collection only.
+- **Stage 2 (Analysis)** — ADVANCED model; strategic planning, resolve `discuss` flags, draft `dynamic_plan.md`.
 - **Stage 3 (Execution)** — FAST model; mechanical implementation item-by-item per the plan.
-- **Stage 4.A (Docs Analysis)** — PRO model; read parity report, sample existing translations for terminology, draft `docs_translation_plan.md`.
+- **Stage 4.A (Docs Analysis)** — ADVANCED model; read FAST outputs, decide terminology and translation strategy, draft `docs_translation_plan.md`.
 - **Stage 4.B (Docs Translation)** — FAST model; execute `docs_translation_plan.md` file-by-file — translate or update each file, then commit.
-- **Stage 5 (Verification + After-sync)** — any model; manual verification, update `accepted_sync.json`.
+- **Stage 5 (Verification + After-sync)** — ADVANCED model for acceptance decisions; hand off to FAST for any mechanical finalization.
 
-**Handoff quality gate (PRO → FAST, Stage 2 → 3):** Before switching to FAST for Stage 3, PRO must verify that `dynamic_plan.md` passes this test: *"Could a mechanical executor complete every item without reading any file not explicitly referenced in the plan?"* If the answer is no, expand the plan before handing off. FAST must never be asked to analyze, judge, or discover — only execute.
+**Handoff quality gate (ADVANCED -> FAST, Stage 2 -> 3):** Before switching to FAST for Stage 3, ADVANCED must verify that `dynamic_plan.md` passes this test: *"Could a mechanical executor complete every item without reading any file not explicitly referenced in the plan?"* If the answer is no, expand the plan before handing off. FAST must never be asked to analyze, judge, or discover — only execute.
 
-**Handoff quality gate (PRO → FAST, Stage 4.A → 4.B):** Before switching to FAST for Stage 4.B, PRO must verify that `docs_translation_plan.md` includes: (1) a terminology glossary, (2) per-file instructions specifying source path, target path, and whether it's a full translation or a targeted update, (3) explicit rules for what to keep untranslated (Pali terms, product names, image paths, code blocks, URLs). FAST must never decide what to translate — only execute the plan.
+**Handoff quality gate (ADVANCED -> FAST, Stage 4.A -> 4.B):** Before switching to FAST for Stage 4.B, ADVANCED must verify that `docs_translation_plan.md` includes: (1) a terminology glossary, (2) per-file instructions specifying source path, target path, and whether it is a full translation or a targeted update, (3) explicit rules for what to keep untranslated (Pali terms, product names, image paths, code blocks, URLs). FAST must never decide what to translate — only execute the plan.
 
-**The agent MUST stop at the end of each Stage and explicitly state the model switch instruction before ending the session. Never begin Stage 2, 3, 4, or 5 in the same session that completed the previous stage.**
+**The agent MUST stop at the end of each Stage and explicitly state the model switch instruction before ending the session. Never begin the next stage in the same session that completed the previous stage.**
 
 ---
 
 ## The 5-Stage Sync Workflow
 
-### Stage 1: Prep (Factual Analysis)
+### Stage 1: Prep (FAST Factual Collection)
 **Goal**: Establish a baseline, validate the environment, and identify what changed upstream.
+**Owner**: FAST only.
+**FAST must stop and request ADVANCED if** registry errors need policy interpretation, new files need classification, a `discuss: true` file changed, command output is ambiguous, or it cannot decide whether something is local, upstream-only, skipped, unique, or shadow.
 <!-- !TODO backup dps first! scripts/backup/backup_dps.py and git add with message "data update"-->
 0. **Pre-sync Shadow Health Check (MANDATORY GATE)**:
    - Run `uv run python3 tests/check_shadow_modifications.py`
@@ -103,8 +173,10 @@ All commands listed in this guide (`uv run`, `grep`, `find`, `git diff`, `git lo
    - (Commit 1 gate). Message format: `#sync: upstream pull <from>..<to>, <N> files, YYYY-MM-DD`
    - **Staging rule:** NEVER use `git add -A -- <file list>` — gitignore'd paths will trigger errors. Always use `git add .` which respects `.gitignore` automatically. If you must stage selectively, pre-filter with `git add <file>` one path at a time or check first with `git check-ignore -v <path>`.
 
-### Stage 2: Analysis (Strategic Planning)
+### Stage 2: Analysis (ADVANCED Strategic Planning)
 **Goal**: Determine how to integrate upstream changes into localized files.
+**Owner**: ADVANCED only.
+**ADVANCED must stop and request FAST if** files need to be copied, generated, formatted, tested, translated in bulk, or mechanically edited.
 
 1. **Dynamic Planning**:
    - Create `dynamic_plan.md` in the thread folder.
@@ -115,15 +187,17 @@ All commands listed in this guide (`uv run`, `grep`, `find`, `git diff`, `git lo
      - Exact anchor string or line reference to locate the change point.
      - Exact code to insert, replace, or delete (literal, not paraphrased).
      - Verification command to confirm the change landed correctly.
-   - If any item says "figure out X", "determine Y", or "check Z" — the plan is incomplete. PRO must resolve those before handing off.
+   - If any item says "figure out X", "determine Y", or "check Z" — the plan is incomplete. ADVANCED must resolve those before handing off.
 2. **Discussion Flags**:
    - Check `discuss` flags in `registry.json`. If `true`, resolve with the user before planning.
    - **Discussion flow**: Discuss each flagged item in chat, one at a time. Do not ask the user to edit any file. Once a decision is reached, mark the item `RESOLVED` in `dynamic_plan.md` with the agreed strategy. Only then proceed.
 3. **Draft Plan Review**:
    - Present the `dynamic_plan.md` to the user for approval. Say: "Please review and reply with proceed / skip / or any objection for each item."
 
-### Stage 3: Execution & Verification (Implementation)
+### Stage 3: Execution & Verification (FAST Implementation)
 **Goal**: Apply changes, verify integrity, and clean up.
+**Owner**: FAST only.
+**FAST must stop and request ADVANCED if** a plan item is incomplete, an expected anchor is missing, a merge conflict requires judgment, a test failure is not covered by the plan, or it believes a different implementation would be better.
 
 1. **Implementation**:
    - Execute `dynamic_plan.md` item-by-item following the **Iron Rule**.
@@ -146,14 +220,14 @@ All commands listed in this guide (`uv run`, `grep`, `find`, `git diff`, `git lo
      - If upstream **does** have an equivalent → investigate: was it replaced by inline rendering? If so, delete the local dead copy.
    - Document findings and decisions in `handoff.md` before deleting anything.
 
-### Stage 4: Docs Translation Parity (Analysis → Execution)
+### Stage 4: Docs Translation Parity (ADVANCED Analysis -> FAST Execution)
 **Goal**: Ensure `docs_rus/` is a complete, up-to-date Russian translation of `docs/`.
 
 `docs/` is upstream-owned and accepted verbatim during sync. `docs_rus/` is the maintained Russian translation — every file in `docs/` must have a counterpart in `docs_rus/` (except `docs_rus/dpd_rus.md`, `docs_rus/contributing/rus_collaboration.md`, and `docs_rus/technical/dpd_headwords_table_ru.md` which are local-only). Never add local content to `docs/`.
 
 **No-translate files (HTML redirect pattern):** Some `docs/` files do not need Russian translation (e.g. `changelog.md` — mostly Pāḷi data and GitHub issue numbers). For these, the canonical approach is an HTML meta-redirect file: `docs_rus/file.md` redirects to an external URL. This satisfies the parity check (file exists) and MkDocs correctly handles it during build. Add such files to `NO_TRANSLATE` in `check_docs_parity.py` to skip staleness checks.
 
-**Stage 4.A — Analysis (PRO model)**:
+**Stage 4.A — Analysis (ADVANCED model)**:
 1. Run `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir>` → produces `docs_parity_report.md`.
 2. Read 3–5 existing `docs_rus/` files to build a terminology glossary (key EN → RU mappings specific to DPD: headword, inflection template, root family, deconstructor, lookup, etc.).
 3. For each stale file listed in the report: run `git diff <accepted_sha> HEAD -- docs/<file>` to capture the exact diff.
@@ -168,9 +242,11 @@ All commands listed in this guide (`uv run`, `grep`, `find`, `git diff`, `git lo
 2. Execute file-by-file in order: missing files first (create + translate), stale files second (targeted update).
 3. After all files are written, update `mkdocs_ru.yaml` nav if any new files were added.
 4. Prepare commit: `#docs: translate/update docs_rus/ for sync <from>..<to>`.
+5. Stop and request ADVANCED if terminology, scope, or source diff interpretation is unclear.
 
-### Stage 5: Verification & After-sync
+### Stage 5: Verification & After-sync (ADVANCED Acceptance)
 **Goal**: Final human verification and close out the sync record.
+**Owner**: ADVANCED for acceptance decisions. If mechanical finalization is needed, ADVANCED writes exact instructions and hands off to FAST.
 
 1. **Full manual verification**
    - Ask user to verify everything and stay back for feedback. After correcting it, do not proceed until user explicitly says "all is good, proceed."
@@ -251,4 +327,4 @@ If a file has `discuss: true` in `registry.json`:
 - `accepted_sync.json`: durable record of the last accepted upstream SHA, date, and ref.
 - `prep_manifest.json`: Stage 1 machine-readable snapshot of the active upstream range.
 
-These files support the 3-stage workflow. They are not a fourth stage.
+These files support the 5-stage workflow. They are not a separate stage.

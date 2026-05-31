@@ -13,11 +13,11 @@ All upstream sync assets live in `kamma/upstream_sync/`.
 | `registry.json` | Machine-readable map of every file that diverges from upstream |
 | `accepted_sync.json` | Last accepted upstream SHA/date/ref used to anchor Stage 1 |
 | `smd/` | Shadow Module Descriptions (Directory) — per-file merge guidance |
-| `guide.md` | Process reference: category definitions, 3-stage workflow, naming policy |
+| `guide.md` | Process reference: category definitions, 5-stage workflow, model responsibilities, naming policy |
 | `archive_improvements.md` | Accumulated lessons from all past sync runs |
 | `new_improvements.md` | A strictly temporary intake file generated during an active sync run. After its contents are reviewed and promoted to `archive_improvements.md`, the file MUST be deleted. It is ignored by git. |
 | `templates/` | `plan.md` / `spec.md` starters for new sync kamma threads |
-| `stages/` | Stage-specific contracts and checklists (Prep, Analysis, Execution) |
+| `stages/` | Stage-specific contracts and checklists with FAST/ADVANCED ownership |
 | `scripts/registry_helper.py` | Shared Python helper to load the registry and extract paths |
 | `scripts/validate_registry.py` | Schema and data-quality validator for `registry.json` |
 | `scripts/verify_smd_coverage.py` | Coverage checker — ensures every registry entry has an SMD entry in `smd/` |
@@ -55,6 +55,20 @@ Every `inspired_by_upstream` entry is an object:
 ```json
 { "local/path": { "upstream": "upstream/path", "divergence_reason": "..." } }
 ```
+
+---
+
+## Model Responsibility
+
+The sync process is intentionally split between two model roles:
+
+| Model | Owns | Must stop when |
+|---|---|---|
+| FAST | Commands, scripted checks, factual reports, literal edits from approved plans, tests, translation execution | Analysis, risk classification, strategy, conflict resolution, or plan repair is needed |
+| ADVANCED | Interpreting FAST outputs, resolving strategy, planning, acceptance decisions | Mechanical editing, command execution, formatting, testing, or bulk translation is needed |
+
+Every model boundary is a hard stop. The current session must update `<thread_dir>/handoff.md`,
+write the exact restart prompt, tell the user which model to switch to, and stop.
 
 ---
 
