@@ -11,6 +11,7 @@ from kamma.upstream_sync.scripts.registry_helper import (
     load_prep_manifest,
     write_accepted_sync_state,
 )
+from kamma.upstream_sync.scripts.sync_runtime import verify_manifest
 
 
 def test_load_accepted_sync_state_valid(tmp_path: Path) -> None:
@@ -144,7 +145,7 @@ def test_load_prep_manifest_invalid(
 
 
 def test_build_and_write_accepted_sync_state(tmp_path: Path) -> None:
-    manifest = {
+    manifest: dict[str, object] = {
         "from_upstream_sha": "oldsha123",
         "to_upstream_sha": "newsha456",
         "target_upstream_ref": "upstream/main",
@@ -168,3 +169,56 @@ def test_build_and_write_accepted_sync_state(tmp_path: Path) -> None:
     assert written["last_accepted_upstream_sha"] == "newsha456"
     assert written["last_accepted_upstream_date"] == "2026-04-09T12:00:00+08:00"
     assert written["last_accepted_upstream_ref"] == "upstream/main"
+
+
+def write_manifest(thread_dir: Path, payload: dict[str, object]) -> None:
+    (thread_dir / "prep_manifest.json").write_text(
+        json.dumps(payload),
+        encoding="utf-8",
+    )
+
+
+def valid_manifest_payload() -> dict[str, object]:
+    return {
+        "from_upstream_sha": "oldsha123",
+        "to_upstream_sha": "newsha456",
+        "target_upstream_ref": "upstream/main",
+        "generated_at": "2026-04-08T10:00:00+08:00",
+        "changed_upstream_paths": [],
+        "deleted_upstream_paths": [],
+        "mapped_actions": {},
+        "discuss_paths": [],
+    }
+
+
+def test_verify_manifest_rejects_discuss_paths_for_execution(tmp_path: Path) -> None:
+    payload = valid_manifest_payload()
+    payload["discuss_paths"] = ["db/models.py"]
+    write_manifest(tmp_path, payload)
+
+    result = verify_manifest(str(tmp_path), allow_discuss=False)
+
+    assert result == 1
+
+
+def test_verify_manifest_rejects_accepted_state_mismatch(tmp_path: Path) -> None:
+    write_manifest(tmp_path, valid_manifest_payload())
+
+    result = verify_manifest(
+        str(tmp_path),
+        accepted_sync_state={
+            "last_accepted_upstream_sha": "different",
+            "last_accepted_upstream_date": "2026-04-08",
+            "last_accepted_upstream_ref": "upstream/main",
+        },
+    )
+
+    assert result == 1
+
+
+def test_verify_manifest_rejects_target_sha_mismatch(tmp_path: Path) -> None:
+    write_manifest(tmp_path, valid_manifest_payload())
+
+    result = verify_manifest(str(tmp_path), target_sha="newer_upstream_sha")
+
+    assert result == 1

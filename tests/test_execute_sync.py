@@ -1,16 +1,16 @@
 """Verify automated upstream sync execution refuses unsafe repository states."""
 
 import unittest
-from unittest.mock import MagicMock, patch
-from pathlib import Path
 import shutil
 import tempfile
+from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 from kamma.upstream_sync.scripts.execute_sync import (
-    execute_sync,
-    get_run_specific_exclusions,
-    get_permanent_exclusions,
     GitContext,
+    execute_sync,
+    get_permanent_exclusions,
+    get_run_specific_exclusions,
 )
 
 
@@ -112,10 +112,12 @@ class TestExecuteSync(unittest.TestCase):
 
     @patch("kamma.upstream_sync.scripts.execute_sync.verify_manifest", return_value=1)
     @patch("kamma.upstream_sync.scripts.execute_sync.load_accepted_sync_state")
+    @patch("kamma.upstream_sync.scripts.execute_sync.run_git")
     @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
     def test_execute_sync_rejects_invalid_manifest(
         self,
         mock_context_class,
+        mock_run_git,
         mock_load_state,
         mock_verify_manifest,
     ):
@@ -124,11 +126,21 @@ class TestExecuteSync(unittest.TestCase):
         context.original_branch = "sbs-ru"
         mock_context_class.return_value = context
         mock_load_state.return_value = {"last_accepted_upstream_ref": "upstream/main"}
+        mock_run_git.side_effect = [
+            MagicMock(stdout=""),  # git fetch upstream
+            MagicMock(stdout="newsha456\n"),  # rev-parse upstream/main
+        ]
 
         result = execute_sync(str(self.thread_dir))
 
         self.assertEqual(result, 1)
-        mock_verify_manifest.assert_called_once_with(str(self.thread_dir))
+        mock_verify_manifest.assert_called_once_with(
+            str(self.thread_dir),
+            accepted_sync_state={"last_accepted_upstream_ref": "upstream/main"},
+            target_sha="newsha456",
+            allow_discuss=False,
+        )
+        mock_run_git.assert_any_call(["git", "fetch", "upstream"])
 
     @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
     def test_execute_sync_rejects_wrong_starting_branch(self, mock_context_class):
@@ -140,6 +152,51 @@ class TestExecuteSync(unittest.TestCase):
         result = execute_sync(str(self.thread_dir))
 
         self.assertEqual(result, 1)
+
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_registry")
+    @patch("kamma.upstream_sync.scripts.execute_sync.verify_manifest", return_value=0)
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_accepted_sync_state")
+    @patch("kamma.upstream_sync.scripts.execute_sync.run_git")
+    @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
+    def test_execute_sync_resets_to_manifest_sha(
+        self,
+        mock_context_class,
+        mock_run_git,
+        mock_load_state,
+        mock_verify_manifest,
+        mock_load_registry,
+    ):
+        context = MagicMock()
+        context.is_dirty = False
+        context.original_branch = "sbs-ru"
+        mock_context_class.return_value = context
+        mock_load_state.return_value = {"last_accepted_upstream_ref": "upstream/main"}
+        mock_load_registry.return_value = {
+            "modified_upstream_files": [],
+            "no_sync_files": [],
+        }
+
+        mock_run_git.side_effect = [
+            MagicMock(stdout=""),  # git fetch upstream
+            MagicMock(stdout="newsha456\n"),  # rev-parse upstream/main
+            MagicMock(stdout=""),  # checkout as_upstream
+            MagicMock(stdout=""),  # reset --hard newsha456
+            MagicMock(stdout=""),  # checkout sbs-ru
+            MagicMock(stdout="localsha789\n"),  # rev-parse HEAD
+            MagicMock(stdout=""),  # checkout as_upstream -- .
+            MagicMock(stdout=""),  # git add .
+        ]
+
+        result = execute_sync(str(self.thread_dir))
+
+        self.assertEqual(result, 0)
+        mock_verify_manifest.assert_called_once_with(
+            str(self.thread_dir),
+            accepted_sync_state={"last_accepted_upstream_ref": "upstream/main"},
+            target_sha="newsha456",
+            allow_discuss=False,
+        )
+        mock_run_git.assert_any_call(["git", "reset", "--hard", "newsha456"])
 
 
 if __name__ == "__main__":

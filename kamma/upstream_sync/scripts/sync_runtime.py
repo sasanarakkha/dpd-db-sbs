@@ -6,11 +6,12 @@ import argparse
 import sys
 
 from kamma.upstream_sync.scripts.registry_helper import (
+    AcceptedSyncState,
     get_prep_manifest_path,
+    get_modified_upstream_paths,
     load_accepted_sync_state,
     load_prep_manifest,
     load_registry,
-    get_modified_upstream_paths,
 )
 from tools.printer import printer as pr
 
@@ -35,11 +36,46 @@ def print_target_ref() -> int:
     return 0
 
 
-def verify_manifest(thread_dir: str) -> int:
+def verify_manifest(
+    thread_dir: str,
+    accepted_sync_state: AcceptedSyncState | None = None,
+    target_sha: str | None = None,
+    allow_discuss: bool = True,
+) -> int:
     """Verify a prep manifest exists and is valid."""
     manifest_path = get_prep_manifest_path(thread_dir)
     try:
         manifest = load_prep_manifest(manifest_path)
+        if accepted_sync_state is not None:
+            expected_from_sha = accepted_sync_state["last_accepted_upstream_sha"]
+            expected_ref = accepted_sync_state["last_accepted_upstream_ref"]
+            if manifest["from_upstream_sha"] != expected_from_sha:
+                pr.red(
+                    "Manifest from_upstream_sha does not match accepted_sync.json: "
+                    f"{manifest['from_upstream_sha']} != {expected_from_sha}"
+                )
+                return 1
+            if manifest["target_upstream_ref"] != expected_ref:
+                pr.red(
+                    "Manifest target_upstream_ref does not match accepted_sync.json: "
+                    f"{manifest['target_upstream_ref']} != {expected_ref}"
+                )
+                return 1
+        if target_sha is not None and manifest["to_upstream_sha"] != target_sha:
+            pr.red(
+                "Manifest to_upstream_sha is stale for current target ref: "
+                f"{manifest['to_upstream_sha']} != {target_sha}"
+            )
+            return 1
+        discuss_paths = manifest["discuss_paths"]
+        if not isinstance(discuss_paths, list):
+            pr.red("Manifest invalid: discuss_paths must be a list")
+            return 1
+        if not allow_discuss and discuss_paths:
+            pr.red("Manifest contains discuss paths. Stop before automated pull:")
+            for path in discuss_paths:
+                pr.red(f"  {path}")
+            return 1
         pr.green(f"Manifest verified: {manifest.get('to_upstream_sha', 'unknown')}")
         return 0
     except FileNotFoundError:

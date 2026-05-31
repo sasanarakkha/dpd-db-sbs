@@ -114,12 +114,22 @@ def execute_sync(thread_dir: str | None, dry_run: bool = False) -> int:
         pr.green("discovering target ref")
         state = load_accepted_sync_state()
         target_ref = state["last_accepted_upstream_ref"]
-        pr.yes(target_ref)
+        run_git(["git", "fetch", "upstream"])
+        target_sha = run_git(["git", "rev-parse", target_ref]).stdout.strip()
+        pr.yes(f"{target_ref} -> {target_sha}")
 
         # 2. Verify manifest if thread_dir is provided
         if thread_dir:
             pr.green("verifying manifest")
-            if verify_manifest(thread_dir) != 0:
+            if (
+                verify_manifest(
+                    thread_dir,
+                    accepted_sync_state=state,
+                    target_sha=target_sha,
+                    allow_discuss=False,
+                )
+                != 0
+            ):
                 pr.red("Manifest verification failed. Stop before checkout/reset.")
                 return 1
             else:
@@ -141,8 +151,7 @@ def execute_sync(thread_dir: str | None, dry_run: bool = False) -> int:
         # 4. Update as_upstream
         pr.green("updating as_upstream")
         run_git(["git", "checkout", "as_upstream"])
-        run_git(["git", "fetch", "upstream"])
-        run_git(["git", "reset", "--hard", target_ref])
+        run_git(["git", "reset", "--hard", target_sha])
         pr.yes("ok")
 
         # 5. Switch to sbs-ru and sync

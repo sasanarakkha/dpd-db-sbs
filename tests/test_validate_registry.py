@@ -1,9 +1,12 @@
+"""Verify upstream sync registry schema and cross-section integrity."""
+
 import pytest
 from kamma.upstream_sync.scripts.validate_registry import (
-    validate_registry_core,
-    validate_inspired_by_upstream,
-    validate_skip_sync_patterns,
     validate_cross_section_overlaps,
+    validate_inspired_by_upstream,
+    validate_registry_core,
+    validate_shadow_mapping,
+    validate_skip_sync_patterns,
 )
 
 
@@ -113,13 +116,50 @@ def test_cross_category_overlap_rejected(base_data):
 
 
 def test_russian_copy_overlap_rejected(base_data):
-    base_data["russian_copies"] = {"exporter/webapp/main_ru.py": "exporter/webapp/main.py"}
+    base_data["russian_copies"] = {
+        "exporter/webapp/main_ru.py": "exporter/webapp/main.py"
+    }
     base_data["unique_paths"] = ["exporter/webapp/main_ru.py"]
 
     errors = validate_cross_section_overlaps(base_data)
 
     assert any(
         "Overlap: 'exporter/webapp/main_ru.py' exists in both russian_copies and unique_paths"
+        in e
+        for e in errors
+    )
+
+
+def test_shadow_mapping_rejects_non_object(base_data):
+    base_data["russian_copies"] = ["not-a-mapping"]
+
+    errors = validate_shadow_mapping("russian_copies", base_data)
+
+    assert errors == ["russian_copies: must be an object"]
+
+
+def test_shadow_mapping_rejects_non_string_source(base_data):
+    base_data["russian_copies"] = {"db/families/family_compound_ru.py": 123}
+
+    errors = validate_shadow_mapping("russian_copies", base_data)
+
+    assert errors == [
+        "russian_copies['db/families/family_compound_ru.py']: upstream path must be a string"
+    ]
+
+
+def test_shadow_mapping_rejects_missing_upstream_source(base_data, tmp_path):
+    shadow_file = tmp_path / "db/families/family_compound_ru.py"
+    shadow_file.parent.mkdir(parents=True)
+    shadow_file.touch()
+    base_data["russian_copies"] = {
+        "db/families/family_compound_ru.py": "db/families/family_compound.py"
+    }
+
+    errors = validate_registry_core(base_data, tmp_path)
+
+    assert any(
+        "russian_copies: upstream source 'db/families/family_compound.py' does not exist"
         in e
         for e in errors
     )
