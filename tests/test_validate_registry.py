@@ -93,6 +93,38 @@ def test_skip_sync_patterns_blank_item_rejected(base_data):
     assert len(errors) == 2
 
 
+def test_unique_paths_rejects_non_string_item(base_data):
+    base_data["unique_paths"] = ["tools/local.py", 123]
+
+    errors = validate_registry_core(base_data)
+
+    assert "unique_paths[1]: must be a non-empty string" in errors
+
+
+def test_unique_paths_rejects_blank_item(base_data):
+    base_data["unique_paths"] = ["tools/local.py", " "]
+
+    errors = validate_registry_core(base_data)
+
+    assert "unique_paths[1]: must be a non-empty string" in errors
+
+
+def test_no_sync_files_rejects_non_string_item(base_data):
+    base_data["no_sync_files"] = ["docs_rus/manual.md", None]
+
+    errors = validate_registry_core(base_data)
+
+    assert "no_sync_files[1]: must be a non-empty string" in errors
+
+
+def test_no_sync_files_rejects_blank_item(base_data):
+    base_data["no_sync_files"] = ["docs_rus/manual.md", ""]
+
+    errors = validate_registry_core(base_data)
+
+    assert "no_sync_files[1]: must be a non-empty string" in errors
+
+
 def test_ignored_files_rejected(base_data):
     base_data["ignored_files"] = ["old/"]
     errors = validate_registry_core(base_data)

@@ -11,6 +11,7 @@
 - **Shadow Updates**: Exact parity changes for `*_ru.py`, `*_sbs.py`, `*_dps.py`, `*_ta.py`, or locale directories.
 - **Inspired Backports**: Select improvements to port into `inspired_by_upstream`.
 - **Manifest Coverage**: every changed upstream path in `prep_manifest.json` accounted for.
+- **Exact Local Targets**: use `mapped_actions[].local_target_path` when present; fall back to `local_path` only for older manifests.
 - **Discuss Logs**: Outcomes of any `discuss: true` flags.
 - **Verification Commands**: Exact commands FAST must run after each item or section.
 

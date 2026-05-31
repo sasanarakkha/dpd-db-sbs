@@ -15,6 +15,7 @@
 
 ## Checklist
 - [ ] `git fetch upstream` completed.
+- [ ] `uv run ruff check tools/ scripts/ db/ exporter/ --select F821,E999 --quiet` passes.
 - [ ] `uv run python3 tests/check_shadow_modifications.py` passes.
 - [ ] `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` passes.
 - [ ] `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` passes.

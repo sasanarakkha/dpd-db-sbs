@@ -6,6 +6,7 @@ import json
 import sys
 from pathlib import Path
 
+from kamma.upstream_sync.scripts.sync_schema import RegistryData
 from tools.printer import printer as pr
 
 REQUIRED_TOP_LEVEL_SECTIONS = [
@@ -275,6 +276,22 @@ def validate_skip_sync_patterns(data: dict[str, object]) -> list[str]:
     return errors
 
 
+def validate_registry_schema(data: dict[str, object]) -> list[str]:
+    """Validate registry item types with the typed schema parser."""
+    try:
+        RegistryData.from_raw(data)
+    except ValueError as exc:
+        message = str(exc)
+        for label in ("unique_paths", "no_sync_files"):
+            for suffix in ("must be a string", "must be a non-empty string"):
+                prefix = f"field '{label}["
+                if message.startswith(prefix) and message.endswith(suffix):
+                    index = message.removeprefix(prefix).split("]", maxsplit=1)[0]
+                    return [f"{label}[{index}]: must be a non-empty string"]
+        return [message]
+    return []
+
+
 def validate_registry_core(
     data: dict[str, object], repo_root: Path | None = None
 ) -> list[str]:
@@ -289,6 +306,7 @@ def validate_registry_core(
         errors.append("'folders_to_check' is no longer valid")
 
     errors.extend(validate_required_top_level_sections(data))
+    errors.extend(validate_registry_schema(data))
     errors.extend(validate_modified_upstream_files(data))
 
     unique_paths = data.get("unique_paths", [])

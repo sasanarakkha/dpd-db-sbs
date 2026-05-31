@@ -13,6 +13,7 @@
 - [ ] **1.1 Environmental Check**:
   - [ ] `git status` — must be clean before sync work begins.
   - [ ] `git fetch upstream` — fetch latest upstream refs.
+  - [ ] `uv run ruff check tools/ scripts/ db/ exporter/ --select F821,E999 --quiet` — catches undefined names and syntax/API breakage before sync work begins.
   - [ ] Review `kamma/upstream_sync/accepted_sync.json` — starting SHA/date/ref are present.
 - [ ] **1.2 Pre-sync Shadow Health Check**:
   - [ ] `uv run python3 tests/check_shadow_modifications.py` — output is clean.

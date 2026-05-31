@@ -28,6 +28,19 @@ from tools.printer import printer as pr
 
 type GitChange = tuple[str, str]
 type MappedAction = dict[str, str]
+type SourceAction = dict[str, str]
+
+
+def expand_git_change(status: str, path: str) -> list[GitChange]:
+    """Represent git renames as a factual delete plus add pair."""
+    if not status.startswith("R"):
+        return [(status, path)]
+
+    parts = path.split()
+    if len(parts) != 2:
+        return [(status, path)]
+    old_path, new_path = parts
+    return [("D", old_path), ("A", new_path)]
 
 
 def resolve_target_upstream_sha(ref: str = "upstream/main") -> str:
@@ -62,14 +75,14 @@ def get_upstream_changes(from_sha: str, to_sha: str) -> list[GitChange]:
     for line in result.stdout.splitlines():
         if not line.strip():
             continue
-        parts = line.split(None, 1)
-        if len(parts) != 2:
+        parts = line.split()
+        if len(parts) < 2:
             continue
         status = parts[0]
-        path = parts[1]
-        if status.startswith("R"):
-            path = path.split(None, 1)[-1]
-        changes.append((status, path))
+        if status.startswith("R") and len(parts) >= 3:
+            changes.extend(expand_git_change(status, f"{parts[1]} {parts[2]}"))
+        else:
+            changes.append((status, parts[1]))
     return changes
 
 
@@ -96,6 +109,32 @@ class PrepAnalyzer:
                 return True
         return False
 
+    def build_mapped_action(
+        self, category: str, local_path: str, source_path: str, changed_path: str
+    ) -> MappedAction:
+        """Build one mapped action, including exact local target path when derivable."""
+        action: MappedAction = {"category": category, "local_path": local_path}
+        if source_path.endswith("/") and local_path.endswith("/"):
+            relative_path = changed_path.removeprefix(source_path)
+            action["local_target_path"] = f"{local_path}{relative_path}"
+        else:
+            action["local_target_path"] = local_path
+        return action
+
+    def build_mapped_actions(
+        self, actions: list[SourceAction], changed_path: str
+    ) -> list[MappedAction]:
+        """Build manifest actions for a changed upstream path."""
+        return [
+            self.build_mapped_action(
+                action["category"],
+                action["local_path"],
+                action["source_path"],
+                changed_path,
+            )
+            for action in actions
+        ]
+
     def run(self) -> None:
         """Generate the Stage 1 report and manifest in the thread folder."""
         from_sha = self.accepted_sync["last_accepted_upstream_sha"]
@@ -104,7 +143,11 @@ class PrepAnalyzer:
 
         target_ref = self.accepted_sync["last_accepted_upstream_ref"]
         to_sha = resolve_target_upstream_sha(target_ref)
-        changes = get_upstream_changes(from_sha, to_sha)
+        changes = [
+            expanded_change
+            for status, path in get_upstream_changes(from_sha, to_sha)
+            for expanded_change in expand_git_change(status, path)
+        ]
 
         tracked_modified: list[str] = []
         shadow_sources_modified: list[tuple[str, list[str]]] = []
@@ -113,17 +156,25 @@ class PrepAnalyzer:
         deleted: list[str] = []
         discuss_paths: list[str] = []
 
-        source_to_shadows: dict[str, list[MappedAction]] = {}
+        source_to_shadows: dict[str, list[SourceAction]] = {}
         for category, mapping in self.shadow_mappings_by_category.items():
             for shadow, source in mapping.items():
                 source_to_shadows.setdefault(source, []).append(
-                    {"category": category, "local_path": shadow}
+                    {
+                        "category": category,
+                        "local_path": shadow,
+                        "source_path": source,
+                    }
                 )
 
-        source_to_inspired: dict[str, list[MappedAction]] = {}
+        source_to_inspired: dict[str, list[SourceAction]] = {}
         for local, source in self.inspired_mappings.items():
             source_to_inspired.setdefault(source, []).append(
-                {"category": "inspired_by_upstream", "local_path": local}
+                {
+                    "category": "inspired_by_upstream",
+                    "local_path": local,
+                    "source_path": source,
+                }
             )
 
         discuss_lookup = {
@@ -143,18 +194,22 @@ class PrepAnalyzer:
                 deleted.append(path)
                 for src, actions in source_to_shadows.items():
                     if src.endswith("/") and path.startswith(src):
-                        mapped_actions[path] = list(actions)
+                        mapped_actions[path] = self.build_mapped_actions(actions, path)
                         break
                     if path == src:
-                        mapped_actions[path] = list(actions)
+                        mapped_actions[path] = self.build_mapped_actions(actions, path)
                         break
 
                 for src, actions in source_to_inspired.items():
                     if src.endswith("/") and path.startswith(src):
-                        mapped_actions.setdefault(path, []).extend(actions)
+                        mapped_actions.setdefault(path, []).extend(
+                            self.build_mapped_actions(actions, path)
+                        )
                         break
                     if path == src:
-                        mapped_actions.setdefault(path, []).extend(actions)
+                        mapped_actions.setdefault(path, []).extend(
+                            self.build_mapped_actions(actions, path)
+                        )
                         break
                 continue
 
@@ -169,33 +224,37 @@ class PrepAnalyzer:
 
             for src, actions in source_to_shadows.items():
                 if src.endswith("/") and path.startswith(src):
+                    manifest_actions = self.build_mapped_actions(actions, path)
                     shadow_sources_modified.append(
-                        (path, [action["local_path"] for action in actions])
+                        (path, [action["local_path"] for action in manifest_actions])
                     )
-                    mapped_actions[path] = list(actions)
+                    mapped_actions[path] = manifest_actions
                     found_source = True
                     break
                 if path == src:
+                    manifest_actions = self.build_mapped_actions(actions, path)
                     shadow_sources_modified.append(
-                        (path, [action["local_path"] for action in actions])
+                        (path, [action["local_path"] for action in manifest_actions])
                     )
-                    mapped_actions[path] = list(actions)
+                    mapped_actions[path] = manifest_actions
                     found_source = True
                     break
 
             for src, actions in source_to_inspired.items():
                 if src.endswith("/") and path.startswith(src):
+                    manifest_actions = self.build_mapped_actions(actions, path)
                     inspired_sources_modified.append(
-                        (path, [action["local_path"] for action in actions])
+                        (path, [action["local_path"] for action in manifest_actions])
                     )
-                    mapped_actions.setdefault(path, []).extend(actions)
+                    mapped_actions.setdefault(path, []).extend(manifest_actions)
                     found_source = True
                     break
                 if path == src:
+                    manifest_actions = self.build_mapped_actions(actions, path)
                     inspired_sources_modified.append(
-                        (path, [action["local_path"] for action in actions])
+                        (path, [action["local_path"] for action in manifest_actions])
                     )
-                    mapped_actions.setdefault(path, []).extend(actions)
+                    mapped_actions.setdefault(path, []).extend(manifest_actions)
                     found_source = True
                     break
 

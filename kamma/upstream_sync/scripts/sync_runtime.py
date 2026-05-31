@@ -13,6 +13,9 @@ from kamma.upstream_sync.scripts.registry_helper import (
     load_prep_manifest,
     load_registry,
 )
+from kamma.upstream_sync.scripts.sync_schema import (
+    AcceptedSyncState as AcceptedSyncStateSchema,
+)
 from tools.printer import printer as pr
 
 
@@ -47,8 +50,9 @@ def verify_manifest(
     try:
         manifest = load_prep_manifest(manifest_path)
         if accepted_sync_state is not None:
-            expected_from_sha = accepted_sync_state["last_accepted_upstream_sha"]
-            expected_ref = accepted_sync_state["last_accepted_upstream_ref"]
+            expected_state = AcceptedSyncStateSchema.from_raw(accepted_sync_state)
+            expected_from_sha = expected_state.last_accepted_upstream_sha
+            expected_ref = expected_state.last_accepted_upstream_ref
             if manifest["from_upstream_sha"] != expected_from_sha:
                 pr.red(
                     "Manifest from_upstream_sha does not match accepted_sync.json: "

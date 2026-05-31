@@ -7,7 +7,7 @@ import sys
 from kamma.upstream_sync.scripts.registry_helper import (
     load_registry,
     get_modified_upstream_paths,
-    get_strict_shadow_mappings,
+    get_shadow_mappings_by_category,
 )
 
 
@@ -43,16 +43,10 @@ def main() -> None:
         sections.append(make_stub(path, "modified_upstream"))
         count += 1
 
-    mappings = get_strict_shadow_mappings(data)
-    russian = data.get("russian_copies", {})
-    for shadow in mappings:
-        category = (
-            "russian_copy"
-            if isinstance(russian, dict) and shadow in russian
-            else "sbs_copy"
-        )
-        sections.append(make_stub(shadow, category))
-        count += 1
+    for category, mapping in get_shadow_mappings_by_category(data).items():
+        for shadow in mapping:
+            sections.append(make_stub(shadow, category))
+            count += 1
 
     inspired = data.get("inspired_by_upstream", {})
     if isinstance(inspired, dict):

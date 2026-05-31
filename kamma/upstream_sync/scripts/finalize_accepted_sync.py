@@ -10,6 +10,7 @@ from kamma.upstream_sync.scripts.registry_helper import (
     build_accepted_sync_state,
     get_accepted_sync_path,
     get_prep_manifest_path,
+    load_accepted_sync_state,
     load_prep_manifest,
     write_accepted_sync_state,
 )
@@ -32,7 +33,15 @@ def finalize_accepted_sync(thread_dir: str, state_path: Path, notes: str) -> int
     """Verify the prep manifest, then advance accepted upstream sync metadata."""
     pr.green_title("finalize_accepted_sync.py")
     pr.green("verifying prep manifest")
-    if verify_manifest(thread_dir, allow_discuss=False) != 0:
+    accepted_sync_state = load_accepted_sync_state(state_path)
+    if (
+        verify_manifest(
+            thread_dir,
+            accepted_sync_state=accepted_sync_state,
+            allow_discuss=False,
+        )
+        != 0
+    ):
         pr.red("Manifest verification failed. accepted_sync.json was not updated.")
         return 1
     pr.yes("ok")

@@ -126,3 +126,104 @@ Older recommended commit messages:
 #sync tooling: block stale manifests and discuss pulls
 #sync tooling: strengthen pre-sync backup and manifests
 ```
+
+## Follow-up Improvement Plan Status
+
+- Completed work:
+  - Added Stage 1 pre-sync API health check command to the canonical guide, stage checklist, and sync thread plan template.
+  - Fixed `gen_smd_scaffold.py` so DPS and Tamil strict shadows keep their correct scaffold categories.
+  - Hardened `finalize_accepted_sync.py` so manifest verification receives the current accepted sync state before `accepted_sync.json` can be advanced.
+  - Added additive `local_target_path` values to `prep_manifest.json` mapped actions, preserving `local_path`.
+  - Documented `local_target_path` usage in Stage 2 planning docs.
+  - Added/updated tests for each behavior.
+- Exact commands run:
+  - `uv run pytest tests/test_upstream_sync_docs_policy.py -v` red, then green.
+  - `uv run pytest tests/test_gen_smd_scaffold.py -v` red, then green.
+  - `uv run pytest tests/test_finalize_accepted_sync.py -v` red.
+  - `uv run pytest tests/test_finalize_accepted_sync.py tests/test_sync_state.py -v` green.
+  - `uv run pytest tests/test_prep_analyzer.py -v` red.
+  - `uv run pytest tests/test_prep_analyzer.py tests/test_sync_state.py -v` green.
+  - `uv run pytest tests/test_upstream_sync_docs_policy.py tests/test_gen_smd_scaffold.py tests/test_finalize_accepted_sync.py tests/test_sync_state.py tests/test_prep_analyzer.py -v` green: 26 passed.
+  - `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` passed.
+  - `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` passed.
+  - `uv run ruff check --fix kamma/upstream_sync/scripts/gen_smd_scaffold.py kamma/upstream_sync/scripts/finalize_accepted_sync.py kamma/upstream_sync/scripts/prep_analyzer.py tests/test_upstream_sync_docs_policy.py tests/test_gen_smd_scaffold.py tests/test_finalize_accepted_sync.py tests/test_prep_analyzer.py` passed.
+  - `uv run ruff format kamma/upstream_sync/scripts/gen_smd_scaffold.py kamma/upstream_sync/scripts/finalize_accepted_sync.py kamma/upstream_sync/scripts/prep_analyzer.py tests/test_upstream_sync_docs_policy.py tests/test_gen_smd_scaffold.py tests/test_finalize_accepted_sync.py tests/test_prep_analyzer.py` reformatted 3 files.
+  - `uv run pyright kamma/upstream_sync/scripts/gen_smd_scaffold.py kamma/upstream_sync/scripts/finalize_accepted_sync.py kamma/upstream_sync/scripts/prep_analyzer.py tests/test_upstream_sync_docs_policy.py tests/test_gen_smd_scaffold.py tests/test_finalize_accepted_sync.py tests/test_prep_analyzer.py` passed: 0 errors.
+  - `uv run --with pyrefly pyrefly check --min-severity warn kamma/upstream_sync/scripts/gen_smd_scaffold.py kamma/upstream_sync/scripts/finalize_accepted_sync.py kamma/upstream_sync/scripts/prep_analyzer.py tests/test_upstream_sync_docs_policy.py tests/test_gen_smd_scaffold.py tests/test_finalize_accepted_sync.py tests/test_prep_analyzer.py` passed: 0 errors, 1 suppressed.
+  - `git diff --check -- kamma/upstream_sync/guide.md kamma/upstream_sync/scripts/finalize_accepted_sync.py kamma/upstream_sync/scripts/gen_smd_scaffold.py kamma/upstream_sync/scripts/prep_analyzer.py kamma/upstream_sync/stages/analysis.md kamma/upstream_sync/stages/prep.md kamma/upstream_sync/templates/sync_thread_plan.md tests/test_finalize_accepted_sync.py tests/test_prep_analyzer.py tests/test_upstream_sync_docs_policy.py` passed.
+  - `rg -n "[ \t]+$" kamma/threads/upstream_sync_improvment/spec.md kamma/threads/upstream_sync_improvment/plan.md tests/test_gen_smd_scaffold.py` found no trailing whitespace.
+- Exact outputs or failures summarized:
+  - Docs-policy red failure: missing API health check command from live docs.
+  - SMD scaffold red failure: DPS/Tamil entries emitted as `sbs_copy`.
+  - Finalize red failure: `verify_manifest` was called without `accepted_sync_state`.
+  - Prep analyzer red failure: mapped actions lacked `local_target_path`.
+  - Final focused test pass: 26 passed.
+- Files changed:
+  - `kamma/threads/upstream_sync_improvment/spec.md`
+  - `kamma/threads/upstream_sync_improvment/plan.md`
+  - `kamma/threads/upstream_sync_improvment/handoff.md`
+  - `kamma/upstream_sync/guide.md`
+  - `kamma/upstream_sync/stages/analysis.md`
+  - `kamma/upstream_sync/stages/prep.md`
+  - `kamma/upstream_sync/templates/sync_thread_plan.md`
+  - `kamma/upstream_sync/scripts/gen_smd_scaffold.py`
+  - `kamma/upstream_sync/scripts/finalize_accepted_sync.py`
+  - `kamma/upstream_sync/scripts/prep_analyzer.py`
+  - `tests/test_upstream_sync_docs_policy.py`
+  - `tests/test_gen_smd_scaffold.py`
+  - `tests/test_finalize_accepted_sync.py`
+  - `tests/test_prep_analyzer.py`
+- Open decisions:
+  - User manual review is still needed.
+  - Run `/kamma:3-review` in a fresh session after user confirms behavior is acceptable.
+- Errors, issues, and repeated mistakes:
+  - The first docs-template patch accidentally indented `- [ ] **1.1 Environmental Check**`; this was caught by diff review and corrected before final validation.
+  - Existing unrelated dirty/untracked `resources/*` entries remain untouched.
+- Next model to use: Review can run in the user's preferred review model.
+- Exact restart prompt:
+
+```text
+Continue upstream sync improvement thread: kamma/threads/upstream_sync_improvment.
+First read:
+1. kamma/threads/upstream_sync_improvment/handoff.md
+2. kamma/threads/upstream_sync_improvment/plan.md
+3. kamma/threads/upstream_sync_improvment/spec.md
+4. kamma/upstream_sync/guide.md
+
+Task: review the completed follow-up implementation and prepare it for finalization. Do not broaden scope. Preserve unrelated resources/* dirty state.
+```
+
+## Typed Hardening Thread Finalized
+
+- Thread finalized: `kamma/threads/20260531_upstream_sync_typed_hardening`.
+- Archived to: `kamma/archive/20260531_upstream_sync_typed_hardening`.
+- Active thread directory removed from `kamma/threads/`.
+- No `project.md` or `tech.md` update was needed.
+- No GitHub issue reference was found, so no issue comment/close was performed.
+- Review verdict was `PASSED`.
+- Objective completed: upstream-sync metadata parsing is now hardened with typed stdlib dataclasses and centralized validation while preserving existing JSON formats and CLI behavior.
+- Main changes:
+  - Added `kamma/upstream_sync/scripts/sync_schema.py`.
+  - Routed registry, manifest, mapped action, and accepted sync state validation through typed schema objects.
+  - Hardened prep analyzer rename handling so git renames are represented as delete/add facts.
+  - Allowed approved intrinsic `rpd` and `tpd` markers in registry category naming checks.
+  - Added exact stale-doc diff evidence to docs parity reporting.
+  - Updated Stage 4.A docs wording for automatic diff evidence.
+  - Added focused test coverage for schema validation, sync state validation, registry validation, rename handling, naming policy, finalize behavior, and docs parity.
+- Review test evidence:
+  - Focused pytest suite passed: 103 tests.
+  - `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` passed.
+  - `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` passed.
+  - `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py /private/tmp/dpd-db-kamma-review` passed.
+  - `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py /private/tmp/dpd-db-kamma-review` passed.
+  - `uv run python3 kamma/upstream_sync/scripts/sync_runtime.py verify-manifest /private/tmp/dpd-db-kamma-review` passed.
+  - Ruff, pyright, pyrefly, and `git diff --check` passed on the changed upstream-sync files.
+- Recommended commit message:
+
+```text
+refactor(upstream-sync): harden typed metadata validation
+```
+
+- Related dirty entries still intentionally separate:
+  - `resources/*`
+  - `kamma/threads/upstream_sync_improvment/handoff.md`

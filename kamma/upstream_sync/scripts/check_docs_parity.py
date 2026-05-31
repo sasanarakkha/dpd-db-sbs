@@ -55,6 +55,21 @@ def get_docs_changed_since(sha: str) -> set[str]:
     return changed
 
 
+def get_docs_diff(sha: str, docs_relative_path: str) -> str:
+    """Return exact git diff evidence for one docs/ file since sha."""
+    try:
+        result = subprocess.run(
+            ["git", "diff", sha, "HEAD", "--", f"docs/{docs_relative_path}"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    except subprocess.CalledProcessError as exc:
+        return f"Unable to collect diff evidence for docs/{docs_relative_path}: {exc}"
+    return result.stdout
+
+
 def collect_md_files(directory: Path) -> set[str]:
     return {str(p.relative_to(directory)) for p in directory.rglob("*.md")}
 
@@ -116,6 +131,21 @@ def write_report(
         lines.append("")
         for f in stale:
             lines.append(f"- `docs/{f}` → review/update `docs_rus/{f}`")
+        lines += [
+            "",
+            "## Stale Translation Diff Evidence",
+            "",
+        ]
+        for f in stale:
+            diff = get_docs_diff(sha, f)
+            lines += [
+                f"### `docs/{f}`",
+                "",
+                "```diff",
+                diff.rstrip(),
+                "```",
+                "",
+            ]
     else:
         lines.append("None.")
 

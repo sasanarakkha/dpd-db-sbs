@@ -19,6 +19,7 @@ def mock_registry():
             "db/families/family_compound_ru.py": "db/families/family_compound.py",
             "db/families/deleted_source_ru.py": "db/families/deleted_source.py",
             "exporter/webapp/main_ru.py": "exporter/webapp/main.py",
+            "exporter/webapp/ru_templates/": "exporter/webapp/templates/",
         },
         "sbs_copies": {},
         "dps_copies": {},
@@ -64,6 +65,7 @@ def test_prep_analyzer_report_generation(
         ("M", "db/models.py"),  # Tracked modified
         ("M", "db/families/family_compound.py"),  # Shadow source modified
         ("M", "exporter/webapp/main.py"),  # Russian source modified
+        ("M", "exporter/webapp/templates/components/card.jinja"),  # Directory shadow
         ("M", "db/epd/epd_to_lookup.py"),  # Tamil source modified
         ("M", "scripts/bash/makedict.py"),  # Inspired source modified
         ("M", "new_file.py"),  # Untracked
@@ -114,6 +116,7 @@ def test_prep_analyzer_report_generation(
         "db/families/family_compound.py",
         "db/models.py",
         "exporter/webapp/main.py",
+        "exporter/webapp/templates/components/card.jinja",
         "new_file.py",
         "scripts/bash/makedict.py",
     ]
@@ -132,10 +135,74 @@ def test_prep_analyzer_report_generation(
         == "db/families/deleted_source_ru.py"
     )
     assert mapped["exporter/webapp/main.py"][0]["category"] == "russian_copy"
+    assert (
+        mapped["exporter/webapp/main.py"][0]["local_target_path"]
+        == "exporter/webapp/main_ru.py"
+    )
+    assert (
+        mapped["exporter/webapp/templates/components/card.jinja"][0]["local_path"]
+        == "exporter/webapp/ru_templates/"
+    )
+    assert (
+        mapped["exporter/webapp/templates/components/card.jinja"][0][
+            "local_target_path"
+        ]
+        == "exporter/webapp/ru_templates/components/card.jinja"
+    )
     assert mapped["db/epd/epd_to_lookup.py"][0]["category"] == "tamil_copy"
     assert mapped["scripts/bash/makedict.py"][0]["category"] == "inspired_by_upstream"
     assert (
         manifest["generated_at"] != accepted_sync_state["last_accepted_upstream_date"]
+    )
+
+
+@patch("kamma.upstream_sync.scripts.prep_analyzer.load_registry")
+@patch("kamma.upstream_sync.scripts.prep_analyzer.load_accepted_sync_state")
+@patch("kamma.upstream_sync.scripts.prep_analyzer.get_upstream_changes")
+@patch("kamma.upstream_sync.scripts.prep_analyzer.resolve_target_upstream_sha")
+def test_prep_analyzer_treats_renames_as_delete_and_add(
+    mock_target,
+    mock_changes,
+    mock_state,
+    mock_load,
+    mock_registry,
+    accepted_sync_state,
+    tmp_path: Path,
+) -> None:
+    mock_load.return_value = mock_registry
+    mock_state.return_value = accepted_sync_state
+    mock_target.return_value = "newsha456"
+    mock_changes.return_value = [
+        ("R100", "db/families/deleted_source.py db/families/family_compound.py")
+    ]
+
+    analyzer = PrepAnalyzer(tmp_path)
+    with (
+        patch(
+            "kamma.upstream_sync.scripts.prep_analyzer.validate_registry_core",
+            return_value=[],
+        ),
+        patch(
+            "kamma.upstream_sync.scripts.prep_analyzer.extract_all_smd_entries",
+            return_value={},
+        ),
+        patch(
+            "kamma.upstream_sync.scripts.prep_analyzer.collect_registry_paths",
+            return_value=[],
+        ),
+    ):
+        analyzer.run()
+
+    manifest = json.loads((tmp_path / "prep_manifest.json").read_text(encoding="utf-8"))
+    assert manifest["deleted_upstream_paths"] == ["db/families/deleted_source.py"]
+    assert manifest["changed_upstream_paths"] == ["db/families/family_compound.py"]
+    assert (
+        manifest["mapped_actions"]["db/families/deleted_source.py"][0]["local_path"]
+        == "db/families/deleted_source_ru.py"
+    )
+    assert (
+        manifest["mapped_actions"]["db/families/family_compound.py"][0]["local_path"]
+        == "db/families/family_compound_ru.py"
     )
 
 

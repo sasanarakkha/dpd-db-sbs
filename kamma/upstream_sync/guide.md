@@ -161,6 +161,7 @@ Stage 4 is split into two model-bound substages: ADVANCED analysis and FAST tran
      remediation in the next sync (see Stage 3.5 in the April 2026 sync thread).
 1. **Environmental Validation**:
    - Run `git fetch upstream` — always fetch before any analysis. No need to search for new commits manually; the scripts derive the range from `accepted_sync.json`.
+   - Run `uv run ruff check tools/ scripts/ db/ exporter/ --select F821,E999 --quiet` — catch undefined names and syntax/API breakage before sync work begins.
    - Run `uv run python3 kamma/upstream_sync/scripts/validate_registry.py`
    - Run `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py`
    - Ensure `kamma/upstream_sync/accepted_sync.json` points at the last accepted upstream sync.
@@ -184,6 +185,7 @@ Stage 4 is split into two model-bound substages: ADVANCED analysis and FAST tran
    - Create `dynamic_plan.md` in the thread folder.
    - Use `prep_manifest.json` as the factual source of changed upstream files and mapped local destinations.
    - For every modified upstream file mapped to a shadow/inspired copy, define the merge strategy.
+   - Use `mapped_actions[].local_target_path` when present for exact shadow/template target paths; use `local_path` only as a backward-compatible fallback.
    - **Plan quality requirement (MANDATORY before handing off to Stage 3):** `dynamic_plan.md` must be self-contained enough for a mechanical executor with zero context and zero judgment. Every item must include:
      - Exact file path(s) to edit.
      - Exact anchor string or line reference to locate the change point.
@@ -234,11 +236,11 @@ FAST must run `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <
 
 1. Read `docs_parity_report.md`.
 2. Read 3–5 existing `docs_rus/` files to build a terminology glossary (key EN → RU mappings specific to DPD: headword, inflection template, root family, deconstructor, lookup, etc.).
-3. For each stale file listed in the report, use the FAST-provided `git diff <accepted_sha> HEAD -- docs/<file>` output. If the diff is missing, stop and request FAST.
+3. For each stale file listed in the report, use the exact diff evidence in `docs_parity_report.md`. If the diff evidence is missing, stop and request FAST.
 4. Write `docs_translation_plan.md` in the thread folder containing:
    - **Terminology glossary** — EN → RU pairs extracted from existing translations.
    - **Translation rules** — keep Pali terms as-is; keep image paths, code blocks, and URLs unchanged; translate heading text and alt text; keep HTML anchor IDs unchanged.
-   - **Per-file tasks** — for each missing file: source path, target path, "full translation". For each stale file: source path, target path, the exact diff, "update only changed sections".
+   - **Per-file tasks** — for each missing file: source path, target path, "full translation". For each stale file: source path, target path, the exact diff evidence from `docs_parity_report.md`, "update only changed sections".
 5. Present `docs_translation_plan.md` to user for approval.
 
 **Stage 4.B — Translation (FAST model)**:

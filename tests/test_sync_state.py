@@ -144,6 +144,53 @@ def test_load_prep_manifest_invalid(
         load_prep_manifest(manifest_path)
 
 
+@pytest.mark.parametrize(
+    ("payload_update", "expected_error"),
+    [
+        (
+            {"mapped_actions": {"db/models.py": "not-a-list"}},
+            "field 'mapped_actions\\['db/models.py'\\]' must be a list",
+        ),
+        (
+            {"mapped_actions": {"db/models.py": ["not-an-object"]}},
+            "field 'mapped_actions\\['db/models.py'\\]\\[0\\]' must be a JSON object",
+        ),
+        (
+            {"mapped_actions": {"db/models.py": [{"local_path": "db/models_ru.py"}]}},
+            "field 'mapped_actions\\['db/models.py'\\]\\[0\\]': missing required field 'category'",
+        ),
+        (
+            {"mapped_actions": {"db/models.py": [{"category": "russian_copy"}]}},
+            "field 'mapped_actions\\['db/models.py'\\]\\[0\\]': missing required field 'local_path'",
+        ),
+        (
+            {
+                "mapped_actions": {
+                    "db/models.py": [
+                        {
+                            "category": "russian_copy",
+                            "local_path": "db/models_ru.py",
+                            "local_target_path": 123,
+                        }
+                    ]
+                }
+            },
+            "field 'mapped_actions\\['db/models.py'\\]\\[0\\]': field 'local_target_path' must be a string",
+        ),
+    ],
+)
+def test_load_prep_manifest_rejects_invalid_mapped_actions(
+    tmp_path: Path, payload_update: dict[str, object], expected_error: str
+) -> None:
+    payload = valid_manifest_payload()
+    payload.update(payload_update)
+    manifest_path = tmp_path / "prep_manifest.json"
+    manifest_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(ValueError, match=expected_error):
+        load_prep_manifest(manifest_path)
+
+
 def test_build_and_write_accepted_sync_state(tmp_path: Path) -> None:
     manifest: dict[str, object] = {
         "from_upstream_sha": "oldsha123",
@@ -220,5 +267,19 @@ def test_verify_manifest_rejects_target_sha_mismatch(tmp_path: Path) -> None:
     write_manifest(tmp_path, valid_manifest_payload())
 
     result = verify_manifest(str(tmp_path), target_sha="newer_upstream_sha")
+
+    assert result == 1
+
+
+def test_verify_manifest_rejects_malformed_accepted_sync_state(tmp_path: Path) -> None:
+    write_manifest(tmp_path, valid_manifest_payload())
+
+    result = verify_manifest(
+        str(tmp_path),
+        accepted_sync_state={
+            "last_accepted_upstream_date": "2026-04-08",
+            "last_accepted_upstream_ref": "upstream/main",
+        },
+    )
 
     assert result == 1
