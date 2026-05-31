@@ -1,10 +1,13 @@
+"""Verify automated upstream sync execution refuses unsafe repository states."""
+
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 from pathlib import Path
 import shutil
 import tempfile
 
 from kamma.upstream_sync.scripts.execute_sync import (
+    execute_sync,
     get_run_specific_exclusions,
     get_permanent_exclusions,
     GitContext,
@@ -94,6 +97,49 @@ class TestExecuteSync(unittest.TestCase):
         self.assertIn("db/models.py", exclusions)
         self.assertIn("exporter/goldendict/export_goldendict.py", exclusions)
         self.assertEqual(len(exclusions), 3)
+
+    @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
+    def test_execute_sync_rejects_dirty_working_tree(self, mock_context_class):
+        context = MagicMock()
+        context.is_dirty = True
+        context.original_branch = "sbs-ru"
+        mock_context_class.return_value = context
+
+        result = execute_sync(str(self.thread_dir))
+
+        self.assertEqual(result, 1)
+        context.restore_original_state.assert_not_called()
+
+    @patch("kamma.upstream_sync.scripts.execute_sync.verify_manifest", return_value=1)
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_accepted_sync_state")
+    @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
+    def test_execute_sync_rejects_invalid_manifest(
+        self,
+        mock_context_class,
+        mock_load_state,
+        mock_verify_manifest,
+    ):
+        context = MagicMock()
+        context.is_dirty = False
+        context.original_branch = "sbs-ru"
+        mock_context_class.return_value = context
+        mock_load_state.return_value = {"last_accepted_upstream_ref": "upstream/main"}
+
+        result = execute_sync(str(self.thread_dir))
+
+        self.assertEqual(result, 1)
+        mock_verify_manifest.assert_called_once_with(str(self.thread_dir))
+
+    @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
+    def test_execute_sync_rejects_wrong_starting_branch(self, mock_context_class):
+        context = MagicMock()
+        context.is_dirty = False
+        context.original_branch = "feature-work"
+        mock_context_class.return_value = context
+
+        result = execute_sync(str(self.thread_dir))
+
+        self.assertEqual(result, 1)
 
 
 if __name__ == "__main__":

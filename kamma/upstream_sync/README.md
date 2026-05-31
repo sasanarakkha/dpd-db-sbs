@@ -55,4 +55,4 @@ For the full protocol, see **[guide.md](./guide.md)**.
 - `tamil_copies`: Strict Tamil shadows (Parity enforced).
 - `inspired_by_upstream`: Structural divergences (Selective backporting).
 - `unique_paths`: Fork-only files (No sync).
-- `skip_sync_patterns`: Ignored paths.
+- `skip_sync_patterns`: Upstream-owned or irrelevant paths excluded from Stage 1 analysis only; still synced unless also listed in `no_sync_files`.

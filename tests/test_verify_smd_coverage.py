@@ -1,3 +1,5 @@
+"""Verify SMD coverage checks include every upstream sync registry category."""
+
 import pytest
 from kamma.upstream_sync.scripts.verify_smd_coverage import (
     collect_registry_paths,
@@ -49,9 +51,9 @@ def test_fail_on_duplicate_file_entry(tmp_path):
         extract_all_smd_entries(tmp_path)
 
 
-def test_check_rubric_inspired_only(base_data=None):
+def test_check_rubric_inspired_only() -> None:
     # inspired_only skips min local changes but requires Watch For
-    entry = {
+    entry: dict[str, object] = {
         "sync_rule": "inspired_only",
         "local_changes_count": 0,
         "watch_for_count": 1,
@@ -59,7 +61,7 @@ def test_check_rubric_inspired_only(base_data=None):
     violations = check_rubric("path", "category", entry)
     assert not violations
 
-    entry_no_watch = {
+    entry_no_watch: dict[str, object] = {
         "sync_rule": "inspired_only",
         "local_changes_count": 0,
         "watch_for_count": 0,
@@ -68,20 +70,41 @@ def test_check_rubric_inspired_only(base_data=None):
     assert any("missing Watch For section" in v for v in violations)
 
 
-def test_check_rubric_strict_requires_min(base_data=None):
-    entry = {"sync_rule": "PORT", "local_changes_count": 1, "watch_for_count": 1}
+def test_check_rubric_strict_requires_min() -> None:
+    entry: dict[str, object] = {
+        "sync_rule": "PORT",
+        "local_changes_count": 1,
+        "watch_for_count": 1,
+    }
     violations = check_rubric("path", "category", entry)
     assert any("only 1 local-change(s), need 2" in v for v in violations)
 
 
 def test_collect_registry_paths_includes_russian_copies() -> None:
-    data = {
+    data: dict[str, object] = {
         "modified_upstream_files": [],
         "russian_copies": {"exporter/webapp/main_ru.py": "exporter/webapp/main.py"},
         "sbs_copies": {},
+        "dps_copies": {},
+        "tamil_copies": {},
         "inspired_by_upstream": {},
     }
 
     paths = collect_registry_paths(data)
 
     assert ("exporter/webapp/main_ru.py", "russian_copy") in paths
+
+
+def test_collect_registry_paths_includes_tamil_copies() -> None:
+    data: dict[str, object] = {
+        "modified_upstream_files": [],
+        "russian_copies": {},
+        "sbs_copies": {},
+        "dps_copies": {},
+        "tamil_copies": {"db/tpd/tpd_to_lookup.py": "db/epd/epd_to_lookup.py"},
+        "inspired_by_upstream": {},
+    }
+
+    paths = collect_registry_paths(data)
+
+    assert ("db/tpd/tpd_to_lookup.py", "tamil_copy") in paths

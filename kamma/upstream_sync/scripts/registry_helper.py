@@ -184,12 +184,25 @@ def get_inspired_by_upstream_mapping(data: dict[str, object]) -> dict[str, str]:
     return mapping
 
 
+def get_string_mapping(data: dict[str, object], key: str) -> dict[str, str]:
+    """Return a string-to-string registry mapping, ignoring malformed values."""
+    value = data.get(key, {})
+    if not isinstance(value, dict):
+        return {}
+    return {
+        local_path: upstream_path
+        for local_path, upstream_path in value.items()
+        if isinstance(local_path, str) and isinstance(upstream_path, str)
+    }
+
+
 def get_strict_shadow_mappings(data: dict[str, object]) -> dict[str, str]:
-    """Return combined russian_copies, sbs_copies, and dps_copies mappings."""
-    russian: dict[str, str] = data.get("russian_copies", {})  # type: ignore[assignment]
-    sbs: dict[str, str] = data.get("sbs_copies", {})  # type: ignore[assignment]
-    dps: dict[str, str] = data.get("dps_copies", {})  # type: ignore[assignment]
-    return {**russian, **sbs, **dps}
+    """Return combined strict shadow mappings for every localized category."""
+    russian = get_string_mapping(data, "russian_copies")
+    sbs = get_string_mapping(data, "sbs_copies")
+    dps = get_string_mapping(data, "dps_copies")
+    tamil = get_string_mapping(data, "tamil_copies")
+    return {**russian, **sbs, **dps, **tamil}
 
 
 def get_shadow_mappings_by_category(
@@ -197,9 +210,10 @@ def get_shadow_mappings_by_category(
 ) -> dict[str, dict[str, str]]:
     """Return strict-shadow mappings grouped by logical category."""
     return {
-        "russian_copy": data.get("russian_copies", {}),  # type: ignore[dict-item]
-        "sbs_copy": data.get("sbs_copies", {}),  # type: ignore[dict-item]
-        "dps_copy": data.get("dps_copies", {}),  # type: ignore[dict-item]
+        "russian_copy": get_string_mapping(data, "russian_copies"),
+        "sbs_copy": get_string_mapping(data, "sbs_copies"),
+        "dps_copy": get_string_mapping(data, "dps_copies"),
+        "tamil_copy": get_string_mapping(data, "tamil_copies"),
     }
 
 

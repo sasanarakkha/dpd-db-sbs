@@ -6,6 +6,7 @@ import argparse
 import fnmatch
 import json
 import subprocess
+from datetime import datetime
 from pathlib import Path
 
 from kamma.upstream_sync.scripts.registry_helper import (
@@ -325,7 +326,7 @@ class PrepAnalyzer:
             "from_upstream_sha": from_sha,
             "to_upstream_sha": to_sha,
             "target_upstream_ref": self.accepted_sync["last_accepted_upstream_ref"],
-            "generated_at": self.accepted_sync["last_accepted_upstream_date"],
+            "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
             "changed_upstream_paths": changed_upstream_paths,
             "deleted_upstream_paths": deleted_upstream_paths,
             "mapped_actions": mapped_actions,

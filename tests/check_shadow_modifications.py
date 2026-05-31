@@ -54,6 +54,7 @@ def check_shadows() -> None:
         "russian_copy": "Russian",
         "sbs_copy": "SBS",
         "dps_copy": "DPS",
+        "tamil_copy": "Tamil",
     }
     for category, mappings in get_shadow_mappings_by_category(registry).items():
         for shadow, source in mappings.items():

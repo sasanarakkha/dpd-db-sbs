@@ -133,7 +133,7 @@ ADVANCED must stop when mechanical work is needed: broad file reading, command e
 - **Stage 2 (Analysis)** — ADVANCED model; strategic planning, resolve `discuss` flags, draft `dynamic_plan.md`.
 - **Stage 3 (Execution)** — FAST model; mechanical implementation item-by-item per the plan.
 - **Stage 4.A (Docs Analysis)** — ADVANCED model; read FAST outputs, decide terminology and translation strategy, draft `docs_translation_plan.md`.
-- **Stage 4.B (Docs Translation)** — FAST model; execute `docs_translation_plan.md` file-by-file — translate or update each file, then commit.
+- **Stage 4.B (Docs Translation)** — FAST model; execute `docs_translation_plan.md` file-by-file — translate or update each file, then prepare the commit message.
 - **Stage 5 (Verification + After-sync)** — ADVANCED model for acceptance decisions; hand off to FAST for any mechanical finalization.
 
 **Handoff quality gate (ADVANCED -> FAST, Stage 2 -> 3):** Before switching to FAST for Stage 3, ADVANCED must verify that `dynamic_plan.md` passes this test: *"Could a mechanical executor complete every item without reading any file not explicitly referenced in the plan?"* If the answer is no, expand the plan before handing off. FAST must never be asked to analyze, judge, or discover — only execute.
@@ -268,7 +268,7 @@ ADVANCED must stop when mechanical work is needed: broad file reading, command e
 | `inspired_by_upstream` | Local files derived from upstream but structurally diverged. No strict parity; backport useful improvements only. |
 | `unique_paths` | Fork-only files/dirs. Never synced. |
 | `no_sync_files` | Infrastructure files that must never be overwritten. |
-| `skip_sync_patterns` | Glob patterns ignored during sync scanning. |
+| `skip_sync_patterns` | Upstream-owned or irrelevant paths excluded from Stage 1 analysis only. They are still synced unless also listed in `no_sync_files`. |
 
 ---
 

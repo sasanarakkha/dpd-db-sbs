@@ -43,7 +43,7 @@ All upstream sync assets live in `kamma/upstream_sync/`.
 | `inspired_by_upstream` | Local files derived from upstream but structurally diverged (Selective backporting) |
 | `unique_paths` | Files that exist only in this fork — never sync these from upstream |
 | `no_sync_files` | Infrastructure files to skip entirely during sync |
-| `skip_sync_patterns` | Glob patterns ignored during sync scanning |
+| `skip_sync_patterns` | Upstream-owned or irrelevant paths excluded from Stage 1 analysis only; still synced unless also listed in `no_sync_files` |
 
 Every `modified_upstream_files` entry is an object:
 ```json

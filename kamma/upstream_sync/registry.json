@@ -165,7 +165,6 @@
     "exporter/goldendict/templates/sbs_example.html",
     "exporter/goldendict/ru_components/README.md",
     "exporter/kindle/ru_components/README.md",
-    "exporter/sutta_central/sc_dict.json",
     "exporter/webapp/static/tabs.js",
     "gui2/dps_*",
     "gui2/font_scaling_helper.py",

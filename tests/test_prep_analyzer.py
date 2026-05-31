@@ -17,9 +17,11 @@ def mock_registry():
         ],
         "russian_copies": {
             "db/families/family_compound_ru.py": "db/families/family_compound.py",
-            "exporter/webapp/main_ru.py": "exporter/webapp/main.py"
+            "exporter/webapp/main_ru.py": "exporter/webapp/main.py",
         },
         "sbs_copies": {},
+        "dps_copies": {},
+        "tamil_copies": {"db/tpd/tpd_to_lookup.py": "db/epd/epd_to_lookup.py"},
         "inspired_by_upstream": {
             "scripts/bash/make_dpd.sh": {
                 "upstream": "scripts/bash/makedict.py",
@@ -60,7 +62,8 @@ def test_prep_analyzer_report_generation(
     mock_changes.return_value = [
         ("M", "db/models.py"),  # Tracked modified
         ("M", "db/families/family_compound.py"),  # Shadow source modified
-        ("M", "exporter/webapp/main.py"),  # DPS source modified
+        ("M", "exporter/webapp/main.py"),  # Russian source modified
+        ("M", "db/epd/epd_to_lookup.py"),  # Tamil source modified
         ("M", "scripts/bash/makedict.py"),  # Inspired source modified
         ("M", "new_file.py"),  # Untracked
         ("D", "deleted_file.py"),  # Deleted
@@ -105,6 +108,7 @@ def test_prep_analyzer_report_generation(
     assert manifest["to_upstream_sha"] == "newsha456"
     assert manifest["discuss_paths"] == ["db/models.py"]
     assert manifest["changed_upstream_paths"] == [
+        "db/epd/epd_to_lookup.py",
         "db/families/family_compound.py",
         "db/models.py",
         "exporter/webapp/main.py",
@@ -117,8 +121,12 @@ def test_prep_analyzer_report_generation(
         mapped["db/families/family_compound.py"][0]["local_path"]
         == "db/families/family_compound_ru.py"
     )
-    assert mapped["exporter/webapp/main.py"][0]["category"] == "dps_copy"
+    assert mapped["exporter/webapp/main.py"][0]["category"] == "russian_copy"
+    assert mapped["db/epd/epd_to_lookup.py"][0]["category"] == "tamil_copy"
     assert mapped["scripts/bash/makedict.py"][0]["category"] == "inspired_by_upstream"
+    assert (
+        manifest["generated_at"] != accepted_sync_state["last_accepted_upstream_date"]
+    )
 
 
 def test_is_skipped(mock_registry, accepted_sync_state, tmp_path: Path) -> None:

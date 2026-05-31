@@ -5,12 +5,11 @@
 import argparse
 import subprocess
 from pathlib import Path
-from typing import Optional
 
 from kamma.upstream_sync.scripts.registry_helper import (
+    get_modified_upstream_paths,
     load_accepted_sync_state,
     load_registry,
-    get_modified_upstream_paths,
 )
 from kamma.upstream_sync.scripts.sync_runtime import verify_manifest
 from tools.printer import printer as pr
@@ -76,7 +75,7 @@ def get_permanent_exclusions() -> list[str]:
     return exclusions
 
 
-def get_run_specific_exclusions(thread_dir: Optional[str]) -> list[str]:
+def get_run_specific_exclusions(thread_dir: str | None) -> list[str]:
     """Load run-specific exclusions from thread_dir/run_exclusions.txt."""
     if not thread_dir:
         return []
@@ -94,13 +93,21 @@ def get_run_specific_exclusions(thread_dir: Optional[str]) -> list[str]:
     return exclusions
 
 
-def execute_sync(thread_dir: Optional[str], dry_run: bool = False) -> int:
+def execute_sync(thread_dir: str | None, dry_run: bool = False) -> int:
     """Orchestrate the selective sync process."""
     pr.green_title("execute_sync.py")
 
     context = GitContext()
     if context.is_dirty:
-        pr.amber("Working tree is dirty. Proceed with caution.")
+        pr.red("Working tree is dirty. Commit or stash changes before sync.")
+        return 1
+
+    if context.original_branch != "sbs-ru":
+        pr.red(
+            f"Sync must start from sbs-ru, not {context.original_branch}. "
+            "Switch branches before running execute_sync.py."
+        )
+        return 1
 
     try:
         # 1. Discover target ref
@@ -113,7 +120,8 @@ def execute_sync(thread_dir: Optional[str], dry_run: bool = False) -> int:
         if thread_dir:
             pr.green("verifying manifest")
             if verify_manifest(thread_dir) != 0:
-                pr.amber("Manifest verification failed. Proceeding anyway...")
+                pr.red("Manifest verification failed. Stop before checkout/reset.")
+                return 1
             else:
                 pr.yes("ok")
 
