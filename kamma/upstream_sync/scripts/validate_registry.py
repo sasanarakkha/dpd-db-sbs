@@ -199,12 +199,6 @@ def validate_cross_section_overlaps(data: dict[str, object]) -> list[str]:
             # Exact match
             if path1 == path2:
                 if i < j:  # Avoid double reporting
-                    # Data classes exception
-                    if path1 == "exporter/goldendict/data_classes_dps.py" and {
-                        sec1,
-                        sec2,
-                    } == {"russian_copies", "sbs_copies"}:
-                        continue
                     errors.append(
                         f"Overlap: '{path1}' exists in both {sec1} and {sec2}"
                     )

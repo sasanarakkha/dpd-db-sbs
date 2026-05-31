@@ -2,6 +2,7 @@
 
 import pytest
 from kamma.upstream_sync.scripts.verify_smd_coverage import (
+    check_category_alignment,
     collect_registry_paths,
     extract_all_smd_entries,
     extract_smd_entries,
@@ -23,6 +24,7 @@ def test_extract_smd_entries_single(tmp_path):
 """)
     entries = extract_smd_entries(smd_file)
     assert "path/to/file.py" in entries
+    assert entries["path/to/file.py"]["category"] == "shadow"
     assert entries["path/to/file.py"]["sync_rule"] == "PORT"
     assert entries["path/to/file.py"]["local_changes_count"] == 2
     assert entries["path/to/file.py"]["watch_for_count"] == 1
@@ -108,3 +110,23 @@ def test_collect_registry_paths_includes_tamil_copies() -> None:
     paths = collect_registry_paths(data)
 
     assert ("db/tpd/tpd_to_lookup.py", "tamil_copy") in paths
+
+
+def test_check_category_alignment_rejects_smd_registry_mismatch() -> None:
+    smd_entries: dict[str, dict[str, object]] = {
+        "scripts/backup/backup_dps.py": {
+            "category": "sbs_copy",
+            "sync_rule": "PORT",
+            "local_changes_count": 2,
+            "watch_for_count": 1,
+        }
+    }
+
+    violations = check_category_alignment(
+        [("scripts/backup/backup_dps.py", "dps_copy")],
+        smd_entries,
+    )
+
+    assert violations == [
+        "  [dps_copy] scripts/backup/backup_dps.py: SMD category is 'sbs_copy'"
+    ]

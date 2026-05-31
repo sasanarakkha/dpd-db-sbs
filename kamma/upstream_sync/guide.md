@@ -198,6 +198,8 @@ Stage 4 is split into two model-bound substages: ADVANCED analysis and FAST tran
 3. **Draft Plan Review**:
    - Present the `dynamic_plan.md` to the user for approval. Say: "Please review and reply with proceed / skip / or any objection for each item."
 
+**Shadow category rule**: one local shadow path may appear in exactly one registry category. `dps_copies` is the single category for mixed/shared fork shadows, including files that combine Russian, SBS, Tamil, or general DPS behavior. Do not duplicate a DPS shadow into `russian_copies`, `sbs_copies`, or `tamil_copies`.
+
 ### Stage 3: Execution & Verification (FAST Implementation)
 **Goal**: Apply changes, verify integrity, and clean up.
 **Owner**: FAST only.
@@ -271,7 +273,7 @@ The script reads `<thread_dir>/prep_manifest.json` and reports docs changes from
 | `modified_upstream_files` | Upstream files where this fork diverges. Requires manual porting of new features. |
 | `russian_copies` | Shadow files mirroring upstream with Russian additions. Strict parity enforced. |
 | `sbs_copies` | Shadow files mirroring upstream with SBS additions. Strict parity enforced. |
-| `dps_copies` | Shadow files mirroring upstream with DPS additions. Strict parity enforced. |
+| `dps_copies` | Shadow files mirroring upstream with shared DPS fork additions. Strict parity enforced. `dps_copies` is the single category for mixed/shared fork shadows and for local upstream shadows that are not cleanly Russian-only, SBS-only, or Tamil-only. |
 | `tamil_copies` | Shadow files mirroring upstream with Tamil additions. Strict parity enforced. Primary shadow: `db/tpd/tpd_to_lookup.py` → `db/epd/epd_to_lookup.py`. |
 | `inspired_by_upstream` | Local files derived from upstream but structurally diverged. No strict parity; backport useful improvements only. |
 | `unique_paths` | Fork-only files/dirs. Never synced. |
@@ -286,7 +288,7 @@ Merge rules are no longer in a monolithic file. See the `kamma/upstream_sync/smd
 - `index.md`: Entry point and directory of all entries.
 - `db.md`, `exporter.md`, `gui.md`, `scripts.md`, `tools.md`: Domain-specific merge rules.
 
-Every entry must define a `Sync Rule` (`PORT`, `MIRROR_EXACTLY`, `PRESERVE`, `DISCUSS`, or `inspired_only`).
+Every entry must define a `Sync Rule` (`PORT`, `MIRROR_EXACTLY`, `PRESERVE`, `DISCUSS`, or `inspired_only`). Every sync-relevant SMD entry must use the exact same `Category` as its `registry.json` entry.
 
 ---
 

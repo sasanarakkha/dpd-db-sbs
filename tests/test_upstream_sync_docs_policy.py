@@ -82,3 +82,26 @@ def test_archive_scope_note_supersedes_stale_docs_exclusion() -> None:
         "upstream-owned and accepted verbatim, while `docs_rus/` is handled by "
         "Stage 4 Docs Translation Parity."
     ) in archive
+
+
+def test_docs_define_single_category_dps_shadow_policy() -> None:
+    guide = Path("kamma/upstream_sync/guide.md").read_text(encoding="utf-8")
+    readme = Path("kamma/upstream_sync/README.md").read_text(encoding="utf-8")
+    infrastructure = Path("kamma/upstream_sync/infrastructure.md").read_text(
+        encoding="utf-8"
+    )
+
+    required = "`dps_copies` is the single category for mixed/shared fork shadows"
+    assert required in guide
+    assert required in readme
+    assert required in infrastructure
+
+
+def test_agents_requires_shadow_documentation_gate() -> None:
+    agents = Path("AGENTS.md").read_text(encoding="utf-8")
+
+    assert "Shadow Documentation Gate" in agents
+    assert (
+        "registry.json and the matching `kamma/upstream_sync/smd/*.md` entry" in agents
+    )
+    assert "one local path may appear in exactly one registry category" in agents

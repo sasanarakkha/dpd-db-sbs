@@ -1,291 +1,160 @@
-# Important Future-Use Summary Only
+# Upstream Sync Improvement Handoff
 
-This handoff intentionally keeps only the important summary needed for a future upstream-sync improvement session. It omits detailed session logs, repeated command output, and implementation narration that is not needed for future improvement work.
+This file is intentionally short. Keep it as future-session context, not as a
+session transcript. Record what changed, why it matters, current state, and
+mistakes to avoid.
 
-## Thread Purpose
+## Purpose
 
-Improve the `kamma/upstream_sync` workflow so upstream syncs are safer, restartable, model-boundary aware, and better validated for RU/SBS/DPS/Tamil localized files.
+Improve `kamma/upstream_sync` so upstream syncs are safer, restartable,
+model-boundary aware, and better validated for RU/SBS/DPS/Tamil localized files.
 
-## Main Outcomes So Far
+## Core Design Decisions
 
-- Reworked upstream-sync docs from the old broad workflow into a 5-stage FAST/ADVANCED responsibility model.
-- Added hard-stop handoffs so model switches and fresh sessions can restart from `handoff.md`.
-- Strengthened registry and SMD validation, including Tamil coverage.
-- Made sync execution fail fast on unsafe state:
-  - dirty working tree;
-  - wrong branch;
-  - missing/invalid/stale `prep_manifest.json`;
-  - non-empty `discuss_paths`;
-  - failing post-sync assertions.
-- Made `finalize_accepted_sync.py` verify the prep manifest before advancing `accepted_sync.json`.
-- Added docs parity checks for unexpected local-only `docs_rus/` files.
-- Added deleted-upstream-source handling so mapped RU/SBS/DPS/Tamil/inspired local paths are still reported in Stage 1 manifests.
-- Added DPS backup behavior to `scripts/cl_dps/dpd-kamma-sync`.
-- Reviewed the whole `kamma/upstream_sync` skill separately for simplicity, elegance, safety, and security. No major redesign was recommended; the current registry + manifest + FAST/ADVANCED hard-stop design remains the simplest safe architecture.
-- Fixed a low-severity `check_docs_parity.py` reporting bug where writing a report to a thread directory outside the repo crashed while formatting the displayed path.
-- Clarified the upstream-sync docs wording: the workflow is still 5 stages, with Stage 4 split into two model-bound substages.
-
-## Important Design Decisions
-
+- The workflow is a 5-stage upstream-sync process with explicit FAST/ADVANCED
+  responsibility boundaries.
 - FAST owns mechanical command execution and evidence generation.
-- ADVANCED owns analysis, planning, acceptance decisions, and reading FAST-produced evidence.
-- If either model crosses its responsibility boundary, stop and write a restartable handoff.
+- ADVANCED owns analysis, planning, acceptance decisions, and reading evidence.
+- If either model crosses its responsibility boundary, stop and write a
+  restartable handoff.
+- `prep_manifest.json` is the central sync contract. Execution and finalization
+  must verify it before changing sync state.
 - `prep_manifest.json.discuss_paths` is a hard stop before `execute_sync.py`.
-- `execute_sync.py` must receive a thread directory; manifest verification cannot be skipped.
-- `execute_sync.py` resets `as_upstream` to the verified manifest target SHA, not an unchecked moving ref.
-- `finalize_accepted_sync.py` must verify the manifest before writing accepted sync state.
-- Autonomous agent commits remain prohibited. The DPS wrapper script may run its reviewed, explicit backup commit behavior.
-- The DPS backup wrapper commit message is exactly:
+- `execute_sync.py` must use a thread directory and reset `as_upstream` to the
+  verified manifest target SHA, not an unchecked moving ref.
+- `finalize_accepted_sync.py` must verify the manifest against current accepted
+  sync state before advancing `accepted_sync.json`.
+- Autonomous agent commits remain prohibited. The reviewed DPS wrapper backup
+  behavior is the only known scripted commit exception, with exact message:
+  `backup dps data`.
+- `dps_copies` is the single category for mixed/shared fork shadows. Do not list
+  one local path in multiple locale categories.
+- SMD `Category` must exactly match the path's category in
+  `kamma/upstream_sync/registry.json`.
 
-```text
-backup dps data
-```
+## Completed Improvements
 
-## Key Files Changed
+- Workflow docs now describe the 5-stage FAST/ADVANCED model, Stage 1 API health
+  checks, Stage 4 docs parity, restartable handoffs, and current sync scope.
+- Runtime gates now fail fast on unsafe branch/state, invalid or stale manifests,
+  unresolved `discuss_paths`, and failed post-sync assertions.
+- Metadata parsing is centralized and typed through `sync_schema.py`; registry,
+  SMD, manifest, mapped actions, and accepted sync state are validated more
+  strictly.
+- Prep analysis now handles deleted upstream sources, rename facts, and
+  `local_target_path` for mapped actions without removing `local_path`.
+- Docs parity now uses the thread manifest range when available, keeps fallback
+  standalone behavior, reports stale-doc diffs, and handles report dirs outside
+  the repo.
+- Registry/SMD tooling now includes Tamil coverage, correct DPS/Tamil scaffold
+  categories, SMD category alignment checks, and the single-category DPS shadow
+  policy.
+- Local rules now require every new or changed shadow file to update both
+  `registry.json` and the matching `kamma/upstream_sync/smd/*.md`.
+- DPS wrapper backup behavior was added to `scripts/cl_dps/dpd-kamma-sync`.
 
-- `kamma/upstream_sync/guide.md`
-- `kamma/upstream_sync/README.md`
-- `kamma/upstream_sync/infrastructure.md`
-- `kamma/upstream_sync/templates/sync_thread_plan.md`
-- `kamma/upstream_sync/templates/sync_thread_spec.md`
-- `kamma/upstream_sync/stages/prep.md`
-- `kamma/upstream_sync/stages/analysis.md`
-- `kamma/upstream_sync/stages/execution.md`
-- `kamma/upstream_sync/registry.json`
-- `kamma/upstream_sync/scripts/registry_helper.py`
-- `kamma/upstream_sync/scripts/prep_analyzer.py`
-- `kamma/upstream_sync/scripts/sync_runtime.py`
-- `kamma/upstream_sync/scripts/execute_sync.py`
-- `kamma/upstream_sync/scripts/finalize_accepted_sync.py`
-- `kamma/upstream_sync/scripts/validate_registry.py`
-- `kamma/upstream_sync/scripts/check_docs_parity.py`
-- `scripts/cl_dps/dpd-kamma-sync`
-- Relevant tests under `tests/test_*`.
-- `tests/test_check_docs_parity.py`
+## Main Files
 
-## Validation Commands Used
+- Docs/templates/stages under `kamma/upstream_sync/`.
+- Registry/SMD: `kamma/upstream_sync/registry.json`,
+  `kamma/upstream_sync/smd/*.md`.
+- Scripts: `prep_analyzer.py`, `execute_sync.py`, `finalize_accepted_sync.py`,
+  `sync_runtime.py`, `sync_state.py`, `sync_schema.py`, `validate_registry.py`,
+  `verify_smd_coverage.py`, `check_docs_parity.py`, `gen_smd_scaffold.py`.
+- Tests: focused upstream-sync, registry, SMD, prep analyzer, docs parity, and
+  docs policy tests under `tests/`.
 
-Use these as the minimum reference set for future related work, adjusted to touched files:
+## Validation Baseline
+
+For future related changes, run the targeted tests for touched behavior plus:
 
 ```fish
 uv run ruff check --fix <changed-files>
 uv run ruff format <changed-files>
 uv run pyright <changed-files>
 uv run --with pyrefly pyrefly check --min-severity warn <changed-files>
-uv run pytest tests/test_execute_sync.py tests/test_finalize_accepted_sync.py tests/test_sync_state.py tests/test_upstream_sync_docs_policy.py tests/test_prep_analyzer.py tests/test_validate_registry.py tests/test_check_docs_parity.py tests/test_verify_smd_coverage.py -v
 uv run python3 kamma/upstream_sync/scripts/validate_registry.py
 uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py
 uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py
 git diff --check -- <changed-files>
 ```
 
-Previously observed passing focused totals:
+Recent broad upstream-sync suites passed in previous sessions, including 77,
+103, and 107 test focused runs. Do not reuse these as current proof; rerun the
+relevant tests after any new change.
 
-- Session 2 focused pytest set: 47 passed.
-- Session 3 focused pytest set: 50 passed.
-- Session 4 focused pytest set: 31 passed.
-- Session 5 focused pytest set: 57 passed.
-- Separate review follow-up focused pytest set: 6 passed.
+## Mistakes To Avoid
 
-## Known Issues, Errors, and Repeated Mistakes
-
-- `~/agents/protocol-fix.md` was stale. The current path is `~/.agents/protocol-fix.md`, but the external protocol reference was intentionally not retained because project/global rules already cover the needed TDD and validation behavior.
-- `exporter/sutta_central/sc_dict.json` was previously contradictory: under a skipped folder and listed as unique. It was removed from `unique_paths`.
-- `tests/test_prep_analyzer.py` previously had stale expectations for `exporter/webapp/main.py`; actual mapping is `russian_copy`, not `dps_copy`.
-- Tamil was initially missing from some helper/test coverage and is now included in strict-shadow mappings and SMD checks.
-- Some RU/Tamil parity divergences are intentional and SMD-documented, so they were whitelisted rather than ported:
-  - `db/families/family_idiom_ru.py` intentionally omits upstream `update_db_cache()`.
-  - `db/tpd/tpd_to_lookup.py` intentionally omits root-processing helpers from `db/epd/epd_to_lookup.py`.
-- `pyright` and `pyrefly` caught several typing weaknesses during implementation. Future changes should keep typed manifests and runtime narrowing explicit.
-- A success-path `execute_sync` unit test once accidentally ran the real `scripts/bash/dpd-sync-assertions.sh`; future tests should mock assertion-script presence/absence deliberately.
-- The broader idea of replacing `checkout as_upstream` plus `reset --hard` was intentionally not implemented. Treat it as a separate behavioral redesign if revisited.
-- `check_docs_parity.py` previously assumed every report path could be made relative to the project root. This failed for external thread/report directories such as `/private/tmp`; it now falls back to an absolute display path.
-- Existing unrelated dirty/untracked `resources/*` entries were left untouched.
+- Do not preserve stale external protocol paths. The old `~/agents/...` path was
+  wrong; project/global rules already cover the needed behavior.
+- Do not list one local path in more than one registry category.
+- Do not let SMD `Category` drift from `registry.json`.
+- Use `dps_copies` for mixed/shared fork shadows; do not classify them as
+  locale-specific copies.
+- Keep Tamil in helper and test coverage; do not assume it is automatic.
+- Do not reintroduce the old contradiction where
+  `exporter/sutta_central/sc_dict.json` was both skipped and unique.
+- `exporter/webapp/main.py` maps as `russian_copy`, not `dps_copy`.
+- Some parity divergences are intentional and SMD-documented; do not port them
+  without review. Known examples: `db/families/family_idiom_ru.py` omits
+  upstream `update_db_cache()`, and `db/tpd/tpd_to_lookup.py` omits root helpers
+  from `db/epd/epd_to_lookup.py`.
+- Keep manifest and runtime typing explicit; `pyright` and `pyrefly` previously
+  caught real weaknesses here.
+- In tests, mock assertion-script presence and execution deliberately. A past
+  success-path `execute_sync` test accidentally ran the real assertion script.
+- Do not implement replacement of `checkout as_upstream` plus `reset --hard`
+  casually. Treat it as a separate behavioral redesign.
+- `check_docs_parity.py` must handle report dirs outside the repo.
+- Patch against current file text. A past patch failed because docs wording had
+  already diverged.
+- Avoid complex multiline `rg` regexes for verification; use simple literal
+  searches when possible.
+- Preserve unrelated dirty/untracked `resources/*` entries unless the user
+  explicitly asks to handle them.
 
 ## Current State
 
-The previous upstream-sync improvement sessions were completed and validated. A separate review session found no need for major redesign and applied only small scoped improvements to docs wording and docs-parity report path handling. No agent-side git commit was made.
+- Previous upstream-sync improvement sessions were implemented and validated.
+- A separate review found no major redesign needed; the current
+  registry + SMD + manifest + FAST/ADVANCED hard-stop architecture remains the
+  recommended design.
+- The typed-hardening thread was finalized and archived at
+  `kamma/archive/20260531_upstream_sync_typed_hardening`.
+- This legacy thread directory currently exists as a compact handoff location.
+  Do not assume `spec.md` or `plan.md` exist here; inspect the directory first.
+- No agent-side git commit was made.
+- User manual review may still be needed for any uncommitted working-tree
+  changes.
 
-Most recent recommended commit message:
+## Recent Recommended Commit Messages
+
+```text
+#sync docs: enforce single dps shadow category
+fix(upstream-sync): pin docs parity to manifest range
+refactor(upstream-sync): harden typed metadata validation
+```
+
+Older messages if history reconstruction is needed:
 
 ```text
 #sync docs: clarify stage wording and parity report path
-```
-
-Earlier recommended commit messages, if history needs reconstruction:
-
-```text
 #sync tooling: tighten sync finalization gates
-```
-
-Older recommended commit messages:
-
-```text
 #sync workflow: clarify fast/advanced handoffs
 #sync tooling: enforce tamil coverage and preflight gates
 #sync tooling: block stale manifests and discuss pulls
 #sync tooling: strengthen pre-sync backup and manifests
 ```
 
-## Follow-up Improvement Plan Status
-
-- Completed work:
-  - Added Stage 1 pre-sync API health check command to the canonical guide, stage checklist, and sync thread plan template.
-  - Fixed `gen_smd_scaffold.py` so DPS and Tamil strict shadows keep their correct scaffold categories.
-  - Hardened `finalize_accepted_sync.py` so manifest verification receives the current accepted sync state before `accepted_sync.json` can be advanced.
-  - Added additive `local_target_path` values to `prep_manifest.json` mapped actions, preserving `local_path`.
-  - Documented `local_target_path` usage in Stage 2 planning docs.
-  - Added/updated tests for each behavior.
-- Exact commands run:
-  - `uv run pytest tests/test_upstream_sync_docs_policy.py -v` red, then green.
-  - `uv run pytest tests/test_gen_smd_scaffold.py -v` red, then green.
-  - `uv run pytest tests/test_finalize_accepted_sync.py -v` red.
-  - `uv run pytest tests/test_finalize_accepted_sync.py tests/test_sync_state.py -v` green.
-  - `uv run pytest tests/test_prep_analyzer.py -v` red.
-  - `uv run pytest tests/test_prep_analyzer.py tests/test_sync_state.py -v` green.
-  - `uv run pytest tests/test_upstream_sync_docs_policy.py tests/test_gen_smd_scaffold.py tests/test_finalize_accepted_sync.py tests/test_sync_state.py tests/test_prep_analyzer.py -v` green: 26 passed.
-  - `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` passed.
-  - `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` passed.
-  - `uv run ruff check --fix kamma/upstream_sync/scripts/gen_smd_scaffold.py kamma/upstream_sync/scripts/finalize_accepted_sync.py kamma/upstream_sync/scripts/prep_analyzer.py tests/test_upstream_sync_docs_policy.py tests/test_gen_smd_scaffold.py tests/test_finalize_accepted_sync.py tests/test_prep_analyzer.py` passed.
-  - `uv run ruff format kamma/upstream_sync/scripts/gen_smd_scaffold.py kamma/upstream_sync/scripts/finalize_accepted_sync.py kamma/upstream_sync/scripts/prep_analyzer.py tests/test_upstream_sync_docs_policy.py tests/test_gen_smd_scaffold.py tests/test_finalize_accepted_sync.py tests/test_prep_analyzer.py` reformatted 3 files.
-  - `uv run pyright kamma/upstream_sync/scripts/gen_smd_scaffold.py kamma/upstream_sync/scripts/finalize_accepted_sync.py kamma/upstream_sync/scripts/prep_analyzer.py tests/test_upstream_sync_docs_policy.py tests/test_gen_smd_scaffold.py tests/test_finalize_accepted_sync.py tests/test_prep_analyzer.py` passed: 0 errors.
-  - `uv run --with pyrefly pyrefly check --min-severity warn kamma/upstream_sync/scripts/gen_smd_scaffold.py kamma/upstream_sync/scripts/finalize_accepted_sync.py kamma/upstream_sync/scripts/prep_analyzer.py tests/test_upstream_sync_docs_policy.py tests/test_gen_smd_scaffold.py tests/test_finalize_accepted_sync.py tests/test_prep_analyzer.py` passed: 0 errors, 1 suppressed.
-  - `git diff --check -- kamma/upstream_sync/guide.md kamma/upstream_sync/scripts/finalize_accepted_sync.py kamma/upstream_sync/scripts/gen_smd_scaffold.py kamma/upstream_sync/scripts/prep_analyzer.py kamma/upstream_sync/stages/analysis.md kamma/upstream_sync/stages/prep.md kamma/upstream_sync/templates/sync_thread_plan.md tests/test_finalize_accepted_sync.py tests/test_prep_analyzer.py tests/test_upstream_sync_docs_policy.py` passed.
-  - `rg -n "[ \t]+$" kamma/threads/upstream_sync_improvment/spec.md kamma/threads/upstream_sync_improvment/plan.md tests/test_gen_smd_scaffold.py` found no trailing whitespace.
-- Exact outputs or failures summarized:
-  - Docs-policy red failure: missing API health check command from live docs.
-  - SMD scaffold red failure: DPS/Tamil entries emitted as `sbs_copy`.
-  - Finalize red failure: `verify_manifest` was called without `accepted_sync_state`.
-  - Prep analyzer red failure: mapped actions lacked `local_target_path`.
-  - Final focused test pass: 26 passed.
-- Files changed:
-  - `kamma/threads/upstream_sync_improvment/spec.md`
-  - `kamma/threads/upstream_sync_improvment/plan.md`
-  - `kamma/threads/upstream_sync_improvment/handoff.md`
-  - `kamma/upstream_sync/guide.md`
-  - `kamma/upstream_sync/stages/analysis.md`
-  - `kamma/upstream_sync/stages/prep.md`
-  - `kamma/upstream_sync/templates/sync_thread_plan.md`
-  - `kamma/upstream_sync/scripts/gen_smd_scaffold.py`
-  - `kamma/upstream_sync/scripts/finalize_accepted_sync.py`
-  - `kamma/upstream_sync/scripts/prep_analyzer.py`
-  - `tests/test_upstream_sync_docs_policy.py`
-  - `tests/test_gen_smd_scaffold.py`
-  - `tests/test_finalize_accepted_sync.py`
-  - `tests/test_prep_analyzer.py`
-- Open decisions:
-  - User manual review is still needed.
-  - Run `/kamma:3-review` in a fresh session after user confirms behavior is acceptable.
-- Errors, issues, and repeated mistakes:
-  - The first docs-template patch accidentally indented `- [ ] **1.1 Environmental Check**`; this was caught by diff review and corrected before final validation.
-  - Existing unrelated dirty/untracked `resources/*` entries remain untouched.
-- Next model to use: Review can run in the user's preferred review model.
-- Exact restart prompt:
+## Restart Prompt
 
 ```text
-Continue upstream sync improvement thread: kamma/threads/upstream_sync_improvment.
-First read:
+Continue upstream sync improvement work. First read:
 1. kamma/threads/upstream_sync_improvment/handoff.md
-2. kamma/threads/upstream_sync_improvment/plan.md
-3. kamma/threads/upstream_sync_improvment/spec.md
-4. kamma/upstream_sync/guide.md
+2. kamma/upstream_sync/guide.md
+3. kamma/upstream_sync/registry.json
+4. the specific upstream-sync script/docs/tests relevant to the requested task
 
-Task: review the completed follow-up implementation and prepare it for finalization. Do not broaden scope. Preserve unrelated resources/* dirty state.
-```
-
-## Typed Hardening Thread Finalized
-
-- Thread finalized: `kamma/threads/20260531_upstream_sync_typed_hardening`.
-- Archived to: `kamma/archive/20260531_upstream_sync_typed_hardening`.
-- Active thread directory removed from `kamma/threads/`.
-- No `project.md` or `tech.md` update was needed.
-- No GitHub issue reference was found, so no issue comment/close was performed.
-- Review verdict was `PASSED`.
-- Objective completed: upstream-sync metadata parsing is now hardened with typed stdlib dataclasses and centralized validation while preserving existing JSON formats and CLI behavior.
-- Main changes:
-  - Added `kamma/upstream_sync/scripts/sync_schema.py`.
-  - Routed registry, manifest, mapped action, and accepted sync state validation through typed schema objects.
-  - Hardened prep analyzer rename handling so git renames are represented as delete/add facts.
-  - Allowed approved intrinsic `rpd` and `tpd` markers in registry category naming checks.
-  - Added exact stale-doc diff evidence to docs parity reporting.
-  - Updated Stage 4.A docs wording for automatic diff evidence.
-  - Added focused test coverage for schema validation, sync state validation, registry validation, rename handling, naming policy, finalize behavior, and docs parity.
-- Review test evidence:
-  - Focused pytest suite passed: 103 tests.
-  - `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` passed.
-  - `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` passed.
-  - `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py /private/tmp/dpd-db-kamma-review` passed.
-  - `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py /private/tmp/dpd-db-kamma-review` passed.
-  - `uv run python3 kamma/upstream_sync/scripts/sync_runtime.py verify-manifest /private/tmp/dpd-db-kamma-review` passed.
-  - Ruff, pyright, pyrefly, and `git diff --check` passed on the changed upstream-sync files.
-- Recommended commit message:
-
-```text
-refactor(upstream-sync): harden typed metadata validation
-```
-
-- Related dirty entries still intentionally separate:
-  - `resources/*`
-  - `kamma/threads/upstream_sync_improvment/handoff.md`
-
-## Latest Separate Upstream Sync Review Follow-up Implemented
-
-- User request:
-  - Review `kamma/upstream_sync/` separately for simplicity, elegance, safety, and security.
-  - Implement the concrete improvements found in that review.
-  - Update this handoff with the summary.
-- Review verdict before implementation:
-  - No major redesign needed.
-  - The current `registry.json` + SMD + `prep_manifest.json` + FAST/ADVANCED hard-stop model remains the simplest safe architecture.
-  - Three scoped improvements were approved for implementation.
-- Completed work:
-  - Changed `check_docs_parity.py` so Stage 4 docs parity uses `<thread_dir>/prep_manifest.json` when a thread dir is provided.
-  - Docs parity now diffs the exact `from_upstream_sha -> to_upstream_sha` manifest range instead of `accepted_sync.json -> HEAD`.
-  - Preserved standalone `check_docs_parity.py` behavior: without `<thread_dir>`, it still falls back to `accepted_sync.json -> HEAD`.
-  - Renamed the misleading prep report section from `Untracked Changes` to `New Or Unmapped Upstream Changes`.
-  - Clarified SMD coverage wording so docs and the script say `sync-relevant registry entries`, matching the actual checker scope.
-  - Updated the stale archive note: `gui/` remains out of sync scope; `docs/` is upstream-owned and accepted verbatim; `docs_rus/` is handled by Stage 4 Docs Translation Parity.
-  - Updated Stage 4 docs/template wording to explicitly mention the manifest range.
-  - Added focused tests for all behavior/documentation changes.
-- Exact commands run:
-  - `uv run pytest tests/test_check_docs_parity.py tests/test_prep_analyzer.py tests/test_upstream_sync_docs_policy.py -v` red: failed during collection because `load_docs_sync_range` did not exist yet.
-  - `uv run pytest tests/test_check_docs_parity.py tests/test_prep_analyzer.py tests/test_upstream_sync_docs_policy.py -v` green: 17 passed.
-  - `uv run ruff check --fix kamma/upstream_sync/scripts/check_docs_parity.py kamma/upstream_sync/scripts/prep_analyzer.py kamma/upstream_sync/scripts/verify_smd_coverage.py tests/test_check_docs_parity.py tests/test_prep_analyzer.py tests/test_upstream_sync_docs_policy.py` passed.
-  - `uv run ruff format kamma/upstream_sync/scripts/check_docs_parity.py kamma/upstream_sync/scripts/prep_analyzer.py kamma/upstream_sync/scripts/verify_smd_coverage.py tests/test_check_docs_parity.py tests/test_prep_analyzer.py tests/test_upstream_sync_docs_policy.py` passed; 6 files left unchanged.
-  - `uv run pyright kamma/upstream_sync/scripts/check_docs_parity.py kamma/upstream_sync/scripts/prep_analyzer.py kamma/upstream_sync/scripts/verify_smd_coverage.py tests/test_check_docs_parity.py tests/test_prep_analyzer.py tests/test_upstream_sync_docs_policy.py` passed: 0 errors, 0 warnings.
-  - `uv run --with pyrefly pyrefly check --min-severity warn kamma/upstream_sync/scripts/check_docs_parity.py kamma/upstream_sync/scripts/prep_analyzer.py kamma/upstream_sync/scripts/verify_smd_coverage.py tests/test_check_docs_parity.py tests/test_prep_analyzer.py tests/test_upstream_sync_docs_policy.py` passed: 0 errors, 3 suppressed.
-  - `uv run pytest tests/test_execute_sync.py tests/test_finalize_accepted_sync.py tests/test_sync_state.py tests/test_upstream_sync_docs_policy.py tests/test_prep_analyzer.py tests/test_validate_registry.py tests/test_check_docs_parity.py tests/test_verify_smd_coverage.py -v` passed: 77 passed.
-  - `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` passed.
-  - `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` passed.
-  - `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py` passed in standalone fallback mode, reporting no missing/stale translations.
-  - `git diff --check -- kamma/upstream_sync/README.md kamma/upstream_sync/archive_improvements.md kamma/upstream_sync/guide.md kamma/upstream_sync/infrastructure.md kamma/upstream_sync/scripts/check_docs_parity.py kamma/upstream_sync/scripts/prep_analyzer.py kamma/upstream_sync/scripts/verify_smd_coverage.py kamma/upstream_sync/stages/prep.md kamma/upstream_sync/templates/sync_thread_plan.md tests/test_check_docs_parity.py tests/test_prep_analyzer.py tests/test_upstream_sync_docs_policy.py` passed.
-- Files changed:
-  - `kamma/upstream_sync/README.md`
-  - `kamma/upstream_sync/archive_improvements.md`
-  - `kamma/upstream_sync/guide.md`
-  - `kamma/upstream_sync/infrastructure.md`
-  - `kamma/upstream_sync/scripts/check_docs_parity.py`
-  - `kamma/upstream_sync/scripts/prep_analyzer.py`
-  - `kamma/upstream_sync/scripts/verify_smd_coverage.py`
-  - `kamma/upstream_sync/stages/prep.md`
-  - `kamma/upstream_sync/templates/sync_thread_plan.md`
-  - `tests/test_check_docs_parity.py`
-  - `tests/test_prep_analyzer.py`
-  - `tests/test_upstream_sync_docs_policy.py`
-  - `kamma/threads/upstream_sync_improvment/handoff.md`
-- Exact outputs or failures summarized:
-  - Red phase failure was expected and useful: `ImportError: cannot import name 'load_docs_sync_range'`.
-  - Final focused upstream-sync pytest suite passed: 77 passed.
-  - Registry validation, SMD coverage, docs parity, ruff, pyright, pyrefly, and diff whitespace checks passed.
-- Open decisions:
-  - User manual review is still needed.
-  - No agent-side git commit was made.
-- Errors, issues, and repeated mistakes:
-  - No implementation blocker was encountered.
-  - Initial red failure was intentional TDD evidence.
-  - Existing unrelated dirty/untracked `resources/*` entries remain untouched.
-- Recommended commit message:
-
-```text
-fix(upstream-sync): pin docs parity to manifest range
+Do not broaden scope. Preserve unrelated resources/* dirty state. Rerun targeted
+tests and validation commands for any touched files before reporting completion.
 ```

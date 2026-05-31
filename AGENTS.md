@@ -61,7 +61,10 @@ Existing tables have extra `*_ru` columns (e.g., `root_ru_meaning`, `html_ru`).
 - "local issue #" refers to https://github.com/sasanarakkha/dpd-db-sbs.
 
 ## Shadow Files & Sync Templates
-- "Shadow" (`*_ru.py`, `*_sbs.py`, `*_dps.py`) or "unique" files MUST have corresponding registry entries in `kamma/upstream_sync/` (specifically `registry.json` and `guide.md`). This registry MUST always be kept up-to-date.
+- "Shadow" (`*_ru.py`, `*_sbs.py`, `*_dps.py`, `*_ta.py`) or "unique" files MUST have corresponding sync documentation in `kamma/upstream_sync/`.
+- **Shadow Documentation Gate:** Any new, renamed, moved, or reclassified shadow/local copy MUST update registry.json and the matching `kamma/upstream_sync/smd/*.md` entry in the same change. Do not report the work complete until `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` and `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` pass.
+- **Single Category Rule:** one local path may appear in exactly one registry category. Use `russian_copies` only for Russian-only shadows, `sbs_copies` only for SBS-only shadows, `tamil_copies` only for Tamil-only shadows, and `dps_copies` for mixed/shared RU/SBS/Tamil/DPS fork shadows or local upstream shadows that do not belong cleanly to one locale.
+- The SMD `Category` line MUST exactly match the `registry.json` category. Do not rely on memory or chat context; update the registry and SMD while making the code change.
 
 ## Engineering Standards
 - **Request Scope Discipline:** Only implement the change explicitly requested by the user. Do not make adjacent improvements, cleanups, restorations, formatting changes, or "while here" fixes unless the user asked for them. If an unrequested change seems useful, necessary, or safer, stop and ask before implementing it.

@@ -171,9 +171,9 @@
 
 
 **File**: `exporter/goldendict/data_classes_dps.py`
-- **Category**: russian_copy, sbs_copy, tamil_copy
+- **Category**: dps_copy
 - **Sync Rule**: PORT
-- **Triple Shadow Note**: This file serves russian_copies, sbs_copies, AND tamil_copies.
+- **DPS Shadow Note**: This file serves shared Russian, SBS, and Tamil fork data. It belongs only in `dps_copies`.
 - **Local Changes**:
   1. `HeadwordData.__init__` accepts `ru: Russian | None`, `sbs: SBS | None`, `ta: Tamil | None`, `show_grammar`, `show_sbs_data`, `show_ru_data`, and `show_ta_data` parameters.
   2. Russian fields populated: `ru_pos`, `ru_plus_case`, `ru_meaning`, `ru_summary`, `ru_complete`, `ru_grammar`, `ru_base`, `ru_phonetic`, `ru_inflections_html`.

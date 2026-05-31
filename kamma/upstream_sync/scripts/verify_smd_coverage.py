@@ -35,6 +35,9 @@ def extract_smd_entries(smd_path: Path) -> dict[str, dict[str, object]]:
             continue
         file_path = file_match.group(1).strip()
 
+        category_match = re.search(r"\*\*Category\*\*:\s*([^\n]+)", block)
+        category = category_match.group(1).strip() if category_match else ""
+
         sync_rule_match = re.search(r"\*\*Sync Rule\*\*:\s*(\S+)", block)
         sync_rule = sync_rule_match.group(1).strip() if sync_rule_match else ""
 
@@ -46,6 +49,7 @@ def extract_smd_entries(smd_path: Path) -> dict[str, dict[str, object]]:
         )
 
         entries[file_path] = {
+            "category": category,
             "sync_rule": sync_rule,
             "local_changes_count": len(local_changes),
             "watch_for_count": len(watch_for_items),
@@ -84,6 +88,28 @@ def collect_registry_paths(data: dict[str, object]) -> list[tuple[str, str]]:
         items.append((path, "inspired_by_upstream"))
 
     return items
+
+
+def check_category_alignment(
+    registry_items: list[tuple[str, str]],
+    smd_entries: dict[str, dict[str, object]],
+) -> list[str]:
+    """Return SMD category mismatches for registry-covered entries."""
+    violations: list[str] = []
+    for path, expected_category in registry_items:
+        entry = smd_entries.get(path)
+        if entry is None:
+            continue
+        actual_category = entry.get("category")
+        if actual_category != expected_category:
+            if isinstance(actual_category, str) and actual_category.strip():
+                actual_label = f"'{actual_category}'"
+            else:
+                actual_label = "missing"
+            violations.append(
+                f"  [{expected_category}] {path}: SMD category is {actual_label}"
+            )
+    return violations
 
 
 def check_rubric(
@@ -133,6 +159,7 @@ def main() -> None:
         sys.exit(1)
 
     gaps: list[str] = []
+    category_fails: list[str] = []
     rubric_fails: list[str] = []
 
     for path, category in all_paths:
@@ -141,9 +168,13 @@ def main() -> None:
         else:
             fails = check_rubric(path, category, smd_entries[path])
             rubric_fails.extend(fails)
+    category_fails.extend(check_category_alignment(all_paths, smd_entries))
 
     pr.green("coverage gaps")
     pr.yes("none") if not gaps else pr.no(f"{len(gaps)}")
+
+    pr.green("category mismatches")
+    pr.yes("none") if not category_fails else pr.no(f"{len(category_fails)}")
 
     pr.green("rubric failures")
     pr.yes("none") if not rubric_fails else pr.no(f"{len(rubric_fails)}")
@@ -153,12 +184,17 @@ def main() -> None:
         for g in gaps:
             pr.red(g)
 
+    if category_fails:
+        pr.red("\nSMD category mismatches:")
+        for f in category_fails:
+            pr.red(f)
+
     if rubric_fails:
         pr.amber("\nRubric failures (entries need enrichment):")
         for f in rubric_fails:
             pr.amber(f)
 
-    if gaps:
+    if gaps or category_fails:
         pr.toc()
         sys.exit(1)
 

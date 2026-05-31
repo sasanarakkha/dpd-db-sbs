@@ -38,7 +38,7 @@ All upstream sync assets live in `kamma/upstream_sync/`.
 | `modified_upstream_files` | Files that exist upstream but have local modifications — review carefully on each sync |
 | `russian_copies` | Shadow copies mirroring upstream with Russian additions (Strict parity) |
 | `sbs_copies` | Shadow copies mirroring upstream with SBS additions (Strict parity) |
-| `dps_copies` | Shadow copies mirroring upstream with DPS additions (Strict parity) |
+| `dps_copies` | Shadow copies mirroring upstream with shared DPS fork additions (Strict parity). `dps_copies` is the single category for mixed/shared fork shadows. |
 | `tamil_copies` | Shadow copies mirroring upstream with Tamil additions (Strict parity) |
 | `inspired_by_upstream` | Local files derived from upstream but structurally diverged (Selective backporting) |
 | `unique_paths` | Files that exist only in this fork — never sync these from upstream |
@@ -79,6 +79,7 @@ The `smd/` directory provides per-file context for every sync-relevant registry 
 
 Each entry contains:
 - **Sync Rule**: `PORT` / `MIRROR_EXACTLY` / `PRESERVE` / `DISCUSS` / `inspired_only`
+- **Category**: exact match to the path's `registry.json` category
 - **Local Changes**: numbered list of concrete divergences from upstream
 - **Watch For**: specific merge pitfalls
 

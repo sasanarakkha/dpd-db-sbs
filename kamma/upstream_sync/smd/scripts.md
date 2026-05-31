@@ -145,7 +145,7 @@
 
 
 **File**: `scripts/backup/backup_dps.py`
-- **Category**: sbs_copy
+- **Category**: dps_copy
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. New script: `backup_russian`, `backup_sbs`, `backup_ta`, and `backup_ru_roots` functions.
@@ -160,7 +160,7 @@
 
 
 **File**: `scripts/build/db_rebuild_from_tsv_dps.py`
-- **Category**: sbs_copy
+- **Category**: dps_copy
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. New script: populates localized tables from TSV.

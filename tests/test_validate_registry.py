@@ -171,6 +171,23 @@ def test_russian_copy_overlap_rejected(base_data):
     )
 
 
+def test_dps_copy_must_not_also_be_registered_as_locale_copy(base_data):
+    base_data["russian_copies"] = {
+        "exporter/goldendict/data_classes_dps.py": "exporter/goldendict/data_classes.py"
+    }
+    base_data["sbs_copies"] = {
+        "exporter/goldendict/data_classes_dps.py": "exporter/goldendict/data_classes.py"
+    }
+
+    errors = validate_cross_section_overlaps(base_data)
+
+    assert any(
+        "Overlap: 'exporter/goldendict/data_classes_dps.py' exists in both russian_copies and sbs_copies"
+        in e
+        for e in errors
+    )
+
+
 def test_shadow_mapping_rejects_non_object(base_data):
     base_data["russian_copies"] = ["not-a-mapping"]
 
