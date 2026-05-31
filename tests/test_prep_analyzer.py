@@ -106,6 +106,8 @@ def test_prep_analyzer_report_generation(
     assert "new_file.py" in content
     assert "deleted_file.py" in content
     assert "tests/ignore_me.py" not in content
+    assert "## New Or Unmapped Upstream Changes" in content
+    assert "## Untracked Changes" not in content
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     assert manifest["from_upstream_sha"] == "oldsha123"

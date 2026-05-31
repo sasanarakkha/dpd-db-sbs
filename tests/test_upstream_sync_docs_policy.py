@@ -53,3 +53,32 @@ def test_stage_1_requires_api_health_check() -> None:
     assert command in guide
     assert command in plan
     assert command in prep_stage
+
+
+def test_smd_coverage_wording_matches_checker_scope() -> None:
+    readme = Path("kamma/upstream_sync/README.md").read_text(encoding="utf-8")
+    infrastructure = Path("kamma/upstream_sync/infrastructure.md").read_text(
+        encoding="utf-8"
+    )
+    checker = Path("kamma/upstream_sync/scripts/verify_smd_coverage.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "every sync-relevant registry entry" in readme
+    assert "every sync-relevant registry entry" in infrastructure
+    assert "Verify sync-relevant registry entries" in checker
+    assert "every registry entry has" not in readme
+    assert "every registry entry has" not in infrastructure
+
+
+def test_archive_scope_note_supersedes_stale_docs_exclusion() -> None:
+    archive = Path("kamma/upstream_sync/archive_improvements.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert "`gui/` and `docs/` are permanently out of sync scope" not in archive
+    assert (
+        "Superseded scope note: `gui/` remains out of sync scope; `docs/` is "
+        "upstream-owned and accepted verbatim, while `docs_rus/` is handled by "
+        "Stage 4 Docs Translation Parity."
+    ) in archive

@@ -18,7 +18,7 @@ handoff, and an explicit model switch when needed. Stage 4 has two model-bound s
     -   `uv run pytest tests/test_shadow_parity.py tests/test_shadow_cleanup.py tests/test_namespace_isolation.py tests/test_template_syntax.py -v` (Sync-related suites).
 4.  **Stage 4: Docs Translation Parity**
     -   **Stage 4.A: ADVANCED Docs Analysis** — docs parity analysis and `docs_translation_plan.md`.
-    -   Read FAST-produced `docs_parity_report.md`; do not run commands in ADVANCED.
+    -   Read FAST-produced `docs_parity_report.md` from the `prep_manifest.json` range; do not run commands in ADVANCED.
     -   **Stage 4.B: FAST Docs Translation** — execute the approved docs translation plan.
 5.  **Stage 5: ADVANCED Verification & After-sync** — decide acceptance after user verification.
 
@@ -32,7 +32,7 @@ For the full protocol, see **[guide.md](./guide.md)**.
 | Command | Purpose |
 |---|---|
 | `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` | Validate `registry.json` schema and paths. |
-| `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` | Ensure every registry entry has SMD merge guidance. |
+| `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` | Ensure every sync-relevant registry entry has SMD merge guidance. |
 | `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py <thread_dir>` | Generate Stage 1 report and manifest. |
 | `uv run python3 kamma/upstream_sync/scripts/execute_sync.py <thread_dir>` | Robustly execute selective sync from upstream. |
 | `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>` | Advance accepted sync metadata after Stage 5 acceptance. |

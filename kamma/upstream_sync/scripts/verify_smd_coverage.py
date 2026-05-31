@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Verify every registry entry has a corresponding SMD section meeting the quality rubric."""
+"""Verify sync-relevant registry entries have SMD sections meeting the quality rubric."""
 
 import re
 import sys

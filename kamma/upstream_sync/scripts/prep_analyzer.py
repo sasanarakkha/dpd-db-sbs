@@ -370,12 +370,12 @@ class PrepAnalyzer:
             lines.append("_No inspired sources modified._")
         lines.append("")
 
-        lines.append("## Untracked Changes")
+        lines.append("## New Or Unmapped Upstream Changes")
         if untracked:
             for path in sorted(set(untracked)):
                 lines.append(f"- {path}")
         else:
-            lines.append("_No untracked changes._")
+            lines.append("_No new or unmapped upstream changes._")
         lines.append("")
 
         if deleted:

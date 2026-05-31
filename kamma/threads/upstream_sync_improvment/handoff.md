@@ -227,3 +227,65 @@ refactor(upstream-sync): harden typed metadata validation
 - Related dirty entries still intentionally separate:
   - `resources/*`
   - `kamma/threads/upstream_sync_improvment/handoff.md`
+
+## Latest Separate Upstream Sync Review Follow-up Implemented
+
+- User request:
+  - Review `kamma/upstream_sync/` separately for simplicity, elegance, safety, and security.
+  - Implement the concrete improvements found in that review.
+  - Update this handoff with the summary.
+- Review verdict before implementation:
+  - No major redesign needed.
+  - The current `registry.json` + SMD + `prep_manifest.json` + FAST/ADVANCED hard-stop model remains the simplest safe architecture.
+  - Three scoped improvements were approved for implementation.
+- Completed work:
+  - Changed `check_docs_parity.py` so Stage 4 docs parity uses `<thread_dir>/prep_manifest.json` when a thread dir is provided.
+  - Docs parity now diffs the exact `from_upstream_sha -> to_upstream_sha` manifest range instead of `accepted_sync.json -> HEAD`.
+  - Preserved standalone `check_docs_parity.py` behavior: without `<thread_dir>`, it still falls back to `accepted_sync.json -> HEAD`.
+  - Renamed the misleading prep report section from `Untracked Changes` to `New Or Unmapped Upstream Changes`.
+  - Clarified SMD coverage wording so docs and the script say `sync-relevant registry entries`, matching the actual checker scope.
+  - Updated the stale archive note: `gui/` remains out of sync scope; `docs/` is upstream-owned and accepted verbatim; `docs_rus/` is handled by Stage 4 Docs Translation Parity.
+  - Updated Stage 4 docs/template wording to explicitly mention the manifest range.
+  - Added focused tests for all behavior/documentation changes.
+- Exact commands run:
+  - `uv run pytest tests/test_check_docs_parity.py tests/test_prep_analyzer.py tests/test_upstream_sync_docs_policy.py -v` red: failed during collection because `load_docs_sync_range` did not exist yet.
+  - `uv run pytest tests/test_check_docs_parity.py tests/test_prep_analyzer.py tests/test_upstream_sync_docs_policy.py -v` green: 17 passed.
+  - `uv run ruff check --fix kamma/upstream_sync/scripts/check_docs_parity.py kamma/upstream_sync/scripts/prep_analyzer.py kamma/upstream_sync/scripts/verify_smd_coverage.py tests/test_check_docs_parity.py tests/test_prep_analyzer.py tests/test_upstream_sync_docs_policy.py` passed.
+  - `uv run ruff format kamma/upstream_sync/scripts/check_docs_parity.py kamma/upstream_sync/scripts/prep_analyzer.py kamma/upstream_sync/scripts/verify_smd_coverage.py tests/test_check_docs_parity.py tests/test_prep_analyzer.py tests/test_upstream_sync_docs_policy.py` passed; 6 files left unchanged.
+  - `uv run pyright kamma/upstream_sync/scripts/check_docs_parity.py kamma/upstream_sync/scripts/prep_analyzer.py kamma/upstream_sync/scripts/verify_smd_coverage.py tests/test_check_docs_parity.py tests/test_prep_analyzer.py tests/test_upstream_sync_docs_policy.py` passed: 0 errors, 0 warnings.
+  - `uv run --with pyrefly pyrefly check --min-severity warn kamma/upstream_sync/scripts/check_docs_parity.py kamma/upstream_sync/scripts/prep_analyzer.py kamma/upstream_sync/scripts/verify_smd_coverage.py tests/test_check_docs_parity.py tests/test_prep_analyzer.py tests/test_upstream_sync_docs_policy.py` passed: 0 errors, 3 suppressed.
+  - `uv run pytest tests/test_execute_sync.py tests/test_finalize_accepted_sync.py tests/test_sync_state.py tests/test_upstream_sync_docs_policy.py tests/test_prep_analyzer.py tests/test_validate_registry.py tests/test_check_docs_parity.py tests/test_verify_smd_coverage.py -v` passed: 77 passed.
+  - `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` passed.
+  - `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` passed.
+  - `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py` passed in standalone fallback mode, reporting no missing/stale translations.
+  - `git diff --check -- kamma/upstream_sync/README.md kamma/upstream_sync/archive_improvements.md kamma/upstream_sync/guide.md kamma/upstream_sync/infrastructure.md kamma/upstream_sync/scripts/check_docs_parity.py kamma/upstream_sync/scripts/prep_analyzer.py kamma/upstream_sync/scripts/verify_smd_coverage.py kamma/upstream_sync/stages/prep.md kamma/upstream_sync/templates/sync_thread_plan.md tests/test_check_docs_parity.py tests/test_prep_analyzer.py tests/test_upstream_sync_docs_policy.py` passed.
+- Files changed:
+  - `kamma/upstream_sync/README.md`
+  - `kamma/upstream_sync/archive_improvements.md`
+  - `kamma/upstream_sync/guide.md`
+  - `kamma/upstream_sync/infrastructure.md`
+  - `kamma/upstream_sync/scripts/check_docs_parity.py`
+  - `kamma/upstream_sync/scripts/prep_analyzer.py`
+  - `kamma/upstream_sync/scripts/verify_smd_coverage.py`
+  - `kamma/upstream_sync/stages/prep.md`
+  - `kamma/upstream_sync/templates/sync_thread_plan.md`
+  - `tests/test_check_docs_parity.py`
+  - `tests/test_prep_analyzer.py`
+  - `tests/test_upstream_sync_docs_policy.py`
+  - `kamma/threads/upstream_sync_improvment/handoff.md`
+- Exact outputs or failures summarized:
+  - Red phase failure was expected and useful: `ImportError: cannot import name 'load_docs_sync_range'`.
+  - Final focused upstream-sync pytest suite passed: 77 passed.
+  - Registry validation, SMD coverage, docs parity, ruff, pyright, pyrefly, and diff whitespace checks passed.
+- Open decisions:
+  - User manual review is still needed.
+  - No agent-side git commit was made.
+- Errors, issues, and repeated mistakes:
+  - No implementation blocker was encountered.
+  - Initial red failure was intentional TDD evidence.
+  - Existing unrelated dirty/untracked `resources/*` entries remain untouched.
+- Recommended commit message:
+
+```text
+fix(upstream-sync): pin docs parity to manifest range
+```

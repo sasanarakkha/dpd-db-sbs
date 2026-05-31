@@ -20,7 +20,7 @@ All upstream sync assets live in `kamma/upstream_sync/`.
 | `stages/` | Stage-specific contracts and checklists with FAST/ADVANCED ownership |
 | `scripts/registry_helper.py` | Shared Python helper to load the registry and extract paths |
 | `scripts/validate_registry.py` | Schema and data-quality validator for `registry.json` |
-| `scripts/verify_smd_coverage.py` | Coverage checker — ensures every registry entry has an SMD entry in `smd/` |
+| `scripts/verify_smd_coverage.py` | Coverage checker — ensures every sync-relevant registry entry has an SMD entry in `smd/` |
 | `scripts/prep_analyzer.py` | Generates factual Stage 1 report and manifest from the accepted sync range |
 | `scripts/execute_sync.py` | Robustly executes selective sync from upstream (Stage 1 automation) |
 | `scripts/finalize_accepted_sync.py` | Advances `accepted_sync.json` from a verified prep manifest |
@@ -74,7 +74,8 @@ write the exact restart prompt, tell the user which model to switch to, and stop
 
 ## Shadow Module Descriptions (SMD)
 
-The `smd/` directory provides per-file context for every registry entry.
+The `smd/` directory provides per-file context for every sync-relevant registry entry
+(`modified_upstream_files`, strict shadows, and `inspired_by_upstream`).
 
 Each entry contains:
 - **Sync Rule**: `PORT` / `MIRROR_EXACTLY` / `PRESERVE` / `DISCUSS` / `inspired_only`
@@ -93,7 +94,7 @@ Checks schema integrity of `registry.json`. Enforces `divergence_reason` for ins
 
 ### `verify_smd_coverage.py`
 
-Aggregates entries from `smd/*.md` and ensures every registry entry is covered. Supports `inspired_only` sync rule.
+Aggregates entries from `smd/*.md` and ensures every sync-relevant registry entry is covered. Supports `inspired_only` sync rule.
 
 ### `prep_analyzer.py`
 

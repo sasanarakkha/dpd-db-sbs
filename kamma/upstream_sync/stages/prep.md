@@ -9,7 +9,7 @@
 ## Required Report Sections
 - **Modified Tracked Files**: Direct divergences (`modified_upstream_files`).
 - **Shadow/Inspired Sources**: Upstream files that drive local copies.
-- **Untracked Changes**: New upstream files not yet in the registry.
+- **New Or Unmapped Upstream Changes**: Added upstream paths and changed paths without a mapped action.
 - **Sync Range**: explicit `from -> to` upstream SHAs.
 - **Validation Status**: Results of registry and SMD validators.
 

@@ -100,7 +100,7 @@
 
 - [ ] **4.A.1 Parity Report**:
   - [ ] Read the FAST output from `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir>` or request FAST to run it if missing.
-  - [ ] Use FAST-provided `git diff <accepted_sha> HEAD -- docs/<file>` output for each stale file; request FAST if missing.
+  - [ ] Confirm the report uses `<thread_dir>/prep_manifest.json` for the exact `from_upstream_sha -> to_upstream_sha` range.
 - [ ] **4.A.2 Terminology and Scope**:
   - [ ] Read 3-5 existing `docs_rus/` files to build a terminology glossary.
   - [ ] For each stale file, capture the exact upstream diff.

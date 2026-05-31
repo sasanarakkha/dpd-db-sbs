@@ -233,6 +233,8 @@ Stage 4 is split into two model-bound substages: ADVANCED analysis and FAST tran
 
 **Stage 4.A — Analysis (ADVANCED model)**:
 FAST must run `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir>` before handing off to Stage 4.A.
+The script reads `<thread_dir>/prep_manifest.json` and reports docs changes from the exact
+`from_upstream_sha -> to_upstream_sha` sync range, not from a moving `HEAD` range.
 
 1. Read `docs_parity_report.md`.
 2. Read 3–5 existing `docs_rus/` files to build a terminology glossary (key EN → RU mappings specific to DPD: headword, inflection template, root family, deconstructor, lookup, etc.).

@@ -7,6 +7,10 @@ import json
 import subprocess
 from pathlib import Path
 
+from kamma.upstream_sync.scripts.registry_helper import (
+    get_prep_manifest_path,
+    load_prep_manifest,
+)
 from tools.printer import printer as pr
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -33,11 +37,24 @@ def load_accepted_sha() -> str:
     return data["last_accepted_upstream_sha"]
 
 
-def get_docs_changed_since(sha: str) -> set[str]:
-    """Return relative paths (under docs/) of files changed since sha."""
+def load_docs_sync_range(thread_dir: Path | None) -> tuple[str, str]:
+    """Return the docs parity git range from the thread manifest, falling back to HEAD."""
+    if thread_dir is None:
+        return load_accepted_sha(), "HEAD"
+
+    manifest = load_prep_manifest(get_prep_manifest_path(thread_dir))
+    from_ref = manifest["from_upstream_sha"]
+    to_ref = manifest["to_upstream_sha"]
+    if not isinstance(from_ref, str) or not isinstance(to_ref, str):
+        raise ValueError("prep manifest sync range must contain string refs")
+    return from_ref, to_ref
+
+
+def get_docs_changed_since(from_ref: str, to_ref: str = "HEAD") -> set[str]:
+    """Return relative paths (under docs/) changed in an explicit git range."""
     try:
         result = subprocess.run(
-            ["git", "diff", "--name-only", sha, "HEAD", "--", "docs/"],
+            ["git", "diff", "--name-only", from_ref, to_ref, "--", "docs/"],
             capture_output=True,
             text=True,
             check=True,
@@ -55,11 +72,11 @@ def get_docs_changed_since(sha: str) -> set[str]:
     return changed
 
 
-def get_docs_diff(sha: str, docs_relative_path: str) -> str:
-    """Return exact git diff evidence for one docs/ file since sha."""
+def get_docs_diff(from_ref: str, docs_relative_path: str, to_ref: str = "HEAD") -> str:
+    """Return exact git diff evidence for one docs/ file in an explicit git range."""
     try:
         result = subprocess.run(
-            ["git", "diff", sha, "HEAD", "--", f"docs/{docs_relative_path}"],
+            ["git", "diff", from_ref, to_ref, "--", f"docs/{docs_relative_path}"],
             cwd=ROOT,
             capture_output=True,
             text=True,
@@ -96,11 +113,12 @@ def write_report(
     no_translate: list[str],
     unique_local: list[str],
     unexpected_local: list[str],
+    to_ref: str = "HEAD",
 ) -> None:
     lines: list[str] = [
         "# Docs Translation Parity Report",
         "",
-        f"Baseline SHA: `{sha}`",
+        f"Sync range: `{sha}` → `{to_ref}`",
         "",
         "---",
         "",
@@ -137,7 +155,7 @@ def write_report(
             "",
         ]
         for f in stale:
-            diff = get_docs_diff(sha, f)
+            diff = get_docs_diff(sha, f, to_ref)
             lines += [
                 f"### `docs/{f}`",
                 "",
@@ -188,12 +206,12 @@ def write_report(
 
 
 def run_parity_check(thread_dir: Path | None) -> int:
-    sha = load_accepted_sha()
-    pr.green_title(f"Docs parity check (baseline {sha})")
+    sha, to_ref = load_docs_sync_range(thread_dir)
+    pr.green_title(f"Docs parity check ({sha} -> {to_ref})")
 
     en_files = collect_md_files(DOCS_EN)
     ru_files = collect_md_files(DOCS_RU)
-    changed = get_docs_changed_since(sha)
+    changed = get_docs_changed_since(sha, to_ref)
 
     missing: list[str] = sorted(f for f in en_files if f not in ru_files)
     stale: list[str] = sorted(
@@ -247,6 +265,7 @@ def run_parity_check(thread_dir: Path | None) -> int:
             no_translate_list,
             unique_local,
             unexpected_local,
+            to_ref=to_ref,
         )
 
     return 1 if unexpected_local else 0

@@ -1,10 +1,34 @@
 """Verify docs translation parity reports classify and write expected outputs."""
 
+import json
 from pathlib import Path
+from unittest.mock import MagicMock
 from unittest.mock import patch
 
 from kamma.upstream_sync.scripts.check_docs_parity import find_unexpected_local_files
+from kamma.upstream_sync.scripts.check_docs_parity import get_docs_changed_since
+from kamma.upstream_sync.scripts.check_docs_parity import load_docs_sync_range
+from kamma.upstream_sync.scripts.check_docs_parity import run_parity_check
 from kamma.upstream_sync.scripts.check_docs_parity import write_report
+
+
+def write_valid_manifest(thread_dir: Path) -> None:
+    """Write a minimal valid prep manifest for docs parity tests."""
+    (thread_dir / "prep_manifest.json").write_text(
+        json.dumps(
+            {
+                "from_upstream_sha": "oldsha123",
+                "to_upstream_sha": "newsha456",
+                "target_upstream_ref": "upstream/main",
+                "generated_at": "2026-05-31T00:00:00+08:00",
+                "changed_upstream_paths": ["docs/example.md"],
+                "deleted_upstream_paths": [],
+                "mapped_actions": {},
+                "discuss_paths": [],
+            }
+        ),
+        encoding="utf-8",
+    )
 
 
 def test_find_unexpected_local_files() -> None:
@@ -17,6 +41,61 @@ def test_find_unexpected_local_files() -> None:
     unexpected = find_unexpected_local_files(unique_local)
 
     assert unexpected == ["technical/untracked_local.md"]
+
+
+def test_load_docs_sync_range_uses_thread_manifest(tmp_path: Path) -> None:
+    write_valid_manifest(tmp_path)
+
+    from_ref, to_ref = load_docs_sync_range(tmp_path)
+
+    assert from_ref == "oldsha123"
+    assert to_ref == "newsha456"
+
+
+@patch("kamma.upstream_sync.scripts.check_docs_parity.subprocess.run")
+def test_get_docs_changed_since_uses_explicit_end_ref(
+    mock_run: MagicMock,
+) -> None:
+    mock_run.return_value.stdout = "docs/example.md\n"
+
+    changed = get_docs_changed_since("oldsha123", "newsha456")
+
+    assert changed == {"example.md"}
+    mock_run.assert_called_once()
+    assert mock_run.call_args.args[0] == [
+        "git",
+        "diff",
+        "--name-only",
+        "oldsha123",
+        "newsha456",
+        "--",
+        "docs/",
+    ]
+
+
+@patch("kamma.upstream_sync.scripts.check_docs_parity.write_report")
+@patch(
+    "kamma.upstream_sync.scripts.check_docs_parity.get_docs_changed_since",
+    return_value={"example.md"},
+)
+@patch(
+    "kamma.upstream_sync.scripts.check_docs_parity.collect_md_files",
+    side_effect=[{"example.md"}, {"example.md"}],
+)
+def test_run_parity_check_uses_thread_manifest_range(
+    mock_collect: MagicMock,
+    mock_changed: MagicMock,
+    mock_write_report: MagicMock,
+    tmp_path: Path,
+) -> None:
+    write_valid_manifest(tmp_path)
+
+    result = run_parity_check(tmp_path)
+
+    assert result == 0
+    mock_collect.assert_called()
+    mock_changed.assert_called_once_with("oldsha123", "newsha456")
+    assert mock_write_report.call_args.kwargs["to_ref"] == "newsha456"
 
 
 def test_write_report_accepts_external_thread_dir(tmp_path: Path) -> None:

@@ -126,7 +126,7 @@ This document provides a unified, exhaustive post-mortem of the Upstream Sync Re
 ## 17. Scope Discipline and Out-of-Scope Directories
 **Issue:** In the 2026-05-02 sync, the agent repeatedly accessed the `gui/` folder despite it being explicitly excluded from sync scope. It even added `"gui/"` to `unique_paths` in the registry — which had to be manually reverted.
 **Recommendation:**
-- `gui/` and `docs/` are permanently out of sync scope. Never run `test_shadow_cleanup.py` against them. Never add them to `unique_paths`. Never modify files inside them during a sync session.
+- Superseded scope note: `gui/` remains out of sync scope; `docs/` is upstream-owned and accepted verbatim, while `docs_rus/` is handled by Stage 4 Docs Translation Parity.
 - The guide now has an explicit `## Sync Scope` note. Consult it at the start of every stage.
 
 ---
@@ -236,4 +236,3 @@ The following workflow was replaced by the 3-stage process (Prep, Analysis, Exec
 8. **USER APPROVAL GATE**: Wait for explicit "Proceed with Commit 3".
 9. Prepare commit: `sync: cleanup and finalization YYYY-MM-DD`
 10. Present `git add` + `git commit -m "..."` to user.
-
