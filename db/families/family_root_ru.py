@@ -8,7 +8,7 @@ import re
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword, DpdRoot, FamilyRoot
-from scripts.build.anki_updater import family_updater
+from exporter.anki.anki_updater import family_updater
 from tools.configger import config_test
 from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
@@ -33,7 +33,7 @@ def main():
         config_test("exporter", "make_dpd", "yes")
         or config_test("regenerate", "db_rebuild", "yes")
     ):
-        pr.green_tmr("disabled in config.ini")
+        pr.green_title("disabled in config.ini")
         pr.toc()
         return
 

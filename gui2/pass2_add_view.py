@@ -14,12 +14,14 @@ from gui2.dpd_fields_lists import (
     NO_SPLIT_LIST,
     PASS1_FIELDS,
     ROOT_FIELDS,
+    SUTTA_FIELDS,
     WORD_FIELDS,
 )
 from gui2.mixins import PopUpMixin
 from gui2.pass2_auto_control import Pass2AutoController
 from gui2.pass2_auto_file_manager import Pass2AutoFileManager
 from gui2.pass2_pre_new_word_manager import Pass2NewWordManager
+from gui2.pass2_x_manager import Pass2XManager
 from gui2.toolkit import ToolKit
 from tools.fast_api_utils_dps import request_dpd_server
 from tools.speech_marks import SpeechMarkManager
@@ -59,6 +61,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
         self.history_manager.register_refresh_callback(self._update_history_dropdown)
         self.corrections_manager = self.toolkit.corrections_manager
         self.additions_manager = self.toolkit.additions_manager
+        self._x_manager = Pass2XManager(self._db)
 
         self.dpd_fields: DpdFields
         self._pass2_auto_file_manager = Pass2AutoFileManager(self.toolkit)
@@ -100,6 +103,9 @@ class Pass2AddView(ft.Column, PopUpMixin):
         self._additions_button = ft.ElevatedButton(
             "Add", on_click=self._click_additions_button, tooltip="additions"
         )
+        self._x_button = ft.ElevatedButton(
+            "X", on_click=self._click_x_button, tooltip="filter queue"
+        )
         self._pread_button = ft.ElevatedButton(
             "PRead", on_click=self._click_pread_button, tooltip="proofreader"
         )
@@ -113,6 +119,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
             hint_style=ft.TextStyle(color=LABEL_COLOUR, size=10),
             hint_text="Enter ID or Lemma",
             on_submit=self._click_edit_headword,
+            on_blur=self._disable_id_field_autofocus,
             text_size=14,
             width=400,
         )
@@ -150,6 +157,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
                     ft.Radio(value="all", label="All"),
                     ft.Radio(value="root", label="Root"),
                     ft.Radio(value="compound", label="Compound"),
+                    ft.Radio(value="sutta", label="Sutta"),
                     ft.Radio(value="word", label="Word"),
                     ft.Radio(value="pass1", label="Pass1"),
                 ]
@@ -176,6 +184,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
                             self._new_word_button,
                             self._corrections_button,
                             self._additions_button,
+                            self._x_button,
                             self._pread_button,
                             self._clear_all_button,
                             self.update_speech_marks_button,
@@ -234,6 +243,10 @@ class Pass2AddView(ft.Column, PopUpMixin):
             self._bottom_section,
         ]
 
+    def _disable_id_field_autofocus(self, e: ft.ControlEvent) -> None:
+        if self._enter_id_or_lemma_field.autofocus:
+            self._enter_id_or_lemma_field.autofocus = False
+
     def _on_delete_hover(self, e: ft.ControlEvent) -> None:
         e.control.bgcolor = ft.Colors.RED if e.data == "true" else None
         e.control.color = "white" if e.data == "true" else None
@@ -264,6 +277,8 @@ class Pass2AddView(ft.Column, PopUpMixin):
             if example_2_field and hasattr(example_2_field, "word_to_find_field"):
                 example_2_field.word_to_find_field.value = lemma_clean[:-1]
                 example_2_field.word_to_find_field.value = lemma_clean[:-1]
+
+        self._apply_sutta_prefill()
 
     def _click_edit_headword(self, e: ft.ControlEvent) -> None:
         id_or_lemma = ""
@@ -428,6 +443,15 @@ class Pass2AddView(ft.Column, PopUpMixin):
         self.speech_marks_dict = self.speech_marks_manager.get_speech_marks()
         self.update_message("speech marks updated")
 
+    def _apply_sutta_prefill(self) -> None:
+        """If sutta filter is active, prefill empty source_1 and commentary with '-'."""
+        if self._filter_radios.value != "sutta":
+            return
+        for prefill_name in ("source_1", "commentary"):
+            prefill_field = self.dpd_fields.get_field(prefill_name)
+            if prefill_field is not None and not prefill_field.value:
+                prefill_field.value = "-"
+
     def _handle_filter_change(self, e: ft.ControlEvent) -> None:
         """Handles changes in the field filter RadioGroup."""
         filter_type = e.control.value
@@ -437,6 +461,9 @@ class Pass2AddView(ft.Column, PopUpMixin):
             visible_fields = ROOT_FIELDS
         elif filter_type == "compound":
             visible_fields = COMPOUND_FIELDS
+        elif filter_type == "sutta":
+            visible_fields = SUTTA_FIELDS
+            self._apply_sutta_prefill()
         elif filter_type == "word":
             visible_fields = WORD_FIELDS
         elif filter_type == "pass1":
@@ -514,7 +541,11 @@ class Pass2AddView(ft.Column, PopUpMixin):
         self._enter_id_or_lemma_field.value = ""
         self._enter_id_or_lemma_field.error_text = None
         self.headword = None  # Resetting the data model reference
-        self._filter_radios.value = "all"  # Reset filter to 'all'
+        if self._filter_radios.value == "sutta":
+            self._apply_sutta_prefill()
+            self.dpd_fields.filter_fields(SUTTA_FIELDS)
+        else:
+            self._filter_radios.value = "all"  # Reset filter to 'all'
         self.headword_original = None  # Resetting the original data reference
         self.current_correction = None
         self.current_addition = None
@@ -849,6 +880,54 @@ class Pass2AddView(ft.Column, PopUpMixin):
 
         except Exception as ex:
             self.update_message(f"Error loading addition: {str(ex)}")
+
+        self.page.update()
+
+    def _click_x_button(self, e: ft.ControlEvent) -> None:
+        """Loads the next headword from the X filter queue."""
+        if self._x_manager._loaded and not self._x_manager._queue:
+            # Re-read pass2_x_manager.py from disk so edits to filter_query
+            # take effect without restarting the app. Bypasses sys.modules
+            # and __pycache__ — importlib.reload was not reliably picking
+            # up changes.
+            import importlib.util
+            from pathlib import Path
+
+            path = Path(__file__).parent / "pass2_x_manager.py"
+            spec = importlib.util.spec_from_file_location(
+                f"pass2_x_manager_live_{id(self)}", path
+            )
+            assert spec is not None and spec.loader is not None
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            self._x_manager = mod.Pass2XManager(self._db)
+
+        headword_id, remaining = self._x_manager.get_next()
+
+        if headword_id is None:
+            self.update_message("No more X words")
+            self.page.update()
+            return
+
+        try:
+            headword = self._db.get_headword_by_id(headword_id)
+            if not headword:
+                self.update_message(f"Headword ID {headword_id} not found in DB")
+                self.page.update()
+                return
+
+            self.clear_all_fields()
+            self.headword = headword
+            self._enter_id_or_lemma_field.value = headword.lemma_1
+            self.headword_original = copy.deepcopy(headword)
+            self.dpd_fields.update_db_fields(headword)
+            self.add_headword_to_examples_and_commentary()
+
+            self.update_message(
+                f"Loaded {headword.lemma_clean}. {remaining} X remaining."
+            )
+        except Exception as ex:
+            self.update_message(f"Error loading X word: {str(ex)}")
 
         self.page.update()
 

@@ -34,7 +34,8 @@ uv run python db/families/family_idiom_ru.py
 
 uv run python scripts/build/families_to_json.py
 
-uv run python scripts/build/anki_updater.py
+uv run python exporter/anki/anki_updater.py
+uv run python exporter/anki/anki_apkg_exporter.py
 
 uv run python db/variants/main.py 
 

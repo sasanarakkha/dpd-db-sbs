@@ -619,12 +619,12 @@ def _check_no_mako_in_templates() -> bool:
 
 
 def _check_anki_import() -> bool:
-    """Verify scripts.build.anki_updater imports without error."""
+    """Verify exporter.anki.anki_updater imports without error."""
     import importlib
 
     try:
-        sys.modules.pop("scripts.build.anki_updater", None)
-        importlib.import_module("scripts.build.anki_updater")
+        sys.modules.pop("exporter.anki.anki_updater", None)
+        importlib.import_module("exporter.anki.anki_updater")
         pr.yes("    anki_updater: import ok")
         return True
     except Exception as exc:
@@ -875,8 +875,8 @@ def phase3_anki() -> bool | None:
         with patched_project_paths():
             import importlib
 
-            sys.modules.pop("scripts.build.anki_updater", None)
-            mod = importlib.import_module("scripts.build.anki_updater")
+            sys.modules.pop("exporter.anki.anki_updater", None)
+            mod = importlib.import_module("exporter.anki.anki_updater")
             if hasattr(mod, "main"):
                 mod.main()
 

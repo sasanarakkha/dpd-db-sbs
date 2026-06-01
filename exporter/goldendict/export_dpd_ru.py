@@ -141,7 +141,7 @@ def render_pali_word_dpd_html(
     synonyms += i.inflections_devanagari_list
     synonyms += i.inflections_thai_list
     synonyms += i.family_set_list
-    
+
     set_ru_dict = read_set_ru_from_tsv()
     ru_set_list = []
     for english_word in i.family_set_list:
@@ -150,7 +150,7 @@ def render_pali_word_dpd_html(
     synonyms += ru_set_list
     synonyms += [str(i.id)]
 
-    if i.needs_sutta_info_button:
+    if i.su and i.needs_sutta_info_button:
         synonyms += i.su.sutta_codes_list
 
     size_dict["dpd_synonyms"] += len(str(synonyms))
@@ -299,6 +299,8 @@ def generate_dpd_html(
 
         for p in processes:
             p.join()
+            if p.exitcode != 0:
+                raise RuntimeError(f"Worker process failed with exit code {p.exitcode}")
 
         if len(batches) > 0 and len(batches[0]) > 0 and offset % limit == 0:
             pr.counter(offset, pali_words_count, batches[0][0]["pali_word"].lemma_1)
@@ -310,4 +312,3 @@ def generate_dpd_html(
     total_sizes = sum_rendered_sizes(rendered_sizes)
 
     return dpd_data_list, total_sizes
-

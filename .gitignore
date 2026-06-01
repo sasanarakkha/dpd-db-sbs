@@ -11,8 +11,12 @@
 .roo/
 .venv
 .vscode/
-.zed/tasks.json
+.zed/
 /.qwen
+/dpd.db-shm
+/dpd.db-wal
+/exporter/anki/templates/.backups
+/exporter/anki/templates/old
 __init__.py
 __pycache__/
 archive/db/bold_definitions/bold_definitions.json
@@ -42,10 +46,10 @@ db/sinhala/dpd sinhala 1.2.xlsx
 db/suttas/code/*
 db/suttas/todo.md
 db/suttas/Untitled Document
+docs/rss.xml
 docs_site
 dpd-db.code-workspace
 dpd.db.tar.bz2
-dpd/
 exporter/archive/other_dictionaries_legacy/*
 exporter/archive/other_dictionaries_legacy/bmp_files/
 exporter/archive/other_dictionaries_legacy/code/cone/bulk_dump_html.html
@@ -110,8 +114,7 @@ scripts/extractor/extract_cone.tsv
 scripts/extractor/extract_cpd.tsv
 scripts/find/most_common_missing_words.tsv
 scripts/find/most_common_missing_words_old.tsv
-scripts/suttas/cst/*.tsv
-scripts/suttas/sc/*.tsv
+scripts/suttas/*/*.tsv
 shared_data/changed_headwords
 shared_data/changed_templates
 shared_data/frequency/*.json
@@ -119,6 +122,10 @@ shared_data/headword_stem_pattern_dict
 temp/
 token.json
 typescript
+/graphify-out
+.antigravitycli/
+.pytest_cache/
+.ruff_cache/
 /.qwen
 
 # --- DPS / SBS / RU UNIQUE patterns ---

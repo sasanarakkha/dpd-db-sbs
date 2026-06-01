@@ -46,7 +46,6 @@ class HeadwordData:
             "example_2",
             "commentary",
             "notes",
-            "link",
             "ru_meaning",
             "ru_meaning_lit",
             "ru_notes",
