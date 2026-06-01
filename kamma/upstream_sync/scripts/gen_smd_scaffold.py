@@ -40,7 +40,7 @@ def main() -> None:
     count = 0
 
     for path in get_modified_upstream_paths(data):
-        sections.append(make_stub(path, "modified_upstream"))
+        sections.append(make_stub(path, "modified_upstream_files"))
         count += 1
 
     for category, mapping in get_shadow_mappings_by_category(data).items():

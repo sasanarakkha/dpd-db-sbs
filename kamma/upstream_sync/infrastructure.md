@@ -38,6 +38,8 @@ All upstream sync assets live in `kamma/upstream_sync/`.
 The only sync-related Bash entrypoint is `scripts/cl_dps/dpd-kamma-sync`. It lives outside
 `kamma/upstream_sync/` because it is a user terminal command, but all sync-owned helper logic lives
 inside `kamma/upstream_sync/scripts/`.
+Only human-run Bash scripts under `scripts/cl_dps/` may perform their own `git commit` operations;
+agents and Python sync scripts must not commit autonomously.
 
 | Key | Meaning |
 |---|---|

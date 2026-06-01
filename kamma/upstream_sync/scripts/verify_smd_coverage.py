@@ -79,7 +79,7 @@ def collect_registry_paths(data: dict[str, object]) -> list[tuple[str, str]]:
     items: list[tuple[str, str]] = []
 
     for path in get_modified_upstream_paths(data):
-        items.append((path, "modified_upstream"))
+        items.append((path, "modified_upstream_files"))
 
     for category, mapping in get_shadow_mappings_by_category(data).items():
         for shadow in mapping:

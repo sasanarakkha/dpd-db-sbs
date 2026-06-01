@@ -1,7 +1,7 @@
 # SMD: DB
 
 **File**: `db/models.py`
-- **Category**: modified_upstream
+- **Category**: modified_upstream_files
 - **Sync Rule**: DISCUSS
 - **Why DISCUSS**: Adds four entire tables (`SBS`, `Russian`, `Tamil`, `Sinhala`) plus relationships (`.sbs`, `.ru`, `.ta`) on `DpdHeadword` and extra columns (`root_ru_meaning`, `sanskrit_root_ru_meaning`) on `DpdRoot`. Blind porting would silently delete all localized schema.
 - **Local Changes**:
@@ -24,7 +24,7 @@
 
 
 **File**: `db/tpd/tpd_to_lookup.py`
-- **Category**: tamil_copy
+- **Category**: tamil_copies
 - **Sync Rule**: PORT
 - **Shadow of**: `db/epd/epd_to_lookup.py`
 - **Local Changes**:
@@ -41,7 +41,7 @@
 
 
 **File**: `db/rpd/rpd_to_lookup.py`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Shadow of**: `db/epd/epd_to_lookup.py`
 - **Local Changes**:
@@ -58,7 +58,7 @@
 
 
 **File**: `db/families/family_compound_ru.py`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. Writes `html_ru` and `data_ru` columns on `FamilyCompound` model in addition to upstream `html` column.
@@ -71,7 +71,7 @@
 
 
 **File**: `db/families/family_idiom_ru.py`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. Imports `ru_degree_of_completion`, `make_short_ru_meaning`, `ru_replace_abbreviations` from Russian utils.
@@ -88,7 +88,7 @@
 
 
 **File**: `db/families/family_root_ru.py`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. Imports `ru_degree_of_completion`, `make_short_ru_meaning`, `ru_replace_abbreviations` from Russian utils.
@@ -105,7 +105,7 @@
 
 
 **File**: `db/families/family_set_ru.py`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. Imports `ru_degree_of_completion`, `make_short_ru_meaning`, `ru_replace_abbreviations`, `populate_set_ru_and_check_errors`.
@@ -120,7 +120,7 @@
 
 
 **File**: `db/families/family_word_ru.py`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. Imports `ru_degree_of_completion`, `make_short_ru_meaning`, `ru_replace_abbreviations`.
@@ -135,7 +135,7 @@
 
 
 **File**: `db/lookup/help_abbrev_add_to_lookup_ru.py`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. Imports and stores `RuPaths` alongside `ProjectPaths`.

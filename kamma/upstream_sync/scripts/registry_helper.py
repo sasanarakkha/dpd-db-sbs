@@ -153,10 +153,10 @@ def get_shadow_mappings_by_category(
 ) -> dict[str, dict[str, str]]:
     """Return strict-shadow mappings grouped by logical category."""
     return {
-        "russian_copy": get_string_mapping(data, "russian_copies"),
-        "sbs_copy": get_string_mapping(data, "sbs_copies"),
-        "dps_copy": get_string_mapping(data, "dps_copies"),
-        "tamil_copy": get_string_mapping(data, "tamil_copies"),
+        "russian_copies": get_string_mapping(data, "russian_copies"),
+        "sbs_copies": get_string_mapping(data, "sbs_copies"),
+        "dps_copies": get_string_mapping(data, "dps_copies"),
+        "tamil_copies": get_string_mapping(data, "tamil_copies"),
     }
 
 

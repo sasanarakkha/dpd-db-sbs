@@ -4,8 +4,7 @@
 
 import argparse
 import subprocess
-from collections.abc import Iterable
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 
 from kamma.upstream_sync.scripts.registry_helper import (
     get_modified_upstream_paths,
@@ -13,6 +12,7 @@ from kamma.upstream_sync.scripts.registry_helper import (
     load_registry,
 )
 from kamma.upstream_sync.scripts.sync_runtime import verify_manifest
+from kamma.upstream_sync.scripts.sync_schema import validate_repo_relative_paths
 from tools.printer import printer as pr
 
 
@@ -64,33 +64,6 @@ def run_git(args: list[str], check: bool = True) -> subprocess.CompletedProcess:
         if e.stderr:
             pr.red(f"Error output: {e.stderr.strip()}")
         raise GitError(f"Command failed: {' '.join(args)}") from e
-
-
-def validate_repo_relative_paths(paths: Iterable[str], label: str) -> list[str]:
-    """Validate git pathspecs that may later be restored or removed."""
-    validated: list[str] = []
-    git_pathspec_chars = set("*?[]")
-    for index, path in enumerate(paths):
-        item_label = f"{label}[{index}]"
-        if not path.strip():
-            raise ValueError(f"{item_label} must be a non-empty path")
-        if path != path.strip():
-            raise ValueError(f"{item_label} must not contain surrounding whitespace")
-        if "\\" in path:
-            raise ValueError(f"{item_label} must use forward slashes")
-        if path.startswith("-"):
-            raise ValueError(f"{item_label} must not start with '-'")
-        if any(char in path for char in git_pathspec_chars):
-            raise ValueError(
-                f"{item_label} must not contain git pathspec metacharacters"
-            )
-        posix_path = PurePosixPath(path)
-        if posix_path.is_absolute() or path.startswith("~"):
-            raise ValueError(f"{item_label} must be a repo-relative path")
-        if ".." in posix_path.parts:
-            raise ValueError(f"{item_label} must stay inside the repository")
-        validated.append(path)
-    return validated
 
 
 def get_permanent_exclusions() -> list[str]:

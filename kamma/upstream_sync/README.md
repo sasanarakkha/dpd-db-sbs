@@ -12,6 +12,8 @@ Bash entrypoint: it backs up DPS localization tables, commits only the backup TS
 changes as `backup dps data`, and initializes the Kamma sync thread through
 `kamma/upstream_sync/scripts/init_sync_thread.py`. All actual sync execution stays
 in Python scripts under `kamma/upstream_sync/scripts/`.
+No agent may run `git commit` directly; only human-run Bash scripts under
+`scripts/cl_dps/` may contain autonomous commit behavior.
 
 Sync operations are executed via Kamma threads. Each stage ends with a hard stop, a fresh-session
 handoff, and an explicit model switch when needed. Stage 4 has two model-bound substages.

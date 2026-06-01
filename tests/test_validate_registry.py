@@ -125,6 +125,32 @@ def test_no_sync_files_rejects_blank_item(base_data):
     assert "no_sync_files[1]: must be a non-empty string" in errors
 
 
+def test_registry_paths_reject_unsafe_values(base_data):
+    base_data["modified_upstream_files"] = [
+        {"path": "/tmp/outside.py", "discuss": False, "discuss_reason": ""}
+    ]
+    base_data["no_sync_files"] = ["../outside.py"]
+    base_data["russian_copies"] = {"-bad.py": "db/source.py"}
+
+    errors = validate_registry_core(base_data)
+
+    assert any("modified_upstream_files[0].path" in e for e in errors)
+    assert any("must be a repo-relative path" in e for e in errors)
+    assert any("no_sync_files[0]" in e for e in errors)
+    assert any("must stay inside the repository" in e for e in errors)
+    assert any("russian_copies key '-bad.py'" in e for e in errors)
+    assert any("must not start with '-'" in e for e in errors)
+
+
+def test_registry_path_validation_allows_inventory_globs(base_data):
+    base_data["unique_paths"] = ["gui2/dps_*"]
+    base_data["skip_sync_patterns"] = ["*.tmp"]
+
+    errors = validate_registry_core(base_data)
+
+    assert not any("pathspec metacharacters" in e for e in errors)
+
+
 def test_ignored_files_rejected(base_data):
     base_data["ignored_files"] = ["old/"]
     errors = validate_registry_core(base_data)

@@ -104,17 +104,17 @@ def test_accepted_sync_state_from_raw_rejects_invalid_payload(
 def test_mapped_action_from_raw_valid_with_local_target_path() -> None:
     action = MappedAction.from_raw(
         {
-            "category": "russian_copy",
+            "category": "russian_copies",
             "local_path": "db/models_ru.py",
             "local_target_path": "db/models_ru.py",
         }
     )
 
-    assert action.category == "russian_copy"
+    assert action.category == "russian_copies"
     assert action.local_path == "db/models_ru.py"
     assert action.local_target_path == "db/models_ru.py"
     assert action.to_json() == {
-        "category": "russian_copy",
+        "category": "russian_copies",
         "local_path": "db/models_ru.py",
         "local_target_path": "db/models_ru.py",
     }
@@ -123,16 +123,16 @@ def test_mapped_action_from_raw_valid_with_local_target_path() -> None:
 def test_mapped_action_from_raw_accepts_backward_compatible_payload() -> None:
     action = MappedAction.from_raw(
         {
-            "category": "russian_copy",
+            "category": "russian_copies",
             "local_path": "db/models_ru.py",
         }
     )
 
-    assert action.category == "russian_copy"
+    assert action.category == "russian_copies"
     assert action.local_path == "db/models_ru.py"
     assert action.local_target_path is None
     assert action.to_json() == {
-        "category": "russian_copy",
+        "category": "russian_copies",
         "local_path": "db/models_ru.py",
     }
 
@@ -142,12 +142,12 @@ def test_mapped_action_from_raw_accepts_backward_compatible_payload() -> None:
     [
         ({"local_path": "db/models_ru.py"}, "missing required field 'category'"),
         (
-            {"category": "russian_copy", "local_path": " "},
+            {"category": "russian_copies", "local_path": " "},
             "field 'local_path' must be a non-empty string",
         ),
         (
             {
-                "category": "russian_copy",
+                "category": "russian_copies",
                 "local_path": "db/models_ru.py",
                 "local_target_path": 123,
             },
@@ -175,7 +175,7 @@ def valid_manifest_payload() -> dict[str, object]:
         "mapped_actions": {
             "db/models.py": [
                 {
-                    "category": "russian_copy",
+                    "category": "russian_copies",
                     "local_path": "db/models_ru.py",
                     "local_target_path": "db/models_ru.py",
                 }
@@ -194,12 +194,12 @@ def test_prep_manifest_from_raw_valid_with_current_fields() -> None:
     assert manifest.deleted_upstream_paths == ["old.py"]
     assert manifest.blocker_paths == ["new_unmapped.py"]
     assert manifest.discuss_paths == ["db/models.py"]
-    assert manifest.mapped_actions["db/models.py"][0].category == "russian_copy"
+    assert manifest.mapped_actions["db/models.py"][0].category == "russian_copies"
     assert manifest.to_json()["blocker_paths"] == ["new_unmapped.py"]
     assert manifest.to_json()["mapped_actions"] == {
         "db/models.py": [
             {
-                "category": "russian_copy",
+                "category": "russian_copies",
                 "local_path": "db/models_ru.py",
                 "local_target_path": "db/models_ru.py",
             }
@@ -239,7 +239,7 @@ def test_prep_manifest_from_raw_valid_with_current_fields() -> None:
         (
             lambda payload: payload.__setitem__(
                 "mapped_actions",
-                {"db/models.py": [{"category": "russian_copy"}]},
+                {"db/models.py": [{"category": "russian_copies"}]},
             ),
             "field 'mapped_actions\\['db/models.py'\\]\\[0\\]': missing required field 'local_path'",
         ),

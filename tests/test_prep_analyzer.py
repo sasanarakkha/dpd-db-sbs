@@ -146,7 +146,7 @@ def test_prep_analyzer_report_generation(
         mapped["db/families/deleted_source.py"][0]["local_path"]
         == "db/families/deleted_source_ru.py"
     )
-    assert mapped["exporter/webapp/main.py"][0]["category"] == "russian_copy"
+    assert mapped["exporter/webapp/main.py"][0]["category"] == "russian_copies"
     assert (
         mapped["exporter/webapp/main.py"][0]["local_target_path"]
         == "exporter/webapp/main_ru.py"
@@ -161,7 +161,7 @@ def test_prep_analyzer_report_generation(
         ]
         == "exporter/webapp/ru_templates/components/card.jinja"
     )
-    assert mapped["db/epd/epd_to_lookup.py"][0]["category"] == "tamil_copy"
+    assert mapped["db/epd/epd_to_lookup.py"][0]["category"] == "tamil_copies"
     assert mapped["scripts/bash/makedict.py"][0]["category"] == "inspired_by_upstream"
     assert (
         manifest["generated_at"] != accepted_sync_state["last_accepted_upstream_date"]

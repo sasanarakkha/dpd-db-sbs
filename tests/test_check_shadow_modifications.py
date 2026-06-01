@@ -35,9 +35,9 @@ def test_get_shadow_mappings_by_category_includes_dps() -> None:
 
     mappings = get_shadow_mappings_by_category(data)
 
-    assert mappings["russian_copy"] == {"a_ru.py": "a.py"}
-    assert mappings["sbs_copy"] == {"a_sbs.py": "a.py"}
-    assert mappings["dps_copy"] == {"a_dps.py": "a.py"}
+    assert mappings["russian_copies"] == {"a_ru.py": "a.py"}
+    assert mappings["sbs_copies"] == {"a_sbs.py": "a.py"}
+    assert mappings["dps_copies"] == {"a_dps.py": "a.py"}
 
 
 def test_get_last_sync_commit_uses_latest_upstream_pull(
@@ -48,14 +48,14 @@ def test_get_last_sync_commit_uses_latest_upstream_pull(
     mock_run.return_value = subprocess.CompletedProcess(
         args=[],
         returncode=0,
-        stdout="cc60ac42abcdef\n",
+        stdout=f"{'a' * 40}\n",
         stderr="",
     )
     monkeypatch.setattr(module.subprocess, "run", mock_run)
 
     commit = module.get_last_sync_commit()
 
-    assert commit == "cc60ac42abcdef"
+    assert commit == "a" * 40
     mock_run.assert_called_once_with(
         [
             "git",
@@ -104,7 +104,7 @@ def test_reviewed_noop_requires_exact_match(tmp_path: Path) -> None:
         json.dumps(
             [
                 {
-                    "sync_commit": "abc123",
+                    "sync_commit": "a" * 40,
                     "source": "source/",
                     "shadow": "shadow/",
                     "changed_paths": ["source/a.py", "source/b.py"],
@@ -119,21 +119,21 @@ def test_reviewed_noop_requires_exact_match(tmp_path: Path) -> None:
 
     assert module.is_reviewed_noop(
         noops,
-        sync_commit="abc123",
+        sync_commit="a" * 40,
         source="source/",
         shadow="shadow/",
         changed_paths=["source/b.py", "source/a.py"],
     )
     assert not module.is_reviewed_noop(
         noops,
-        sync_commit="abc123",
+        sync_commit="a" * 40,
         source="source/",
         shadow="shadow/",
         changed_paths=["source/a.py", "source/c.py"],
     )
     assert not module.is_reviewed_noop(
         noops,
-        sync_commit="future456",
+        sync_commit="b" * 40,
         source="source/",
         shadow="shadow/",
         changed_paths=["source/a.py", "source/b.py"],
@@ -147,7 +147,7 @@ def test_reviewed_noop_rejects_missing_reason(tmp_path: Path) -> None:
         json.dumps(
             [
                 {
-                    "sync_commit": "abc123",
+                    "sync_commit": "a" * 40,
                     "source": "source/",
                     "shadow": "shadow/",
                     "changed_paths": ["source/a.py"],
@@ -158,6 +158,50 @@ def test_reviewed_noop_rejects_missing_reason(tmp_path: Path) -> None:
     )
 
     with pytest.raises(ValueError, match="reason"):
+        module.load_reviewed_shadow_noops(ledger_path)
+
+
+def test_reviewed_noop_rejects_short_sync_commit(tmp_path: Path) -> None:
+    module = load_shadow_modification_script()
+    ledger_path = tmp_path / "reviewed_shadow_noops.json"
+    ledger_path.write_text(
+        json.dumps(
+            [
+                {
+                    "sync_commit": "abc123",
+                    "source": "source/",
+                    "shadow": "shadow/",
+                    "changed_paths": ["source/a.py"],
+                    "reason": "Reviewed and intentionally not ported.",
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="full 40-character lowercase git SHA"):
+        module.load_reviewed_shadow_noops(ledger_path)
+
+
+def test_reviewed_noop_rejects_unsafe_paths(tmp_path: Path) -> None:
+    module = load_shadow_modification_script()
+    ledger_path = tmp_path / "reviewed_shadow_noops.json"
+    ledger_path.write_text(
+        json.dumps(
+            [
+                {
+                    "sync_commit": "a" * 40,
+                    "source": "source/",
+                    "shadow": "shadow/",
+                    "changed_paths": ["../source/a.py"],
+                    "reason": "Reviewed and intentionally not ported.",
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="must stay inside the repository"):
         module.load_reviewed_shadow_noops(ledger_path)
 
 
@@ -183,7 +227,7 @@ def test_check_shadows_skips_reviewed_noop(
         json.dumps(
             [
                 {
-                    "sync_commit": "abc123",
+                    "sync_commit": "a" * 40,
                     "source": "source/",
                     "shadow": "shadow/",
                     "changed_paths": ["source/a.py"],
@@ -196,7 +240,7 @@ def test_check_shadows_skips_reviewed_noop(
 
     monkeypatch.setattr(module, "REGISTRY_PATH", registry_path)
     monkeypatch.setattr(module, "NOOP_LEDGER_PATH", ledger_path)
-    monkeypatch.setattr(module, "get_last_sync_commit", lambda: "abc123")
+    monkeypatch.setattr(module, "get_last_sync_commit", lambda: "a" * 40)
     monkeypatch.setattr(
         module,
         "get_modified_files",

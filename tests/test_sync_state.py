@@ -172,7 +172,7 @@ def test_load_prep_manifest_invalid(
             "field 'mapped_actions\\['db/models.py'\\]\\[0\\]': missing required field 'category'",
         ),
         (
-            {"mapped_actions": {"db/models.py": [{"category": "russian_copy"}]}},
+            {"mapped_actions": {"db/models.py": [{"category": "russian_copies"}]}},
             "field 'mapped_actions\\['db/models.py'\\]\\[0\\]': missing required field 'local_path'",
         ),
         (
@@ -180,7 +180,7 @@ def test_load_prep_manifest_invalid(
                 "mapped_actions": {
                     "db/models.py": [
                         {
-                            "category": "russian_copy",
+                            "category": "russian_copies",
                             "local_path": "db/models_ru.py",
                             "local_target_path": 123,
                         }

@@ -2,13 +2,16 @@
 """Check whether strict shadow copies were updated when their upstream sources changed."""
 
 import json
-import re
 import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
 
 from kamma.upstream_sync.scripts.registry_helper import get_shadow_mappings_by_category
+from kamma.upstream_sync.scripts.sync_schema import (
+    FULL_SHA_RE,
+    validate_repo_relative_paths,
+)
 
 REGISTRY_PATH = Path("kamma/upstream_sync/registry.json")
 NOOP_LEDGER_PATH = Path("kamma/upstream_sync/reviewed_shadow_noops.json")
@@ -45,9 +48,9 @@ def get_last_sync_commit() -> str:
         check=False,
     )
     if result.stdout:
-        match = re.match(r"^([a-f0-9]+)$", result.stdout.strip())
+        match = FULL_SHA_RE.match(result.stdout.strip())
         if match:
-            return match.group(1)
+            return result.stdout.strip()
     return "HEAD^"
 
 
@@ -104,6 +107,16 @@ def load_reviewed_shadow_noops(
         shadow = require_string(entry, "shadow", label)
         changed_paths = frozenset(require_string_list(entry, "changed_paths", label))
         reason = require_string(entry, "reason", label)
+        if not FULL_SHA_RE.fullmatch(sync_commit):
+            raise ValueError(
+                f"{label}: field 'sync_commit' must be a full 40-character lowercase git SHA"
+            )
+        validate_repo_relative_paths([source], f"{label}.source")
+        validate_repo_relative_paths([shadow], f"{label}.shadow")
+        validate_repo_relative_paths(
+            list(changed_paths),
+            f"{label}.changed_paths",
+        )
 
         key = (sync_commit, source, shadow, changed_paths)
         if key in seen:
@@ -167,10 +180,10 @@ def check_shadows() -> None:
 
     all_mappings: list[tuple[str, str, str]] = []
     category_labels = {
-        "russian_copy": "Russian",
-        "sbs_copy": "SBS",
-        "dps_copy": "DPS",
-        "tamil_copy": "Tamil",
+        "russian_copies": "Russian",
+        "sbs_copies": "SBS",
+        "dps_copies": "DPS",
+        "tamil_copies": "Tamil",
     }
     for category, mappings in get_shadow_mappings_by_category(registry).items():
         for shadow, source in mappings.items():

@@ -6,7 +6,10 @@ import json
 import sys
 from pathlib import Path
 
-from kamma.upstream_sync.scripts.sync_schema import RegistryData
+from kamma.upstream_sync.scripts.sync_schema import (
+    RegistryData,
+    validate_repo_relative_paths,
+)
 from tools.printer import printer as pr
 
 REQUIRED_TOP_LEVEL_SECTIONS = [
@@ -270,6 +273,87 @@ def validate_skip_sync_patterns(data: dict[str, object]) -> list[str]:
     return errors
 
 
+def append_path_safety_error(
+    errors: list[str],
+    label: str,
+    path: str,
+    allow_globs: bool = False,
+) -> None:
+    """Append a registry path-safety error for one path if validation fails."""
+    try:
+        validate_repo_relative_paths([path], label, allow_globs=allow_globs)
+    except ValueError as exc:
+        errors.append(str(exc).replace(f"{label}[0]", label, 1))
+
+
+def validate_registry_path_safety(data: dict[str, object]) -> list[str]:
+    """Reject registry paths that could escape the repo or become unsafe git pathspecs."""
+    errors: list[str] = []
+
+    entries = data.get("modified_upstream_files", [])
+    if isinstance(entries, list):
+        for index, entry in enumerate(entries):
+            if isinstance(entry, dict):
+                path = entry.get("path")
+                if isinstance(path, str):
+                    append_path_safety_error(
+                        errors,
+                        f"modified_upstream_files[{index}].path",
+                        path,
+                    )
+
+    for category in ["russian_copies", "sbs_copies", "dps_copies", "tamil_copies"]:
+        mapping = data.get(category, {})
+        if isinstance(mapping, dict):
+            for shadow, upstream in mapping.items():
+                if isinstance(shadow, str):
+                    append_path_safety_error(
+                        errors, f"{category} key '{shadow}'", shadow
+                    )
+                if isinstance(upstream, str):
+                    append_path_safety_error(
+                        errors,
+                        f"{category}['{shadow}']",
+                        upstream,
+                    )
+
+    inspired = data.get("inspired_by_upstream", {})
+    if isinstance(inspired, dict):
+        for local_path, entry in inspired.items():
+            if isinstance(local_path, str):
+                append_path_safety_error(
+                    errors,
+                    f"inspired_by_upstream key '{local_path}'",
+                    local_path,
+                )
+            if isinstance(entry, dict):
+                upstream = entry.get("upstream")
+                if isinstance(upstream, str):
+                    append_path_safety_error(
+                        errors,
+                        f"inspired_by_upstream['{local_path}'].upstream",
+                        upstream,
+                    )
+
+    for list_name, allow_globs in [
+        ("unique_paths", True),
+        ("no_sync_files", False),
+        ("skip_sync_patterns", True),
+    ]:
+        values = data.get(list_name, [])
+        if isinstance(values, list):
+            for index, value in enumerate(values):
+                if isinstance(value, str):
+                    append_path_safety_error(
+                        errors,
+                        f"{list_name}[{index}]",
+                        value,
+                        allow_globs=allow_globs,
+                    )
+
+    return errors
+
+
 def validate_registry_schema(data: dict[str, object]) -> list[str]:
     """Validate registry item types with the typed schema parser."""
     try:
@@ -314,6 +398,7 @@ def validate_registry_core(
 
     errors.extend(validate_inspired_by_upstream(data, repo_root))
     errors.extend(validate_skip_sync_patterns(data))
+    errors.extend(validate_registry_path_safety(data))
     errors.extend(validate_cross_section_overlaps(data))
 
     return errors

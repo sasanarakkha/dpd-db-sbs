@@ -71,13 +71,21 @@ def main() -> None:
     print()
     print("Next steps:")
     print(f"  1. Fill in the upstream diff range in {thread_dir}/spec.md")
-    print("  2. Run `/kamma:2-do` to start the sync.")
+    print("  2. Switch to FAST. Start a fresh session.")
+    print(f"  3. Continue upstream sync thread: {thread_dir}.")
+    print("  4. First read:")
+    print(f"     - {thread_dir}/handoff.md")
+    print("     - kamma/upstream_sync/guide.md")
+    print(f"     - {thread_dir}/plan.md")
+    print("  5. Your task: run Stage 1 FAST Prep exactly as defined in the plan.")
+    print("     Do not perform analysis or strategic planning.")
+    print("     Stop before Stage 2 and update handoff.md.")
     print()
     print("After the sync completes:")
     print(
-        "  3. Write kamma/upstream_sync/new_improvements.md with lessons from this run."
+        "  6. Write kamma/upstream_sync/new_improvements.md with lessons from this run."
     )
-    print("  4. Run `/kamma:3-review`, then `/kamma:4-finalize` to close the thread.")
+    print("  7. Run `/kamma:3-review`, then `/kamma:4-finalize` to close the thread.")
 
 
 if __name__ == "__main__":

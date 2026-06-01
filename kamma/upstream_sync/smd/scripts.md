@@ -51,7 +51,7 @@
 
 
 **File**: `scripts/build/families_to_json_ru.py`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. `GlobalVars` adds `rupth: RuPaths` and sets `self.paths = rupth`.
@@ -65,7 +65,7 @@
 
 
 **File**: `scripts/backup/backup_dps.py`
-- **Category**: dps_copy
+- **Category**: dps_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. New script: `backup_russian`, `backup_sbs`, `backup_ta`, and `backup_ru_roots` functions.
@@ -82,7 +82,7 @@
 
 
 **File**: `scripts/build/db_rebuild_from_tsv_dps.py`
-- **Category**: dps_copy
+- **Category**: dps_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. New script: populates localized tables from TSV.
@@ -97,7 +97,7 @@
 
 
 **File**: `scripts/fix/character_replacer_sbs.py`
-- **Category**: sbs_copy
+- **Category**: sbs_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. New script: configurable `table` ("SBS", "Russian", or default) and `column`.
@@ -109,7 +109,7 @@
 
 
 **File**: `scripts/server/update-dpd-sbs.sh`
-- **Category**: sbs_copy
+- **Category**: sbs_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. Target directory `dpd-db-sbs`.

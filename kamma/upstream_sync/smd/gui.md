@@ -1,7 +1,7 @@
 # SMD: GUI
 
 **File**: `gui2/main.py`
-- **Category**: modified_upstream
+- **Category**: modified_upstream_files
 - **Sync Rule**: DISCUSS
 - **Why DISCUSS**: Imports `fast_api_utils_dps` (DPS-specific server launcher) instead of upstream's `fast_api_utils`, and adds `DpsView` and `AnalysisView` tabs. Blind porting removes DPS GUI entirely.
 - **Local Changes**:
@@ -18,7 +18,7 @@
 
 
 **File**: `gui2/pass2_add_view.py`
-- **Category**: modified_upstream
+- **Category**: modified_upstream_files
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. `from tools.fast_api_utils_dps import request_dpd_server` (line ~24) replaces upstream's `fast_api_utils` import for DPS server requests.

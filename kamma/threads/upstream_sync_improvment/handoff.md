@@ -104,6 +104,12 @@ model-boundary aware, and better validated for RU/SBS/DPS/Tamil localized files.
   pre-authorizes `rg` instead of `grep`/`find`, `archive_improvements.md` is
   explicitly historical-only, `stages/` is marked legacy Stage 1-3 reference
   material, and the empty `kamma/upstream_sync/suggestions.md` file was deleted.
+- Standalone June 2026 review hardening was implemented: SMD `Category` values
+  now use exact `registry.json` category keys, the `scripts/cl_dps/` autonomous
+  commit exception is explicitly bounded to human-run Bash scripts, registry path
+  safety is validated before sync execution, reviewed shadow no-op entries require
+  full SHAs and repo-relative paths, and `init_sync_thread.py` prints the exact
+  Stage 1 FAST restart prompt.
 
 ## Main Files
 
@@ -258,6 +264,29 @@ tests reported 37 passed; the broader upstream-sync suite reported 146 passed.
 Registry, SMD coverage, shadow modification, docs parity, pyright, pyrefly,
 ruff, and diff whitespace checks passed.
 
+Most recent validation for standalone category/path/no-op/commit-rule hardening:
+
+```fish
+uv run pytest tests/test_verify_smd_coverage.py tests/test_check_shadow_modifications.py tests/test_prep_analyzer.py tests/test_sync_schema.py tests/test_sync_state.py tests/test_validate_registry.py tests/test_upstream_sync_docs_policy.py tests/test_gen_smd_scaffold.py -q
+uv run ruff check --fix kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/gen_smd_scaffold.py kamma/upstream_sync/scripts/init_sync_thread.py kamma/upstream_sync/scripts/registry_helper.py kamma/upstream_sync/scripts/sync_schema.py kamma/upstream_sync/scripts/validate_registry.py kamma/upstream_sync/scripts/verify_smd_coverage.py tests/check_shadow_modifications.py tests/test_check_shadow_modifications.py tests/test_gen_smd_scaffold.py tests/test_prep_analyzer.py tests/test_sync_schema.py tests/test_sync_state.py tests/test_upstream_sync_docs_policy.py tests/test_validate_registry.py tests/test_verify_smd_coverage.py
+uv run ruff format kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/gen_smd_scaffold.py kamma/upstream_sync/scripts/init_sync_thread.py kamma/upstream_sync/scripts/registry_helper.py kamma/upstream_sync/scripts/sync_schema.py kamma/upstream_sync/scripts/validate_registry.py kamma/upstream_sync/scripts/verify_smd_coverage.py tests/check_shadow_modifications.py tests/test_check_shadow_modifications.py tests/test_gen_smd_scaffold.py tests/test_prep_analyzer.py tests/test_sync_schema.py tests/test_sync_state.py tests/test_upstream_sync_docs_policy.py tests/test_validate_registry.py tests/test_verify_smd_coverage.py
+uv run pyright kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/gen_smd_scaffold.py kamma/upstream_sync/scripts/init_sync_thread.py kamma/upstream_sync/scripts/registry_helper.py kamma/upstream_sync/scripts/sync_schema.py kamma/upstream_sync/scripts/validate_registry.py kamma/upstream_sync/scripts/verify_smd_coverage.py tests/check_shadow_modifications.py tests/test_check_shadow_modifications.py tests/test_gen_smd_scaffold.py tests/test_prep_analyzer.py tests/test_sync_schema.py tests/test_sync_state.py tests/test_upstream_sync_docs_policy.py tests/test_validate_registry.py tests/test_verify_smd_coverage.py
+uv run --with pyrefly pyrefly check --min-severity warn kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/gen_smd_scaffold.py kamma/upstream_sync/scripts/init_sync_thread.py kamma/upstream_sync/scripts/registry_helper.py kamma/upstream_sync/scripts/sync_schema.py kamma/upstream_sync/scripts/validate_registry.py kamma/upstream_sync/scripts/verify_smd_coverage.py tests/check_shadow_modifications.py tests/test_check_shadow_modifications.py tests/test_gen_smd_scaffold.py tests/test_prep_analyzer.py tests/test_sync_schema.py tests/test_sync_state.py tests/test_upstream_sync_docs_policy.py tests/test_validate_registry.py tests/test_verify_smd_coverage.py
+uv run pytest tests/test_sync_schema.py tests/test_sync_state.py tests/test_prep_analyzer.py tests/test_execute_sync.py tests/test_finalize_accepted_sync.py tests/test_validate_registry.py tests/test_verify_smd_coverage.py tests/test_check_docs_parity.py tests/test_upstream_sync_docs_policy.py tests/test_registry_category_naming.py tests/test_check_shadow_modifications.py tests/test_smoke_test_sync.py tests/test_gen_smd_scaffold.py -q
+uv run python3 kamma/upstream_sync/scripts/validate_registry.py
+uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py
+uv run python3 tests/check_shadow_modifications.py
+uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py
+git diff --check -- AGENTS.md kamma/threads/upstream_sync_improvment/handoff.md kamma/upstream_sync/README.md kamma/upstream_sync/guide.md kamma/upstream_sync/infrastructure.md kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/gen_smd_scaffold.py kamma/upstream_sync/scripts/init_sync_thread.py kamma/upstream_sync/scripts/registry_helper.py kamma/upstream_sync/scripts/sync_schema.py kamma/upstream_sync/scripts/validate_registry.py kamma/upstream_sync/scripts/verify_smd_coverage.py kamma/upstream_sync/smd/db.md kamma/upstream_sync/smd/exporter.md kamma/upstream_sync/smd/gui.md kamma/upstream_sync/smd/root.md kamma/upstream_sync/smd/scripts.md kamma/upstream_sync/smd/tools.md tests/check_shadow_modifications.py tests/test_check_shadow_modifications.py tests/test_gen_smd_scaffold.py tests/test_prep_analyzer.py tests/test_sync_schema.py tests/test_sync_state.py tests/test_upstream_sync_docs_policy.py tests/test_validate_registry.py tests/test_verify_smd_coverage.py
+```
+
+Result: red phase confirmed first with 10 expected failures, then all checks
+passed. Focused hardening tests reported 123 passed; changed-file execution
+suite reported 140 passed; broader upstream-sync suite reported 156 passed with
+one third-party aksharamukha deprecation warning. Registry, SMD coverage, shadow
+modification, docs parity, pyright, pyrefly, ruff, and diff whitespace checks
+passed.
+
 ## Mistakes To Avoid
 
 - Do not preserve stale external protocol paths. The old `~/agents/...` path was
@@ -315,6 +344,10 @@ ruff, and diff whitespace checks passed.
   `rg`, not `grep` or `find`.
 - Preserve unrelated dirty/untracked `resources/*` entries unless the user
   explicitly asks to handle them.
+- Do not reintroduce singular SMD category aliases such as `russian_copy` or
+  `modified_upstream`; SMD `Category` must use the exact `registry.json` key.
+- Do not broaden autonomous commit exceptions beyond human-run Bash scripts in
+  `scripts/cl_dps/`. Agents and Python sync scripts must not commit.
 
 ## Current State
 
@@ -346,6 +379,10 @@ ruff, and diff whitespace checks passed.
   the only sync-related Bash entrypoint; `init_sync_thread.py` now lives under
   `kamma/upstream_sync/scripts/`; post-sync assertions were folded into
   `execute_sync.py`; obsolete Bash sync paths were deleted.
+- The latest standalone review hardening is implemented and validated: category
+  naming is exact, commit exceptions are bounded, path safety is checked earlier,
+  no-op ledger entries are stricter, and thread initialization gives an exact
+  Stage 1 prompt.
 - No agent-side git commit was made.
 - User manual review may still be needed for any uncommitted working-tree
   changes.
@@ -388,10 +425,15 @@ ruff, and diff whitespace checks passed.
   paths were still present.
 - `git mv` failed with `.git/index.lock` permission denial in the sandbox; the
   file move was done in the working tree without staging or committing.
+- Red phase was confirmed for the latest standalone hardening: tests first
+  failed on singular SMD categories, missing commit-exception wording, missing
+  registry path-safety errors, permissive reviewed no-op schema, and the old
+  `/kamma:2-do` init prompt.
 
 ## Recent Recommended Commit Messages
 
 ```text
+#sync tooling: harden upstream sync rules
 #sync tooling: consolidate upstream sync entrypoints
 #sync docs: simplify upstream sync guidance
 #sync tooling: harden exclusions and document reviewed noops

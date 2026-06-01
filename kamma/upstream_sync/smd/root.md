@@ -1,7 +1,7 @@
 # SMD: ROOT
 
 **File**: `.gitignore`
-- **Category**: modified_upstream
+- **Category**: modified_upstream_files
 - **Sync Rule**: DISCUSS
 - **Why DISCUSS**: Contains a `# --- DPS / SBS / RU UNIQUE patterns ---` block (line ~114) listing DPS-specific build artifacts and generated JS/XHTML files. Blind porting would re-track these files in git.
 - **Local Changes**:
@@ -15,7 +15,7 @@
 
 
 **File**: `AGENTS.md`
-- **Category**: modified_upstream
+- **Category**: modified_upstream_files
 - **Sync Rule**: DISCUSS
 - **Why DISCUSS**: Fork identity sections, shadow sync policy, and localized project rules are embedded here. Blind porting would overwrite fork-specific AI agent instructions with upstream defaults.
 - **Local Changes**:
@@ -90,7 +90,7 @@
 
 
 **File**: `shared_data/help_ru/`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. Russian translations for `abbreviations.tsv`, `bibliography.tsv`, `help.tsv`, and `thanks.tsv`.

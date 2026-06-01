@@ -4,9 +4,41 @@
 
 import re
 from dataclasses import dataclass
+from pathlib import PurePosixPath
 
 BOOTSTRAP_SHA_SENTINEL = "BOOTSTRAP_REQUIRED"
 FULL_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+
+
+def validate_repo_relative_paths(
+    paths: list[str],
+    label: str,
+    allow_globs: bool = False,
+) -> list[str]:
+    """Validate path strings that must stay inside the repository."""
+    validated: list[str] = []
+    git_pathspec_chars = set("*?[]")
+    for index, path in enumerate(paths):
+        item_label = f"{label}[{index}]"
+        if not path.strip():
+            raise ValueError(f"{item_label} must be a non-empty path")
+        if path != path.strip():
+            raise ValueError(f"{item_label} must not contain surrounding whitespace")
+        if "\\" in path:
+            raise ValueError(f"{item_label} must use forward slashes")
+        if path.startswith("-"):
+            raise ValueError(f"{item_label} must not start with '-'")
+        if not allow_globs and any(char in path for char in git_pathspec_chars):
+            raise ValueError(
+                f"{item_label} must not contain git pathspec metacharacters"
+            )
+        posix_path = PurePosixPath(path)
+        if posix_path.is_absolute() or path.startswith("~"):
+            raise ValueError(f"{item_label} must be a repo-relative path")
+        if ".." in posix_path.parts:
+            raise ValueError(f"{item_label} must stay inside the repository")
+        validated.append(path)
+    return validated
 
 
 def _as_object(raw: object, label: str) -> dict[str, object]:
