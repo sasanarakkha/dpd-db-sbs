@@ -102,16 +102,16 @@
 
 **Owner**: ADVANCED only. Analyze docs parity and write a translation plan. Do not bulk translate.
 
-- [ ] **4.A.1 Parity Report**:
-  - [ ] Read the FAST output from `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir>` or request FAST to run it if missing.
-  - [ ] Confirm the report uses `<thread_dir>/prep_manifest.json` for the exact `from_upstream_sha -> to_upstream_sha` range.
-- [ ] **4.A.2 Terminology and Scope**:
-  - [ ] Read 3-5 existing `docs_rus/` files to build a terminology glossary.
-  - [ ] For each stale file, capture the exact upstream diff.
-- [ ] **4.A.3 Translation Plan**:
-  - [ ] Create `<thread_dir>/docs_translation_plan.md`.
-  - [ ] Include glossary, translation rules, source paths, target paths, and per-file instructions.
-  - [ ] Present plan to user for approval.
+- [x] **4.A.1 Parity Report**:
+  - [x] Read the FAST output from `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir>` or request FAST to run it if missing. (Ran read-only script per handoff restart prompt; `docs_parity_report.md` generated.)
+  - [x] Confirm the report uses `<thread_dir>/prep_manifest.json` for the exact `from_upstream_sha -> to_upstream_sha` range. (44a8a00 → 0ea58833 confirmed.)
+- [x] **4.A.2 Terminology and Scope**:
+  - [x] Read 3-5 existing `docs_rus/` files to build a terminology glossary. (browser_extension.md, dpd_app.md, index.md, abbreviations.md, chromebook.md.)
+  - [x] For each stale file, capture the exact upstream diff. (In `docs_parity_report.md`.)
+- [x] **4.A.3 Translation Plan**:
+  - [x] Create `<thread_dir>/docs_translation_plan.md`.
+  - [x] Include glossary, translation rules, source paths, target paths, and per-file instructions.
+  - [x] Present plan to user for approval. (Approved 2026-06-01.)
 
 **ADVANCED must stop and request FAST if** the parity script must be run, files must be translated, or `mkdocs_ru.yaml` must be edited.
 
