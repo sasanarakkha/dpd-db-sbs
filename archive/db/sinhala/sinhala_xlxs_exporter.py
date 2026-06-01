@@ -12,7 +12,7 @@ from tools.printer import printer as pr
 
 def main():
     pr.tic()
-    pr.green_title("export sinhala db to xlsx")
+    pr.title("export sinhala db to xlsx")
 
     file_output = "db/sinhala/dpd sinhala 1.2.xlsx"
 

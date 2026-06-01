@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import flet as ft
-
 from gui2.dpd_fields_classes import DpdTextField
 from gui2.dpd_fields_functions import clean_example, remove_bold_tags, remove_brackets
 from gui2.example_stash_manager import ExampleStashManager
@@ -101,7 +100,13 @@ book_codes: dict[str, str] = {
     "16a. NIDD2a Cūlaniddesa Commentary": "kn16a",
     "17a. PMa Patisambhidhāmagga Commentary": "kn17a",
     "18a. NPa Nettipakarana Commentary": "kn19a",
+    "ADha Abhidhamma Commentary": "abha",
     "VISM Visuddhimagga": "vism",
+    # ṭīkās
+    "DNt Dīgha Ṭīkā": "dnt",
+    "MNt Majjhima Ṭīkā": "mnt",
+    "SNt Saṃyutta Ṭīkā": "snt",
+    "ANt Aṅguttara Ṭīkā": "ant",
     "VISMa Visuddhimagga Ṭīkā": "visma",
     # aññā
     "abhidhānappadīpikā": "ap",
@@ -283,7 +288,7 @@ class DpdExampleField(ft.Column):
         self.text_field.update()
 
     # --- Toggle Visibility Handling ---
-    def _toggle_tools_visibility(self, e: ft.ControlEvent | None):
+    def _toggle_tools_visibility(self, e: ft.ControlEvent):
         """Toggles the visibility of the search and action rows."""
         are_visible = not self._search_row.visible
         self._search_row.visible = are_visible

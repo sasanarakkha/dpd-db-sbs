@@ -2,7 +2,7 @@
 """Find synonyms for words that share 2+ cleaned meanings and same pos/grammar signature."""
 
 import json
-import re
+import sys
 
 import pyperclip
 from rich import print
@@ -12,9 +12,22 @@ from sqlalchemy.orm import Session
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword
 from tools.db_search_string import db_search_string
-from tools.pali_sort_key import pali_list_sorter
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
+from tools.synonym_variant import (
+    TILINGA_POS,
+    assign_relationship,
+    clean_meaning,
+    grammar_signature,
+    pair_consistently_related,
+    pair_consistently_related_sets,
+    pos_class,
+    split_field,
+)
+
+# Temporary review filter: when True, only show cross-pos pairs from the
+# tiliṅga class (adj/pp/ptp/prp). Set to False to see everything.
+ONLY_TILINGA_CROSS_POS = False
 
 
 class GlobalVars:
@@ -41,30 +54,6 @@ class GlobalVars:
         self._save_exceptions()
 
 
-_CASE_PERSON = re.compile(r"\b(nom|acc|instr|dat|abl|gen|loc|voc|1st|2nd|3rd)\b")
-_GENDER = re.compile(r"\b(masc|fem|nt)\b")
-
-
-def clean_meaning(text: str) -> str:
-    """Remove commentary meaning and bracketed content from a meaning string."""
-    text = re.sub(r"\(comm\).*$", "", text)
-    text = re.sub(r" \(.*?\) | \(.*?\)|\(.*?\) ", "", text)
-    return text.strip()
-
-
-def grammar_signature(grammar: str) -> str:
-    """Return case/person markers; add gender only when case is also present."""
-    cases = set(_CASE_PERSON.findall(grammar))
-    if not cases:
-        return ""
-    markers = sorted(cases | set(_GENDER.findall(grammar)))
-    return ",".join(markers)
-
-
-def _split_field(value: str) -> set[str]:
-    return {t.strip() for t in value.split(",") if t.strip()}
-
-
 def _pair_key(pos: str, hw_a: DpdHeadword, hw_b: DpdHeadword, sig: str) -> str:
     lemmas = sorted([hw_a.lemma_clean, hw_b.lemma_clean])
     return f"{pos}:{lemmas[0]}|{lemmas[1]}:{sig}"
@@ -76,20 +65,18 @@ def _general_key(pos: str, meanings: list[str]) -> str:
 
 def find_multi_meaning_pairs(g: GlobalVars) -> None:
     """Find pairs of multi-meaning headwords sharing ≥2 cleaned meanings and same pos/grammar sig."""
-    pr.green_tmr("finding multi-meaning pairs")
+    pr.green_tmr("\nfinding multi-meaning pairs\n")
 
-    # bucket: (pos, sig) -> list of (hw, frozenset of cleaned meanings)
     buckets: dict[tuple[str, str], list[tuple[DpdHeadword, frozenset[str]]]] = {}
 
-    # precompute relationship sets once to avoid repeated splits in inner loop
     syn_sets: dict[int, set[str]] = {}
     phon_sets: dict[int, set[str]] = {}
     text_sets: dict[int, set[str]] = {}
 
     for hw in g.dpd_db:
         syn_sets[hw.id] = set(hw.synonym_list)
-        phon_sets[hw.id] = _split_field(hw.var_phonetic)
-        text_sets[hw.id] = _split_field(hw.var_text)
+        phon_sets[hw.id] = split_field(hw.var_phonetic)
+        text_sets[hw.id] = split_field(hw.var_text)
         if not hw.meaning_1 or "; " not in hw.meaning_1:
             continue
         cleaned: frozenset[str] = frozenset(
@@ -98,21 +85,19 @@ def find_multi_meaning_pairs(g: GlobalVars) -> None:
         if not cleaned:
             continue
         sig = grammar_signature(hw.grammar)
-        bucket_key = (hw.pos, sig)
+        bucket_key = (pos_class(hw.pos), sig)
         buckets.setdefault(bucket_key, []).append((hw, cleaned))
 
     pairs: list[tuple[DpdHeadword, DpdHeadword, list[str]]] = []
     seen: set[frozenset[int]] = set()
 
     for (pos, sig), entries in buckets.items():
-        # inverted index: meaning -> headwords in this bucket
         meaning_to_hws: dict[str, list[DpdHeadword]] = {}
         for hw, meanings in entries:
             for m in meanings:
                 meaning_to_hws.setdefault(m, []).append(hw)
 
         for hw_a, meanings_a in entries:
-            # candidates: headwords sharing at least one meaning with hw_a
             candidates: dict[int, DpdHeadword] = {}
             for m in meanings_a:
                 for hw_b in meaning_to_hws[m]:
@@ -120,6 +105,12 @@ def find_multi_meaning_pairs(g: GlobalVars) -> None:
                         candidates[hw_b.id] = hw_b
 
             for hw_b in candidates.values():
+                if ONLY_TILINGA_CROSS_POS and not (
+                    hw_a.pos != hw_b.pos
+                    and hw_a.pos in TILINGA_POS
+                    and hw_b.pos in TILINGA_POS
+                ):
+                    continue
                 edge = frozenset({hw_a.id, hw_b.id})
                 if edge in seen:
                     continue
@@ -136,20 +127,9 @@ def find_multi_meaning_pairs(g: GlobalVars) -> None:
                 gen_key = _general_key(pos, list(shared))
                 if key in g.exceptions or gen_key in g.exceptions:
                     continue
-                b_clean = hw_b.lemma_clean
-                a_clean = hw_a.lemma_clean
-                a_has_b = (
-                    b_clean in syn_sets[hw_a.id]
-                    or b_clean in phon_sets[hw_a.id]
-                    or b_clean in text_sets[hw_a.id]
-                )
-                b_has_a = (
-                    a_clean in syn_sets[hw_b.id]
-                    or a_clean in phon_sets[hw_b.id]
-                    or a_clean in text_sets[hw_b.id]
-                )
-                already_related = a_has_b and b_has_a
-                if already_related:
+                if pair_consistently_related_sets(
+                    hw_a, hw_b, syn_sets, phon_sets, text_sets
+                ):
                     continue
                 pairs.append((hw_a, hw_b, sorted(shared)))
 
@@ -157,12 +137,182 @@ def find_multi_meaning_pairs(g: GlobalVars) -> None:
     pr.yes(str(len(g.pairs)))
 
 
+def find_identical_meaning_clusters(
+    g: GlobalVars,
+) -> list[tuple[str, str, frozenset[str], list[DpdHeadword]]]:
+    """Group headwords with identical cleaned meaning-sets into clusters.
+
+    Within a cluster, every member is a true synonym of every other,
+    so one user decision can write all N×(N-1)/2 syn relationships.
+    Returns clusters sorted by size descending.
+    """
+    pr.green_tmr("finding identical-meaning clusters")
+
+    buckets: dict[tuple[str, str, frozenset[str]], list[DpdHeadword]] = {}
+    for hw in g.dpd_db:
+        if not hw.meaning_1 or "; " not in hw.meaning_1:
+            continue
+        cleaned = frozenset(
+            m for raw in hw.meaning_1.split("; ") if (m := clean_meaning(raw))
+        )
+        if len(cleaned) < 2:
+            continue
+        sig = grammar_signature(hw.grammar)
+        buckets.setdefault((pos_class(hw.pos), sig, cleaned), []).append(hw)
+
+    clusters: list[tuple[str, str, frozenset[str], list[DpdHeadword]]] = []
+    exceptions = set(g.exceptions)
+    for (pcls, sig, meanings), members in buckets.items():
+        if len(members) < 2:
+            continue
+        if ONLY_TILINGA_CROSS_POS and not (
+            pcls == "tiliṅga" and len({m.pos for m in members}) >= 2
+        ):
+            continue
+        # skip if cluster has a general exception
+        if _general_key(pcls, sorted(meanings)) in exceptions:
+            continue
+        # skip if every pair is already related (syn/var_phon/var_text)
+        if _all_pairs_related(members):
+            continue
+        clusters.append((pcls, sig, meanings, members))
+
+    clusters.sort(key=lambda c: -len(c[3]))
+    pr.yes(str(len(clusters)))
+    return clusters
+
+
+def _all_pairs_related(members: list[DpdHeadword]) -> bool:
+    """Cluster is fully resolved only if every pair references the other via
+    the SAME field (syn / var_phonetic / var_text). Mixed states surface so
+    the user can resolve them.
+    """
+    for i, a in enumerate(members):
+        for b in members[i + 1 :]:
+            if a.lemma_clean == b.lemma_clean:
+                continue
+            if not pair_consistently_related(a, b):
+                return False
+    return True
+
+
+def prompt_clusters(
+    g: GlobalVars,
+    clusters: list[tuple[str, str, frozenset[str], list[DpdHeadword]]],
+) -> bool:
+    """One prompt per cluster — (a)ccept all pairwise / (pass) / (r)estart / (q)uit.
+
+    Returns True if a restart was requested.
+    """
+    if not clusters:
+        return False
+    pr.green("approving identical-meaning clusters")
+
+    total = len(clusters)
+    for counter, (pcls, sig, meanings, members) in enumerate(clusters):
+        print("\n" + "=" * 100)
+        print(
+            f"[white]cluster {counter + 1} / {total}  "
+            f"[blue][{pcls}]  [green]{'; '.join(sorted(meanings))}  "
+            f"[white]({len(members)} members)"
+        )
+        print("=" * 100)
+        for m in members:
+            print(_entry_label(m))
+            print(f"[cyan]{_format_fields(m)}")
+
+        gui_string = db_search_string([m.lemma_1 for m in members], gui=True)
+        pyperclip.copy(gui_string)
+        print(f"\n[white]{gui_string}")
+        choice = Prompt.ask(
+            "[white](s)ynonym all pairwise, (p)honetic all pairwise, (g)eneral exception, (pass), (r)estart, (q)uit"
+        )
+
+        if choice == "s":
+            written = 0
+            skipped_phon = 0
+            for i, a in enumerate(members):
+                a_syn = set(a.synonym_list)
+                a_phon = split_field(a.var_phonetic)
+                for b in members[i + 1 :]:
+                    if a.lemma_clean == b.lemma_clean:
+                        continue
+                    b_phon = split_field(b.var_phonetic)
+                    if b.lemma_clean in a_phon or a.lemma_clean in b_phon:
+                        skipped_phon += 1
+                        print(
+                            f"  [yellow]kept as phonetic variant: "
+                            f"{a.lemma_1} ↔ {b.lemma_1}"
+                        )
+                        continue
+                    if b.lemma_clean in a_syn and a.lemma_clean in set(b.synonym_list):
+                        continue
+                    assign_relationship(a, b.lemma_clean, "synonym")
+                    assign_relationship(b, a.lemma_clean, "synonym")
+                    written += 1
+            g.db_session.commit()
+            print(
+                f"  [green]wrote {written} new pairwise syn relationships"
+                f"  [yellow]({skipped_phon} preserved as phonetic variants)"
+            )
+            for m in members:
+                _show_result(m)
+
+        elif choice == "p":
+            written = 0
+            skipped_text = 0
+            for i, a in enumerate(members):
+                a_phon = split_field(a.var_phonetic)
+                a_text = split_field(a.var_text)
+                for b in members[i + 1 :]:
+                    if a.lemma_clean == b.lemma_clean:
+                        continue
+                    b_text = split_field(b.var_text)
+                    if b.lemma_clean in a_text or a.lemma_clean in b_text:
+                        skipped_text += 1
+                        print(
+                            f"  [yellow]kept as textual variant: "
+                            f"{a.lemma_1} ↔ {b.lemma_1}"
+                        )
+                        continue
+                    b_phon = split_field(b.var_phonetic)
+                    if b.lemma_clean in a_phon and a.lemma_clean in b_phon:
+                        continue
+                    assign_relationship(a, b.lemma_clean, "var_phonetic")
+                    assign_relationship(b, a.lemma_clean, "var_phonetic")
+                    written += 1
+            g.db_session.commit()
+            print(
+                f"  [green]wrote {written} new pairwise var_phonetic relationships"
+                f"  [yellow]({skipped_text} preserved as textual variants)"
+            )
+            for m in members:
+                _show_result(m)
+
+        elif choice == "g":
+            gen_key = _general_key(pcls, sorted(meanings))
+            if gen_key not in g.exceptions:
+                g.add_exception(gen_key)
+                print(f"  [red]general exception added: {gen_key!r}")
+            else:
+                print(f"  [yellow]general exception already present: {gen_key!r}")
+
+        elif choice == "r":
+            return True
+
+        elif choice == "q":
+            pr.toc()
+            sys.exit(0)
+
+    return False
+
+
 def _entry_label(hw: DpdHeadword) -> str:
     family_root = f" [magenta]{hw.family_root}" if hw.family_root else ""
     family_word = f" [magenta]{hw.family_word}" if hw.family_word else ""
     return (
         f"[yellow]{hw.lemma_1} [blue]{hw.pos} "
-        f"[green]{hw.meaning_1} [white]({hw.degree_of_completion})"
+        f"[green]{hw.meaning_combo} [white]({hw.degree_of_completion})"
         f"{family_root}{family_word}"
     )
 
@@ -171,7 +321,7 @@ def _format_fields(hw: DpdHeadword) -> str:
     syn = hw.synonym.split(", ") if hw.synonym else []
     var = hw.variant.split(", ") if hw.variant else []
     var_text = hw.var_text.split(", ") if hw.var_text else []
-    phon = sorted(_split_field(hw.var_phonetic))
+    phon = sorted(split_field(hw.var_phonetic))
     return f"  syn:{syn}\n  var:{var}\n  var_text:{var_text}\n  var_phon:{phon}"
 
 
@@ -181,46 +331,6 @@ def _show_result(hw: DpdHeadword) -> None:
     print(f"[green]{_format_fields(hw)}")
 
 
-def _assign(hw: DpdHeadword, other: str, target: str) -> None:
-    """Add `other` to `target` field, enforcing exclusivity rules:
-    - s and p are mutually exclusive
-    - s and t can coexist
-    - variant is a legacy catch-all: modified surgically, never recomputed wholesale
-    """
-    syn = _split_field(hw.synonym)
-    var = _split_field(hw.variant)
-    var_phon = _split_field(hw.var_phonetic)
-    var_text = _split_field(hw.var_text)
-
-    if target == "synonym":
-        syn.add(other)
-        var_phon.discard(other)
-        # s and t can coexist — do not touch var_text
-        # only remove from variant if other is no longer in either var_ field
-        if other not in var_text and other not in var_phon:
-            var.discard(other)
-
-    elif target == "var_phonetic":
-        var_phon.add(other)
-        var.add(other)
-        syn.discard(other)  # s and p are mutually exclusive
-        # do not touch var_text
-
-    elif target == "var_text":
-        var_text.add(other)
-        var.add(other)
-        # s and t can coexist — do not touch synonym or var_phon
-
-    elif target == "delete":
-        syn.discard(other)
-        # leave var, var_phon, var_text untouched
-
-    hw.synonym = ", ".join(pali_list_sorter(syn))
-    hw.variant = ", ".join(pali_list_sorter(var))
-    hw.var_phonetic = ", ".join(pali_list_sorter(var_phon))
-    hw.var_text = ", ".join(pali_list_sorter(var_text))
-
-
 def prompt_pairs(g: GlobalVars) -> bool:
     """Walk through pairs and prompt the user. Returns True if restart requested."""
     pr.green("adding synonyms to db")
@@ -228,7 +338,7 @@ def prompt_pairs(g: GlobalVars) -> bool:
     total = len(g.pairs)
 
     for counter, (hw_a, hw_b, shared) in enumerate(g.pairs):
-        pos = hw_a.pos
+        pos = pos_class(hw_a.pos)
         gen_key = _general_key(pos, shared)
         if gen_key in g.exceptions:
             continue
@@ -256,22 +366,22 @@ def prompt_pairs(g: GlobalVars) -> bool:
         )
 
         if choice == "s":
-            _assign(hw_a, hw_b.lemma_clean, "synonym")
-            _assign(hw_b, hw_a.lemma_clean, "synonym")
+            assign_relationship(hw_a, hw_b.lemma_clean, "synonym")
+            assign_relationship(hw_b, hw_a.lemma_clean, "synonym")
             _show_result(hw_a)
             _show_result(hw_b)
             g.db_session.commit()
 
         elif choice == "p":
-            _assign(hw_a, hw_b.lemma_clean, "var_phonetic")
-            _assign(hw_b, hw_a.lemma_clean, "var_phonetic")
+            assign_relationship(hw_a, hw_b.lemma_clean, "var_phonetic")
+            assign_relationship(hw_b, hw_a.lemma_clean, "var_phonetic")
             _show_result(hw_a)
             _show_result(hw_b)
             g.db_session.commit()
 
         elif choice == "t":
-            _assign(hw_a, hw_b.lemma_clean, "var_text")
-            _assign(hw_b, hw_a.lemma_clean, "var_text")
+            assign_relationship(hw_a, hw_b.lemma_clean, "var_text")
+            assign_relationship(hw_b, hw_a.lemma_clean, "var_text")
             _show_result(hw_a)
             _show_result(hw_b)
             g.db_session.commit()
@@ -298,9 +408,16 @@ def main() -> None:
     print("[bright_yellow]synonym multi — finding and adding multi-meaning synonyms")
     while True:
         g = GlobalVars()
+        # Phase 1: bulk-accept clusters of headwords with identical meaning sets.
+        clusters = find_identical_meaning_clusters(g)
+        if prompt_clusters(g, clusters):
+            continue
+        # Phase 2: existing pairwise pass for partial-overlap residual.
+        # Re-run discovery so newly-syn pairs from Phase 1 are filtered out.
         find_multi_meaning_pairs(g)
-        if not prompt_pairs(g):
-            break
+        if prompt_pairs(g):
+            continue
+        break
     pr.toc()
 
 

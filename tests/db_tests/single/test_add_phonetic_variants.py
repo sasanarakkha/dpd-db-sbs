@@ -3,11 +3,9 @@
 from types import SimpleNamespace
 from typing import Any
 
-from db_tests.single.add_phonetic_variants import (
+from tools.synonym_variant import (
     PhoneticVariantDetector,
-    _assign,
-    _base_differs_e_aya,
-    _base_differs_iya,
+    assign_relationship as _assign,
 )
 
 
@@ -21,7 +19,8 @@ def make_hw(
     family_word: str = "",
     family_root: str = "",
     root_key: str = "",
-    meaning_1: str = "",
+    root_sign: str = "",
+    meaning_1: str = "x",
     meaning_combo: str = "",
     var_phonetic: str = "",
     var_text: str = "",
@@ -38,12 +37,15 @@ def make_hw(
         family_word=family_word,
         family_root=family_root,
         root_key=root_key,
+        root_sign=root_sign,
         meaning_1=meaning_1,
         meaning_combo=meaning_combo,
         var_phonetic=var_phonetic,
         var_text=var_text,
         variant=variant,
         synonym=synonym,
+        synonym_list=synonym.split(", ") if synonym else [],
+        freq_data_unpack={},
     )
 
 
@@ -55,28 +57,31 @@ def _rules_of(results: list[tuple[Any, str, str]]) -> set[str]:
     return {r[2] for r in results}
 
 
-def test_assign_synonym_removes_phonetic_and_variant_when_no_textual() -> None:
-    hw = make_hw("foo", synonym="", var_phonetic="bar", variant="bar", var_text="")
+def test_assign_synonym_removes_phonetic_textual_and_variant() -> None:
+    hw = make_hw("foo", synonym="", var_phonetic="bar", variant="bar", var_text="bar")
     _assign(hw, "bar", "synonym")
     assert hw.synonym == "bar"
     assert hw.var_phonetic == ""
+    assert hw.var_text == ""
     assert hw.variant == ""
 
 
-def test_assign_phonetic_removes_synonym_and_keeps_variant() -> None:
-    hw = make_hw("foo", synonym="bar", var_phonetic="", variant="", var_text="")
+def test_assign_phonetic_removes_synonym_textual_and_variant() -> None:
+    hw = make_hw("foo", synonym="bar", var_phonetic="", variant="bar", var_text="bar")
     _assign(hw, "bar", "var_phonetic")
     assert hw.synonym == ""
     assert hw.var_phonetic == "bar"
-    assert hw.variant == "bar"
+    assert hw.var_text == ""
+    assert hw.variant == ""
 
 
-def test_assign_textual_can_coexist_with_synonym() -> None:
-    hw = make_hw("foo", synonym="bar", var_phonetic="", variant="", var_text="")
+def test_assign_textual_removes_synonym_phonetic_and_variant() -> None:
+    hw = make_hw("foo", synonym="bar", var_phonetic="bar", variant="bar", var_text="")
     _assign(hw, "bar", "var_text")
-    assert hw.synonym == "bar"
+    assert hw.synonym == ""
+    assert hw.var_phonetic == ""
     assert hw.var_text == "bar"
-    assert hw.variant == "bar"
+    assert hw.variant == ""
 
 
 # ---- same_construction ----
@@ -102,11 +107,13 @@ def test_same_construction_ignores_empty() -> None:
     assert PhoneticVariantDetector([a, b]).detect_same_construction() == []
 
 
-def test_same_construction_skips_already_recorded() -> None:
+def test_same_construction_surfaces_inconsistent_recording() -> None:
+    # Inconsistent: a says phon, b says nothing. Raw detector should still
+    # propose both directions so the pair surfaces in the canonical layer.
     a = make_hw("jeti", construction_clean="ji + *a", pos="verb", var_phonetic="jayati")
     b = make_hw("jayati", construction_clean="ji + *a", pos="verb")
     results = PhoneticVariantDetector([a, b]).detect_same_construction()
-    assert not any(r[0].lemma_1 == "jeti" for r in results)
+    assert any(r[0].lemma_1 == "jeti" for r in results)
     assert any(r[0].lemma_1 == "jayati" for r in results)
 
 
@@ -128,30 +135,15 @@ def test_rules_t_retroflex_matches() -> None:
     assert "rule:t<->ṭ" in _rules_of(results)
 
 
-def test_rules_skips_already_recorded() -> None:
+def test_rules_surfaces_inconsistent_recording() -> None:
+    # Inconsistent one-sided var_phonetic: surface so the user can fix it.
     a = make_hw("akaṭa", var_phonetic="akata")
     b = make_hw("akata")
     results = PhoneticVariantDetector([a, b]).detect_by_rules()
-    assert not any(r[0].lemma_1 == "akaṭa" for r in results)
+    assert any(r[0].lemma_1 == "akaṭa" for r in results)
 
 
 # ---- detect_base_e_aya ----
-
-
-def test_base_differs_e_aya_detects_simple() -> None:
-    assert _base_differs_e_aya("ji + e", "ji + aya")
-    assert _base_differs_e_aya("ji + aya", "ji + e")
-    assert _base_differs_e_aya("ji + *e", "ji + *aya")
-    assert _base_differs_e_aya("ji + *e", "ji + aya")
-    assert _base_differs_e_aya("ji + e", "ji + *aya")
-
-
-def test_base_differs_e_aya_rejects_multi_diff() -> None:
-    assert not _base_differs_e_aya("ji + e + sa", "ji + aya + so")
-
-
-def test_base_differs_e_aya_rejects_same() -> None:
-    assert not _base_differs_e_aya("ji + e", "ji + e")
 
 
 def test_detect_base_e_aya_finds_pair() -> None:
@@ -159,13 +151,19 @@ def test_detect_base_e_aya_finds_pair() -> None:
         "jeti",
         construction_clean="ji + *a",
         pos="verb",
-        root_base_clean="ji + e",
+        root_base_clean="ji > ji + e",
+        root_key="ji_1",
+        family_root="ji",
+        root_sign="*e",
     )
     b = make_hw(
         "jayati",
         construction_clean="ji + *a",
         pos="verb",
-        root_base_clean="ji + aya",
+        root_base_clean="ji > ji + aya",
+        root_key="ji_1",
+        family_root="ji",
+        root_sign="*aya",
     )
     results = PhoneticVariantDetector([a, b]).detect_base_e_aya()
     assert ("jeti", "jayati") in _pairs_of(results) or ("jayati", "jeti") in _pairs_of(
@@ -174,40 +172,35 @@ def test_detect_base_e_aya_finds_pair() -> None:
     assert all(r[2] == "base:e<->aya" for r in results)
 
 
-# ---- detect_base_iya_iiya ----
+# ---- detect_base_ya_iya_iiya ----
 
 
-def test_base_differs_iya_detects() -> None:
-    assert _base_differs_iya("yāci + iya", "yāci + īya")
-    assert _base_differs_iya("yāci + īya", "yāci + iya")
-    assert _base_differs_iya("yāci + *iya", "yāci + īya")
-    assert _base_differs_iya("yāci + iya", "yāci + *īya")
-
-
-def test_base_differs_iya_rejects_no_match() -> None:
-    assert not _base_differs_iya("yāci + iya", "yāci + aya")
-
-
-def test_detect_base_iya_iiya_finds_pair() -> None:
+def test_detect_base_ya_iya_iiya_finds_pair() -> None:
     a = make_hw(
         "yāciyamāna",
         construction_clean="yāc + *iya + māna",
         pos="ptp",
-        root_base_clean="yāci + iya",
+        root_base_clean="yāc > yāci + iya",
+        root_key="yāc_1",
+        family_root="yāc",
+        root_sign="iya",
     )
     b = make_hw(
         "yācīyamāna",
         construction_clean="yāc + *iya + māna",
         pos="ptp",
-        root_base_clean="yāci + īya",
+        root_base_clean="yāc > yāci + īya",
+        root_key="yāc_1",
+        family_root="yāc",
+        root_sign="īya",
     )
-    results = PhoneticVariantDetector([a, b]).detect_base_iya_iiya()
+    results = PhoneticVariantDetector([a, b]).detect_base_ya_iya_iiya()
     pairs = _pairs_of(results)
     assert ("yāciyamāna", "yācīyamāna") in pairs or (
         "yācīyamāna",
         "yāciyamāna",
     ) in pairs
-    assert all(r[2] == "base:iya<->īya" for r in results)
+    assert all(r[2] == "base:ya<->iya<->īya" for r in results)
 
 
 # ---- canonical pairs ----
@@ -241,7 +234,12 @@ def test_canonical_pairs_drops_already_related() -> None:
         pos="verb",
         var_phonetic="jayati",
     )
-    b = make_hw("jayati", construction_clean="ji + *a", pos="verb")
+    b = make_hw(
+        "jayati",
+        construction_clean="ji + *a",
+        pos="verb",
+        var_phonetic="jeti",
+    )
     pairs = PhoneticVariantDetector([a, b]).detect_canonical_pairs([])
     assert pairs == []
 
@@ -252,6 +250,33 @@ def test_canonical_pairs_reject_different_pos() -> None:
     detector = PhoneticVariantDetector([a, b])
     pairs = detector.detect_canonical_pairs([])
     assert pairs == []
+
+
+def test_canonical_pairs_allow_masc_nt() -> None:
+    # t↔ṭ rule: kūṭa masc ↔ kūta nt — masc/nt treated as the same class
+    a = make_hw("kūṭa", lemma_clean="kūṭa", pos="masc")
+    b = make_hw("kūta", lemma_clean="kūta", pos="nt")
+    detector = PhoneticVariantDetector([a, b])
+    pairs = detector.detect_canonical_pairs([])
+    assert len(pairs) >= 1
+
+
+def test_canonical_pairs_allow_masc_fem() -> None:
+    # t↔ṭ rule: kūṭa masc ↔ kūta fem — all three noun genders share a class
+    a = make_hw("kūṭa", lemma_clean="kūṭa", pos="masc")
+    b = make_hw("kūta", lemma_clean="kūta", pos="fem")
+    detector = PhoneticVariantDetector([a, b])
+    pairs = detector.detect_canonical_pairs([])
+    assert len(pairs) >= 1
+
+
+def test_canonical_pairs_allow_nt_fem() -> None:
+    # t↔ṭ rule: kūṭa nt ↔ kūta fem — all three noun genders share a class
+    a = make_hw("kūṭa", lemma_clean="kūṭa", pos="nt")
+    b = make_hw("kūta", lemma_clean="kūta", pos="fem")
+    detector = PhoneticVariantDetector([a, b])
+    pairs = detector.detect_canonical_pairs([])
+    assert len(pairs) >= 1
 
 
 def test_canonical_pairs_reject_different_family_root() -> None:

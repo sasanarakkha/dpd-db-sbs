@@ -40,7 +40,6 @@
 91st
 92nd
 9th
-a deit
 aaaah
 ababa-count
 abbhantara
@@ -183,6 +182,7 @@ aor
 aorist
 apa
 Apadāna
+Apaṇṇakasutta
 api
 api
 appanā
@@ -224,7 +224,7 @@ asammuccā
 Asaṅkhatasaṃyuttaṃ
 ascertains
 asceticism
-Asclepias syriaca
+Asclepias
 ashoka
 Asiatica
 asiaticus
@@ -351,6 +351,7 @@ bha
 Bhaddasārī
 Bhaddekarattasutta
 Bhaddiya
+Bhaddā
 Bhaddāli
 Bhadraka
 Bhadraka's
@@ -466,7 +467,7 @@ Campā
 Capparis
 captious
 capucapu
-capucapu soun
+capucapu
 Carandas
 carasīti
 carefulness
@@ -488,6 +489,7 @@ censurable
 censures
 centered
 centeredness
+centre
 ceramicist
 cerasoides
 Ceta
@@ -645,6 +647,7 @@ Cūḷapuṇṇamasutta
 Cūḷasuññatasutta
 cūḷavagga
 d
+Dabba
 dacoit
 daddabha
 dadāti
@@ -662,6 +665,7 @@ davatte
 dawnrise
 Daḷhanemi
 de-illusionment
+debars
 decad
 decayless
 Deccan
@@ -678,6 +682,7 @@ defilement
 defilements
 dehorned
 dehusked
+deity
 dejection
 delicateness
 delimited
@@ -945,6 +950,7 @@ felly
 ferruginea
 fetcher
 fettering
+fibre
 fickleness
 fidgetiness
 fineness
@@ -958,6 +964,7 @@ flambeau
 flatterer
 flaviviridis
 flavour
+flavoured
 flavourful
 flavourless
 flavours
@@ -1111,6 +1118,7 @@ harmonizes
 hattha
 Hatthaka
 Hatthi
+Hatthigāmaka
 Hatthisāriputta
 haughtiness
 Haṭaka
@@ -1167,6 +1175,7 @@ humour
 husband's
 hā
 Hāliddikānisutta
+hāra
 hāsupañño
 hū
 I.B
@@ -1196,6 +1205,7 @@ impingements
 importunate
 imprudently
 in-front-ness
+inappreciativeness
 inarticulate
 inarticulately
 inattentively
@@ -1364,6 +1374,7 @@ Kattik
 Kattika
 Kaḷāramaṭṭaka
 kaṃsa
+Kaṅkhārevata
 kaṇikāra
 Kaṇṇakatthala
 Kaṇṭaka
@@ -1382,6 +1393,7 @@ keḷāyati
 Keṇiya
 kh
 kha
+Khadiravaniya
 Khandasaṃyuttaṃ
 khandha
 Khandhaka
@@ -1425,8 +1437,10 @@ Knowledges
 ko
 Kokanada
 Kokālika
+Koliyadhītā
 Koliyan
 Koliyans
+Komārabhacca
 Korakkhattiya
 kosa
 Kosala
@@ -1445,6 +1459,7 @@ Koṭigāma
 Koṭṭhika
 Koṭṭhita
 kudācana
+Kulagharikā
 kumbha
 kumbhathūna
 kumuda-count
@@ -1463,9 +1478,11 @@ Kuvera
 Kuvera
 Kuvera's
 kuḍuba
+Kuṇḍalakesā
 Kuṇḍaliya
 kuṇḍañhi
 kuṭi
+Kuṭikaṇṇa
 kuṭis
 kyphotic
 Kāliṅga
@@ -1473,6 +1490,7 @@ Kāliṅgas
 Kālāma
 Kālāmas
 Kāmabhū
+Kāpilānī
 Kāsi
 Kāsi
 Kāsian
@@ -1482,6 +1500,8 @@ Kāyagatāsatisutta
 Kāḷaka
 Kāḷigodha
 Kāḷudāyi
+Kāḷudāyī
+Kāḷī
 kī
 Kīṭāgiri
 Kūṭadanta
@@ -1491,11 +1511,13 @@ labourers
 Lacucha
 Lagopodioides
 Lakkhaṇasaṃyuttaṃ
+Lakuṇḍaka
 lambaste
 lambastes
 Lanka
 Lankan
-lapis lazuli
+Lankan
+lapis
 latfolia
 latifolia
 layed
@@ -1505,6 +1527,7 @@ laypeople
 layperson
 layperson's
 laywoman
+lazuli
 leatherwork
 leatherworker
 lebbeck
@@ -1549,7 +1572,9 @@ līyati
 Maccha
 Maccha
 Macchas
+Macchikā
 Macchikā's
+Macchikāsaṇḍika
 mad
 Madda
 Madhura
@@ -1617,6 +1642,7 @@ Malabarica
 Malla
 Mallan
 Mallans
+Mallaputta
 Mallas
 malnourishment
 malodorousness
@@ -1653,6 +1679,7 @@ meanness
 measurable
 measurer
 meditator
+meditators
 mendaciously
 mendicants
 menses
@@ -1828,6 +1855,7 @@ mūlaghaccaṃ
 na
 Nadubbhiyasuttaṃ
 nakhā
+Nakula
 Nanda
 Nandaka
 Nandiya
@@ -1969,6 +1997,7 @@ Padarūpasiddhi
 padkos
 paduma-count
 padūsimhā
+paediatrician
 Pajjota
 Pajjunna
 Pajjunna's
@@ -2099,6 +2128,7 @@ pistils
 Pisum
 pitbull
 piyajātikasuttaṃ
+piyal
 piṭ
 Piṭaka
 Piṭakas
@@ -2123,6 +2153,7 @@ post-mortem
 Posāla's
 Potaliya
 potsherd
+Poṭṭhapāda
 ppa
 prajuhoti
 prakṛti
@@ -2307,6 +2338,7 @@ rudh
 rudhādigaṇa
 Ruellia
 rufipogon
+rule
 rulership
 Rumā
 Rusa
@@ -2335,6 +2367,7 @@ Sabhiya
 Saccaka
 Saccasaṃyuttaṃ
 Saccharum
+Sacetana
 Saddha
 safflower
 sagacity
@@ -2367,6 +2400,7 @@ samaṇa
 Sambac
 Sambari
 Sambhava
+Samiddha
 Samiddhi
 Samiddhi's
 Sammappadhānasaṃyuttaṃ
@@ -2389,6 +2423,7 @@ Sarabhū
 Saraca
 saravanaṃ
 Saraṇāni
+sarus
 sassata
 sati
 satiates
@@ -2396,6 +2431,7 @@ satiety
 satipaṭṭhāna
 Satipaṭṭhānasaṃyuttaṃ
 Satipaṭṭḥānasaṃyuttaṃ
+satisfier
 sativa
 sativum
 Sattakanipāta
@@ -2443,6 +2479,7 @@ sellable
 semi-vowel
 Senagiri
 seniormost
+Seniyadhītā
 sensorial
 seraglio
 serrata
@@ -2539,7 +2576,6 @@ spontaneum
 spritzed
 squanderer
 Sri
-Sri Lankan
 ssa
 st
 stabilises
@@ -2571,6 +2607,7 @@ suavity
 sub-commentary
 subbaṭṭitaṃ
 Subha
+Subha
 Subhadda
 Subhaddā
 Subhaga
@@ -2595,6 +2632,7 @@ suffusion
 sugata-span
 suggester
 Sujā's
+Sujātā
 sullenness
 Sumana
 Sumaṅgala's
@@ -2616,6 +2654,7 @@ Supaṇṇasaṃyuttaṃ
 supercluster
 supernormal
 Suppatita
+Suppavāsā
 Suppiya
 supportless
 suppurating
@@ -2626,7 +2665,6 @@ surmounting
 surpassable
 surpassingly
 surusuru
-surusuru soun
 Susima
 Susumāragira
 Sutanu
@@ -2648,6 +2686,7 @@ syllogism
 sylvatica
 Symplocos
 syntactician
+syriaca
 Syzygium
 Syām
 sāci
@@ -2758,6 +2797,7 @@ Tikanipāta
 timbaru
 tinctoria
 tinctorius
+tinduka
 tinkler
 Tinospora
 Tipiṭaka
@@ -2782,7 +2822,7 @@ towelled
 townsperson
 tradable
 tragocamelus
-training rule
+training
 tranquillization
 transfixes
 transgresses
@@ -2829,7 +2869,10 @@ Udumbarikā
 Udāna
 Udāyi
 Udāyī
+Ugga
+Uggata
 ugghāṭeti
+Uggo
 Ujjenī
 Ujuññā
 Ukkacelā
@@ -2856,6 +2899,7 @@ unarisen
 unaroused
 unarranged
 unassimilated
+unattackable
 unattained
 unattractiveness
 unattractiveness
@@ -3036,6 +3080,7 @@ unwished
 unwrought
 unyoked
 unyoking
+Upacālā
 Upamañña
 upasampadā
 upasantapadisso
@@ -3114,6 +3159,8 @@ Vaḍḍhamātar
 Vaḍḍhīsutta
 vaṃsa
 Vaṃsas
+Vaṅganta
+Vaṅgantaputta
 Vaṅgantaputta
 Vaṅgīsa
 Vaṅgīsasaṃyuttaṃ
@@ -3150,6 +3197,7 @@ Vessantara
 Vessavaṇa
 Vessavaṇa's
 Vessāmitta
+Vesālika
 Vesālī
 Vetaric
 vetiver
@@ -3261,6 +3309,7 @@ yojanas
 yoking
 you're
 youthfulness
+yy
 Yāma
 zizanioides
 Ziziphus
@@ -3300,6 +3349,7 @@ Ziziphus
 āḷakamanda
 Āḷakamandā
 Āḷavi
+Āḷavikā
 Āḷavī
 āḷhaka
 Āḷāra
@@ -3340,5 +3390,31 @@ Ziziphus
 ṭhāna
 ṭīkā
 …
-debars
-sarus
+Avakujjasutta
+Udaya
+thwarter
+Tikaṇṇa
+Jāṇussoṇisutta
+Venāgapura
+Sarabha
+Sappinikā
+Kesamutti
+Sāḷha
+Venāgapurasutta
+Gandhārians
+Pubbavideha
+Pañcāla
+Kaliṇga
+Kekaka
+Uttarāpa
+vipassanā
+recompensate
+dreadlock
+Sansevieria
+fibres
+attaches
+miscomprehension
+miscomprehension
+unseparated
+karṣa
+Godhika

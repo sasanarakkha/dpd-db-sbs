@@ -3,6 +3,7 @@
 """Update Anki with latest data directly from the DB."""
 
 import copy
+from pathlib import Path
 
 from anki.collection import Collection
 from anki.errors import DBError
@@ -70,6 +71,15 @@ def family_updater(anki_data_list, deck):
 def get_anki_collection() -> Collection | None:
     pr.green_tmr("get anki collection")
     anki_db_path = config_read("anki", "db_path")
+    if not anki_db_path:
+        pr.no("no")
+        pr.red("No anki db_path configured in config.ini [anki].")
+        return None
+    if not Path(anki_db_path).exists():
+        pr.no("no")
+        pr.red(f"Anki collection not found at: {anki_db_path}")
+        pr.red("Check the profile name in config.ini [anki] db_path/backup_path.")
+        return None
     try:
         col = Collection(anki_db_path)  # type: ignore[arg-type]
         pr.yes("ok")
@@ -220,6 +230,8 @@ def update_from_db(db, col, data_dict, deck_dict, model_dict) -> None:
     deleted_list = []
     changed_deck_list = []
 
+    notes_to_update = []
+
     for counter, i in enumerate(db):
         id = str(i.id)
         deck = deck_selector(i)
@@ -230,7 +242,7 @@ def update_from_db(db, col, data_dict, deck_dict, model_dict) -> None:
                 note, is_updated = update_note_values(col, note, i)
                 if is_updated:
                     updated_list += [i.id]
-                    col.update_note(note)
+                    notes_to_update.append(note)
                 if update_deck(col, note, i, data_dict[id], deck_dict, model_dict):
                     changed_deck_list += [i.id]
 
@@ -246,6 +258,11 @@ def update_from_db(db, col, data_dict, deck_dict, model_dict) -> None:
             if i.id in data_dict:
                 print(data_dict[id])
                 deleted_list += [i.id]
+
+    if notes_to_update:
+        pr.green_tmr("flush note updates")
+        col.update_notes(notes_to_update)
+        pr.yes(len(notes_to_update))
 
     pr.summary("added", len(added_list))
     pr.summary("updated", len(updated_list))
@@ -265,6 +282,8 @@ def update_family(col, deck, data_dict, deck_dict, model_dict, anki_data) -> Non
     updated_list = []
     deleted_list = []
 
+    notes_to_update = []
+
     for i in anki_data:
         key, html = i
         if key in data_dict:
@@ -272,12 +291,15 @@ def update_family(col, deck, data_dict, deck_dict, model_dict, anki_data) -> Non
             note, is_updated = update_family_note(note, i)
             if is_updated:
                 updated_list += [key]
-                col.update_note(note)
+                notes_to_update.append(note)
 
             # add note
         else:
             added_list += [key]
             make_new_family_note(col, deck, model_dict, deck_dict, i)
+
+    if notes_to_update:
+        col.update_notes(notes_to_update)
 
     for key, data in data_dict.items():
         if data["note"]["Front"] not in [item[0] for item in anki_data]:
@@ -349,6 +371,8 @@ def update_note_values(col, note, i):
     note["example_2"] = str(i.example_2).replace("\n", "<br>")
     note["antonym"] = str(i.antonym)
     note["synonym"] = str(i.synonym)
+    note["var_phonetic"] = str(i.var_phonetic)
+    note["var_text"] = str(i.var_text)
     note["variant"] = str(i.variant)
     note["commentary"] = str(i.commentary).replace("\n", "<br>")
     note["notes"] = str(i.notes).replace("\n", "<br>")
@@ -413,10 +437,6 @@ def update_deck(col, note, i, data, deck_dict, model_dict):
     old_deck = deck_dict[data["did"]]
 
     if old_deck != new_deck:
-        # update note
-        note.mid = model_dict[new_deck]
-        col.update_note(note)
-
         # update card
         card = data["card"]
         card.did = deck_dict[new_deck]
@@ -432,7 +452,7 @@ def update_deck(col, note, i, data, deck_dict, model_dict):
 
 def make_new_note(col, deck, model_dict, deck_dict, i):
     """Make a new note."""
-    model_id = model_dict[deck]
+    model_id = model_dict["DPD"]
     deck_id = deck_dict[deck]
     note = col.new_note(model_id)
     note, is_updated = update_note_values(col, note, i)
@@ -442,7 +462,7 @@ def make_new_note(col, deck, model_dict, deck_dict, i):
 def make_new_family_note(col, deck, model_dict, deck_dict, i):
     """Make a new note for family decks."""
     deck = deck[0]
-    model_id = model_dict[deck]
+    model_id = model_dict["DPD Family"]
     deck_id = deck_dict[deck]
     note = col.new_note(model_id)
     note, is_updated = update_family_note(note, i)

@@ -169,7 +169,7 @@ def prepare_and_export_to_gd_mdict(g: GlobalVars) -> None:
 
 def main():
     pr.tic()
-    pr.green_title("dpd deconstructor")
+    pr.title("dpd deconstructor")
 
     # should the program run?
     if not config_test("exporter", "make_deconstructor", "yes"):

@@ -54,7 +54,7 @@ class GlobalVars:
 
 def main():
     pr.tic()
-    pr.green_title("exporting dpd to goldendict and mdict")
+    pr.title("exporting dpd to goldendict and mdict")
 
     if not config_test("exporter", "make_dpd", "yes"):
         pr.green_title("disabled in config.ini")

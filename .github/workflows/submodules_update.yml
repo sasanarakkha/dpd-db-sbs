@@ -171,7 +171,7 @@ jobs:
       shell: bash
       run: |
         declare -A submodules=(
-          ["resources/fdg_dpd"]="fdg https://github.com/dhammagift/dictPlugin.git"
+          ["resources/fdg_dpd"]="fdg https://github.com/o28o/dictPlugin.git"
           ["resources/bw2"]="tbw https://github.com/thebuddhaswords/BW2.git" 
           ["resources/sc-data"]="sc https://github.com/digitalpalidictionary/sc-data.git"
         )
