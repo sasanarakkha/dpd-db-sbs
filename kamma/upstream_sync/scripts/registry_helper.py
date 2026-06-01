@@ -166,3 +166,11 @@ def get_skip_sync_patterns(data: dict[str, object]) -> list[str]:
     if not isinstance(patterns, list):
         return []
     return [p for p in patterns if isinstance(p, str)]
+
+
+def get_no_sync_files(data: dict[str, object]) -> list[str]:
+    """Return the list of permanent no-sync infrastructure paths."""
+    entries = data.get("no_sync_files", [])
+    if not isinstance(entries, list):
+        return []
+    return [p for p in entries if isinstance(p, str)]

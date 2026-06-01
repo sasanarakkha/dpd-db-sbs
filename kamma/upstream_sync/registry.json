@@ -132,7 +132,8 @@
     "kamma/",
     "exporter/mcp",
     "exporter/analysis",
-    "exporter/archive/"
+    "exporter/archive/",
+    "tools/ai_models.json"
   ],
   "skip_sync_patterns": [
     "gui2/data/",
@@ -145,7 +146,27 @@
     "exporter/tester/",
     "exporter/sutta_central/",
     "exporter/pdf/",
-    "tests/"
+    "tests/",
+    "scripts/find/",
+    "scripts/suttas/",
+    "exporter/anki/",
+    "db_tests/",
+    ".claude/",
+    ".zed/",
+    "scripts/build/mkdocs_overrides/",
+    "scripts/fix/double_consonant_replacer.py",
+    "scripts/fix/variant_cleaner.py",
+    "scripts/fix/verb_finder.py",
+    "scripts/build/generate_books_tsv.py",
+    "scripts/build/anki_updater.py",
+    "tools/ai_nvidia.py",
+    "tools/cst_book_translator.py",
+    "tools/cst_book_translator.tsv",
+    "tools/rss_feed.py",
+    "tools/synonym_variant.py",
+    "gui2/pass2_x_manager.py",
+    "misc/DPD-feedback.xlsx",
+    "scripts/dbreader.py"
   ],
   "unique_paths": [
     ".github/workflows/submodules_update.yml",
@@ -161,7 +182,6 @@
     "db/suttas/suttas.html",
     "db/suttas/suttas.tsv",
     "db/families/family_set_ru_update.py",
-    "db_tests/sbs_consistency_tests.py",
     "exporter/goldendict/templates/sbs_example.html",
     "exporter/goldendict/ru_components/README.md",
     "exporter/kindle/ru_components/README.md",

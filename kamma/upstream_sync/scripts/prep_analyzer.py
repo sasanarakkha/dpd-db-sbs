@@ -13,6 +13,7 @@ from kamma.upstream_sync.scripts.registry_helper import (
     AcceptedSyncState,
     get_inspired_by_upstream_mapping,
     get_modified_upstream_paths,
+    get_no_sync_files,
     get_shadow_mappings_by_category,
     get_skip_sync_patterns,
     load_accepted_sync_state,
@@ -101,6 +102,7 @@ class PrepAnalyzer:
         self.registry = load_registry()
         self.accepted_sync: AcceptedSyncState = load_accepted_sync_state()
         self.skip_patterns = get_skip_sync_patterns(self.registry)
+        self.no_sync_files = get_no_sync_files(self.registry)
         self.modified_upstream = set(get_modified_upstream_paths(self.registry))
         self.shadow_mappings_by_category = get_shadow_mappings_by_category(
             self.registry
@@ -109,6 +111,9 @@ class PrepAnalyzer:
 
     def is_skipped(self, path: str) -> bool:
         """Return True when the path is outside sync scanning scope."""
+        for entry in self.no_sync_files:
+            if path == entry or path.startswith(entry.rstrip("/") + "/"):
+                return True
         for pattern in self.skip_patterns:
             if pattern.endswith("/") and path.startswith(pattern):
                 return True

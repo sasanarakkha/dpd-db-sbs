@@ -38,9 +38,16 @@ class GitContext:
         return result.stdout.strip()
 
     def _check_if_dirty(self) -> bool:
-        """Check if the current working tree has uncommitted changes."""
+        """Check if the current working tree has uncommitted changes.
+
+        Submodule-internal modifications and untracked files are ignored
+        (``--ignore-submodules=dirty``): they cannot be cleaned by a
+        superproject commit and are irrelevant to protecting uncommitted
+        edits to upstream-tracked files. Gitlink (recorded-commit) changes
+        are still reported.
+        """
         result = subprocess.run(
-            ["git", "status", "--porcelain"],
+            ["git", "status", "--porcelain", "--ignore-submodules=dirty"],
             capture_output=True,
             text=True,
             check=True,
