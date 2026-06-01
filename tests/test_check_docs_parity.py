@@ -1,12 +1,14 @@
 """Verify docs translation parity reports classify and write expected outputs."""
 
 import json
+import subprocess
 from pathlib import Path
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
 
+from kamma.upstream_sync.scripts.check_docs_parity import DocsDiffError
 from kamma.upstream_sync.scripts.check_docs_parity import find_unexpected_local_files
 from kamma.upstream_sync.scripts.check_docs_parity import get_docs_changed_since
 from kamma.upstream_sync.scripts.check_docs_parity import load_docs_sync_range
@@ -76,6 +78,45 @@ def test_get_docs_changed_since_uses_explicit_end_ref(
         "--",
         "docs/",
     ]
+
+
+@patch("kamma.upstream_sync.scripts.check_docs_parity.subprocess.run")
+def test_get_docs_changed_since_strict_mode_raises_on_git_diff_failure(
+    mock_run: MagicMock,
+) -> None:
+    mock_run.side_effect = subprocess.CalledProcessError(
+        returncode=128,
+        cmd=["git", "diff"],
+        stderr="bad revision",
+    )
+
+    with pytest.raises(DocsDiffError, match="git diff failed"):
+        get_docs_changed_since(FULL_OLD_SHA, FULL_NEW_SHA, fail_on_error=True)
+
+
+@patch("kamma.upstream_sync.scripts.check_docs_parity.write_report")
+@patch(
+    "kamma.upstream_sync.scripts.check_docs_parity.get_docs_changed_since",
+    side_effect=DocsDiffError("git diff failed"),
+)
+@patch(
+    "kamma.upstream_sync.scripts.check_docs_parity.collect_md_files",
+    side_effect=[{"example.md"}, {"example.md"}],
+)
+def test_run_parity_check_strict_mode_fails_when_git_diff_fails(
+    mock_collect: MagicMock,
+    mock_changed: MagicMock,
+    mock_write_report: MagicMock,
+    tmp_path: Path,
+) -> None:
+    write_valid_manifest(tmp_path)
+
+    result = run_parity_check(tmp_path, strict=True)
+
+    assert result == 1
+    mock_collect.assert_called()
+    mock_changed.assert_called_once_with(FULL_OLD_SHA, FULL_NEW_SHA, fail_on_error=True)
+    mock_write_report.assert_not_called()
 
 
 @patch("kamma.upstream_sync.scripts.check_docs_parity.write_report")
@@ -149,7 +190,7 @@ def test_run_parity_check_strict_mode_fails_on_missing_or_stale_docs(
 
     assert result == 1
     mock_collect.assert_called()
-    mock_changed.assert_called_once_with(FULL_OLD_SHA, FULL_NEW_SHA)
+    mock_changed.assert_called_once_with(FULL_OLD_SHA, FULL_NEW_SHA, fail_on_error=True)
     assert mock_write_report.called
 
 

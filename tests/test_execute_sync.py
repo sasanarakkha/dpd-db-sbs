@@ -122,6 +122,11 @@ class TestExecuteSync(unittest.TestCase):
             validate_repo_relative_paths(["--cached"], "test paths")
 
         with self.assertRaisesRegex(
+            ValueError, "test paths\\[0\\] must not use git pathspec magic"
+        ):
+            validate_repo_relative_paths([":(glob)docs/**"], "test paths")
+
+        with self.assertRaisesRegex(
             ValueError, "test paths\\[0\\] must not contain git pathspec metacharacters"
         ):
             validate_repo_relative_paths(["exporter/**/*.py"], "test paths")

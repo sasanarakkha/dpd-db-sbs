@@ -187,7 +187,8 @@ def test_prep_analyzer_treats_renames_as_delete_and_add(
     mock_state.return_value = accepted_sync_state
     mock_target.return_value = FULL_NEW_SHA
     mock_changes.return_value = [
-        ("R100", "db/families/deleted_source.py db/families/family_compound.py")
+        ("D", "db/families/deleted_source.py"),
+        ("A", "db/families/family_compound.py"),
     ]
 
     analyzer = PrepAnalyzer(tmp_path)

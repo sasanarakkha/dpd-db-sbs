@@ -32,6 +32,10 @@ NO_TRANSLATE: set[str] = {
 }
 
 
+class DocsDiffError(RuntimeError):
+    """Raised when docs git-diff evidence cannot be collected."""
+
+
 def load_accepted_sha() -> str:
     data: dict[str, str] = json.loads(ACCEPTED_SYNC_PATH.read_text())
     return data["last_accepted_upstream_sha"]
@@ -50,7 +54,9 @@ def load_docs_sync_range(thread_dir: Path | None) -> tuple[str, str]:
     return from_ref, to_ref
 
 
-def get_docs_changed_since(from_ref: str, to_ref: str = "HEAD") -> set[str]:
+def get_docs_changed_since(
+    from_ref: str, to_ref: str = "HEAD", fail_on_error: bool = False
+) -> set[str]:
     """Return relative paths (under docs/) changed in an explicit git range."""
     try:
         result = subprocess.run(
@@ -61,7 +67,10 @@ def get_docs_changed_since(from_ref: str, to_ref: str = "HEAD") -> set[str]:
             cwd=ROOT,
         )
     except subprocess.CalledProcessError as exc:
-        pr.amber(f"git diff failed: {exc} — staleness check skipped")
+        message = f"git diff failed: {exc}"
+        if fail_on_error:
+            raise DocsDiffError(message) from exc
+        pr.amber(f"{message} — staleness check skipped")
         return set()
 
     changed: set[str] = set()
@@ -219,7 +228,14 @@ def run_parity_check(thread_dir: Path | None, strict: bool = False) -> int:
 
     en_files = collect_md_files(DOCS_EN)
     ru_files = collect_md_files(DOCS_RU)
-    changed = get_docs_changed_since(sha, to_ref)
+    try:
+        if strict:
+            changed = get_docs_changed_since(sha, to_ref, fail_on_error=True)
+        else:
+            changed = get_docs_changed_since(sha, to_ref)
+    except DocsDiffError as exc:
+        pr.red(str(exc))
+        return 1
 
     missing: list[str] = sorted(f for f in en_files if f not in ru_files)
     stale: list[str] = sorted(

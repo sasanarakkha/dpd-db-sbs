@@ -56,6 +56,19 @@ model-boundary aware, and validated for RU/SBS/DPS/Tamil localized files.
 - Active sync docs/tooling no longer depend on `kamma/threads.md`,
   symlink-based no-translate policy, or obsolete Bash sync entrypoints.
 - Helper script output was migrated to `tools.printer` where relevant.
+- `check_docs_parity.py --strict` now fails if docs git-diff evidence cannot be
+  collected; non-strict standalone report mode still warns and continues.
+- Exclusion/path validation rejects leading `:` Git pathspec magic in addition
+  to absolute paths, `..`, backslashes, whitespace, leading `-`, and glob
+  metacharacters where globs are not explicitly allowed.
+- `init_sync_thread.py` now reads `accepted_sync.json`, fills the sync spec
+  source SHA/ref, and writes a fuller restartable `handoff.md` with the
+  required errors/issues section.
+- `prep_analyzer.py` has a single rename expansion path: NUL-delimited
+  `git diff --name-status -z` parsing expands renames, with no second
+  whitespace-splitting pass.
+- `scripts/cl_dps/dpd-kamma-sync` now checks that the current branch is
+  `sbs-ru` before running the backup script or committing `backup dps data`.
 
 ## Important Files
 
@@ -111,6 +124,13 @@ passing focused suites, but every new change needs fresh targeted evidence.
 - User manual review may still be needed for uncommitted working-tree changes.
 - Unrelated dirty/untracked state has existed under `resources/*`; preserve it
   unless the user explicitly asks to handle it.
+- Current uncommitted upstream-sync improvement work touches only:
+  `check_docs_parity.py`, `sync_schema.py`, `init_sync_thread.py`,
+  `prep_analyzer.py`, `scripts/cl_dps/dpd-kamma-sync`, and targeted tests.
+- Latest validation passed: targeted upstream-sync tests (`64 passed`),
+  related metadata/finalization tests (`97 passed`), ruff check/format,
+  pyright, pyrefly, Bash syntax check, registry/SMD validators, docs parity,
+  shadow-modification check, and `git diff --check`.
 
 ## Mistakes To Avoid
 
@@ -135,7 +155,8 @@ passing focused suites, but every new change needs fresh targeted evidence.
 - Keep prep manifest, registry exclusion, and run-exclusion paths
   repo-relative and pathspec-safe.
 - Do not allow absolute paths, `..`, backslashes, surrounding whitespace,
-  leading `-`, or git pathspec metacharacters in exclusions.
+  leading `-`, leading `:` pathspec magic, or git pathspec metacharacters in
+  exclusions.
 - Do not reintroduce `kamma/threads.md`; sync thread discovery is directory
   based under `kamma/threads/`.
 - Do not make `execute_sync.py` auto-stage by default.
@@ -167,6 +188,10 @@ passing focused suites, but every new change needs fresh targeted evidence.
   before `init_sync_thread.py` failed on missing `kamma/threads.md`. Do not undo
   that commit or generated sync state unless explicitly requested.
 - Existing unrelated dirty/untracked `resources/*` entries were not touched.
+- TDD red phase for strict docs parity failed at collection because
+  `DocsDiffError` did not exist yet; this was the intended initial failure.
+- One existing strict docs parity test needed its mock expectation updated to
+  include `fail_on_error=True` after strict mode began calling the safer path.
 
 ## Recent Commit Message Candidates
 
@@ -182,6 +207,7 @@ passing focused suites, but every new change needs fresh targeted evidence.
 #sync docs: clarify unique cleanup inventory
 #sync tooling: block unsafe prep paths and pin upstream ref
 #sync docs: enforce single dps shadow category
+#sync tooling: harden sync init and docs parity
 ```
 
 ## Restart Prompt

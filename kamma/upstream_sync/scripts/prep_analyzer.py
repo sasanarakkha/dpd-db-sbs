@@ -31,18 +31,6 @@ type MappedAction = dict[str, str]
 type SourceAction = dict[str, str]
 
 
-def expand_git_change(status: str, path: str) -> list[GitChange]:
-    """Represent git renames as a factual delete plus add pair."""
-    if not status.startswith("R"):
-        return [(status, path)]
-
-    parts = path.split()
-    if len(parts) != 2:
-        return [(status, path)]
-    old_path, new_path = parts
-    return [("D", old_path), ("A", new_path)]
-
-
 def resolve_target_upstream_sha(ref: str = "upstream/main") -> str:
     """Resolve a git ref to a concrete commit SHA."""
     try:
@@ -162,11 +150,7 @@ class PrepAnalyzer:
 
         target_ref = self.accepted_sync["last_accepted_upstream_ref"]
         to_sha = resolve_target_upstream_sha(target_ref)
-        changes = [
-            expanded_change
-            for status, path in get_upstream_changes(from_sha, to_sha)
-            for expanded_change in expand_git_change(status, path)
-        ]
+        changes = get_upstream_changes(from_sha, to_sha)
 
         tracked_modified: list[str] = []
         shadow_sources_modified: list[tuple[str, list[str]]] = []

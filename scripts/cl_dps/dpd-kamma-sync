@@ -15,6 +15,12 @@ BACKUP_FILES=(
 )
 BACKUP_COMMIT_MESSAGE="backup dps data"
 
+CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+if [ "$CURRENT_BRANCH" != "sbs-ru" ]; then
+    echo "❌ Error: Wrong branch '$CURRENT_BRANCH'. Switch to sbs-ru before running this script."
+    exit 1
+fi
+
 if [ -f "$BACKUP_SCRIPT" ]; then
     if ! git diff --cached --quiet; then
         echo "❌ Error: staged changes already exist. Commit or unstage them before running this script."

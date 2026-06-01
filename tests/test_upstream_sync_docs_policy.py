@@ -245,6 +245,17 @@ def test_commit_exception_is_limited_to_cl_dps_bash_scripts() -> None:
     assert all("git commit" not in script for script in python_sync_scripts)
 
 
+def test_dpd_kamma_sync_checks_branch_before_backup_commit() -> None:
+    wrapper = Path("scripts/cl_dps/dpd-kamma-sync").read_text(encoding="utf-8")
+
+    assert 'CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"' in wrapper
+    assert 'if [ "$CURRENT_BRANCH" != "sbs-ru" ]; then' in wrapper
+    assert "Wrong branch" in wrapper
+    assert wrapper.index('CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"') < (
+        wrapper.index('uv run python3 "$BACKUP_SCRIPT"')
+    )
+
+
 def test_init_sync_thread_prints_exact_stage_one_restart_prompt() -> None:
     init_script = Path("kamma/upstream_sync/scripts/init_sync_thread.py").read_text(
         encoding="utf-8"
@@ -255,6 +266,15 @@ def test_init_sync_thread_prints_exact_stage_one_restart_prompt() -> None:
     assert "Run `/kamma:2-do` to start the sync." not in init_script
     assert legacy_index not in init_script
     assert "THREADS_FILE" not in init_script
+
+
+def test_prep_analyzer_has_single_rename_expansion_path() -> None:
+    source = Path("kamma/upstream_sync/scripts/prep_analyzer.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "def expand_git_change(" not in source
+    assert "for expanded_change in expand_git_change" not in source
 
 
 def test_registry_docs_rus_description_matches_translation_parity_policy() -> None:

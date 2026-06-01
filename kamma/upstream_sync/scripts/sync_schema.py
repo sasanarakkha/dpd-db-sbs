@@ -28,6 +28,8 @@ def validate_repo_relative_paths(
             raise ValueError(f"{item_label} must use forward slashes")
         if path.startswith("-"):
             raise ValueError(f"{item_label} must not start with '-'")
+        if path.startswith(":"):
+            raise ValueError(f"{item_label} must not use git pathspec magic")
         if not allow_globs and any(char in path for char in git_pathspec_chars):
             raise ValueError(
                 f"{item_label} must not contain git pathspec metacharacters"
