@@ -15,7 +15,6 @@
 Когда выйдет новая версия, снова скачайте и откройте последний **dpd-anki.apkg**. Anki распознает существующую колоду и спросит, хотите ли вы обновить её. Выберите обновление.
 
 <!-- placeholder: screenshot of the Anki update prompt -->
-<!-- ![update prompt](../pics/anki/anki_update.png) -->
 
 ## Тема
 
