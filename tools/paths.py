@@ -553,6 +553,10 @@ class ProjectPaths:
             base_dir / "resources/sc-data/dictionaries/simple/en/pli2en_dpd.json"
         )  # final dictionary format
 
+        self.sc_pli2ru_dpd_json = (
+            base_dir / "resources/sc-data/dictionaries/simple/ru/pli2ru_dpd.json"
+        )  # Russian equivalent of pli2en_dpd.json
+
         # FIXME part of the old sc exporter, delete when tested
         # self.sc_data_dpd_dir = base_dir / "resources/sc-data/dpd/"
 

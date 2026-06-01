@@ -266,6 +266,9 @@ jobs:
         echo "=== After Variants export ==="
         $HOME/check_disk.sh
 
+    - name: Export SuttaCentral Ru
+      run: uv run python exporter/sutta_central/sutta_central_exporter_ru.py
+
     - name: Check disk space and memory
       run: |
         free -h  # Check available memory
@@ -523,6 +526,16 @@ jobs:
         asset_path: exporter/share/dpd.db.tar.bz2
         asset_name: dpd.db.tar.bz2
         asset_content_type: application/zip
+
+    - name: Upload Asset pli2ru_dpd.json
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: resources/sc-data/dictionaries/simple/ru/pli2ru_dpd.json
+        asset_name: pli2ru_dpd.json
+        asset_content_type: application/json
 
     - name: Upload Asset dpd+sbs-goldendict.zip
       uses: actions/upload-release-asset@v1
