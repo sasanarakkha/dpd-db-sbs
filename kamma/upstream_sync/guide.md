@@ -46,6 +46,8 @@ Each stage runs in its own fresh session. The chat history is never the source o
 folder is. At every hard stop, the current agent must save enough state for the next fresh session to
 continue from files only.
 
+**Prefer frequent restarts.** Shorter sessions are better. Starting a fresh session is cheap; a degraded context window is expensive and causes errors. Bias toward stopping early and handing off rather than completing "one more task" in a heavy session.
+
 **Required hard-stop artifacts:**
 - `<thread_dir>/handoff.md`
 - The current stage output:
@@ -71,6 +73,7 @@ continue from files only.
 
 **Hard Stop Triggers (mandatory fresh-session split):**
 - After completing any full Stage (1, 2, 3, 4.A, 4.B, or 5).
+- After preparing ANY commit message (Commit 1, 2, 3, or docs). Preparing a Commit is always a session boundary: update `handoff.md` and write a restart prompt naming the exact model and `/kamma:2-do` command before ending.
 - When FAST needs analysis, planning, judgment, or conflict resolution.
 - When ADVANCED needs mechanical editing, command execution, file copying, formatting, testing, or bulk research.
 - After every 5 implementation items in Stage 3.
@@ -200,6 +203,13 @@ Stage 4 is split into two model-bound substages: ADVANCED analysis and FAST tran
 **Owner**: ADVANCED only.
 **ADVANCED must stop and request FAST if** files need to be copied, generated, formatted, tested, translated in bulk, or mechanically edited.
 
+**Stage 2 sub-stage splitting (context safety):** Stage 2 routinely exceeds one session's context. Split it into restartable sub-stages, updating `handoff.md` and writing a restart prompt at each boundary so a fresh session can resume from files alone:
+- **2a — Impact assessment:** read `prep_report.md` + `prep_manifest.json`; classify every changed path (port / mirror / preserve / discuss / inspired / skip / docs) in `dynamic_plan.md`, then hard stop.
+- **2b — Discuss resolution:** resolve each `discuss: true` item with the user one at a time; record each as RESOLVED in `dynamic_plan.md`, then hard stop.
+- **2c — Literal plan authoring:** write self-contained per-file instructions (anchors, literal edits, verify commands); split again after each major domain if context grows, then hard stop.
+- **2d — Approval gate:** present `dynamic_plan.md` for approval.
+A session must be restartable at any sub-stage boundary from files alone — never rely on chat history.
+
 1. **Dynamic Planning**:
    - Create `dynamic_plan.md` in the thread folder.
    - Use `prep_manifest.json` as the factual source of changed upstream files and mapped local destinations.
@@ -277,6 +287,7 @@ The script reads `<thread_dir>/prep_manifest.json` and reports docs changes from
 ### Stage 5: Verification & After-sync (ADVANCED Acceptance)
 **Goal**: Final human verification and close out the sync record.
 **Owner**: ADVANCED for acceptance decisions. If mechanical finalization is needed, ADVANCED writes exact instructions and hands off to FAST.
+**ADVANCED hard stop (Stage 5):** ADVANCED reads outputs, makes the acceptance decision, and writes exact FAST instructions ONLY. It MUST NOT run any command that mutates state, builds, or runs tests (no `uv sync`, no exporters, no `pytest`, no `finalize_accepted_sync.py`, no source edits). If ADVANCED finds itself about to run such a command, STOP and hand off to FAST immediately. All verification commands and finalization belong to FAST.
 
 1. **Full manual verification**
    - Ask user to verify everything and stay back for feedback. After correcting it, do not proceed until user explicitly says "all is good, proceed."

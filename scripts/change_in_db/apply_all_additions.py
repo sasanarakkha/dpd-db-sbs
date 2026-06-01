@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
 """Add all additions from gui2/data/additions.json to the database with new IDs."""
+
 import json
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword
+from tools.configger import config_read
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 from tools.paths_dps import DPSPaths
@@ -25,16 +27,16 @@ def load_id_map_from_additions_added(gui_paths: Gui2Paths) -> dict[str, int]:
     pr.green_title(f"Loading ID map from {gui_paths.additions_added_path}")
     id_map: dict[str, int] = {}
     try:
-        with open(gui_paths.additions_added_path, 'r', encoding='utf-8') as f:
+        with open(gui_paths.additions_added_path, "r", encoding="utf-8") as f:
             additions_data = json.load(f)
             if not isinstance(additions_data, list):
                 pr.red(f"Error: {gui_paths.additions_added_path} is not a JSON list.")
                 return {}
-            
+
             for item in additions_data:
                 if isinstance(item, dict) and "id_add" in item and "id" in item:
-                    old_id = str(item["id_add"]) # Ensure old_id is string
-                    new_id = int(item["id"])     # Ensure new_id is int
+                    old_id = str(item["id_add"])  # Ensure old_id is string
+                    new_id = int(item["id"])  # Ensure new_id is int
                     id_map[old_id] = new_id
                 else:
                     pr.red(f"Skipping invalid item in additions_added.json: {item}")
@@ -63,31 +65,33 @@ def replace_old_ids_in_tsv_files(id_map: dict[str, int]):
         pr.yes("ok")
 
         try:
-            with open(file_path, 'r', newline='', encoding='utf-8') as file:
+            with open(file_path, "r", newline="", encoding="utf-8") as file:
                 lines = file.readlines()
         except FileNotFoundError:
             pr.red(f"File not found: {file_path}")
             return
 
         replacements_done = 0
-        with open(file_path, 'w', newline='', encoding='utf-8') as file:
+        with open(file_path, "w", newline="", encoding="utf-8") as file:
             for line_number, line in enumerate(lines):
-                columns = line.strip().split('\t')
+                columns = line.strip().split("\t")
                 if columns:
                     # Clean the first column ID for matching (remove existing quotes)
                     id_to_check = columns[0].strip().strip('"')
                     if id_to_check in current_id_map:
                         new_id = current_id_map[id_to_check]
-                        columns[0] = f'"{new_id}"' # Add quotes to the new ID
-                        replacements_done +=1
-                file.write('\t'.join(columns) + '\n')
-        pr.green(f"Finished processing {file_path}. Replacements made: {replacements_done}")
+                        columns[0] = f'"{new_id}"'  # Add quotes to the new ID
+                        replacements_done += 1
+                file.write("\t".join(columns) + "\n")
+        pr.green(
+            f"Finished processing {file_path}. Replacements made: {replacements_done}"
+        )
         pr.yes("ok")
 
     process_file(str(dpspth.russian_path), id_map)
     process_file(str(dpspth.sbs_path), id_map)
     pr.yes("ok")
-    
+
 
 def add_all_additions_with_new_ids():
     """
@@ -95,9 +99,12 @@ def add_all_additions_with_new_ids():
     and adds them to the database.
     Does not modify any JSON files.
     """
-    pr.green_title("Starting batch addition of 'additions.json' entries to DB with new IDs...")
+    pr.green_title(
+        "Starting batch addition of 'additions.json' entries to DB with new IDs..."
+    )
 
-    additions_json_path = Gui2Paths().additions_path
+    username = config_read("gui2", "username") or "1"
+    additions_json_path = Gui2Paths.for_user(username).additions_path
 
     try:
         with open(additions_json_path) as f:
@@ -126,13 +133,21 @@ def add_all_additions_with_new_ids():
     for old_id_str, addition_data in all_additions_to_process.items():
         lemma_1_to_check = addition_data.get("lemma_1")
         if lemma_1_to_check:
-            existing_headword = db_session.query(DpdHeadword).filter(DpdHeadword.lemma_1 == lemma_1_to_check).first()
+            existing_headword = (
+                db_session.query(DpdHeadword)
+                .filter(DpdHeadword.lemma_1 == lemma_1_to_check)
+                .first()
+            )
             if existing_headword:
-                pr.red(f"  Error: Lemma '{lemma_1_to_check}' (from old ID {old_id_str}) already exists in DB with ID {existing_headword.id}. Skipping this addition.")
+                pr.red(
+                    f"  Error: Lemma '{lemma_1_to_check}' (from old ID {old_id_str}) already exists in DB with ID {existing_headword.id}. Skipping this addition."
+                )
                 failed_count += 1
                 continue
         else:
-            pr.red(f"  Error: 'lemma_1' not found in addition data for old ID {old_id_str}. Skipping.")
+            pr.red(
+                f"  Error: 'lemma_1' not found in addition data for old ID {old_id_str}. Skipping."
+            )
             failed_count += 1
             continue
 
@@ -145,13 +160,19 @@ def add_all_additions_with_new_ids():
                 continue
             if hasattr(new_headword, field_name):
                 try:
-                    if field_name in ["ebt_count"] and isinstance(value, str) and value.isdigit():
+                    if (
+                        field_name in ["ebt_count"]
+                        and isinstance(value, str)
+                        and value.isdigit()
+                    ):
                         value = int(value)
                     setattr(new_headword, field_name, value)
                 except Exception as e:
                     pr.red(f"  Could not set field '{field_name}' to '{value}': {e}")
             else:
-                pr.red(f"  Field '{field_name}' (value: '{value}') from addition data does not exist in DpdHeadword model. Skipping this field.")
+                pr.red(
+                    f"  Field '{field_name}' (value: '{value}') from addition data does not exist in DpdHeadword model. Skipping this field."
+                )
 
         try:
             db_session.add(new_headword)
@@ -160,7 +181,9 @@ def add_all_additions_with_new_ids():
             successful_id_map[old_id_str] = new_id
         except Exception as e:
             db_session.rollback()
-            pr.red(f"  Database commit failed for '{new_headword.lemma_1}' (Old ID: {old_id_str}, New ID: {new_id}): {e}")
+            pr.red(
+                f"  Database commit failed for '{new_headword.lemma_1}' (Old ID: {old_id_str}, New ID: {new_id}): {e}"
+            )
             failed_count += 1
             continue
 
@@ -172,9 +195,13 @@ def add_all_additions_with_new_ids():
         if not all_additions_to_process:
             pass
         elif failed_count == len(all_additions_to_process):
-            pr.red("No words were successfully added to the database. TSV files not updated.")
+            pr.red(
+                "No words were successfully added to the database. TSV files not updated."
+            )
         else:
-            pr.green("No new words were committed to the database. TSV files not updated.")
+            pr.green(
+                "No new words were committed to the database. TSV files not updated."
+            )
     pr.yes("ok")
 
     pr.green_title("Batch Addition Summary")
@@ -190,7 +217,9 @@ def process_additions_added_and_update_tsvs():
     Loads ID map from additions_added.json and updates TSV files.
     """
     pr.green_title("Processing additions_added.json and updating TSVs...")
-    pr.red("find a way to track which been replaced, maybe mark them in addition_added.")
+    pr.red(
+        "find a way to track which been replaced, maybe mark them in addition_added."
+    )
     return
 
     gui_paths = Gui2Paths()

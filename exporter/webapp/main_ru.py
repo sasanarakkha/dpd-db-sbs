@@ -471,9 +471,9 @@ async def track_performance(request: Request, call_next):
                     break
 
         # Decode Unicode request string
-        request_display = unquote(str(request.url.path))
+        request_display = unquote(request.url.path)
         if request.url.query:
-            request_display += f"?{unquote(str(request.url.query))}"
+            request_display += f"?{unquote(request.url.query)}"
 
         if route_pattern:
             # Official Endpoint

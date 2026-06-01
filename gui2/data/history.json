@@ -1,5 +1,9 @@
 [
     {
+        "id": 48512,
+        "lemma_1": "buddha 2"
+    },
+    {
         "id": 20592,
         "lemma_1": "kalahajāta"
     },
@@ -74,9 +78,5 @@
     {
         "id": 41879,
         "lemma_1": "pattathavikā"
-    },
-    {
-        "id": 10977,
-        "lemma_1": "aṃsabaddhaka"
     }
 ]

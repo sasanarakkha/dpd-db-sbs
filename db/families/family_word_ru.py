@@ -129,7 +129,6 @@ def compile_wf_html_ru(wf_db: list[DpdHeadword], wf_dict):
 def add_wf_to_db(db_session, wf_dict):
     pr.green_tmr("adding to db")
 
-    add_to_db = []
     errors_list = []
 
     for __counter__, wf in enumerate(wf_dict):

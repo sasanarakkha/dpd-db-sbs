@@ -1,5 +1,9 @@
 [
     {
+        "id": 48512,
+        "lemma_1": "buddha 2"
+    },
+    {
         "id": 16054,
         "lemma_1": "upalāpeti 1"
     },
@@ -94,9 +98,5 @@
     {
         "id": 66380,
         "lemma_1": "varaṃ"
-    },
-    {
-        "id": 43966,
-        "lemma_1": "pariyāpuṇāti"
     }
 ]

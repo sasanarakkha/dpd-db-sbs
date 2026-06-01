@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """Update all yojana-related distance measurements in the DPD database."""
 
 # ruff: noqa: E402

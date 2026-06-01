@@ -59,7 +59,7 @@ class DpdHeadwordDbParts(TypedDict):
     family_compounds: List[FamilyCompound]
     family_idioms: List[FamilyIdiom]
     family_set: List[FamilySet]
-    sutta_info: SuttaInfo
+    sutta_info: SuttaInfo | None
 
 
 class DpdHeadwordRenderDataBase(TypedDict):
@@ -89,7 +89,7 @@ def render_pali_word_dpd_html(
     fc: List[FamilyCompound] = db_parts["family_compounds"]
     fi: List[FamilyIdiom] = db_parts["family_idioms"]
     fs: List[FamilySet] = db_parts["family_set"]
-    su: SuttaInfo = db_parts["sutta_info"]
+    su: SuttaInfo | None = db_parts["sutta_info"]
 
     pth = rd["pth"]
     jinja_env = rd["jinja_env"]
@@ -268,7 +268,7 @@ def generate_dpd_html(
                 "sutta_info": pw.su,
             }
 
-        dpd_db_data = [_add_parts(i.tuple()) for i in dpd_db]
+        dpd_db_data = [_add_parts(i._tuple()) for i in dpd_db]
 
         batches: List[List[DpdHeadwordDbParts]] = list_into_batches(
             dpd_db_data, num_logical_cores

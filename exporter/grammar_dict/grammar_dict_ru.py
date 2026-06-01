@@ -68,7 +68,7 @@ def main():
     pr.yellow_title("exporting grammar dictionary (ru)")
 
     if not config_test("exporter", "make_grammar", "yes"):
-        pr.green_tmr("disabled in config.ini")
+        pr.green_title("disabled in config.ini")
         pr.toc()
         return
 
@@ -185,6 +185,7 @@ def prepare_gd_mdict_and_export(g: ProgData_ru):
 
     if g.make_mdict:
         export_to_mdict(dict_info, dict_vars, g.dict_data)
+
 
 if __name__ == "__main__":
     main()

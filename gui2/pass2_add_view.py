@@ -243,6 +243,10 @@ class Pass2AddView(ft.Column, PopUpMixin):
             self._bottom_section,
         ]
 
+    def _require_page(self) -> ft.Page:
+        assert self.page is not None
+        return self.page
+
     def _disable_id_field_autofocus(self, e: ft.ControlEvent) -> None:
         if self._enter_id_or_lemma_field.autofocus:
             self._enter_id_or_lemma_field.autofocus = False
@@ -254,7 +258,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
 
     def update_message(self, message: str) -> None:
         self._message_field.value = message
-        self.page.update()
+        self._require_page().update()
 
     def add_headword_to_examples_and_commentary(self) -> None:
         # add headword to example_1 example_2 and commentary
@@ -346,7 +350,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
         self.update_message(
             f"Cloned {cloned_count} fields from {headword_to_clone.lemma_1}."
         )
-        self.page.update()
+        self._require_page().update()
 
     def _click_split_headword(self, e: ft.ControlEvent) -> None:
         """Copies current fields to a new ID, increments lemma_1, and clears specific fields."""
@@ -379,7 +383,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
         self.dpd_fields.clear_fields(target="add")
 
         self.update_message(f"Split {old_lemma} into {new_lemma} id: {new_id})")
-        self.page.update()
+        self._require_page().update()
         current_lemma_1_field.focus()
 
     def _click_load_new_word(self, e: ft.ControlEvent | None = None) -> None:
@@ -470,7 +474,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
             visible_fields = PASS1_FIELDS
 
         self.dpd_fields.filter_fields(visible_fields)
-        self.page.update()
+        self._require_page().update()
 
     def _update_history_dropdown(self) -> None:
         """Populates the history dropdown with the latest history."""
@@ -484,7 +488,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
                         text=f"{item.get('id')}: {item.get('lemma_1', 'N/A')}",
                     )
                 )
-        self.page.update()
+        self._require_page().update()
 
     def _handle_history_selection(self, e: ft.ControlEvent) -> None:
         """Loads the selected headword from history."""
@@ -512,7 +516,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
                 self.update_message("Invalid history item ID selected")
             finally:
                 self._history_dropdown.value = None  # Reset dropdown selection
-                self.page.update()
+                self._require_page().update()
 
     # Add the new builder method
     def _build_middle_section(self) -> ft.Column:
@@ -551,7 +555,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
         self.current_addition = None
 
         self.update_message("")  # Clear message field
-        self.page.update()
+        self._require_page().update()
 
     def _click_run_tests(self, e: ft.ControlEvent) -> None:
         """Run tests on current field values"""
@@ -585,12 +589,13 @@ class Pass2AddView(ft.Column, PopUpMixin):
             self.update_message("Opening tests TSV...")
             self.test_manager._handle_open_test_file(e)
             self._add_to_db_button.color = None
-        self.page.update()
+        self._require_page().update()
 
     def _click_add_to_db(self, e: ft.ControlEvent) -> None:
         """Add the word to db, or update in db."""
 
         word_to_save = self.dpd_fields.get_current_headword()
+        item_to_history = word_to_save
         comment = self.dpd_fields.get_field("comment").value
 
         if (
@@ -697,16 +702,16 @@ class Pass2AddView(ft.Column, PopUpMixin):
 
                     self.corrections_manager.save_processed_correction(word_data)
 
-            self.page.set_clipboard(word_to_save.lemma_1)
+            self._require_page().set_clipboard(word_to_save.lemma_1)
 
             self._update_history_dropdown()
-            self.page.update()
+            self._require_page().update()
             self.clear_all_fields()
         else:
             self.update_message(f"Commit failed: {message}")
 
         self._add_to_db_button.color = ft.Colors.RED
-        self.page.update()
+        self._require_page().update()
 
     def _click_update_with_ai(self, e: ft.ControlEvent) -> None:
         """Handles the 'Update with AI' button click."""
@@ -767,12 +772,12 @@ class Pass2AddView(ft.Column, PopUpMixin):
             ],
         )
 
-        self.page.open(self.delete_alert)
-        self.page.update()
+        self._require_page().open(self.delete_alert)
+        self._require_page().update()
 
     def _click_delete_ok(self, e: ft.ControlEvent) -> None:
         self.delete_alert.open = False
-        self.page.update()
+        self._require_page().update()
 
         if self.headword:
             deleted, message = self._db.delete_word_in_db(self.headword)
@@ -786,11 +791,11 @@ class Pass2AddView(ft.Column, PopUpMixin):
 
     def _click_delete_cancel(self, e: ft.ControlEvent) -> None:
         self.delete_alert.open = False
-        self.page.update()
+        self._require_page().update()
 
     def _click_corrections_button(self, e: ft.ControlEvent) -> None:
         """Loads the next correction and populates the _add fields."""
-        correction_data, corrections_remaining = (
+        correction_data, _origin_path, corrections_remaining = (
             self.corrections_manager.get_next_correction()
         )
 
@@ -840,11 +845,13 @@ class Pass2AddView(ft.Column, PopUpMixin):
         except Exception as ex:
             self.update_message(f"Error loading correction: {str(ex)}")
 
-        self.page.update()
+        self._require_page().update()
 
     def _click_additions_button(self, e: ft.ControlEvent) -> None:
         """Loads the next addition and populates the _add fields."""
-        addition_data, additions_remaining = self.additions_manager.get_next_addition()
+        addition_data, _origin_path, _source_key, additions_remaining = (
+            self.additions_manager.get_next_addition()
+        )
 
         if not addition_data:
             self.update_message("No more additions available")
@@ -881,7 +888,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
         except Exception as ex:
             self.update_message(f"Error loading addition: {str(ex)}")
 
-        self.page.update()
+        self._require_page().update()
 
     def _click_x_button(self, e: ft.ControlEvent) -> None:
         """Loads the next headword from the X filter queue."""
@@ -906,14 +913,14 @@ class Pass2AddView(ft.Column, PopUpMixin):
 
         if headword_id is None:
             self.update_message("No more X words")
-            self.page.update()
+            self._require_page().update()
             return
 
         try:
             headword = self._db.get_headword_by_id(headword_id)
             if not headword:
                 self.update_message(f"Headword ID {headword_id} not found in DB")
-                self.page.update()
+                self._require_page().update()
                 return
 
             self.clear_all_fields()
@@ -929,7 +936,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
         except Exception as ex:
             self.update_message(f"Error loading X word: {str(ex)}")
 
-        self.page.update()
+        self._require_page().update()
 
     def _click_pread_button(self, e: ft.ControlEvent) -> None:
         """Loads the next proofreader correction and populates the gui."""
@@ -965,4 +972,4 @@ class Pass2AddView(ft.Column, PopUpMixin):
         except Exception as ex:
             self.update_message(f"Error loading proofreading: {str(ex)}")
 
-        self.page.update()
+        self._require_page().update()

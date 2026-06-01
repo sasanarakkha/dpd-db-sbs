@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
 """Apply all corrections from gui2/data/corrections.json to the database."""
+
 import json
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword
+from tools.configger import config_read
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 from gui2.paths import Gui2Paths
@@ -21,7 +23,8 @@ def apply_all_corrections_from_json():
     """
     pr.green_title("Starting batch application of corrections from JSON...")
 
-    corrections_json_path = Gui2Paths().corrections_path
+    username = config_read("gui2", "username") or "1"
+    corrections_json_path = Gui2Paths.for_user(username).corrections_path
 
     try:
         with open(corrections_json_path) as f:
@@ -47,11 +50,15 @@ def apply_all_corrections_from_json():
         try:
             word_id = int(word_id_str)
         except ValueError:
-            pr.red(f"  Invalid ID format '{word_id_str}' for correction entry. Skipping.")
+            pr.red(
+                f"  Invalid ID format '{word_id_str}' for correction entry. Skipping."
+            )
             failed_count += 1
             continue
 
-        db_entry = db_session.query(DpdHeadword).filter(DpdHeadword.id == word_id).first()
+        db_entry = (
+            db_session.query(DpdHeadword).filter(DpdHeadword.id == word_id).first()
+        )
 
         if not db_entry:
             pr.red(f"  Headword with ID {word_id} not found in the database. Skipping.")
@@ -66,9 +73,13 @@ def apply_all_corrections_from_json():
                 current_value = getattr(db_entry, field_name)
                 if current_value != new_value:
                     setattr(db_entry, field_name, new_value)
-                    fields_updated_log.append(f"'{field_name}': '{current_value}' -> '{new_value}'")
+                    fields_updated_log.append(
+                        f"'{field_name}': '{current_value}' -> '{new_value}'"
+                    )
             else:
-                pr.red(f"  Field '{field_name}' (value: '{new_value}') from correction data does not exist in DpdHeadword model. Skipping this field.")
+                pr.red(
+                    f"  Field '{field_name}' (value: '{new_value}') from correction data does not exist in DpdHeadword model. Skipping this field."
+                )
 
         if fields_updated_log:
             try:
@@ -79,7 +90,9 @@ def apply_all_corrections_from_json():
                 pr.red(f"  Failed to commit changes for headword ID {word_id}: {e}")
                 failed_count += 1
         else:
-            pr.red(f"  No actual field changes for headword ID {word_id} ({db_entry.lemma_1}).")
+            pr.red(
+                f"  No actual field changes for headword ID {word_id} ({db_entry.lemma_1})."
+            )
 
     pr.yes("ok")
     pr.green_title("Batch Correction Summary")
@@ -88,6 +101,7 @@ def apply_all_corrections_from_json():
     print(f"Failed or skipped: {failed_count}")
     print("Batch script finished.")
     pr.yes("ok")
+
 
 # Ensure main function calls the correct processing function
 def main():

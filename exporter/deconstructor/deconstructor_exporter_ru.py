@@ -169,13 +169,15 @@ def main():
 
     # should the program run?
     if not config_test("exporter", "make_deconstructor", "yes"):
-        pr.green_tmr("disabled in config.ini")
+        pr.green_title("disabled in config.ini")
+        pr.toc()
         return
 
     g = ProgData_ru()
     make_deconstructor_dict_data(g)
     prepare_and_export_to_gd_mdict(g)
     pr.toc()
+
 
 if __name__ == "__main__":
     main()

@@ -115,3 +115,17 @@
   - Sync with upstream `mkdocs.yaml` regularly to ensure documentation coverage parity.
 
 ---
+
+
+**File**: `pyproject.toml`
+- **Category**: modified_upstream_files
+- **Sync Rule**: DISCUSS
+- **Why DISCUSS**: Carries local-only dependencies not present upstream (currently `num2words>=0.5.14`, added for `scripts/change_in_db/update_yojana_km.py`). The Stage 1 `execute_sync` checkout overwrites `pyproject.toml` with the upstream version; without an exclusion entry the local-only deps are silently dropped.
+- **Local Changes**:
+  1. Local-only runtime dependencies appended to `[project].dependencies` that upstream does not declare. Current set: `num2words>=0.5.14`.
+  2. Any future fork-only dependency added to `dependencies` or `[dependency-groups]` must be re-applied after every upstream pull.
+- **Watch For**:
+  - After each upstream pull, diff local `pyproject.toml` against `upstream/main:pyproject.toml`, re-apply every local-only dependency, then run `uv lock` + `uv sync --all-groups`.
+  - This is a MERGE, not a wholesale local-wins replace — also take upstream's new deps; do not delete upstream additions.
+
+---

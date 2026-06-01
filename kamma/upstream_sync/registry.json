@@ -39,6 +39,11 @@
       "path": "AGENTS.md",
       "discuss": true,
       "discuss_reason": "Fork identity and sync policy sections are localized. Blind porting would overwrite fork-specific AI instructions with upstream defaults, breaking sync and shadow-file protocols."
+    },
+    {
+      "path": "pyproject.toml",
+      "discuss": true,
+      "discuss_reason": "Carries local-only dependencies not present upstream (currently num2words>=0.5.14). The Stage 1 execute_sync checkout overwrites pyproject.toml with the upstream version; without a modified_upstream_files exclusion the local-only deps are silently dropped (regressed in the 2026-06-01 sync). Must be restored and merged manually so local-only deps survive every sync."
     }
   ],
   "inspired_by_upstream": {
@@ -133,10 +138,11 @@
     "exporter/mcp",
     "exporter/analysis",
     "exporter/archive/",
-    "tools/ai_models.json"
+    "tools/ai_models.json",
+    "gui2/data/additions_deva.json",
+    "gui2/data/corrections_deva.json"
   ],
   "skip_sync_patterns": [
-    "gui2/data/",
     "scripts/archive/",
     "exporter/apple_dictionary/",
     "exporter/chrome_extension/",

@@ -405,11 +405,11 @@ class Lookup(Base):
 
     # epd pack unpack
 
-    def epd_pack(self, list: list[tuple[str, str, str]]) -> None:
-        if dict:
-            self.epd = json.dumps(list, ensure_ascii=False, indent=1)
+    def epd_pack(self, values: list[tuple[str, str, str]]) -> None:
+        if values:
+            self.epd = json.dumps(values, ensure_ascii=False, indent=1)
         else:
-            raise ValueError("A dict must be provided to pack.")
+            raise ValueError("A list must be provided to pack.")
 
     @property
     def epd_unpack(self) -> list[tuple[str, str, str]]:
@@ -420,11 +420,11 @@ class Lookup(Base):
 
     # rpd pack unpack
 
-    def rpd_pack(self, list: list[tuple[str, str, str]]) -> None:
-        if dict:
-            self.rpd = json.dumps(list, ensure_ascii=False, indent=1)
+    def rpd_pack(self, values: list[tuple[str, str, str]]) -> None:
+        if values:
+            self.rpd = json.dumps(values, ensure_ascii=False, indent=1)
         else:
-            raise ValueError("A dict must be provided to pack.")
+            raise ValueError("A list must be provided to pack.")
 
     @property
     def rpd_unpack(self) -> list[tuple[str, str, str]]:
@@ -718,7 +718,8 @@ class SuttaInfo(Base):
         link_url = config_read("dictionary", "link_url")
         if not link_url:
             link_url = "https://www.thebuddhaswords.net/"
-        if self.sc_code:
+        sc_book_code = self.sc_book_code
+        if self.sc_code and sc_book_code:
             if self.book_code in [
                 "DN",
                 "MN",
@@ -732,10 +733,12 @@ class SuttaInfo(Base):
                 "TH",
                 "THI",
             ]:
-                if self.sc_book_code == "iti":
+                if sc_book_code == "iti":
                     return f"{link_url}it/it.html"
                 else:
-                    return f"{link_url}{self.sc_book_code.lower()}/{self.sc_code.lower()}.html"
+                    return (
+                        f"{link_url}{sc_book_code.lower()}/{self.sc_code.lower()}.html"
+                    )
             else:
                 return None
         else:
@@ -743,7 +746,8 @@ class SuttaInfo(Base):
 
     @cached_property
     def tbw_legacy(self) -> str | None:
-        if self.sc_code:
+        sc_book_code = self.sc_book_code
+        if self.sc_code and sc_book_code:
             if self.book_code in [
                 "DN",
                 "MN",
@@ -757,10 +761,10 @@ class SuttaInfo(Base):
                 "TH",
                 "THI",
             ]:
-                if self.sc_book_code == "iti":
+                if sc_book_code == "iti":
                     return "https://find.dhamma.gift/bw/it/it.html"
                 else:
-                    return f"https://find.dhamma.gift/bw/{self.sc_book_code.lower()}/{self.sc_code.lower()}.html"
+                    return f"https://find.dhamma.gift/bw/{sc_book_code.lower()}/{self.sc_code.lower()}.html"
             else:
                 return None
         else:
@@ -1582,11 +1586,11 @@ class DpdHeadword(Base):
 
     @cached_property
     def needs_conjugation_button(self) -> bool:
-        return bool(self.pos in CONJUGATIONS)
+        return self.pos in CONJUGATIONS
 
     @cached_property
     def needs_declension_button(self) -> bool:
-        return bool(self.pos in DECLENSIONS)
+        return self.pos in DECLENSIONS
 
     @cached_property
     def needs_root_family_button(self) -> bool:
@@ -1675,7 +1679,7 @@ class DpdHeadword(Base):
 
     @cached_property
     def needs_frequency_button(self) -> bool:
-        return bool(self.pos not in EXCLUDE_FROM_FREQ)
+        return self.pos not in EXCLUDE_FROM_FREQ
 
     # Determine uniqueness of ru_notes
     @cached_property
