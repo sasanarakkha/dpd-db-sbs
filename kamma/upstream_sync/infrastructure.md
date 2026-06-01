@@ -19,6 +19,7 @@ All upstream sync assets live in `kamma/upstream_sync/`.
 | `new_improvements.md` | A strictly temporary intake file generated during an active sync run. After its contents are reviewed and promoted to `archive_improvements.md`, the file MUST be deleted. It is ignored by git. |
 | `templates/` | `plan.md` / `spec.md` starters for new sync kamma threads |
 | `stages/` | Legacy Stage 1-3 reference checklists; `guide.md` and `templates/` are canonical for current 5-stage syncs |
+| `scripts/init_sync_thread.py` | Creates the Kamma sync thread after `scripts/cl_dps/dpd-kamma-sync` backs up DPS data |
 | `scripts/registry_helper.py` | Shared Python helper to load the registry and extract paths |
 | `scripts/validate_registry.py` | Schema and data-quality validator for `registry.json` |
 | `scripts/verify_smd_coverage.py` | Coverage checker — ensures every sync-relevant registry entry has an SMD entry in `smd/` |
@@ -33,6 +34,10 @@ All upstream sync assets live in `kamma/upstream_sync/`.
 ## Registry Purpose
 
 `registry.json` is the single source of truth for sync decisions. It has these top-level sections:
+
+The only sync-related Bash entrypoint is `scripts/cl_dps/dpd-kamma-sync`. It lives outside
+`kamma/upstream_sync/` because it is a user terminal command, but all sync-owned helper logic lives
+inside `kamma/upstream_sync/scripts/`.
 
 | Key | Meaning |
 |---|---|

@@ -2,7 +2,6 @@
 
 import unittest
 import shutil
-import subprocess
 import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -12,6 +11,7 @@ from kamma.upstream_sync.scripts.execute_sync import (
     execute_sync,
     get_permanent_exclusions,
     get_run_specific_exclusions,
+    run_sync_assertions,
     validate_repo_relative_paths,
 )
 
@@ -206,6 +206,9 @@ class TestExecuteSync(unittest.TestCase):
         self.assertEqual(result, 1)
 
     @patch("kamma.upstream_sync.scripts.execute_sync.load_registry")
+    @patch(
+        "kamma.upstream_sync.scripts.execute_sync.run_sync_assertions", return_value=0
+    )
     @patch("kamma.upstream_sync.scripts.execute_sync.verify_manifest", return_value=0)
     @patch("kamma.upstream_sync.scripts.execute_sync.load_accepted_sync_state")
     @patch("kamma.upstream_sync.scripts.execute_sync.run_git")
@@ -218,6 +221,7 @@ class TestExecuteSync(unittest.TestCase):
         mock_run_git,
         mock_load_state,
         mock_verify_manifest,
+        mock_run_assertions,
         mock_load_registry,
     ):
         context = MagicMock()
@@ -252,6 +256,7 @@ class TestExecuteSync(unittest.TestCase):
         mock_run_git.assert_any_call(
             ["git", "update-ref", "refs/heads/as_upstream", "newsha456"]
         )
+        mock_run_assertions.assert_called_once_with("localsha789")
         self.assertNotIn(
             (["git", "reset", "--hard", "newsha456"],),
             [call.args for call in mock_run_git.call_args_list],
@@ -260,6 +265,9 @@ class TestExecuteSync(unittest.TestCase):
     @patch("kamma.upstream_sync.scripts.execute_sync.subprocess.run")
     @patch("kamma.upstream_sync.scripts.execute_sync.Path.exists", return_value=False)
     @patch("kamma.upstream_sync.scripts.execute_sync.load_registry")
+    @patch(
+        "kamma.upstream_sync.scripts.execute_sync.run_sync_assertions", return_value=0
+    )
     @patch("kamma.upstream_sync.scripts.execute_sync.verify_manifest", return_value=0)
     @patch("kamma.upstream_sync.scripts.execute_sync.load_accepted_sync_state")
     @patch("kamma.upstream_sync.scripts.execute_sync.run_git")
@@ -270,6 +278,7 @@ class TestExecuteSync(unittest.TestCase):
         mock_run_git,
         mock_load_state,
         mock_verify_manifest,
+        mock_run_assertions,
         mock_load_registry,
         mock_path_exists,
         mock_subprocess_run,
@@ -297,6 +306,7 @@ class TestExecuteSync(unittest.TestCase):
         result = execute_sync(str(self.thread_dir))
 
         self.assertEqual(result, 0)
+        mock_run_assertions.assert_called_once_with("localsha789")
         mock_run_git.assert_any_call(
             [
                 "git",
@@ -310,9 +320,10 @@ class TestExecuteSync(unittest.TestCase):
             ]
         )
 
-    @patch("kamma.upstream_sync.scripts.execute_sync.subprocess.run")
-    @patch("kamma.upstream_sync.scripts.execute_sync.Path.exists", return_value=True)
     @patch("kamma.upstream_sync.scripts.execute_sync.load_registry")
+    @patch(
+        "kamma.upstream_sync.scripts.execute_sync.run_sync_assertions", return_value=1
+    )
     @patch("kamma.upstream_sync.scripts.execute_sync.verify_manifest", return_value=0)
     @patch("kamma.upstream_sync.scripts.execute_sync.load_accepted_sync_state")
     @patch("kamma.upstream_sync.scripts.execute_sync.run_git")
@@ -323,9 +334,8 @@ class TestExecuteSync(unittest.TestCase):
         mock_run_git,
         mock_load_state,
         mock_verify_manifest,
+        mock_run_assertions,
         mock_load_registry,
-        mock_path_exists,
-        mock_subprocess_run,
     ):
         context = MagicMock()
         context.is_dirty = False
@@ -344,13 +354,31 @@ class TestExecuteSync(unittest.TestCase):
             MagicMock(stdout=""),
             MagicMock(stdout=""),
         ]
-        mock_subprocess_run.side_effect = subprocess.CalledProcessError(
-            1, ["bash", "scripts/bash/dpd-sync-assertions.sh", "localsha789"]
-        )
 
         result = execute_sync(str(self.thread_dir))
 
         self.assertEqual(result, 1)
+        mock_run_assertions.assert_called_once_with("localsha789")
+
+    @patch("kamma.upstream_sync.scripts.execute_sync.run_git")
+    def test_run_sync_assertions_uses_python_git_checks(self, mock_run_git):
+        mock_run_git.side_effect = [
+            MagicMock(stdout="db/models.py | 2 +-\n"),
+            MagicMock(stdout="db/models.py\nexporter/goldendict/templates/new.jinja\n"),
+            MagicMock(stdout="exporter/goldendict/templates/new.jinja\n"),
+        ]
+
+        result = run_sync_assertions("oldsha123")
+
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            [call.args[0] for call in mock_run_git.call_args_list],
+            [
+                ["git", "diff", "--stat", "oldsha123"],
+                ["git", "diff", "--name-only", "oldsha123"],
+                ["git", "diff", "--name-only", "--diff-filter=A", "oldsha123"],
+            ],
+        )
 
 
 if __name__ == "__main__":

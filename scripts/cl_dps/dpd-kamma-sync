@@ -6,7 +6,7 @@ PROJECT_DIR="$HOME/Documents/dpd-db"
 cd "$PROJECT_DIR"
 
 BACKUP_SCRIPT="scripts/backup/backup_dps.py"
-INIT_SCRIPT="scripts/bash/dpd_init_sync.py"
+INIT_SCRIPT="kamma/upstream_sync/scripts/init_sync_thread.py"
 BACKUP_FILES=(
     db/backup_tsv/russian.tsv
     db/backup_tsv/sbs.tsv

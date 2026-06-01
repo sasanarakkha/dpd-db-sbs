@@ -112,9 +112,10 @@ model-boundary aware, and better validated for RU/SBS/DPS/Tamil localized files.
   `kamma/upstream_sync/smd/*.md`.
 - Reviewed no-op ledger:
   `kamma/upstream_sync/reviewed_shadow_noops.json`.
-- Scripts: `prep_analyzer.py`, `execute_sync.py`, `finalize_accepted_sync.py`,
-  `sync_runtime.py`, `sync_state.py`, `sync_schema.py`, `validate_registry.py`,
-  `verify_smd_coverage.py`, `check_docs_parity.py`, `gen_smd_scaffold.py`.
+- Scripts: `init_sync_thread.py`, `prep_analyzer.py`, `execute_sync.py`,
+  `finalize_accepted_sync.py`, `sync_runtime.py`, `sync_schema.py`,
+  `validate_registry.py`, `verify_smd_coverage.py`, `check_docs_parity.py`,
+  `gen_smd_scaffold.py`.
 - Tests: focused upstream-sync, registry, SMD, prep analyzer, docs parity, and
   docs policy tests under `tests/`.
 
@@ -236,6 +237,27 @@ checks passed. The focused docs-policy test reported 17 passed; the broader
 focused upstream-sync suite reported 142 passed. The final `rg` search returned
 no active `suggestions.md` references outside the policy test.
 
+Most recent validation for entrypoint cleanup:
+
+```fish
+uv run pytest tests/test_execute_sync.py tests/test_upstream_sync_docs_policy.py -q
+uv run ruff check --fix kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/init_sync_thread.py tests/test_execute_sync.py tests/test_upstream_sync_docs_policy.py
+uv run ruff format kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/init_sync_thread.py tests/test_execute_sync.py tests/test_upstream_sync_docs_policy.py
+uv run pyright kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/init_sync_thread.py tests/test_execute_sync.py tests/test_upstream_sync_docs_policy.py
+uv run --with pyrefly pyrefly check --min-severity warn kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/init_sync_thread.py tests/test_execute_sync.py tests/test_upstream_sync_docs_policy.py
+uv run pytest tests/test_sync_schema.py tests/test_sync_state.py tests/test_prep_analyzer.py tests/test_execute_sync.py tests/test_finalize_accepted_sync.py tests/test_validate_registry.py tests/test_verify_smd_coverage.py tests/test_check_docs_parity.py tests/test_upstream_sync_docs_policy.py tests/test_registry_category_naming.py tests/test_check_shadow_modifications.py -q
+uv run python3 kamma/upstream_sync/scripts/validate_registry.py
+uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py
+uv run python3 tests/check_shadow_modifications.py
+uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py
+git diff --check -- kamma/upstream_sync/scripts/execute_sync.py kamma/upstream_sync/scripts/init_sync_thread.py scripts/cl_dps/dpd-kamma-sync scripts/cl_dps/dpd-sync-folders scripts/bash/full_sync.sh scripts/bash/dpd-sync-assertions.sh scripts/bash/test_dpd_sync_assertions.sh scripts/bash/dpd_init_sync.py kamma/upstream_sync/README.md kamma/upstream_sync/guide.md kamma/upstream_sync/infrastructure.md conductor/product-guidelines.md tests/test_execute_sync.py tests/test_upstream_sync_docs_policy.py kamma/threads/upstream_sync_improvment/handoff.md
+```
+
+Result: red phase confirmed first, then all checks passed. Focused entrypoint
+tests reported 37 passed; the broader upstream-sync suite reported 146 passed.
+Registry, SMD coverage, shadow modification, docs parity, pyright, pyrefly,
+ruff, and diff whitespace checks passed.
+
 ## Mistakes To Avoid
 
 - Do not preserve stale external protocol paths. The old `~/agents/...` path was
@@ -319,17 +341,16 @@ no active `suggestions.md` references outside the policy test.
   entries.
 - The smoke sync test now uses temporary config isolation. Do not reintroduce
   writes to `config.ini`.
-- Standalone sync review found no architectural redesign needed. Only the
-  approved docs-hygiene cleanup was implemented.
+- Standalone sync review found no architectural redesign needed. The approved
+  entrypoint cleanup was implemented: `scripts/cl_dps/dpd-kamma-sync` remains
+  the only sync-related Bash entrypoint; `init_sync_thread.py` now lives under
+  `kamma/upstream_sync/scripts/`; post-sync assertions were folded into
+  `execute_sync.py`; obsolete Bash sync paths were deleted.
 - No agent-side git commit was made.
 - User manual review may still be needed for any uncommitted working-tree
   changes.
-- Current uncommitted working-tree changes from this standalone review touch
-  `kamma/upstream_sync/archive_improvements.md`,
-  `kamma/upstream_sync/guide.md`,
-  `kamma/upstream_sync/infrastructure.md`,
-  deleted `kamma/upstream_sync/suggestions.md`,
-  `tests/test_upstream_sync_docs_policy.py`, and this handoff.
+- Current unrelated dirty/untracked state remains under `resources/*`; preserve
+  it unless the user explicitly asks to handle it.
 
 ## Errors, Issues, and Repeated Mistakes
 
@@ -362,10 +383,16 @@ no active `suggestions.md` references outside the policy test.
   docs-policy assertions first failed on active `grep`/`find` wording, missing
   historical-only archive wording, missing legacy `stages/` label, and the
   still-present empty `suggestions.md` file.
+- Red phase was confirmed for the entrypoint cleanup: the updated tests first
+  failed because `run_sync_assertions()` did not exist and obsolete Bash sync
+  paths were still present.
+- `git mv` failed with `.git/index.lock` permission denial in the sandbox; the
+  file move was done in the working tree without staging or committing.
 
 ## Recent Recommended Commit Messages
 
 ```text
+#sync tooling: consolidate upstream sync entrypoints
 #sync docs: simplify upstream sync guidance
 #sync tooling: harden exclusions and document reviewed noops
 #sync tooling: harden sync metadata validators

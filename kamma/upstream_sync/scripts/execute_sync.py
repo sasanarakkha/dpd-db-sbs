@@ -121,6 +121,53 @@ def get_run_specific_exclusions(thread_dir: str | None) -> list[str]:
     return validate_repo_relative_paths(exclusions, "run-specific exclusions")
 
 
+def run_sync_assertions(previous_sha: str) -> int:
+    """Run lightweight post-sync assertions without leaving the Python workflow."""
+    pr.green_title("post-sync assertions")
+
+    pr.green(f"diff summary since {previous_sha}")
+    diff_stat = run_git(["git", "diff", "--stat", previous_sha]).stdout.strip()
+    if diff_stat:
+        pr.cyan(diff_stat)
+    else:
+        pr.yes("no file changes")
+
+    changed_files = [
+        path
+        for path in run_git(
+            ["git", "diff", "--name-only", previous_sha]
+        ).stdout.splitlines()
+        if path.strip()
+    ]
+    pr.green("checking db schema changes")
+    if "db/models.py" in changed_files:
+        pr.amber(
+            "db/models.py changed; verify SBS, Russian, Tamil, and Sinhala schema "
+            "extensions during Stage 2."
+        )
+    else:
+        pr.yes("no db/models.py change")
+
+    new_files = [
+        path
+        for path in run_git(
+            ["git", "diff", "--name-only", "--diff-filter=A", previous_sha]
+        ).stdout.splitlines()
+        if path.strip()
+    ]
+    new_templates = [path for path in new_files if "templates/" in path]
+
+    pr.green("checking new upstream templates")
+    if new_templates:
+        pr.amber("new template files detected:")
+        for path in new_templates:
+            pr.amber(f"  {path}")
+    else:
+        pr.yes("no new templates")
+
+    return 0
+
+
 def execute_sync(thread_dir: str | None, dry_run: bool = False) -> int:
     """Orchestrate the selective sync process."""
     pr.green_title("execute_sync.py")
@@ -255,17 +302,9 @@ def execute_sync(thread_dir: str | None, dry_run: bool = False) -> int:
         pr.yes("ok")
 
         # 8. Run assertions
-        assertions_script = Path("scripts/bash/dpd-sync-assertions.sh")
-        if assertions_script.exists():
-            pr.green("running sync assertions")
-            try:
-                subprocess.run(
-                    ["bash", str(assertions_script), sbs_ru_original_sha], check=True
-                )
-                pr.yes("ok")
-            except subprocess.CalledProcessError:
-                pr.red("Sync assertions failed. Check output above.")
-                return 1
+        if run_sync_assertions(sbs_ru_original_sha) != 0:
+            pr.red("Sync assertions failed. Check output above.")
+            return 1
 
         pr.green("✅ Sync execution complete. Ready for Stage 2 (Analysis).")
         return 0

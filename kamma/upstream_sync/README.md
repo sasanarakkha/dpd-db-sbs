@@ -7,6 +7,12 @@ docs under upstream-owned `docs/`.
 
 ## Quick Start: The 5-Stage Model-Split Workflow
 
+Before Stage 1, run `scripts/cl_dps/dpd-kamma-sync`. This is the only sync-related
+Bash entrypoint: it backs up DPS localization tables, commits only the backup TSV
+changes as `backup dps data`, and initializes the Kamma sync thread through
+`kamma/upstream_sync/scripts/init_sync_thread.py`. All actual sync execution stays
+in Python scripts under `kamma/upstream_sync/scripts/`.
+
 Sync operations are executed via Kamma threads. Each stage ends with a hard stop, a fresh-session
 handoff, and an explicit model switch when needed. Stage 4 has two model-bound substages.
 

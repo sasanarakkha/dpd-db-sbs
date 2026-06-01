@@ -6,6 +6,15 @@
 All local sync-process documentation must stay inside `kamma/upstream_sync/`. The upstream-owned
 `docs/` tree is not a place for local sync-process instructions.
 
+## Pre-Sync Entrypoint
+
+Run `scripts/cl_dps/dpd-kamma-sync` before Stage 1. This is the only sync-related Bash entrypoint.
+It backs up DPS localization tables, commits only the backup TSV changes as `backup dps data`, and
+creates the Kamma thread through `kamma/upstream_sync/scripts/init_sync_thread.py`.
+
+After that wrapper finishes, all sync work must use the Python scripts in
+`kamma/upstream_sync/scripts/` and the 5-stage workflow below. Do not use legacy shell sync wrappers.
+
 ---
 
 ## Iron Rule

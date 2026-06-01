@@ -31,9 +31,9 @@
     - **Standard Examples:** Columns `dhp` (Dhammapada), `pat` (Patimokkha), `vib` (Vibhanga), and `discourses` must follow standard DPD quality guidelines for accuracy and context.
 
 ## Fork Maintenance & Workflow
-- **Upstream Sync:** This fork is maintained via a strict sync protocol using `scripts/cl/dpd-sync-folders`.
-    - **Flow:** Upstream `dpd-db/main` -> Local `as_upstream` branch -> Local `sbs-ru` branch.
-    - **Preservation:** The sync script explicitly *excludes* DPS-specific files (like modified `db/models.py`) to prevent overwriting local features.
+- **Upstream Sync:** This fork is maintained via the strict protocol in `kamma/upstream_sync/guide.md`. Start with the single Bash entrypoint `scripts/cl_dps/dpd-kamma-sync`, then continue with the Python sync scripts under `kamma/upstream_sync/scripts/`.
+    - **Flow:** `dpd-kamma-sync` backs up DPS data and creates the Kamma thread; `prep_analyzer.py` freezes the upstream range; `execute_sync.py` applies the manifest-gated upstream pull.
+    - **Preservation:** Sync exclusions and local shadow mappings come from `kamma/upstream_sync/registry.json` and `kamma/upstream_sync/smd/`, not from ad hoc shell logic.
 - **"DPS" Terminology:** All fork-specific scripts and data related to Russian/SBS extensions are collectively referred to as "DPS".
 - **Issue Reference Mapping:**
     - "upstream repo issue #" refers to the issues at https://github.com/digitalpalidictionary/dpd-db.

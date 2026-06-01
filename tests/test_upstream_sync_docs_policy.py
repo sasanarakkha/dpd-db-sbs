@@ -208,3 +208,47 @@ def test_agents_requires_shadow_documentation_gate() -> None:
         "registry.json and the matching `kamma/upstream_sync/smd/*.md` entry" in agents
     )
     assert "one local path may appear in exactly one registry category" in agents
+
+
+def test_only_dpd_kamma_sync_remains_as_sync_bash_entrypoint() -> None:
+    wrapper = Path("scripts/cl_dps/dpd-kamma-sync").read_text(encoding="utf-8")
+
+    assert "kamma/upstream_sync/scripts/init_sync_thread.py" in wrapper
+    assert "scripts/bash/dpd_init_sync.py" not in wrapper
+
+    obsolete_paths = [
+        Path("scripts/cl_dps/dpd-sync-folders"),
+        Path("scripts/bash/full_sync.sh"),
+        Path("scripts/bash/dpd-sync-assertions.sh"),
+        Path("scripts/bash/test_dpd_sync_assertions.sh"),
+        Path("scripts/bash/dpd_init_sync.py"),
+    ]
+    assert [str(path) for path in obsolete_paths if path.exists()] == []
+
+
+def test_execute_sync_assertions_are_python_owned() -> None:
+    source = Path("kamma/upstream_sync/scripts/execute_sync.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "def run_sync_assertions(" in source
+    assert "dpd-sync-assertions.sh" not in source
+    assert '["bash"' not in source
+
+
+def test_sync_docs_document_single_bash_wrapper() -> None:
+    readme = Path("kamma/upstream_sync/README.md").read_text(encoding="utf-8")
+    infrastructure = Path("kamma/upstream_sync/infrastructure.md").read_text(
+        encoding="utf-8"
+    )
+    guide = Path("kamma/upstream_sync/guide.md").read_text(encoding="utf-8")
+    product_guidelines = Path("conductor/product-guidelines.md").read_text(
+        encoding="utf-8"
+    )
+
+    wrapper = "scripts/cl_dps/dpd-kamma-sync"
+    assert wrapper in readme
+    assert wrapper in infrastructure
+    assert wrapper in guide
+    assert wrapper in product_guidelines
+    assert "scripts/cl/dpd-sync-folders" not in product_guidelines
