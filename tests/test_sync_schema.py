@@ -231,6 +231,36 @@ def test_prep_manifest_from_raw_valid_with_current_fields() -> None:
             "field 'discuss_paths\\[1\\]' must be a string",
         ),
         (
+            lambda payload: payload["changed_upstream_paths"].append("../outside.py"),
+            "changed_upstream_paths\\[1\\] must stay inside the repository",
+        ),
+        (
+            lambda payload: payload["deleted_upstream_paths"].append("/tmp/outside.py"),
+            "deleted_upstream_paths\\[1\\] must be a repo-relative path",
+        ),
+        (
+            lambda payload: payload["blocker_paths"].append("exporter/**/*.py"),
+            "blocker_paths\\[1\\] must not contain git pathspec metacharacters",
+        ),
+        (
+            lambda payload: payload["discuss_paths"].append(" spaced.py "),
+            "discuss_paths\\[1\\] must not contain surrounding whitespace",
+        ),
+        (
+            lambda payload: payload.__setitem__(
+                "mapped_actions",
+                {
+                    "../outside.py": [
+                        {
+                            "category": "russian_copies",
+                            "local_path": "db/models_ru.py",
+                        }
+                    ]
+                },
+            ),
+            "mapped_actions key '../outside.py' must stay inside the repository",
+        ),
+        (
             lambda payload: payload.__setitem__(
                 "mapped_actions", {"db/models.py": "copy"}
             ),
@@ -242,6 +272,37 @@ def test_prep_manifest_from_raw_valid_with_current_fields() -> None:
                 {"db/models.py": [{"category": "russian_copies"}]},
             ),
             "field 'mapped_actions\\['db/models.py'\\]\\[0\\]': missing required field 'local_path'",
+        ),
+        (
+            lambda payload: payload.__setitem__(
+                "mapped_actions",
+                {
+                    "db/models.py": [
+                        {
+                            "category": "russian_copies",
+                            "local_path": "-danger",
+                        }
+                    ]
+                },
+            ),
+            "field 'mapped_actions\\['db/models.py'\\]\\[0\\]': "
+            "local_path must not start with '-'",
+        ),
+        (
+            lambda payload: payload.__setitem__(
+                "mapped_actions",
+                {
+                    "db/models.py": [
+                        {
+                            "category": "russian_copies",
+                            "local_path": "db/models_ru.py",
+                            "local_target_path": "db/../outside.py",
+                        }
+                    ]
+                },
+            ),
+            "field 'mapped_actions\\['db/models.py'\\]\\[0\\]': "
+            "local_target_path must stay inside the repository",
         ),
     ],
 )

@@ -68,7 +68,7 @@
     },
     "docs_rus/": {
       "upstream": "docs/",
-      "divergence_reason": "Content-diverged Russian documentation; not a translation of upstream docs."
+      "divergence_reason": "Maintained Russian translation of upstream docs/ handled by Stage 4 Docs Translation Parity."
     },
     "mkdocs_ru.yaml": {
       "upstream": "mkdocs.yaml",

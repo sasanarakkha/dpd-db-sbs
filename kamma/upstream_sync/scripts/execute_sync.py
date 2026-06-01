@@ -141,7 +141,9 @@ def run_sync_assertions(previous_sha: str) -> int:
     return 0
 
 
-def execute_sync(thread_dir: str | None, dry_run: bool = False) -> int:
+def execute_sync(
+    thread_dir: str | None, dry_run: bool = False, stage: bool = False
+) -> int:
     """Orchestrate the selective sync process."""
     pr.green_title("execute_sync.py")
 
@@ -269,10 +271,13 @@ def execute_sync(thread_dir: str | None, dry_run: bool = False) -> int:
 
         pr.yes(f"restored {restored_count}, removed {removed_count}")
 
-        # 7. Final staging
-        pr.green("staging all changes")
-        run_git(["git", "add", "."])
-        pr.yes("ok")
+        # 7. Optional staging
+        if stage:
+            pr.green("staging all changes")
+            run_git(["git", "add", "."])
+            pr.yes("ok")
+        else:
+            pr.amber("leaving changes unstaged; review before manual staging")
 
         # 8. Run assertions
         if run_sync_assertions(sbs_ru_original_sha) != 0:
@@ -301,9 +306,14 @@ def main() -> int:
         action="store_true",
         help="Show what would be done without modifying the repository",
     )
+    parser.add_argument(
+        "--stage",
+        action="store_true",
+        help="Stage all sync changes after execution.",
+    )
 
     args = parser.parse_args()
-    return execute_sync(args.thread_dir, args.dry_run)
+    return execute_sync(args.thread_dir, dry_run=args.dry_run, stage=args.stage)
 
 
 if __name__ == "__main__":

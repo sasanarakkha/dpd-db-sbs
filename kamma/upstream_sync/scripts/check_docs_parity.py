@@ -205,7 +205,7 @@ def write_report(
     pr.green(f"Report written → {display_report_path(report_path)}")
 
 
-def run_parity_check(thread_dir: Path | None) -> int:
+def run_parity_check(thread_dir: Path | None, strict: bool = False) -> int:
     try:
         sha, to_ref = load_docs_sync_range(thread_dir)
     except FileNotFoundError as exc:
@@ -271,7 +271,9 @@ def run_parity_check(thread_dir: Path | None) -> int:
             to_ref=to_ref,
         )
 
-    return 1 if unexpected_local else 0
+    if unexpected_local or (strict and (missing or stale)):
+        return 1
+    return 0
 
 
 def main() -> int:
@@ -281,10 +283,15 @@ def main() -> int:
     parser.add_argument(
         "thread_dir", nargs="?", help="Thread folder to write report into"
     )
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Fail when translations are missing or stale.",
+    )
     args = parser.parse_args()
 
     thread_dir = Path(args.thread_dir) if args.thread_dir else None
-    return run_parity_check(thread_dir)
+    return run_parity_check(thread_dir, strict=args.strict)
 
 
 if __name__ == "__main__":

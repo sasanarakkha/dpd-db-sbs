@@ -240,7 +240,6 @@ class TestExecuteSync(unittest.TestCase):
             MagicMock(stdout="localsha789\n"),  # rev-parse HEAD
             MagicMock(stdout=""),  # update-ref refs/heads/as_upstream newsha456
             MagicMock(stdout=""),  # checkout as_upstream -- .
-            MagicMock(stdout=""),  # git add .
         ]
 
         result = execute_sync(str(self.thread_dir))
@@ -261,6 +260,53 @@ class TestExecuteSync(unittest.TestCase):
             (["git", "reset", "--hard", "newsha456"],),
             [call.args for call in mock_run_git.call_args_list],
         )
+        self.assertNotIn(
+            (["git", "add", "."],),
+            [call.args for call in mock_run_git.call_args_list],
+        )
+
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_registry")
+    @patch(
+        "kamma.upstream_sync.scripts.execute_sync.run_sync_assertions", return_value=0
+    )
+    @patch("kamma.upstream_sync.scripts.execute_sync.verify_manifest", return_value=0)
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_accepted_sync_state")
+    @patch("kamma.upstream_sync.scripts.execute_sync.run_git")
+    @patch("kamma.upstream_sync.scripts.execute_sync.Path.exists", return_value=False)
+    @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
+    def test_execute_sync_stages_only_when_stage_flag_is_set(
+        self,
+        mock_context_class,
+        mock_path_exists,
+        mock_run_git,
+        mock_load_state,
+        mock_verify_manifest,
+        mock_run_assertions,
+        mock_load_registry,
+    ):
+        context = MagicMock()
+        context.is_dirty = False
+        context.original_branch = "sbs-ru"
+        mock_context_class.return_value = context
+        mock_load_state.return_value = {"last_accepted_upstream_ref": "upstream/main"}
+        mock_load_registry.return_value = {
+            "modified_upstream_files": [],
+            "no_sync_files": [],
+        }
+        mock_run_git.side_effect = [
+            MagicMock(stdout=""),
+            MagicMock(stdout="newsha456\n"),
+            MagicMock(stdout="localsha789\n"),
+            MagicMock(stdout=""),
+            MagicMock(stdout=""),
+            MagicMock(stdout=""),
+        ]
+
+        result = execute_sync(str(self.thread_dir), stage=True)
+
+        self.assertEqual(result, 0)
+        mock_run_git.assert_any_call(["git", "add", "."])
+        mock_run_assertions.assert_called_once_with("localsha789")
 
     @patch("kamma.upstream_sync.scripts.execute_sync.subprocess.run")
     @patch("kamma.upstream_sync.scripts.execute_sync.Path.exists", return_value=False)
@@ -296,7 +342,6 @@ class TestExecuteSync(unittest.TestCase):
             MagicMock(stdout=""),
             MagicMock(stdout="newsha456\n"),
             MagicMock(stdout="localsha789\n"),
-            MagicMock(stdout=""),
             MagicMock(stdout=""),
             MagicMock(stdout=""),
             MagicMock(stdout=""),
@@ -350,7 +395,6 @@ class TestExecuteSync(unittest.TestCase):
             MagicMock(stdout=""),
             MagicMock(stdout="newsha456\n"),
             MagicMock(stdout="localsha789\n"),
-            MagicMock(stdout=""),
             MagicMock(stdout=""),
             MagicMock(stdout=""),
         ]

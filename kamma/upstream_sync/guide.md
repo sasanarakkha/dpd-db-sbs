@@ -192,7 +192,8 @@ Stage 4 is split into two model-bound substages: ADVANCED analysis and FAST tran
    - Review and add any run-specific exclusions to `<thread_dir>/run_exclusions.txt` before execution if needed.
    - `execute_sync.py` pins `as_upstream` directly to the verified manifest SHA without switching branches.
    - (Commit 1 gate). Message format: `#sync: upstream pull <from>..<to>, <N> files, YYYY-MM-DD`
-   - **Staging rule:** NEVER use `git add -A -- <file list>` — gitignore'd paths will trigger errors. Always use `git add .` which respects `.gitignore` automatically. If you must stage selectively, pre-filter with `git add <file>` one path at a time or check first with `git check-ignore -v <path>`.
+   - `execute_sync.py <thread_dir>` leaves changes unstaged by default. Review `git diff` before manual staging; use `--stage` only when you intentionally want the script to run `git add .`.
+   - **Staging rule:** NEVER use `git add -A -- <file list>` — gitignore'd paths will trigger errors. If you stage all sync changes manually, use `git add .` which respects `.gitignore` automatically. If you must stage selectively, pre-filter with `git add <file>` one path at a time or check first with `git check-ignore -v <path>`.
 
 ### Stage 2: Analysis (ADVANCED Strategic Planning)
 **Goal**: Determine how to integrate upstream changes into localized files.
@@ -269,8 +270,9 @@ The script reads `<thread_dir>/prep_manifest.json` and reports docs changes from
 1. Read `docs_translation_plan.md` — do not read any other file not referenced there.
 2. Execute file-by-file in order: missing files first (create + translate), stale files second (targeted update).
 3. After all files are written, update `mkdocs_ru.yaml` nav if any new files were added.
-4. Prepare commit: `#docs: translate/update docs_rus/ for sync <from>..<to>`.
-5. Stop and request ADVANCED if terminology, scope, or source diff interpretation is unclear.
+4. Run `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir> --strict` and record the result in `handoff.md`.
+5. Prepare commit: `#docs: translate/update docs_rus/ for sync <from>..<to>`.
+6. Stop and request ADVANCED if terminology, scope, or source diff interpretation is unclear.
 
 ### Stage 5: Verification & After-sync (ADVANCED Acceptance)
 **Goal**: Final human verification and close out the sync record.

@@ -29,6 +29,7 @@
 - [ ] **1.5 Automated Pull + Commit 1 Gate**:
   - [ ] Review `<thread_dir>/run_exclusions.txt` if needed.
   - [ ] `uv run python3 kamma/upstream_sync/scripts/execute_sync.py <thread_dir>`.
+  - [ ] Confirm `execute_sync.py <thread_dir>` leaves changes unstaged by default; review `git diff` before manual staging.
   - [ ] Confirm `as_upstream` was pinned directly to the verified manifest SHA.
   - [ ] Prepare commit message only: `#sync: upstream pull <from>..<to>, <N> files, YYYY-MM-DD`.
 
@@ -128,6 +129,7 @@
 - [ ] Translate or update files exactly as listed in `docs_translation_plan.md`.
 - [ ] Split after every 5 translation files.
 - [ ] Update `mkdocs_ru.yaml` only if explicitly instructed.
+- [ ] Run `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir> --strict`.
 - [ ] Prepare commit message only: `#docs: translate/update docs_rus/ for sync <from>..<to>`.
 
 **FAST must stop and request ADVANCED if** terminology, source diff interpretation, or translation scope is unclear.

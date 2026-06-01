@@ -41,6 +41,14 @@ def validate_repo_relative_paths(
     return validated
 
 
+def validate_repo_relative_path(path: str, label: str) -> str:
+    """Validate one path string that must stay inside the repository."""
+    try:
+        return validate_repo_relative_paths([path], label)[0]
+    except ValueError as exc:
+        raise ValueError(str(exc).replace(f"{label}[0]", label, 1)) from exc
+
+
 def _as_object(raw: object, label: str) -> dict[str, object]:
     if not isinstance(raw, dict):
         raise ValueError(f"{label} must be a JSON object")
@@ -175,6 +183,11 @@ class MappedAction:
             category = _required_string(data, "category")
             local_path = _required_string(data, "local_path")
             local_target_path = _optional_string(data, "local_target_path")
+            local_path = validate_repo_relative_path(local_path, "local_path")
+            if local_target_path is not None:
+                local_target_path = validate_repo_relative_path(
+                    local_target_path, "local_target_path"
+                )
         except ValueError as exc:
             if label == "mapped action":
                 raise
@@ -222,6 +235,10 @@ class PrepManifest:
         deleted_upstream_paths = _string_list(data, "deleted_upstream_paths")
         blocker_paths = _optional_string_list(data, "blocker_paths")
         discuss_paths = _string_list(data, "discuss_paths")
+        validate_repo_relative_paths(changed_upstream_paths, "changed_upstream_paths")
+        validate_repo_relative_paths(deleted_upstream_paths, "deleted_upstream_paths")
+        validate_repo_relative_paths(blocker_paths, "blocker_paths")
+        validate_repo_relative_paths(discuss_paths, "discuss_paths")
         return cls(
             from_upstream_sha=from_upstream_sha,
             to_upstream_sha=to_upstream_sha,
@@ -247,6 +264,7 @@ class PrepManifest:
                 raise ValueError(
                     "field 'mapped_actions' key must be a non-empty string"
                 )
+            validate_repo_relative_path(path, f"mapped_actions key '{path}'")
             action_label = f"mapped_actions['{path}']"
             if not isinstance(actions, list):
                 raise ValueError(f"field '{action_label}' must be a list")

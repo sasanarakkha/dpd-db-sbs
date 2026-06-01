@@ -103,6 +103,56 @@ def test_run_parity_check_uses_thread_manifest_range(
     assert mock_write_report.call_args.kwargs["to_ref"] == FULL_NEW_SHA
 
 
+@patch("kamma.upstream_sync.scripts.check_docs_parity.write_report")
+@patch(
+    "kamma.upstream_sync.scripts.check_docs_parity.get_docs_changed_since",
+    return_value={"stale.md"},
+)
+@patch(
+    "kamma.upstream_sync.scripts.check_docs_parity.collect_md_files",
+    side_effect=[{"missing.md", "stale.md"}, {"stale.md"}],
+)
+def test_run_parity_check_default_mode_reports_missing_and_stale_without_failing(
+    mock_collect: MagicMock,
+    mock_changed: MagicMock,
+    mock_write_report: MagicMock,
+    tmp_path: Path,
+) -> None:
+    write_valid_manifest(tmp_path)
+
+    result = run_parity_check(tmp_path)
+
+    assert result == 0
+    mock_collect.assert_called()
+    mock_changed.assert_called_once_with(FULL_OLD_SHA, FULL_NEW_SHA)
+    assert mock_write_report.called
+
+
+@patch("kamma.upstream_sync.scripts.check_docs_parity.write_report")
+@patch(
+    "kamma.upstream_sync.scripts.check_docs_parity.get_docs_changed_since",
+    return_value={"stale.md"},
+)
+@patch(
+    "kamma.upstream_sync.scripts.check_docs_parity.collect_md_files",
+    side_effect=[{"missing.md", "stale.md"}, {"stale.md"}],
+)
+def test_run_parity_check_strict_mode_fails_on_missing_or_stale_docs(
+    mock_collect: MagicMock,
+    mock_changed: MagicMock,
+    mock_write_report: MagicMock,
+    tmp_path: Path,
+) -> None:
+    write_valid_manifest(tmp_path)
+
+    result = run_parity_check(tmp_path, strict=True)
+
+    assert result == 1
+    mock_collect.assert_called()
+    mock_changed.assert_called_once_with(FULL_OLD_SHA, FULL_NEW_SHA)
+    assert mock_write_report.called
+
+
 def test_run_parity_check_reports_missing_thread_manifest(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:

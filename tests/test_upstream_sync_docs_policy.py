@@ -249,9 +249,46 @@ def test_init_sync_thread_prints_exact_stage_one_restart_prompt() -> None:
     init_script = Path("kamma/upstream_sync/scripts/init_sync_thread.py").read_text(
         encoding="utf-8"
     )
+    legacy_index = "kamma/" + "threads" + ".md"
 
     assert "Switch to FAST. Start a fresh session." in init_script
     assert "Run `/kamma:2-do` to start the sync." not in init_script
+    assert legacy_index not in init_script
+    assert "THREADS_FILE" not in init_script
+
+
+def test_registry_docs_rus_description_matches_translation_parity_policy() -> None:
+    registry = Path("kamma/upstream_sync/registry.json").read_text(encoding="utf-8")
+    guide = Path("kamma/upstream_sync/guide.md").read_text(encoding="utf-8")
+
+    assert "not a translation of upstream docs" not in registry
+    assert "Stage 4: Docs Translation Parity" in guide
+    assert "Maintained Russian translation of upstream docs/" in registry
+
+
+def test_execute_sync_documents_manual_staging_by_default() -> None:
+    guide = Path("kamma/upstream_sync/guide.md").read_text(encoding="utf-8")
+    plan = Path("kamma/upstream_sync/templates/sync_thread_plan.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert "`execute_sync.py <thread_dir>` leaves changes unstaged by default" in guide
+    assert "`--stage`" in guide
+    assert "`execute_sync.py <thread_dir>` leaves changes unstaged by default" in plan
+
+
+def test_docs_translation_stage_uses_strict_parity_check() -> None:
+    guide = Path("kamma/upstream_sync/guide.md").read_text(encoding="utf-8")
+    plan = Path("kamma/upstream_sync/templates/sync_thread_plan.md").read_text(
+        encoding="utf-8"
+    )
+    command = (
+        "uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py "
+        "<thread_dir> --strict"
+    )
+
+    assert command in guide
+    assert command in plan
 
 
 def test_execute_sync_assertions_are_python_owned() -> None:

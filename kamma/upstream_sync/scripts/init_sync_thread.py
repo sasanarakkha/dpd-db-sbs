@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Initialize a new upstream sync kamma thread, copy templates, and register it in kamma/threads.md."""
+"""Initialize a new upstream sync kamma thread and copy the standard templates."""
 
 import datetime
 from pathlib import Path
@@ -9,7 +9,6 @@ from tools.printer import printer as pr
 
 TEMPLATES_DIR = Path("kamma/upstream_sync/templates")
 THREADS_DIR = Path("kamma/threads")
-THREADS_FILE = Path("kamma/threads.md")
 
 
 def main() -> None:
@@ -58,18 +57,6 @@ def main() -> None:
         encoding="utf-8",
     )
     pr.green(f"Written: {handoff}")
-
-    # --- Register in kamma/threads.md ---
-    entry_heading = f"## [ ] Thread: Upstream Sync {date_human}"
-    entry_link = f"*Link: [./threads/{thread_id}/](./threads/{thread_id})*"
-    full_entry = f"\n\n---\n\n{entry_heading}\n{entry_link}\n"
-
-    existing = THREADS_FILE.read_text(encoding="utf-8")
-    if entry_link in existing:
-        pr.amber("Entry already in kamma/threads.md; skipping registration.")
-    else:
-        THREADS_FILE.write_text(existing.rstrip() + full_entry, encoding="utf-8")
-        pr.green(f"Registered in {THREADS_FILE}")
 
     # --- Done ---
     pr.green(f"Thread ready: {thread_dir}")
