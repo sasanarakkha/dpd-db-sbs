@@ -110,6 +110,12 @@ model-boundary aware, and better validated for RU/SBS/DPS/Tamil localized files.
   safety is validated before sync execution, reviewed shadow no-op entries require
   full SHAs and repo-relative paths, and `init_sync_thread.py` prints the exact
   Stage 1 FAST restart prompt.
+- Standalone simplification cleanup was implemented after review: no-translate
+  docs policy now uses only the existing HTML redirect pattern, symlink references
+  were removed from active sync policy/tooling, `init_sync_thread.py` and
+  `tests/check_shadow_modifications.py` now use `tools.printer`, and
+  `prep_analyzer.py` now reads `git diff --name-status -z` so spaced paths and
+  renames are parsed safely.
 
 ## Main Files
 
@@ -287,6 +293,29 @@ one third-party aksharamukha deprecation warning. Registry, SMD coverage, shadow
 modification, docs parity, pyright, pyrefly, ruff, and diff whitespace checks
 passed.
 
+Most recent validation for redirect/printer/NUL parsing cleanup:
+
+```fish
+uv run pytest tests/test_upstream_sync_docs_policy.py tests/test_prep_analyzer.py -q
+uv run ruff check --fix kamma/upstream_sync/scripts/check_docs_parity.py kamma/upstream_sync/scripts/prep_analyzer.py kamma/upstream_sync/scripts/init_sync_thread.py tests/check_shadow_modifications.py tests/test_upstream_sync_docs_policy.py tests/test_prep_analyzer.py
+uv run ruff format kamma/upstream_sync/scripts/check_docs_parity.py kamma/upstream_sync/scripts/prep_analyzer.py kamma/upstream_sync/scripts/init_sync_thread.py tests/check_shadow_modifications.py tests/test_upstream_sync_docs_policy.py tests/test_prep_analyzer.py
+uv run pyright kamma/upstream_sync/scripts/check_docs_parity.py kamma/upstream_sync/scripts/prep_analyzer.py kamma/upstream_sync/scripts/init_sync_thread.py tests/check_shadow_modifications.py tests/test_upstream_sync_docs_policy.py tests/test_prep_analyzer.py
+uv run --with pyrefly pyrefly check --min-severity warn kamma/upstream_sync/scripts/check_docs_parity.py kamma/upstream_sync/scripts/prep_analyzer.py kamma/upstream_sync/scripts/init_sync_thread.py tests/check_shadow_modifications.py tests/test_upstream_sync_docs_policy.py tests/test_prep_analyzer.py
+uv run pytest tests/test_upstream_sync_docs_policy.py tests/test_prep_analyzer.py tests/test_check_docs_parity.py tests/test_check_shadow_modifications.py -q
+uv run pytest tests/test_sync_schema.py tests/test_sync_state.py tests/test_prep_analyzer.py tests/test_execute_sync.py tests/test_finalize_accepted_sync.py tests/test_validate_registry.py tests/test_verify_smd_coverage.py tests/test_check_docs_parity.py tests/test_upstream_sync_docs_policy.py tests/test_registry_category_naming.py tests/test_check_shadow_modifications.py tests/test_gen_smd_scaffold.py tests/test_smoke_test_sync.py -q
+uv run python3 kamma/upstream_sync/scripts/validate_registry.py
+uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py
+uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py
+uv run python3 tests/check_shadow_modifications.py
+git diff --check -- AGENTS.md kamma/upstream_sync/scripts/check_docs_parity.py kamma/upstream_sync/scripts/prep_analyzer.py kamma/upstream_sync/scripts/init_sync_thread.py tests/check_shadow_modifications.py tests/test_upstream_sync_docs_policy.py tests/test_prep_analyzer.py
+```
+
+Result: red phase confirmed first with 3 expected failures, then all checks
+passed. Affected tests reported 44 passed; broader upstream-sync suite reported
+159 passed with one third-party aksharamukha deprecation warning. Registry, SMD
+coverage, docs parity, live shadow modification check, pyright, pyrefly, ruff,
+and diff whitespace checks passed.
+
 ## Mistakes To Avoid
 
 - Do not preserve stale external protocol paths. The old `~/agents/...` path was
@@ -383,6 +412,9 @@ passed.
   naming is exact, commit exceptions are bounded, path safety is checked earlier,
   no-op ledger entries are stricter, and thread initialization gives an exact
   Stage 1 prompt.
+- The latest simplification cleanup is implemented and validated: no active
+  sync docs/tooling mention symlinks for no-translate docs, helper script output
+  uses `tools.printer`, and prep diff parsing is NUL-delimited.
 - No agent-side git commit was made.
 - User manual review may still be needed for any uncommitted working-tree
   changes.
@@ -429,10 +461,17 @@ passed.
   failed on singular SMD categories, missing commit-exception wording, missing
   registry path-safety errors, permissive reviewed no-op schema, and the old
   `/kamma:2-do` init prompt.
+- Red phase was confirmed for the latest simplification cleanup: tests first
+  failed on active symlink policy/tooling references, `print()` usage in sync
+  helper scripts, and whitespace-corrupting `prep_analyzer.py` diff parsing.
+- A validation command mistakenly passed `AGENTS.md` to `ruff`, causing expected
+  Markdown-as-Python syntax errors. The corrected Python-only ruff command then
+  passed.
 
 ## Recent Recommended Commit Messages
 
 ```text
+#sync tooling: harden prep parsing and sync docs
 #sync tooling: harden upstream sync rules
 #sync tooling: consolidate upstream sync entrypoints
 #sync docs: simplify upstream sync guidance

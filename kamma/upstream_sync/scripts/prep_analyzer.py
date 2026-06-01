@@ -61,7 +61,7 @@ def get_upstream_changes(from_sha: str, to_sha: str) -> list[GitChange]:
     """Return list of changed upstream paths for the explicit sync range."""
     try:
         result = subprocess.run(
-            ["git", "diff", "--name-status", from_sha, to_sha],
+            ["git", "diff", "--name-status", "-z", from_sha, to_sha],
             capture_output=True,
             text=True,
             check=True,
@@ -71,18 +71,37 @@ def get_upstream_changes(from_sha: str, to_sha: str) -> list[GitChange]:
             f"failed to diff upstream range '{from_sha}..{to_sha}'"
         ) from exc
 
+    return parse_name_status_z(result.stdout)
+
+
+def parse_name_status_z(output: str) -> list[GitChange]:
+    """Parse `git diff --name-status -z` output without corrupting spaced paths."""
+    fields = output.split("\0")
+    if fields and fields[-1] == "":
+        fields.pop()
+
     changes: list[GitChange] = []
-    for line in result.stdout.splitlines():
-        if not line.strip():
+    index = 0
+    while index < len(fields):
+        status = fields[index]
+        index += 1
+        if not status:
             continue
-        parts = line.split()
-        if len(parts) < 2:
+
+        if status.startswith("R"):
+            if index + 1 >= len(fields):
+                raise RuntimeError("malformed NUL-delimited git rename output")
+            old_path = fields[index]
+            new_path = fields[index + 1]
+            index += 2
+            changes.extend([("D", old_path), ("A", new_path)])
             continue
-        status = parts[0]
-        if status.startswith("R") and len(parts) >= 3:
-            changes.extend(expand_git_change(status, f"{parts[1]} {parts[2]}"))
-        else:
-            changes.append((status, parts[1]))
+
+        if index >= len(fields):
+            raise RuntimeError("malformed NUL-delimited git diff output")
+        changes.append((status, fields[index]))
+        index += 1
+
     return changes
 
 

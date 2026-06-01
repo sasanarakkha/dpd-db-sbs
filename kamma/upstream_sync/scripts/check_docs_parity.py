@@ -228,10 +228,7 @@ def run_parity_check(thread_dir: Path | None) -> int:
     unique_local: list[str] = sorted(f for f in ru_files if f not in en_files)
     unexpected_local = find_unexpected_local_files(unique_local)
 
-    # Collect no-translate files (symlinks OR files in NO_TRANSLATE)
-    no_translate_list: list[str] = sorted(
-        f for f in ru_files if f in NO_TRANSLATE or (DOCS_RU / f).is_symlink()
-    )
+    no_translate_list: list[str] = sorted(f for f in ru_files if f in NO_TRANSLATE)
 
     if missing:
         pr.no(f"{len(missing)} missing translations")
@@ -250,9 +247,7 @@ def run_parity_check(thread_dir: Path | None) -> int:
     if no_translate_list:
         pr.green(f"{len(no_translate_list)} no-translate files (informational)")
         for f in no_translate_list:
-            p = DOCS_RU / f
-            type_str = "SYMLINK " if p.is_symlink() else "REDIRECT"
-            pr.green(f"  {type_str}  docs_rus/{f}")
+            pr.green(f"  REDIRECT  docs_rus/{f}")
 
     if unique_local:
         pr.green(f"{len(unique_local)} unique local files (informational)")

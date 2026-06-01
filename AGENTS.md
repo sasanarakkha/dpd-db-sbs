@@ -98,7 +98,7 @@ Renames/moves are atomic. You MUST:
 - NEVER re-run batch LLM processing for trivial changes like filename dates or field labels. Use local text manipulation (e.g., regex, rename) instead.
 
 ## Project Principles
-- **Docs Sanctity:** `docs/` is upstream-only. Put local docs in `docs_rus/` or `kamma/`. Use relative symlinks (e.g., `docs_rus/changelog.md` -> `../docs/changelog.md`) for files in `docs/` that do not require translation. This ensures permanent parity for "no-translate" content.
+- **Docs Sanctity:** `docs/` is upstream-only. Put local docs in `docs_rus/` or `kamma/`. For files in `docs/` that do not require translation, use the no-translate redirect pattern documented in `kamma/upstream_sync/guide.md`.
 - **Strict Parity:** For shadow copies, maintain strict logic parity with upstream. DO NOT introduce new solutions. Emulate upstream implementation exactly, only layering localized UI/data on top.
 - **Templates:** Use standard Jinja2 (`{{ var }}`, `{% if %}`). Legacy Mako syntax (`${var}`, `% if`) is STRICTLY prohibited in localized templates.
 - **Changes:** Must document tech stack changes in `kamma/tech.md` before implementation. Code changes must pass `uv run ruff check --fix` and `uv run ruff format`.

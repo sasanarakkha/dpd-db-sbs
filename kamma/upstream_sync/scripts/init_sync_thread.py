@@ -4,6 +4,8 @@
 import datetime
 from pathlib import Path
 
+from tools.printer import printer as pr
+
 
 TEMPLATES_DIR = Path("kamma/upstream_sync/templates")
 THREADS_DIR = Path("kamma/threads")
@@ -11,6 +13,9 @@ THREADS_FILE = Path("kamma/threads.md")
 
 
 def main() -> None:
+    pr.tic()
+    pr.green_title("init_sync_thread.py")
+
     today = datetime.date.today()
     date_str = today.strftime("%Y%m%d")
     date_human = today.strftime("%Y-%m-%d")
@@ -20,13 +25,14 @@ def main() -> None:
 
     # --- Guard: already exists ---
     if thread_dir.exists():
-        print(f"⚠️  Thread folder already exists: {thread_dir}")
-        print("   Delete it first or pick a different date.")
+        pr.amber(f"Thread folder already exists: {thread_dir}")
+        pr.amber("Delete it first or pick a different date.")
+        pr.toc()
         return
 
     # --- Create thread folder ---
     thread_dir.mkdir(parents=True)
-    print(f"📂 Created: {thread_dir}")
+    pr.green(f"Created: {thread_dir}")
 
     # --- Copy and date-stamp templates ---
     for template_name, target_name in [
@@ -37,7 +43,7 @@ def main() -> None:
         dst = thread_dir / target_name
         content = src.read_text(encoding="utf-8").replace("<DATE>", date_human)
         dst.write_text(content, encoding="utf-8")
-        print(f"📄 Written:  {dst}")
+        pr.green(f"Written: {dst}")
 
     # --- Write handoff stub ---
     handoff = thread_dir / "handoff.md"
@@ -51,7 +57,7 @@ def main() -> None:
         "_Add cross-session notes here._\n",
         encoding="utf-8",
     )
-    print(f"📄 Written:  {handoff}")
+    pr.green(f"Written: {handoff}")
 
     # --- Register in kamma/threads.md ---
     entry_heading = f"## [ ] Thread: Upstream Sync {date_human}"
@@ -60,32 +66,32 @@ def main() -> None:
 
     existing = THREADS_FILE.read_text(encoding="utf-8")
     if entry_link in existing:
-        print("⚠️  Entry already in kamma/threads.md — skipping registration.")
+        pr.amber("Entry already in kamma/threads.md; skipping registration.")
     else:
         THREADS_FILE.write_text(existing.rstrip() + full_entry, encoding="utf-8")
-        print(f"📝 Registered in {THREADS_FILE}")
+        pr.green(f"Registered in {THREADS_FILE}")
 
     # --- Done ---
-    print()
-    print(f"✅ Thread ready: {thread_dir}")
-    print()
-    print("Next steps:")
-    print(f"  1. Fill in the upstream diff range in {thread_dir}/spec.md")
-    print("  2. Switch to FAST. Start a fresh session.")
-    print(f"  3. Continue upstream sync thread: {thread_dir}.")
-    print("  4. First read:")
-    print(f"     - {thread_dir}/handoff.md")
-    print("     - kamma/upstream_sync/guide.md")
-    print(f"     - {thread_dir}/plan.md")
-    print("  5. Your task: run Stage 1 FAST Prep exactly as defined in the plan.")
-    print("     Do not perform analysis or strategic planning.")
-    print("     Stop before Stage 2 and update handoff.md.")
-    print()
-    print("After the sync completes:")
-    print(
+    pr.green(f"Thread ready: {thread_dir}")
+    pr.green("Next steps:")
+    pr.green(f"  1. Fill in the upstream diff range in {thread_dir}/spec.md")
+    pr.green("  2. Switch to FAST. Start a fresh session.")
+    pr.green(f"  3. Continue upstream sync thread: {thread_dir}.")
+    pr.green("  4. First read:")
+    pr.green(f"     - {thread_dir}/handoff.md")
+    pr.green("     - kamma/upstream_sync/guide.md")
+    pr.green(f"     - {thread_dir}/plan.md")
+    pr.green("  5. Your task: run Stage 1 FAST Prep exactly as defined in the plan.")
+    pr.green("     Do not perform analysis or strategic planning.")
+    pr.green("     Stop before Stage 2 and update handoff.md.")
+    pr.green("After the sync completes:")
+    pr.green(
         "  6. Write kamma/upstream_sync/new_improvements.md with lessons from this run."
     )
-    print("  7. Run `/kamma:3-review`, then `/kamma:4-finalize` to close the thread.")
+    pr.green(
+        "  7. Run `/kamma:3-review`, then `/kamma:4-finalize` to close the thread."
+    )
+    pr.toc()
 
 
 if __name__ == "__main__":

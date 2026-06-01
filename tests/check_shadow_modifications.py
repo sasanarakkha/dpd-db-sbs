@@ -12,6 +12,7 @@ from kamma.upstream_sync.scripts.sync_schema import (
     FULL_SHA_RE,
     validate_repo_relative_paths,
 )
+from tools.printer import printer as pr
 
 REGISTRY_PATH = Path("kamma/upstream_sync/registry.json")
 NOOP_LEDGER_PATH = Path("kamma/upstream_sync/reviewed_shadow_noops.json")
@@ -155,18 +156,18 @@ def is_reviewed_noop(
 
 def check_shadows() -> None:
     if not REGISTRY_PATH.exists():
-        print(f"Error: Registry not found at {REGISTRY_PATH}")
+        pr.red(f"Error: Registry not found at {REGISTRY_PATH}")
         sys.exit(1)
 
     registry: dict[str, object] = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     try:
         reviewed_noops = load_reviewed_shadow_noops(NOOP_LEDGER_PATH)
     except ValueError as exc:
-        print(f"Error: {NOOP_LEDGER_PATH}: {exc}")
+        pr.red(f"Error: {NOOP_LEDGER_PATH}: {exc}")
         sys.exit(1)
 
     sync_commit = get_last_sync_commit()
-    print(f"ℹ️  Checking modifications relative to sync commit: {sync_commit}")
+    pr.green(f"Checking modifications relative to sync commit: {sync_commit}")
 
     # 1. Upstream sources modified in the sync commit
     upstream_modified = get_modified_files(
@@ -231,24 +232,24 @@ def check_shadows() -> None:
                 )
 
     if unmodified_shadows:
-        print(
-            "\n❌ WARNING: The following upstream sources were modified, but their shadow copies have NOT been updated:"
+        pr.red(
+            "WARNING: The following upstream sources were modified, but their shadow copies have NOT been updated:"
         )
         for item in unmodified_shadows:
-            print(f"\n  [{item['category']}]")
-            print(f"  Source: {item['source']}")
-            print(f"  Shadow: {item['shadow']}")
-            print("  Modified upstream files in this path:")
+            pr.amber(f"  [{item['category']}]")
+            pr.amber(f"  Source: {item['source']}")
+            pr.amber(f"  Shadow: {item['shadow']}")
+            pr.amber("  Modified upstream files in this path:")
             for f in item["details"][:10]:
-                print(f"    - {f}")
+                pr.amber(f"    - {f}")
             if len(item["details"]) > 10:
-                print(f"    - ... and {len(item['details']) - 10} more")
+                pr.amber(f"    - ... and {len(item['details']) - 10} more")
 
-        print(f"\nTotal missing shadow updates: {len(unmodified_shadows)}")
+        pr.red(f"Total missing shadow updates: {len(unmodified_shadows)}")
         sys.exit(1)
     else:
-        print(
-            "\n✅ SUCCESS: All shadow copies of modified upstream sources have been updated."
+        pr.green(
+            "SUCCESS: All shadow copies of modified upstream sources have been updated."
         )
         sys.exit(0)
 

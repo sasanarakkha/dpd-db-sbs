@@ -280,3 +280,32 @@ def test_sync_docs_document_single_bash_wrapper() -> None:
     assert wrapper in guide
     assert wrapper in product_guidelines
     assert "scripts/cl/dpd-sync-folders" not in product_guidelines
+
+
+def test_sync_docs_use_only_no_translate_redirect_policy() -> None:
+    docs = [
+        Path("AGENTS.md"),
+        Path("kamma/upstream_sync/guide.md"),
+        Path("kamma/upstream_sync/scripts/check_docs_parity.py"),
+    ]
+    forbidden_word = "sym" + "link"
+
+    offenders = [
+        str(path)
+        for path in docs
+        if forbidden_word in path.read_text(encoding="utf-8").lower()
+    ]
+
+    assert offenders == []
+
+
+def test_sync_helper_scripts_use_printer_not_print() -> None:
+    scripts = [
+        Path("kamma/upstream_sync/scripts/init_sync_thread.py"),
+        Path("tests/check_shadow_modifications.py"),
+    ]
+
+    for script in scripts:
+        source = script.read_text(encoding="utf-8")
+        assert "from tools.printer import printer as pr" in source
+        assert "print(" not in source

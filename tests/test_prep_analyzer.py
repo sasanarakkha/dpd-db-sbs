@@ -1,12 +1,14 @@
 """Verify Prep analyzer builds stage-one sync report and manifest from explicit sync state."""
 
 import json
+import subprocess
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 from kamma.upstream_sync.scripts.prep_analyzer import PrepAnalyzer
+from kamma.upstream_sync.scripts.prep_analyzer import get_upstream_changes
 
 FULL_OLD_SHA = "a" * 40
 FULL_NEW_SHA = "b" * 40
@@ -215,6 +217,37 @@ def test_prep_analyzer_treats_renames_as_delete_and_add(
     assert (
         manifest["mapped_actions"]["db/families/family_compound.py"][0]["local_path"]
         == "db/families/family_compound_ru.py"
+    )
+
+
+@patch("kamma.upstream_sync.scripts.prep_analyzer.subprocess.run")
+def test_get_upstream_changes_uses_nul_delimited_name_status(
+    mock_run: MagicMock,
+) -> None:
+    mock_run.return_value = subprocess.CompletedProcess(
+        args=[],
+        returncode=0,
+        stdout=(
+            "M\x00path with spaces.py\x00"
+            "R100\x00old folder/old name.py\x00new folder/new name.py\x00"
+            "A\x00added.py\x00"
+        ),
+        stderr="",
+    )
+
+    changes = get_upstream_changes(FULL_OLD_SHA, FULL_NEW_SHA)
+
+    assert changes == [
+        ("M", "path with spaces.py"),
+        ("D", "old folder/old name.py"),
+        ("A", "new folder/new name.py"),
+        ("A", "added.py"),
+    ]
+    mock_run.assert_called_once_with(
+        ["git", "diff", "--name-status", "-z", FULL_OLD_SHA, FULL_NEW_SHA],
+        capture_output=True,
+        text=True,
+        check=True,
     )
 
 
