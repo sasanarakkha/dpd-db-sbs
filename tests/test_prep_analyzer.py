@@ -1,12 +1,17 @@
 """Verify Prep analyzer builds stage-one sync report and manifest from explicit sync state."""
 
 import json
+import subprocess
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 from kamma.upstream_sync.scripts.prep_analyzer import PrepAnalyzer
+from kamma.upstream_sync.scripts.prep_analyzer import get_upstream_changes
+
+FULL_OLD_SHA = "a" * 40
+FULL_NEW_SHA = "b" * 40
 
 
 @pytest.fixture
@@ -17,9 +22,13 @@ def mock_registry():
         ],
         "russian_copies": {
             "db/families/family_compound_ru.py": "db/families/family_compound.py",
-            "exporter/webapp/main_ru.py": "exporter/webapp/main.py"
+            "db/families/deleted_source_ru.py": "db/families/deleted_source.py",
+            "exporter/webapp/main_ru.py": "exporter/webapp/main.py",
+            "exporter/webapp/ru_templates/": "exporter/webapp/templates/",
         },
         "sbs_copies": {},
+        "dps_copies": {},
+        "tamil_copies": {"db/tpd/tpd_to_lookup.py": "db/epd/epd_to_lookup.py"},
         "inspired_by_upstream": {
             "scripts/bash/make_dpd.sh": {
                 "upstream": "scripts/bash/makedict.py",
@@ -35,7 +44,7 @@ def mock_registry():
 @pytest.fixture
 def accepted_sync_state() -> dict[str, str]:
     return {
-        "last_accepted_upstream_sha": "oldsha123",
+        "last_accepted_upstream_sha": FULL_OLD_SHA,
         "last_accepted_upstream_date": "2026-04-08",
         "last_accepted_upstream_ref": "upstream/main",
     }
@@ -56,13 +65,17 @@ def test_prep_analyzer_report_generation(
 ) -> None:
     mock_load.return_value = mock_registry
     mock_state.return_value = accepted_sync_state
-    mock_target.return_value = "newsha456"
+    mock_target.return_value = FULL_NEW_SHA
     mock_changes.return_value = [
         ("M", "db/models.py"),  # Tracked modified
         ("M", "db/families/family_compound.py"),  # Shadow source modified
-        ("M", "exporter/webapp/main.py"),  # DPS source modified
+        ("M", "exporter/webapp/main.py"),  # Russian source modified
+        ("M", "exporter/webapp/templates/components/card.jinja"),  # Directory shadow
+        ("M", "db/epd/epd_to_lookup.py"),  # Tamil source modified
         ("M", "scripts/bash/makedict.py"),  # Inspired source modified
         ("M", "new_file.py"),  # Untracked
+        ("A", "new_unmapped.py"),  # New upstream file needing classification
+        ("D", "db/families/deleted_source.py"),  # Deleted shadow source
         ("D", "deleted_file.py"),  # Deleted
         ("M", "tests/ignore_me.py"),  # Skipped
     ]
@@ -99,17 +112,31 @@ def test_prep_analyzer_report_generation(
     assert "new_file.py" in content
     assert "deleted_file.py" in content
     assert "tests/ignore_me.py" not in content
+    assert "## New Or Unmapped Upstream Changes" in content
+    assert "## Untracked Changes" not in content
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    assert manifest["from_upstream_sha"] == "oldsha123"
-    assert manifest["to_upstream_sha"] == "newsha456"
+    assert manifest["from_upstream_sha"] == FULL_OLD_SHA
+    assert manifest["to_upstream_sha"] == FULL_NEW_SHA
     assert manifest["discuss_paths"] == ["db/models.py"]
     assert manifest["changed_upstream_paths"] == [
+        "db/epd/epd_to_lookup.py",
         "db/families/family_compound.py",
         "db/models.py",
         "exporter/webapp/main.py",
+        "exporter/webapp/templates/components/card.jinja",
         "new_file.py",
+        "new_unmapped.py",
         "scripts/bash/makedict.py",
+    ]
+    assert manifest["deleted_upstream_paths"] == [
+        "db/families/deleted_source.py",
+        "deleted_file.py",
+    ]
+    assert manifest["blocker_paths"] == [
+        "db/families/deleted_source.py",
+        "deleted_file.py",
+        "new_unmapped.py",
     ]
 
     mapped = manifest["mapped_actions"]
@@ -117,8 +144,112 @@ def test_prep_analyzer_report_generation(
         mapped["db/families/family_compound.py"][0]["local_path"]
         == "db/families/family_compound_ru.py"
     )
-    assert mapped["exporter/webapp/main.py"][0]["category"] == "dps_copy"
+    assert (
+        mapped["db/families/deleted_source.py"][0]["local_path"]
+        == "db/families/deleted_source_ru.py"
+    )
+    assert mapped["exporter/webapp/main.py"][0]["category"] == "russian_copies"
+    assert (
+        mapped["exporter/webapp/main.py"][0]["local_target_path"]
+        == "exporter/webapp/main_ru.py"
+    )
+    assert (
+        mapped["exporter/webapp/templates/components/card.jinja"][0]["local_path"]
+        == "exporter/webapp/ru_templates/"
+    )
+    assert (
+        mapped["exporter/webapp/templates/components/card.jinja"][0][
+            "local_target_path"
+        ]
+        == "exporter/webapp/ru_templates/components/card.jinja"
+    )
+    assert mapped["db/epd/epd_to_lookup.py"][0]["category"] == "tamil_copies"
     assert mapped["scripts/bash/makedict.py"][0]["category"] == "inspired_by_upstream"
+    assert (
+        manifest["generated_at"] != accepted_sync_state["last_accepted_upstream_date"]
+    )
+
+
+@patch("kamma.upstream_sync.scripts.prep_analyzer.load_registry")
+@patch("kamma.upstream_sync.scripts.prep_analyzer.load_accepted_sync_state")
+@patch("kamma.upstream_sync.scripts.prep_analyzer.get_upstream_changes")
+@patch("kamma.upstream_sync.scripts.prep_analyzer.resolve_target_upstream_sha")
+def test_prep_analyzer_treats_renames_as_delete_and_add(
+    mock_target,
+    mock_changes,
+    mock_state,
+    mock_load,
+    mock_registry,
+    accepted_sync_state,
+    tmp_path: Path,
+) -> None:
+    mock_load.return_value = mock_registry
+    mock_state.return_value = accepted_sync_state
+    mock_target.return_value = FULL_NEW_SHA
+    mock_changes.return_value = [
+        ("D", "db/families/deleted_source.py"),
+        ("A", "db/families/family_compound.py"),
+    ]
+
+    analyzer = PrepAnalyzer(tmp_path)
+    with (
+        patch(
+            "kamma.upstream_sync.scripts.prep_analyzer.validate_registry_core",
+            return_value=[],
+        ),
+        patch(
+            "kamma.upstream_sync.scripts.prep_analyzer.extract_all_smd_entries",
+            return_value={},
+        ),
+        patch(
+            "kamma.upstream_sync.scripts.prep_analyzer.collect_registry_paths",
+            return_value=[],
+        ),
+    ):
+        analyzer.run()
+
+    manifest = json.loads((tmp_path / "prep_manifest.json").read_text(encoding="utf-8"))
+    assert manifest["deleted_upstream_paths"] == ["db/families/deleted_source.py"]
+    assert manifest["changed_upstream_paths"] == ["db/families/family_compound.py"]
+    assert (
+        manifest["mapped_actions"]["db/families/deleted_source.py"][0]["local_path"]
+        == "db/families/deleted_source_ru.py"
+    )
+    assert (
+        manifest["mapped_actions"]["db/families/family_compound.py"][0]["local_path"]
+        == "db/families/family_compound_ru.py"
+    )
+
+
+@patch("kamma.upstream_sync.scripts.prep_analyzer.subprocess.run")
+def test_get_upstream_changes_uses_nul_delimited_name_status(
+    mock_run: MagicMock,
+) -> None:
+    mock_run.return_value = subprocess.CompletedProcess(
+        args=[],
+        returncode=0,
+        stdout=(
+            "M\x00path with spaces.py\x00"
+            "R100\x00old folder/old name.py\x00new folder/new name.py\x00"
+            "A\x00added.py\x00"
+        ),
+        stderr="",
+    )
+
+    changes = get_upstream_changes(FULL_OLD_SHA, FULL_NEW_SHA)
+
+    assert changes == [
+        ("M", "path with spaces.py"),
+        ("D", "old folder/old name.py"),
+        ("A", "new folder/new name.py"),
+        ("A", "added.py"),
+    ]
+    mock_run.assert_called_once_with(
+        ["git", "diff", "--name-status", "-z", FULL_OLD_SHA, FULL_NEW_SHA],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
 
 
 def test_is_skipped(mock_registry, accepted_sync_state, tmp_path: Path) -> None:

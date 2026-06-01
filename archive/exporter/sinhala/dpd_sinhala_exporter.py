@@ -36,7 +36,7 @@ class GlobalVars:
 
 def main():
     pr.tic()
-    pr.green_title("exporting dpd sinhala")
+    pr.title("exporting dpd sinhala")
     pr.green("initializing data sources")
     g = GlobalVars()
     dict_data: list[DictEntry] = []

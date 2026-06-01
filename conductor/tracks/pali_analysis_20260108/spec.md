@@ -5,7 +5,7 @@ This track implements a comprehensive Pāḷi sentence analysis pipeline involvi
 
 ## 2. Components & Stages
 
-### Stage 1: Refine `exporter/mcp/analyzer.py`
+### Stage 1: Refine `exporter/analysis/analyzer.py`
 *   **Goal:** Create a robust, deterministic Python-based analyzer.
 *   **Functionality:**
     *   Take a Pāḷi sentence as input.
@@ -16,7 +16,7 @@ This track implements a comprehensive Pāḷi sentence analysis pipeline involvi
     *   Utilize and expand `tests/test_analyze_sentence.py`.
     *   **Critical Gate:** This stage requires extensive testing with various sentence structures and parts of speech. Work on Stage 2 will NOT begin until the user explicitly approves the accuracy of Stage 1 output on a diverse test set.
 
-### Stage 2: Refine `exporter/mcp/ai_pali_translate.py`
+### Stage 2: Refine `exporter/analysis/ai_pali_translate.py`
 *   **Goal:** Create a hybrid AI tool that "decorates" the analyzer's output without risking data corruption.
 *   **Functionality:**
     *   **Input:** The JSON output from Stage 1 + the original sentence.
@@ -70,8 +70,8 @@ This track implements a comprehensive Pāḷi sentence analysis pipeline involvi
     *   Build on `gui2/analysis_view.py`.
 
 ## 4. Acceptance Criteria
-*   [ ] `exporter/mcp/analyzer.py` passes all regression tests in `tests/test_analyze_sentence.py` and manual verification by the user.
-*   [ ] `exporter/mcp/ai_pali_translate.py` implements the "Safe Merge" pattern (no hallucinated JSON structure) and passes user approval.
+*   [ ] `exporter/analysis/analyzer.py` passes all regression tests in `tests/test_analyze_sentence.py` and manual verification by the user.
+*   [ ] `exporter/analysis/ai_pali_translate.py` implements the "Safe Merge" pattern (no hallucinated JSON structure) and passes user approval.
 *   [ ] `gui2` tab (`analysis_view.py`) allows selecting from Stage 1 options and toggling AI assistance.
 *   [ ] Manual overrides are correctly handled and can trigger a re-translation.
 *   [ ] Analysis data can be exported to MD and CSV.

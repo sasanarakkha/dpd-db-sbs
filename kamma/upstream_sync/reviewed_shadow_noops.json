@@ -1,0 +1,20 @@
+[
+  {
+    "sync_commit": "cc60ac42a91339f3e5c7c515aaa7c17610410b06",
+    "source": "exporter/kindle/epub/",
+    "shadow": "exporter/kindle/ru_components/epub/",
+    "changed_paths": [
+      "exporter/kindle/epub/OEBPS/Text/titlepage.xhtml"
+    ],
+    "reason": "Upstream titlepage update date/time is irrelevant for the Russian shadow because those dates are generated locally by the Russian Kindle build."
+  },
+  {
+    "sync_commit": "cc60ac42a91339f3e5c7c515aaa7c17610410b06",
+    "source": "db/backup_tsv/backup_dpd_headwords_and_roots.py",
+    "shadow": "scripts/backup/backup_dps.py",
+    "changed_paths": [
+      "db/backup_tsv/backup_dpd_headwords_and_roots.py"
+    ],
+    "reason": "Upstream split_tsv_file chunking changes are intentionally not ported because DPS shadow backups are small localized TSV files and do not need chunk splitting."
+  }
+]

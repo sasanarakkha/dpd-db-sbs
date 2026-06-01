@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+PROJECT_DIR="$HOME/Documents/dpd-db"
+FILES=(
+    gui2/data/additions_deva.json
+    gui2/data/corrections_deva.json
+)
+
+cd "$PROJECT_DIR"
+
+# Checkout as_upstream branch and update from upstream
+git checkout as_upstream
+git pull upstream main
+
+# Copy the two files from sbs-ru branch
+for FILE in "${FILES[@]}"; do
+    git checkout sbs-ru -- "$FILE"
+done
+
+# Add and commit the files
+git add "${FILES[@]}"
+git commit -m "additions and corrections"
+
+# Push to upstream (replace 'upstream' with your remote name if needed)
+git push upstream as_upstream:main
+
+# Return to your previous branch
+git checkout sbs-ru
+
+# Empty files
+echo '{}' > gui2/data/additions_deva.json
+echo '{}' > gui2/data/corrections_deva.json

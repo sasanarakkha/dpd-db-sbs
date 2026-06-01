@@ -7,9 +7,9 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Environment & Scaffolding' (Protocol in workflow.md)
 
 ## Phase 2: Core Logic Implementation
-- [x] Task: Create `exporter/mcp/analyzer.py` with the sentence tokenization and normalization logic.
+- [x] Task: Create `exporter/analysis/analyzer.py` with the sentence tokenization and normalization logic.
 - [x] Task: Implement TDD for tokenization: Write tests in `tests/test_mcp_analyzer.py` and implement code to pass.
-- [~] Task: Implement database lookup logic in `exporter/mcp/analyzer.py` using `DpdHeadword` and `Lookup` models.
+- [~] Task: Implement database lookup logic in `exporter/analysis/analyzer.py` using `DpdHeadword` and `Lookup` models.
 - [ ] Task: Implement TDD for database lookup: Write tests for single word lookup and full sentence analysis.
 - [ ] Task: Handle "not_found" status for tokens missing from the dictionary.
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Core Logic Implementation' (Protocol in workflow.md)

@@ -3,10 +3,9 @@
 """SBS Example Consistency Tests."""
 
 import re
-from typing import List, Tuple, Optional
+import sys
 
 from sqlalchemy.orm import Session
-from rich import print
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword, SBS
@@ -14,139 +13,278 @@ from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 
 
-def run_sbs_consistency_tests():
-    print("[bright_yellow]run sbs consistency tests")
+def run_sbs_consistency_tests() -> int:
+    pr.tic()
+    pr.yellow_title("run sbs consistency tests")
     pth = ProjectPaths()
     db_session = get_db_session(pth.dpd_db_path)
 
-    # tests
-    results_list = []
+    results_list: list[tuple[str, str | None, int, str]] = []
 
-    results_list.append(check_pat_consistency(db_session))
-    results_list.append(check_dhp_source_consistency(db_session))
-    results_list.append(check_dhp_triplet_consistency(db_session))
-    results_list.append(check_vib_consistency(db_session))
-    results_list.append(check_class_consistency(db_session))
-    results_list.append(check_discourses_consistency(db_session))
-    results_list.append(check_class_anki_consistency(db_session))
-    results_list.append(check_discourses_source_prefix(db_session))
-    results_list.append(check_sbs_example_consistency(db_session))
-    results_list.append(check_sbs_index_mapping(db_session))
-    results_list.extend(check_bold_tags(db_session))
-    results_list.append(check_class_translation_uniqueness(db_session))
+    def run_one(name, func):
+        pr.green_tmr(name.replace("_", " "))
 
-    for name, results, count, solution in results_list:
-        print(f"[green]{name.replace('_', ' ')} [{count}]")
+        res = func(db_session)
+        results_list.append(res)
+
+        count = res[2]
+        if count == 0:
+            pr.yes(count)
+        else:
+            pr.no(count)
+
         if count > 0:
-            print(f"solution: {solution}")
-            if results:
-                print(results)
-        print()
+            pr.red(f"solution: {res[3]}")
+            if res[1]:
+                pr.white(res[1])
+        pr.white("")
 
+    # Triplet
+    run_one("pat_consistency", check_pat_consistency)
+    run_one("dhp_source_consistency", check_dhp_source_consistency)
+    run_one("dhp_triplet_consistency", check_dhp_triplet_consistency)
+    run_one("vib_consistency", check_vib_consistency)
+    run_one("class_consistency", check_class_consistency)
+    run_one("discourses_consistency", check_discourses_consistency)
+    run_one("extra_consistency", check_extra_consistency)
+    run_one("sbs_example_consistency", check_sbs_example_consistency)
+    run_one("class_anki_consistency", check_class_anki_consistency)
 
-def check_dhp_source_consistency(
-    db_session: Session,
-) -> Tuple[str, Optional[str], int, str]:
-    r"""If meaning_1 and (DpdHeadword.source_1 or DpdHeadword.source_2) contains "DHP\d+", then SBS.dhp_source must not be empty."""
-    results = []
-    data = db_session.query(DpdHeadword).outerjoin(SBS).all()
-    for headword in data:
-        if not headword.meaning_1:
-            continue
-        has_dhp_source = re.search(r"DHP\d+", headword.source_1) or re.search(
-            r"DHP\d+", headword.source_2
+    # Source validation
+    run_one("discourses_source_prefix", check_discourses_source_prefix)
+    run_one("discourses_source_full", check_discourses_source_full)
+
+    for field in SOURCE_FIELDS:
+        run_one(
+            f"source_has_space_{field}",
+            lambda db: check_source_has_space_field(db, field),
         )
-        if has_dhp_source:
-            if not headword.sbs or not headword.sbs.dhp_source:
-                results.append(str(headword.id))
-    return (
-        "dhp_source_consistency",
-        regex_results(results),
-        len(results),
-        "ensure dhp_source is present if headword has DHP source, run def dhp in scripts/change_in_db/sbs_examples_rearrangement.py",
-    )
+
+    # Formatting
+    for field in EXAMPLE_FIELDS:
+        run_one(f"bold_tags_{field}", lambda db: check_bold_tags_field(db, field))
+
+    for field in EXAMPLE_FIELDS:
+        run_one(
+            f"capital_letter_{field}",
+            lambda db: check_example_capital_letters_field(db, field),
+        )
+
+    for field in EXAMPLE_FIELDS:
+        run_one(
+            f"space_comma_{field}",
+            lambda db: check_example_spacing_comma_field(db, field),
+        )
+        run_one(
+            f"space_comma_edge_{field}",
+            lambda db: check_example_spacing_comma_edge_field(db, field),
+        )
+        run_one(
+            f"space_fullstop_edge_{field}",
+            lambda db: check_example_spacing_fullstop_edge_field(db, field),
+        )
+
+    # Cross-reference
+    run_one("sbs_index_mapping", check_sbs_index_mapping)
+    run_one("class_translation_uniqueness", check_class_translation_uniqueness)
+
+    total_errors = sum(count for _, _, count, _ in results_list)
+
+    if total_errors > 0:
+        pr.red(f"SBS consistency tests FAILED with {total_errors} total errors.")
+        pr.toc()
+        return 1
+
+    pr.green("All SBS consistency tests passed.")
+    pr.toc()
+    return 0
+
+
+# ============================================================
+# SHARED HELPERS & CONSTANTS
+# ============================================================
+
+EXAMPLE_FIELDS: list[str] = [
+    "sbs_example_1",
+    "sbs_example_2",
+    "dhp_example",
+    "pat_example",
+    "vib_example",
+    "class_example",
+    "discourses_example",
+]
+
+SOURCE_FIELDS: list[str] = [
+    "sbs_source_1",
+    "sbs_source_2",
+    "dhp_source",
+    "pat_source",
+    "vib_source",
+    "class_source",
+    "discourses_source",
+]
+
+# Source values where sutta is allowed to be empty (from TSV rows 71-77).
+SUTTA_EXCEPTION_SOURCES: list[str] = ["MJG", "Sri Lanka", "Thai", "Trad"]
+
+# Source substrings where a space is allowed in the source value (TSV rows 108-114).
+SOURCE_SPACE_EXEMPT_SUBSTRINGS: list[str] = ["PAT", "Sri Lanka", "(modif)", "(simpl)"]
+
+
+def regex_results(results: list[str]) -> str | None:
+    """Take a list of results and return a regex search string or None"""
+    if results:
+        results = results[:100]
+        regex_string = r"/\b("
+        regex_string += "|".join(results)
+        regex_string += r")\b/"
+        return regex_string
+    return None
+
+
+def _check_triplet(
+    db_session: Session,
+    *,
+    name: str,
+    example_field: str,
+    source_field: str,
+    sutta_field: str,
+    solution: str,
+    allow_sutta_exception: bool = True,
+) -> tuple[str, str | None, int, str]:
+    """Generic example/source/sutta triplet check."""
+    results: list[str] = []
+    for sbs in db_session.query(SBS).all():
+        example = getattr(sbs, example_field) or ""
+        source = getattr(sbs, source_field) or ""
+        sutta = getattr(sbs, sutta_field) or ""
+        if not (example or source or sutta):
+            continue
+        if not example or not source:
+            results.append(str(sbs.id))
+            continue
+        if sutta:
+            continue
+        if allow_sutta_exception and source in SUTTA_EXCEPTION_SOURCES:
+            continue
+        results.append(str(sbs.id))
+    return (name, regex_results(results), len(results), solution)
+
+
+def _check_field_regex(
+    db_session: Session,
+    *,
+    name: str,
+    field: str,
+    pattern: str,
+    solution: str,
+) -> tuple[str, str | None, int, str]:
+    """Run one regex across one field."""
+    compiled = re.compile(pattern)
+    results: list[str] = []
+    for sbs in db_session.query(SBS).all():
+        val = getattr(sbs, field) or ""
+        if val and compiled.search(val):
+            results.append(str(sbs.id))
+    return (name, regex_results(results), len(results), solution)
+
+
+# ==== TRIPLET CHECKS ====
 
 
 def check_dhp_triplet_consistency(
     db_session: Session,
-) -> Tuple[str, Optional[str], int, str]:
-    """If any of dhp_example, dhp_source, or dhp_sutta is present, all three must be present."""
-    results = []
-    sbs_data = db_session.query(SBS).all()
-    for sbs in sbs_data:
-        vals = [sbs.dhp_example, sbs.dhp_source, sbs.dhp_sutta]
-        if any(vals) and not all(vals):
-            results.append(str(sbs.id))
-    return (
-        "dhp_triplet_consistency",
-        regex_results(results),
-        len(results),
-        "ensure dhp_example, dhp_source, and dhp_sutta are all present",
+) -> tuple[str, str | None, int, str]:
+    """If any of dhp_example, dhp_source, or dhp_sutta is present, example+source must be present."""
+    return _check_triplet(
+        db_session,
+        name="dhp_triplet_consistency",
+        example_field="dhp_example",
+        source_field="dhp_source",
+        sutta_field="dhp_sutta",
+        solution="ensure dhp_example, dhp_source, and dhp_sutta are all present",
     )
 
 
-def check_sbs_index_mapping(db_session: Session) -> Tuple[str, Optional[str], int, str]:
-    """
-    For sbs_example_1 and sbs_example_2, the combination of sbs_chant_pali,
-    sbs_chant_eng, and sbs_chapter must match a valid row in sbs_index.csv.
-    """
-    import csv
-    from tools.paths_dps import DPSPaths
+def check_vib_consistency(db_session: Session) -> tuple[str, str | None, int, str]:
+    """If any of vib_example, vib_source, or vib_sutta is present, example+source must be present."""
+    return _check_triplet(
+        db_session,
+        name="vib_consistency",
+        example_field="vib_example",
+        source_field="vib_source",
+        sutta_field="vib_sutta",
+        solution="ensure vib_example, vib_source, and vib_sutta are all present",
+    )
 
-    dpspth = DPSPaths()
 
-    # Load sbs_index.csv
-    valid_mappings = set()
-    try:
-        with open(dpspth.sbs_index_path, "r", encoding="utf-8") as csvfile:
-            reader = csv.DictReader(csvfile, delimiter="\t")
-            for row in reader:
-                # Store tuple of (pali, eng, chapter)
-                valid_mappings.add(
-                    (row["pali_chant"], row["english_chant"], row["chapter"])
-                )
-    except Exception as e:
-        print(f"[red]Error loading sbs_index.csv: {e}")
-        return "sbs_index_mapping", None, 0, f"Error: {e}"
+def check_class_consistency(db_session: Session) -> tuple[str, str | None, int, str]:
+    """If any of class_example, class_source, or class_sutta is present, all three must be present."""
+    results: list[str] = []
+    for sbs in db_session.query(SBS).all():
+        example = sbs.class_example or ""
+        source = sbs.class_source or ""
+        sutta = sbs.class_sutta or ""
+        if not (example or source or sutta):
+            continue
 
-    results = []
-    sbs_data = db_session.query(SBS).all()
+        # Existing class_anki exception
+        if sbs.class_anki == 2 and any(
+            w in example for w in ["upāsak", "thero", "sīho"]
+        ):
+            continue
 
-    for sbs in sbs_data:
-        # Check set 1
-        if sbs.sbs_chant_pali_1:
-            mapping1 = (sbs.sbs_chant_pali_1, sbs.sbs_chant_eng_1, sbs.sbs_chapter_1)
-            if mapping1 not in valid_mappings:
-                results.append(str(sbs.id))
-                continue
-
-        # Check set 2
-        if sbs.sbs_chant_pali_2:
-            mapping2 = (sbs.sbs_chant_pali_2, sbs.sbs_chant_eng_2, sbs.sbs_chapter_2)
-            if mapping2 not in valid_mappings:
-                results.append(str(sbs.id))
-
+        if not example or not source:
+            results.append(str(sbs.id))
+            continue
+        if sutta:
+            continue
+        # New: MJG/Sri Lanka/Thai/Trad sutta exception
+        if source in SUTTA_EXCEPTION_SOURCES:
+            continue
+        results.append(str(sbs.id))
     return (
-        "sbs_index_mapping",
+        "class_consistency",
         regex_results(results),
         len(results),
-        "ensure chanting/chapter mapping matches sbs_index.csv",
+        "ensure class_example, class_source, and class_sutta are all present",
+    )
+
+
+def check_discourses_consistency(
+    db_session: Session,
+) -> tuple[str, str | None, int, str]:
+    """If any of discourses_example, discourses_source, or discourses_sutta is present, example+source must be present."""
+    return _check_triplet(
+        db_session,
+        name="discourses_consistency",
+        example_field="discourses_example",
+        source_field="discourses_source",
+        sutta_field="discourses_sutta",
+        solution="ensure discourses_example, discourses_source, and discourses_sutta are all present",
+    )
+
+
+def check_extra_consistency(db_session: Session) -> tuple[str, str | None, int, str]:
+    """Triplet check for extra_example/extra_source/extra_sutta."""
+    return _check_triplet(
+        db_session,
+        name="extra_consistency",
+        example_field="extra_example",
+        source_field="extra_source",
+        sutta_field="extra_sutta",
+        solution="ensure extra_example, extra_source, and extra_sutta are all present",
     )
 
 
 def check_sbs_example_consistency(
     db_session: Session,
-) -> Tuple[str, Optional[str], int, str]:
+) -> tuple[str, str | None, int, str]:
     """
-    Each set of 6 related fields (sbs_source_1/2, sbs_sutta_1/2, sbs_example_1/2,
-    sbs_chant_pali_1/2, sbs_chant_eng_1/2, sbs_chapter_1/2) must be fully populated
-    if any one of them has a value.
-    Exception: If sbs_source_1/2 is one of ["Trad", "Sri Lanka", "Thai", "MJG"],
-    then sbs_sutta_1/2 is allowed to be empty.
+    Each set of 6 related fields must be fully populated if any one of them has a value.
     """
-    results = []
+    results: list[str] = []
     sbs_data = db_session.query(SBS).all()
-
     exceptions = ["Trad", "Sri Lanka", "Thai", "MJG"]
 
     for sbs in sbs_data:
@@ -161,7 +299,6 @@ def check_sbs_example_consistency(
         ]
         if any(set1):
             if sbs.sbs_source_1 in exceptions:
-                # Sutta can be empty
                 other_fields = [
                     sbs.sbs_source_1,
                     sbs.sbs_example_1,
@@ -174,7 +311,6 @@ def check_sbs_example_consistency(
             else:
                 if not all(set1):
                     results.append(str(sbs.id))
-                    continue  # Already added
 
         # Check set 2
         set2 = [
@@ -187,7 +323,6 @@ def check_sbs_example_consistency(
         ]
         if any(set2):
             if sbs.sbs_source_2 in exceptions:
-                # Sutta can be empty
                 other_fields = [
                     sbs.sbs_source_2,
                     sbs.sbs_example_2,
@@ -209,151 +344,27 @@ def check_sbs_example_consistency(
     )
 
 
-def check_vib_consistency(db_session: Session) -> Tuple[str, Optional[str], int, str]:
-    """If any of vib_example, vib_source, or vib_sutta is present, all three must be present."""
-    results = []
-    sbs_data = db_session.query(SBS).all()
-    for sbs in sbs_data:
-        vals = [sbs.vib_example, sbs.vib_source, sbs.vib_sutta]
-        if any(vals) and not all(vals):
-            results.append(str(sbs.id))
-    return (
-        "vib_consistency",
-        regex_results(results),
-        len(results),
-        "ensure vib_example, vib_source, and vib_sutta are all present",
-    )
-
-
-def check_class_consistency(db_session: Session) -> Tuple[str, Optional[str], int, str]:
-    """If any of class_example, class_source, or class_sutta is present, all three must be present."""
-    results = []
-    sbs_data = db_session.query(SBS).all()
-    for sbs in sbs_data:
-        vals = [sbs.class_example, sbs.class_source, sbs.class_sutta]
-        if any(vals) and not all(vals):
-            # Exception: class_anki == 2 and words "upāsak" or "thero" or "sīho" in class_example
-            if sbs.class_anki == 2 and any(
-                word in sbs.class_example for word in ["upāsak", "thero", "sīho"]
-            ):
-                continue
-            results.append(str(sbs.id))
-    return (
-        "class_consistency",
-        regex_results(results),
-        len(results),
-        "ensure class_example, class_source, and class_sutta are all present",
-    )
-
-
-def check_discourses_consistency(
-    db_session: Session,
-) -> Tuple[str, Optional[str], int, str]:
-    """If any of discourses_example, discourses_source, or discourses_sutta is present, all three must be present."""
-    results = []
-    sbs_data = db_session.query(SBS).all()
-    for sbs in sbs_data:
-        vals = [sbs.discourses_example, sbs.discourses_source, sbs.discourses_sutta]
-        if any(vals) and not all(vals):
-            results.append(str(sbs.id))
-    return (
-        "discourses_consistency",
-        regex_results(results),
-        len(results),
-        "ensure discourses_example, discourses_source, and discourses_sutta are all present",
-    )
-
-
-def check_class_anki_consistency(
-    db_session: Session,
-) -> Tuple[str, Optional[str], int, str]:
-    """
-    1. 1:1 relationship between SBS.class_example and SBS.class_anki (if one exists, the other must).
-    2. If SBS.class_anki is not "1" (or 1), then SBS.class_example AND SBS.class_example_translation must have values.
-    """
-    results = []
-    sbs_data = db_session.query(SBS).all()
-
-    for sbs in sbs_data:
-        # Rule 1
-        if (sbs.class_example and not sbs.class_anki) or (
-            not sbs.class_example and sbs.class_anki
-        ):
-            # Special case for Rule 2: if anki is 1, example can be empty.
-            # So if (no example and anki == 1), it's OK.
-            if not (not sbs.class_example and str(sbs.class_anki) == "1"):
-                results.append(str(sbs.id))
-                continue
-
-        # Rule 2
-        if sbs.class_anki and str(sbs.class_anki) != "1":
-            if not sbs.class_example or not sbs.class_example_translation:
-                results.append(str(sbs.id))
-
-    return (
-        "class_anki_consistency",
-        regex_results(results),
-        len(results),
-        "ensure class_example, class_anki and class_example_translation are consistent",
-    )
-
-
-def check_discourses_source_prefix(
-    db_session: Session,
-) -> Tuple[str, Optional[str], int, str]:
-    """
-    The prefix of SBS.discourses_source (before the first '.')
-    must exist in the sbs_category_list (case-insensitive).
-    If there is no '.', the entire string must exist in the list.
-    """
-    from tools.sbs_table_functions import sbs_category_list
-
-    results = []
-    sbs_data = db_session.query(SBS).all()
-    categories = [cat.lower() for cat in sbs_category_list]
-
-    for sbs in sbs_data:
-        if sbs.discourses_source:
-            prefix = sbs.discourses_source.split(".")[0].lower()
-            if prefix not in categories:
-                results.append(str(sbs.id))
-
-    return (
-        "discourses_source_prefix",
-        regex_results(results),
-        len(results),
-        "ensure discourses_source prefix is in sbs_category_list",
-    )
-
-
-def check_pat_consistency(db_session: Session) -> Tuple[str, Optional[str], int, str]:
-    """
-    1. If SBS.pat_example is present, SBS.pat_source must contain "VIN PAT".
-    2. If SBS.pat_source contains "VIN PAT", SBS.pat_example must not be empty.
-    3. If any of pat_example, pat_source, or pat_sutta is present, all three must be present.
-    """
-    results = []
+def check_pat_consistency(db_session: Session) -> tuple[str, str | None, int, str]:
+    """Patimokkha consistency rules."""
+    results: list[str] = []
     exceptions_count = 0
-
     sbs_data = db_session.query(SBS).all()
     for sbs in sbs_data:
         if sbs.pat_source == "PAT":
             exceptions_count += 1
             continue
-        # Rule 1 & 2
         if sbs.pat_example and "VIN PAT" not in sbs.pat_source:
             results.append(str(sbs.id))
         elif "VIN PAT" in sbs.pat_source and not sbs.pat_example:
             results.append(str(sbs.id))
-        # Rule 3
         elif any([sbs.pat_example, sbs.pat_source, sbs.pat_sutta]):
             if not all([sbs.pat_example, sbs.pat_source, sbs.pat_sutta]):
                 results.append(str(sbs.id))
 
-    # print reminder of issue #29
-    print(
-        f"[red]Reminder: {exceptions_count} rows still do not have Pātimokkha examples, see issue #29"
-    )
+    if exceptions_count > 0:
+        pr.amber(
+            f"Reminder: {exceptions_count} rows still do not have Pātimokkha examples, see issue #29"
+        )
 
     return (
         "pat_consistency",
@@ -363,86 +374,295 @@ def check_pat_consistency(db_session: Session) -> Tuple[str, Optional[str], int,
     )
 
 
-def check_bold_tags(db_session: Session) -> List[Tuple[str, Optional[str], int, str]]:
-    """All SBS-related example fields must contain both start <b> and end </b> tags if not empty."""
-    example_fields = [
-        "sbs_example_1",
-        "sbs_example_2",
-        "dhp_example",
-        "pat_example",
-        "vib_example",
-        "class_example",
-        "discourses_example",
-    ]
+# ==== FORMATTING ====
 
-    all_results = []
-    sbs_data = db_session.query(SBS).all()
 
-    for field in example_fields:
-        results = []
-        for sbs in sbs_data:
-            val = getattr(sbs, field)
-            if val:
-                if "<b>" not in val or "</b>" not in val:
-                    results.append(str(sbs.id))
+def check_bold_tags_field(
+    db_session: Session, field: str
+) -> tuple[str, str | None, int, str]:
+    """Check bold tags in one field."""
+    results: list[str] = []
+    for sbs in db_session.query(SBS).all():
+        val = getattr(sbs, field)
+        if val and ("<b>" not in val or "</b>" not in val):
+            results.append(str(sbs.id))
+    return (
+        f"bold_tags_{field}",
+        regex_results(results),
+        len(results),
+        f"ensure {field} has both <b> and </b> tags",
+    )
 
-        all_results.append(
-            (
-                f"bold_tags_{field}",
-                regex_results(results),
-                len(results),
-                f"ensure {field} has both <b> and </b> tags",
-            )
+
+def check_example_capital_letters_field(
+    db_session: Session, field: str
+) -> tuple[str, str | None, int, str]:
+    """Check capital letters in one field."""
+    return _check_field_regex(
+        db_session,
+        name=f"capital_letter_{field}",
+        field=field,
+        pattern=r"[A-Z]",
+        solution="remove stray ASCII capital letters from example",
+    )
+
+
+def check_example_spacing_comma_field(
+    db_session: Session, field: str
+) -> tuple[str, str | None, int, str]:
+    """Check space before comma."""
+    return _check_field_regex(
+        db_session,
+        name=f"space_comma_{field}",
+        field=field,
+        pattern=r" ,",
+        solution="remove space before comma",
+    )
+
+
+def check_example_spacing_comma_edge_field(
+    db_session: Session, field: str
+) -> tuple[str, str | None, int, str]:
+    """Check trailing or floating comma."""
+    return _check_field_regex(
+        db_session,
+        name=f"space_comma_edge_{field}",
+        field=field,
+        pattern=r" ,$| , ",
+        solution="remove trailing or floating ' ,'",
+    )
+
+
+def check_example_spacing_fullstop_edge_field(
+    db_session: Session, field: str
+) -> tuple[str, str | None, int, str]:
+    """Check trailing or floating full stop."""
+    return _check_field_regex(
+        db_session,
+        name=f"space_fullstop_edge_{field}",
+        field=field,
+        pattern=r" \.$| \. ",
+        solution="remove trailing or floating ' .'",
+    )
+
+
+# ==== SOURCE VALIDATION ====
+# MARKER: add full-source validations below (issue #20)
+
+
+def check_discourses_source_prefix(
+    db_session: Session,
+) -> tuple[str, str | None, int, str]:
+    """Check discourses source prefix."""
+    from tools.sbs_table_functions import sbs_category_list
+
+    results: list[str] = []
+    categories = [cat.lower() for cat in sbs_category_list]
+    for sbs in db_session.query(SBS).all():
+        if sbs.discourses_source:
+            prefix = sbs.discourses_source.split(".")[0].lower()
+            if prefix not in categories:
+                results.append(str(sbs.id))
+
+    if results:
+        pr.amber(f"Reminder: {len(results)} rows have invalid discourses prefix")
+    return (
+        "discourses_source_prefix",
+        regex_results(results),
+        len(results),
+        "ensure discourses_source prefix is in sbs_category_list",
+    )
+
+
+def check_discourses_source_full(
+    db_session: Session,
+) -> tuple[str, str | None, int, str]:
+    """Check discourses source against full list."""
+    from tools.sbs_table_functions import list_of_discourses
+
+    valid = set(list_of_discourses)
+    results: list[str] = []
+    for sbs in db_session.query(SBS).all():
+        if sbs.discourses_source and sbs.discourses_source not in valid:
+            results.append(str(sbs.id))
+
+    if results:
+        pr.amber(f"Reminder: {len(results)} rows have invalid discourses source")
+    return (
+        "discourses_source_full",
+        regex_results(results),
+        len(results),
+        "ensure discourses_source matches entry in tools/sbs_table_functions.py:list_of_discourses",
+    )
+
+
+def check_source_has_space_field(
+    db_session: Session, field: str
+) -> tuple[str, str | None, int, str]:
+    """Check for spaces in source field."""
+    results: list[str] = []
+    for sbs in db_session.query(SBS).all():
+        val = getattr(sbs, field) or ""
+        if not val or " " not in val:
+            continue
+        if any(exempt in val for exempt in SOURCE_SPACE_EXEMPT_SUBSTRINGS):
+            continue
+        results.append(str(sbs.id))
+    return (
+        f"source_has_space_{field}",
+        regex_results(results),
+        len(results),
+        f"remove space from {field}",
+    )
+
+
+# ==== CROSS-REFERENCE ====
+
+
+def check_dhp_source_consistency(
+    db_session: Session,
+) -> tuple[str, str | None, int, str]:
+    """DHP source consistency."""
+    results: list[str] = []
+    data = db_session.query(DpdHeadword).outerjoin(SBS).all()
+    for headword in data:
+        if not headword.meaning_1:
+            continue
+        has_dhp_source = re.search(r"DHP\d+", headword.source_1) or re.search(
+            r"DHP\d+", headword.source_2
         )
+        if has_dhp_source:
+            if not headword.sbs or not headword.sbs.dhp_source:
+                results.append(str(headword.id))
 
-    return all_results
+    if results:
+        pr.amber(f"Reminder: {len(results)} rows still do not have DHP examples")
+    return (
+        "dhp_source_consistency",
+        regex_results(results),
+        len(results),
+        "ensure dhp_source is present if headword has DHP source",
+    )
+
+
+def check_sbs_index_mapping(db_session: Session) -> tuple[str, str | None, int, str]:
+    """Check sbs_index.csv mapping."""
+    from tools.sbs_table_functions import SBS_table_tools
+
+    sbs_tools = SBS_table_tools()
+    try:
+        valid_mappings = sbs_tools.load_valid_mappings()
+    except Exception as e:
+        return "sbs_index_mapping", None, 0, f"Error: {e}"
+
+    results: list[str] = []
+    for sbs in db_session.query(SBS).all():
+        if sbs.sbs_chant_pali_1:
+            if (
+                sbs.sbs_chant_pali_1,
+                sbs.sbs_chant_eng_1,
+                sbs.sbs_chapter_1,
+            ) not in valid_mappings:
+                results.append(str(sbs.id))
+        if sbs.sbs_chant_pali_2:
+            if (
+                sbs.sbs_chant_pali_2,
+                sbs.sbs_chant_eng_2,
+                sbs.sbs_chapter_2,
+            ) not in valid_mappings:
+                results.append(str(sbs.id))
+    return (
+        "sbs_index_mapping",
+        regex_results(results),
+        len(results),
+        "ensure chanting/chapter mapping matches sbs_index.csv",
+    )
+
+
+def check_class_anki_consistency(
+    db_session: Session,
+) -> tuple[str, str | None, int, str]:
+    """Check class_anki consistency."""
+    results: list[str] = []
+    for sbs in db_session.query(SBS).all():
+        if (sbs.class_example and not sbs.class_anki) or (
+            not sbs.class_example and sbs.class_anki
+        ):
+            if not (not sbs.class_example and str(sbs.class_anki) == "1"):
+                results.append(str(sbs.id))
+        elif sbs.class_anki and str(sbs.class_anki) != "1":
+            if not sbs.class_example or not sbs.class_example_translation:
+                results.append(str(sbs.id))
+    return (
+        "class_anki_consistency",
+        regex_results(results),
+        len(results),
+        "ensure class_example, class_anki and class_example_translation are consistent",
+    )
 
 
 def check_class_translation_uniqueness(
     db_session: Session,
-) -> Tuple[str, Optional[str], int, str]:
-    """If any class_example_translation has more than 1 corresponding class_source, it should be investigated."""
-    sbs_data = db_session.query(SBS).all()
-
-    # Map translation to set of sources
-    translation_map = {}  # {translation: set(sources)}
-
-    for sbs in sbs_data:
+) -> tuple[str, str | None, int, str]:
+    """Check class translation uniqueness."""
+    translation_map = {}
+    for sbs in db_session.query(SBS).all():
         if sbs.class_example_translation:
             tr = sbs.class_example_translation.strip()
             if tr not in translation_map:
                 translation_map[tr] = set()
-            source = sbs.class_source.strip() if sbs.class_source else ""
-            translation_map[tr].add(source)
-
-    output_lines = []
-    for tr, sources in translation_map.items():
-        if len(sources) > 1:
-            sorted_sources = sorted([str(s) for s in sources])
-            output_lines.append(f"'{tr}': {sorted_sources}")
-
-    results_str = "\n".join(output_lines) if output_lines else None
-
+            translation_map[tr].add(
+                sbs.class_source.strip() if sbs.class_source else ""
+            )
+    output_lines = [
+        f"'{tr}': {sorted([str(s) for s in sources])}"
+        for tr, sources in translation_map.items()
+        if len(sources) > 1
+    ]
     return (
         "class_translation_uniqueness",
-        results_str,
+        "\n".join(output_lines) if output_lines else None,
         len(output_lines),
         "ensure class_example_translation corresponds to only one class_source",
     )
 
 
-def regex_results(results: List[str]) -> Optional[str]:
-    """Take a list of results and return a regex search string or None"""
-    if results:
-        results = results[:100]
-        regex_string = r"/\b("
-        regex_string += "|".join(results)
-        regex_string += r")\b/"
-        return regex_string
-    return None
+# ============================================================
+# COMPATIBILITY WRAPPERS FOR TESTS
+# ============================================================
+
+
+def check_source_has_space(
+    db_session: Session,
+) -> list[tuple[str, str | None, int, str]]:
+    """Compatibility wrapper for all source fields."""
+    return [check_source_has_space_field(db_session, f) for f in SOURCE_FIELDS]
+
+
+def check_bold_tags(db_session: Session) -> list[tuple[str, str | None, int, str]]:
+    """Compatibility wrapper for all example fields."""
+    return [check_bold_tags_field(db_session, f) for f in EXAMPLE_FIELDS]
+
+
+def check_example_capital_letters(
+    db_session: Session,
+) -> list[tuple[str, str | None, int, str]]:
+    """Compatibility wrapper for all example fields."""
+    return [check_example_capital_letters_field(db_session, f) for f in EXAMPLE_FIELDS]
+
+
+def check_example_spacing(
+    db_session: Session,
+) -> list[tuple[str, str | None, int, str]]:
+    """Compatibility wrapper for all example fields."""
+    results = []
+    for f in EXAMPLE_FIELDS:
+        results.append(check_example_spacing_comma_field(db_session, f))
+        results.append(check_example_spacing_comma_edge_field(db_session, f))
+        results.append(check_example_spacing_fullstop_edge_field(db_session, f))
+    return results
 
 
 if __name__ == "__main__":
-    pr.tic()
-    run_sbs_consistency_tests()
-    pr.toc()
+    exit_code = run_sbs_consistency_tests()
+    sys.exit(exit_code)

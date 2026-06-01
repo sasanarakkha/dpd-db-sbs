@@ -108,8 +108,10 @@ class Pass2PreController:
 
             self.word_in_text = list(self.missing_examples_dict.keys())[0]
             self.ui.update_word_in_text(self.word_in_text)
+            added = len(self.file_manager.matched) + len(self.file_manager.new_word)
+            processed = self.daily_log.get_count("pass2_pre")
             self.ui.update_preprocessed_count(
-                f"{len(self.file_manager.matched)} / {len(self.missing_examples_dict)}"
+                f"Added: {added}  Processed: {processed}  Remaining: {len(self.missing_examples_dict)}"
             )
             self.headwords = self.db.get_headwords(self.word_in_text)
 
@@ -146,6 +148,7 @@ class Pass2PreController:
     def load_next_headword(self):
         if self.headword_index + 1 >= len(self.headwords):
             self.missing_examples_dict.pop(self.word_in_text)
+            self.daily_log.increment("pass2_pre")
             self.load_next_word()
             return
 

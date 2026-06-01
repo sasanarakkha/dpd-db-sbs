@@ -92,7 +92,7 @@ def main():
         config_test("exporter", "make_dpd", "yes")
         or config_test("regenerate", "db_rebuild", "yes")
     ):
-        pr.green_tmr("disabled in config.ini")
+        pr.green_title("disabled in config.ini")
         pr.toc()
         return
 

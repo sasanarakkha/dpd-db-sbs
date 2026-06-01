@@ -59,7 +59,7 @@ class DpdHeadwordDbParts(TypedDict):
     family_compounds: List[FamilyCompound]
     family_idioms: List[FamilyIdiom]
     family_set: List[FamilySet]
-    sutta_info: SuttaInfo
+    sutta_info: SuttaInfo | None
 
 
 class DpdHeadwordRenderDataBase(TypedDict):
@@ -89,7 +89,7 @@ def render_pali_word_dpd_html(
     fc: List[FamilyCompound] = db_parts["family_compounds"]
     fi: List[FamilyIdiom] = db_parts["family_idioms"]
     fs: List[FamilySet] = db_parts["family_set"]
-    su: SuttaInfo = db_parts["sutta_info"]
+    su: SuttaInfo | None = db_parts["sutta_info"]
 
     pth = rd["pth"]
     jinja_env = rd["jinja_env"]
@@ -141,7 +141,7 @@ def render_pali_word_dpd_html(
     synonyms += i.inflections_devanagari_list
     synonyms += i.inflections_thai_list
     synonyms += i.family_set_list
-    
+
     set_ru_dict = read_set_ru_from_tsv()
     ru_set_list = []
     for english_word in i.family_set_list:
@@ -150,7 +150,7 @@ def render_pali_word_dpd_html(
     synonyms += ru_set_list
     synonyms += [str(i.id)]
 
-    if i.needs_sutta_info_button:
+    if i.su and i.needs_sutta_info_button:
         synonyms += i.su.sutta_codes_list
 
     size_dict["dpd_synonyms"] += len(str(synonyms))
@@ -268,7 +268,7 @@ def generate_dpd_html(
                 "sutta_info": pw.su,
             }
 
-        dpd_db_data = [_add_parts(i.tuple()) for i in dpd_db]
+        dpd_db_data = [_add_parts(i._tuple()) for i in dpd_db]
 
         batches: List[List[DpdHeadwordDbParts]] = list_into_batches(
             dpd_db_data, num_logical_cores
@@ -299,6 +299,8 @@ def generate_dpd_html(
 
         for p in processes:
             p.join()
+            if p.exitcode != 0:
+                raise RuntimeError(f"Worker process failed with exit code {p.exitcode}")
 
         if len(batches) > 0 and len(batches[0]) > 0 and offset % limit == 0:
             pr.counter(offset, pali_words_count, batches[0][0]["pali_word"].lemma_1)
@@ -310,4 +312,3 @@ def generate_dpd_html(
     total_sizes = sum_rendered_sizes(rendered_sizes)
 
     return dpd_data_list, total_sizes
-

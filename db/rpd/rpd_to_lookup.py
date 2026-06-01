@@ -8,6 +8,7 @@ from sqlalchemy.orm import joinedload
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword, DpdRoot, Lookup
+from tools.configger import config_read
 from tools.lookup_is_another_value import is_another_value
 from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
@@ -17,6 +18,13 @@ from tools.update_test_add import update_test_add
 from tools.tools_for_ru_exporter import (
     ru_replace_abbreviations,
 )
+
+if config_read("generate", "rpd", "yes") == "no":
+    pr.tic()
+    pr.green_title("generating rpd data for lookup table")
+    pr.green_title("disabled in config.ini")
+    pr.toc()
+    raise SystemExit(0)
 
 
 class GlobalVars:

@@ -39,6 +39,11 @@
       "path": "AGENTS.md",
       "discuss": true,
       "discuss_reason": "Fork identity and sync policy sections are localized. Blind porting would overwrite fork-specific AI instructions with upstream defaults, breaking sync and shadow-file protocols."
+    },
+    {
+      "path": "pyproject.toml",
+      "discuss": true,
+      "discuss_reason": "Carries local-only dependencies not present upstream (currently num2words>=0.5.14). The Stage 1 execute_sync checkout overwrites pyproject.toml with the upstream version; without a modified_upstream_files exclusion the local-only deps are silently dropped (regressed in the 2026-06-01 sync). Must be restored and merged manually so local-only deps survive every sync."
     }
   ],
   "inspired_by_upstream": {
@@ -68,7 +73,7 @@
     },
     "docs_rus/": {
       "upstream": "docs/",
-      "divergence_reason": "Content-diverged Russian documentation; not a translation of upstream docs."
+      "divergence_reason": "Maintained Russian translation of upstream docs/ handled by Stage 4 Docs Translation Parity."
     },
     "mkdocs_ru.yaml": {
       "upstream": "mkdocs.yaml",
@@ -131,10 +136,13 @@
     "conductor/",
     "kamma/",
     "exporter/mcp",
-    "exporter/archive/"
+    "exporter/analysis",
+    "exporter/archive/",
+    "tools/ai_models.json",
+    "gui2/data/additions_deva.json",
+    "gui2/data/corrections_deva.json"
   ],
   "skip_sync_patterns": [
-    "gui2/data/",
     "scripts/archive/",
     "exporter/apple_dictionary/",
     "exporter/chrome_extension/",
@@ -144,7 +152,27 @@
     "exporter/tester/",
     "exporter/sutta_central/",
     "exporter/pdf/",
-    "tests/"
+    "tests/",
+    "scripts/find/",
+    "scripts/suttas/",
+    "exporter/anki/",
+    "db_tests/",
+    ".claude/",
+    ".zed/",
+    "scripts/build/mkdocs_overrides/",
+    "scripts/fix/double_consonant_replacer.py",
+    "scripts/fix/variant_cleaner.py",
+    "scripts/fix/verb_finder.py",
+    "scripts/build/generate_books_tsv.py",
+    "scripts/build/anki_updater.py",
+    "tools/ai_nvidia.py",
+    "tools/cst_book_translator.py",
+    "tools/cst_book_translator.tsv",
+    "tools/rss_feed.py",
+    "tools/synonym_variant.py",
+    "gui2/pass2_x_manager.py",
+    "misc/DPD-feedback.xlsx",
+    "scripts/dbreader.py"
   ],
   "unique_paths": [
     ".github/workflows/submodules_update.yml",
@@ -160,11 +188,9 @@
     "db/suttas/suttas.html",
     "db/suttas/suttas.tsv",
     "db/families/family_set_ru_update.py",
-    "db_tests/sbs_consistency_tests.py",
     "exporter/goldendict/templates/sbs_example.html",
     "exporter/goldendict/ru_components/README.md",
     "exporter/kindle/ru_components/README.md",
-    "exporter/sutta_central/sc_dict.json",
     "exporter/webapp/static/tabs.js",
     "gui2/dps_*",
     "gui2/font_scaling_helper.py",

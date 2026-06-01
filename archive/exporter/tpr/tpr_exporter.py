@@ -530,7 +530,7 @@ def copy_zip_to_tpr_downloads(g: GlobalVars):
 def main():
     pr.tic()
 
-    pr.green_title("generate tpr data")
+    pr.title("generate tpr data")
 
     if not config_test("exporter", "make_tpr", "yes"):
         pr.green_title("disabled in config.ini")

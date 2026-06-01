@@ -47,13 +47,15 @@ class Pass2PreProcessView(ft.Column):
         ] = []
         self.examples_page_size: int = 50
         self.examples_shown: int = 50
+        self.search_query: str = ""
 
         # Define controls
-        self.message_field = ft.Text(
+        self.message_field = ft.TextField(
             "",
             expand=True,
             color=ft.Colors.BLUE_200,
-            selectable=True,
+            border_radius=20,
+            read_only=True,
         )
         self.book_options = [
             ft.dropdown.Option(key=item, text=item)
@@ -72,10 +74,11 @@ class Pass2PreProcessView(ft.Column):
             "",
             label="Counter",
             label_style=TEXT_FIELD_LABEL_STYLE,
-            width=200,
+            width=400,
             color=HIGHLIGHT_COLOUR,
             border_radius=20,
             expand=True,
+            read_only=True,
         )
         self.search_bar = ft.SearchBar(
             bar_hint_text="",
@@ -125,6 +128,14 @@ class Pass2PreProcessView(ft.Column):
             expand=True,
             label="check meaning_1 before adding exceptions!",
             label_style=TEXT_FIELD_LABEL_STYLE,
+        )
+        self.examples_count_field = ft.TextField(
+            "",
+            width=60,
+            color=HIGHLIGHT_COLOUR,
+            border_radius=20,
+            read_only=True,
+            text_align=ft.TextAlign.RIGHT,
         )
 
         top_fixed_section_controls = [
@@ -183,7 +194,9 @@ class Pass2PreProcessView(ft.Column):
             ft.Row(
                 controls=[
                     self.message_field,
+                    self.examples_count_field,
                 ],
+                spacing=5,
             ),
         ]
 
@@ -226,6 +239,10 @@ class Pass2PreProcessView(ft.Column):
         self.word_in_text_field.value = word
         self.page.update()
 
+    def update_examples_count(self, count: int):
+        self.examples_count_field.value = str(count)
+        self.page.update()
+
     def update_preprocessed_count(self, count: str):
         self.preprocessed_count_field.value = str(count)
         self.page.update()
@@ -258,11 +275,7 @@ class Pass2PreProcessView(ft.Column):
         )
         self.update_message(message)
 
-        # Update log (this now automatically updates the appbar)
-        self.controller.daily_log.increment("pass2_pre")
-
         self.selected_sentence_index = 0
-
         self.controller.load_next_headword()
 
     def handle_no_click(self, e):
@@ -271,8 +284,6 @@ class Pass2PreProcessView(ft.Column):
             self.controller.headwords[self.controller.headword_index].id,
         )
         self.update_message(message)
-        # Update log (this now automatically updates the appbar)
-        self.controller.daily_log.increment("pass2_pre")
         self.selected_sentence_index = 0
         self.controller.load_next_headword()
 
@@ -302,7 +313,6 @@ class Pass2PreProcessView(ft.Column):
             )
             self.selected_sentence_index = 0
             self.update_message(message)
-            self.controller.daily_log.increment("pass2_pre")
 
         comment_input = ft.TextField(expand=True, autofocus=True, on_submit=on_ok)
 
@@ -340,8 +350,13 @@ class Pass2PreProcessView(ft.Column):
     ) -> ft.RadioGroup:
         self.examples_list = examples_list
         self.examples_shown = self.examples_page_size
+        self.search_query = ""
+        self.search_bar.value = ""
         self._filter_examples()
-        return self._build_examples_radio_group()
+        self.update_examples_count(len(self.filtered_examples))
+        radio_group = self._build_examples_radio_group()
+        self._apply_search_highlight(radio_group)
+        return radio_group
 
     def _filter_examples(self) -> None:
         cleaned_word_in_text = self.controller.clean_quotes(
@@ -369,6 +384,19 @@ class Pass2PreProcessView(ft.Column):
                 if text_to_search and compiled_exception_regex.search(text_to_search):
                     continue
             self.filtered_examples.append((counter, example))
+
+        if self.search_query:
+            query_filtered = []
+            for counter, example in self.filtered_examples:
+                if isinstance(example, SuttaCentralSegment):
+                    text = f"{example.pali} {example.english}".lower()
+                elif isinstance(example, CstSourceSuttaExample):
+                    text = f"{example.example} {example.source} {example.sutta}".lower()
+                else:
+                    text = ""
+                if self.search_query in text:
+                    query_filtered.append((counter, example))
+            self.filtered_examples = query_filtered
 
     def _build_examples_radio_group(self) -> ft.RadioGroup:
         example_controls: list[ft.Control] = []
@@ -471,32 +499,31 @@ class Pass2PreProcessView(ft.Column):
             self.selected_sentence_index = int(selected_example_index_str)
 
     def handle_search(self, e: ft.ControlEvent) -> None:
-        query = str(e.data or "").lower()
-        if not self.examples_field.content or not query:
+        self.search_query = str(e.data or "").lower()
+        if not self.examples_list:
             return
+        self._filter_examples()
+        self.update_examples_count(len(self.filtered_examples))
+        radio_group = self._build_examples_radio_group()
+        self._apply_search_highlight(radio_group)
+        self.update_examples(radio_group)
 
-        radio_group = self.examples_field.content
-
+    def _apply_search_highlight(self, radio_group: ft.RadioGroup) -> None:
+        if not self.search_query:
+            return
         for example_column in radio_group.content.controls:  # type: ignore
             if not isinstance(example_column, ft.Column):
                 continue
-
             for control in example_column.controls:
                 if isinstance(control, ft.Row):
                     for row_control in control.controls:
                         if isinstance(row_control, ft.Text):
-                            self._simple_highlight(row_control, query)
+                            self._simple_highlight(row_control, self.search_query)
                 elif isinstance(control, ft.Container):
                     if isinstance(control.content, ft.Text):
-                        self._simple_highlight(control.content, query)
-
-        self.page.update()
+                        self._simple_highlight(control.content, self.search_query)
 
     def _simple_highlight(self, text_control: ft.Text, query: str) -> None:
-        if not query:
-            text_control.color = None
-            return
-
         text = str(text_control.value or "").lower()
         text_control.color = ft.Colors.AMBER if query in text else None
 
@@ -525,12 +552,14 @@ class Pass2PreProcessView(ft.Column):
         # Clear input fields
         self.exceptions_field.value = ""
         self.search_bar.value = ""
+        self.search_query = ""
 
         # Reset dropdown
         self.books_dropdown.value = None
 
         # Clear examples container
         self.examples_field.content = None
+        self.examples_count_field.value = ""
 
         # Reset selected sentence index
         self.selected_sentence_index = 0

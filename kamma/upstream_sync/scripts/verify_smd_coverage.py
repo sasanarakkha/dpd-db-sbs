@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Verify every registry entry has a corresponding SMD section meeting the quality rubric."""
+"""Verify sync-relevant registry entries have SMD sections meeting the quality rubric."""
 
 import re
 import sys
@@ -17,6 +17,7 @@ from tools.printer import printer as pr
 # Quality rubric minimums (unless sync_rule is MIRROR_EXACTLY or inspired_only)
 MIN_LOCAL_CHANGES = 2
 MIN_WATCH_FOR = 1
+VALID_SYNC_RULES = {"PORT", "MIRROR_EXACTLY", "PRESERVE", "DISCUSS", "inspired_only"}
 
 
 def extract_smd_entries(smd_path: Path) -> dict[str, dict[str, object]]:
@@ -35,6 +36,9 @@ def extract_smd_entries(smd_path: Path) -> dict[str, dict[str, object]]:
             continue
         file_path = file_match.group(1).strip()
 
+        category_match = re.search(r"\*\*Category\*\*:\s*([^\n]+)", block)
+        category = category_match.group(1).strip() if category_match else ""
+
         sync_rule_match = re.search(r"\*\*Sync Rule\*\*:\s*(\S+)", block)
         sync_rule = sync_rule_match.group(1).strip() if sync_rule_match else ""
 
@@ -46,6 +50,7 @@ def extract_smd_entries(smd_path: Path) -> dict[str, dict[str, object]]:
         )
 
         entries[file_path] = {
+            "category": category,
             "sync_rule": sync_rule,
             "local_changes_count": len(local_changes),
             "watch_for_count": len(watch_for_items),
@@ -74,7 +79,7 @@ def collect_registry_paths(data: dict[str, object]) -> list[tuple[str, str]]:
     items: list[tuple[str, str]] = []
 
     for path in get_modified_upstream_paths(data):
-        items.append((path, "modified_upstream"))
+        items.append((path, "modified_upstream_files"))
 
     for category, mapping in get_shadow_mappings_by_category(data).items():
         for shadow in mapping:
@@ -84,6 +89,41 @@ def collect_registry_paths(data: dict[str, object]) -> list[tuple[str, str]]:
         items.append((path, "inspired_by_upstream"))
 
     return items
+
+
+def check_category_alignment(
+    registry_items: list[tuple[str, str]],
+    smd_entries: dict[str, dict[str, object]],
+) -> list[str]:
+    """Return SMD category mismatches for registry-covered entries."""
+    violations: list[str] = []
+    for path, expected_category in registry_items:
+        entry = smd_entries.get(path)
+        if entry is None:
+            continue
+        actual_category = entry.get("category")
+        if actual_category != expected_category:
+            if isinstance(actual_category, str) and actual_category.strip():
+                actual_label = f"'{actual_category}'"
+            else:
+                actual_label = "missing"
+            violations.append(
+                f"  [{expected_category}] {path}: SMD category is {actual_label}"
+            )
+    return violations
+
+
+def check_unregistered_smd_entries(
+    registry_items: list[tuple[str, str]],
+    smd_entries: dict[str, dict[str, object]],
+) -> list[str]:
+    """Return SMD entries that no longer correspond to sync registry paths."""
+    registered_paths = {path for path, _category in registry_items}
+    return [
+        f"  UNREGISTERED: {path}"
+        for path in sorted(smd_entries)
+        if path not in registered_paths
+    ]
 
 
 def check_rubric(
@@ -96,6 +136,9 @@ def check_rubric(
     sync_rule = str(entry.get("sync_rule", ""))
     local_changes = int(entry.get("local_changes_count", 0))  # type: ignore[arg-type]
     watch_for = int(entry.get("watch_for_count", 0))  # type: ignore[arg-type]
+
+    if sync_rule not in VALID_SYNC_RULES:
+        violations.append(f"  [{category}] {path}: unknown Sync Rule '{sync_rule}'")
 
     if sync_rule not in ["MIRROR_EXACTLY", "inspired_only"]:
         if local_changes < MIN_LOCAL_CHANGES:
@@ -133,6 +176,8 @@ def main() -> None:
         sys.exit(1)
 
     gaps: list[str] = []
+    category_fails: list[str] = []
+    unregistered_fails: list[str] = []
     rubric_fails: list[str] = []
 
     for path, category in all_paths:
@@ -141,9 +186,17 @@ def main() -> None:
         else:
             fails = check_rubric(path, category, smd_entries[path])
             rubric_fails.extend(fails)
+    category_fails.extend(check_category_alignment(all_paths, smd_entries))
+    unregistered_fails.extend(check_unregistered_smd_entries(all_paths, smd_entries))
 
     pr.green("coverage gaps")
     pr.yes("none") if not gaps else pr.no(f"{len(gaps)}")
+
+    pr.green("category mismatches")
+    pr.yes("none") if not category_fails else pr.no(f"{len(category_fails)}")
+
+    pr.green("unregistered smd entries")
+    pr.yes("none") if not unregistered_fails else pr.no(f"{len(unregistered_fails)}")
 
     pr.green("rubric failures")
     pr.yes("none") if not rubric_fails else pr.no(f"{len(rubric_fails)}")
@@ -153,12 +206,22 @@ def main() -> None:
         for g in gaps:
             pr.red(g)
 
+    if category_fails:
+        pr.red("\nSMD category mismatches:")
+        for f in category_fails:
+            pr.red(f)
+
+    if unregistered_fails:
+        pr.red("\nUnregistered SMD entries:")
+        for f in unregistered_fails:
+            pr.red(f)
+
     if rubric_fails:
         pr.amber("\nRubric failures (entries need enrichment):")
         for f in rubric_fails:
             pr.amber(f)
 
-    if gaps:
+    if gaps or category_fails or unregistered_fails:
         pr.toc()
         sys.exit(1)
 

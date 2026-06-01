@@ -106,11 +106,13 @@ def process_patimokkha_csv() -> None:
 
     if "pali" in df_processed.columns and not df_processed["pali"].empty:
         df_processed.loc[:, "feedback"] = df_processed["pali"].apply(
-            lambda pali_word: f'Spot a mistake? <a class="link" href="https://docs.google.com/forms/d/e/1FAIpQLSdG6zKDtlwibtrX-cbKVn4WmIs8miH4VnuJvb7f94plCDKJyA/viewform?usp=pp_url&entry.438735500={pali_word if pd.notna(pali_word) else ""}&entry.1433863141=Anki">Fix it here</a>.'
+            lambda pali_word: (
+                f'Spot a mistake? <a class="link" href="https://docs.google.com/forms/d/e/1FAIpQLSdG6zKDtlwibtrX-cbKVn4WmIs8miH4VnuJvb7f94plCDKJyA/viewform?usp=pp_url&entry.438735500={pali_word if pd.notna(pali_word) else ""}&entry.1433863141=Anki-{datetime.today().strftime("%y-%m-%d")}">Fix it here</a>.'
+            )
         )
     else:
         df_processed.loc[:, "feedback"] = (
-            'Spot a mistake? <a class="link" href="https://docs.google.com/forms/d/e/1FAIpQLSdG6zKDtlwibtrX-cbKVn4WmIs8miH4VnuJvb7f94plCDKJyA/viewform?usp=pp_url&entry.1433863141=Anki">Fix it here</a>.'
+            f'Spot a mistake? <a class="link" href="https://docs.google.com/forms/d/e/1FAIpQLSdG6zKDtlwibtrX-cbKVn4WmIs8miH4VnuJvb7f94plCDKJyA/viewform?usp=pp_url&entry.1433863141=Anki-{datetime.today().strftime("%y-%m-%d")}">Fix it here</a>.'
         )
 
     if sources_links_path.exists():
@@ -127,9 +129,11 @@ def process_patimokkha_csv() -> None:
                     cast(Any, source_to_link)
                 )
                 df_processed.loc[:, "web_link"] = df_processed["web_link_temp"].apply(
-                    lambda x: f'Check out the web analysis of rule <a class="link" href="{x}">here</a>.'
-                    if pd.notna(x) and x
-                    else ""
+                    lambda x: (
+                        f'Check out the web analysis of rule <a class="link" href="{x}">here</a>.'
+                        if pd.notna(x) and x
+                        else ""
+                    )
                 )
                 df_processed.drop(columns=["web_link_temp"], inplace=True)
             else:

@@ -1,7 +1,7 @@
 # SMD: EXPORTER
 
 **File**: `exporter/webapp/data_classes.py`
-- **Category**: modified_upstream
+- **Category**: modified_upstream_files
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. `HeadwordData.__init__` includes `self.sbs` (line ~18) and `self.show_ru_data` flag (line ~26) plus `ru_meaning`, `ru_meaning_lit`, `ru_notes`, `sbs_meaning`, `sbs_notes` fields (lines ~46-50).
@@ -14,7 +14,7 @@
 
 
 **File**: `exporter/webapp/static/app.js`
-- **Category**: modified_upstream
+- **Category**: modified_upstream_files
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. SBS dictionary link to `sasanarakkha.github.io/study-tools/dict/sbs-pali-dictionary` in UI (line ~380).
@@ -26,7 +26,7 @@
 
 
 **File**: `exporter/webapp/static/home.js`
-- **Category**: modified_upstream
+- **Category**: modified_upstream_files
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. SBS dictionary link to `sasanarakkha.github.io/study-tools/dict/sbs-pali-dictionary` in English start message (line ~67).
@@ -39,7 +39,7 @@
 
 
 **File**: `exporter/deconstructor/deconstructor_exporter_ru.py`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. `DeconstructorDataRu` subclass overrides `_generate_header` to use `deconstructor_header_ru.jinja` and applies "deconstructor" CSS style via `CSSManager`.
@@ -57,7 +57,7 @@
 
 
 **File**: `exporter/goldendict/ru_components/javascript/`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. JavaScript components for Russian GoldenDict export; mirrors upstream `templates/javascript/`.
@@ -75,7 +75,7 @@
 
 
 **File**: `exporter/goldendict/ru_components/templates/`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Triple Shadow**: This directory, `exporter/goldendict/sbs_templates/`, and upstream `exporter/goldendict/templates/` are all related.
 - **Local Changes**:
@@ -171,9 +171,9 @@
 
 
 **File**: `exporter/goldendict/data_classes_dps.py`
-- **Category**: russian_copy, sbs_copy, tamil_copy
+- **Category**: dps_copies
 - **Sync Rule**: PORT
-- **Triple Shadow Note**: This file serves russian_copies, sbs_copies, AND tamil_copies.
+- **DPS Shadow Note**: This file serves shared Russian, SBS, and Tamil fork data. It belongs only in `dps_copies`.
 - **Local Changes**:
   1. `HeadwordData.__init__` accepts `ru: Russian | None`, `sbs: SBS | None`, `ta: Tamil | None`, `show_grammar`, `show_sbs_data`, `show_ru_data`, and `show_ta_data` parameters.
   2. Russian fields populated: `ru_pos`, `ru_plus_case`, `ru_meaning`, `ru_summary`, `ru_complete`, `ru_grammar`, `ru_base`, `ru_phonetic`, `ru_inflections_html`.
@@ -190,7 +190,7 @@
 
 
 **File**: `exporter/grammar_dict/grammar_dict_ru.py`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. `GrammarDataRu` subclass overrides `_process_grammar` to translate POS and components using `ru_replace_abbreviations`.
@@ -206,7 +206,7 @@
 
 
 **File**: `exporter/kindle/kindle_exporter_ru.py`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. `render_dpd_xhtml` signature changed to accept `pth` and `rupth`; `script_attr` logic removed (Russian fork uses Roman script only).
@@ -223,7 +223,7 @@
 
 
 **File**: `exporter/kindle/ru_components/cover/`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. Russian-language cover image for Kindle/EPUB.
@@ -235,19 +235,21 @@
 
 
 **File**: `exporter/kindle/ru_components/epub/`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. Russian-language EPUB structural files (OEBPS/content.opf, titlepage.xhtml).
   2. Metadata (title, creator, language="ru") set to Russian fork values.
+  3. `titlepage.xhtml` update date/time is generated locally for the Russian Kindle build; upstream date/time-only changes are intentionally not ported.
 - **Watch For**:
   - Navigation entries in `content.opf` must match the generated letter files.
+  - Do not sync upstream `titlepage.xhtml` update date/time into the Russian shadow; only port structural or metadata changes.
 
 ---
 
 
 **File**: `exporter/kindle/ru_components/templates/`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. Full set of Russian XHTML templates for ebook export: `ebook_ru_entry.jinja`, `ebook_ru_grammar.jinja`, `ebook_ru_example.jinja`, `ebook_ru_rpd_letter.jinja`, etc.
@@ -259,7 +261,7 @@
 
 
 **File**: `exporter/tbw/tbw_exporter_ru.py`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. `ProgData` class adds `rupth: RuPaths`.
@@ -274,7 +276,7 @@
 
 
 **File**: `exporter/tpr/tpr_exporter_ru.py`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. `GlobalVars` adds `rupth: RuPaths`.
@@ -289,7 +291,7 @@
 
 
 **File**: `exporter/webapp/data_classes_ru.py`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. `HeadwordData.__init__` populates `ru_meaning`, `ru_complete`, `ru_grammar`, `ru_pos`, `ru_plus_case`, `ru_root_base`, `ru_phonetic`, and `inflections_html_ru`.
@@ -303,7 +305,7 @@
 
 
 **File**: `exporter/webapp/main_ru.py`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. Routes updated: `@app.get("/")` maps to `home_page_ru`, and `/sbs` is added for the English/SBS view.
@@ -320,7 +322,7 @@
 
 
 **File**: `exporter/webapp/preloads_ru.py`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. `make_headwords_clean_set_ru` filters `Lookup` entries to only include those with Russian EPD data (`Lookup.rpd != ""`).
@@ -332,7 +334,7 @@
 
 
 **File**: `exporter/webapp/toolkit_ru.py`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. `make_dpd_html_ru` accepts `rupth: RuPaths`.
@@ -346,7 +348,7 @@
 
 
 **File**: `exporter/webapp/ru_templates/`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. Webapp Jinja2 templates with Russian bindings.
@@ -358,7 +360,7 @@
 
 
 **File**: `exporter/goldendict/sbs_templates/`
-- **Category**: sbs_copy
+- **Category**: sbs_copies
 - **Sync Rule**: PORT
 - **Triple Shadow**: See `exporter/goldendict/ru_components/templates/` — same pattern, SBS variant.
 - **Local Changes**:
@@ -394,7 +396,7 @@
 
 
 **File**: `exporter/goldendict/export_rpd.py`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Shadow of**: `exporter/goldendict/export_epd.py`
 - **Local Changes**:
@@ -471,7 +473,7 @@
 
 
 **File**: `exporter/webapp/sbs_templates/`
-- **Category**: sbs_copy
+- **Category**: sbs_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. Webapp Jinja2 templates with SBS field bindings (chant links, class links).

@@ -6,12 +6,37 @@ import json
 import sys
 from pathlib import Path
 
+from kamma.upstream_sync.scripts.sync_schema import (
+    RegistryData,
+    validate_repo_relative_paths,
+)
 from tools.printer import printer as pr
+
+REQUIRED_TOP_LEVEL_SECTIONS = [
+    "modified_upstream_files",
+    "russian_copies",
+    "sbs_copies",
+    "dps_copies",
+    "tamil_copies",
+    "inspired_by_upstream",
+    "unique_paths",
+    "no_sync_files",
+    "skip_sync_patterns",
+]
 
 
 def load_registry(registry_path: Path) -> dict[str, object]:
     with registry_path.open("r") as f:
         return json.load(f)  # type: ignore[no-any-return]
+
+
+def validate_required_top_level_sections(data: dict[str, object]) -> list[str]:
+    """Validate that every registry category is explicitly present."""
+    return [
+        f"registry: missing required top-level section '{section}'"
+        for section in REQUIRED_TOP_LEVEL_SECTIONS
+        if section not in data
+    ]
 
 
 def validate_modified_upstream_files(data: dict[str, object]) -> list[str]:
@@ -79,6 +104,58 @@ def validate_shadow_paths_exist(
     return errors
 
 
+def validate_shadow_mapping(
+    label: str, data: dict[str, object], repo_root: Path | None = None
+) -> list[str]:
+    """Validate one strict-shadow registry mapping section."""
+    errors: list[str] = []
+    value = data.get(label, {})
+    if not isinstance(value, dict):
+        return [f"{label}: must be an object"]
+
+    seen: set[str] = set()
+    for shadow, upstream in value.items():
+        if not isinstance(shadow, str) or not shadow.strip():
+            errors.append(f"{label}: shadow path must be a non-empty string")
+            continue
+        if shadow in seen:
+            errors.append(f"{label}: duplicate entry '{shadow}'")
+        seen.add(shadow)
+
+        if not isinstance(upstream, str):
+            errors.append(f"{label}['{shadow}']: upstream path must be a string")
+            continue
+        if not upstream.strip():
+            errors.append(f"{label}['{shadow}']: upstream path must be non-empty")
+            continue
+
+        if repo_root:
+            shadow_path = repo_root / shadow
+            upstream_path = repo_root / upstream
+            if "*" not in shadow:
+                if shadow.endswith("/"):
+                    if not shadow_path.is_dir():
+                        errors.append(
+                            f"{label}: shadow directory '{shadow}' does not exist in repo"
+                        )
+                elif not shadow_path.exists():
+                    errors.append(
+                        f"{label}: shadow file '{shadow}' does not exist in repo"
+                    )
+            if "*" not in upstream:
+                if upstream.endswith("/"):
+                    if not upstream_path.is_dir():
+                        errors.append(
+                            f"{label}: upstream source '{upstream}' does not exist"
+                        )
+                elif not upstream_path.exists():
+                    errors.append(
+                        f"{label}: upstream source '{upstream}' does not exist"
+                    )
+
+    return errors
+
+
 def validate_cross_section_overlaps(data: dict[str, object]) -> list[str]:
     errors: list[str] = []
     import fnmatch
@@ -125,12 +202,6 @@ def validate_cross_section_overlaps(data: dict[str, object]) -> list[str]:
             # Exact match
             if path1 == path2:
                 if i < j:  # Avoid double reporting
-                    # Data classes exception
-                    if path1 == "exporter/goldendict/data_classes_dps.py" and {
-                        sec1,
-                        sec2,
-                    } == {"russian_copies", "sbs_copies"}:
-                        continue
                     errors.append(
                         f"Overlap: '{path1}' exists in both {sec1} and {sec2}"
                     )
@@ -170,7 +241,7 @@ def validate_inspired_by_upstream(
         if not upstream or not isinstance(upstream, str):
             errors.append(f"{label}: missing or invalid 'upstream' path")
         elif repo_root:
-            if not (repo_root / str(upstream)).exists():
+            if not (repo_root / upstream).exists():
                 errors.append(f"{label}: upstream path '{upstream}' does not exist")
 
         reason = entry.get("divergence_reason")
@@ -202,6 +273,103 @@ def validate_skip_sync_patterns(data: dict[str, object]) -> list[str]:
     return errors
 
 
+def append_path_safety_error(
+    errors: list[str],
+    label: str,
+    path: str,
+    allow_globs: bool = False,
+) -> None:
+    """Append a registry path-safety error for one path if validation fails."""
+    try:
+        validate_repo_relative_paths([path], label, allow_globs=allow_globs)
+    except ValueError as exc:
+        errors.append(str(exc).replace(f"{label}[0]", label, 1))
+
+
+def validate_registry_path_safety(data: dict[str, object]) -> list[str]:
+    """Reject registry paths that could escape the repo or become unsafe git pathspecs."""
+    errors: list[str] = []
+
+    entries = data.get("modified_upstream_files", [])
+    if isinstance(entries, list):
+        for index, entry in enumerate(entries):
+            if isinstance(entry, dict):
+                path = entry.get("path")
+                if isinstance(path, str):
+                    append_path_safety_error(
+                        errors,
+                        f"modified_upstream_files[{index}].path",
+                        path,
+                    )
+
+    for category in ["russian_copies", "sbs_copies", "dps_copies", "tamil_copies"]:
+        mapping = data.get(category, {})
+        if isinstance(mapping, dict):
+            for shadow, upstream in mapping.items():
+                if isinstance(shadow, str):
+                    append_path_safety_error(
+                        errors, f"{category} key '{shadow}'", shadow
+                    )
+                if isinstance(upstream, str):
+                    append_path_safety_error(
+                        errors,
+                        f"{category}['{shadow}']",
+                        upstream,
+                    )
+
+    inspired = data.get("inspired_by_upstream", {})
+    if isinstance(inspired, dict):
+        for local_path, entry in inspired.items():
+            if isinstance(local_path, str):
+                append_path_safety_error(
+                    errors,
+                    f"inspired_by_upstream key '{local_path}'",
+                    local_path,
+                )
+            if isinstance(entry, dict):
+                upstream = entry.get("upstream")
+                if isinstance(upstream, str):
+                    append_path_safety_error(
+                        errors,
+                        f"inspired_by_upstream['{local_path}'].upstream",
+                        upstream,
+                    )
+
+    for list_name, allow_globs in [
+        ("unique_paths", True),
+        ("no_sync_files", False),
+        ("skip_sync_patterns", True),
+    ]:
+        values = data.get(list_name, [])
+        if isinstance(values, list):
+            for index, value in enumerate(values):
+                if isinstance(value, str):
+                    append_path_safety_error(
+                        errors,
+                        f"{list_name}[{index}]",
+                        value,
+                        allow_globs=allow_globs,
+                    )
+
+    return errors
+
+
+def validate_registry_schema(data: dict[str, object]) -> list[str]:
+    """Validate registry item types with the typed schema parser."""
+    try:
+        RegistryData.from_raw(data)
+    except ValueError as exc:
+        message = str(exc)
+        for label in ("unique_paths", "no_sync_files"):
+            for suffix in ("must be a string", "must be a non-empty string"):
+                prefix = f"field '{label}["
+                if message.startswith(prefix) and message.endswith(suffix):
+                    index = message.removeprefix(prefix).split("]", maxsplit=1)[0]
+                    return [f"{label}[{index}]: must be a non-empty string"]
+        return [message]
+    return []
+
+
 def validate_registry_core(
     data: dict[str, object], repo_root: Path | None = None
 ) -> list[str]:
@@ -215,45 +383,22 @@ def validate_registry_core(
     if "folders_to_check" in data:
         errors.append("'folders_to_check' is no longer valid")
 
+    errors.extend(validate_required_top_level_sections(data))
+    errors.extend(validate_registry_schema(data))
     errors.extend(validate_modified_upstream_files(data))
 
     unique_paths = data.get("unique_paths", [])
-    errors.extend(validate_no_duplicates_in_list("unique_paths", unique_paths))  # type: ignore[arg-type]
+    if isinstance(unique_paths, list):
+        errors.extend(validate_no_duplicates_in_list("unique_paths", unique_paths))
+    else:
+        errors.append("unique_paths: must be a list")
 
-    russian_copies: dict[str, str] = data.get("russian_copies", {})  # type: ignore[assignment]
-    errors.extend(
-        validate_no_duplicates_in_list(
-            "russian_copies keys", list(russian_copies.keys())
-        )
-    )
-
-    sbs_copies: dict[str, str] = data.get("sbs_copies", {})  # type: ignore[assignment]
-    errors.extend(
-        validate_no_duplicates_in_list("sbs_copies keys", list(sbs_copies.keys()))
-    )
-
-    dps_copies: dict[str, str] = data.get("dps_copies", {})  # type: ignore[assignment]
-    errors.extend(
-        validate_no_duplicates_in_list("dps_copies keys", list(dps_copies.keys()))
-    )
-
-    tamil_copies: dict[str, str] = data.get("tamil_copies", {})  # type: ignore[assignment]
-    errors.extend(
-        validate_no_duplicates_in_list("tamil_copies keys", list(tamil_copies.keys()))
-    )
-
-    if repo_root:
-        errors.extend(
-            validate_shadow_paths_exist("russian_copies", russian_copies, repo_root)
-        )
-        errors.extend(validate_shadow_paths_exist("sbs_copies", sbs_copies, repo_root))
-        errors.extend(validate_shadow_paths_exist("dps_copies", dps_copies, repo_root))
-        errors.extend(
-            validate_shadow_paths_exist("tamil_copies", tamil_copies, repo_root)
-        )
+    for label in ["russian_copies", "sbs_copies", "dps_copies", "tamil_copies"]:
+        errors.extend(validate_shadow_mapping(label, data, repo_root))
 
     errors.extend(validate_inspired_by_upstream(data, repo_root))
     errors.extend(validate_skip_sync_patterns(data))
+    errors.extend(validate_registry_path_safety(data))
     errors.extend(validate_cross_section_overlaps(data))
 
     return errors
@@ -273,13 +418,6 @@ def main() -> None:
 
     pr.green("validating registry core")
     all_errors = validate_registry_core(data, repo_root)
-
-    pr.green("checking cross-section overlaps")
-    all_warnings = validate_cross_section_overlaps(data)
-
-    if all_warnings:
-        for w in all_warnings:
-            pr.amber(w)
 
     if all_errors:
         pr.red(f"\n{len(all_errors)} error(s) found:")

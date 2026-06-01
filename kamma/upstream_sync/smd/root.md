@@ -1,53 +1,7 @@
 # SMD: ROOT
 
-**File**: path
-- **Category**: modified_upstream | russian_copy | sbs_copy
-- **Sync Rule**: PORT / MIRROR_EXACTLY / PRESERVE / DISCUSS
-- **Local Changes**: numbered list of concrete changes
-- **Watch For**: specific pitfalls during sync
-
----
-
-**File**: `conductor/product-guidelines.md`
-- **Category**: modified_upstream
-- **Sync Rule**: PRESERVE
-- **Local Changes**:
-  1. Fork-specific product guidelines for the DPS/SBS/RU project context.
-  2. Upstream may update guidelines; fork version reflects DPS editorial decisions.
-- **Watch For**:
-  - Review upstream changes for relevant policy shifts, but do not blindly overwrite — DPS guidelines take precedence.
-
----
-
-
-**File**: `conductor/product.md`
-- **Category**: modified_upstream
-- **Sync Rule**: PRESERVE
-- **Local Changes**:
-  1. Fork-specific product definition for DPS/SBS dictionary builds.
-  2. Documents localized build targets (RU goldendict, SBS goldendict, webapp).
-- **Watch For**:
-  - Upstream product.md reflects upstream build targets only — do not replace fork version.
-
----
-
-
-**File**: `conductor/tech-stack.md`
-- **Category**: modified_upstream
-- **Sync Rule**: PRESERVE
-- **Local Changes**:
-  1. "DPS Ecosystem" section added: fork repo, recitations, courses, study-tools links.
-  2. "Custom Tooling" section references `kamma/upstream_sync/registry.json`.
-  3. "Modified Upstream Files" and "DPS & SBS Unique Tooling" sections document fork deviations.
-- **Watch For**:
-  - Upstream tech-stack changes (new frameworks, tooling) should be merged into the DPS Ecosystem section manually.
-  - Never replace the entire file — always merge.
-
----
-
-
 **File**: `.gitignore`
-- **Category**: modified_upstream
+- **Category**: modified_upstream_files
 - **Sync Rule**: DISCUSS
 - **Why DISCUSS**: Contains a `# --- DPS / SBS / RU UNIQUE patterns ---` block (line ~114) listing DPS-specific build artifacts and generated JS/XHTML files. Blind porting would re-track these files in git.
 - **Local Changes**:
@@ -61,7 +15,7 @@
 
 
 **File**: `AGENTS.md`
-- **Category**: modified_upstream
+- **Category**: modified_upstream_files
 - **Sync Rule**: DISCUSS
 - **Why DISCUSS**: Fork identity sections, shadow sync policy, and localized project rules are embedded here. Blind porting would overwrite fork-specific AI agent instructions with upstream defaults.
 - **Local Changes**:
@@ -136,7 +90,7 @@
 
 
 **File**: `shared_data/help_ru/`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. Russian translations for `abbreviations.tsv`, `bibliography.tsv`, `help.tsv`, and `thanks.tsv`.
@@ -159,5 +113,19 @@
   3. Social links point to `sasanarakkha/dpd-db-sbs`.
 - **Watch For**:
   - Sync with upstream `mkdocs.yaml` regularly to ensure documentation coverage parity.
+
+---
+
+
+**File**: `pyproject.toml`
+- **Category**: modified_upstream_files
+- **Sync Rule**: DISCUSS
+- **Why DISCUSS**: Carries local-only dependencies not present upstream (currently `num2words>=0.5.14`, added for `scripts/change_in_db/update_yojana_km.py`). The Stage 1 `execute_sync` checkout overwrites `pyproject.toml` with the upstream version; without an exclusion entry the local-only deps are silently dropped.
+- **Local Changes**:
+  1. Local-only runtime dependencies appended to `[project].dependencies` that upstream does not declare. Current set: `num2words>=0.5.14`.
+  2. Any future fork-only dependency added to `dependencies` or `[dependency-groups]` must be re-applied after every upstream pull.
+- **Watch For**:
+  - After each upstream pull, diff local `pyproject.toml` against `upstream/main:pyproject.toml`, re-apply every local-only dependency, then run `uv lock` + `uv sync --all-groups`.
+  - This is a MERGE, not a wholesale local-wins replace — also take upstream's new deps; do not delete upstream additions.
 
 ---

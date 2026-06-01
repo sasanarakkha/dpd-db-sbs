@@ -5,7 +5,6 @@
 
 import pandas as pd
 from datetime import datetime
-from pathlib import Path
 from tools.paths_dps import DPSPaths
 from tools.paths import ProjectPaths
 
@@ -15,6 +14,17 @@ dpspth = DPSPaths()
 pth = ProjectPaths()
 
 current_date = datetime.now().strftime("%m-%d")
+current_date_year = datetime.now().strftime("%y-%m-%d")
+
+
+def make_feedback_link(question_text: object, update_date: str) -> str:
+    """Build the prefilled grammar feedback form link."""
+    return (
+        f"""Spot a mistake? <a class="link" href="https://docs.google.com/forms/d/1Z8Jjt0-E0HNX7ygABIzAcrChG23M3IOyoZGQ-EDRzXY/viewform?usp=pp_url&entry.438735500"""
+        f"""={question_text}"""
+        f"""&entry.957833742=Anki Deck Grammar"""
+        f"""&entry.1940411063=Anki-{update_date}">Fix it here</a>"""
+    )
 
 
 def main():
@@ -87,10 +97,8 @@ def make_grammar_csvs(excel_file_dir):
 
                 second_column_name = df.columns[1]
                 df["feedback"] = df.apply(
-                    lambda row: (
-                        f"""Spot a mistake? <a class="link" href="https://docs.google.com/forms/d/1Z8Jjt0-E0HNX7ygABIzAcrChG23M3IOyoZGQ-EDRzXY/viewform?usp=pp_url&entry.438735500"""
-                        f"""={row[second_column_name]}"""
-                        f"""&entry.957833742=Anki Deck Grammar">Fix it here</a>"""
+                    lambda row: make_feedback_link(
+                        row[second_column_name], current_date_year
                     ),
                     axis=1,
                 )
@@ -133,11 +141,7 @@ def make_grammar_csvs(excel_file_dir):
         df_abbr.columns[1] if len(df_abbr.columns) > 1 else df_abbr.columns[0]
     )
     df_abbr["feedback"] = df_abbr.apply(
-        lambda row: (
-            f"""Spot a mistake? <a class="link" href="https://docs.google.com/forms/d/1Z8Jjt0-E0HNX7ygABIzAcrChG23M3IOyoZGQ-EDRzXY/viewform?usp=pp_url&entry.438735500"""
-            f"""={row[second_column_name]}"""
-            f"""&entry.957833742=Anki Deck Grammar">Fix it here</a>"""
-        ),
+        lambda row: make_feedback_link(row[second_column_name], current_date_year),
         axis=1,
     )
     df_abbr["test"] = current_date

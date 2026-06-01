@@ -549,7 +549,7 @@ def get_lemma_clean_list(db_session):
 def delete_word(pth, db_session, values, window):
     try:
         word_id = values["id"]
-        word_lemma = values["lemma_1"]
+        values["lemma_1"]
 
         db_session.query(DpdHeadword).filter(word_id == DpdHeadword.id).delete()
         db_session.commit()
@@ -655,6 +655,7 @@ def make_words_to_add_list_generic(
     sutta_name=None,
     source=None,
     field=None,
+    prefix="",
     output_filename_template="temp/{prefix}{identifier}.tsv",
 ) -> list:
     """
@@ -670,6 +671,7 @@ def make_words_to_add_list_generic(
     - sutta_name: The sutta name (optional).
     - source: Source identifier (optional).
     - field: Field name for inflections (optional).
+    - prefix: Prefix for the output filename (optional).
     - output_filename_template: Template for the output file name.
 
     Returns:
@@ -759,5 +761,5 @@ def make_sandhi_ok_list(pth):
 
 
 def major_change_record(pth, db_session, values):
-    word_id = values["id"]
-    word_lemma = values["lemma_1"]
+    values["id"]
+    values["lemma_1"]

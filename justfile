@@ -26,6 +26,15 @@ makedict:
     timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
     script -q -c "uv run python scripts/bash/makedict.py" | tee >(ansi2html > "logs/makedict_$timestamp.html")
 
+# Fast DPD-only build: turns off everything off-able, then re-enables generate components
+makedict-quick:
+    #!/usr/bin/env bash
+    mkdir -p logs
+    uv run python scripts/build/config_quick_profile.py
+    timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
+    script -q -c "uv run python scripts/bash/makedict.py" | tee >(ansi2html > "logs/makedict_$timestamp.html")
+    uv run python scripts/build/config_quick_profile.py reset
+
 # Complete rebuild and export everything
 initial_build_db_and_export_all:
     uv run python scripts/bash/initial_build_db_and_export_all.py
@@ -185,6 +194,18 @@ css:
 backup:
     uv run python db/backup_tsv/backup_dpd_headwords_and_roots.py
 
+# Update Anki cards from the DB
+anki:
+    uv run exporter/anki/anki_updater.py
+
+# Push DPD note type templates (front/back/styling) into Anki
+anki-templates:
+    uv run exporter/anki/template_pusher.py
+
+# Export Vocab deck to exporter/share/dpd-anki.apkg
+anki-apkg:
+    uv run exporter/anki/anki_apkg_exporter.py
+
 # Enable newsletter scraping
 newsletter-on:
     uv run python -c "from tools.configger import config_update; config_update('exporter', 'make_newsletter', 'yes')"
@@ -297,3 +318,8 @@ limit0:
 # Open config.ini in fresh
 config:
     fresh config.ini
+
+# Open transcription hotwords in fresh
+hotwords:
+    fresh /home/bodhirasa/.config/transcribe/hotwords.txt
+    transcribe -r

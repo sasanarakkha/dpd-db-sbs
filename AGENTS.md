@@ -42,6 +42,7 @@ For full table & column documentation, you MUST read `docs/technical/dpd_headwor
 
 ## Tools/printer.py
 Use `from tools.printer import printer as pr` for colored terminal output and timing. See `tools/printer.py` for the full API. If initialized with a log file path, operations log to TSV.
+- Use `icecream` (`from icecream import ic`) for debug output, not `print()`.
 
 # Localized Rules (local fork)
 
@@ -59,10 +60,18 @@ Existing tables have extra `*_ru` columns (e.g., `root_ru_meaning`, `html_ru`).
 ## GitHub Issue Reference Mapping
 - "local issue #" refers to https://github.com/sasanarakkha/dpd-db-sbs.
 
+## Local Commit Exception
+- Only human-run Bash scripts under `scripts/cl_dps/` may perform their own `git commit` operations, and only for narrowly scoped local automation explicitly documented by that script.
+- Agents MUST NOT run `git commit` directly and MUST NOT add autonomous commit behavior to Python scripts or scripts outside `scripts/cl_dps/`.
+
 ## Shadow Files & Sync Templates
-- "Shadow" (`*_ru.py`, `*_sbs.py`, `*_dps.py`) or "unique" files MUST have corresponding registry entries in `kamma/upstream_sync/` (specifically `registry.json` and `guide.md`). This registry MUST always be kept up-to-date.
+- "Shadow" (`*_ru.py`, `*_sbs.py`, `*_dps.py`, `*_ta.py`) or "unique" files MUST have corresponding sync documentation in `kamma/upstream_sync/`.
+- **Shadow Documentation Gate:** Any new, renamed, moved, or reclassified shadow/local copy MUST update registry.json and the matching `kamma/upstream_sync/smd/*.md` entry in the same change. Do not report the work complete until `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` and `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` pass.
+- **Single Category Rule:** one local path may appear in exactly one registry category. Use `russian_copies` only for Russian-only shadows, `sbs_copies` only for SBS-only shadows, `tamil_copies` only for Tamil-only shadows, and `dps_copies` for mixed/shared RU/SBS/Tamil/DPS fork shadows or local upstream shadows that do not belong cleanly to one locale.
+- The SMD `Category` line MUST exactly match the `registry.json` category. Do not rely on memory or chat context; update the registry and SMD while making the code change.
 
 ## Engineering Standards
+- **Request Scope Discipline:** Only implement the change explicitly requested by the user. Do not make adjacent improvements, cleanups, restorations, formatting changes, or "while here" fixes unless the user asked for them. If an unrequested change seems useful, necessary, or safer, stop and ask before implementing it.
 - **Surgical Logic Layering**: Avoid rewriting core logic in shadow copies. Layer localized changes (RU/SBS) clearly on top of the original structure for easy sync.
 - **Namespace Isolation**:
   - **Tier 1 (Upstream copy)**: Exact upstream name, NO markers.
@@ -71,6 +80,7 @@ Existing tables have extra `*_ru` columns (e.g., `root_ru_meaning`, `html_ru`).
   - **HTML IDs**: Always prefix with `ru_`, `sbs_`, or `dps_`.
 - **Clean Codebase**: Prefer modular abstractions. Use modern type hints and pathlib. Remove unused dependencies.
 - **No Inline Scripting**: NEVER use `python -c "..."` or `python3 -c "..."` in Bash. If you need a one-shot script, write it to `temp/<descriptive_name>.py` and run `uv run python temp/<descriptive_name>.py`. Delete the file when done. This rule exists because inline scripts are invisible in code review, cannot be re-run, and cannot be linted.
+- **UI Migrations**: When migrating UI or logging (e.g., to `printer.py`), perform a "runtime sweep" to catch undefined variables (`NameError`) in callbacks or rarely-triggered code paths.
 
 ## Clean Root Folder Protocol
 - The root directory MUST remain free of temporary scripts, logs, and artifacts.
@@ -88,7 +98,7 @@ Renames/moves are atomic. You MUST:
 - NEVER re-run batch LLM processing for trivial changes like filename dates or field labels. Use local text manipulation (e.g., regex, rename) instead.
 
 ## Project Principles
-- **Docs Sanctity:** `docs/` is upstream-only. Put local docs in `docs_rus/` or `kamma/`. Use relative symlinks (e.g., `docs_rus/changelog.md` -> `../docs/changelog.md`) for files in `docs/` that do not require translation. This ensures permanent parity for "no-translate" content.
+- **Docs Sanctity:** `docs/` is upstream-only. Put local docs in `docs_rus/` or `kamma/`. For files in `docs/` that do not require translation, use the no-translate redirect pattern documented in `kamma/upstream_sync/guide.md`.
 - **Strict Parity:** For shadow copies, maintain strict logic parity with upstream. DO NOT introduce new solutions. Emulate upstream implementation exactly, only layering localized UI/data on top.
 - **Templates:** Use standard Jinja2 (`{{ var }}`, `{% if %}`). Legacy Mako syntax (`${var}`, `% if`) is STRICTLY prohibited in localized templates.
 - **Changes:** Must document tech stack changes in `kamma/tech.md` before implementation. Code changes must pass `uv run ruff check --fix` and `uv run ruff format`.
@@ -100,9 +110,10 @@ Renames/moves are atomic. You MUST:
 1. `uv run ruff check --fix <file>`
 2. `uv run ruff format <file>`
 3. `uv run pyright <file>`
-4. `uv run pytest tests/test_<feature>.py -v` (for affected tests)
+4. `uv run --with pyrefly pyrefly check --min-severity warn <file>`
+5. `uv run pytest tests/test_<feature>.py -v` (for affected tests)
 
-**Do NOT report completion until all checks pass.** This is non-negotiable. Do not skip or defer these. Type safety is mandatory, not optional.
+**Do NOT report completion until all checks pass.** This is non-negotiable. Do not skip or defer these. Pyrefly warnings count as failures unless explicitly approved by the user. Type safety is mandatory, not optional.
 - **Verification:** Write tests for accurate data output (not UI components). Readme MUST be updated.
 - **Research:** Always perform Google Search for framework/OS quirks.
 - **Sync Tracking:** Only track and update exporters in the sync registry that contain localized data (Russian, SBS, or DPS-specific).

@@ -1,59 +1,103 @@
-#!/usr/bin/env python3
+"""Update sbs_chant_eng_*/sbs_chapter_* from sbs_index.csv; fuzzy-prompts for unrecognized pali chants."""
 
-"""Updating sbs_examples chanting book fields according to pali chant names"""
-
-from gui.functions_db_dps import fetch_sbs_index
-from db.models import SBS, DpdHeadword
 from db.db_helpers import get_db_session
+from db.models import DpdHeadword, SBS
+from sqlalchemy.orm import Session, joinedload
 from tools.paths import ProjectPaths
-from tools.paths_dps import DPSPaths
-from sqlalchemy.orm import joinedload
+from tools.printer import printer as pr
+from tools.sbs_table_functions import SBS_table_tools
+
+FUZZY_THRESHOLD = 0.8
 
 
+def update_sbs_chants(db_session: Session, sbs_tools: SBS_table_tools) -> None:
+    pr.tic()
+    pr.green("update sbs chants")
+    pr.bip()
 
-pth: ProjectPaths = ProjectPaths()
-dpspth = DPSPaths()
+    auto_fixed = 0
+    fuzzy_fixed = 0
+    unresolved: list[str] = []
 
-db_session = get_db_session(pth.dpd_db_path)
+    results = (
+        db_session.query(DpdHeadword)
+        .options(joinedload(DpdHeadword.sbs))
+        .filter(DpdHeadword.sbs != None)  # noqa: E711
+        .all()
+    )
 
+    for dpd_word in results:
+        sbs: SBS = dpd_word.sbs
+        if not sbs:
+            continue
 
-def update_sbs_chants_in_db(dpspth, db_session, dpd_word):
-    """Update SBS chants and chapters directly in the database."""
-    for number in range(1, 3):
-        chant_field = f"sbs_chant_pali_{number}"
-        chant = getattr(dpd_word, chant_field, None)
-        
-        if chant:
-            result = fetch_sbs_index(dpspth, chant)
+        for number in (1, 2):
+            chant_pali: str = getattr(sbs, f"sbs_chant_pali_{number}", "") or ""
+            if not chant_pali:
+                continue
+
+            # Pass A: exact match → auto-correct eng/chapter
+            result = sbs_tools.fetch_sbs_index(chant_pali)
             if result is not None:
                 english, chapter = result
-                sbs_word = db_session.query(SBS).filter(SBS.id == dpd_word.id).first()
+                old_eng: str = getattr(sbs, f"sbs_chant_eng_{number}", "") or ""
+                old_chap: str = getattr(sbs, f"sbs_chapter_{number}", "") or ""
+                if old_eng != english or old_chap != chapter:
+                    setattr(sbs, f"sbs_chant_eng_{number}", english)
+                    setattr(sbs, f"sbs_chapter_{number}", chapter)
+                    pr.amber(
+                        f"ID {sbs.id} sbs_chant_pali_{number}: auto-fixed eng/chapter"
+                    )
+                    auto_fixed += 1
+                continue
 
-                old_english = getattr(sbs_word, f"sbs_chant_eng_{number}", None)
-                old_chapter = getattr(sbs_word, f"sbs_chapter_{number}", None)
+            # Pass B: not in index → fuzzy match + prompt
+            closest = sbs_tools.find_closest_chant(
+                chant_pali, threshold=FUZZY_THRESHOLD
+            )
+            if closest is not None:
+                candidate, ratio = closest
+                try:
+                    answer = (
+                        input(
+                            f'ID {sbs.id} | sbs_chant_pali_{number}: "{chant_pali}" '
+                            f'→ did you mean "{candidate}" (ratio={ratio:.2f})? [y/n]: '
+                        )
+                        .strip()
+                        .lower()
+                    )
+                except EOFError:
+                    answer = "n"
+                if answer == "y":
+                    fix = sbs_tools.fetch_sbs_index(candidate)
+                    if fix:
+                        setattr(sbs, f"sbs_chant_pali_{number}", candidate)
+                        setattr(sbs, f"sbs_chant_eng_{number}", fix[0])
+                        setattr(sbs, f"sbs_chapter_{number}", fix[1])
+                        fuzzy_fixed += 1
+                    continue
 
-                if old_english != english:
-                    print(f"Updating SBS ID {sbs_word.id}:")
-                    # debug print for old and new values
-                    print(f"  sbs_chant_eng_{number}: {old_english} -> {english}")
-                    setattr(sbs_word, f"sbs_chant_eng_{number}", english)
+            unresolved.append(f'ID {sbs.id} sbs_chant_pali_{number}: "{chant_pali}"')
 
-                if old_chapter != chapter:
-                    # debug print for old and new values
-                    print(f"  sbs_chapter_{number}: {old_chapter} -> {chapter}")
-                    setattr(sbs_word, f"sbs_chapter_{number}", chapter)
-            else:
-                # handle the case when the chant is not found
-                error_message = f"chant is not found for {i.sbs.id}"
-                print(error_message)
-    
+    db_session.commit()
 
-results = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.sbs)).filter(DpdHeadword.sbs).all()
-for i in results:
-    if i.sbs:
-        i: DpdHeadword
-        update_sbs_chants_in_db(dpspth, db_session, i.sbs)
+    if auto_fixed:
+        pr.yes(f"{auto_fixed} auto-fixed")
+    if fuzzy_fixed:
+        pr.yes(f"{fuzzy_fixed} fuzzy-fixed")
+    if unresolved:
+        pr.no(f"{len(unresolved)} unresolved")
+        for item in unresolved:
+            pr.amber(item)
+    if not auto_fixed and not fuzzy_fixed and not unresolved:
+        pr.yes("no changes needed")
 
-# db_session.commit()
-# db_session.close()
+    pr.toc()
 
+
+if __name__ == "__main__":
+    pth = ProjectPaths()
+    db_session = get_db_session(pth.dpd_db_path)
+    sbs_tools = SBS_table_tools()
+    update_sbs_chants(db_session, sbs_tools)
+    db_session.close()

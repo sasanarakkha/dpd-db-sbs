@@ -6,12 +6,14 @@ import argparse
 import fnmatch
 import json
 import subprocess
+from datetime import datetime
 from pathlib import Path
 
 from kamma.upstream_sync.scripts.registry_helper import (
     AcceptedSyncState,
     get_inspired_by_upstream_mapping,
     get_modified_upstream_paths,
+    get_no_sync_files,
     get_shadow_mappings_by_category,
     get_skip_sync_patterns,
     load_accepted_sync_state,
@@ -27,6 +29,7 @@ from tools.printer import printer as pr
 
 type GitChange = tuple[str, str]
 type MappedAction = dict[str, str]
+type SourceAction = dict[str, str]
 
 
 def resolve_target_upstream_sha(ref: str = "upstream/main") -> str:
@@ -47,7 +50,7 @@ def get_upstream_changes(from_sha: str, to_sha: str) -> list[GitChange]:
     """Return list of changed upstream paths for the explicit sync range."""
     try:
         result = subprocess.run(
-            ["git", "diff", "--name-status", from_sha, to_sha],
+            ["git", "diff", "--name-status", "-z", from_sha, to_sha],
             capture_output=True,
             text=True,
             check=True,
@@ -57,18 +60,37 @@ def get_upstream_changes(from_sha: str, to_sha: str) -> list[GitChange]:
             f"failed to diff upstream range '{from_sha}..{to_sha}'"
         ) from exc
 
+    return parse_name_status_z(result.stdout)
+
+
+def parse_name_status_z(output: str) -> list[GitChange]:
+    """Parse `git diff --name-status -z` output without corrupting spaced paths."""
+    fields = output.split("\0")
+    if fields and fields[-1] == "":
+        fields.pop()
+
     changes: list[GitChange] = []
-    for line in result.stdout.splitlines():
-        if not line.strip():
+    index = 0
+    while index < len(fields):
+        status = fields[index]
+        index += 1
+        if not status:
             continue
-        parts = line.split(None, 1)
-        if len(parts) != 2:
-            continue
-        status = parts[0]
-        path = parts[1]
+
         if status.startswith("R"):
-            path = path.split(None, 1)[-1]
-        changes.append((status, path))
+            if index + 1 >= len(fields):
+                raise RuntimeError("malformed NUL-delimited git rename output")
+            old_path = fields[index]
+            new_path = fields[index + 1]
+            index += 2
+            changes.extend([("D", old_path), ("A", new_path)])
+            continue
+
+        if index >= len(fields):
+            raise RuntimeError("malformed NUL-delimited git diff output")
+        changes.append((status, fields[index]))
+        index += 1
+
     return changes
 
 
@@ -80,6 +102,7 @@ class PrepAnalyzer:
         self.registry = load_registry()
         self.accepted_sync: AcceptedSyncState = load_accepted_sync_state()
         self.skip_patterns = get_skip_sync_patterns(self.registry)
+        self.no_sync_files = get_no_sync_files(self.registry)
         self.modified_upstream = set(get_modified_upstream_paths(self.registry))
         self.shadow_mappings_by_category = get_shadow_mappings_by_category(
             self.registry
@@ -88,12 +111,41 @@ class PrepAnalyzer:
 
     def is_skipped(self, path: str) -> bool:
         """Return True when the path is outside sync scanning scope."""
+        for entry in self.no_sync_files:
+            if path == entry or path.startswith(entry.rstrip("/") + "/"):
+                return True
         for pattern in self.skip_patterns:
             if pattern.endswith("/") and path.startswith(pattern):
                 return True
             if fnmatch.fnmatch(path, pattern):
                 return True
         return False
+
+    def build_mapped_action(
+        self, category: str, local_path: str, source_path: str, changed_path: str
+    ) -> MappedAction:
+        """Build one mapped action, including exact local target path when derivable."""
+        action: MappedAction = {"category": category, "local_path": local_path}
+        if source_path.endswith("/") and local_path.endswith("/"):
+            relative_path = changed_path.removeprefix(source_path)
+            action["local_target_path"] = f"{local_path}{relative_path}"
+        else:
+            action["local_target_path"] = local_path
+        return action
+
+    def build_mapped_actions(
+        self, actions: list[SourceAction], changed_path: str
+    ) -> list[MappedAction]:
+        """Build manifest actions for a changed upstream path."""
+        return [
+            self.build_mapped_action(
+                action["category"],
+                action["local_path"],
+                action["source_path"],
+                changed_path,
+            )
+            for action in actions
+        ]
 
     def run(self) -> None:
         """Generate the Stage 1 report and manifest in the thread folder."""
@@ -110,19 +162,28 @@ class PrepAnalyzer:
         inspired_sources_modified: list[tuple[str, list[str]]] = []
         untracked: list[str] = []
         deleted: list[str] = []
+        blocker_paths: list[str] = []
         discuss_paths: list[str] = []
 
-        source_to_shadows: dict[str, list[MappedAction]] = {}
+        source_to_shadows: dict[str, list[SourceAction]] = {}
         for category, mapping in self.shadow_mappings_by_category.items():
             for shadow, source in mapping.items():
                 source_to_shadows.setdefault(source, []).append(
-                    {"category": category, "local_path": shadow}
+                    {
+                        "category": category,
+                        "local_path": shadow,
+                        "source_path": source,
+                    }
                 )
 
-        source_to_inspired: dict[str, list[MappedAction]] = {}
+        source_to_inspired: dict[str, list[SourceAction]] = {}
         for local, source in self.inspired_mappings.items():
             source_to_inspired.setdefault(source, []).append(
-                {"category": "inspired_by_upstream", "local_path": local}
+                {
+                    "category": "inspired_by_upstream",
+                    "local_path": local,
+                    "source_path": source,
+                }
             )
 
         discuss_lookup = {
@@ -140,6 +201,26 @@ class PrepAnalyzer:
 
             if status == "D":
                 deleted.append(path)
+                blocker_paths.append(path)
+                for src, actions in source_to_shadows.items():
+                    if src.endswith("/") and path.startswith(src):
+                        mapped_actions[path] = self.build_mapped_actions(actions, path)
+                        break
+                    if path == src:
+                        mapped_actions[path] = self.build_mapped_actions(actions, path)
+                        break
+
+                for src, actions in source_to_inspired.items():
+                    if src.endswith("/") and path.startswith(src):
+                        mapped_actions.setdefault(path, []).extend(
+                            self.build_mapped_actions(actions, path)
+                        )
+                        break
+                    if path == src:
+                        mapped_actions.setdefault(path, []).extend(
+                            self.build_mapped_actions(actions, path)
+                        )
+                        break
                 continue
 
             changed_upstream_paths.add(path)
@@ -153,33 +234,37 @@ class PrepAnalyzer:
 
             for src, actions in source_to_shadows.items():
                 if src.endswith("/") and path.startswith(src):
+                    manifest_actions = self.build_mapped_actions(actions, path)
                     shadow_sources_modified.append(
-                        (path, [action["local_path"] for action in actions])
+                        (path, [action["local_path"] for action in manifest_actions])
                     )
-                    mapped_actions[path] = list(actions)
+                    mapped_actions[path] = manifest_actions
                     found_source = True
                     break
                 if path == src:
+                    manifest_actions = self.build_mapped_actions(actions, path)
                     shadow_sources_modified.append(
-                        (path, [action["local_path"] for action in actions])
+                        (path, [action["local_path"] for action in manifest_actions])
                     )
-                    mapped_actions[path] = list(actions)
+                    mapped_actions[path] = manifest_actions
                     found_source = True
                     break
 
             for src, actions in source_to_inspired.items():
                 if src.endswith("/") and path.startswith(src):
+                    manifest_actions = self.build_mapped_actions(actions, path)
                     inspired_sources_modified.append(
-                        (path, [action["local_path"] for action in actions])
+                        (path, [action["local_path"] for action in manifest_actions])
                     )
-                    mapped_actions.setdefault(path, []).extend(actions)
+                    mapped_actions.setdefault(path, []).extend(manifest_actions)
                     found_source = True
                     break
                 if path == src:
+                    manifest_actions = self.build_mapped_actions(actions, path)
                     inspired_sources_modified.append(
-                        (path, [action["local_path"] for action in actions])
+                        (path, [action["local_path"] for action in manifest_actions])
                     )
-                    mapped_actions.setdefault(path, []).extend(actions)
+                    mapped_actions.setdefault(path, []).extend(manifest_actions)
                     found_source = True
                     break
 
@@ -187,6 +272,8 @@ class PrepAnalyzer:
                 not found_source and path not in self.modified_upstream
             ):
                 untracked.append(path)
+                if status == "A" and not found_source:
+                    blocker_paths.append(path)
 
         report = self.generate_report(
             tracked=tracked_modified,
@@ -194,6 +281,7 @@ class PrepAnalyzer:
             inspired=inspired_sources_modified,
             untracked=untracked,
             deleted=deleted,
+            blockers=sorted(set(blocker_paths)),
             from_sha=from_sha,
             to_sha=to_sha,
         )
@@ -202,6 +290,7 @@ class PrepAnalyzer:
             to_sha=to_sha,
             changed_upstream_paths=sorted(changed_upstream_paths),
             deleted_upstream_paths=sorted(set(deleted)),
+            blocker_paths=sorted(set(blocker_paths)),
             mapped_actions=mapped_actions,
             discuss_paths=sorted(set(discuss_paths)),
         )
@@ -223,6 +312,7 @@ class PrepAnalyzer:
         inspired: list[tuple[str, list[str]]],
         untracked: list[str],
         deleted: list[str],
+        blockers: list[str],
         from_sha: str,
         to_sha: str,
     ) -> str:
@@ -295,12 +385,12 @@ class PrepAnalyzer:
             lines.append("_No inspired sources modified._")
         lines.append("")
 
-        lines.append("## Untracked Changes")
+        lines.append("## New Or Unmapped Upstream Changes")
         if untracked:
             for path in sorted(set(untracked)):
                 lines.append(f"- {path}")
         else:
-            lines.append("_No untracked changes._")
+            lines.append("_No new or unmapped upstream changes._")
         lines.append("")
 
         if deleted:
@@ -308,6 +398,17 @@ class PrepAnalyzer:
             for path in sorted(set(deleted)):
                 lines.append(f"- {path}")
             lines.append("")
+
+        lines.append("## Stage 1 Blocker Paths")
+        if blockers:
+            lines.append(
+                "Resolve these paths before running `execute_sync.py`; rerun prep after registry/SMD or run-specific scope changes."
+            )
+            for path in blockers:
+                lines.append(f"- {path}")
+        else:
+            lines.append("_No Stage 1 blockers._")
+        lines.append("")
 
         return "\n".join(lines)
 
@@ -317,6 +418,7 @@ class PrepAnalyzer:
         to_sha: str,
         changed_upstream_paths: list[str],
         deleted_upstream_paths: list[str],
+        blocker_paths: list[str],
         mapped_actions: dict[str, list[MappedAction]],
         discuss_paths: list[str],
     ) -> dict[str, object]:
@@ -325,9 +427,10 @@ class PrepAnalyzer:
             "from_upstream_sha": from_sha,
             "to_upstream_sha": to_sha,
             "target_upstream_ref": self.accepted_sync["last_accepted_upstream_ref"],
-            "generated_at": self.accepted_sync["last_accepted_upstream_date"],
+            "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
             "changed_upstream_paths": changed_upstream_paths,
             "deleted_upstream_paths": deleted_upstream_paths,
+            "blocker_paths": blocker_paths,
             "mapped_actions": mapped_actions,
             "discuss_paths": discuss_paths,
         }

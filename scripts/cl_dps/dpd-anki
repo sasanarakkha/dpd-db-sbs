@@ -12,8 +12,14 @@ LOG_BASE_NAME="anki_update"
 TARGET_SCRIPT_PATH="${PROJECT_ROOT}/scripts/export/dps_anki_updater.py"
 TEST_SCRIPT_PATH="${PROJECT_ROOT}/db_tests/sbs_consistency_tests.py"
 
+# fix chants before testing
+bash "${MASTER_SCRIPT}" "${LOG_BASE_NAME}" bash -c "cd '${PROJECT_ROOT}' && uv run python '${PROJECT_ROOT}/scripts/change_in_db/update_sbs_chants_in_db.py'"
+
 # run tests
-bash "${MASTER_SCRIPT}" "${LOG_BASE_NAME}" bash -c "cd '${PROJECT_ROOT}' && uv run python '${TEST_SCRIPT_PATH}'"
+if ! bash "${MASTER_SCRIPT}" "${LOG_BASE_NAME}" bash -c "cd '${PROJECT_ROOT}' && uv run python '${TEST_SCRIPT_PATH}'"; then
+    echo -e "\033[1;31m SBS consistency tests FAILED. Aborting Anki update. \033[0m"
+    exit 1
+fi
 
 # The command to run, including 'uv run python'
 BASE_COMMAND_TO_EXECUTE="cd '${PROJECT_ROOT}' && uv run python '${TARGET_SCRIPT_PATH}'"

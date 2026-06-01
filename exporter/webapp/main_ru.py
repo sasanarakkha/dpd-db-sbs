@@ -3,6 +3,7 @@ from contextlib import contextmanager
 
 import uvicorn
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import HTMLResponse, Response, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -34,6 +35,7 @@ pth: ProjectPaths = ProjectPaths()
 rupth: RuPaths = RuPaths()
 app = FastAPI()
 
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["GET"])
 app.add_middleware(GZipMiddleware, minimum_size=500)
 app.mount("/static", StaticFiles(directory=str(pth.webapp_static_dir)), name="static")
 
@@ -469,9 +471,9 @@ async def track_performance(request: Request, call_next):
                     break
 
         # Decode Unicode request string
-        request_display = unquote(str(request.url.path))
+        request_display = unquote(request.url.path)
         if request.url.query:
-            request_display += f"?{unquote(str(request.url.query))}"
+            request_display += f"?{unquote(request.url.query)}"
 
         if route_pattern:
             # Official Endpoint

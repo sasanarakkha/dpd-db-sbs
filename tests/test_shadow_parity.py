@@ -6,6 +6,8 @@ from pathlib import Path
 
 import pytest
 
+type WhitelistEntry = dict[str, object]
+
 
 def get_registry_path() -> Path:
     return Path("kamma/upstream_sync/registry.json")
@@ -31,6 +33,10 @@ def get_python_pairs() -> list[tuple[str, str]]:
             pairs.append((shadow, upstream))
 
     for shadow, upstream in registry.get("dps_copies", {}).items():  # type: ignore[union-attr]
+        if shadow.endswith(".py") and upstream.endswith(".py"):
+            pairs.append((shadow, upstream))
+
+    for shadow, upstream in registry.get("tamil_copies", {}).items():  # type: ignore[union-attr]
         if shadow.endswith(".py") and upstream.endswith(".py"):
             pairs.append((shadow, upstream))
 
@@ -66,11 +72,23 @@ def extract_ast_info(filepath: str) -> dict[str, set[str]] | None:
     return {"imports": imports, "functions": functions, "classes": classes}
 
 
-WHITELIST = {
+WHITELIST: dict[str, WhitelistEntry] = {
     "db/families/family_compound_ru.py": {"functions": ["compile_cf_html"]},
     "db/families/family_idiom_ru.py": {
-        "functions": ["compile_idioms_html", "sync_idiom_numbers_with_family_compound"],
-        "imports": ["re"],
+        "functions": [
+            "compile_idioms_html",
+            "sync_idiom_numbers_with_family_compound",
+            "update_db_cache",
+        ],
+        "imports": ["re", "json", "db.models.DbInfo"],
+    },
+    "db/tpd/tpd_to_lookup.py": {
+        "functions": [
+            "compile_roots_data",
+            "make_meaning_plus_case",
+            "make_clean_meaning_list",
+        ],
+        "imports": ["re", "db.models.DpdRoot"],
     },
     "db/families/family_root_ru.py": {
         "functions": [
@@ -312,6 +330,13 @@ WHITELIST = {
 }
 
 
+def whitelist_values(shadow_whitelist: WhitelistEntry, key: str) -> set[str]:
+    value = shadow_whitelist.get(key, [])
+    if not isinstance(value, list):
+        return set()
+    return {item for item in value if isinstance(item, str)}
+
+
 @pytest.mark.parametrize("shadow, upstream", get_python_pairs())
 def test_shadow_copy_parity(shadow, upstream):
     """
@@ -340,12 +365,9 @@ def test_shadow_copy_parity(shadow, upstream):
 
     # Filter with whitelist
     shadow_whitelist = WHITELIST.get(shadow, {})
-    if "imports" in shadow_whitelist:
-        missing_imports -= set(shadow_whitelist["imports"])
-    if "functions" in shadow_whitelist:
-        missing_functions -= set(shadow_whitelist["functions"])
-    if "classes" in shadow_whitelist:
-        missing_classes -= set(shadow_whitelist["classes"])
+    missing_imports -= whitelist_values(shadow_whitelist, "imports")
+    missing_functions -= whitelist_values(shadow_whitelist, "functions")
+    missing_classes -= whitelist_values(shadow_whitelist, "classes")
 
     errors = []
     # Note: Sometimes shadow copies intentionally drop things or rename things.

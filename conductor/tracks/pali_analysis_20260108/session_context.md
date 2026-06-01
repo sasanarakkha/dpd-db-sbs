@@ -7,7 +7,7 @@
 
 ## Key Implementation Details (Session Jan 14, 2026)
 
-### 1. Analyzer Logic Refinements (`exporter/mcp/analyzer.py`)
+### 1. Analyzer Logic Refinements (`exporter/analysis/analyzer.py`)
 *   **Compound Breakdown Sources:**
     *   **Dvanda**: Strictly uses `construction_summary` (simple split).
     *   **Kammadhāraya, Abyayībhāva, Tappurisa, Digu**: Prioritizes `compound_construction` if available (handling `<b>` tags for inflection).
@@ -22,7 +22,7 @@
     *   **Outcome:** This successfully excludes irrelevant inflected forms (e.g., `santa` loc. sg.) when looking for a stem (`sati`).
 *   **Recursive Logic:** The `is_compound_part` block was refactored to respect the `is_inflected_part` flag, ensuring that even simplified component entries undergo strict stem filtering.
 
-### 2. AI Translation & Safe Merge (`exporter/mcp/ai_pali_translate.py`)
+### 2. AI Translation & Safe Merge (`exporter/analysis/ai_pali_translate.py`)
 *   **Flat Score Architecture:** The AI now returns a flat dictionary of `scores` keyed by option ID (e.g., `{"11766_0": {"score": 10, ...}}`) instead of reconstructing the tree.
 *   **Safe Merge:** Python merges these scores into the master JSON output.
 *   **Markdown Formatting:**
@@ -48,6 +48,6 @@
 *   **GUI Verification:** Confirm the new recursive markdown table looks correct in the actual `gui2` interface.
 
 ## Files Modified
-- `exporter/mcp/analyzer.py` (Major logic overhaul)
-- `exporter/mcp/ai_pali_translate.py` (3-step pipeline, recursive markdown)
+- `exporter/analysis/analyzer.py` (Major logic overhaul)
+- `exporter/analysis/ai_pali_translate.py` (3-step pipeline, recursive markdown)
 - `conductor/workflow.md` (Process improvements)

@@ -8,17 +8,26 @@ from rich.prompt import Prompt
 from db.models import DpdHeadword
 from db_tests.single.add_synonym_variant_multi import (
     GlobalVars,
-    _assign,
     _entry_label,
     _format_fields,
     _general_key,
     _show_result,
-    _split_field,
-    clean_meaning,
-    grammar_signature,
 )
 from tools.db_search_string import db_search_string
 from tools.printer import printer as pr
+from tools.synonym_variant import (
+    TILINGA_POS,
+    assign_relationship,
+    clean_meaning,
+    grammar_signature,
+    pair_consistently_related_sets,
+    pos_class,
+    split_field,
+)
+
+# Temporary review filter: when True, only show cross-pos pairs from the
+# tiliṅga class (adj/pp/ptp/prp). Set to False to see everything.
+ONLY_TILINGA_CROSS_POS = False
 
 
 def _pair_key_single(
@@ -40,15 +49,15 @@ def find_single_meaning_pairs(g: GlobalVars) -> None:
 
     for hw in g.dpd_db:
         syn_sets[hw.id] = set(hw.synonym_list)
-        phon_sets[hw.id] = _split_field(hw.var_phonetic)
-        text_sets[hw.id] = _split_field(hw.var_text)
+        phon_sets[hw.id] = split_field(hw.var_phonetic)
+        text_sets[hw.id] = split_field(hw.var_text)
         if not hw.meaning_1 or "; " in hw.meaning_1:
             continue
         cleaned = clean_meaning(hw.meaning_1)
         if not cleaned:
             continue
         sig = grammar_signature(hw.grammar)
-        buckets.setdefault((hw.pos, sig, cleaned), []).append(hw)
+        buckets.setdefault((pos_class(hw.pos), sig, cleaned), []).append(hw)
 
     pairs: list[tuple[DpdHeadword, DpdHeadword, str]] = []
     seen: set[frozenset[int]] = set()
@@ -58,6 +67,12 @@ def find_single_meaning_pairs(g: GlobalVars) -> None:
             continue
         for i, hw_a in enumerate(entries):
             for hw_b in entries[i + 1 :]:
+                if ONLY_TILINGA_CROSS_POS and not (
+                    hw_a.pos != hw_b.pos
+                    and hw_a.pos in TILINGA_POS
+                    and hw_b.pos in TILINGA_POS
+                ):
+                    continue
                 edge = frozenset({hw_a.id, hw_b.id})
                 if edge in seen:
                     continue
@@ -68,20 +83,9 @@ def find_single_meaning_pairs(g: GlobalVars) -> None:
                 gen_key = _general_key(pos, [meaning])
                 if key in g.exceptions or gen_key in g.exceptions:
                     continue
-                a_clean = hw_a.lemma_clean
-                b_clean = hw_b.lemma_clean
-                a_has_b = (
-                    b_clean in syn_sets[hw_a.id]
-                    or b_clean in phon_sets[hw_a.id]
-                    or b_clean in text_sets[hw_a.id]
-                )
-                b_has_a = (
-                    a_clean in syn_sets[hw_b.id]
-                    or a_clean in phon_sets[hw_b.id]
-                    or a_clean in text_sets[hw_b.id]
-                )
-                already_related = a_has_b and b_has_a
-                if already_related:
+                if pair_consistently_related_sets(
+                    hw_a, hw_b, syn_sets, phon_sets, text_sets
+                ):
                     continue
                 pairs.append((hw_a, hw_b, meaning))
 
@@ -101,7 +105,7 @@ def prompt_pairs(g: GlobalVars) -> bool:
 
     for counter, (hw_a, hw_b, shared) in enumerate(g.pairs):
         meaning = shared[0]
-        pos = hw_a.pos
+        pos = pos_class(hw_a.pos)
         gen_key = _general_key(pos, [meaning])
         if gen_key in g.exceptions:
             continue
@@ -126,22 +130,22 @@ def prompt_pairs(g: GlobalVars) -> bool:
         )
 
         if choice == "s":
-            _assign(hw_a, hw_b.lemma_clean, "synonym")
-            _assign(hw_b, hw_a.lemma_clean, "synonym")
+            assign_relationship(hw_a, hw_b.lemma_clean, "synonym")
+            assign_relationship(hw_b, hw_a.lemma_clean, "synonym")
             _show_result(hw_a)
             _show_result(hw_b)
             g.db_session.commit()
 
         elif choice == "p":
-            _assign(hw_a, hw_b.lemma_clean, "var_phonetic")
-            _assign(hw_b, hw_a.lemma_clean, "var_phonetic")
+            assign_relationship(hw_a, hw_b.lemma_clean, "var_phonetic")
+            assign_relationship(hw_b, hw_a.lemma_clean, "var_phonetic")
             _show_result(hw_a)
             _show_result(hw_b)
             g.db_session.commit()
 
         elif choice == "t":
-            _assign(hw_a, hw_b.lemma_clean, "var_text")
-            _assign(hw_b, hw_a.lemma_clean, "var_text")
+            assign_relationship(hw_a, hw_b.lemma_clean, "var_text")
+            assign_relationship(hw_b, hw_a.lemma_clean, "var_text")
             _show_result(hw_a)
             _show_result(hw_b)
             g.db_session.commit()

@@ -2,7 +2,7 @@
 
 
 **File**: `tools/degree_of_completion_ru.py`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. `ru_degree_of_completion` function wraps upstream `degree_of_completion`.
@@ -31,7 +31,7 @@
 
 
 **File**: `tools/ru_spelling.py`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. `RuSpellChecker` singleton using `SpellChecker(language="ru")`.
@@ -45,7 +45,7 @@
 
 
 **File**: `tools/translit_ru.py`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. `is_cyrillic` helper using Unicode range check (`\u0400` - `\u04FF`).
@@ -58,7 +58,7 @@
 
 
 **File**: `tools/version_ru.py`
-- **Category**: russian_copy
+- **Category**: russian_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. `make_version` returns an additional `version_ru` string (prefixed with `ru_`).
@@ -71,7 +71,7 @@
 
 
 **File**: `tools/utils_sbs.py`
-- **Category**: sbs_copy
+- **Category**: sbs_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. Adds `paragraphs_are_similar` utility (used by `db/models.py`).

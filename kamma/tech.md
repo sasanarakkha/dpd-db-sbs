@@ -31,6 +31,7 @@ GUI onboarding workflow.
 - The root directory must stay clean — no temporary scripts or artifacts.
 - **No Inline Scripting**: NEVER use `python -c "..."` or `python3 -c "..."` in Bash. If you need a one-shot script, write it to `temp/<descriptive_name>.py` and run `uv run python temp/<descriptive_name>.py`. Delete the file when done.
 - **Atomic Rename Protocol**: Renames/moves are atomic. All imports, paths, scripts, registries, and docs MUST be updated and staged in the same commit as the `git mv`.
+- **Mandatory UI Tooling**: All Python scripts MUST use `tools.printer` (`pr`) for console output (UI, status, timing) instead of standard `print()`. Use `pr.tic()` / `pr.toc()` for script-level timing and `pr.bip()` / `pr.yes()` etc. for step-level timing. Standard `print()` is only allowed for outputting structured data intended for piping or when explicitly marked as debug (e.g., using `icecream`).
 - Releases are time-boxed to Uposatha days (~monthly).
 
 ## Resources

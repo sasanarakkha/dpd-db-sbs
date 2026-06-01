@@ -1,3 +1,5 @@
+"""Build localized GoldenDict render data for DPS exporters."""
+
 from typing import Set
 from db.models import (
     DpdHeadword,
@@ -14,6 +16,8 @@ from db.models import (
     Tamil,
 )
 from tools.paths import ProjectPaths
+from tools.paths_dps import DPSPaths
+from tools.paths_ru import RuPaths
 from tools.meaning_construction import make_grammar_line, make_meaning_combo_html
 from tools.pos import CONJUGATIONS, DECLENSIONS
 from exporter.goldendict.helpers import TODAY
@@ -39,8 +43,8 @@ class HeadwordData:
         fc: list[FamilyCompound],
         fi: list[FamilyIdiom],
         fs: list[FamilySet],
-        su: SuttaInfo,
-        pth: ProjectPaths,
+        su: SuttaInfo | None,
+        pth: ProjectPaths | RuPaths | DPSPaths,
         jinja_env,
         cf_set: Set[str],
         idioms_set: Set[str],
@@ -73,10 +77,7 @@ class HeadwordData:
         self.show_ta_data = show_ta_data
         self.ru = self._convert_newlines_ru(ru) if ru else None
         self.sbs = self._convert_newlines_sbs(sbs) if sbs else None
-        if ta:
-            self.ta = ta
-        else:
-            self.ta = None
+        self.ta: Tamil | None = ta
         self.today = TODAY
         self.date = year_month_day_dash()
         self.grammar = make_grammar_line(i)
@@ -133,7 +134,6 @@ class HeadwordData:
             "example_2",
             "commentary",
             "notes",
-            "link",
         ]
         for attr_name in attrs:
             attr_value = getattr(obj, attr_name, None)

@@ -1,16 +1,20 @@
+"""Verify automated upstream sync execution refuses unsafe repository states."""
+
 import unittest
-from unittest.mock import patch, MagicMock
-from pathlib import Path
-import os
 import shutil
 import tempfile
+from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 from kamma.upstream_sync.scripts.execute_sync import (
-    get_run_specific_exclusions,
-    get_permanent_exclusions,
     GitContext,
-    GitError,
+    execute_sync,
+    get_permanent_exclusions,
+    get_run_specific_exclusions,
+    run_sync_assertions,
+    validate_repo_relative_paths,
 )
+
 
 class TestExecuteSync(unittest.TestCase):
     def setUp(self):
@@ -26,13 +30,13 @@ class TestExecuteSync(unittest.TestCase):
         # Mock git rev-parse --abbrev-ref HEAD
         mock_rev_parse = MagicMock()
         mock_rev_parse.stdout = "sbs-ru\n"
-        
+
         # Mock git status --porcelain
         mock_status = MagicMock()
         mock_status.stdout = "M file.py\n"
-        
+
         mock_run.side_effect = [mock_rev_parse, mock_status]
-        
+
         context = GitContext()
         self.assertEqual(context.original_branch, "sbs-ru")
         self.assertTrue(context.is_dirty)
@@ -44,21 +48,26 @@ class TestExecuteSync(unittest.TestCase):
         mock_rev_parse_init.stdout = "sbs-ru\n"
         mock_status_init = MagicMock()
         mock_status_init.stdout = ""
-        
+
         # State during restore
         mock_rev_parse_current = MagicMock()
         mock_rev_parse_current.stdout = "as_upstream\n"
-        
+
         # Calls:
         # 1. _get_current_branch (in __init__)
         # 2. _check_if_dirty (in __init__)
         # 3. _get_current_branch (in restore_original_state)
         # 4. subprocess.run(["git", "checkout", ...])
-        mock_run.side_effect = [mock_rev_parse_init, mock_status_init, mock_rev_parse_current, MagicMock()]
-        
+        mock_run.side_effect = [
+            mock_rev_parse_init,
+            mock_status_init,
+            mock_rev_parse_current,
+            MagicMock(),
+        ]
+
         context = GitContext()
         context.restore_original_state()
-        
+
         mock_run.assert_any_call(["git", "checkout", "sbs-ru"], check=False)
 
     def test_get_run_specific_exclusions_empty(self):
@@ -68,10 +77,59 @@ class TestExecuteSync(unittest.TestCase):
 
     def test_get_run_specific_exclusions_with_file(self):
         exclusions_file = self.thread_dir / "run_exclusions.txt"
-        exclusions_file.write_text("path/to/file1\n# comment\n  path/to/file2  \n\n", encoding="utf-8")
-        
+        exclusions_file.write_text(
+            "path/to/file1\n# comment\npath/to/file2\n\n", encoding="utf-8"
+        )
+
         exclusions = get_run_specific_exclusions(str(self.thread_dir))
         self.assertEqual(exclusions, ["path/to/file1", "path/to/file2"])
+
+    def test_get_run_specific_exclusions_rejects_padded_path(self):
+        exclusions_file = self.thread_dir / "run_exclusions.txt"
+        exclusions_file.write_text("  path/to/file  \n", encoding="utf-8")
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "run-specific exclusions\\[0\\] must not contain surrounding whitespace",
+        ):
+            get_run_specific_exclusions(str(self.thread_dir))
+
+    def test_get_run_specific_exclusions_rejects_unsafe_path(self):
+        exclusions_file = self.thread_dir / "run_exclusions.txt"
+        exclusions_file.write_text("../outside\n", encoding="utf-8")
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "run-specific exclusions\\[0\\] must stay inside the repository",
+        ):
+            get_run_specific_exclusions(str(self.thread_dir))
+
+    def test_validate_repo_relative_paths_rejects_absolute_and_parent_paths(self):
+        with self.assertRaisesRegex(
+            ValueError, "test paths\\[0\\] must be a repo-relative path"
+        ):
+            validate_repo_relative_paths(["/tmp/outside"], "test paths")
+
+        with self.assertRaisesRegex(
+            ValueError, "test paths\\[0\\] must stay inside the repository"
+        ):
+            validate_repo_relative_paths(["../outside"], "test paths")
+
+    def test_validate_repo_relative_paths_rejects_option_like_and_globs(self):
+        with self.assertRaisesRegex(
+            ValueError, "test paths\\[0\\] must not start with '-'"
+        ):
+            validate_repo_relative_paths(["--cached"], "test paths")
+
+        with self.assertRaisesRegex(
+            ValueError, "test paths\\[0\\] must not use git pathspec magic"
+        ):
+            validate_repo_relative_paths([":(glob)docs/**"], "test paths")
+
+        with self.assertRaisesRegex(
+            ValueError, "test paths\\[0\\] must not contain git pathspec metacharacters"
+        ):
+            validate_repo_relative_paths(["exporter/**/*.py"], "test paths")
 
     @patch("kamma.upstream_sync.scripts.execute_sync.load_registry")
     def test_get_permanent_exclusions(self, mock_load_registry):
@@ -79,15 +137,298 @@ class TestExecuteSync(unittest.TestCase):
             "no_sync_files": ["infra/file1"],
             "modified_upstream_files": [
                 "db/models.py",
-                {"path": "exporter/goldendict/export_goldendict.py"}
-            ]
+                {"path": "exporter/goldendict/export_goldendict.py"},
+            ],
         }
-        
+
         exclusions = get_permanent_exclusions()
         self.assertIn("infra/file1", exclusions)
         self.assertIn("db/models.py", exclusions)
         self.assertIn("exporter/goldendict/export_goldendict.py", exclusions)
         self.assertEqual(len(exclusions), 3)
+
+    @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
+    def test_execute_sync_requires_thread_dir(self, mock_context_class):
+        result = execute_sync(None)
+
+        self.assertEqual(result, 1)
+        mock_context_class.assert_not_called()
+
+    @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
+    def test_execute_sync_rejects_dirty_working_tree(self, mock_context_class):
+        context = MagicMock()
+        context.is_dirty = True
+        context.original_branch = "sbs-ru"
+        mock_context_class.return_value = context
+
+        result = execute_sync(str(self.thread_dir))
+
+        self.assertEqual(result, 1)
+        context.restore_original_state.assert_not_called()
+
+    @patch("kamma.upstream_sync.scripts.execute_sync.verify_manifest", return_value=1)
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_accepted_sync_state")
+    @patch("kamma.upstream_sync.scripts.execute_sync.run_git")
+    @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
+    def test_execute_sync_rejects_invalid_manifest(
+        self,
+        mock_context_class,
+        mock_run_git,
+        mock_load_state,
+        mock_verify_manifest,
+    ):
+        context = MagicMock()
+        context.is_dirty = False
+        context.original_branch = "sbs-ru"
+        mock_context_class.return_value = context
+        mock_load_state.return_value = {"last_accepted_upstream_ref": "upstream/main"}
+        mock_run_git.side_effect = [
+            MagicMock(stdout=""),  # git fetch upstream
+            MagicMock(stdout="newsha456\n"),  # rev-parse upstream/main
+        ]
+
+        result = execute_sync(str(self.thread_dir))
+
+        self.assertEqual(result, 1)
+        mock_verify_manifest.assert_called_once_with(
+            str(self.thread_dir),
+            accepted_sync_state={"last_accepted_upstream_ref": "upstream/main"},
+            target_sha="newsha456",
+            allow_discuss=False,
+            allow_blockers=False,
+        )
+        mock_run_git.assert_any_call(["git", "fetch", "upstream"])
+
+    @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
+    def test_execute_sync_rejects_wrong_starting_branch(self, mock_context_class):
+        context = MagicMock()
+        context.is_dirty = False
+        context.original_branch = "feature-work"
+        mock_context_class.return_value = context
+
+        result = execute_sync(str(self.thread_dir))
+
+        self.assertEqual(result, 1)
+
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_registry")
+    @patch(
+        "kamma.upstream_sync.scripts.execute_sync.run_sync_assertions", return_value=0
+    )
+    @patch("kamma.upstream_sync.scripts.execute_sync.verify_manifest", return_value=0)
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_accepted_sync_state")
+    @patch("kamma.upstream_sync.scripts.execute_sync.run_git")
+    @patch("kamma.upstream_sync.scripts.execute_sync.Path.exists", return_value=False)
+    @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
+    def test_execute_sync_updates_as_upstream_ref_to_manifest_sha(
+        self,
+        mock_context_class,
+        mock_path_exists,
+        mock_run_git,
+        mock_load_state,
+        mock_verify_manifest,
+        mock_run_assertions,
+        mock_load_registry,
+    ):
+        context = MagicMock()
+        context.is_dirty = False
+        context.original_branch = "sbs-ru"
+        mock_context_class.return_value = context
+        mock_load_state.return_value = {"last_accepted_upstream_ref": "upstream/main"}
+        mock_load_registry.return_value = {
+            "modified_upstream_files": [],
+            "no_sync_files": [],
+        }
+
+        mock_run_git.side_effect = [
+            MagicMock(stdout=""),  # git fetch upstream
+            MagicMock(stdout="newsha456\n"),  # rev-parse upstream/main
+            MagicMock(stdout="localsha789\n"),  # rev-parse HEAD
+            MagicMock(stdout=""),  # update-ref refs/heads/as_upstream newsha456
+            MagicMock(stdout=""),  # checkout as_upstream -- .
+        ]
+
+        result = execute_sync(str(self.thread_dir))
+
+        self.assertEqual(result, 0)
+        mock_verify_manifest.assert_called_once_with(
+            str(self.thread_dir),
+            accepted_sync_state={"last_accepted_upstream_ref": "upstream/main"},
+            target_sha="newsha456",
+            allow_discuss=False,
+            allow_blockers=False,
+        )
+        mock_run_git.assert_any_call(
+            ["git", "update-ref", "refs/heads/as_upstream", "newsha456"]
+        )
+        mock_run_assertions.assert_called_once_with("localsha789")
+        self.assertNotIn(
+            (["git", "reset", "--hard", "newsha456"],),
+            [call.args for call in mock_run_git.call_args_list],
+        )
+        self.assertNotIn(
+            (["git", "add", "."],),
+            [call.args for call in mock_run_git.call_args_list],
+        )
+
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_registry")
+    @patch(
+        "kamma.upstream_sync.scripts.execute_sync.run_sync_assertions", return_value=0
+    )
+    @patch("kamma.upstream_sync.scripts.execute_sync.verify_manifest", return_value=0)
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_accepted_sync_state")
+    @patch("kamma.upstream_sync.scripts.execute_sync.run_git")
+    @patch("kamma.upstream_sync.scripts.execute_sync.Path.exists", return_value=False)
+    @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
+    def test_execute_sync_stages_only_when_stage_flag_is_set(
+        self,
+        mock_context_class,
+        mock_path_exists,
+        mock_run_git,
+        mock_load_state,
+        mock_verify_manifest,
+        mock_run_assertions,
+        mock_load_registry,
+    ):
+        context = MagicMock()
+        context.is_dirty = False
+        context.original_branch = "sbs-ru"
+        mock_context_class.return_value = context
+        mock_load_state.return_value = {"last_accepted_upstream_ref": "upstream/main"}
+        mock_load_registry.return_value = {
+            "modified_upstream_files": [],
+            "no_sync_files": [],
+        }
+        mock_run_git.side_effect = [
+            MagicMock(stdout=""),
+            MagicMock(stdout="newsha456\n"),
+            MagicMock(stdout="localsha789\n"),
+            MagicMock(stdout=""),
+            MagicMock(stdout=""),
+            MagicMock(stdout=""),
+        ]
+
+        result = execute_sync(str(self.thread_dir), stage=True)
+
+        self.assertEqual(result, 0)
+        mock_run_git.assert_any_call(["git", "add", "."])
+        mock_run_assertions.assert_called_once_with("localsha789")
+
+    @patch("kamma.upstream_sync.scripts.execute_sync.subprocess.run")
+    @patch("kamma.upstream_sync.scripts.execute_sync.Path.exists", return_value=False)
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_registry")
+    @patch(
+        "kamma.upstream_sync.scripts.execute_sync.run_sync_assertions", return_value=0
+    )
+    @patch("kamma.upstream_sync.scripts.execute_sync.verify_manifest", return_value=0)
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_accepted_sync_state")
+    @patch("kamma.upstream_sync.scripts.execute_sync.run_git")
+    @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
+    def test_execute_sync_uses_path_separator_for_restore(
+        self,
+        mock_context_class,
+        mock_run_git,
+        mock_load_state,
+        mock_verify_manifest,
+        mock_run_assertions,
+        mock_load_registry,
+        mock_path_exists,
+        mock_subprocess_run,
+    ):
+        context = MagicMock()
+        context.is_dirty = False
+        context.original_branch = "sbs-ru"
+        mock_context_class.return_value = context
+        mock_load_state.return_value = {"last_accepted_upstream_ref": "upstream/main"}
+        mock_load_registry.return_value = {
+            "modified_upstream_files": [{"path": "db/models.py"}],
+            "no_sync_files": [],
+        }
+        mock_run_git.side_effect = [
+            MagicMock(stdout=""),
+            MagicMock(stdout="newsha456\n"),
+            MagicMock(stdout="localsha789\n"),
+            MagicMock(stdout=""),
+            MagicMock(stdout=""),
+            MagicMock(stdout=""),
+        ]
+        mock_subprocess_run.return_value = MagicMock(returncode=0)
+
+        result = execute_sync(str(self.thread_dir))
+
+        self.assertEqual(result, 0)
+        mock_run_assertions.assert_called_once_with("localsha789")
+        mock_run_git.assert_any_call(
+            [
+                "git",
+                "restore",
+                "--source",
+                "localsha789",
+                "--staged",
+                "--worktree",
+                "--",
+                "db/models.py",
+            ]
+        )
+
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_registry")
+    @patch(
+        "kamma.upstream_sync.scripts.execute_sync.run_sync_assertions", return_value=1
+    )
+    @patch("kamma.upstream_sync.scripts.execute_sync.verify_manifest", return_value=0)
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_accepted_sync_state")
+    @patch("kamma.upstream_sync.scripts.execute_sync.run_git")
+    @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
+    def test_execute_sync_fails_when_assertions_fail(
+        self,
+        mock_context_class,
+        mock_run_git,
+        mock_load_state,
+        mock_verify_manifest,
+        mock_run_assertions,
+        mock_load_registry,
+    ):
+        context = MagicMock()
+        context.is_dirty = False
+        context.original_branch = "sbs-ru"
+        mock_context_class.return_value = context
+        mock_load_state.return_value = {"last_accepted_upstream_ref": "upstream/main"}
+        mock_load_registry.return_value = {
+            "modified_upstream_files": [],
+            "no_sync_files": [],
+        }
+        mock_run_git.side_effect = [
+            MagicMock(stdout=""),
+            MagicMock(stdout="newsha456\n"),
+            MagicMock(stdout="localsha789\n"),
+            MagicMock(stdout=""),
+            MagicMock(stdout=""),
+        ]
+
+        result = execute_sync(str(self.thread_dir))
+
+        self.assertEqual(result, 1)
+        mock_run_assertions.assert_called_once_with("localsha789")
+
+    @patch("kamma.upstream_sync.scripts.execute_sync.run_git")
+    def test_run_sync_assertions_uses_python_git_checks(self, mock_run_git):
+        mock_run_git.side_effect = [
+            MagicMock(stdout="db/models.py | 2 +-\n"),
+            MagicMock(stdout="db/models.py\nexporter/goldendict/templates/new.jinja\n"),
+            MagicMock(stdout="exporter/goldendict/templates/new.jinja\n"),
+        ]
+
+        result = run_sync_assertions("oldsha123")
+
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            [call.args[0] for call in mock_run_git.call_args_list],
+            [
+                ["git", "diff", "--stat", "oldsha123"],
+                ["git", "diff", "--name-only", "oldsha123"],
+                ["git", "diff", "--name-only", "--diff-filter=A", "oldsha123"],
+            ],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

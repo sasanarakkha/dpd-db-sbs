@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
+"""Manage OpenAI Batch API operations including upload, status check, and result saving."""
 
 import openai
-
-import os
 import json
 
 from tools.ai_related import get_ai_client, print_ai_config
@@ -11,6 +10,7 @@ from db.db_helpers import get_db_session
 from db.models import Russian, Tamil
 from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
+from tools.printer import printer as pr
 
 dpspth = DPSPaths()
 pth = ProjectPaths()
@@ -19,18 +19,22 @@ db_session = get_db_session(pth.dpd_db_path)
 
 def upload_and_create_batch(file_name: str) -> None:
     """Uploads a file and creates a batch for processing."""
+    pr.tic()
     client = get_ai_client()
     print_ai_config()
     if client is None or client.__class__.__module__.split(".")[0] != "openai":
-        print("Batch API is only supported for OpenAI client.")
+        pr.red("Batch API is only supported for OpenAI client.")
         return
 
     def _openai_upload_and_create_batch(client, file_name: str) -> None:
-        file_path: str = os.path.join(dpspth.ai_for_batch_api_dir, f"{file_name}.jsonl")
+        file_path = dpspth.ai_for_batch_api_dir / f"{file_name}.jsonl"
         try:
+            pr.green_tmr(f"uploading {file_path.name}")
             with open(file_path, "rb") as file:
                 batch_input_file = client.files.create(file=file, purpose="batch")
-                print("File upload response:", batch_input_file)
+                pr.yes("ok")
+
+                pr.green_tmr("creating batch")
                 num_lines: int = sum(1 for line in open(file_path, "r"))
                 batch_response = client.batches.create(
                     input_file_id=batch_input_file.id,
@@ -38,29 +42,30 @@ def upload_and_create_batch(file_name: str) -> None:
                     completion_window="24h",
                     metadata={"description": f"batch of {num_lines} words"},
                 )
-                print("Batch creation response:", batch_response)
+                pr.yes(batch_response.id)
+                pr.white(f"Status: {batch_response.status}")
         except openai.APIConnectionError as e:
-            print("The server could not be reached")
-            print(e.__cause__)
+            pr.red("The server could not be reached")
+            pr.red(str(e.__cause__))
         except openai.RateLimitError:
-            print("A 429 status code was received; we should back off a bit.")
+            pr.red("A 429 status code was received; we should back off a bit.")
         except openai.APIStatusError as e:
-            print("Another non-200-range status code was received")
-            print(e.status_code)
-            print(e.response)
+            pr.red(f"Another non-200-range status code was received: {e.status_code}")
 
     _openai_upload_and_create_batch(client, file_name)
+    pr.toc()
 
 
 def check_batch_list() -> None:
     client = get_ai_client()
     if client is None or client.__class__.__module__.split(".")[0] != "openai":
-        print("Batch API is only supported for OpenAI client.")
+        pr.red("Batch API is only supported for OpenAI client.")
         return
 
     def _openai_check_batch_list(client) -> None:
         try:
             batches = client.batches.list()
+            pr.green_title("OpenAI Batch List")
             for batch in batches:
                 status_msg = f"Batch ID: {batch.id}, Status: {batch.status}"
                 if batch.request_counts:
@@ -68,9 +73,9 @@ def check_batch_list() -> None:
                     status_msg += (
                         f", Progress: {counts.get('completed')}/{counts.get('total')}"
                     )
-                print(status_msg)
+                pr.white(status_msg)
         except Exception as e:
-            print("An error occurred while retrieving batch list:", str(e))
+            pr.red(f"An error occurred while retrieving batch list: {e}")
 
     _openai_check_batch_list(client)
 
@@ -78,13 +83,14 @@ def check_batch_list() -> None:
 def check_batch_status(batch_id: str) -> object | None:
     client = get_ai_client()
     if client is None or client.__class__.__module__.split(".")[0] != "openai":
-        print("Batch API is only supported for OpenAI client.")
+        pr.red("Batch API is only supported for OpenAI client.")
         return None
 
     def _openai_check_batch_status(client, batch_id: str) -> object | None:
         try:
+            pr.green_tmr(f"checking status: {batch_id}")
             batch_info = client.batches.retrieve(batch_id=batch_id)
-            status_msg = f"Batch ID: {batch_info.id}, Status: {batch_info.status}"
+            status_msg = f"Status: {batch_info.status}"
             if batch_info.request_counts:
                 counts = serialize_request_counts(batch_info.request_counts)
                 status_msg += (
@@ -92,12 +98,12 @@ def check_batch_status(batch_id: str) -> object | None:
                 )
                 if counts.get("failed", 0) > 0:
                     status_msg += f", Failed: {counts.get('failed')}"
-            print(status_msg)
+            pr.yes(batch_info.status)
+            pr.white(status_msg)
             return batch_info
         except Exception as e:
-            print(
-                f"An error occurred while retrieving batch {batch_id} status:", str(e)
-            )
+            pr.no("failed")
+            pr.red(f"An error occurred while retrieving batch {batch_id} status: {e}")
             return None
 
     return _openai_check_batch_status(client, batch_id)
@@ -116,7 +122,7 @@ def serialize_request_counts(request_counts: object | None) -> dict[str, int]:
 def print_batch_info(batch_id: str) -> None:
     client = get_ai_client()
     if client is None or client.__class__.__module__.split(".")[0] != "openai":
-        print("Batch API is only supported for OpenAI client.")
+        pr.red("Batch API is only supported for OpenAI client.")
         return
 
     def _openai_print_batch_info(client, batch_id: str) -> None:
@@ -144,11 +150,10 @@ def print_batch_info(batch_id: str) -> None:
                 "request_counts": serialize_request_counts(batch_info.request_counts),
                 "metadata": batch_info.metadata,
             }
-            print(json.dumps(batch_details, indent=2))
+            pr.white(json.dumps(batch_details, indent=2))
         except Exception as e:
-            print(
-                f"An error occurred while retrieving batch {batch_id} information:",
-                str(e),
+            pr.red(
+                f"An error occurred while retrieving batch {batch_id} information: {e}"
             )
 
     _openai_print_batch_info(client, batch_id)
@@ -157,19 +162,21 @@ def print_batch_info(batch_id: str) -> None:
 def cancel_batch(batch_id: str) -> None:
     client = get_ai_client()
     if client is None or client.__class__.__module__.split(".")[0] != "openai":
-        print("Batch API is only supported for OpenAI client.")
+        pr.red("Batch API is only supported for OpenAI client.")
         return
 
     def _openai_cancel_batch(client, batch_id: str) -> None:
         try:
+            pr.green_tmr(f"cancelling batch {batch_id}")
             batch_info = client.batches.retrieve(batch_id=batch_id)
             if batch_info:
                 client.batches.cancel(batch_id=batch_id)
-                print(f"Batch '{batch_id}' has been canceld successfully.")
+                pr.yes("ok")
             else:
-                print(f"Batch '{batch_id}' does not exist.")
+                pr.no("not found")
         except openai.APIError as e:
-            print(f"Error canceling batch '{batch_id}': {e}")
+            pr.no("failed")
+            pr.red(f"Error canceling batch '{batch_id}': {e}")
 
     _openai_cancel_batch(client, batch_id)
 
@@ -177,24 +184,25 @@ def cancel_batch(batch_id: str) -> None:
 def save_batch_results(
     batch_id: str, file_name: str, skip_empty: bool = True
 ) -> dict[str, str]:
+    pr.tic()
     client = get_ai_client()
     if client is None or client.__class__.__module__.split(".")[0] != "openai":
-        print("Batch API is only supported for OpenAI client.")
+        pr.red("Batch API is only supported for OpenAI client.")
         return {}
 
     def _openai_save_batch_results(
         client, batch_id: str, file_name: str, skip_empty: bool = True
     ) -> dict[str, str]:
         try:
+            pr.green_tmr(f"retrieving batch {batch_id}")
             batch_info = client.batches.retrieve(batch_id=batch_id)
             if batch_info.output_file_id:
+                pr.yes("ok")
                 output_file_id = batch_info.output_file_id
                 file_response = client.files.content(file_id=output_file_id)
                 response_lines = file_response.text.splitlines()
                 ids_and_contents: dict[str, str] = {}
-                file_path: str = os.path.join(
-                    dpspth.ai_for_batch_api_dir, f"{file_name}.jsonl"
-                )
+                file_path = dpspth.ai_for_batch_api_dir / f"{file_name}.jsonl"
 
                 # Statistics tracking
                 total_lines = len(response_lines)
@@ -203,6 +211,8 @@ def save_batch_results(
                 error_count = 0
                 missing_id_count = 0
 
+                pr.green_tmr("saving results")
+                file_path.parent.mkdir(parents=True, exist_ok=True)
                 with open(file_path, "a", encoding="utf-8") as f:
                     for line_num, line in enumerate(response_lines, 1):
                         try:
@@ -218,8 +228,8 @@ def save_batch_results(
                                 )
                             else:
                                 missing_id_count += 1
-                                print(
-                                    f"⚠ Line {line_num}: Missing custom_id in response"
+                                pr.amber(
+                                    f"Line {line_num}: Missing custom_id in response"
                                 )
                                 continue
 
@@ -234,8 +244,8 @@ def save_batch_results(
                                     .get("error", {})
                                     .get("message", "Unknown error")
                                 )
-                                print(
-                                    f"❌ Line {line_num} - HTTP {response_data.get('status_code', 'unknown')}: {error_msg}"
+                                pr.red(
+                                    f"Line {line_num} - HTTP {response_data.get('status_code', 'unknown')}: {error_msg}"
                                 )
                                 continue
 
@@ -243,7 +253,7 @@ def save_batch_results(
                             choices = response_data.get("body", {}).get("choices", [])
                             if not choices:
                                 error_count += 1
-                                print(f"❌ Line {line_num} - No choices in response")
+                                pr.red(f"Line {line_num} - No choices in response")
                                 continue
 
                             message = choices[0].get("message", {})
@@ -260,9 +270,7 @@ def save_batch_results(
                                         error_msg = response_data.get("error", {}).get(
                                             "message", "Unknown error"
                                         )
-                                        print(
-                                            f"❌ Line {line_num} - Error: {error_msg}"
-                                        )
+                                        pr.red(f"Line {line_num} - Error: {error_msg}")
                                     else:
                                         # Check for other response status indicators
                                         if (
@@ -270,20 +278,12 @@ def save_batch_results(
                                             and response_data["status_code"] != 200
                                         ):
                                             error_count += 1
-                                            print(
-                                                f"❌ Line {line_num} - Status: {response_data.get('status_code', 'unknown')}"
+                                            pr.red(
+                                                f"Line {line_num} - Status: {response_data.get('status_code', 'unknown')}"
                                             )
                                     continue
                                 else:
                                     skipped_empty_count += 1
-                                    if translated_text == "":
-                                        print(
-                                            f"⚠ Line {line_num} - Empty content (status: {response_data.get('status_code', 'unknown')}, finish_reason: {message.get('finish_reason', 'unknown')})"
-                                        )
-                                    else:
-                                        print(
-                                            f"⚠ Line {line_num} - No content returned for ID: {id}"
-                                        )
                                     continue
 
                             # Valid content found
@@ -298,73 +298,73 @@ def save_batch_results(
 
                         except json.JSONDecodeError as e:
                             error_count += 1
-                            print(f"❌ Line {line_num} - JSON decode error: {e}")
-                            print(
-                                f"   Problematic line: {line[:100]}{'...' if len(line) > 100 else ''}"
-                            )
+                            pr.red(f"Line {line_num} - JSON decode error: {e}")
                         except KeyError as e:
                             error_count += 1
-                            print(f"❌ Line {line_num} - Missing key: {e}")
+                            pr.red(f"Line {line_num} - Missing key: {e}")
                         except Exception as e:
                             error_count += 1
-                            print(f"❌ Line {line_num} - Unexpected error: {e}")
+                            pr.red(f"Line {line_num} - Unexpected error: {e}")
+
+                pr.yes("ok")
 
                 # Print summary
-                print(f"\n📊 Processing Summary for batch {batch_id}:")
-                print(f"   ✅ Successfully processed: {processed_count}")
-                print(f"   ⚠️  Skipped (empty content): {skipped_empty_count}")
-                print(f"   ❌ Errors: {error_count}")
-                print(f"   🔍 Missing IDs: {missing_id_count}")
-                print(f"   📄 Total lines processed: {total_lines}")
+                pr.summary("Processed", processed_count)
+                pr.summary("Skipped", skipped_empty_count)
+                pr.summary("Errors", error_count)
+                pr.summary("Missing IDs", missing_id_count)
+                pr.summary("Total", total_lines)
 
                 if processed_count > 0:
-                    print(
-                        f"✅ Successfully saved {processed_count} translations to {file_path}"
+                    pr.green(
+                        f"Successfully saved {processed_count} translations to {file_path}"
                     )
                 else:
-                    print("⚠️  No valid translations found to save")
+                    pr.amber("No valid translations found to save")
 
                 return ids_and_contents
             else:
-                print("No output file is available for this batch.")
+                pr.no("no output")
+                pr.amber("No output file is available for this batch.")
                 return {}
         except Exception as e:
-            print(
-                f"❌ An error occurred while downloading batch {batch_id} output file: {e}"
+            pr.no("failed")
+            pr.red(
+                f"An error occurred while downloading batch {batch_id} output file: {e}"
             )
             return {}
 
-    return _openai_save_batch_results(client, batch_id, file_name, skip_empty)
+    results = _openai_save_batch_results(client, batch_id, file_name, skip_empty)
+    pr.toc()
+    return results
 
 
 def save_processed_ids(ids_and_contents: dict[str, str]) -> None:
-    """Extract IDs from ids_and_contents and save to ai_processed_ids_json file.
-
-    Always starts fresh by completely rewriting the file content.
-    """
+    """Extract IDs from ids_and_contents and save to ai_processed_ids_json file."""
     ids = list(ids_and_contents.keys())
 
     try:
         # First, remove the existing file to ensure a completely fresh start
         if dpspth.ai_processed_ids_json.exists():
             dpspth.ai_processed_ids_json.unlink()
-            print(
+            pr.white(
                 f"Removed existing processed IDs file: {dpspth.ai_processed_ids_json}"
             )
 
         # Create new file with fresh content
         with open(dpspth.ai_processed_ids_json, "w", encoding="utf-8") as f:
             json.dump(ids, f, ensure_ascii=False, indent=2)
-        print(f"Fresh processed IDs saved to {dpspth.ai_processed_ids_json}")
-        print(f"Total IDs saved: {len(ids)}")
+        pr.green(f"Fresh processed IDs saved to {dpspth.ai_processed_ids_json}")
+        pr.summary("Total IDs saved", len(ids))
     except Exception as e:
-        print(f"Error saving processed IDs: {e}")
+        pr.red(f"Error saving processed IDs: {e}")
 
 
 def update_translation_table(
     ids_and_contents: dict[str, str], file_name_in: str
 ) -> None:
-    print("Updating translation in db")
+    pr.tic()
+    pr.green_title("Updating translation in db")
     updated_count: int = 0
     added_count: int = 0
 
@@ -372,7 +372,7 @@ def update_translation_table(
     # Expected format: {mode}-{lang}-{date}.jsonl
     parts = file_name_in.split("-")
     if len(parts) < 2:
-        print(f"❌ Could not parse mode and language from filename: {file_name_in}")
+        pr.red(f"Could not parse mode and language from filename: {file_name_in}")
         return
 
     mode = parts[0]
@@ -386,10 +386,10 @@ def update_translation_table(
         orm_model = Tamil
         field_to_update = "ta_meaning"
     else:
-        print(f"❌ Unsupported language: {lang}")
+        pr.red(f"Unsupported language: {lang}")
         return
 
-    print(
+    pr.white(
         f"Updating {orm_model.__name__}.{field_to_update} for lang: {lang}, mode: {mode}"
     )
 
@@ -412,14 +412,16 @@ def update_translation_table(
             new_record = orm_model(**record_data)
             added_count += 1
             db_session.add(new_record)
+
     db_session.commit()
-    print(f"Total updated records: {updated_count}")
-    print(f"Total added records: {added_count}")
+    pr.summary("Updated", updated_count)
+    pr.summary("Added", added_count)
     if skipped_count > 0:
-        print(f"Total skipped records (field not empty): {skipped_count}")
+        pr.summary("Skipped (not empty)", skipped_count)
 
     # Save processed IDs after successful database commit
     save_processed_ids(ids_and_contents)
+    pr.toc()
 
 
 if __name__ == "__main__":
@@ -440,4 +442,4 @@ if __name__ == "__main__":
     # if ids_and_contents:
     #     update_translation_table(ids_and_contents, file_name_in)
     # else:
-    #     print("⚠️ No valid results to update database")
+    #     pr.amber("No valid results to update database")

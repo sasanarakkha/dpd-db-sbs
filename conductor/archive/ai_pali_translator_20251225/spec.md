@@ -6,7 +6,7 @@ A CLI tool that provides high-quality Pāḷi-to-English translations by combini
 ## Functional Requirements
 
 ### 1. Analysis Integration
-- Use `analyze_sentence` from `exporter/mcp/analyzer.py` to get grammatical details for each word in the input sentence.
+- Use `analyze_sentence` from `exporter/analysis/analyzer.py` to get grammatical details for each word in the input sentence.
 
 ### 2. Prompt Construction
 - **System Prompt:** Define the LLM's role as an expert Pāḷi translator.

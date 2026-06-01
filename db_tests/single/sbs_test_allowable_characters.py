@@ -13,6 +13,7 @@ from tools.pali_alphabet import (
     sanskrit_alphabet,
 )
 from tools.paths import ProjectPaths
+from tools.unicode_char import unicode_char
 
 
 class AllowableCharacters:
@@ -131,7 +132,7 @@ class AllowableCharacters:
 
     cyrillic_pali = ["а̄", "ӣ", "ӯ", "н̇", "н̃", "т̣", "т̣х", "д̣", "д̣х", "н̣", "л̣", "м̣"]
 
-    number_ru = ['№']
+    number_ru = ["№"]
 
     # digits
     digits = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
@@ -687,123 +688,102 @@ class AllowableCharacters:
 
     ru_meaning_allowed = (
         # letters
-        cyrillic_characters +
-        cyrillic_capitals +
-        cyrillic_pali +
+        cyrillic_characters
+        + cyrillic_capitals
+        + cyrillic_pali
+        +
         # pali_alphabet +
         # pali_capitals +
         # niggahitas +
         # sanskrit_capitals +
         # greek_characters +
-        
         # digits
-        digits +
-        super_digits +
-        
+        digits
+        + super_digits
+        +
         # punctuation
-        space +
-        comma + 
-        semicolon +
-        fullstop +
-        exclamation + 
-        question +
-        apostrophe +
-        brackets +
-        percent +
-        forward_slash + 
-        dot_dot_dot + 
-        star +
-        root + 
-        equals +
-        ampersand +
-        dash +
-        number_ru +
-        quote
+        space
+        + comma
+        + semicolon
+        + fullstop
+        + exclamation
+        + question
+        + apostrophe
+        + brackets
+        + percent
+        + forward_slash
+        + dot_dot_dot
+        + star
+        + root
+        + equals
+        + ampersand
+        + dash
+        + number_ru
+        + quote
     )
 
-    root_meaning_ru_allowed = (
-        cyrillic_characters +
-        space +
-        comma 
-    )
+    root_meaning_ru_allowed = cyrillic_characters + space + comma
 
     ru_notes_allowed = (
-        pali_alphabet +
-        pali_capitals +
-        cyrillic_characters +
-        cyrillic_capitals +
-        english_capitals +
-        sanskrit_alphabet +
-        sanskrit_capitals +
-        german_characters +
-        digits +
-        space +
-        comma +
-        semicolon +
-        colon +
-        fullstop +
-        exclamation +
-        question +
-        apostrophe +
-        dash +
-        dot_dot_dot +
-        new_line +
-        plus +
-        star +
-        root +
-        equals +                # in measures 1x = 12y
-        forward_slash +         # in fractions 1/12th
-        greater_than +          # in derivations na > an 
-        brackets +
-        bold + 
-        italic +
-        section +
-        number_ru +
-        niggahitas + 
-        quote
+        pali_alphabet
+        + pali_capitals
+        + cyrillic_characters
+        + cyrillic_capitals
+        + english_capitals
+        + sanskrit_alphabet
+        + sanskrit_capitals
+        + german_characters
+        + digits
+        + space
+        + comma
+        + semicolon
+        + colon
+        + fullstop
+        + exclamation
+        + question
+        + apostrophe
+        + dash
+        + dot_dot_dot
+        + new_line
+        + plus
+        + star
+        + root
+        + equals  # in measures 1x = 12y
+        + forward_slash  # in fractions 1/12th
+        + greater_than  # in derivations na > an
+        + brackets
+        + bold
+        + italic
+        + section
+        + number_ru
+        + niggahitas
+        + quote
     )
-
 
     # --------------------------------------------------
     # allowable characters for SBS fields
     # --------------------------------------------------
 
     sbs_source_allowed = (
-        english_capitals +
-        source +
-        english_alphabet +
-        digits +
-        space +
-        fullstop +
-        dash
+        english_capitals + source + english_alphabet + digits + space + fullstop + dash
     )
-    
+
     sbs_chant_pali_allowed = (
-        pali_alphabet +
-        pali_capitals +
-        english_capitals +
-        space +
-        apostrophe +
-        dash
+        pali_alphabet + pali_capitals + english_capitals + space + apostrophe + dash
     )
 
     sbs_chant_english_allowed = (
-        pali_alphabet +
-        english_alphabet +
-        english_capitals +
-        space +
-        apostrophe +
-        dash +
-        quote +
-        comma
+        pali_alphabet
+        + english_alphabet
+        + english_capitals
+        + space
+        + apostrophe
+        + dash
+        + quote
+        + comma
     )
 
-    sbs_chapter_allowed = (
-        pali_alphabet +
-        english_alphabet +
-        english_capitals +
-        space
-    )
+    sbs_chapter_allowed = pali_alphabet + english_alphabet + english_capitals + space
 
     sbs_translation_allowed = (
         english_alphabet
@@ -828,9 +808,7 @@ class AllowableCharacters:
         + quote
     )
 
-    extra_allowed = (
-        "extra"
-    )
+    extra_allowed = "extra"
 
     # --------------------------------------------------
     # test data, tuple of column and allowable characters
@@ -887,50 +865,40 @@ class AllowableCharacters:
 
     sbs_data = [
         ("sbs_meaning", meaning_1_allowed),
-
         ("class_anki", digits),
         ("sbs_class", digits),
-        
         ("sbs_source_1", sbs_source_allowed),
         ("sbs_sutta_1", sutta_allowed),
         ("sbs_example_1", example_allowed),
         ("sbs_chant_pali_1", sbs_chant_pali_allowed),
         ("sbs_chant_eng_1", sbs_chant_english_allowed),
         ("sbs_chapter_1", sbs_chapter_allowed),
-
         ("sbs_source_2", sbs_source_allowed),
         ("sbs_sutta_2", sutta_allowed),
         ("sbs_example_2", example_allowed),
         ("sbs_chant_pali_2", sbs_chant_pali_allowed),
         ("sbs_chant_eng_2", sbs_chant_english_allowed),
         ("sbs_chapter_2", sbs_chapter_allowed),
-
         ("dhp_source", sbs_source_allowed),
         ("dhp_sutta", sutta_allowed),
         ("dhp_example", example_allowed),
-
         ("pat_source", sbs_source_allowed),
         ("pat_sutta", sutta_allowed),
         ("pat_example", example_allowed),
-
         ("vib_source", sbs_source_allowed),
         ("vib_sutta", sutta_allowed),
         ("vib_example", example_allowed),
-
         ("class_source", sbs_source_allowed),
         ("class_sutta", sutta_allowed),
         ("class_example", example_allowed),
         ("class_example_translation", sbs_translation_allowed),
         ("class_extra", extra_allowed),
-
         ("discourses_source", sbs_source_allowed),
         ("discourses_sutta", sutta_allowed),
         ("discourses_example", example_allowed),
-
         ("extra_source", sbs_source_allowed),
         ("extra_sutta", sutta_allowed),
         ("extra_example", example_allowed),
-
         ("sbs_notes", notes_allowed),
     ]
 
@@ -943,7 +911,7 @@ class AllowableCharacters:
 
     roots_ru_data = [
         ("sanskrit_root_ru_meaning", root_meaning_ru_allowed),
-        ("root_ru_meaning", root_meaning_ru_allowed)
+        ("root_ru_meaning", root_meaning_ru_allowed),
     ]
 
     # dps_tests_data = sbs_data + ru_data
@@ -954,13 +922,17 @@ class AllowableCharacters:
 def main(table_to_check):
     pth = ProjectPaths()
     db_session = get_db_session(pth.dpd_db_path)
-    db = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.sbs), joinedload(DpdHeadword.ru)).all()
+    db = (
+        db_session.query(DpdHeadword)
+        .options(joinedload(DpdHeadword.sbs), joinedload(DpdHeadword.ru))
+        .all()
+    )
 
     a = AllowableCharacters()
 
     debug = False
     error_list = []
-    
+
     if table_to_check == "SBS":
         tests_data = a.sbs_data
     elif table_to_check == "Russian":
@@ -1068,6 +1040,37 @@ def check_root_db():
             print("[green]db search string copied to clipboard")
 
 
+def test_allowable_characters_gui_dps(values: dict[str, str]) -> dict[str, str]:
+    """Test allowable characters in dps gui values dict.
+    Return a dict of problems."""
+    a = AllowableCharacters()
+
+    error_dict: dict[str, str] = {}
+    dps_tests_data = a.sbs_data + a.ru_data
+    for test_data in dps_tests_data:
+        column, allowed = test_data
+        allowed = join_allowed(allowed)
+
+        # check if it is a dps field
+        dps_column = f"dps_{column}"
+        if dps_column in values:
+            # grab the text from the column
+            text = values[dps_column]
+
+            # remove all allowable characters
+            oops = re.sub(allowed, "", str(text))
+
+            # add to error dict
+            error_string = ""
+            if oops:
+                error_list = []
+                error_list.extend(char + unicode_char(char) for char in set(oops))
+                error_string = " ".join(error_list)
+                error_dict[column] = error_string
+
+    return error_dict
+
+
 def join_allowed(allowed: list) -> str:
     """Turn a list into a compiled string for regex
     find and replace."""
@@ -1075,7 +1078,7 @@ def join_allowed(allowed: list) -> str:
 
 
 if __name__ == "__main__":
-    #-----Puck Table To Check------
+    # -----Puck Table To Check------
     table_to_check = "SBS"
     # table_to_check = "Russian"
 
