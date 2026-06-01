@@ -2,90 +2,102 @@
 
 ## Status
 
-**Stage 3 — Phase A DONE (committed). Phase B.1 DONE. Phase B.2 staged, awaiting USER commit.**
+**Stage 3 — Phases A + B DONE (committed). Manifest SHA bumped. Awaiting USER commit of SHA bump, then Phase C.**
 
 - Phase A: complete, committed (all 6 steps).
-- Phase B.1: `execute_sync._check_if_dirty` patched with `--ignore-submodules=dirty`. ruff/pyright/pyrefly clean. `rg` verify: 2 matches ✓
-- Phase B.2: all 10 files staged. Pre-sync commit message prepared. Waiting for USER to run commit.
+- Phase B.1: `execute_sync._check_if_dirty` patched with `--ignore-submodules=dirty`. ✓
+- Phase B.2: pre-sync commit `#pre-sync: clear sync blockers, ack discuss, 2026-06-01` ✓ (d3a82e75)
+- Manifest SHA bump: `prep_manifest.json.to_upstream_sha` updated from `40083765` → `0ea58833`.
+  Staged. USER must commit before Phase C.
 
 ## Current Stage / Next Model
 
-**FAST** — USER must first run the pre-sync commit (see B.2 below), then FAST continues
-Phase C → D → E → F. Do NOT re-analyze the blocker; all decisions locked.
+**FAST** — after USER commit of SHA bump, FAST continues Phase C → D → E → F.
+Do NOT re-analyze decisions; all locked.
 
-## Upstream Range
+## Upstream Range (UPDATED)
 - From: `44a8a00556cce9bd3874a94efb5dfaceaaf20a66`
-- To:   `40083765d770a68b93bfc5e7227b5973e3faf414` (upstream/main, tag v0.4.20260531)
+- To:   `0ea5883380f56b682cf8574043afb8e66cca3260` (upstream/main as of 2026-06-01)
+  - Original planned target was `40083765d770...` but upstream moved to `0ea58833` (4 new commits).
+  - Bumped to current upstream/main; additional shadow work is 5 single-line edits (see D.3+ and D.13/D.14 below).
+
+## Why the SHA was bumped (do NOT re-litigate)
+
+Upstream/main moved 4 commits past the planned target. The 4 new commits:
+1. `58bdda2a` docs: update changelog — docs only, no shadow.
+2. `13cf0e9c` exporter: fix multi-link href — 1 line each in `data_classes.py` x2; shadows `data_classes_dps.py` + `data_classes_ru.py` need same fix (D.13, D.14).
+3. `3431ac5f` pali update — data TSV only, no shadow.
+4. `0ea58833` makedict-quick — `family_root/set/word.py` `pr.green_tmr→pr.green_title` (1 line); shadows need same fix in D.3+ step.
+
+Decision: proceed with full current range. Additional port work is entirely mechanical.
 
 ---
 
-## Phase A — DONE (all 6 steps, staged)
+## Open items for next session (FAST)
 
-1. **A.1 Registry edits** — `kamma/upstream_sync/registry.json`: added `tools/ai_models.json`
-   to `no_sync_files`; added 7 dir + 13 file patterns to `skip_sync_patterns`. Side fix:
-   removed `db_tests/sbs_consistency_tests.py` from `unique_paths` (the new `db_tests/` dir
-   pattern superseded it; fixed a validate_registry overlap error).
-2. **A.2 registry_helper.py** — added `get_no_sync_files()`.
-3. **A.3 prep_analyzer.py** — imported `get_no_sync_files`; added `self.no_sync_files`;
-   `is_skipped()` now checks `no_sync_files` before `skip_patterns`.
-4. **A.4** — ruff/pyright/pyrefly clean; `validate_registry.py` PASS; `verify_smd_coverage.py` PASS.
-5. **A.5** — prep rerun: `blocker_paths: []` ✓
-6. **A.6** — manually set `discuss_paths: []` ✓
+1. **SHA-bump commit (first thing):** Confirm user ran:
+   `git commit -m "#pre-sync: bump manifest sha to current upstream/main 0ea58833"`
+   Then verify: `git status --porcelain --ignore-submodules=dirty` is EMPTY.
 
-### Files staged (ready for pre-sync commit)
-- `kamma/threads/20260601_upstream_sync/` (all 6 thread files)
-- `kamma/upstream_sync/registry.json`
-- `kamma/upstream_sync/scripts/registry_helper.py`
-- `kamma/upstream_sync/scripts/prep_analyzer.py`
-- `kamma/upstream_sync/scripts/execute_sync.py` (B.1 patch)
+2. **Phase C.1:** `uv run python3 kamma/upstream_sync/scripts/execute_sync.py kamma/threads/20260601_upstream_sync`
 
----
+3. **Phase C.2:** git rm 3 files:
+   - `git rm .zed/launch.json`
+   - `git rm scripts/dbreader.py`
+   - `git rm scripts/build/anki_updater.py`
+   (`.claude/commands/dpd-newsletter.md` already absent — verified.)
 
-## Phase B.1 BLOCKER — RESOLVED (ADVANCED, 2026-06-01)
+4. **Phase C.3:** Review git diff → `git add .` → present Commit 1 for user:
+   `#sync: upstream pull 44a8a00..0ea58833, <N> files, 2026-06-01`
 
-### Diagnosis (verified this session)
-- `git status --porcelain --ignore-submodules=dirty` → shows ONLY the staged kamma files;
-  zero `resources/*` lines.
-- `git submodule status` → NO `+` prefix on any submodule; recorded gitlinks are correct.
-- The `" M"` entries are purely submodule-INTERNAL worktree dirt:
-  - `resources/bw2`: untracked temp artifact `home/.!69916!engsearch.html`.
-  - `resources/sc-data`: many modified tracked files + a deleted `.DS_Store`.
-- A superproject commit CANNOT clean this (committing the parent does not commit inside
-  submodules) → the original B.2 "porcelain empty" verify was unachievable, and the old
-  `_check_if_dirty` (plain `git status --porcelain`) would block `execute_sync` indefinitely.
+5. **Phase C.4 post-pull dependency checks:**
+   - `rg -n "^SUTTA_FIELDS = " gui2/dpd_fields_lists.py` — must exist
+   - `test -f gui2/pass2_x_manager.py` — must exist
+   If either missing, STOP before D.10.
 
-### Decision: Option 2 — patch `execute_sync._check_if_dirty` with `--ignore-submodules=dirty`
-- **Correct by design:** the dirty check protects uncommitted edits to upstream-tracked
-  files; submodule internals are opaque to the sync (`git checkout as_upstream -- .` never
-  touches submodule worktrees). `--ignore-submodules=dirty` still reports gitlink drift, so
-  no real protection is lost.
-- **Durable & local:** `execute_sync.py` is under `kamma/` (never synced) → not clobbered.
-  (Rejected Option 1 `.gitmodules ignore=dirty` — upstream-tracked, overwritten next sync.)
-- **Non-destructive:** does NOT touch the unknown `sc-data` modifications (rejected Option 3
-  manual cleaning — risky, out of scope). Option 4 (re-staging gitlinks) is a no-op.
-- Literal edit is written in `dynamic_plan.md` → Phase B.1.
+6. **Phase D — manual ports (all decisions locked):**
+   - D.1: `db/models.py` — PORT (3 hunks per dynamic_plan.md)
+   - D.2: `.gitignore` — MERGE (6 edits per dynamic_plan.md)
+   - D.3: family imports mirror — `family_compound_ru.py`, `family_root_ru.py`, `family_word_ru.py`:
+     - Replace `from scripts.build.anki_updater import family_updater` → `from exporter.anki.anki_updater import family_updater`
+     - **ALSO** replace `pr.green_tmr("disabled in config.ini")` → `pr.green_title("disabled in config.ini")` (new from makedict commit 0ea58833; verify line exists first with rg)
+   - D.4: `exporter/webapp/main_ru.py` — CORS middleware
+   - D.5: webapp templates ru + sbs — 4 hunks each
+   - D.6: goldendict jinja templates ru + sbs — 4 hunks each
+   - D.7: `shared_data/help_ru/abbreviations.tsv` — DNnt row
+   - D.8: `scripts/bash/generate_components.sh` — anki path update
+   - D.9: `tests/smoke_test_sync.py` — 5 import replacements
+   - D.10: `gui2/pass2_add_view.py` — PORT (13 edits per dynamic_plan.md)
+   - D.11: `exporter/goldendict/export_dpd_ru.py` + `export_dpd_sbs.py` — exitcode check (approved YES)
+   - **D.13 (NEW):** `exporter/goldendict/data_classes_dps.py` — remove `"link"` from `_convert_newlines` list (mirror of upstream `13cf0e9c`)
+   - **D.14 (NEW):** `exporter/webapp/data_classes_ru.py` — remove `"link"` from `convert_newlines` list (mirror of upstream `13cf0e9c`)
 
----
+7. **Phase E:** Full verification suite (per dynamic_plan.md Phase E).
+
+8. **Phase F:** `git add .` → present Commit 2 for user:
+   `#sync: manual merge resolutions 2026-06-01`
 
 ## Decisions (all LOCKED, do NOT re-ask)
 - A1 db/models.py → PORT (D.1). A2 .gitignore → MERGE (D.2). A3 AGENTS.md → SKIP.
 - Prep blocker_paths → no_sync_files code fix (Phase A) — DONE.
-- Dirty-submodule blocker → Option 2 (`--ignore-submodules=dirty` in execute_sync) — B.1.
+- Dirty-submodule blocker → Option 2 (`--ignore-submodules=dirty`) — DONE.
 - C tools/ai_models.json → no_sync_files — DONE.
-- pass2_add_view.py → PORT (D.10). D.11 export_dpd exitcode → YES (apply).
-- Skips (prose only, no ledger): home.html RSS, paths_ru/dps attrs, mkdocs_ru custom_dir +
-  Anki nav (Stage 4), ru_static.yml RSS + uv modernization.
+- pass2_add_view.py → PORT (D.10). D.11 export_dpd exitcode → YES.
+- SHA bump: proceed with `0ea58833` (current upstream/main) — DECIDED this session.
+- D.13 + D.14 data_classes shadow port → YES (mechanical 1-line mirrors).
+- Skips (prose only): home.html RSS, paths_ru/dps attrs, mkdocs_ru custom_dir + Anki nav, ru_static.yml RSS + uv sync.
 
-## Files changed this session (FAST B.1)
-- `kamma/upstream_sync/scripts/execute_sync.py` — B.1 patch (`--ignore-submodules=dirty`)
-- `kamma/threads/20260601_upstream_sync/handoff.md` — this update
+## D.13 / D.14 Detail (new, not in dynamic_plan.md)
 
-## Files changed prior sessions (staged, included in B.2 commit)
-- `kamma/upstream_sync/registry.json` — A.1
-- `kamma/upstream_sync/scripts/registry_helper.py` — A.2
-- `kamma/upstream_sync/scripts/prep_analyzer.py` — A.3
-- `kamma/threads/20260601_upstream_sync/prep_manifest.json` — A.6
-- `kamma/threads/20260601_upstream_sync/dynamic_plan.md` — ADVANCED corrections
+### D.13 `exporter/goldendict/data_classes_dps.py` — mirror exporter fix
+Find the `_convert_newlines` list. Remove the entry `"link"` from it.
+Upstream diff: one line deleted from `exporter/goldendict/data_classes.py` (commit 13cf0e9c).
+→ verify: `rg -n '"link"' exporter/goldendict/data_classes_dps.py` returns nothing in that list.
+
+### D.14 `exporter/webapp/data_classes_ru.py` — mirror exporter fix
+Find the `convert_newlines` list. Remove the entry `"link"` from it.
+Upstream diff: one line deleted from `exporter/webapp/data_classes.py` (commit 13cf0e9c).
+→ verify: `rg -n '"link"' exporter/webapp/data_classes_ru.py` returns nothing in that list.
 
 ## Errors, Issues, and Repeated Mistakes
 - **Prior handoff A1 anchors were WRONG** (sc_link/dv_exists neighbors). Corrected Stage 2.
@@ -93,22 +105,9 @@ Phase C → D → E → F. Do NOT re-analyze the blocker; all decisions locked.
 - `resources/fdg_dpd` submodule fetch fails (remote not found) — pre-existing, not a blocker.
 - Manifest `mapped_actions[].local_target_path` wrong for renamed goldendict shadows — D.6 uses real paths.
 - execute_sync has no discuss-acknowledge flag — manual `discuss_paths:[]` edit required.
-- A.1 registry edit caused validate_registry overlap (`db_tests/` vs the specific unique_path
-  entry); fixed by removing the specific entry. Not in original plan.
-- **Dirty submodule blocker** (NOW RESOLVED): `git submodule update --init --recursive` does
-  not clean submodule internal worktree dirt; the parent commit cannot either. Fixed by
-  `--ignore-submodules=dirty` in `execute_sync._check_if_dirty` (B.1). Submodule dirt is
-  pre-existing and intentionally left untouched.
-
-## Open items for next session (FAST)
-1. **B.2 USER COMMIT (first thing):** confirm the user has run:
-   `git commit -m "#pre-sync: clear sync blockers, ack discuss, 2026-06-01"`
-   Then verify: branch is `sbs-ru` and `git status --porcelain --ignore-submodules=dirty` is EMPTY.
-   (Bare `git status --porcelain` will still list ` M resources/*` — that is expected submodule dirt, ignore it.)
-2. **Phase C:** `uv run python3 kamma/upstream_sync/scripts/execute_sync.py kamma/threads/20260601_upstream_sync` → C.2 git rm 3 files → C.3 stage + USER commit.
-3. **Phase D:** manual ports D.1–D.11, item by item per dynamic_plan.md.
-4. **Phase E:** verification suite.
-5. **Phase F:** `git add .` + USER commit `#sync: manual merge resolutions 2026-06-01`.
+- A.1 registry edit caused validate_registry overlap (`db_tests/` vs the specific unique_path entry); fixed.
+- **Dirty submodule blocker (RESOLVED):** `--ignore-submodules=dirty` in execute_sync (B.1).
+- **Upstream SHA drift:** upstream/main moved 4 commits past planned target during work. Resolved by bumping `prep_manifest.json.to_upstream_sha` to current upstream/main and adding D.13/D.14.
 
 ## Next Model
 **FAST.**
@@ -121,18 +120,11 @@ Continue upstream sync thread: kamma/threads/20260601_upstream_sync.
 
 First read:
 1. kamma/threads/20260601_upstream_sync/handoff.md
-2. kamma/threads/20260601_upstream_sync/dynamic_plan.md
+2. kamma/threads/20260601_upstream_sync/dynamic_plan.md (for D.1–D.11 literal hunks)
 
-Phase A is DONE (committed). Phase B.1 is DONE (execute_sync.py patched). Phase B.2 files
-are staged — the USER still needs to run the pre-sync commit. Ask the user to confirm they
-have run:
+Confirm the user ran: git commit -m "#pre-sync: bump manifest sha to current upstream/main 0ea58833"
+Then verify git status --porcelain --ignore-submodules=dirty is EMPTY.
 
-  git commit -m "#pre-sync: clear sync blockers, ack discuss, 2026-06-01"
-
-Then verify branch=sbs-ru and git status --porcelain --ignore-submodules=dirty is empty.
-Then proceed Phase C → D → E → F literally, item by item from dynamic_plan.md. All commits
-are USER-RUN. Stop and ask only if a plan anchor is missing or a test fails in a way the
-plan does not cover.
+Then execute Phase C → D (including D.13 + D.14 from handoff.md) → E → F literally.
+All commits are USER-RUN. Stop only if a plan anchor is missing or a test fails unexpectedly.
 ```
-
-Do not continue in this session.
