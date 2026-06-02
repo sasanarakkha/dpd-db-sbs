@@ -1,5 +1,57 @@
 [
     {
+        "id": 62730,
+        "lemma_1": "sikkhākaraṇīyā"
+    },
+    {
+        "id": 18955,
+        "lemma_1": "olokenta"
+    },
+    {
+        "id": 28189,
+        "lemma_1": "jātaka 4"
+    },
+    {
+        "id": 48075,
+        "lemma_1": "bahārāme"
+    },
+    {
+        "id": 13712,
+        "lemma_1": "idhūpacarati"
+    },
+    {
+        "id": 9857,
+        "lemma_1": "asekkhasammata"
+    },
+    {
+        "id": 9858,
+        "lemma_1": "asekkhasammatasaññī"
+    },
+    {
+        "id": 64795,
+        "lemma_1": "sekkhasammatasaññī"
+    },
+    {
+        "id": 26308,
+        "lemma_1": "carituṃ 1.2"
+    },
+    {
+        "id": 89526,
+        "lemma_1": "hāyati 2"
+    },
+    {
+        "id": 70634,
+        "lemma_1": "vosāsati"
+    },
+    {
+        "id": 89616,
+        "lemma_1": "samakaṃ"
+    },
+    {
+        "id": 38421,
+        "lemma_1": "nivāreti"
+    },
+    {
         "id": 48512,
         "lemma_1": "buddha 2"
     },
@@ -26,57 +78,5 @@
     {
         "id": 16054,
         "lemma_1": "upalāpeti 1"
-    },
-    {
-        "id": 14090,
-        "lemma_1": "ukkhitta 2"
-    },
-    {
-        "id": 4368,
-        "lemma_1": "anukkhitta"
-    },
-    {
-        "id": 4369,
-        "lemma_1": "anukkhittaka 2"
-    },
-    {
-        "id": 89392,
-        "lemma_1": "anukkhittaka 1"
-    },
-    {
-        "id": 14092,
-        "lemma_1": "ukkhittaka 1"
-    },
-    {
-        "id": 89416,
-        "lemma_1": "saṃvasati 2"
-    },
-    {
-        "id": 89415,
-        "lemma_1": "kammika 3"
-    },
-    {
-        "id": 33108,
-        "lemma_1": "duṭṭhullāduṭṭhulla"
-    },
-    {
-        "id": 60688,
-        "lemma_1": "sambhoga 1"
-    },
-    {
-        "id": 89414,
-        "lemma_1": "kappa 1.9"
-    },
-    {
-        "id": 73712,
-        "lemma_1": "araho"
-    },
-    {
-        "id": 30772,
-        "lemma_1": "tiriyaṃtaraṇa"
-    },
-    {
-        "id": 41879,
-        "lemma_1": "pattathavikā"
     }
 ]
