@@ -43,6 +43,21 @@ def in_memory_db():
     session.close()
 
 
+def assert_regex_match(pattern: str, text: str | None) -> None:
+    assert text is not None
+    assert re.search(pattern, text)
+
+
+def assert_regex_no_match(pattern: str, text: str | None) -> None:
+    assert text is not None
+    assert not re.search(pattern, text)
+
+
+def assert_text_contains(expected: str, text: str | None) -> None:
+    assert text is not None
+    assert expected in text
+
+
 def test_pat_consistency_logic(in_memory_db):
     # Case 1: All correct
     sbs1 = SBS(id=1, pat_example="ex", pat_source="VIN PAT", pat_sutta="su")
@@ -64,9 +79,9 @@ def test_pat_consistency_logic(in_memory_db):
 
     name, results, count, solution = check_pat_consistency(in_memory_db)
     assert count == 3
-    assert re.search(r"2", results)
-    assert re.search(r"3", results)
-    assert re.search(r"4", results)
+    assert_regex_match(r"2", results)
+    assert_regex_match(r"3", results)
+    assert_regex_match(r"4", results)
 
 
 def test_dhp_source_consistency_logic(in_memory_db):
@@ -88,8 +103,8 @@ def test_dhp_source_consistency_logic(in_memory_db):
 
     name, results, count, solution = check_dhp_source_consistency(in_memory_db)
     assert count == 2
-    assert re.search(r"2", results)
-    assert re.search(r"3", results)
+    assert_regex_match(r"2", results)
+    assert_regex_match(r"3", results)
 
 
 def test_dhp_triplet_consistency_logic(in_memory_db):
@@ -105,8 +120,8 @@ def test_dhp_triplet_consistency_logic(in_memory_db):
 
     name, results, count, solution = check_dhp_triplet_consistency(in_memory_db)
     assert count == 1
-    assert re.search(r"2", results)
-    assert not re.search(r"3", results)
+    assert_regex_match(r"2", results)
+    assert_regex_no_match(r"3", results)
 
 
 def test_triplet_consistency_logic(in_memory_db):
@@ -141,19 +156,19 @@ def test_triplet_consistency_logic(in_memory_db):
 
     name, results, count, solution = check_vib_consistency(in_memory_db)
     assert count == 1
-    assert re.search(r"1", results)
-    assert not re.search(r"8", results)
+    assert_regex_match(r"1", results)
+    assert_regex_no_match(r"8", results)
 
     name, results, count, solution = check_class_consistency(in_memory_db)
     assert count == 1  # Only s2 should be flagged, s7 and s10 are excepted
-    assert re.search(r"2", results)
-    assert not re.search(r"7", results)
-    assert not re.search(r"10", results)
+    assert_regex_match(r"2", results)
+    assert_regex_no_match(r"7", results)
+    assert_regex_no_match(r"10", results)
 
     name, results, count, solution = check_discourses_consistency(in_memory_db)
     assert count == 1
-    assert re.search(r"3", results)
-    assert not re.search(r"9", results)
+    assert_regex_match(r"3", results)
+    assert_regex_no_match(r"9", results)
 
 
 def test_extra_consistency_logic(in_memory_db):
@@ -171,7 +186,7 @@ def test_extra_consistency_logic(in_memory_db):
 
     name, results, count, solution = check_extra_consistency(in_memory_db)
     assert count == 1
-    assert re.search(r"2", results)
+    assert_regex_match(r"2", results)
 
 
 def test_class_anki_logic(in_memory_db):
@@ -191,9 +206,9 @@ def test_class_anki_logic(in_memory_db):
 
     name, results, count, solution = check_class_anki_consistency(in_memory_db)
     assert count == 3
-    assert re.search(r"3", results)
-    assert re.search(r"4", results)
-    assert re.search(r"5", results)
+    assert_regex_match(r"3", results)
+    assert_regex_match(r"4", results)
+    assert_regex_match(r"5", results)
 
 
 def test_discourses_source_prefix_logic(in_memory_db):
@@ -211,10 +226,10 @@ def test_discourses_source_prefix_logic(in_memory_db):
 
     name, results, count, solution = check_discourses_source_prefix(in_memory_db)
     assert count == 1
-    assert re.search(r"2", results)
+    assert_regex_match(r"2", results)
 
 
-def test_discourses_source_full_logic(in_memory_db):
+def test_discourses_source_full_logic(in_memory_db, capsys: pytest.CaptureFixture[str]):
     # 1. discourses_source="SN12.1" -> OK (in list).
     s1 = SBS(id=1, discourses_source="SN12.1")
     # 2. discourses_source="SN12.99" -> flagged (prefix OK but full value not in list).
@@ -230,7 +245,8 @@ def test_discourses_source_full_logic(in_memory_db):
     name, results, count, solution = check_discourses_source_full(in_memory_db)
     # Note: MN107 and SN12.1 are in tools.sbs_table_functions.list_of_discourses
     assert count == 1
-    assert re.search(r"2", results)
+    assert_regex_match(r"2", results)
+    assert "issue #47" in capsys.readouterr().out
 
 
 def test_source_has_space_logic(in_memory_db):
@@ -252,7 +268,7 @@ def test_source_has_space_logic(in_memory_db):
 
     sbs1_res = next(r for r in results_list if r[0] == "source_has_space_sbs_source_1")
     assert sbs1_res[2] == 1  # id 1
-    assert re.search(r"1", sbs1_res[1])
+    assert_regex_match(r"1", sbs1_res[1])
 
     pat_res = next(r for r in results_list if r[0] == "source_has_space_pat_source")
     assert pat_res[2] == 0  # id 2 excepted
@@ -261,7 +277,7 @@ def test_source_has_space_logic(in_memory_db):
         r for r in results_list if r[0] == "source_has_space_discourses_source"
     )
     assert disc_res[2] == 1  # id 5
-    assert re.search(r"5", disc_res[1])
+    assert_regex_match(r"5", disc_res[1])
 
 
 def test_sbs_example_population_logic(in_memory_db):
@@ -314,8 +330,8 @@ def test_sbs_example_population_logic(in_memory_db):
 
     name, results, count, solution = check_sbs_example_consistency(in_memory_db)
     assert count == 2
-    assert re.search(r"2", results)
-    assert re.search(r"5", results)
+    assert_regex_match(r"2", results)
+    assert_regex_match(r"5", results)
 
 
 def test_sbs_index_mapping_logic(in_memory_db):
@@ -349,8 +365,8 @@ def test_sbs_index_mapping_logic(in_memory_db):
     with patch("builtins.open", mock_open(read_data=csv_content)):
         name, results, count, solution = check_sbs_index_mapping(in_memory_db)
         assert count == 2
-        assert re.search(r"2", results)
-        assert re.search(r"3", results)
+        assert_regex_match(r"2", results)
+        assert_regex_match(r"3", results)
 
 
 def test_bold_tag_verification_logic(in_memory_db):
@@ -376,14 +392,14 @@ def test_bold_tag_verification_logic(in_memory_db):
     # Check dhp_example results
     dhp_res = next(r for r in results_list if r[0] == "bold_tags_dhp_example")
     assert dhp_res[2] == 3  # ids 2, 3, 4
-    assert re.search(r"2", dhp_res[1])
-    assert re.search(r"3", dhp_res[1])
-    assert re.search(r"4", dhp_res[1])
+    assert_regex_match(r"2", dhp_res[1])
+    assert_regex_match(r"3", dhp_res[1])
+    assert_regex_match(r"4", dhp_res[1])
 
     # Check sbs_example_2 results
     sbs2_res = next(r for r in results_list if r[0] == "bold_tags_sbs_example_2")
     assert sbs2_res[2] == 1  # id 6
-    assert re.search(r"6", sbs2_res[1])
+    assert_regex_match(r"6", sbs2_res[1])
 
 
 def test_example_capital_letters_logic(in_memory_db):
@@ -403,11 +419,11 @@ def test_example_capital_letters_logic(in_memory_db):
 
     dhp_res = next(r for r in results_list if r[0] == "capital_letter_dhp_example")
     assert dhp_res[2] == 1  # id 2
-    assert re.search(r"2", dhp_res[1])
+    assert_regex_match(r"2", dhp_res[1])
 
     sbs1_res = next(r for r in results_list if r[0] == "capital_letter_sbs_example_1")
     assert sbs1_res[2] == 1  # id 4
-    assert re.search(r"4", sbs1_res[1])
+    assert_regex_match(r"4", sbs1_res[1])
 
 
 def test_example_spacing_logic(in_memory_db):
@@ -430,20 +446,20 @@ def test_example_spacing_logic(in_memory_db):
     results_list = check_example_spacing(in_memory_db)
 
     comma_res = next(r for r in results_list if r[0] == "space_comma_sbs_example_1")
-    assert re.search(r"1", comma_res[1])
-    assert re.search(r"6", comma_res[1])
+    assert_regex_match(r"1", comma_res[1])
+    assert_regex_match(r"6", comma_res[1])
 
     comma_edge_res = next(
         r for r in results_list if r[0] == "space_comma_edge_sbs_example_1"
     )
-    assert not re.search(r"1", comma_edge_res[1])  # " ,bar" is not edge
-    assert re.search(r"6", comma_edge_res[1])
+    assert_regex_no_match(r"1", comma_edge_res[1])  # " ,bar" is not edge
+    assert_regex_match(r"6", comma_edge_res[1])
 
     dot_edge_res = next(
         r for r in results_list if r[0] == "space_fullstop_edge_sbs_example_1"
     )
-    assert re.search(r"2", dot_edge_res[1])
-    assert re.search(r"3", dot_edge_res[1])
+    assert_regex_match(r"2", dot_edge_res[1])
+    assert_regex_match(r"3", dot_edge_res[1])
 
 
 def test_class_translation_uniqueness_logic(in_memory_db):
@@ -469,10 +485,10 @@ def test_class_translation_uniqueness_logic(in_memory_db):
     # Expect count to be 1 (one translation 'tr2' has conflicts)
     assert count == 1
 
-    assert re.search(r"so1", results)
-    assert re.search(r"so2", results)
-    assert "tr2" in results
-    assert not re.search(r"3", results)  # Should not contain IDs
+    assert_regex_match(r"so1", results)
+    assert_regex_match(r"so2", results)
+    assert_text_contains("tr2", results)
+    assert_regex_no_match(r"3", results)  # Should not contain IDs
 
 
 def test_run_returns_exit_code(in_memory_db):
@@ -486,7 +502,7 @@ def test_run_returns_exit_code(in_memory_db):
             exit_code = run_sbs_consistency_tests()
             assert exit_code == 0
 
-            # Case 2: Soft-check failures must still block the runner.
+            # Case 2: Soft reminder checks must not block the runner.
             s1 = SBS(
                 id=1,
                 discourses_example="<b>ex</b>",
@@ -497,12 +513,34 @@ def test_run_returns_exit_code(in_memory_db):
             in_memory_db.commit()
 
             exit_code = run_sbs_consistency_tests()
-            assert exit_code == 1
+            assert exit_code == 0
 
             in_memory_db.delete(s1)
             in_memory_db.commit()
 
-            # Case 3: Injected hard error
+            # Case 3: Pātimokkha reminder must not block the runner.
+            s1 = SBS(id=1, pat_source="PAT")
+            in_memory_db.add(s1)
+            in_memory_db.commit()
+
+            exit_code = run_sbs_consistency_tests()
+            assert exit_code == 0
+
+            in_memory_db.delete(s1)
+            in_memory_db.commit()
+
+            # Case 4: DHP source consistency remains a hard error.
+            h1 = DpdHeadword(id=1, lemma_1="l1", source_1="DHP100", meaning_1="m1")
+            in_memory_db.add(h1)
+            in_memory_db.commit()
+
+            exit_code = run_sbs_consistency_tests()
+            assert exit_code == 1
+
+            in_memory_db.delete(h1)
+            in_memory_db.commit()
+
+            # Case 5: Injected hard error
             s1 = SBS(id=1, dhp_example="ex", dhp_source="so", dhp_sutta="")
             in_memory_db.add(s1)
             in_memory_db.commit()

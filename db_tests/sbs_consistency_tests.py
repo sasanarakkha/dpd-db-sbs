@@ -88,7 +88,11 @@ def run_sbs_consistency_tests() -> int:
     run_one("sbs_index_mapping", check_sbs_index_mapping)
     run_one("class_translation_uniqueness", check_class_translation_uniqueness)
 
-    total_errors = sum(count for _, _, count, _ in results_list)
+    total_errors = sum(
+        count
+        for name, _, count, _ in results_list
+        if name not in SOFT_ERROR_CHECK_NAMES
+    )
 
     if total_errors > 0:
         pr.red(f"SBS consistency tests FAILED with {total_errors} total errors.")
@@ -129,6 +133,8 @@ SUTTA_EXCEPTION_SOURCES: list[str] = ["MJG", "Sri Lanka", "Thai", "Trad"]
 
 # Source substrings where a space is allowed in the source value (TSV rows 108-114).
 SOURCE_SPACE_EXEMPT_SUBSTRINGS: list[str] = ["PAT", "Sri Lanka", "(modif)", "(simpl)"]
+
+SOFT_ERROR_CHECK_NAMES: set[str] = {"discourses_source_full"}
 
 
 def regex_results(results: list[str]) -> str | None:
@@ -487,7 +493,9 @@ def check_discourses_source_full(
             results.append(str(sbs.id))
 
     if results:
-        pr.amber(f"Reminder: {len(results)} rows have invalid discourses source")
+        pr.amber(
+            f"Reminder: {len(results)} rows have invalid discourses source, see issue #47"
+        )
     return (
         "discourses_source_full",
         regex_results(results),
