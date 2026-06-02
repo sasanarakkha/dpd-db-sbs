@@ -1,11 +1,25 @@
 #!/usr/bin/env python3
+"""Interactively review correction comments and remember processed IDs."""
 
 import json
 from tools.paths_dps import DPSPaths
 from gui2.paths import Gui2Paths
 
 
-def main():
+def _normalize_id(id_value: object) -> int | None:
+    if isinstance(id_value, bool):
+        return None
+    if isinstance(id_value, int):
+        return id_value
+    if isinstance(id_value, str):
+        try:
+            return int(id_value)
+        except ValueError:
+            return None
+    return None
+
+
+def main() -> None:
     dps_paths = DPSPaths()
     gui2_paths = Gui2Paths()
 
@@ -29,7 +43,11 @@ def main():
     if processed_file.exists():
         try:
             with open(processed_file, "r") as f:
-                processed_ids = set(json.load(f))
+                processed_ids = {
+                    normalized_id
+                    for id_val in json.load(f)
+                    if (normalized_id := _normalize_id(id_val)) is not None
+                }
         except json.JSONDecodeError:
             print(f"Warning: {processed_file} is empty or invalid. Starting fresh.")
 
@@ -38,7 +56,9 @@ def main():
     total_with_comment_add = len(all_with_comment_add)
 
     to_process = [
-        item for item in all_with_comment_add if item.get("id") not in processed_ids
+        item
+        for item in all_with_comment_add
+        if _normalize_id(item.get("id")) not in processed_ids
     ]
 
     if not to_process:
@@ -54,7 +74,7 @@ def main():
 
     try:
         for i, item in enumerate(to_process):
-            item_id = item.get("id")
+            item_id = _normalize_id(item.get("id"))
             if item_id is None:
                 print(f"Warning: Skipping item at index {i} because it has no ID.")
                 continue
