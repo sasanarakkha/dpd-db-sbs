@@ -25,8 +25,8 @@ response=$(uv run python "$PROJECT_DIR/tools/ask.py" "need to push vocab for cla
 if [[ $response == "y" ]]; then
     uv run python scripts/change_in_db/class_relation.py
     uv run python scripts/export/vocab_abbrev_pali_course.py
-    cd "$HOME/Documents/dpd-pali-courses"
-    git-push
+    bash "$PROJECT_DIR/scripts/bash/pali_vocab_push.sh" || exit 1
+    cd "$PROJECT_DIR"
 fi
 
 # grammar.xlsx - https://docs.google.com/spreadsheets/d/1KV5LmebIQpNyNKl03Pmo_Ti-LNW3IYWB6uc7OfGRGPU/
@@ -43,7 +43,7 @@ fi
 response=$(uv run python "$PROJECT_DIR/tools/ask.py" "need to generate patimokkha.csv?") || exit 1
 if [[ $response == "y" ]]; then
     cd "$HOME/Documents/sasanarakkha/study-tools/"
-    uv run bash scripts/download_patimokkha.sh
+    env -u VIRTUAL_ENV uv run bash scripts/download_patimokkha.sh
     cd "$HOME/Documents/dpd-db/"
     uv run python scripts/work_with_csv/xlsx2csv.py "$HOME/Documents/sasanarakkha/study-tools/temp/patimokkha.xlsx" "temp/patimokkha_word_by_word.csv" "analysis"
     uv run python scripts/work_with_csv/pat_for_anki.py

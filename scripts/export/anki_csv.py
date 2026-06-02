@@ -88,6 +88,7 @@ def common_roots(db_session, dpspth):
         "main_verb",
         "examples_or_words",
         "native",
+        "test",
         "feedback",
     ]
 
@@ -128,6 +129,7 @@ def common_roots(db_session, dpspth):
             main_verb,
             examples,
             "",
+            current_date,
             feedback,
         ]
         rows.append([x if x is not None else "" for x in row])
@@ -149,6 +151,7 @@ def common_roots(db_session, dpspth):
                 "main_verb",
                 "examples",
                 "native",
+                "test",
                 "feedback",
             ]
         )

@@ -226,21 +226,25 @@ def test_only_dpd_kamma_sync_remains_as_sync_bash_entrypoint() -> None:
     assert [str(path) for path in obsolete_paths if path.exists()] == []
 
 
-def test_commit_exception_is_limited_to_cl_dps_bash_scripts() -> None:
+def test_commit_policy_is_inherited_from_global_rules() -> None:
     agents = Path("AGENTS.md").read_text(encoding="utf-8")
     guide = Path("kamma/upstream_sync/guide.md").read_text(encoding="utf-8")
+    readme = Path("kamma/upstream_sync/README.md").read_text(encoding="utf-8")
+    infrastructure = Path("kamma/upstream_sync/infrastructure.md").read_text(
+        encoding="utf-8"
+    )
     wrapper = Path("scripts/cl_dps/dpd-kamma-sync").read_text(encoding="utf-8")
     python_sync_scripts = [
         path.read_text(encoding="utf-8")
         for path in Path("kamma/upstream_sync/scripts").glob("*.py")
     ]
 
-    expected = (
-        "Only human-run Bash scripts under `scripts/cl_dps/` may perform their own "
-        "`git commit` operations"
-    )
-    assert expected in agents
+    expected = "Git commit/push policy is inherited from the global rules."
+    assert "Local Commit Exception" not in agents
+    assert "Only human-run Bash scripts under `scripts/cl_dps/`" not in agents
     assert expected in guide
+    assert expected in readme
+    assert expected in infrastructure
     assert 'git commit -m "$BACKUP_COMMIT_MESSAGE"' in wrapper
     assert all("git commit" not in script for script in python_sync_scripts)
 

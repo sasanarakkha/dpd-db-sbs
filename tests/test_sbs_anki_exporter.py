@@ -1,6 +1,11 @@
+"""Test SBS Anki exporter collection and deck update behavior."""
+
 import csv
 import shutil
+from collections.abc import Generator
+from contextlib import contextmanager
 from pathlib import Path
+from typing import Any, cast
 from unittest.mock import patch
 from anki.collection import Collection
 from scripts.export import sbs_anki_updater, anki_csv
@@ -8,8 +13,91 @@ from scripts.work_with_csv import anki_class_grammar, pat_for_anki
 from tools.paths_dps import DPSPaths
 from db.models import DpdHeadword, SBS
 from scripts.export.sbs_anki_updater import deck_selector
+from tools.configger import config_read
 
 dpspth = DPSPaths()
+TEST_DPD_ID = 999999001
+TEST_DPD_ID_STR = str(TEST_DPD_ID)
+
+
+def copy_configured_sbs_collection(tmp_path: Path, filename: str) -> Path:
+    """Copy the configured SBS Anki collection into a test temp directory."""
+    configured_path = config_read("anki", "db_path_sbs")
+    assert configured_path, "db_path_sbs must be set in config.ini"
+
+    source_path = Path(configured_path)
+    assert source_path.exists(), f"Configured SBS collection not found: {source_path}"
+
+    collection_path = tmp_path / filename
+    shutil.copy2(source_path, collection_path)
+    return collection_path
+
+
+@contextmanager
+def patched_sbs_config(collection_path: Path, tmp_path: Path) -> Generator[None]:
+    """Patch SBS Anki config reads to use the copied test collection."""
+
+    def mock_config(section: str, key: str) -> str:
+        if section == "anki" and key == "db_path_sbs":
+            return str(collection_path)
+        if section == "anki" and key == "backup_path_sbs":
+            return str(tmp_path / "backups")
+        return config_read(section, key) or "dummy"
+
+    with (
+        patch("scripts.export.sbs_anki_collection_verifier.config_read") as mock_v,
+        patch("scripts.export.sbs_anki_updater.config_read") as mock_u,
+    ):
+        mock_v.side_effect = mock_config
+        mock_u.side_effect = mock_config
+        yield
+
+
+def model_by_name(col: Collection, model_name: str) -> dict[str, Any]:
+    """Return the Anki model for a model name."""
+    models = [model for model in col.models.all() if model["name"] == model_name]
+    assert models, f"Model not found: {model_name}"
+    return models[0]
+
+
+def remove_test_notes(col: Collection) -> None:
+    """Remove existing notes using the deterministic test ID."""
+    note_ids = col.find_notes(f"id:{TEST_DPD_ID_STR}")
+    if note_ids:
+        col.remove_notes(note_ids)
+
+
+def add_test_note(
+    col: Collection,
+    deck_name: str,
+    model_name: str,
+    fields: dict[str, str],
+) -> int:
+    """Add one deterministic note to a deck in the copied collection."""
+    deck_id = col.decks.id(deck_name, create=True)
+    assert deck_id is not None, f"Deck not found: {deck_name}"
+    note = col.new_note(model_by_name(col, model_name))
+    for field_name, value in fields.items():
+        if field_name in note:
+            note[field_name] = value
+    col.add_note(note, deck_id)
+    return int(note.id)
+
+
+def prepare_collection_with_note(
+    tmp_path: Path,
+    filename: str,
+    deck_name: str,
+    model_name: str,
+    fields: dict[str, str],
+) -> Path:
+    """Copy the configured collection and seed one controlled test note."""
+    collection_path = copy_configured_sbs_collection(tmp_path, filename)
+    col = Collection(str(collection_path))
+    remove_test_notes(col)
+    add_test_note(col, deck_name, model_name, fields)
+    col.close()
+    return collection_path
 
 
 def test_pipeline_regenerates_all_csvs():
@@ -65,33 +153,26 @@ def test_pipeline_regenerates_all_csvs():
         assert pat_csv.exists(), f"Patimokkha CSV not found: {pat_csv}"
 
 
-def test_update_existing_note_from_fixture(tmp_path):
+def test_update_existing_note_from_configured_collection(tmp_path):
     """
     Test that updating an existing note in Anki from the DB works as expected.
     """
-    fixture_src = Path("temp/fixtures/anki/minimal_collection.anki2")
-    fixture_dest = tmp_path / "collection.anki2"
-    shutil.copy(fixture_src, fixture_dest)
+    collection_path = prepare_collection_with_note(
+        tmp_path,
+        "collection.anki2",
+        "SBS Pali-English Vocab",
+        "SBS Vocab",
+        {
+            "id": TEST_DPD_ID_STR,
+            "pali": "buddha 1",
+            "meaning": "Buddha; Awakened One",
+        },
+    )
 
-    # Mock config_read to return our temporary collection path
-    with (
-        patch("scripts.export.sbs_anki_collection_verifier.config_read") as mock_v,
-        patch("scripts.export.sbs_anki_updater.config_read") as mock_u,
-    ):
-
-        def mock_config(section, key):
-            if key == "db_path_sbs":
-                return str(fixture_dest)
-            if key == "backup_path_sbs":
-                return str(tmp_path / "backups")
-            return "dummy"
-
-        mock_v.side_effect = mock_config
-        mock_u.side_effect = mock_config
-
+    with patched_sbs_config(collection_path, tmp_path):
         # Open collection to check initial state
-        col = Collection(str(fixture_dest))
-        note_id = col.find_notes("id:48511")[0]
+        col = Collection(str(collection_path))
+        note_id = col.find_notes(f"id:{TEST_DPD_ID_STR}")[0]
         note = col.get_note(note_id)
         assert note["meaning"] == "Buddha; Awakened One"
         col.close()
@@ -103,7 +184,7 @@ def test_update_existing_note_from_fixture(tmp_path):
         ):
             # Create a mock headword
             mock_headword = DpdHeadword()
-            mock_headword.id = 48511
+            mock_headword.id = TEST_DPD_ID
             mock_headword.lemma_1 = "buddha 1"
             mock_headword.meaning_1 = "Updated Meaning"
             mock_headword.sbs = SBS()
@@ -117,8 +198,8 @@ def test_update_existing_note_from_fixture(tmp_path):
             sbs_anki_updater.run_pipeline(skip_collection=False)
 
         # Verify note was updated
-        col = Collection(str(fixture_dest))
-        note_id = col.find_notes("id:48511")[0]
+        col = Collection(str(collection_path))
+        note_id = col.find_notes(f"id:{TEST_DPD_ID_STR}")[0]
         note = col.get_note(note_id)
         assert note["meaning"] == "Updated Meaning"
         col.close()
@@ -176,31 +257,24 @@ def test_deck_selector_vocab_routing():
 
 def test_sbs_vocab_tag_sync(tmp_path):
     """Test that tags are synced and marks field is preserved for SBS Vocab."""
-    fixture_src = Path("temp/fixtures/anki/minimal_collection.anki2")
-    fixture_dest = tmp_path / "collection_tags.anki2"
-    shutil.copy(fixture_src, fixture_dest)
+    collection_path = prepare_collection_with_note(
+        tmp_path,
+        "collection_tags.anki2",
+        "SBS Pali-English Vocab",
+        "SBS Vocab",
+        {
+            "id": TEST_DPD_ID_STR,
+            "pali": "buddha 1",
+            "marks": "user note",
+        },
+    )
 
-    with (
-        patch("scripts.export.sbs_anki_collection_verifier.config_read") as mock_v,
-        patch("scripts.export.sbs_anki_updater.config_read") as mock_u,
-    ):
-
-        def mock_config(section, key):
-            if key == "db_path_sbs":
-                return str(fixture_dest)
-            if key == "backup_path_sbs":
-                return str(tmp_path / "backups")
-            return "dummy"
-
-        mock_v.side_effect = mock_config
-        mock_u.side_effect = mock_config
-
+    with patched_sbs_config(collection_path, tmp_path):
         # Prepare note with existing tags and marks
-        col = Collection(str(fixture_dest))
-        note_id = col.find_notes("id:48511")[0]
+        col = Collection(str(collection_path))
+        note_id = col.find_notes(f"id:{TEST_DPD_ID_STR}")[0]
         note = col.get_note(note_id)
         note.tags = ["old-tag"]
-        note["marks"] = "user note"
         col.update_note(note)
         col.close()
 
@@ -210,7 +284,7 @@ def test_sbs_vocab_tag_sync(tmp_path):
             patch("scripts.export.sbs_anki_updater.recalculate_all_sbs_indices"),
         ):
             mock_headword = DpdHeadword()
-            mock_headword.id = 48511
+            mock_headword.id = TEST_DPD_ID
             mock_headword.lemma_1 = "buddha 1"
             mock_headword.sbs = SBS()
             mock_headword.sbs.sbs_index = 1
@@ -224,8 +298,8 @@ def test_sbs_vocab_tag_sync(tmp_path):
             sbs_anki_updater.run_pipeline(skip_collection=False)
 
         # Verify
-        col = Collection(str(fixture_dest))
-        note_id = col.find_notes("id:48511")[0]
+        col = Collection(str(collection_path))
+        note_id = col.find_notes(f"id:{TEST_DPD_ID_STR}")[0]
         note = col.get_note(note_id)
         assert set(note.tags) == {"tag1", "tag2"}
         assert note["marks"] == "user note"
@@ -234,28 +308,18 @@ def test_sbs_vocab_tag_sync(tmp_path):
 
 def test_note_moves_between_decks(tmp_path):
     """Test that a note moves from one deck to another when its routing changes."""
-    fixture_src = Path("temp/fixtures/anki/minimal_collection.anki2")
-    fixture_dest = tmp_path / "collection_move.anki2"
-    shutil.copy(fixture_src, fixture_dest)
+    collection_path = prepare_collection_with_note(
+        tmp_path,
+        "collection_move.anki2",
+        "SBS Pali-English Vocab",
+        "SBS Vocab",
+        {"id": TEST_DPD_ID_STR, "pali": "buddha 1"},
+    )
 
-    with (
-        patch("scripts.export.sbs_anki_collection_verifier.config_read") as mock_v,
-        patch("scripts.export.sbs_anki_updater.config_read") as mock_u,
-    ):
-
-        def mock_config(section, key):
-            if key == "db_path_sbs":
-                return str(fixture_dest)
-            if key == "backup_path_sbs":
-                return str(tmp_path / "backups")
-            return "dummy"
-
-        mock_v.side_effect = mock_config
-        mock_u.side_effect = mock_config
-
+    with patched_sbs_config(collection_path, tmp_path):
         # Initially, buddha 1 is in 'SBS Pali-English Vocab'
-        col = Collection(str(fixture_dest))
-        note_id = col.find_notes("id:48511")[0]
+        col = Collection(str(collection_path))
+        note_id = col.find_notes(f"id:{TEST_DPD_ID_STR}")[0]
         card_id = col.find_cards(f"nid:{note_id}")[0]
         card = col.get_card(card_id)
         old_deck_id = col.decks.id("SBS Pali-English Vocab")
@@ -268,7 +332,7 @@ def test_note_moves_between_decks(tmp_path):
             patch("scripts.export.sbs_anki_updater.recalculate_all_sbs_indices"),
         ):
             mock_headword = DpdHeadword()
-            mock_headword.id = 48511
+            mock_headword.id = TEST_DPD_ID
             mock_headword.lemma_1 = "buddha 1"
             mock_headword.sbs = SBS()
             mock_headword.sbs.dhp_source = "DHP 1"  # Routes to DHP deck
@@ -281,8 +345,8 @@ def test_note_moves_between_decks(tmp_path):
             sbs_anki_updater.run_pipeline(skip_collection=False)
 
         # Verify it moved
-        col = Collection(str(fixture_dest))
-        note_id = col.find_notes("id:48511")[0]
+        col = Collection(str(collection_path))
+        note_id = col.find_notes(f"id:{TEST_DPD_ID_STR}")[0]
         card_id = col.find_cards(f"nid:{note_id}")[0]
         card = col.get_card(card_id)
         new_deck_id = col.decks.id("Pali DHP vocab")
@@ -292,40 +356,21 @@ def test_note_moves_between_decks(tmp_path):
 
 def test_csv_deck_update(tmp_path):
     """Test that notes are updated from a CSV source (Patimokkha)."""
-    fixture_src = Path("temp/fixtures/anki/minimal_collection.anki2")
-    fixture_dest = tmp_path / "collection_csv.anki2"
-    shutil.copy(fixture_src, fixture_dest)
+    collection_path = prepare_collection_with_note(
+        tmp_path,
+        "collection_csv.anki2",
+        "Pali Patimokkha Word By Word",
+        "Pātimokkha word by word",
+        {"pali": "test_csv_buddha", "meaning": "Old Meaning"},
+    )
 
-    with (
-        patch("scripts.export.sbs_anki_collection_verifier.config_read") as mock_v,
-        patch("scripts.export.sbs_anki_updater.config_read") as mock_u,
-    ):
-
-        def mock_config(section, key):
-            if key == "db_path_sbs":
-                return str(fixture_dest)
-            if key == "backup_path_sbs":
-                return str(tmp_path / "backups")
-            return "dummy"
-
-        mock_v.side_effect = mock_config
-        mock_u.side_effect = mock_config
-
-        # Open collection to check initial state of a Patimokkha note
-        col = Collection(str(fixture_dest))
-        note_id = col.find_notes('deck:"Pali Patimokkha Word By Word"')[0]
-        note = col.get_note(note_id)
-        note["pali"] = "buddha"
-        note["meaning"] = "Old Meaning"
-        col.update_note(note)
-        col.close()
-
+    with patched_sbs_config(collection_path, tmp_path):
         csv_dir = tmp_path / "csvs"
         csv_dir.mkdir()
         pat_csv = csv_dir / "anki_patimokkha.csv"
-        with open(pat_csv, "w") as f:
-            f.write("pali_1\tmeaning\n")
-            f.write("buddha\tUpdated CSV Meaning\n")
+        with open(pat_csv, "w", encoding="utf-8") as f:
+            f.write("pali\tmeaning\n")
+            f.write("test_csv_buddha\tUpdated CSV Meaning\n")
 
         with (
             patch("scripts.export.sbs_anki_updater.get_db_session") as mock_get_session,
@@ -339,8 +384,10 @@ def test_csv_deck_update(tmp_path):
             sbs_anki_updater.run_pipeline(skip_collection=False)
 
         # Verify
-        col = Collection(str(fixture_dest))
-        note_id = col.find_notes('deck:"Pali Patimokkha Word By Word"')[0]
+        col = Collection(str(collection_path))
+        note_id = col.find_notes(
+            'deck:"Pali Patimokkha Word By Word" pali:test_csv_buddha'
+        )[0]
         note = col.get_note(note_id)
         assert note["meaning"] == "Updated CSV Meaning"
         col.close()
@@ -348,41 +395,22 @@ def test_csv_deck_update(tmp_path):
 
 def test_csv_deck_deletion_removes_stale_note(tmp_path):
     """A CSV-deck note absent from the CSV must be deleted after update."""
-    fixture_src = Path("temp/fixtures/anki/minimal_collection.anki2")
-    fixture_dest = tmp_path / "collection_csv_del.anki2"
-    shutil.copy(fixture_src, fixture_dest)
+    collection_path = prepare_collection_with_note(
+        tmp_path,
+        "collection_csv_del.anki2",
+        "Pali Patimokkha Word By Word",
+        "Pātimokkha word by word",
+        {"pali": "test_old_word", "order": "1"},
+    )
 
-    with (
-        patch("scripts.export.sbs_anki_collection_verifier.config_read") as mock_v,
-        patch("scripts.export.sbs_anki_updater.config_read") as mock_u,
-    ):
-
-        def mock_config(section, key):
-            if key == "db_path_sbs":
-                return str(fixture_dest)
-            if key == "backup_path_sbs":
-                return str(tmp_path / "backups")
-            return "dummy"
-
-        mock_v.side_effect = mock_config
-        mock_u.side_effect = mock_config
-
-        # Set fixture Patimokkha note key to "old_word"
-        col = Collection(str(fixture_dest))
-        pat_note_ids = col.find_notes('deck:"Pali Patimokkha Word By Word"')
-        note = col.get_note(pat_note_ids[0])
-        note["pali"] = "old_word"
-        note["order"] = "1"
-        col.update_note(note)
-        col.close()
-
-        # CSV contains only "new_word", not "old_word"
+    with patched_sbs_config(collection_path, tmp_path):
+        # CSV contains only "test_new_word", not "test_old_word"
         csv_dir = tmp_path / "csvs"
         csv_dir.mkdir()
         pat_csv = csv_dir / "anki_patimokkha.csv"
-        with open(pat_csv, "w") as f:
-            f.write("pali_1\tmeaning\torder\n")
-            f.write("new_word\tSome meaning\t2\n")
+        with open(pat_csv, "w", encoding="utf-8") as f:
+            f.write("pali\tmeaning\torder\n")
+            f.write("test_new_word\tSome meaning\t2\n")
 
         with (
             patch("scripts.export.sbs_anki_updater.get_db_session") as mock_get_session,
@@ -394,46 +422,37 @@ def test_csv_deck_deletion_removes_stale_note(tmp_path):
             mock_session.query.return_value.options.return_value.all.return_value = []
             sbs_anki_updater.run_pipeline(skip_collection=False)
 
-        col = Collection(str(fixture_dest))
-        stale = col.find_notes('deck:"Pali Patimokkha Word By Word" pali:old_word')
+        col = Collection(str(collection_path))
+        stale = col.find_notes('deck:"Pali Patimokkha Word By Word" pali:test_old_word')
         assert len(stale) == 0, "Stale note must be deleted"
-        new_notes = col.find_notes('deck:"Pali Patimokkha Word By Word" pali:new_word')
+        new_notes = col.find_notes(
+            'deck:"Pali Patimokkha Word By Word" pali:test_new_word'
+        )
         assert len(new_notes) == 1, "New CSV entry must be created"
         col.close()
 
 
 def test_deck_reorder_and_force_new(tmp_path):
     """After update: cards must be new (queue=0, type=0) and ordered by deck field."""
-    fixture_src = Path("temp/fixtures/anki/minimal_collection.anki2")
-    fixture_dest = tmp_path / "collection_reorder.anki2"
-    shutil.copy(fixture_src, fixture_dest)
+    collection_path = prepare_collection_with_note(
+        tmp_path,
+        "collection_reorder.anki2",
+        "Pali Patimokkha Word By Word",
+        "Pātimokkha word by word",
+        {"pali": "test_pati_word", "order": "42"},
+    )
 
-    with (
-        patch("scripts.export.sbs_anki_collection_verifier.config_read") as mock_v,
-        patch("scripts.export.sbs_anki_updater.config_read") as mock_u,
-    ):
-
-        def mock_config(section, key):
-            if key == "db_path_sbs":
-                return str(fixture_dest)
-            if key == "backup_path_sbs":
-                return str(tmp_path / "backups")
-            return "dummy"
-
-        mock_v.side_effect = mock_config
-        mock_u.side_effect = mock_config
-
-        # Prepare Patimokkha note with order=42; force it to review (queue=2) first
-        col = Collection(str(fixture_dest))
-        pat_note_ids = col.find_notes('deck:"Pali Patimokkha Word By Word"')
+    with patched_sbs_config(collection_path, tmp_path):
+        # Force the Patimokkha note to review first.
+        col = Collection(str(collection_path))
+        pat_note_ids = col.find_notes(
+            'deck:"Pali Patimokkha Word By Word" pali:test_pati_word'
+        )
         note = col.get_note(pat_note_ids[0])
-        note["pali"] = "pati_word"
-        note["order"] = "42"
-        col.update_note(note)
         card_ids = col.find_cards(f"nid:{note.id}")
         card = col.get_card(card_ids[0])
-        card.queue = 2  # simulate a reviewed card
-        card.type = 2
+        cast(Any, card).queue = 2  # simulate a reviewed card
+        cast(Any, card).type = 2
         card.due = 999
         col.update_card(card)
         col.close()
@@ -441,9 +460,9 @@ def test_deck_reorder_and_force_new(tmp_path):
         csv_dir = tmp_path / "csvs"
         csv_dir.mkdir()
         pat_csv = csv_dir / "anki_patimokkha.csv"
-        with open(pat_csv, "w") as f:
-            f.write("pali_1\tmeaning\torder\n")
-            f.write("pati_word\tsome meaning\t42\n")
+        with open(pat_csv, "w", encoding="utf-8") as f:
+            f.write("pali\tmeaning\torder\n")
+            f.write("test_pati_word\tsome meaning\t42\n")
 
         with (
             patch("scripts.export.sbs_anki_updater.get_db_session") as mock_get_session,
@@ -455,8 +474,10 @@ def test_deck_reorder_and_force_new(tmp_path):
             mock_session.query.return_value.options.return_value.all.return_value = []
             sbs_anki_updater.run_pipeline(skip_collection=False)
 
-        col = Collection(str(fixture_dest))
-        note_ids = col.find_notes('deck:"Pali Patimokkha Word By Word" pali:pati_word')
+        col = Collection(str(collection_path))
+        note_ids = col.find_notes(
+            'deck:"Pali Patimokkha Word By Word" pali:test_pati_word'
+        )
         assert len(note_ids) == 1
         card_ids = col.find_cards(f"nid:{note_ids[0]}")
         card = col.get_card(card_ids[0])
@@ -471,15 +492,15 @@ def test_deck_reorder_and_force_new(tmp_path):
 
 def test_apkg_exporter_produces_all_decks(tmp_path):
     """Test that all decks are exported to .apkg files."""
-    fixture_src = Path("temp/fixtures/anki/minimal_collection.anki2")
-    fixture_dest = tmp_path / "collection_export.anki2"
-    shutil.copy(fixture_src, fixture_dest)
+    collection_path = copy_configured_sbs_collection(
+        tmp_path, "collection_export.anki2"
+    )
 
     output_dir = tmp_path / "apkg_output"
     output_dir.mkdir()
 
     with patch("scripts.export.sbs_anki_apkg.config_read") as mock_config_read:
-        mock_config_read.return_value = str(fixture_dest)
+        mock_config_read.return_value = str(collection_path)
 
         from scripts.export import sbs_anki_apkg
 
@@ -499,40 +520,30 @@ def test_no_cross_deck_move_between_flat_decks(tmp_path):
     This is a regression test for the removed else block that was moving
     notes across incompatible deck types.
     """
-    fixture_src = Path("temp/fixtures/anki/minimal_collection.anki2")
-    fixture_dest = tmp_path / "collection_cross_deck.anki2"
-    shutil.copy(fixture_src, fixture_dest)
+    collection_path = prepare_collection_with_note(
+        tmp_path,
+        "collection_cross_deck.anki2",
+        "SBS Pali-English Vocab",
+        "SBS Vocab",
+        {"id": TEST_DPD_ID_STR, "pali": "buddha 1"},
+    )
 
-    with (
-        patch("scripts.export.sbs_anki_collection_verifier.config_read") as mock_v,
-        patch("scripts.export.sbs_anki_updater.config_read") as mock_u,
-    ):
-
-        def mock_config(section, key):
-            if key == "db_path_sbs":
-                return str(fixture_dest)
-            if key == "backup_path_sbs":
-                return str(tmp_path / "backups")
-            return "dummy"
-
-        mock_v.side_effect = mock_config
-        mock_u.side_effect = mock_config
-
-        # Initial state: note 48511 is in SBS Pali-English Vocab with sbs_index=1
-        col = Collection(str(fixture_dest))
-        note_id = col.find_notes("id:48511")[0]
+    with patched_sbs_config(collection_path, tmp_path):
+        # Initial state: test note is in SBS Pali-English Vocab.
+        col = Collection(str(collection_path))
+        note_id = col.find_notes(f"id:{TEST_DPD_ID_STR}")[0]
         note = col.get_note(note_id)
         old_nid = note.id
         col.close()
 
-        # Run updater: word 48511 now qualifies for DHP vocab but NOT SBS vocab
+        # Run updater: word now qualifies for DHP vocab but NOT SBS vocab
         # (no sbs_index set, but dhp_source is set)
         with (
             patch("scripts.export.sbs_anki_updater.get_db_session") as mock_get_session,
             patch("scripts.export.sbs_anki_updater.recalculate_all_sbs_indices"),
         ):
             mock_headword = DpdHeadword()
-            mock_headword.id = 48511
+            mock_headword.id = TEST_DPD_ID
             mock_headword.lemma_1 = "buddha 1"
             mock_headword.sbs = SBS()
             mock_headword.sbs.dhp_source = "DHP 1"
@@ -546,14 +557,16 @@ def test_no_cross_deck_move_between_flat_decks(tmp_path):
             sbs_anki_updater.run_pipeline(skip_collection=False)
 
         # After update: the old SBS note should be deleted, a new DHP note created
-        col = Collection(str(fixture_dest))
+        col = Collection(str(collection_path))
 
-        # Old note should be deleted (no SBS note for id:48511)
-        sbs_notes = col.find_notes('deck:"SBS Pali-English Vocab" id:48511')
+        # Old note should be deleted (no SBS note for test id)
+        sbs_notes = col.find_notes(
+            f'deck:"SBS Pali-English Vocab" id:{TEST_DPD_ID_STR}'
+        )
         assert len(sbs_notes) == 0, "Old SBS note should be deleted"
 
-        # New note should exist in DHP (id:48511 in DHP)
-        dhp_notes = col.find_notes('deck:"Pali DHP vocab" id:48511')
+        # New note should exist in DHP
+        dhp_notes = col.find_notes(f'deck:"Pali DHP vocab" id:{TEST_DPD_ID_STR}')
         assert len(dhp_notes) > 0, "New DHP note should be created"
 
         # Verify the new note has a different nid (it's a new note, not the moved one)
@@ -568,31 +581,21 @@ def test_word_in_multiple_flat_decks_simultaneously(tmp_path):
     Verify that a word with conditions matching MULTIPLE different top-level decks
     ends up with notes in ALL of them simultaneously (multi-deck membership).
     """
-    fixture_src = Path("temp/fixtures/anki/minimal_collection.anki2")
-    fixture_dest = tmp_path / "collection_multi_deck.anki2"
-    shutil.copy(fixture_src, fixture_dest)
+    collection_path = prepare_collection_with_note(
+        tmp_path,
+        "collection_multi_deck.anki2",
+        "SBS Pali-English Vocab",
+        "SBS Vocab",
+        {"id": TEST_DPD_ID_STR, "pali": "buddha 1"},
+    )
 
-    with (
-        patch("scripts.export.sbs_anki_collection_verifier.config_read") as mock_v,
-        patch("scripts.export.sbs_anki_updater.config_read") as mock_u,
-    ):
-
-        def mock_config(section, key):
-            if key == "db_path_sbs":
-                return str(fixture_dest)
-            if key == "backup_path_sbs":
-                return str(tmp_path / "backups")
-            return "dummy"
-
-        mock_v.side_effect = mock_config
-        mock_u.side_effect = mock_config
-
+    with patched_sbs_config(collection_path, tmp_path):
         with (
             patch("scripts.export.sbs_anki_updater.get_db_session") as mock_get_session,
             patch("scripts.export.sbs_anki_updater.recalculate_all_sbs_indices"),
         ):
             mock_headword = DpdHeadword()
-            mock_headword.id = 48511
+            mock_headword.id = TEST_DPD_ID
             mock_headword.lemma_1 = "buddha 1"
             mock_headword.sbs = SBS()
             mock_headword.sbs.sbs_index = 1  # SBS Pali-English Vocab
@@ -605,14 +608,16 @@ def test_word_in_multiple_flat_decks_simultaneously(tmp_path):
 
             sbs_anki_updater.run_pipeline(skip_collection=False)
 
-        col = Collection(str(fixture_dest))
+        col = Collection(str(collection_path))
 
         # Word should be in SBS Pali-English Vocab (already existed in fixture, updated)
-        sbs_notes = col.find_notes('deck:"SBS Pali-English Vocab" id:48511')
+        sbs_notes = col.find_notes(
+            f'deck:"SBS Pali-English Vocab" id:{TEST_DPD_ID_STR}'
+        )
         assert len(sbs_notes) == 1, "Word should have 1 note in SBS Pali-English Vocab"
 
         # Word should also be in Pali DHP vocab (newly created)
-        dhp_notes = col.find_notes('deck:"Pali DHP vocab" id:48511')
+        dhp_notes = col.find_notes(f'deck:"Pali DHP vocab" id:{TEST_DPD_ID_STR}')
         assert len(dhp_notes) == 1, (
             "Word should have 1 note in Pali DHP vocab (newly created)"
         )
@@ -620,8 +625,8 @@ def test_word_in_multiple_flat_decks_simultaneously(tmp_path):
         # Verify both notes have correct "id" field value
         sbs_note = col.get_note(sbs_notes[0])
         dhp_note = col.get_note(dhp_notes[0])
-        assert sbs_note["id"] == "48511"
-        assert dhp_note["id"] == "48511"
+        assert sbs_note["id"] == TEST_DPD_ID_STR
+        assert dhp_note["id"] == TEST_DPD_ID_STR
 
         col.close()
 
@@ -633,43 +638,21 @@ def test_suttas_not_deleted_when_discourses_source_missing(tmp_path):
     but no discourses_source should NOT be deleted.
     Before the fix, it was deleted because deck_selector used discourses_source.
     """
-    fixture_src = Path("temp/fixtures/anki/minimal_collection.anki2")
-    fixture_dest = tmp_path / "collection_suttas.anki2"
-    shutil.copy(fixture_src, fixture_dest)
+    collection_path = prepare_collection_with_note(
+        tmp_path,
+        "collection_suttas.anki2",
+        "Suttas Advanced Pali Class",
+        "Advanced Suttas",
+        {"id": TEST_DPD_ID_STR, "pali": "buddha 1"},
+    )
 
-    with (
-        patch("scripts.export.sbs_anki_collection_verifier.config_read") as mock_v,
-        patch("scripts.export.sbs_anki_updater.config_read") as mock_u,
-    ):
-
-        def mock_config(section, key):
-            if key == "db_path_sbs":
-                return str(fixture_dest)
-            if key == "backup_path_sbs":
-                return str(tmp_path / "backups")
-            return "dummy"
-
-        mock_v.side_effect = mock_config
-        mock_u.side_effect = mock_config
-
-        # Pre-populate: create a note in Suttas Advanced Pali Class for word 48511
-        col = Collection(str(fixture_dest))
-        suttas_deck_id = col.decks.id("Suttas Advanced Pali Class", create=True)
-        model_id = [
-            m["id"] for m in col.models.all() if m["name"] == "Advanced Suttas"
-        ][0]
-        note = col.new_note(model_id)
-        note["id"] = "48511"
-        note["pali"] = "buddha 1"
-        col.add_note(note, suttas_deck_id)
-        col.close()
-
+    with patched_sbs_config(collection_path, tmp_path):
         with (
             patch("scripts.export.sbs_anki_updater.get_db_session") as mock_get_session,
             patch("scripts.export.sbs_anki_updater.recalculate_all_sbs_indices"),
         ):
             mock_headword = DpdHeadword()
-            mock_headword.id = 48511
+            mock_headword.id = TEST_DPD_ID
             mock_headword.lemma_1 = "buddha 1"
             mock_headword.sbs = SBS()
             mock_headword.sbs.discourses_example = "some example"
@@ -682,10 +665,12 @@ def test_suttas_not_deleted_when_discourses_source_missing(tmp_path):
 
             sbs_anki_updater.run_pipeline(skip_collection=False)
 
-        col = Collection(str(fixture_dest))
+        col = Collection(str(collection_path))
 
         # Word should still be in Suttas Advanced Pali Class (parent deck, not deleted)
-        suttas_notes = col.find_notes('deck:"Suttas Advanced Pali Class" id:48511')
+        suttas_notes = col.find_notes(
+            f'deck:"Suttas Advanced Pali Class" id:{TEST_DPD_ID_STR}'
+        )
         assert len(suttas_notes) == 1, (
             "Suttas note should NOT be deleted even though discourses_source is empty"
         )
@@ -701,6 +686,8 @@ def test_common_roots_csv_has_header_row(tmp_path):
         writer.writerow(
             [
                 "root",
+                "root_clean",
+                "sanskrit_root",
                 "root_group",
                 "root_sign",
                 "root_meaning",
@@ -711,7 +698,20 @@ def test_common_roots_csv_has_header_row(tmp_path):
             ]
         )
         writer.writerows(
-            [["√bhū", "1", "+", "to be", "atthi", "bhavati", "", "feedback"]]
+            [
+                [
+                    "√bhū",
+                    "bhū",
+                    "bhū",
+                    "1",
+                    "+",
+                    "to be",
+                    "atthi",
+                    "bhavati",
+                    "",
+                    "feedback",
+                ]
+            ]
         )
     with open(csv_file, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f, delimiter="\t")

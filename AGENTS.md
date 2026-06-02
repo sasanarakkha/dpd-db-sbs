@@ -60,10 +60,6 @@ Existing tables have extra `*_ru` columns (e.g., `root_ru_meaning`, `html_ru`).
 ## GitHub Issue Reference Mapping
 - "local issue #" refers to https://github.com/sasanarakkha/dpd-db-sbs.
 
-## Local Commit Exception
-- Only human-run Bash scripts under `scripts/cl_dps/` may perform their own `git commit` operations, and only for narrowly scoped local automation explicitly documented by that script.
-- Agents MUST NOT run `git commit` directly and MUST NOT add autonomous commit behavior to Python scripts or scripts outside `scripts/cl_dps/`.
-
 ## Shadow Files & Sync Templates
 - "Shadow" (`*_ru.py`, `*_sbs.py`, `*_dps.py`, `*_ta.py`) or "unique" files MUST have corresponding sync documentation in `kamma/upstream_sync/`.
 - **Shadow Documentation Gate:** Any new, renamed, moved, or reclassified shadow/local copy MUST update registry.json and the matching `kamma/upstream_sync/smd/*.md` entry in the same change. Do not report the work complete until `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` and `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` pass.

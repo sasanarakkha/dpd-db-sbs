@@ -34,7 +34,7 @@ def get_feedback(i: DpdHeadword, deck_name: str) -> str:
 
 def get_root_key(i: DpdHeadword) -> str:
     if i.rt:
-        return re.sub(r" \d*$", "", str(i.root_key))
+        return re.sub(r" \d*$", "", i.root_key)
     return ""
 
 
@@ -127,6 +127,7 @@ EXPECTED_COLLECTION = {
             "main_verb",
             "examples",
             "native",
+            "test",
             "feedback",
             "marks",
         ],
@@ -600,6 +601,7 @@ DECKS: list[DeckSpec] = [
             "main_verb": lambda row: row.get("main_verb", ""),
             "examples": lambda row: row.get("examples", ""),
             "native": lambda row: row.get("native", ""),
+            "test": lambda row: row.get("test", ""),
             "feedback": lambda row: row.get("feedback", ""),
         },
     ),

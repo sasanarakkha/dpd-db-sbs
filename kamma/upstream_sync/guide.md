@@ -12,9 +12,7 @@ Run `scripts/cl_dps/dpd-kamma-sync` before Stage 1. This is the only sync-relate
 It backs up DPS localization tables, commits only the backup TSV changes as `backup dps data`, and
 creates the Kamma thread through `kamma/upstream_sync/scripts/init_sync_thread.py`.
 
-Only human-run Bash scripts under `scripts/cl_dps/` may perform their own `git commit` operations.
-Agents must not run `git commit` directly, and no Python sync script or script outside
-`scripts/cl_dps/` may add autonomous commit behavior.
+Git commit/push policy is inherited from the global rules.
 
 After that wrapper finishes, all sync work must use the Python scripts in
 `kamma/upstream_sync/scripts/` and the 5-stage workflow below. Do not use legacy shell sync wrappers.

@@ -7,6 +7,7 @@ import os
 import re
 import shutil
 import csv
+import unicodedata
 from typing import Any, cast
 
 from anki.collection import Collection
@@ -62,7 +63,7 @@ class UpdateStats:
                 )
 
 
-def backup_anki_db():
+def backup_anki_db() -> bool:
     """Backup Anki collection to backup_path_sbs."""
     pr.green("backup anki db")
     anki_db_path = config_read("anki", "db_path_sbs")
@@ -70,7 +71,7 @@ def backup_anki_db():
 
     if not anki_db_path or not backup_dir:
         pr.red("Paths not found in config.ini")
-        return
+        return False
 
     os.makedirs(backup_dir, exist_ok=True)
     import datetime
@@ -81,9 +82,11 @@ def backup_anki_db():
     try:
         shutil.copy2(anki_db_path, backup_path)
         pr.yes(f"backed up to {backup_path}")
+        return True
     except Exception as e:
         pr.no("error")
         pr.red(f"Backup failed: {e}")
+        return False
 
 
 def setup_anki_updater(
@@ -271,6 +274,11 @@ def deck_selector(i: DpdHeadword) -> list[str]:
     return result
 
 
+def normalize_anki_text(value: Any) -> str:
+    """Convert Anki field values to normalized text."""
+    return unicodedata.normalize("NFC", str(value)) if value is not None else ""
+
+
 def update_note_values(note, i, deck_config: DeckSpec) -> bool:
     """Update note fields using deck_config.field_map. Returns True if changed."""
     old_fields = copy.copy(note.fields)
@@ -278,8 +286,7 @@ def update_note_values(note, i, deck_config: DeckSpec) -> bool:
     for field_name, producer in deck_config.field_map.items():
         if field_name in note:
             try:
-                value = producer(i)
-                note[field_name] = str(value) if value is not None else ""
+                note[field_name] = normalize_anki_text(cast(Any, producer(i)))
             except Exception as e:
                 pr.red(f"Error producing field '{field_name}' for {i.lemma_1}: {e}")
 
@@ -304,8 +311,7 @@ def update_note_values_csv(note: Note, row: dict, deck_config: DeckSpec) -> bool
     for field_name, producer in deck_config.field_map.items():
         if field_name in note:
             try:
-                value = producer(row)
-                note[field_name] = str(value) if value is not None else ""
+                note[field_name] = normalize_anki_text(cast(Any, producer(row)))
             except Exception as e:
                 pr.red(
                     f"Error producing field '{field_name}' for row {row.get('pali', row.get('id', 'unknown'))}: {e}"
@@ -485,7 +491,7 @@ def update_from_csv(
     csv_keys: set[str] = set()
     for item in all_data:
         if item["deck"].startswith(top_level):
-            key = item["note"].fields[0]
+            key = normalize_anki_text(item["note"].fields[0])
             notes_by_key[key] = item
 
     with open(csv_path, "r", encoding="utf-8") as f:
@@ -495,7 +501,7 @@ def update_from_csv(
             if not headers:
                 continue
             key_header = headers[0]
-            key_value = row[key_header]
+            key_value = normalize_anki_text(row[key_header])
             csv_keys.add(key_value)
 
             if key_value in notes_by_key:
@@ -534,7 +540,7 @@ def delete_stale_csv_notes(
     notes_by_key: dict[str, dict] = {}
     for item in all_data:
         if item["deck"].startswith(top_level):
-            key = item["note"].fields[0]
+            key = normalize_anki_text(item["note"].fields[0])
             notes_by_key[key] = item
 
     for key, item in notes_by_key.items():
@@ -702,7 +708,9 @@ def run_pipeline(skip_collection: bool = False):
         pr.yes("pipeline complete (skipped collection)")
         return
 
-    backup_anki_db()
+    if not backup_anki_db():
+        pr.red("Aborting before collection update because backup failed.")
+        return
 
     deck_names = list(EXPECTED_COLLECTION.keys())
     col, data_dict, all_data, deck_dict, model_dict = setup_anki_updater(deck_names)
