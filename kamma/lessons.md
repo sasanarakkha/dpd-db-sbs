@@ -10,3 +10,4 @@
 - 2026-05-04 [POSITIVE] One-shot scripts can accept minor output nits (e.g., double-prefixes in edge cases) if data is correct and user reviews dry-run before committing.
 - 2026-05-28 [WORKFLOW] The MCP Pali analysis feedback-loop thread must not be archived or finalized without an explicit passed review and user confirmation that all issues are resolved.
 - 2026-06-01 [WORKFLOW] In tool-driven checks, avoid Fish-only `and`/`or` conditionals unless the shell is verified; shell-neutral probes prevent false command failures.
+- 2026-06-06 [POSITIVE] Checker script (sbs_anki_fields_check.py) immediately surfaced a real field-name divergence (examples_or_words vs examples) in anki_csv.py — validating the gate-before-import pattern as highly effective for catching silent drift.
