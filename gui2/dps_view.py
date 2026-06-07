@@ -36,7 +36,7 @@ class DpsView(ft.Column, PopUpMixin):
             spacing=5,
         )
 
-        self.page: ft.Page = page
+        self._page: ft.Page = page
         self.toolkit: ToolKit = toolkit
 
         self._db = self.toolkit.db_manager
@@ -93,6 +93,7 @@ class DpsView(ft.Column, PopUpMixin):
             hint_style=ft.TextStyle(color=LABEL_COLOUR, size=15),
             hint_text="Enter ID or Lemma",
             on_submit=self._click_edit_headword,
+            on_blur=self._disable_id_field_autofocus,
             text_size=17,
             width=400,
         )
@@ -259,7 +260,11 @@ class DpsView(ft.Column, PopUpMixin):
 
     def update_message(self, message: str) -> None:
         self._message_field.value = message
-        self.page.update()
+        self._page.update()
+
+    def _disable_id_field_autofocus(self, e: ft.ControlEvent) -> None:
+        if self._enter_id_or_lemma_field.autofocus:
+            self._enter_id_or_lemma_field.autofocus = False
 
     def _handle_filter_change(self, e: ft.ControlEvent) -> None:
         """Handles changes in the field filter RadioGroup."""
@@ -272,7 +277,7 @@ class DpsView(ft.Column, PopUpMixin):
             visible_fields = CLASS_FIELDS
 
         self.dps_fields.filter_fields(visible_fields)
-        self.page.update()
+        self._page.update()
 
     def _click_edit_headword(self, _e: ft.ControlEvent) -> None:
         id_or_lemma = (self._enter_id_or_lemma_field.value or "").strip()
@@ -387,6 +392,9 @@ class DpsView(ft.Column, PopUpMixin):
         selected_id = self._history_dropdown.value
         if selected_id:
             self._enter_id_or_lemma_field.value = selected_id
+            self._history_dropdown.value = (
+                None  # reset so the same item can be reselected
+            )
             self._click_edit_headword(e)  # Reuse existing load logic
 
     def _build_middle_section(self) -> ft.Column:
@@ -433,14 +441,14 @@ class DpsView(ft.Column, PopUpMixin):
                         name="change",
                         data=current_filter,
                         control=self._filter_radios,
-                        page=self.page,
+                        page=self._page,
                     )
                 )
         # Clear relevant top-section fields and reset state
         self._enter_id_or_lemma_field.value = ""
         self.tests_passed = False
         self.update_message("Fields cleared.")
-        self.page.update()
+        self._page.update()
 
     def _click_run_tests(self, _e: ft.ControlEvent) -> None:
         """Run tests on current field values - using enhanced DPS test manager"""
@@ -494,9 +502,9 @@ class DpsView(ft.Column, PopUpMixin):
                 request_dpd_server(str(self.headword.id))
 
                 self._update_history_dropdown()
-                self.page.update()
+                self._page.update()
 
-                self.page.set_clipboard(
+                self._page.set_clipboard(
                     self.headword.lemma_1
                 )  # Copy headword to clipboard
                 self._click_clear_all(e)  # Clear all fields after successful update

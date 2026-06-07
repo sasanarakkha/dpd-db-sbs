@@ -130,6 +130,22 @@
     "tools/fast_api_utils_dps.py": {
       "upstream": "tools/fast_api_utils.py",
       "divergence_reason": "DPS-specific FastAPI utilities; architectural divergence from upstream."
+    },
+    "gui2/dps_view.py": {
+      "upstream": "gui2/pass2_add_view.py",
+      "divergence_reason": "Implements the DPS RU/SBS editing tab: reuses upstream's View/Column/PopUpMixin shell but runs an independent data model (Russian/SBS tables), navigation, filters, and DB-write path that have evolved separately for over a year."
+    },
+    "gui2/dps_fields.py": {
+      "upstream": "gui2/dpd_fields.py",
+      "divergence_reason": "Same field-manager pattern but a wholly different mapping-driven RU/SBS field set with AI translation and SBS chant logic, so it cannot share upstream's FieldConfig-driven implementation."
+    },
+    "gui2/dps_fields_lists.py": {
+      "upstream": "gui2/dpd_fields_lists.py",
+      "divergence_reason": "Centralizes the DPS dps_* field names and Vibhanga/Class view groupings, which have no structural overlap with upstream's DPD filter and operational lists."
+    },
+    "gui2/dps_test_manager.py": {
+      "upstream": "gui2/test_manager.py",
+      "divergence_reason": "Runs the same PopUpMixin test-runner pattern against DpsView and a string-values dict with DPS-only test loading/saving, diverging from upstream's toolkit-delegated DpdHeadword-based manager."
     }
   },
   "no_sync_files": [
@@ -192,7 +208,11 @@
     "exporter/goldendict/ru_components/README.md",
     "exporter/kindle/ru_components/README.md",
     "exporter/webapp/static/tabs.js",
-    "gui2/dps_*",
+    "gui2/dps_db_helpers.py",
+    "gui2/dps_ai_service.py",
+    "gui2/dps_process_additions.py",
+    "gui2/dps_process_corrections.py",
+    "gui2/dps_field_mapping.py",
     "gui2/font_scaling_helper.py",
     "misc/pat",
     "scripts/change_in_db/",
@@ -270,7 +290,10 @@
   "dps_copies": {
     "exporter/goldendict/data_classes_dps.py": "exporter/goldendict/data_classes.py",
     "scripts/backup/backup_dps.py": "db/backup_tsv/backup_dpd_headwords_and_roots.py",
-    "scripts/build/db_rebuild_from_tsv_dps.py": "scripts/build/db_rebuild_from_tsv.py"
+    "scripts/build/db_rebuild_from_tsv_dps.py": "scripts/build/db_rebuild_from_tsv.py",
+    "gui2/dps_example_field.py": "gui2/dpd_fields_examples.py",
+    "gui2/dps_example_stash_manager.py": "gui2/example_stash_manager.py",
+    "gui2/dps_meaning_field.py": "gui2/dpd_fields_meaning.py"
   },
   "tamil_copies": {
     "db/tpd/tpd_to_lookup.py": "db/epd/epd_to_lookup.py"

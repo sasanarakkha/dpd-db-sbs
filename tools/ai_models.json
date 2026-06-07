@@ -2,32 +2,12 @@
   "default_models": [
     {
       "provider": "gemini",
-      "model": "gemini-1.5-flash",
-      "delay": 4
-    },
-    {
-      "provider": "gemini",
       "model": "gemini-2.5-flash",
       "delay": 6
     },
     {
       "provider": "gemini",
       "model": "gemini-2.5-flash-lite",
-      "delay": 5
-    },
-    {
-      "provider": "claude",
-      "model": "opus",
-      "delay": 5
-    },
-    {
-      "provider": "claude",
-      "model": "sonnet",
-      "delay": 5
-    },
-    {
-      "provider": "claude",
-      "model": "haiku",
       "delay": 5
     },
     {
@@ -48,11 +28,6 @@
     {
       "provider": "openrouter",
       "model": "qwen/qwen3.5-flash-02-23",
-      "delay": 5
-    },
-    {
-      "provider": "openrouter",
-      "model": "deepseek/deepseek-v4-pro",
       "delay": 5
     },
     {

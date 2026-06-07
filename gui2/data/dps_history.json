@@ -1,5 +1,9 @@
 [
     {
+        "id": 48511,
+        "lemma_1": "buddha 1"
+    },
+    {
         "id": 41646,
         "lemma_1": "paṇṇa 1.1"
     },
@@ -94,9 +98,5 @@
     {
         "id": 61533,
         "lemma_1": "saṃkaḍḍhitvā"
-    },
-    {
-        "id": 43497,
-        "lemma_1": "parittaka"
     }
 ]

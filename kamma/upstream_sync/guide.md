@@ -219,6 +219,7 @@ A session must be restartable at any sub-stage boundary from files alone — nev
      - Exact code to insert, replace, or delete (literal, not paraphrased).
      - Verification command to confirm the change landed correctly.
    - If any item says "figure out X", "determine Y", or "check Z" — the plan is incomplete. ADVANCED must resolve those before handing off.
+   - **Shadow/inspired refactor porting check (MANDATORY when upstream change is structural):** For every upstream file in the dynamic plan whose diff shows structural refactoring — type hint modernisation, `os` → `pathlib`, `print()` / `rich.print()` → `pr.*`, dead code removal, method signature cleanup, or similar quality improvements — check `registry.json` for registered shadow copies (`russian_copies`, `sbs_copies`, `dps_copies`, `tamil_copies`) and `inspired_by_upstream` entries with that file as counterpart. If any exist, the `dynamic_plan.md` item for each copy must include those structural changes in addition to any feature change. Do not port a feature change in isolation when the upstream source was also structurally improved in the same commit range.
 2. **Discussion Flags**:
    - Check `discuss` flags in `registry.json`. If `true`, resolve with the user before planning.
    - **Discussion flow**: Discuss each flagged item in chat, one at a time. Do not ask the user to edit any file. Once a decision is reached, mark the item `RESOLVED` in `dynamic_plan.md` with the agreed strategy. Only then proceed.
