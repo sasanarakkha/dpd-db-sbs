@@ -1,0 +1,62 @@
+{
+  "numbered_dot": {
+    "input": "1. монахи",
+    "output": "монахи"
+  },
+  "numbered_dot_space": {
+    "input": "12.  слово",
+    "output": "слово"
+  },
+  "dash_prefix": {
+    "input": "- монахи",
+    "output": "монахи"
+  },
+  "star_prefix": {
+    "input": "* слово",
+    "output": "слово"
+  },
+  "bold_markdown": {
+    "input": "**монахи**",
+    "output": "*монахи"
+  },
+  "bold_inline": {
+    "input": "слово **жизнь**",
+    "output": "слово жизнь"
+  },
+  "clean_line": {
+    "input": "монахи",
+    "output": "монахи"
+  },
+  "numbered_no_content": {
+    "input": "3.",
+    "output": ""
+  },
+  "leading_trailing_spaces": {
+    "input": "  монахи  ",
+    "output": "монахи"
+  },
+  "combined_numbered_bold": {
+    "input": "2. **монахи**",
+    "output": "*монахи"
+  },
+  "combined_dash_bold": {
+    "input": "- **слово**",
+    "output": "*слово"
+  },
+  "combined_star_bold": {
+    "input": "* **жизнь**",
+    "output": "жизнь"
+  },
+  "not_numbered_mid": {
+    "input": "слово 1. другое",
+    "output": "слово 1. другое"
+  },
+  "not_dash_mid": {
+    "input": "слово - другое",
+    "output": "слово - другое"
+  },
+  "unicode_pali": {
+    "input": "1. ниббāна",
+    "output": "ниббāна"
+  }
+}
