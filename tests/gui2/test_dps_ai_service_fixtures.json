@@ -1,0 +1,68 @@
+{
+  "full": {
+    "input": {
+      "lemma_1": "akakkasa",
+      "grammar": "adj, from na kakkasa",
+      "meaning_1": "smooth; tender; not harsh; not rough",
+      "example_1": "<b>akakkasaṃ</b> viññāpaniṃ,\ngiraṃ saccam'udīraye,\nyāya n'ābhisaje kañci,\ntam'ahaṃ brūmi brāhmaṇaṃ.",
+      "pos": "adj",
+      "notes": "PED suggests ku + √kar + ta."
+    },
+    "meaning_prompt": {
+      "sys": "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules.",
+      "user": "\n\tTranslate the English definition of the Pali term into Russian, following these rules:\n\n\t- Translate all bracketed text (e.g., \"(gram)\" → \"(грам)\", \"(comm)\" → \"(комм)\", \"(vinaya)\" → \"(виная)\", \"(of weather)\" → \"(о погоде)\").\n\t- Separate synonyms with `;`.\n\t- Match the grammatical structure of the Pali term (noun, verb, etc.).\n\t- Use lowercase unless it's a proper noun.\n\t- Translate \"lit.\" as \"досл.\".\n\t- Retain clarifications if any (e.g., \"(of trap) laid down\" → \"(о капкане) установленный\").\n\t- Translate idioms to Russian equivalents.\n\t- Ensure no English remains untranslated, including within brackets.\n\t- Output only the translation of the Definition, without labels like \"Перевод\" etc, without any comments, without translation of the Grammar and in one line.\n\n\t**Pali Term**: akakkasa\n\t**Grammar**: adjective\n\t**Definition**: smooth; tender; not harsh; not rough\n\n- Consider Pali context: <b>akakkasaṃ</b> viññāpaniṃ,\ngiraṃ saccam'udīraye,\nyāya n'ābhisaje kañci,\ntam'ahaṃ brūmi brāhmaṇaṃ.\n- Match this example format: знающий, свободный, плохой, мягкий, верхний, полый, незрячий, тугой, личный"
+    },
+    "meaning_prompt_synonyms": {
+      "sys": "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules.",
+      "user": "\n\tProvide at least nine (9) distinct Russian synonyms for the English definition of Pali term, following these rules:\n\n\t- Translate all bracketed text (e.g., \"(gram)\" → \"(грам)\", \"(comm)\" → \"(комм)\", \"(vinaya)\" → \"(виная)\", \"(of weather)\" → \"(о погоде)\").\n\t- Separate synonyms with `;`.\n\t- Match the grammatical structure of the Pali term (noun, verb, etc.).\n\t- Use lowercase unless it's a proper noun.\n\t- Translate \"lit.\" as \"досл.\".\n\t- Retain clarifications if any (e.g., \"(of trap) laid down\" → \"(о капкане) установленный\").\n\t- Translate idioms to Russian equivalents.\n\t- Ensure no English remains untranslated, including within brackets.\n\t- Output only the translation of the Definition, without labels like \"Перевод\" etc, without any comments, without translation of the Grammar and in one line.\n\n\t**Pali Term**: akakkasa\n\t**Grammar**: adjective\n\t**Definition**: smooth; tender; not harsh; not rough\n\n- Consider Pali context: <b>akakkasaṃ</b> viññāpaniṃ,\ngiraṃ saccam'udīraye,\nyāya n'ābhisaje kañci,\ntam'ahaṃ brūmi brāhmaṇaṃ.\n- Match this example format: знающий, свободный, плохой, мягкий, верхний, полый, незрячий, тугой, личный"
+    },
+    "notes_prompt": {
+      "sys": "You are a helpful assistant that translates English text to Russian considering the context.",
+      "user": "\n\tTranslate the English notes into Russian, following these rules:\n\t- Keep Pali or Sanskrit terms in roman script.\n\t- Output only the translation of the Notes, without labels like \"Перевод\" etc, without any comments, without translation of the Grammar and in one line.\n\n\t**Pali Term**: akakkasa\n\t**Grammar**: adjective\n\t**Notes**: PED suggests ku + √kar + ta.\n"
+    }
+  },
+  "no_notes": {
+    "input": {
+      "lemma_1": "a 1.1",
+      "grammar": "letter, masc",
+      "meaning_1": "(gram) letter a; 1st letter of the alphabet; guttural vowel",
+      "example_1": "<b>a</b> kavagga hā kaṇṭhajā, i cavagga yā tālujā, u pavaggā oṭṭhajā, ṭavagga ra ḷā muddhajā, tavagga la sā dantajā, e kaṇṭhatālujo, o kaṇṭh'oṭṭhajo, vo dant'oṭṭhajo.",
+      "pos": "letter",
+      "notes": ""
+    },
+    "meaning_prompt": {
+      "sys": "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules.",
+      "user": "\n\tTranslate the English definition of the Pali term into Russian, following these rules:\n\n\t- Translate all bracketed text (e.g., \"(gram)\" → \"(грам)\", \"(comm)\" → \"(комм)\", \"(vinaya)\" → \"(виная)\", \"(of weather)\" → \"(о погоде)\").\n\t- Separate synonyms with `;`.\n\t- Match the grammatical structure of the Pali term (noun, verb, etc.).\n\t- Use lowercase unless it's a proper noun.\n\t- Translate \"lit.\" as \"досл.\".\n\t- Retain clarifications if any (e.g., \"(of trap) laid down\" → \"(о капкане) установленный\").\n\t- Translate idioms to Russian equivalents.\n\t- Ensure no English remains untranslated, including within brackets.\n\t- Output only the translation of the Definition, without labels like \"Перевод\" etc, without any comments, without translation of the Grammar and in one line.\n\n\t**Pali Term**: a 1.1\n\t**Grammar**: letter , masculine noun\n\t**Definition**: (gram) letter a; 1st letter of the alphabet; guttural vowel\n\n- Consider Pali context: <b>a</b> kavagga hā kaṇṭhajā, i cavagga yā tālujā, u pavaggā oṭṭhajā, ṭavagga ra ḷā muddhajā, tavagga la sā dantajā, e kaṇṭhatālujo, o kaṇṭh'oṭṭhajo, vo dant'oṭṭhajo."
+    },
+    "meaning_prompt_synonyms": {
+      "sys": "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules.",
+      "user": "\n\tProvide at least nine (9) distinct Russian synonyms for the English definition of Pali term, following these rules:\n\n\t- Translate all bracketed text (e.g., \"(gram)\" → \"(грам)\", \"(comm)\" → \"(комм)\", \"(vinaya)\" → \"(виная)\", \"(of weather)\" → \"(о погоде)\").\n\t- Separate synonyms with `;`.\n\t- Match the grammatical structure of the Pali term (noun, verb, etc.).\n\t- Use lowercase unless it's a proper noun.\n\t- Translate \"lit.\" as \"досл.\".\n\t- Retain clarifications if any (e.g., \"(of trap) laid down\" → \"(о капкане) установленный\").\n\t- Translate idioms to Russian equivalents.\n\t- Ensure no English remains untranslated, including within brackets.\n\t- Output only the translation of the Definition, without labels like \"Перевод\" etc, without any comments, without translation of the Grammar and in one line.\n\n\t**Pali Term**: a 1.1\n\t**Grammar**: letter , masculine noun\n\t**Definition**: (gram) letter a; 1st letter of the alphabet; guttural vowel\n\n- Consider Pali context: <b>a</b> kavagga hā kaṇṭhajā, i cavagga yā tālujā, u pavaggā oṭṭhajā, ṭavagga ra ḷā muddhajā, tavagga la sā dantajā, e kaṇṭhatālujo, o kaṇṭh'oṭṭhajo, vo dant'oṭṭhajo."
+    },
+    "notes_prompt": {
+      "sys": "You are a helpful assistant that translates English text to Russian considering the context.",
+      "user": "\n\tTranslate the English notes into Russian, following these rules:\n\t- Keep Pali or Sanskrit terms in roman script.\n\t- Output only the translation of the Notes, without labels like \"Перевод\" etc, without any comments, without translation of the Grammar and in one line.\n\n\t**Pali Term**: a 1.1\n\t**Grammar**: letter , masculine noun\n\t**Notes**: \n"
+    }
+  },
+  "no_example": {
+    "input": {
+      "lemma_1": "akaṭṭhapākasālipātubhāva",
+      "grammar": "masc, abstr, comp",
+      "meaning_1": "appearance of uncultivated ready to eat fine rice",
+      "example_1": "",
+      "pos": "masc",
+      "notes": ""
+    },
+    "meaning_prompt": {
+      "sys": "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules.",
+      "user": "\n\tTranslate the English definition of the Pali term into Russian, following these rules:\n\n\t- Translate all bracketed text (e.g., \"(gram)\" → \"(грам)\", \"(comm)\" → \"(комм)\", \"(vinaya)\" → \"(виная)\", \"(of weather)\" → \"(о погоде)\").\n\t- Separate synonyms with `;`.\n\t- Match the grammatical structure of the Pali term (noun, verb, etc.).\n\t- Use lowercase unless it's a proper noun.\n\t- Translate \"lit.\" as \"досл.\".\n\t- Retain clarifications if any (e.g., \"(of trap) laid down\" → \"(о капкане) установленный\").\n\t- Translate idioms to Russian equivalents.\n\t- Ensure no English remains untranslated, including within brackets.\n\t- Output only the translation of the Definition, without labels like \"Перевод\" etc, without any comments, without translation of the Grammar and in one line.\n\n\t**Pali Term**: akaṭṭhapākasālipātubhāva\n\t**Grammar**: masculine noun , abstract noun , compound\n\t**Definition**: appearance of uncultivated ready to eat fine rice\n\n- Match this example format: костер, помощник, проступок, скелет, водоем, вопрос, период, владыка, вред"
+    },
+    "meaning_prompt_synonyms": {
+      "sys": "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules.",
+      "user": "\n\tProvide at least nine (9) distinct Russian synonyms for the English definition of Pali term, following these rules:\n\n\t- Translate all bracketed text (e.g., \"(gram)\" → \"(грам)\", \"(comm)\" → \"(комм)\", \"(vinaya)\" → \"(виная)\", \"(of weather)\" → \"(о погоде)\").\n\t- Separate synonyms with `;`.\n\t- Match the grammatical structure of the Pali term (noun, verb, etc.).\n\t- Use lowercase unless it's a proper noun.\n\t- Translate \"lit.\" as \"досл.\".\n\t- Retain clarifications if any (e.g., \"(of trap) laid down\" → \"(о капкане) установленный\").\n\t- Translate idioms to Russian equivalents.\n\t- Ensure no English remains untranslated, including within brackets.\n\t- Output only the translation of the Definition, without labels like \"Перевод\" etc, without any comments, without translation of the Grammar and in one line.\n\n\t**Pali Term**: akaṭṭhapākasālipātubhāva\n\t**Grammar**: masculine noun , abstract noun , compound\n\t**Definition**: appearance of uncultivated ready to eat fine rice\n\n- Match this example format: костер, помощник, проступок, скелет, водоем, вопрос, период, владыка, вред"
+    },
+    "notes_prompt": {
+      "sys": "You are a helpful assistant that translates English text to Russian considering the context.",
+      "user": "\n\tTranslate the English notes into Russian, following these rules:\n\t- Keep Pali or Sanskrit terms in roman script.\n\t- Output only the translation of the Notes, without labels like \"Перевод\" etc, without any comments, without translation of the Grammar and in one line.\n\n\t**Pali Term**: akaṭṭhapākasālipātubhāva\n\t**Grammar**: masculine noun , abstract noun , compound\n\t**Notes**: \n"
+    }
+  }
+}
