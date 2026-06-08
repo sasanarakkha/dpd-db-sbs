@@ -3,6 +3,7 @@
 
 import json
 from tools.paths_dps import DPSPaths
+from tools.printer import printer as pr
 from gui2.paths import Gui2Paths
 
 
@@ -27,31 +28,28 @@ def main() -> None:
     processed_file = dps_paths.corrections_processed_json_path
 
     if not input_file.exists():
-        print(f"Error: {input_file} not found.")
+        pr.red(f"Error: {input_file} not found.")
         return
 
-    # Load corrections
     try:
-        with open(input_file, "r") as f:
+        with open(input_file, encoding="utf-8") as f:
             corrections = json.load(f)
     except (json.JSONDecodeError, OSError) as e:
-        print(f"Error loading {input_file}: {e}")
+        pr.red(f"Error loading {input_file}: {e}")
         return
 
-    # Load processed IDs
-    processed_ids = set()
+    processed_ids: set[int] = set()
     if processed_file.exists():
         try:
-            with open(processed_file, "r") as f:
+            with open(processed_file, encoding="utf-8") as f:
                 processed_ids = {
                     normalized_id
                     for id_val in json.load(f)
                     if (normalized_id := _normalize_id(id_val)) is not None
                 }
         except json.JSONDecodeError:
-            print(f"Warning: {processed_file} is empty or invalid. Starting fresh.")
+            pr.amber(f"Warning: {processed_file} is empty or invalid. Starting fresh.")
 
-    # Filter items
     all_with_comment_add = [item for item in corrections if item.get("comment_add")]
     total_with_comment_add = len(all_with_comment_add)
 
@@ -62,38 +60,38 @@ def main() -> None:
     ]
 
     if not to_process:
-        print(
+        pr.white(
             f"No new corrections with 'comment_add' to process. (Total with comment_add: {total_with_comment_add})"
         )
         return
 
-    print(f"Total entries with 'comment_add': {total_with_comment_add}")
-    print(f"Remaining to process: {len(to_process)}\n")
+    pr.white(f"Total entries with 'comment_add': {total_with_comment_add}")
+    pr.white(f"Remaining to process: {len(to_process)}\n")
 
-    newly_processed = []
+    newly_processed: list[int] = []
 
     try:
         for i, item in enumerate(to_process):
             item_id = _normalize_id(item.get("id"))
             if item_id is None:
-                print(f"Warning: Skipping item at index {i} because it has no ID.")
+                pr.amber(f"Warning: Skipping item at index {i} because it has no ID.")
                 continue
 
-            print("-" * 40)
-            print(
+            pr.white("-" * 40)
+            pr.white(
                 f"Progress: {i + 1}/{len(to_process)} (Total with 'comment_add': {total_with_comment_add})"
             )
 
-            # Print Context
-            print(f"ID: {item_id}")
-            print(f"Lemma: {item.get('lemma_1')} (Proposed: {item.get('lemma_1_add')})")
-            print(
+            pr.white(f"ID: {item_id}")
+            pr.white(
+                f"Lemma: {item.get('lemma_1')} (Proposed: {item.get('lemma_1_add')})"
+            )
+            pr.white(
                 f"Meaning: {item.get('meaning_1')} (Proposed: {item.get('meaning_1_add')})"
             )
-            print(f"Comment: {item.get('comment')}")
-            print(f"Comment Add: {item.get('comment_add')}")
+            pr.white(f"Comment: {item.get('comment')}")
+            pr.white(f"Comment Add: {item.get('comment_add')}")
 
-            # Iterate through other _add fields and compare with original
             other_diffs = []
             exclude_keys = [
                 "id",
@@ -109,24 +107,22 @@ def main() -> None:
 
                     original_val = item.get(base_key, "")
 
-                    # Normalize None and empty string
                     norm_new = new_val if new_val is not None else ""
                     norm_orig = original_val if original_val is not None else ""
 
-                    # Only show if they differ
                     if str(norm_new) != str(norm_orig):
                         other_diffs.append((base_key, original_val, new_val))
 
             if other_diffs:
-                print("\n--- OTHER DIFFERENCES ---")
+                pr.cyan("--- OTHER DIFFERENCES ---")
                 for base_key, original_val, new_val in other_diffs:
-                    print(f"{base_key:20}: {original_val}")
-                    print(f"{base_key + '_add':20}: {new_val}")
-                    print()
+                    pr.white(f"{base_key:20}: {original_val}")
+                    pr.white(f"{base_key + '_add':20}: {new_val}")
+                    pr.white("")
             else:
-                print("\nNo other data differences found.")
+                pr.white("No other data differences found.")
 
-            print("-" * 40)
+            pr.white("-" * 40)
 
             user_input = (
                 input("Press Enter to mark as processed (or 'q' to quit): ")
@@ -141,17 +137,19 @@ def main() -> None:
             processed_ids.add(item_id)
 
     except KeyboardInterrupt:
-        print("\nInterrupted by user.")
+        pr.amber("Interrupted by user.")
 
-    # Save processed IDs
     if newly_processed:
-        with open(processed_file, "w") as f:
-            json.dump(sorted([int(id_val) for id_val in processed_ids]), f, indent=4)
-        print(
-            f"\nSaved {len(newly_processed)} newly processed IDs to {processed_file}."
-        )
+        try:
+            with open(processed_file, "w", encoding="utf-8") as f:
+                json.dump(sorted(processed_ids), f, indent=4)
+            pr.green(
+                f"Saved {len(newly_processed)} newly processed IDs to {processed_file}."
+            )
+        except OSError as e:
+            pr.red(f"Error saving {processed_file}: {e}")
     else:
-        print("\nNo IDs were marked as processed.")
+        pr.white("No IDs were marked as processed.")
 
 
 if __name__ == "__main__":
