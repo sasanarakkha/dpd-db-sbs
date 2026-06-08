@@ -3,6 +3,7 @@
 """Add all additions from gui2/data/additions.json to the database with new IDs."""
 
 import json
+from pathlib import Path
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword
@@ -19,37 +20,7 @@ db_session = get_db_session(app_pth.dpd_db_path)
 dpspth = DPSPaths()
 
 
-def load_id_map_from_additions_added(gui_paths: Gui2Paths) -> dict[str, int]:
-    """
-    Loads an ID map from the additions_added.json file.
-    The map is from old_id (id_add) to new_id (id).
-    """
-    pr.green_title(f"Loading ID map from {gui_paths.additions_added_path}")
-    id_map: dict[str, int] = {}
-    try:
-        with open(gui_paths.additions_added_path, "r", encoding="utf-8") as f:
-            additions_data = json.load(f)
-            if not isinstance(additions_data, list):
-                pr.red(f"Error: {gui_paths.additions_added_path} is not a JSON list.")
-                return {}
-
-            for item in additions_data:
-                if isinstance(item, dict) and "id_add" in item and "id" in item:
-                    old_id = str(item["id_add"])  # Ensure old_id is string
-                    new_id = int(item["id"])  # Ensure new_id is int
-                    id_map[old_id] = new_id
-                else:
-                    pr.red(f"Skipping invalid item in additions_added.json: {item}")
-            pr.green(f"Successfully loaded {len(id_map)} ID mappings.")
-            pr.yes("ok")
-    except FileNotFoundError:
-        pr.red(f"File not found: {gui_paths.additions_added_path}")
-    except json.JSONDecodeError:
-        pr.red(f"Error decoding JSON from {gui_paths.additions_added_path}")
-    return id_map
-
-
-def replace_old_ids_in_tsv_files(id_map: dict[str, int]):
+def replace_old_ids_in_tsv_files(id_map: dict[str, int]) -> None:
     """
     Replaces old IDs with new IDs in specified TSV files.
     id_map: A dictionary mapping old_id_str to new_id (int).
@@ -60,10 +31,7 @@ def replace_old_ids_in_tsv_files(id_map: dict[str, int]):
         pr.red("ID map is empty. No TSV files to update.")
         return
 
-    def process_file(file_path: str, current_id_map: dict[str, int]):
-        # pr.green(f"Processing TSV file: {file_path}")
-        pr.yes("ok")
-
+    def process_file(file_path: Path, current_id_map: dict[str, int]) -> None:
         try:
             with open(file_path, "r", newline="", encoding="utf-8") as file:
                 lines = file.readlines()
@@ -88,12 +56,12 @@ def replace_old_ids_in_tsv_files(id_map: dict[str, int]):
         )
         pr.yes("ok")
 
-    process_file(str(dpspth.russian_path), id_map)
-    process_file(str(dpspth.sbs_path), id_map)
+    process_file(dpspth.russian_path, id_map)
+    process_file(dpspth.sbs_path, id_map)
     pr.yes("ok")
 
 
-def add_all_additions_with_new_ids():
+def add_all_additions_with_new_ids() -> None:
     """
     Processes all additions from additions.json, assigns new IDs,
     and adds them to the database.
@@ -161,7 +129,7 @@ def add_all_additions_with_new_ids():
             if hasattr(new_headword, field_name):
                 try:
                     if (
-                        field_name in ["ebt_count"]
+                        field_name == "ebt_count"
                         and isinstance(value, str)
                         and value.isdigit()
                     ):
@@ -191,52 +159,25 @@ def add_all_additions_with_new_ids():
 
     if successful_id_map:
         replace_old_ids_in_tsv_files(successful_id_map)
+    elif failed_count == len(all_additions_to_process):
+        pr.red(
+            "No words were successfully added to the database. TSV files not updated."
+        )
     else:
-        if not all_additions_to_process:
-            pass
-        elif failed_count == len(all_additions_to_process):
-            pr.red(
-                "No words were successfully added to the database. TSV files not updated."
-            )
-        else:
-            pr.green(
-                "No new words were committed to the database. TSV files not updated."
-            )
+        pr.green("No new words were committed to the database. TSV files not updated.")
     pr.yes("ok")
 
     pr.green_title("Batch Addition Summary")
-    print(f"Total additions attempted: {len(all_additions_to_process)}")
-    print(f"Successfully prepared and (attempted) to add to DB: {processed_count}")
-    print(f"Failed during preparation or DB commit: {failed_count}")
-    print("Batch script finished. additions.json was NOT modified.")
+    pr.green(f"Total additions attempted: {len(all_additions_to_process)}")
+    pr.green(f"Successfully prepared and (attempted) to add to DB: {processed_count}")
+    pr.green(f"Failed during preparation or DB commit: {failed_count}")
+    pr.green("Batch script finished. additions.json was NOT modified.")
     pr.yes("ok")
 
 
-def process_additions_added_and_update_tsvs():
-    """
-    Loads ID map from additions_added.json and updates TSV files.
-    """
-    pr.green_title("Processing additions_added.json and updating TSVs...")
-    pr.red(
-        "find a way to track which been replaced, maybe mark them in addition_added."
-    )
-    return
-
-    gui_paths = Gui2Paths()
-    id_map = load_id_map_from_additions_added(gui_paths)
-
-    if id_map:
-        replace_old_ids_in_tsv_files(id_map)
-    else:
-        pr.red("No ID map loaded or map is empty, TSV files will not be updated.")
-    pr.yes("ok")
-    pr.green_title("Finished processing additions_added.json.")
-
-
-def main():
+def main() -> None:
     pr.tic()
     add_all_additions_with_new_ids()
-    process_additions_added_and_update_tsvs()
     pr.toc()
 
 
