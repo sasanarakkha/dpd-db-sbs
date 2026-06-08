@@ -16,7 +16,7 @@ app_pth = ProjectPaths()
 db_session = get_db_session(app_pth.dpd_db_path)
 
 
-def apply_all_corrections_from_json():
+def apply_all_corrections_from_json() -> None:
     """
     Processes all corrections from corrections.json and applies them to the database.
     Does not modify any JSON files.
@@ -27,7 +27,7 @@ def apply_all_corrections_from_json():
     corrections_json_path = Gui2Paths.for_user(username).corrections_path
 
     try:
-        with open(corrections_json_path) as f:
+        with open(corrections_json_path, encoding="utf-8") as f:
             all_corrections_to_process = json.load(f)
     except FileNotFoundError:
         pr.red(f"File not found: {corrections_json_path}")
@@ -65,7 +65,7 @@ def apply_all_corrections_from_json():
             failed_count += 1
             continue
 
-        fields_updated_log = []
+        any_changed: bool = False
         for field_name, new_value in correction_data.items():
             if field_name == "comment":
                 continue
@@ -73,15 +73,13 @@ def apply_all_corrections_from_json():
                 current_value = getattr(db_entry, field_name)
                 if current_value != new_value:
                     setattr(db_entry, field_name, new_value)
-                    fields_updated_log.append(
-                        f"'{field_name}': '{current_value}' -> '{new_value}'"
-                    )
+                    any_changed = True
             else:
                 pr.red(
                     f"  Field '{field_name}' (value: '{new_value}') from correction data does not exist in DpdHeadword model. Skipping this field."
                 )
 
-        if fields_updated_log:
+        if any_changed:
             try:
                 db_session.commit()
                 processed_count += 1
@@ -94,17 +92,14 @@ def apply_all_corrections_from_json():
                 f"  No actual field changes for headword ID {word_id} ({db_entry.lemma_1})."
             )
 
-    pr.yes("ok")
     pr.green_title("Batch Correction Summary")
-    print(f"Total corrections attempted: {len(all_corrections_to_process)}")
-    print(f"Successfully processed and updated in DB: {processed_count}")
-    print(f"Failed or skipped: {failed_count}")
-    print("Batch script finished.")
+    pr.green(f"Total corrections attempted: {len(all_corrections_to_process)}")
+    pr.green(f"Successfully processed and updated in DB: {processed_count}")
+    pr.green(f"Failed or skipped: {failed_count}")
     pr.yes("ok")
 
 
-# Ensure main function calls the correct processing function
-def main():
+def main() -> None:
     pr.tic()
     apply_all_corrections_from_json()
     pr.toc()
