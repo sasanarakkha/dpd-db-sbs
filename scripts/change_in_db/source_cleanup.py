@@ -12,7 +12,7 @@ from db.models import SBS
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 
-SOURCE_FIELDS: list[str] = [
+SOURCE_FIELDS: tuple[str, ...] = (
     "sbs_source_1",
     "sbs_source_2",
     "dhp_source",
@@ -20,9 +20,9 @@ SOURCE_FIELDS: list[str] = [
     "vib_source",
     "class_source",
     "discourses_source",
-]
+)
 
-EXEMPTS: list[str] = ["PAT", "Sri Lanka", "(modif)", "(simpl)"]
+EXEMPTS: tuple[str, ...] = ("PAT", "Sri Lanka", "(modif)", "(simpl)")
 
 
 def main() -> None:
@@ -59,6 +59,7 @@ def main() -> None:
         pr.yes(f"cleaned up {changed_count} rows")
     else:
         pr.yes("no source cleanup needed")
+    db_session.close()
     pr.toc()
 
 
