@@ -49,7 +49,15 @@ All tasks follow a strict lifecycle:
 
 Before marking any task complete, verify:
 
-- [ ] All tests pass via `uv run pytest tests/test_<thread_name>.py -v`.
+- [ ] **Pre-completion validation — run ALL of the following on the exact changed file(s),
+      one command at a time, never batched together, never on `.` or the whole repo:**
+      1. `uv run ruff check --fix <file>`
+      2. `uv run ruff format <file>`
+      3. `uv run pyright <file>`
+      4. `uv run --with pyrefly pyrefly check --min-severity warn <file>`
+      5. `uv run pytest tests/test_<thread_name>.py -v`
+      **Do NOT report completion until every command passes.**
+      Pyrefly warnings count as failures unless explicitly approved by the user.
       **NEVER use bare `uv run pytest` without a specific file path —
       parallel bash calls spawn concurrent processes and cause macOS memory
       explosions (91 GB+). Enforced by `~/.claude/hooks/guard_pytest.sh`.**
@@ -115,9 +123,11 @@ A thread is complete when:
 
 ### Daily Development
 ```bash
-# Linting and Formatting
-uv run ruff check .
-uv run ruff format .
+# Run each command separately on the exact file — never batch, never use `.` (whole repo)
+uv run ruff check --fix <file>
+uv run ruff format <file>
+uv run pyright <file>
+uv run --with pyrefly pyrefly check --min-severity warn <file>
 
 # Testing — always use targeted file paths in plans and agentic tasks
 uv run pytest tests/test_<specific>.py -v

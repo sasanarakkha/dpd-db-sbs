@@ -213,7 +213,6 @@
     "gui2/dps_process_additions.py",
     "gui2/dps_process_corrections.py",
     "gui2/dps_field_mapping.py",
-    "gui2/font_scaling_helper.py",
     "misc/pat",
     "scripts/change_in_db/",
     "scripts/moving/",
