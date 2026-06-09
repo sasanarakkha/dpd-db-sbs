@@ -3,7 +3,7 @@
 import argparse
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, NotRequired, TypedDict, cast
 
 from sqlalchemy.orm import Session
 
@@ -21,6 +21,175 @@ from exporter.analysis.example_bolding import (
 from tools.ai_manager import AIManager
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
+
+
+class InputVerse(TypedDict):
+    num: str
+    vagga: str
+    text: str
+    speech_mark_options: NotRequired[dict[str, list[str]]]
+
+
+class AnalysisOption(TypedDict):
+    key: str
+    id: int | str
+    pali: str
+    ai_score: float
+    compound_type: NotRequired[str]
+    pos: NotRequired[str]
+    components: NotRequired[list[list[Any]]]
+
+
+class TokenAnalysis(TypedDict):
+    word: str
+    status: str
+    data: list[AnalysisOption]
+
+
+class VerseAnalysis(TypedDict):
+    num: str
+    vagga: str
+    text: str
+    verse_text: NotRequired[str]
+    translation: str
+    literal_translation: str
+    analysis: list[TokenAnalysis]
+
+
+class ProposedChange(TypedDict):
+    id: int
+    pali: str
+    status: str
+    dhp_example: str
+
+
+def _build_speech_marks_section(speech_mark_options: dict[str, list[str]]) -> str:
+    if not speech_mark_options:
+        return ""
+    options_lines = [
+        f"- **{word}**: {', '.join(variants)}"
+        for word, variants in speech_mark_options.items()
+    ]
+    return "### Speech Mark Options\n\n" + "\n".join(options_lines)
+
+
+def _build_proposed_changes_section(rows: list[ProposedChange]) -> str:
+    if not rows:
+        return ""
+    table_header = "| ID | Pali | Status | Proposed dhp_example |\n"
+    table_sep = "|---|---|---|---|\n"
+    table_rows = "\n".join(
+        f"| {row['id']} | {row['pali']} | {row['status']} | `{row['dhp_example']}` |"
+        for row in rows
+    )
+    return "### Proposed SBS Changes\n\n" + table_header + table_sep + table_rows
+
+
+def _collect_verse_changes(
+    verse: VerseAnalysis,
+    verse_text: str,
+    sbs_map: dict[int, SBS],
+    db_session: Session,
+) -> list[ProposedChange]:
+    proposed_changes: list[ProposedChange] = []
+    updated_ids: set[int] = set()
+
+    for token_data in verse.get("analysis", []):
+        word = token_data.get("word", "")
+        options: list[AnalysisOption] = token_data.get("data", [])
+        if not options:
+            continue
+
+        best_option = max(options, key=lambda x: x.get("ai_score", 0))
+        all_entries = collect_all_ids(cast(dict[str, Any], best_option), word)
+        apos_word = find_token_in_apos_verse(word, verse_text)
+
+        for (
+            headword_id,
+            component_pali,
+            _word_in_verse,
+            is_first_component,
+            is_top_level,
+        ) in all_entries:
+            if headword_id in updated_ids:
+                continue
+
+            sbs = sbs_map.get(headword_id)
+            status = "SKIP" if sbs and sbs.dhp_example else "NEW"
+            proposed_example = bold_word_in_verse(
+                verse_text,
+                apos_word,
+                component_pali,
+                headword_id,
+                db_session,
+                is_first_component,
+                is_top_level,
+            )
+            proposed_changes.append(
+                {
+                    "id": headword_id,
+                    "pali": component_pali,
+                    "status": status,
+                    "dhp_example": proposed_example,
+                }
+            )
+            updated_ids.add(headword_id)
+
+    return proposed_changes
+
+
+def _load_or_analyze_verse(
+    verse_num: str,
+    force: bool,
+    all_analysis: list[VerseAnalysis],
+    input_verses: dict[str, InputVerse],
+    analysis_path: Path,
+    db_session: Session,
+) -> list[VerseAnalysis] | None:
+    """Return analysis results for a single verse, running analysis if missing or forced.
+
+    Returns None when the verse is not found in input and cannot be analyzed.
+    """
+    if force:
+        all_analysis = [v for v in all_analysis if v["num"] != verse_num]
+
+    analysis_results = [v for v in all_analysis if v["num"] == verse_num]
+    if not analysis_results:
+        input_verse = input_verses.get(verse_num)
+        if not input_verse:
+            pr.no(f"Verse '{verse_num}' not found in input either")
+            return None
+        msg = (
+            f"Re-analyzing verse '{verse_num}'..."
+            if force
+            else f"Verse '{verse_num}' not yet analyzed — running analysis now..."
+        )
+        pr.green(msg)
+        ai_manager = AIManager()
+        result = translate_sentence(
+            input_verse["text"],
+            db_session,
+            ai_manager,
+            verse_source=verse_num,
+            speech_mark_options=input_verse.get("speech_mark_options"),
+        )
+        verse_text: str = result.get("verse_text") or input_verse["text"]
+        new_entry: VerseAnalysis = {
+            "num": verse_num,
+            "vagga": input_verse["vagga"],
+            "text": input_verse["text"],
+            "verse_text": verse_text,
+            "translation": result["translation"],
+            "literal_translation": result["literal_translation"],
+            "analysis": result["analysis"],
+        }
+        all_analysis.append(new_entry)
+        with open(analysis_path, "w", encoding="utf-8") as f:
+            json.dump(all_analysis, f, ensure_ascii=False, indent=2)
+        pr.yes(f"Analysis saved to {analysis_path}")
+        return [new_entry]
+
+    return analysis_results
 
 
 def main() -> None:
@@ -48,54 +217,28 @@ def main() -> None:
         pr.no(f"Analysis file not found: {analysis_path}")
         return
 
-    with open(input_path, encoding="utf-8") as f:
-        input_verses: dict[str, dict[str, Any]] = {v["num"]: v for v in json.load(f)}
-
-    with open(analysis_path, encoding="utf-8") as f:
-        all_analysis: list[dict[str, Any]] = json.load(f)
+    input_verses: dict[str, InputVerse] = {
+        v["num"]: v for v in json.loads(input_path.read_text(encoding="utf-8"))
+    }
+    all_analysis: list[VerseAnalysis] = json.loads(
+        analysis_path.read_text(encoding="utf-8")
+    )
 
     paths = ProjectPaths()
     db_session: Session = get_db_session(paths.dpd_db_path)
 
     if args.verse:
-        if args.force:
-            all_analysis = [v for v in all_analysis if v["num"] != args.verse]
-
-        analysis_results = [v for v in all_analysis if v["num"] == args.verse]
-        if not analysis_results:
-            # Auto-analyze missing verse
-            input_verse = input_verses.get(args.verse)
-            if not input_verse:
-                pr.no(f"Verse '{args.verse}' not found in {input_path} either")
-                db_session.close()
-                return
-            msg = f"Verse '{args.verse}' not yet analyzed — running analysis now..."
-            if args.force:
-                msg = f"Re-analyzing verse '{args.verse}'..."
-            pr.green(msg)
-            ai_manager = AIManager()
-            result = translate_sentence(
-                input_verse["text"],
-                db_session,
-                ai_manager,
-                verse_source=args.verse,
-                speech_mark_options=input_verse.get("speech_mark_options"),
-            )
-            verse_text: str = result.get("verse_text") or input_verse["text"]
-            new_entry = {
-                "num": args.verse,
-                "vagga": input_verse["vagga"],
-                "text": input_verse["text"],
-                "verse_text": verse_text,
-                "translation": result["translation"],
-                "literal_translation": result["literal_translation"],
-                "analysis": result["analysis"],
-            }
-            all_analysis.append(new_entry)
-            with open(analysis_path, "w", encoding="utf-8") as f:
-                json.dump(all_analysis, f, ensure_ascii=False, indent=2)
-            pr.yes(f"Analysis saved to {analysis_path}")
-            analysis_results = [new_entry]
+        analysis_results = _load_or_analyze_verse(
+            args.verse,
+            args.force,
+            all_analysis,
+            input_verses,
+            analysis_path,
+            db_session,
+        )
+        if analysis_results is None:
+            db_session.close()
+            return
     else:
         analysis_results = all_analysis
 
@@ -109,84 +252,21 @@ def main() -> None:
             verse_num = verse["num"]
             verse_text = verse.get("verse_text") or verse.get("text", "")
 
-            # Section 1: Analysis report
-            analysis_report = generate_markdown_report(verse, verse_text, verse_num)
+            analysis_report = generate_markdown_report(
+                cast(dict[str, Any], verse), verse_text, verse_num
+            )
 
-            # Section 2: Speech mark options
             input_verse = input_verses.get(verse_num, {})
             speech_mark_options = input_verse.get("speech_mark_options", {})
-            speech_marks_section = ""
-            if speech_mark_options:
-                options_lines = [
-                    f"- **{word}**: {', '.join(variants)}"
-                    for word, variants in speech_mark_options.items()
-                ]
-                speech_marks_section = "### Speech Mark Options\n\n" + "\n".join(
-                    options_lines
-                )
+            speech_marks_section = _build_speech_marks_section(speech_mark_options)
 
-            # Section 3: Proposed SBS changes
-            proposed_changes_rows = []
-            updated_ids: set[int] = set()
+            proposed_changes_rows = _collect_verse_changes(
+                verse, verse_text, sbs_map, db_session
+            )
+            proposed_changes_section = _build_proposed_changes_section(
+                proposed_changes_rows
+            )
 
-            for token_data in verse.get("analysis", []):
-                word = token_data.get("word", "")
-                options: list[dict[str, Any]] = token_data.get("data", [])
-                if not options:
-                    continue
-
-                best_option = max(options, key=lambda x: x.get("ai_score", 0))
-                all_entries = collect_all_ids(best_option, word)
-                apos_word = find_token_in_apos_verse(word, verse_text)
-
-                for (
-                    headword_id,
-                    component_pali,
-                    _word_in_verse,
-                    is_first_component,
-                    is_top_level,
-                ) in all_entries:
-                    if headword_id in updated_ids:
-                        continue
-
-                    sbs = sbs_map.get(headword_id)
-                    status = "SKIP" if sbs and sbs.dhp_example else "NEW"
-                    proposed_example = bold_word_in_verse(
-                        verse_text,
-                        apos_word,
-                        component_pali,
-                        headword_id,
-                        db_session,
-                        is_first_component,
-                        is_top_level,
-                    )
-
-                    proposed_changes_rows.append(
-                        {
-                            "id": headword_id,
-                            "pali": component_pali,
-                            "status": status,
-                            "dhp_example": proposed_example,
-                        }
-                    )
-                    updated_ids.add(headword_id)
-
-            proposed_changes_section = ""
-            if proposed_changes_rows:
-                table_header = "| ID | Pali | Status | Proposed dhp_example |\n"
-                table_sep = "|---|---|---|---|\n"
-                table_rows = "\n".join(
-                    f"| {row['id']} | {row['pali']} | {row['status']} | `{row['dhp_example']}` |"
-                    for row in proposed_changes_rows
-                )
-                proposed_changes_section = (
-                    "### Proposed SBS Changes\n\n"
-                    + table_header
-                    + table_sep
-                    + table_rows
-                )
-
-            # Combine all sections
             report_parts = [analysis_report]
             if speech_marks_section:
                 report_parts.append(speech_marks_section)
@@ -194,12 +274,8 @@ def main() -> None:
                 report_parts.append(proposed_changes_section)
 
             report_content = "\n\n".join(report_parts)
-
-            # Write to file
             report_path = reports_dir / f"{book}_{verse_num}.md"
-            with open(report_path, "w", encoding="utf-8") as f:
-                f.write(report_content)
-
+            report_path.write_text(report_content, encoding="utf-8")
             pr.yes(f"Saved: {report_path}")
 
     finally:

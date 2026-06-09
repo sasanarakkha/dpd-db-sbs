@@ -1,0 +1,85 @@
+{
+  "speech_marks_empty": {
+    "input": {},
+    "output": ""
+  },
+  "speech_marks_single_variant": {
+    "input": {
+      "cakkaṃva": [
+        "cakkaṃ'va",
+        "cakkaṃva"
+      ]
+    },
+    "output": "### Speech Mark Options\n\n- **cakkaṃva**: cakkaṃ'va, cakkaṃva"
+  },
+  "speech_marks_single_one_variant": {
+    "input": {
+      "sutvā": [
+        "sutvā"
+      ]
+    },
+    "output": "### Speech Mark Options\n\n- **sutvā**: sutvā"
+  },
+  "speech_marks_multi_words": {
+    "input": {
+      "dhammā": [
+        "dhammā",
+        "dhamma"
+      ],
+      "sutvā": [
+        "sutvā",
+        "sutva"
+      ]
+    },
+    "output": "### Speech Mark Options\n\n- **dhammā**: dhammā, dhamma\n- **sutvā**: sutvā, sutva"
+  },
+  "changes_empty": {
+    "input": [],
+    "output": ""
+  },
+  "changes_new_single": {
+    "input": [
+      {
+        "id": 1234,
+        "pali": "dhamma",
+        "status": "NEW",
+        "dhp_example": "**dhamma**ṃ sutvā"
+      }
+    ],
+    "output": "### Proposed SBS Changes\n\n| ID | Pali | Status | Proposed dhp_example |\n|---|---|---|---|\n| 1234 | dhamma | NEW | `**dhamma**ṃ sutvā` |"
+  },
+  "changes_skip_single": {
+    "input": [
+      {
+        "id": 5678,
+        "pali": "sutta",
+        "status": "SKIP",
+        "dhp_example": "sutte **sutta**"
+      }
+    ],
+    "output": "### Proposed SBS Changes\n\n| ID | Pali | Status | Proposed dhp_example |\n|---|---|---|---|\n| 5678 | sutta | SKIP | `sutte **sutta**` |"
+  },
+  "changes_multi_rows": {
+    "input": [
+      {
+        "id": 1,
+        "pali": "dhamma",
+        "status": "NEW",
+        "dhp_example": "**dhamma**ṃ"
+      },
+      {
+        "id": 2,
+        "pali": "mano",
+        "status": "SKIP",
+        "dhp_example": "**mano**pubbaṅgamā"
+      },
+      {
+        "id": 3,
+        "pali": "pubbaṅgama",
+        "status": "NEW",
+        "dhp_example": "mano**pubbaṅgama**"
+      }
+    ],
+    "output": "### Proposed SBS Changes\n\n| ID | Pali | Status | Proposed dhp_example |\n|---|---|---|---|\n| 1 | dhamma | NEW | `**dhamma**ṃ` |\n| 2 | mano | SKIP | `**mano**pubbaṅgamā` |\n| 3 | pubbaṅgama | NEW | `mano**pubbaṅgama**` |"
+  }
+}
