@@ -8,7 +8,7 @@ import sys
 from sqlalchemy.orm import Session
 
 from db.db_helpers import get_db_session
-from db.models import DpdHeadword, SBS
+from db.models import SBS, DpdHeadword
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 
@@ -544,7 +544,9 @@ def check_dhp_source_consistency(
                 results.append(str(headword.id))
 
     if results:
-        pr.amber(f"Reminder: {len(results)} rows still do not have DHP examples")
+        pr.amber(
+            f"Reminder: {len(results)} rows still do not have DHP examples consider running scripts/change_in_db/dhp_examples_copy.py"
+        )
     return (
         "dhp_source_consistency",
         regex_results(results),

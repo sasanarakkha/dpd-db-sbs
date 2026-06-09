@@ -1,0 +1,98 @@
+[
+  {
+    "id": 7,
+    "source_1": "DHP408",
+    "source_2": "",
+    "expected_idx": 1
+  },
+  {
+    "id": 11,
+    "source_1": "DHP390",
+    "source_2": "",
+    "expected_idx": 1
+  },
+  {
+    "id": 32,
+    "source_1": "DHP314",
+    "source_2": "AN5.140",
+    "expected_idx": 1
+  },
+  {
+    "id": 34,
+    "source_1": "DHP50",
+    "source_2": "DHP314",
+    "expected_idx": 1
+  },
+  {
+    "id": 46,
+    "source_1": "DHP97",
+    "source_2": "",
+    "expected_idx": 1
+  },
+  {
+    "id": 50,
+    "source_1": "DHPa1.6.5",
+    "source_2": "",
+    "expected_idx": null
+  },
+  {
+    "id": 310,
+    "source_1": "DHPa1.1.3",
+    "source_2": "",
+    "expected_idx": null
+  },
+  {
+    "id": 392,
+    "source_1": "DHPa1.2.1",
+    "source_2": "",
+    "expected_idx": null
+  },
+  {
+    "id": 464,
+    "source_1": "DHPa2.11.9",
+    "source_2": "",
+    "expected_idx": null
+  },
+  {
+    "id": 624,
+    "source_1": "DHPa2.11.9",
+    "source_2": "",
+    "expected_idx": null
+  },
+  {
+    "id": 186,
+    "source_1": "TH243",
+    "source_2": "DHP293",
+    "expected_idx": 2
+  },
+  {
+    "id": 1,
+    "source_1": "bālāvatāra",
+    "source_2": "",
+    "expected_idx": null
+  },
+  {
+    "id": 2,
+    "source_1": "VIN1.2.1",
+    "source_2": "DN19.15",
+    "expected_idx": null
+  },
+  {
+    "id": 3,
+    "source_1": "MN43",
+    "source_2": "SN1.13",
+    "expected_idx": null
+  },
+  {
+    "id": 4,
+    "source_1": "UD45",
+    "source_2": "AN3.112",
+    "expected_idx": null
+  },
+  {
+    "id": 5,
+    "source_1": "AN3.103",
+    "source_2": "TH261",
+    "expected_idx": null
+  }
+]
