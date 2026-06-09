@@ -1,5 +1,9 @@
 [
     {
+        "id": 88,
+        "lemma_1": "akappakata"
+    },
+    {
         "id": 48511,
         "lemma_1": "buddha 1"
     },
@@ -94,9 +98,5 @@
     {
         "id": 20920,
         "lemma_1": "kātabba 2"
-    },
-    {
-        "id": 61533,
-        "lemma_1": "saṃkaḍḍhitvā"
     }
 ]
