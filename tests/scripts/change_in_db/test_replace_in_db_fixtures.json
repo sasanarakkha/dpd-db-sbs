@@ -1,0 +1,22 @@
+{
+  "case_single": {
+    "old_value": "some text<b> </b>with bold space",
+    "expected": "some text with bold space"
+  },
+  "case_multiple": {
+    "old_value": "text<b> </b>more<b> </b>end",
+    "expected": "text more end"
+  },
+  "case_leading": {
+    "old_value": "<b> </b>leading text",
+    "expected": " leading text"
+  },
+  "case_trailing": {
+    "old_value": "trailing text<b> </b>",
+    "expected": "trailing text "
+  },
+  "case_no_match": {
+    "old_value": "clean text without bold spaces",
+    "expected": "clean text without bold spaces"
+  }
+}
