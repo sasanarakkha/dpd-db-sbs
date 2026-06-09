@@ -1,0 +1,63 @@
+{
+  "match_source1": {
+    "headword_id": 1,
+    "lemma_1": "a 1.1",
+    "source_value": "bālāvatāra",
+    "source_1": "bālāvatāra",
+    "source_2": "",
+    "sutta_1": "sandhi kaṇḍa",
+    "sutta_2": "",
+    "example_1": "<b>a</b> kavagga hā kaṇṭhajā, i cavagga yā tālujā, u pavaggā oṭṭhajā, ṭavagga ra",
+    "example_2": "",
+    "expected_match": true,
+    "expected_idx": 1,
+    "expected_target_source": "bālāvatāra",
+    "expected_target_sutta": "sandhi kaṇḍa",
+    "expected_target_example": "<b>a</b> kavagga hā kaṇṭhajā, i cavagga yā tālujā, u pavaggā oṭṭhajā, ṭavagga ra"
+  },
+  "match_source2_only": {
+    "headword_id": 85420,
+    "lemma_1": "bālasūriya",
+    "source_value": "ANa7.69",
+    "source_1": "",
+    "source_2": "ANa7.69",
+    "sutta_1": "",
+    "sutta_2": "pāricchattakasuttavaṇṇanā",
+    "example_1": "",
+    "example_2": "ābhāya phuṭaṃ hotī'ti tattakaṃ ṭhānaṃ obhāsena phuṭaṃ hoti. tesañ'hi pupphānaṃ <",
+    "expected_match": true,
+    "expected_idx": 2,
+    "expected_target_source": "ANa7.69",
+    "expected_target_sutta": "pāricchattakasuttavaṇṇanā",
+    "expected_target_example": "ābhāya phuṭaṃ hotī'ti tattakaṃ ṭhānaṃ obhāsena phuṭaṃ hoti. tesañ'hi pupphānaṃ <"
+  },
+  "match_source2_fallback": {
+    "headword_id": 2,
+    "lemma_1": "a 2.1",
+    "source_value": "DN19.15",
+    "source_1": "VIN1.2.1",
+    "source_2": "DN19.15",
+    "sutta_1": "sukkavissaṭṭhisikkhāpadaṃ",
+    "sutta_2": "mahāgovindasuttaṃ",
+    "example_1": "saṅgh'ādiseso'ti saṅgho'va tassā āpattiyā parivāsaṃ deti, mūlāya paṭikassati, mā",
+    "example_2": "atha kho bho mahāgovindo brāhmaṇo tassa satt'āhassa accayena kesamassuṃ ohāretvā",
+    "expected_match": true,
+    "expected_idx": 2,
+    "expected_target_source": "DN19.15",
+    "expected_target_sutta": "mahāgovindasuttaṃ",
+    "expected_target_example": "atha kho bho mahāgovindo brāhmaṇo tassa satt'āhassa accayena kesamassuṃ ohāretvā"
+  },
+  "no_match": {
+    "headword_id": 1,
+    "lemma_1": "a 1.1",
+    "source_value": "XYZNONEXISTENTPATTERN999",
+    "source_1": "bālāvatāra",
+    "source_2": "",
+    "sutta_1": "sandhi kaṇḍa",
+    "sutta_2": "",
+    "example_1": "<b>a</b> kavagga hā kaṇṭhajā, i cavagga yā tālujā, u pavaggā oṭṭhajā, ṭavagga ra",
+    "example_2": "",
+    "expected_match": false,
+    "expected_idx": null
+  }
+}
