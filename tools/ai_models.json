@@ -1,4 +1,28 @@
 {
+  "gemini_cli_work_models": [
+    {
+      "provider": "gemini_cli",
+      "model": "gemini-3.1-pro-preview",
+      "delay": 5
+    },
+    {
+      "provider": "gemini_cli",
+      "model": "gemini-2.5-pro",
+      "delay": 5
+    },
+    {
+      "provider": "gemini_cli",
+      "model": "gemini-3-flash-preview",
+      "delay": 5
+    }
+  ],
+  "gemini_cli_test_models": [
+    {
+      "provider": "gemini_cli",
+      "model": "gemini-3.1-flash-lite",
+      "delay": 5
+    }
+  ],
   "default_models": [
     {
       "provider": "gemini",

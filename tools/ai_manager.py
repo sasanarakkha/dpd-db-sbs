@@ -1,4 +1,5 @@
 import json
+import shutil
 import time
 from pathlib import Path
 from typing import Any, NamedTuple, Optional
@@ -13,8 +14,13 @@ def _load_models_from_json() -> dict[str, list[tuple[str, str, int]]]:
     """Load model lists from tools/ai_models.json."""
     try:
         data = json.loads(AI_MODELS_PATH.read_text())
+        gemini_cli_work = [
+            (m["provider"], m["model"], m["delay"])
+            for m in data.get("gemini_cli_work_models", [])
+        ]
         return {
-            "default": [
+            "default": gemini_cli_work
+            + [
                 (m["provider"], m["model"], m["delay"])
                 for m in data.get("default_models", [])
             ],
@@ -86,6 +92,14 @@ class AIManager:
             pr.green("nvidia initialized")
         else:
             pr.amber("NVIDIA API key not found, manager not initialized.")
+
+        if shutil.which("gemini"):
+            from tools.ai_gemini_cli import GeminiCliManager
+
+            self.providers["gemini_cli"] = GeminiCliManager()
+            pr.green("gemini_cli initialized")
+        else:
+            pr.amber("gemini executable not found on PATH, gemini_cli not initialized.")
 
         pr.green(
             f"loaded {len(self.DEFAULT_MODELS)} default models, {len(self.GROUNDED_MODELS)} grounded models"
