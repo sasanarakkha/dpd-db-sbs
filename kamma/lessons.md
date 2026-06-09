@@ -11,3 +11,5 @@
 - 2026-05-28 [WORKFLOW] The MCP Pali analysis feedback-loop thread must not be archived or finalized without an explicit passed review and user confirmation that all issues are resolved.
 - 2026-06-01 [WORKFLOW] In tool-driven checks, avoid Fish-only `and`/`or` conditionals unless the shell is verified; shell-neutral probes prevent false command failures.
 - 2026-06-06 [POSITIVE] Checker script (sbs_anki_fields_check.py) immediately surfaced a real field-name divergence (examples_or_words vs examples) in anki_csv.py — validating the gate-before-import pattern as highly effective for catching silent drift.
+- 2026-06-09 [BEHAVIOR] In Flet, `setattr()` applied post-construction bypasses `__init__` monkeypatches — guard against this by skipping the patched attribute in setattr loops and adding a post-init hook.
+- 2026-06-09 [BEHAVIOR] In Flet, setting `ft.TextStyle(size=N)` in `page.theme.text_theme` / `page.theme.tabs_theme` without `color=` bypasses Flutter's color-scheme defaults, causing invisible (white-on-white) text. Constructor patching alone is the safer approach.

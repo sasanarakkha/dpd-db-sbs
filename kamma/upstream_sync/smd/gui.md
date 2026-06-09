@@ -9,10 +9,13 @@
   2. `DpsView` tab (line ~91): `self.dps_view = DpsView(self.page, self.toolkit)`.
   3. `AnalysisView` tab (line ~92): `self.analysis_view = AnalysisView(...)`.
   4. Conditional imports for `DpsView`/`AnalysisView` inside the class body (lines ~26-27).
+  5. Runtime font scaling patch (module level, after all imports, before `class App`): patches `ft.Text.__init__`, `ft.TextStyle.__init__`, `ft.TextField.__init__`, and `ft.Dropdown.__init__` via `_make_font_scaler` to multiply `size=` / `text_size=` kwargs by `_DPS_FONT_SCALE = 1.4` (using `round()`). No exclusions — all tabs are scaled uniformly. Adjust `_DPS_FONT_SCALE` in `main.py` to retune the app-wide font size. Also patches `DpdTextField.__init__` (post-init): sets `text_size = round(14 * _DPS_FONT_SCALE)` when `text_size is None`, covering fields that omit an explicit `text_size`. DPS files (`dps_view.py`, `dps_fields.py`, `dps_field_mapping.py`) were normalized to upstream-matching explicit sizes (`text_size=14`, `size=12`, etc.) so the global scale renders them at a consistent visual size.
 - **Watch For**:
   - Upstream GUI refactors that change the tab initialization pattern will break DPS tab injection — check constructor signature.
   - If upstream switches from `fast_api_utils` to another server module, `fast_api_utils_dps` must be updated to match the new API.
   - New upstream view tabs added to `main.py` should be reviewed to ensure DPS views are still appended correctly.
+  - If upstream adds new text-bearing widgets with explicit `size=` / `text_size=` args that should scale, add them to the `_make_font_scaler` calls in `main.py`.
+  - If DPS adds new widgets with explicit sizes, use upstream-matching values (e.g. `text_size=14`, `size=10`) so the global scale renders them correctly.
 
 ---
 
@@ -38,6 +41,7 @@
   2. DPS navigation buttons "Next Ru" / "Next Note": `_click_next_ru` → `_get_next_word_ru` (DpdHeadword JOIN Russian JOIN SBS) and `_click_next_note` → `_get_next_note_ru` (`Russian.ru_notes.like("%ИИ%")`).
   3. `_handle_filter_change` drives all/vib/class radio filters through `DpsFields.filter_fields()` (upstream uses all/root/compound/sutta/word/pass1).
   4. `_click_update_db` gated on `tests_passed` from `DpsTestManager`; builds the middle section with `DpsFields` + `DpsExampleField` and reads a DPS CSV/TSV in `_load_translation_examples` for the translation-hint tooltip; constructs `DPSPaths` and a DPS `HistoryManager`.
+  5. Font-scale normalization: explicit `text_size=17 → 14` (3 occurrences) and hint `size=15 → 14` (2 occurrences) so the global `_DPS_FONT_SCALE` renders DPS fields at a consistent size with other tabs.
 - **Watch For**:
   - If upstream changes the `request_dpd_server` signature in `fast_api_utils_dps`, the server calls in `_click_update_db` and related handlers must be updated to match.
   - Upstream `Pass2AddView` automation (clone/split/auto/new-word/X-queue/proofreader) is intentionally absent here; only re-evaluate porting if those workflows become relevant to the DPS RU/SBS tab.
@@ -54,6 +58,7 @@
   2. Loads the SBS chant index (`_load_sbs_index` from `sbs_index_path` TSV) and auto-fills `chant_eng`/`chapter` via `_handle_sbs_chant_change`.
   3. AI integration: `_handle_ai_click` → `translate_with_ai_from_gui` (from `dps_ai_service`) for `dps_suggestion`/`dps_notes_suggestion`, plus `_handle_copy_split_click` splitting Russian suggestions on "досл."/"букв." delimiters and `_handle_copy_notes_click`.
   4. `populate_dps_tab(headword, ru_word, sbs_word)` reads `DpdHeadword` + `Russian` + `SBS` (root_ru_meaning, grammar assembly) over the entirely DPS `dps_*` field set; uses `RuSpellChecker` and `DpsExampleStashManager`.
+  5. Font-scale normalization: label `size=15 → 12` in field rows; `text_size` skipped in the `setattr` loops for `DpsExampleField` and `DpsMeaningField` (scaling is handled by the `DpdTextField` post-init patch in `main.py`, not via `setattr`). `dps_field_mapping.py` `common_params["text_size"]` normalized `17 → 14` for the same reason.
 - **Watch For**:
   - Upstream `DpdFields` carries a large field-automation surface (id_submit, lemma/root/family/construction handlers, etc.) that is deliberately not mirrored — port a handler only if the matching DPS field gains the same behavior.
   - If upstream changes `make_meaning_combo` or `read_tsv_dot_dict` signatures, `populate_dps_tab` / `_load_sbs_index` must follow.

@@ -76,10 +76,10 @@ class DpsView(ft.Column, PopUpMixin):
             color=ft.Colors.BLUE_200,
             expand_loose=True,
             expand=True,
-            hint_style=ft.TextStyle(color=LABEL_COLOUR, size=15),
+            hint_style=ft.TextStyle(color=LABEL_COLOUR, size=14),
             hint_text="Messages",
             read_only=True,
-            text_size=17,
+            text_size=14,
             width=700,
         )
 
@@ -90,11 +90,11 @@ class DpsView(ft.Column, PopUpMixin):
             border_radius=20,
             expand_loose=True,
             expand=True,
-            hint_style=ft.TextStyle(color=LABEL_COLOUR, size=15),
+            hint_style=ft.TextStyle(color=LABEL_COLOUR, size=14),
             hint_text="Enter ID or Lemma",
             on_submit=self._click_edit_headword,
             on_blur=self._disable_id_field_autofocus,
-            text_size=17,
+            text_size=14,
             width=400,
         )
 
@@ -105,7 +105,7 @@ class DpsView(ft.Column, PopUpMixin):
             expand=True,
             expand_loose=True,
             border_radius=20,
-            text_size=17,
+            text_size=14,
             on_change=self._handle_history_selection,
         )
 

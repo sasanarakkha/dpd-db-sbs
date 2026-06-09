@@ -75,8 +75,11 @@ class DpsFields:
                 )
 
                 # Apply ALL parameters to the internal text field
+                # Skip text_size — DpdTextField scaling is handled by main.py patch
                 text_field = example_field.text_field
                 for key, value in params.items():
+                    if key == "text_size":
+                        continue
                     if hasattr(text_field, key):
                         setattr(text_field, key, value)
 
@@ -93,7 +96,10 @@ class DpsFields:
                 )
 
                 # Apply parameters to the internal meaning field
+                # Skip text_size — DpdTextField scaling is handled by main.py patch
                 for key, value in params.items():
+                    if key == "text_size":
+                        continue
                     if hasattr(meaning_field.meaning_field, key):
                         setattr(meaning_field.meaning_field, key, value)
 
@@ -164,7 +170,7 @@ class DpsFields:
             label = ft.Text(
                 label_text,
                 color=ft.Colors.GREY_500,
-                size=15,
+                size=12,
                 width=150,
                 selectable=True,
             )

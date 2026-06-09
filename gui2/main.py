@@ -5,15 +5,56 @@ from pathlib import Path
 import flet as ft
 
 from gui2.compound_type_tab_view import CompoundTypeTabView
+from gui2.dpd_fields_classes import DpdTextField
 from gui2.roots_tab_view import RootsTabView
 from gui2.sandhi_find_replace_view import SandhiFindReplaceView
 from gui2.sandhi_view import SandhiView
 from gui2.toolkit import ToolKit
 from tools.fast_api_utils_dps import start_dpd_server
 
+# DPS local: runtime font scaling — adjust _DPS_FONT_SCALE to retune
+_DPS_FONT_SCALE: float = 1.4
+
+
+def _make_font_scaler(original_init, attrs: tuple[str, ...], scale: float):
+    def _scaled_init(self, *args, **kwargs):
+        for attr in attrs:
+            v = kwargs.get(attr)
+            if isinstance(v, (int, float)):
+                kwargs[attr] = round(v * scale)
+        original_init(self, *args, **kwargs)
+
+    return _scaled_init
+
+
+ft.Text.__init__ = _make_font_scaler(ft.Text.__init__, ("size",), _DPS_FONT_SCALE)
+ft.TextStyle.__init__ = _make_font_scaler(
+    ft.TextStyle.__init__, ("size",), _DPS_FONT_SCALE
+)
+ft.TextField.__init__ = _make_font_scaler(
+    ft.TextField.__init__, ("text_size",), _DPS_FONT_SCALE
+)
+ft.Dropdown.__init__ = _make_font_scaler(
+    ft.Dropdown.__init__, ("text_size",), _DPS_FONT_SCALE
+)
+
+_orig_dpd_tf_init = DpdTextField.__init__
+
+
+def _dpd_tf_init_scaled(self, *args, **kwargs):
+    _orig_dpd_tf_init(self, *args, **kwargs)
+    if self.text_size is None:
+        self.text_size = round(14 * _DPS_FONT_SCALE)
+
+
+DpdTextField.__init__ = _dpd_tf_init_scaled
+
 
 class App:
     def __init__(self, page: ft.Page) -> None:
+        from gui2.analysis_view import AnalysisView
+        from gui2.bold_search_view import BoldSearchView
+        from gui2.dps_view import DpsView
         from gui2.filter_tab_view import FilterTabView
         from gui2.global_tab_view import GlobalTabView
         from gui2.pass1_add_view import Pass1AddView
@@ -21,16 +62,12 @@ class App:
         from gui2.pass2_add_view import Pass2AddView
         from gui2.pass2_auto_view import Pass2AutoView
         from gui2.pass2_pre_view import Pass2PreProcessView
-        from gui2.bold_search_view import BoldSearchView
         from gui2.tests_tab_view import TestsTabView
         from gui2.translations_view import TranslationsView
-        from gui2.dps_view import DpsView
-        from gui2.analysis_view import AnalysisView
 
         self.page = page
 
-        page.theme = ft.Theme()
-        page.theme.font_family = "Inter"
+        page.theme = ft.Theme(font_family="Inter")
         self.page.window.top = 0
         self.page.window.left = 0
         self.page.window.height = 1280
@@ -172,9 +209,9 @@ class App:
             view = tab.content
             # Ctrl+S saves table changes in tabs that support it
             if hasattr(view, "_on_save_changes"):
-                view._on_save_changes(None)
+                getattr(view, "_on_save_changes")(None)
             elif hasattr(view, "_save_changes_clicked"):
-                view._save_changes_clicked(None)
+                getattr(view, "_save_changes_clicked")(None)
         elif e.key == "Arrow Left" and e.alt:
             if self.tabs.selected_index > 0:
                 self.tabs.selected_index -= 1
@@ -289,6 +326,7 @@ def main(page: ft.Page) -> None:
     # Enable/disable profiling
     enable_profiling = False
     profile_file = Path("gui2_profile.prof")
+    profiler: cProfile.Profile | None = None
 
     if enable_profiling:
         profiler = cProfile.Profile()
@@ -304,7 +342,7 @@ def main(page: ft.Page) -> None:
     App(page)
     print(f"App initialized in {time.time() - start_time:.2f}s")
 
-    if enable_profiling:
+    if enable_profiling and profiler is not None:
         profiler.disable()
         profiler.dump_stats(str(profile_file))
         print(f"snakeviz {profile_file}")
