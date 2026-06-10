@@ -68,3 +68,27 @@ def test_request_allows_explicit_thinking_override() -> None:
         "type": "enabled",
         "reasoning_effort": "high",
     }
+
+
+def test_request_uses_raised_max_tokens_default() -> None:
+    manager = _CapturingDeepseekManager()
+
+    response = manager.request(prompt="Return JSON.", model="deepseek-v4-flash")
+
+    assert response.content == '{"ok": true}'
+    assert manager.captured_payload is not None
+    assert manager.captured_payload["max_tokens"] == 8192
+
+
+def test_request_allows_explicit_max_tokens_override() -> None:
+    manager = _CapturingDeepseekManager()
+
+    response = manager.request(
+        prompt="Return JSON.",
+        model="deepseek-v4-flash",
+        max_tokens=512,
+    )
+
+    assert response.content == '{"ok": true}'
+    assert manager.captured_payload is not None
+    assert manager.captured_payload["max_tokens"] == 512
