@@ -13,6 +13,7 @@ DEFAULT_API_KEY_NAME = "deepseek"
 DS_BALANCE = "https://api.deepseek.com/user/balance"
 DS_CHAT = "https://api.deepseek.com/chat/completions"
 DS_CHAT_MODELS = "https://api.deepseek.com/models"
+DISABLED_THINKING_MODE = {"type": "disabled"}
 
 
 class DeepseekManager:
@@ -91,6 +92,7 @@ class DeepseekManager:
         payload = {
             "model": current_model,  # Use the potentially defaulted model
             "max_tokens": 2048,
+            "thinking": DISABLED_THINKING_MODE,
             "presence_penalty": 0,
             "stream": False,
             "temperature": 1,

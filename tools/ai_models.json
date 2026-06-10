@@ -9,6 +9,11 @@
   ],
   "default_models": [
     {
+      "provider": "deepseek",
+      "model": "deepseek-v4-flash",
+      "delay": 5
+    },
+    {
       "provider": "openrouter",
       "model": "deepseek/deepseek-v4-flash",
       "delay": 5
@@ -21,11 +26,6 @@
     {
       "provider": "openrouter",
       "model": "openai/gpt-4.1-nano",
-      "delay": 5
-    },
-    {
-      "provider": "deepseek",
-      "model": "deepseek-v4-flash",
       "delay": 5
     }
   ],
