@@ -1,52 +1,31 @@
 {
-  "gemini_cli_work_models": [
+  "antigravity_cli_work_models": [
     {
-      "provider": "gemini_cli",
-      "model": "gemini-3.1-pro-preview",
-      "delay": 5
-    },
-    {
-      "provider": "gemini_cli",
-      "model": "gemini-2.5-pro",
-      "delay": 5
-    },
-    {
-      "provider": "gemini_cli",
-      "model": "gemini-3-flash-preview",
-      "delay": 5
-    }
-  ],
-  "gemini_cli_test_models": [
-    {
-      "provider": "gemini_cli",
-      "model": "gemini-3.1-flash-lite",
-      "delay": 5
+      "provider": "antigravity_cli",
+      "model": "Gemini 3.5 Flash (High)",
+      "delay": 5,
+      "timeout": 90
     }
   ],
   "default_models": [
     {
-      "provider": "gemini",
-      "model": "gemini-2.5-flash",
-      "delay": 6
-    },
-    {
-      "provider": "gemini",
-      "model": "gemini-2.5-flash-lite",
-      "delay": 5
-    },
-    {
       "provider": "openrouter",
       "model": "deepseek/deepseek-v4-flash",
       "delay": 5
     },
     {
       "provider": "openrouter",
-      "model": "minimax/minimax-m2.5:free",
+      "model": "meta-llama/llama-4-scout",
+      "delay": 5
+    },
+    {
+      "provider": "openrouter",
+      "model": "openai/gpt-4.1-nano",
       "delay": 5
     },
     {
       "provider": "deepseek",
-      "model": "deepseek/deepseek-v4-flash",
+      "model": "deepseek-v4-flash",
       "delay": 5
     }
   ],

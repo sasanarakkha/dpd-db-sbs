@@ -8,6 +8,82 @@ for Anki or another flashcard workflow. The MCP server still lives in
 `exporter/mcp/`, but the passage-analysis and AI-translation logic has moved
 out of MCP so it can run as ordinary command-line exporter tools.
 
+## AI Provider Setup
+
+The passage analysis pipeline sends scoring prompts to an AI provider. It tries
+providers in this priority order:
+
+1. **Antigravity CLI** (`agy`) — primary, free, no API key required
+2. **OpenRouter** — secondary, paid, requires an API key
+
+### Antigravity CLI (primary)
+
+Antigravity CLI is a local command-line tool that runs Gemini models through
+your Google account without a paid API key.
+
+Install it from <https://antigravity.dev> and make sure the `agy` executable is
+on your PATH. Verify it works:
+
+```bash
+agy --version
+```
+
+When `agy` is found on PATH it is used automatically. No config file change is
+needed.
+
+### OpenRouter (secondary / fallback)
+
+OpenRouter is used when Antigravity CLI is not installed or fails.
+
+1. Create an account at <https://openrouter.ai> and generate an API key.
+2. Open `config.ini` at the project root and paste your key into the `[apis]`
+   section:
+
+```ini
+[apis]
+openrouter = sk-or-v1-...your-key-here...
+```
+
+OpenRouter is initialized automatically when that key is present.
+
+### Changing the AI model
+
+Model choices are stored in `tools/ai_models.json`. The active Antigravity
+model is in `antigravity_cli_work_models`:
+
+```json
+{
+  "antigravity_cli_work_models": [
+    {
+      "provider": "antigravity_cli",
+      "model": "Gemini 3.5 Flash (Medium)",
+      "delay": 5
+    }
+  ]
+}
+```
+
+If translation quality is poor, change the `model` string. Two practical
+upgrade steps:
+
+| Model string | Notes |
+|---|---|
+| `"Gemini 3.5 Flash (High)"` | faster, cheaper — try this first |
+| `"Gemini 3.1 Pro (Low)"` | slower, higher quality |
+
+Edit the `model` field in `tools/ai_models.json` and re-run the analysis script
+— no restart needed, the file is read fresh each run.
+
+To check what models are currently available, run `agy --list-models` or see
+the Antigravity documentation at <https://antigravity.dev>. Model names change
+as new versions are released; the names above were current at the time of
+writing.
+
+The `delay` field (seconds between requests) can also be raised if you hit rate
+limits.
+
+---
+
 ## What Changed
 
 The old MCP analysis scripts were split into two responsibilities:

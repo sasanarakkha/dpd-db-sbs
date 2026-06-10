@@ -10,24 +10,21 @@ from tools.printer import printer as pr
 AI_MODELS_PATH = Path("tools/ai_models.json")
 
 
-def _load_models_from_json() -> dict[str, list[tuple[str, str, int]]]:
+def _load_models_from_json() -> dict[str, list[tuple[str, str, int, float]]]:
     """Load model lists from tools/ai_models.json."""
+
+    def _entry(m: dict) -> tuple[str, str, int, float]:
+        return (m["provider"], m["model"], m["delay"], float(m.get("timeout", 150.0)))
+
     try:
         data = json.loads(AI_MODELS_PATH.read_text())
-        gemini_cli_work = [
-            (m["provider"], m["model"], m["delay"])
-            for m in data.get("gemini_cli_work_models", [])
+        antigravity_cli_work = [
+            _entry(m) for m in data.get("antigravity_cli_work_models", [])
         ]
         return {
-            "default": gemini_cli_work
-            + [
-                (m["provider"], m["model"], m["delay"])
-                for m in data.get("default_models", [])
-            ],
-            "grounded": [
-                (m["provider"], m["model"], m["delay"])
-                for m in data.get("grounded_models", [])
-            ],
+            "default": antigravity_cli_work
+            + [_entry(m) for m in data.get("default_models", [])],
+            "grounded": [_entry(m) for m in data.get("grounded_models", [])],
         }
     except (FileNotFoundError, json.JSONDecodeError, KeyError) as e:
         pr.red(f"Failed to load {AI_MODELS_PATH}: {e}")
@@ -51,8 +48,8 @@ class AIResponse(NamedTuple):
 class AIManager:
     def __init__(self):
         models = _load_models_from_json()
-        self.DEFAULT_MODELS: list[tuple[str, str, int]] = models["default"]
-        self.GROUNDED_MODELS: list[tuple[str, str, int]] = models["grounded"]
+        self.DEFAULT_MODELS: list[tuple[str, str, int, float]] = models["default"]
+        self.GROUNDED_MODELS: list[tuple[str, str, int, float]] = models["grounded"]
 
         self.providers: dict[str, Any] = {}
 
@@ -93,13 +90,15 @@ class AIManager:
         else:
             pr.amber("NVIDIA API key not found, manager not initialized.")
 
-        if shutil.which("gemini"):
-            from tools.ai_gemini_cli import GeminiCliManager
+        if shutil.which("agy"):
+            from tools.ai_antigravity_cli import AntigravityCliManager
 
-            self.providers["gemini_cli"] = GeminiCliManager()
-            pr.green("gemini_cli initialized")
+            self.providers["antigravity_cli"] = AntigravityCliManager()
+            pr.green("antigravity_cli initialized")
         else:
-            pr.amber("gemini executable not found on PATH, gemini_cli not initialized.")
+            pr.amber(
+                "agy executable not found on PATH, antigravity_cli not initialized."
+            )
 
         pr.green(
             f"loaded {len(self.DEFAULT_MODELS)} default models, {len(self.GROUNDED_MODELS)} grounded models"
@@ -113,21 +112,25 @@ class AIManager:
     def reload_models(self) -> None:
         """Reload model lists from tools/ai_models.json."""
         models = _load_models_from_json()
-        self.DEFAULT_MODELS = models["default"]
-        self.GROUNDED_MODELS = models["grounded"]
+        self.DEFAULT_MODELS: list[tuple[str, str, int, float]] = models["default"]
+        self.GROUNDED_MODELS: list[tuple[str, str, int, float]] = models["grounded"]
         pr.green(
             f"reloaded {len(self.DEFAULT_MODELS)} default models, {len(self.GROUNDED_MODELS)} grounded models"
         )
 
     def _get_model_delay(self, provider: str, model: str) -> float:
         """Get delay for specific model, with fallback to global delay."""
-        # Look through all model lists for this provider/model combination
         for model_tuple in self.DEFAULT_MODELS + self.GROUNDED_MODELS:
             if model_tuple[0] == provider and model_tuple[1] == model:
                 return model_tuple[2]
-
-        # Fallback to global delay if model not found
         return self.min_delay_seconds
+
+    def _get_model_timeout(self, provider: str, model: str) -> float:
+        """Get per-model timeout, falling back to 150s if not configured."""
+        for model_tuple in self.DEFAULT_MODELS + self.GROUNDED_MODELS:
+            if model_tuple[0] == provider and model_tuple[1] == model:
+                return model_tuple[3]
+        return 150.0
 
     def request(
         self,
@@ -192,7 +195,7 @@ class AIManager:
                     prompt=prompt,
                     prompt_sys=prompt_sys,
                     model=model_name,
-                    timeout=60.0,
+                    timeout=self._get_model_timeout(provider_name, model_name),
                     grounding=grounding,
                     **kwargs,
                 )
@@ -203,6 +206,11 @@ class AIManager:
                     status_message = (
                         f"SUCCESS in {duration:.2f}s. {ai_response.status_message}"
                     )
+                    if errors:
+                        status_message = (
+                            f"{status_message} (after {len(errors)} failed attempt(s): "
+                            f"{' | '.join(errors)})"
+                        )
                     pr.green(status_message)
                     return AIResponse(
                         content=ai_response.content,
