@@ -368,6 +368,7 @@ def _find_missing_score_groups(
     scores_map: dict[str, Any],
 ) -> list[dict[str, Any]]:
     missing_groups: list[dict[str, Any]] = []
+    seen: set[tuple[str, tuple[str, ...]]] = set()
 
     def inspect_group(
         word: str,
@@ -376,38 +377,41 @@ def _find_missing_score_groups(
     ) -> None:
         if not options:
             return
-        option_keys = [
-            option.get("key")
-            for option in options
-            if isinstance(option.get("key"), str)
-        ]
+        option_keys: list[str] = []
+        for option in options:
+            key = option.get("key")
+            if isinstance(key, str):
+                option_keys.append(key)
         if option_keys and not any(key in scores_map for key in option_keys):
-            missing_groups.append(
-                {
-                    "word": word,
-                    "context": context,
-                    "missing_keys": option_keys,
-                    "options": [
-                        {
-                            key: option.get(key, "")
-                            for key in (
-                                "key",
-                                "id",
-                                "pali",
-                                "pos",
-                                "grammar",
-                                "meaning_1",
-                                "meaning_combo",
-                                "example_1",
-                                "source_1",
-                                "example_2",
-                                "source_2",
-                            )
-                        }
-                        for option in options
-                    ],
-                }
-            )
+            signature = (word, tuple(option_keys))
+            if signature not in seen:
+                seen.add(signature)
+                missing_groups.append(
+                    {
+                        "word": word,
+                        "context": context,
+                        "missing_keys": option_keys,
+                        "options": [
+                            {
+                                key: option.get(key, "")
+                                for key in (
+                                    "key",
+                                    "id",
+                                    "pali",
+                                    "pos",
+                                    "grammar",
+                                    "meaning_1",
+                                    "meaning_combo",
+                                    "example_1",
+                                    "source_1",
+                                    "example_2",
+                                    "source_2",
+                                )
+                            }
+                            for option in options
+                        ],
+                    }
+                )
 
         for option in options:
             option_context = str(option.get("pali") or option.get("key") or context)

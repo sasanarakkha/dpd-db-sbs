@@ -1,5 +1,6 @@
 """Test Pāḷi passage variant handling in AI analysis reports."""
 
+import copy
 from typing import Any, cast
 
 import pytest
@@ -268,6 +269,16 @@ def test_merge_ai_selections_preserves_missing_scores_as_none() -> None:
 
     assert options[0]["ai_score"] is None
     assert options[1]["ai_score"] == 0
+
+
+def test_find_missing_score_groups_deduplicates_repeated_words() -> None:
+    option = {"key": "1_0", "pali": "ca", "pos": "ind"}
+    token = {"word": "ca", "data": [option]}
+    analysis = [token, copy.deepcopy(token)]
+
+    groups = translate_core._find_missing_score_groups(analysis, scores_map={})
+
+    assert len(groups) == 1
 
 
 def test_pre_match_db_examples_requires_text_overlap() -> None:
