@@ -1,12 +1,12 @@
 """Interactive Pāḷi passage analyzer: retrieve a passage by sutta code, analyze with AI, write a markdown study report."""
 
+import argparse
 import json
 import re
 from pathlib import Path
 
 from db.db_helpers import get_db_session
 from exporter.analysis.paths import ensure_analysis_dirs
-from exporter.analysis.passage_extraction import format_extraction_report
 from exporter.analysis.translate_core import (
     generate_markdown_report,
     translate_sentence,
@@ -129,9 +129,71 @@ def _print_translation_progress(source: str, event: str) -> None:
         pr.green_tmr(f"Analyzing {source!r}")
     elif event == "ai_done":
         pr.yes("done")
+    elif event == "ai_reformat_start":
+        pr.green_tmr("Reformatting non-standard response")
+    elif event == "ai_reformat_done":
+        pr.yes("done")
+    elif event == "ai_translation_start":
+        pr.green_tmr("Fetching translation for word→key map")
+    elif event == "ai_translation_done":
+        pr.yes("done")
+
+
+def _build_raw_responses_log(source: str, ai_debug: dict) -> str:
+    """Collect all raw AI responses from a debug dict into one readable text file."""
+    sections: list[str] = [f"# Raw AI responses for {source}\n"]
+
+    def _section(title: str, status: str, content: str | None) -> str:
+        body = content if content else "(no content)"
+        return f"## {title}\nStatus: {status}\n\n{body}\n"
+
+    sections.append(
+        _section(
+            "First response",
+            ai_debug.get("status_message", ""),
+            ai_debug.get("raw_response"),
+        )
+    )
+
+    if "reformat_raw_response" in ai_debug:
+        sections.append(
+            _section(
+                "Reformat response",
+                ai_debug.get("reformat_status_message", ""),
+                ai_debug.get("reformat_raw_response"),
+            )
+        )
+
+    if "translation_raw_response" in ai_debug:
+        sections.append(
+            _section(
+                "Translation response (word→key map path)",
+                ai_debug.get("translation_status_message", ""),
+                ai_debug.get("translation_raw_response"),
+            )
+        )
+
+    for i, retry in enumerate(ai_debug.get("retry_requests", []), start=1):
+        sections.append(
+            _section(
+                f"Retry {i} (missing scores)",
+                retry.get("status_message", ""),
+                retry.get("raw_response"),
+            )
+        )
+
+    return "\n".join(sections)
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Pāḷi passage analyzer — Stage 1")
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Print raw AI responses and parse errors to the terminal",
+    )
+    args = parser.parse_args()
+
     paths = ProjectPaths()
     if not paths.dpd_db_path.exists():
         pr.red(f"Database not found: {paths.dpd_db_path}")
@@ -181,6 +243,7 @@ def main() -> None:
             speech_mark_options=speech_mark_options,
             progress=lambda event: _print_translation_progress(source, event),
             debug=ai_debug,
+            verbose=args.debug,
         )
     finally:
         db_session.close()
@@ -197,6 +260,13 @@ def main() -> None:
     debug_path.write_text(
         json.dumps(ai_debug, ensure_ascii=False, indent=2), encoding="utf-8"
     )
+
+    if args.debug:
+        raw_path = _REPORTS_DIR / f"{source}_ai_raw.txt"
+        raw_path.write_text(
+            _build_raw_responses_log(source, ai_debug), encoding="utf-8"
+        )
+        pr.green(f"Raw AI responses: {raw_path}")
 
     pr.green("")
     pr.green(f"Report: {report_path}")

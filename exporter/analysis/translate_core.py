@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from exporter.analysis.analyzer import analyze_sentence, tokenize_sentence
 from tools.ai_manager import AIManager
+from tools.printer import printer as pr
 
 
 def extract_variant_options(text: str) -> tuple[str, dict[str, list[str]]]:
@@ -17,7 +18,7 @@ def extract_variant_options(text: str) -> tuple[str, dict[str, list[str]]]:
     parts = re.split(r"(\s+)", text)
     options: dict[str, list[str]] = {}
     resolved_parts: list[str] = []
-    trailing_punctuation = ".,;:!?)]}”’\""
+    trailing_punctuation = '.,;:!?)]}”’"'
 
     for part in parts:
         if "//" not in part:
@@ -52,7 +53,7 @@ def apply_variant_choices(
 
     parts = re.split(r"(\s+)", text)
     resolved_parts: list[str] = []
-    trailing_punctuation = ".,;:!?)]}”’\""
+    trailing_punctuation = '.,;:!?)]}”’"'
 
     for part in parts:
         if "//" not in part:
@@ -233,6 +234,81 @@ def _parse_ai_json(response_text: str) -> tuple[dict[str, Any], str]:
         return _extract_partial_response(response_text), str(exc)
 
 
+def _collect_option_keys(analysis: list[dict[str, Any]]) -> set[str]:
+    """Gather every option `key` (including components/deconstructions) in the analysis."""
+    keys: set[str] = set()
+    for token_data in analysis:
+        for option in _iter_options(token_data.get("data", [])):
+            key = option.get("key")
+            if isinstance(key, str):
+                keys.add(key)
+    return keys
+
+
+def _extract_word_key_map(
+    ai_data: dict[str, Any],
+    analysis: list[dict[str, Any]],
+) -> dict[str, str] | None:
+    """Detect a flat or ``{"disambiguation": {...}}`` word-key map.
+
+    Antigravity/Gemini routinely returns this compact shape instead of the required
+    ``{translation, literal_translation, scores}`` schema. When the values are real
+    option keys from the analysis, the map IS the disambiguation we want. Returns
+    ``None`` when the response is not such a map (proper schema, dict-valued, unknown
+    keys, or empty).
+    """
+    if not isinstance(ai_data, dict) or not ai_data:
+        return None
+    if "scores" in ai_data or "translation" in ai_data:
+        return None
+    candidate = ai_data
+    if set(ai_data) == {"disambiguation"}:
+        disambiguation = ai_data["disambiguation"]
+        if not isinstance(disambiguation, dict) or not disambiguation:
+            return None
+        candidate = disambiguation
+    valid_keys = _collect_option_keys(analysis)
+    if not valid_keys:
+        return None
+    matched = {
+        surface_word: value
+        for surface_word, value in candidate.items()
+        if isinstance(value, str) and value in valid_keys
+    }
+    if not matched or len(matched) * 2 < len(candidate):
+        return None
+    return matched
+
+
+def _build_translation_prompt(
+    sentence: str,
+    surface_words: list[str] | None = None,
+) -> str:
+    """Build a lightweight translation-only follow-up prompt.
+
+    Used when the first call returned a usable word→key map but no translation; we only
+    need the prose and contextual meanings, so this prompt is small and does not re-send
+    the dictionary context.
+    """
+    surface_words_instruction = ""
+    if surface_words:
+        surface_words_json = json.dumps(surface_words, ensure_ascii=False)
+        surface_words_instruction = (
+            f"\nUse exactly these surface-word keys in meanings: {surface_words_json}\n"
+        )
+    return (
+        f'Translate this Pāḷi sentence into English: "{sentence}"\n\n'
+        "Return ONLY a JSON object with these three keys and nothing else:\n"
+        "{\n"
+        '  "translation": "Fluent English translation of the sentence",\n'
+        '  "literal_translation": "Literal word-by-word English translation",\n'
+        '  "meanings": {"surface_word": "short contextual English meaning"}\n'
+        "}\n"
+        f"{surface_words_instruction}"
+        "No prose, no markdown fences, no scores."
+    )
+
+
 def _apply_deterministic_scores_to_map(
     analysis: list[dict[str, Any]],
     scores_map: dict[str, Any],
@@ -241,11 +317,21 @@ def _apply_deterministic_scores_to_map(
         for option in _iter_options(token_data.get("data", [])):
             key = option.get("key")
             score = option.get("ai_score")
-            if key and option.get("db_example_match") and isinstance(score, int | float):
-                scores_map[key] = {
+            if (
+                key
+                and option.get("db_example_match")
+                and isinstance(score, int | float)
+            ):
+                deterministic_score: dict[str, Any] = {
                     "score": score,
                     "selection_source": option.get("selection_source", "deterministic"),
                 }
+                existing_score = scores_map.get(key)
+                if isinstance(existing_score, dict):
+                    for field in ("contextual_meaning", "selected_pos"):
+                        if field in existing_score:
+                            deterministic_score[field] = existing_score[field]
+                scores_map[key] = deterministic_score
             elif key and key not in scores_map and isinstance(score, int | float):
                 scores_map[key] = {
                     "score": score,
@@ -312,17 +398,52 @@ def _find_missing_score_groups(
     return missing_groups
 
 
+def _build_reformat_prompt(sentence: str, prose_response: str) -> str:
+    """Build a follow-up prompt asking the AI to reformat its response into the required JSON schema."""
+    return (
+        f'Your previous response for the Pāḷi sentence "{sentence}" did not match '
+        "the required format. Please reformat it as a JSON object matching this structure exactly:\n\n"
+        "{\n"
+        '  "translation": "Fluent English translation of the sentence",\n'
+        '  "literal_translation": "Literal word-by-word English translation",\n'
+        '  "scores": {\n'
+        '    "key_0": {"score": 10, "contextual_meaning": "..."},\n'
+        "    ...\n"
+        "  }\n"
+        "}\n\n"
+        "Extract the translation from your previous analysis and convert each selected "
+        "lemma to a score entry of 10 with its key. "
+        "Return only the JSON object. No prose, no markdown fences.\n\n"
+        "Your previous analysis:\n"
+        f"{prose_response[:3000]}"
+    )
+
+
 def _build_missing_scores_prompt(
     sentence: str,
     missing_groups: list[dict[str, Any]],
 ) -> str:
-    context = json.dumps(missing_groups, ensure_ascii=False, indent=2)
+    context = json.dumps(missing_groups, ensure_ascii=False, separators=(",", ":"))
+
+    has_decon = any(
+        key.startswith("decon_")
+        for group in missing_groups
+        for key in group.get("missing_keys", [])
+    )
+    decon_instruction = ""
+    if has_decon:
+        decon_instruction = (
+            '\nFor keys starting with "decon_", you MUST include "contextual_meaning" '
+            "with a full English translation of that sandhi/compound in the context of the sentence. "
+            'Example: "decon_okassa_0": {"score": 10, "contextual_meaning": "to the dwelling"}\n'
+        )
+
     return f"""Please supply missing dictionary option scores for this Pāḷi sentence:
 {sentence}
 
 Only score the option keys in this focused context. Return JSON with a flat `scores`
-object. Do not translate again and do not explain.
-
+object where each value is {{"score": N}} (an integer 0–10). Do not translate again and do not explain.
+{decon_instruction}
 Missing dictionary option scores:
 {context}
 """
@@ -336,6 +457,7 @@ def translate_sentence(
     verse_source: str | None = None,
     speech_mark_options: dict[str, list[str]] | None = None,
     progress: Callable[[str], None] | None = None,
+    verbose: bool = False,
     debug: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Full pipeline: Analyze → AI Translate → Merge. Returns the enriched analysis object."""
@@ -356,7 +478,7 @@ def translate_sentence(
         pre_match_db_examples(analysis, verse_source, resolved_sentence)
 
     sys_prompt = build_system_prompt(analysis, speech_mark_options)
-    user_prompt = f"Please translate and analyze: {resolved_sentence}"
+    user_prompt = f"Return JSON for: {resolved_sentence}"
     if debug is not None:
         debug["system_prompt"] = sys_prompt
         debug["user_prompt"] = user_prompt
@@ -377,12 +499,121 @@ def translate_sentence(
     if not response.content:
         raise ValueError(f"AI Request Failed: {response.status_message}")
 
+    if verbose:
+        pr.green(f"  AI response: {response.status_message}")
+
     ai_data, parse_error = _parse_ai_json(response.content)
     if debug is not None:
         debug["raw_response"] = response.content
         debug["status_message"] = response.status_message
         debug["parsed_response"] = ai_data
         debug["parse_error"] = parse_error
+
+    word_key_map = _extract_word_key_map(ai_data, analysis) if not parse_error else None
+
+    if word_key_map is not None:
+        # First call returned a usable word→key disambiguation map. Use it directly for
+        # scores and fetch only the translation, instead of discarding it and paying a
+        # full prose-reformat round-trip.
+        if verbose:
+            pr.amber(
+                "  Word→key disambiguation map detected — using it for scores, "
+                "fetching translation only"
+            )
+        word_key_scores: dict[str, Any] = {
+            key: {"score": 10} for key in word_key_map.values()
+        }
+        ai_data = {
+            "translation": "",
+            "literal_translation": "",
+            "scores": word_key_scores,
+        }
+        if progress:
+            progress("ai_translation_start")
+        translation_response = ai_manager.request(
+            prompt=_build_translation_prompt(resolved_sentence, list(word_key_map)),
+            model=model,
+            prompt_sys="Return only a JSON object with translation, literal_translation, and meanings. No prose. No markdown.",
+        )
+        if progress:
+            progress("ai_translation_done")
+        if verbose:
+            pr.green(f"  Translation response: {translation_response.status_message}")
+        translation_data: dict[str, Any] = {}
+        translation_error = ""
+        if translation_response.content:
+            translation_data, translation_error = _parse_ai_json(
+                translation_response.content
+            )
+            if isinstance(translation_data, dict):
+                ai_data["translation"] = translation_data.get("translation", "") or ""
+                ai_data["literal_translation"] = (
+                    translation_data.get("literal_translation", "") or ""
+                )
+                meanings = translation_data.get("meanings", {})
+                if isinstance(meanings, dict):
+                    for surface_word, key in word_key_map.items():
+                        contextual_meaning = meanings.get(surface_word)
+                        if (
+                            isinstance(contextual_meaning, str)
+                            and contextual_meaning.strip()
+                        ):
+                            word_key_scores[key]["contextual_meaning"] = (
+                                contextual_meaning.strip()
+                            )
+        if debug is not None:
+            debug["translation_raw_response"] = translation_response.content
+            debug["translation_status_message"] = translation_response.status_message
+            debug["translation_parsed_response"] = translation_data
+            debug["translation_parse_error"] = translation_error
+        needs_reformat = False
+    else:
+        needs_reformat = bool(
+            parse_error or not isinstance(ai_data.get("scores"), dict)
+        )
+
+    if needs_reformat and response.content:
+        if verbose:
+            if parse_error:
+                pr.amber(f"  Non-JSON response — parse error: {parse_error}")
+            else:
+                pr.amber(
+                    "  Valid JSON but wrong schema — "
+                    f"scores key is {type(ai_data.get('scores')).__name__}, expected dict"
+                )
+            pr.amber("  Full raw response:")
+            pr.amber(response.content)
+            pr.amber("  Reformatting...")
+        if progress:
+            progress("ai_reformat_start")
+        reformat_response = ai_manager.request(
+            prompt=_build_reformat_prompt(resolved_sentence, response.content),
+            prompt_sys="Return only a valid JSON object. No prose. No markdown.",
+        )
+        if progress:
+            progress("ai_reformat_done")
+        if verbose:
+            pr.green(f"  Reformat response: {reformat_response.status_message}")
+        if reformat_response.content:
+            reformat_data, reformat_error = _parse_ai_json(reformat_response.content)
+            reformat_ok = not reformat_error and isinstance(
+                reformat_data.get("scores"), dict
+            )
+            if reformat_ok:
+                ai_data = reformat_data
+                if verbose:
+                    pr.yes("  Reformat succeeded — scores dict present")
+            else:
+                if verbose:
+                    pr.no(
+                        f"  Reformat failed — parse_error={reformat_error!r}, "
+                        f"scores type={type(reformat_data.get('scores')).__name__}"
+                    )
+            if debug is not None:
+                debug["reformat_raw_response"] = reformat_response.content
+                debug["reformat_status_message"] = reformat_response.status_message
+                debug["reformat_parsed_response"] = reformat_data
+                debug["reformat_parse_error"] = reformat_error
 
     ai_data = _normalize_ai_response(ai_data)
     scores_map = ai_data.setdefault("scores", {})
@@ -418,9 +649,7 @@ def translate_sentence(
                     "parsed_response": retry_data,
                     "parse_error": retry_parse_error,
                     "missing_keys": [
-                        key
-                        for group in missing_groups
-                        for key in group["missing_keys"]
+                        key for group in missing_groups for key in group["missing_keys"]
                     ],
                 }
             )
@@ -492,7 +721,7 @@ def build_system_prompt(
 ) -> str:
     """Build a comprehensive system prompt with the Pāḷi dictionary context."""
 
-    context_str = json.dumps(analysis, ensure_ascii=False, indent=2)
+    context_str = json.dumps(analysis, ensure_ascii=False, separators=(",", ":"))
 
     disambiguation_block = ""
     verse_text_field = ""
@@ -508,11 +737,11 @@ zero-based option index for each key in the `variant_choices` field. Do not retu
 full passage text.
 {options_lines}
 """
-        verse_text_field = (
-            '\n  "variant_choices": {"variant option key": 0},'
-        )
+        verse_text_field = '\n  "variant_choices": {"variant option key": 0},'
 
-    prompt = f"""You are an expert Pāḷi translator and grammarian with deep knowledge of the Tipitaka.
+    prompt = f"""IMPORTANT: Your response MUST be a valid JSON object only. Do NOT write prose, markdown, explanations, or any text outside the JSON. Start your response with {{ and end with }}.
+
+You are an expert Pāḷi translator and grammarian with deep knowledge of the Tipitaka.
 Your task is to analyze a Pāḷi sentence and perform word-sense disambiguation using the provided dictionary analysis.
 
 ### Dictionary Context (Word-by-Word Analysis Options)
@@ -765,16 +994,22 @@ def merge_ai_selections(
             key = item.get("key")
             if key in scores_map:
                 update = scores_map[key]
-                item["ai_score"] = update.get("score", 0)
-                if "selection_source" in update:
-                    item["selection_source"] = update["selection_source"]
+                if not isinstance(update, dict):
+                    # AI returned a bare scalar instead of a score object
+                    item["ai_score"] = (
+                        int(update) if isinstance(update, (int, float)) else 0
+                    )
+                else:
+                    item["ai_score"] = update.get("score", 0)
+                    if "selection_source" in update:
+                        item["selection_source"] = update["selection_source"]
 
-                # Apply contextual info if score is positive (implying relevance)
-                if update.get("score", 0) > 0:
-                    if "contextual_meaning" in update:
-                        item["meaning_combo"] = update["contextual_meaning"]
-                    if "selected_pos" in update:
-                        item["selected_pos"] = update["selected_pos"]
+                    # Apply contextual info if score is positive (implying relevance)
+                    if update.get("score", 0) > 0:
+                        if "contextual_meaning" in update:
+                            item["meaning_combo"] = update["contextual_meaning"]
+                        if "selected_pos" in update:
+                            item["selected_pos"] = update["selected_pos"]
             else:
                 item["ai_score"] = item.get("ai_score")
 

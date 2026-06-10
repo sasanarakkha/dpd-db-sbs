@@ -2,10 +2,15 @@
 
 from typing import cast
 
+import pytest
+
 from sqlalchemy.orm import Session
 
+import exporter.analysis.translate_core as translate_core
 from tools.ai_manager import AIManager
 from exporter.analysis.translate_core import (
+    _build_missing_scores_prompt,
+    _extract_word_key_map,
     apply_variant_choices,
     build_system_prompt,
     extract_variant_options,
@@ -68,15 +73,11 @@ def test_generate_markdown_report_uses_ai_variant_choice_and_prints_options() ->
         speech_mark_options=variants,
     )
 
-    assert (
-        "jarāmaraṇaṃ soka-parideva-dukkha-domanass'upāyāsā sambhavanti."
-        in report
-    )
+    assert "jarāmaraṇaṃ soka-parideva-dukkha-domanass'upāyāsā sambhavanti." in report
     assert "### Variants" in report
     assert (
         "soka-parideva-dukkha-domanass'upāyāsā//"
-        "sokaparidevadukkhadomanass'upāyāsā"
-        in report
+        "sokaparidevadukkhadomanass'upāyāsā" in report
     )
     assert "sambhavan'ti//sambhavanti" in report
 
@@ -180,6 +181,37 @@ def test_build_system_prompt_requests_variant_choices_not_full_text() -> None:
     assert '"verse_text"' not in prompt
 
 
+def test_build_system_prompt_uses_compact_context_json() -> None:
+    analysis = [
+        {
+            "word": "samma",
+            "data": [
+                {
+                    "key": "12345_0",
+                    "pali": "samma",
+                    "meaning_combo": "rightly",
+                }
+            ],
+        }
+    ]
+    missing_groups = [
+        {
+            "word": "samma",
+            "context": "samma",
+            "missing_keys": ["12345_0"],
+            "options": [{"key": "12345_0", "meaning_combo": "rightly"}],
+        }
+    ]
+
+    system_prompt = build_system_prompt(analysis)
+    missing_scores_prompt = _build_missing_scores_prompt("samma", missing_groups)
+
+    assert '"key":"12345_0"' in system_prompt
+    assert '  "key"' not in system_prompt
+    assert '"missing_keys":["12345_0"]' in missing_scores_prompt
+    assert '  "missing_keys"' not in missing_scores_prompt
+
+
 def test_translate_sentence_reports_json_and_ai_progress(monkeypatch) -> None:
     events: list[str] = []
 
@@ -264,8 +296,7 @@ def test_pre_match_db_examples_requires_text_overlap() -> None:
         }
     ]
     sentence = (
-        "evam'etassa kevalassa dukkhakkhandhassa nirodho hotī'ti. "
-        "nirodho, nirodho'ti"
+        "evam'etassa kevalassa dukkhakkhandhassa nirodho hotī'ti. nirodho, nirodho'ti"
     )
 
     pre_match_db_examples(analysis, "SN12.1", sentence)
@@ -392,6 +423,134 @@ def test_translate_sentence_retries_missing_component_scores(monkeypatch) -> Non
     assert debug["retry_requests"][0]["missing_keys"] == ["60693_0", "60789_0"]
 
 
+def _patch_sammasambuddhassa_analysis(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: [
+            {
+                "word": "sammāsambuddhassa",
+                "status": "found",
+                "data": [
+                    {
+                        "key": "60847_0",
+                        "id": 60847,
+                        "pali": "sammāsambuddhassa",
+                        "pos": "noun",
+                        "grammar": "masc gen sg of sammāsambuddha",
+                        "meaning_combo": "perfectly awakened Buddha",
+                        "components": [
+                            [
+                                {
+                                    "key": "60693_0",
+                                    "id": 60693,
+                                    "pali": "sammā",
+                                    "pos": "nt",
+                                    "meaning_1": "cymbal",
+                                    "meaning_combo": "cymbal",
+                                    "example_1": "example",
+                                    "example_2": "",
+                                },
+                                {
+                                    "key": "60789_0",
+                                    "id": 60789,
+                                    "pali": "sammā",
+                                    "pos": "ind",
+                                    "meaning_1": "perfectly",
+                                    "meaning_combo": "perfectly; rightly",
+                                    "example_1": "example",
+                                    "example_2": "",
+                                },
+                            ]
+                        ],
+                    }
+                ],
+            }
+        ],
+    )
+
+
+def test_translate_sentence_retry_accepts_flat_score_map(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[str] = []
+    _patch_sammasambuddhassa_analysis(monkeypatch)
+
+    class FakeAIManager:
+        def request(self, **kwargs):
+            calls.append(kwargs["prompt"])
+            content = (
+                '{"translation": "", "literal_translation": "", '
+                '"scores": {"60847_0": {"score": 10}}}'
+            )
+            if len(calls) == 2:
+                content = '{"60789_0": {"score": 10}}'
+            return type(
+                "FakeResponse",
+                (),
+                {"content": content, "status_message": "ok"},
+            )()
+
+    debug: dict = {}
+    result = translate_sentence(
+        "sammāsambuddhassa",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        debug=debug,
+    )
+
+    component_options = result["analysis"][0]["data"][0]["components"][0]
+    assert component_options[1]["ai_score"] == 10
+
+
+def test_translate_sentence_retry_ignores_unrelated_flat_score_map(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[str] = []
+    _patch_sammasambuddhassa_analysis(monkeypatch)
+
+    class FakeAIManager:
+        def request(self, **kwargs):
+            calls.append(kwargs["prompt"])
+            content = (
+                '{"translation": "", "literal_translation": "", '
+                '"scores": {"60847_0": {"score": 10}}}'
+            )
+            if len(calls) == 2:
+                content = '{"unrelated_key": {"score": 5}}'
+            return type(
+                "FakeResponse",
+                (),
+                {"content": content, "status_message": "ok"},
+            )()
+
+    debug: dict = {}
+    result = translate_sentence(
+        "sammāsambuddhassa",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        debug=debug,
+    )
+
+    component_options = result["analysis"][0]["data"][0]["components"][0]
+    assert "unrelated_key" not in debug["final_scores"]
+    assert component_options[1]["ai_score"] is None
+
+
+def test_coerce_flat_score_map_shapes() -> None:
+    expected = {"a_0", "b_0"}
+
+    assert translate_core._coerce_flat_score_map({"a_0": {"score": 3}}, expected) == {
+        "scores": {"a_0": {"score": 3}}
+    }
+    assert translate_core._coerce_flat_score_map({"a_0": 7}, expected) == {
+        "scores": {"a_0": {"score": 7}}
+    }
+    untouched = {"scores": {"a_0": {"score": 1}}}
+    assert translate_core._coerce_flat_score_map(untouched, expected) is untouched
+    prose_like = {"x": "y", "z": "w", "a_0": {"score": 1}}
+    assert translate_core._coerce_flat_score_map(prose_like, expected) is prose_like
+
+
 def test_translate_sentence_curated_example_match_overrides_ai_score(
     monkeypatch,
 ) -> None:
@@ -443,6 +602,63 @@ def test_translate_sentence_curated_example_match_overrides_ai_score(
 
     option = result["analysis"][0]["data"][0]
     assert option["ai_score"] == 10
+    assert option["selection_source"] == "db_example_source_text_overlap"
+
+
+def test_translate_sentence_db_example_preserves_ai_contextual_meaning(
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: [
+            {
+                "word": "dharaṇī",
+                "status": "found",
+                "data": [
+                    {
+                        "key": "35009_0",
+                        "id": 35009,
+                        "pali": "dharaṇī",
+                        "pos": "fem",
+                        "meaning_1": "earth",
+                        "meaning_combo": "earth; world; lit. carrier",
+                        "example_1": "dharaṇī siñcati.",
+                        "source_1": "TH50",
+                        "example_2": "",
+                        "source_2": "",
+                    }
+                ],
+            }
+        ],
+    )
+
+    class FakeAIManager:
+        def request(self, **_kwargs):
+            return type(
+                "FakeResponse",
+                (),
+                {
+                    "content": (
+                        '{"translation": "", "literal_translation": "", '
+                        '"scores": {"35009_0": {"score": 10, '
+                        '"contextual_meaning": "earth", '
+                        '"selected_pos": "fem"}}}'
+                    ),
+                    "status_message": "ok",
+                },
+            )()
+
+    result = translate_sentence(
+        "dharaṇī siñcati.",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        verse_source="TH50",
+    )
+
+    option = result["analysis"][0]["data"][0]
+    assert option["ai_score"] == 10
+    assert option["meaning_combo"] == "earth"
+    assert option["selected_pos"] == "fem"
     assert option["selection_source"] == "db_example_source_text_overlap"
 
 
@@ -547,3 +763,442 @@ def test_format_markdown_table_fallback_uses_meaning_1_quality() -> None:
     table = format_markdown_table(analysis)
 
     assert "| 11 | - part | nt | real meaning |" in table
+
+
+def test_build_system_prompt_json_instruction_at_start() -> None:
+    prompt = build_system_prompt([])
+    first_line = prompt.strip().splitlines()[0]
+    assert "JSON" in first_line
+
+
+def test_translate_sentence_reformat_triggered_when_prose_returned(
+    monkeypatch,
+) -> None:
+    """When the first response is not JSON, a second reformat request is made."""
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: [],
+    )
+    calls: list[dict] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs):
+            calls.append(kwargs)
+            if len(calls) == 1:
+                content = "Here is a detailed prose analysis of the verse..."
+            else:
+                content = '{"translation": "reformatted", "literal_translation": "lit", "scores": {}}'
+            return type("R", (), {"content": content, "status_message": "ok"})()
+
+    result = translate_sentence(
+        "sabbaṃ",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+    )
+
+    assert len(calls) == 2
+    assert result["translation"] == "reformatted"
+
+
+def test_translate_sentence_reformat_progress_events(monkeypatch) -> None:
+    """Reformat path emits ai_reformat_start and ai_reformat_done progress events."""
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: [],
+    )
+    events: list[str] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs):
+            events.append("request")
+            if len([e for e in events if e == "request"]) == 1:
+                content = "Prose analysis, not JSON."
+            else:
+                content = '{"translation": "", "literal_translation": "", "scores": {}}'
+            return type("R", (), {"content": content, "status_message": "ok"})()
+
+    translate_sentence(
+        "sabbaṃ",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        progress=events.append,
+    )
+
+    assert "ai_reformat_start" in events
+    assert "ai_reformat_done" in events
+    assert events.index("ai_reformat_start") < events.index("ai_reformat_done")
+
+
+def test_translate_sentence_reformat_debug_keys_populated(monkeypatch) -> None:
+    """Debug dict gets reformat keys when prose response triggers reformat."""
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: [],
+    )
+    call_count = 0
+
+    class FakeAIManager:
+        def request(self, **kwargs):
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1:
+                content = "Prose, not JSON."
+            else:
+                content = (
+                    '{"translation": "ok", "literal_translation": "ok", "scores": {}}'
+                )
+            return type("R", (), {"content": content, "status_message": "ok"})()
+
+    debug: dict = {}
+    translate_sentence(
+        "sabbaṃ",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        debug=debug,
+    )
+
+    assert "reformat_raw_response" in debug
+    assert "reformat_status_message" in debug
+    assert "reformat_parse_error" in debug
+    assert debug["reformat_parse_error"] == ""
+
+
+def test_extract_word_key_map_detects_disambiguation_map() -> None:
+    """A flat {word: option_key} map whose values are real keys is recognised."""
+    analysis = [
+        {"word": "x", "data": [{"key": "35009_0"}, {"key": "62854_0"}]},
+    ]
+
+    assert _extract_word_key_map(
+        {"dharaṇī": "35009_0", "siñcati": "62854_0"}, analysis
+    ) == {"dharaṇī": "35009_0", "siñcati": "62854_0"}
+
+
+def test_extract_word_key_map_detects_nested_disambiguation_map() -> None:
+    """A nested antigravity disambiguation map is recognised."""
+    analysis = [
+        {"word": "x", "data": [{"key": "35009_0"}, {"key": "62854_0"}]},
+    ]
+
+    assert _extract_word_key_map(
+        {"disambiguation": {"dharaṇī": "35009_0", "siñcati": "62854_0"}},
+        analysis,
+    ) == {"dharaṇī": "35009_0", "siñcati": "62854_0"}
+
+
+def test_extract_word_key_map_rejects_non_map_shapes() -> None:
+    """Proper schema, dict-valued, unknown-key, and empty responses are not maps."""
+    analysis = [{"word": "x", "data": [{"key": "35009_0"}]}]
+
+    # Proper {translation, scores} schema is not a disambiguation map.
+    assert _extract_word_key_map({"translation": "x", "scores": {}}, analysis) is None
+    # Dict-valued wrong schema (matches the reformat fallback test) is not a map.
+    assert _extract_word_key_map({"passa": {"lemma": "passati"}}, analysis) is None
+    # String values that match no real option key are not a map.
+    assert _extract_word_key_map({"a": "nope", "b": "nada"}, analysis) is None
+    # Empty response is not a map.
+    assert _extract_word_key_map({}, analysis) is None
+    # No analysis keys to match against → never a map.
+    assert _extract_word_key_map({"dharaṇī": "35009_0"}, []) is None
+
+
+def test_translate_sentence_uses_word_key_map_skips_reformat(monkeypatch) -> None:
+    """A word→key first response drives scores directly and fetches only the translation.
+
+    The wasteful prose-reformat round-trip must NOT fire; instead a lightweight
+    translation-only call supplies translation/literal_translation.
+    """
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: [
+            {
+                "word": "dharaṇī",
+                "status": "found",
+                "data": [
+                    {
+                        "key": "35009_0",
+                        "id": 35009,
+                        "pali": "dharaṇī",
+                        "pos": "fem",
+                        "meaning_combo": "earth",
+                    }
+                ],
+            },
+            {
+                "word": "siñcati",
+                "status": "found",
+                "data": [
+                    {
+                        "key": "62854_0",
+                        "id": 62854,
+                        "pali": "siñcati",
+                        "pos": "verb",
+                        "meaning_combo": "sprinkles",
+                    }
+                ],
+            },
+        ],
+    )
+    calls: list[dict] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs):
+            calls.append(kwargs)
+            if len(calls) == 1:
+                content = '{"dharaṇī": "35009_0", "siñcati": "62854_0"}'
+            else:
+                content = (
+                    '{"translation": "The earth is sprinkled.", '
+                    '"literal_translation": "earth sprinkles."}'
+                )
+            return type("R", (), {"content": content, "status_message": "ok"})()
+
+    debug: dict = {}
+    result = translate_sentence(
+        "dharaṇī siñcati",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        debug=debug,
+    )
+
+    # Exactly two calls: the map first call + a translation-only call. No retry,
+    # because the map already supplies every top-level option key.
+    assert len(calls) == 2
+    # The second call is the translation prompt, NOT the prose-reformat prompt.
+    assert "did not match" not in calls[1]["prompt"]
+    assert "Translate" in calls[1]["prompt"]
+    # Scores come straight from the discarded-no-longer first call.
+    assert result["analysis"][0]["data"][0]["ai_score"] == 10
+    assert result["analysis"][1]["data"][0]["ai_score"] == 10
+    # Translation comes from the follow-up call.
+    assert result["translation"] == "The earth is sprinkled."
+    assert result["literal_translation"] == "earth sprinkles."
+    # The prose-reformat debug keys are absent because reformat never ran.
+    assert "reformat_raw_response" not in debug
+    assert debug["translation_raw_response"]
+
+
+def test_translate_sentence_word_key_map_applies_contextual_meanings(
+    monkeypatch,
+) -> None:
+    """A word→key map path should apply contextual meanings from the follow-up."""
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: [
+            {
+                "word": "dharaṇī",
+                "status": "found",
+                "data": [
+                    {
+                        "key": "35009_0",
+                        "id": 35009,
+                        "pali": "dharaṇī",
+                        "pos": "fem",
+                        "meaning_combo": "earth; world; lit. carrier",
+                        "example_1": "dharaṇī siñcati.",
+                        "source_1": "TH50",
+                        "example_2": "",
+                        "source_2": "",
+                    }
+                ],
+            }
+        ],
+    )
+    calls: list[dict] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs):
+            calls.append(kwargs)
+            if len(calls) == 1:
+                content = '{"dharaṇī": "35009_0"}'
+            else:
+                content = (
+                    '{"translation": "The earth is sprinkled.", '
+                    '"literal_translation": "earth sprinkles.", '
+                    '"meanings": {"dharaṇī": "earth"}}'
+                )
+            return type("R", (), {"content": content, "status_message": "ok"})()
+
+    result = translate_sentence(
+        "dharaṇī siñcati.",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        verse_source="TH50",
+    )
+
+    option = result["analysis"][0]["data"][0]
+    assert '"meanings"' in calls[1]["prompt"]
+    assert option["ai_score"] == 10
+    assert option["meaning_combo"] == "earth"
+    assert option["selection_source"] == "db_example_source_text_overlap"
+
+
+def test_translate_sentence_uses_nested_word_key_map_skips_reformat(
+    monkeypatch,
+) -> None:
+    """A nested disambiguation map follows the same translation-only path."""
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: [
+            {
+                "word": "dharaṇī",
+                "status": "found",
+                "data": [
+                    {
+                        "key": "35009_0",
+                        "id": 35009,
+                        "pali": "dharaṇī",
+                        "pos": "fem",
+                        "meaning_combo": "earth",
+                    }
+                ],
+            },
+            {
+                "word": "siñcati",
+                "status": "found",
+                "data": [
+                    {
+                        "key": "62854_0",
+                        "id": 62854,
+                        "pali": "siñcati",
+                        "pos": "verb",
+                        "meaning_combo": "sprinkles",
+                    }
+                ],
+            },
+        ],
+    )
+    calls: list[dict] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs):
+            calls.append(kwargs)
+            if len(calls) == 1:
+                content = (
+                    '{"disambiguation": {"dharaṇī": "35009_0", "siñcati": "62854_0"}}'
+                )
+            else:
+                content = (
+                    '{"translation": "The earth is sprinkled.", '
+                    '"literal_translation": "earth sprinkles."}'
+                )
+            return type("R", (), {"content": content, "status_message": "ok"})()
+
+    debug: dict = {}
+    result = translate_sentence(
+        "dharaṇī siñcati",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        debug=debug,
+    )
+
+    assert len(calls) == 2
+    assert "did not match" not in calls[1]["prompt"]
+    assert "Translate" in calls[1]["prompt"]
+    assert result["analysis"][0]["data"][0]["ai_score"] == 10
+    assert result["analysis"][1]["data"][0]["ai_score"] == 10
+    assert result["translation"] == "The earth is sprinkled."
+    assert result["literal_translation"] == "earth sprinkles."
+    assert "reformat_raw_response" not in debug
+    assert debug["translation_raw_response"]
+
+
+def test_translate_sentence_reformat_triggered_on_wrong_schema(monkeypatch) -> None:
+    """Valid JSON in the wrong schema (no translation/scores keys) triggers reformat."""
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: [],
+    )
+    call_count = 0
+
+    class FakeAIManager:
+        def request(self, **kwargs):
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1:
+                content = '{"passa": {"lemma": "passati", "meaning": "see"}}'
+            else:
+                content = '{"translation": "Behold!", "literal_translation": "See!", "scores": {}}'
+            return type("R", (), {"content": content, "status_message": "ok"})()
+
+    result = translate_sentence(
+        "passa",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+    )
+
+    assert call_count == 2
+    assert result["translation"] == "Behold!"
+
+
+def test_missing_scores_prompt_specifies_score_object_format() -> None:
+    """Retry prompt must include an explicit {"score": N} value format example."""
+    missing_groups = [
+        {
+            "word": "sammā",
+            "context": "sammā",
+            "missing_keys": ["60789_0"],
+            "options": [{"key": "60789_0", "meaning_combo": "rightly"}],
+        }
+    ]
+    prompt = _build_missing_scores_prompt("sammā", missing_groups)
+    assert '"score"' in prompt
+
+
+def test_missing_scores_prompt_requires_contextual_meaning_for_decon_keys() -> None:
+    """When missing keys include a decon_ key, prompt must contain contextual_meaning instruction."""
+    missing_groups = [
+        {
+            "word": "okassa",
+            "context": "okassa",
+            "missing_keys": ["decon_okassa_0"],
+            "options": [{"key": "decon_okassa_0", "meaning_combo": "[Deconstructed]"}],
+        }
+    ]
+    prompt = _build_missing_scores_prompt("okassa", missing_groups)
+    assert "contextual_meaning" in prompt
+
+
+def test_translate_sentence_retry_contextual_meaning_applied_to_decon_option(
+    monkeypatch,
+) -> None:
+    """When retry returns contextual_meaning for a decon_ key, meaning_combo is updated."""
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: [
+            {
+                "word": "okassa",
+                "status": "found",
+                "data": [
+                    {
+                        "key": "decon_okassa_0",
+                        "id": 0,
+                        "pali": "okassa",
+                        "pos": "sandhi",
+                        "meaning_combo": "[Deconstructed]",
+                    }
+                ],
+            }
+        ],
+    )
+    call_count = 0
+
+    class FakeAIManager:
+        def request(self, **kwargs):
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1:
+                content = '{"translation": "to the dwelling", "literal_translation": "to the house", "scores": {}}'
+            else:
+                content = '{"scores": {"decon_okassa_0": {"score": 10, "contextual_meaning": "to the dwelling"}}}'
+            return type("R", (), {"content": content, "status_message": "ok"})()
+
+    result = translate_sentence(
+        "okassa",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+    )
+
+    option = result["analysis"][0]["data"][0]
+    assert option["ai_score"] == 10
+    assert option["meaning_combo"] == "to the dwelling"
