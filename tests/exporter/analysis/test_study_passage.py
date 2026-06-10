@@ -2,6 +2,7 @@
 
 from exporter.analysis.passage_extraction import format_extraction_report
 from exporter.analysis.study_passage import (
+    _build_raw_responses_log,
     _format_selection_preview,
     _parse_selection_indices,
     _select_passage,
@@ -70,6 +71,37 @@ def test_parse_selection_indices_rejects_out_of_bounds_values() -> None:
     assert _parse_selection_indices("0 2", 4) is None
     assert _parse_selection_indices("2-5", 4) is None
     assert _parse_selection_indices("x", 4) is None
+
+
+def test_build_raw_responses_log_includes_chunk_requests() -> None:
+    log = _build_raw_responses_log(
+        "SN15.1_p2",
+        {
+            "chunk_requests": [
+                {
+                    "status_message": "first ok",
+                    "raw_response": '{"scores": {}}',
+                    "reformat_status_message": "reformat ok",
+                    "reformat_raw_response": '{"scores": {"1_0": {"score": 10}}}',
+                    "translation_status_message": "translation ok",
+                    "translation_raw_response": '{"translation": "T"}',
+                }
+            ],
+            "retry_requests": [
+                {
+                    "status_message": "retry ok",
+                    "raw_response": '{"scores": {"2_0": {"score": 10}}}',
+                }
+            ],
+        },
+    )
+
+    assert "## First response" not in log
+    assert "## Chunk 1 first response" in log
+    assert "Status: first ok" in log
+    assert "## Chunk 1 reformat response" in log
+    assert "## Chunk 1 translation response (word→key map path)" in log
+    assert "## Retry 1 (missing scores)" in log
 
 
 def test_select_passage_returns_joined_mixed_selection(

@@ -356,6 +356,154 @@ def test_pre_match_db_examples_ranks_source_text_overlap_strongest() -> None:
     assert source_text["db_example_match_type"] == "source_text_overlap"
 
 
+def test_split_into_sentence_chunks_single_chunk_under_budget() -> None:
+    analysis = [
+        {"word": "buddho", "status": "found", "data": []},
+        {"word": "dhammo", "status": "found", "data": []},
+    ]
+    sentence = "buddho dhammo."
+
+    chunks = translate_core._split_into_sentence_chunks(
+        sentence,
+        analysis,
+        max_context_chars=10_000,
+    )
+
+    assert chunks == [(sentence, analysis)]
+
+
+def test_split_into_sentence_chunks_packs_sentences() -> None:
+    sentence = "buddho bhagavā. dhammo."
+    analysis = [
+        {"word": "buddho", "status": "found", "data": [{"key": "1_0"}]},
+        {"word": "bhagavā", "status": "found", "data": [{"key": "2_0"}]},
+        {"word": "dhammo", "status": "found", "data": [{"key": "3_0"}]},
+    ]
+
+    chunks = translate_core._split_into_sentence_chunks(
+        sentence,
+        analysis,
+        max_context_chars=10,
+    )
+
+    assert chunks == [
+        ("buddho bhagavā.", analysis[:2]),
+        ("dhammo.", analysis[2:]),
+    ]
+    assert [entry for _, chunk in chunks for entry in chunk] == analysis
+
+
+def test_split_into_sentence_chunks_falls_back_on_token_mismatch() -> None:
+    sentence = "buddho bhagavā. dhammo."
+    analysis = [
+        {"word": "buddho", "status": "found", "data": []},
+        {"word": "dhammo", "status": "found", "data": []},
+    ]
+
+    chunks = translate_core._split_into_sentence_chunks(
+        sentence,
+        analysis,
+        max_context_chars=10,
+    )
+
+    assert chunks == [(sentence, analysis)]
+
+
+def test_translate_sentence_chunks_oversized_passage(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    analysis = [
+        {
+            "word": "buddho",
+            "status": "found",
+            "data": [
+                {
+                    "key": "1_0",
+                    "pali": "buddho",
+                    "pos": "noun",
+                    "meaning_combo": "awakened one",
+                }
+            ],
+        },
+        {
+            "word": "bhagavā",
+            "status": "found",
+            "data": [
+                {
+                    "key": "2_0",
+                    "pali": "bhagavā",
+                    "pos": "noun",
+                    "meaning_combo": "blessed one",
+                }
+            ],
+        },
+        {
+            "word": "dhammo",
+            "status": "found",
+            "data": [
+                {
+                    "key": "3_0",
+                    "pali": "dhammo",
+                    "pos": "noun",
+                    "meaning_combo": "teaching",
+                }
+            ],
+        },
+    ]
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: analysis,
+    )
+    monkeypatch.setattr(translate_core, "MAX_FIRST_CONTEXT_CHARS", 10, raising=False)
+    calls: list[dict[str, Any]] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs: Any) -> object:
+            calls.append(kwargs)
+            if len(calls) == 1:
+                content = (
+                    '{"translation": "T1", "literal_translation": "L1", '
+                    '"scores": {"1_0": {"score": 10}, "2_0": {"score": 10}}}'
+                )
+            else:
+                content = (
+                    '{"translation": "T2", "literal_translation": "L2", '
+                    '"scores": {"3_0": {"score": 10}}}'
+                )
+            return type(
+                "FakeResponse", (), {"content": content, "status_message": "ok"}
+            )()
+
+    debug: dict[str, Any] = {}
+    result = translate_sentence(
+        "buddho bhagavā. dhammo.",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        debug=debug,
+    )
+
+    assert len(calls) == 2
+    assert "buddho bhagavā." in calls[0]["prompt"]
+    assert (
+        "Full passage for context (score ONLY the words in your part)"
+        in calls[0]["prompt"]
+    )
+    assert result["translation"] == "T1 T2"
+    assert result["literal_translation"] == "L1 L2"
+    assert [entry["data"][0]["ai_score"] for entry in result["analysis"]] == [
+        10,
+        10,
+        10,
+    ]
+    assert len(debug["chunk_requests"]) == 2
+    assert debug["chunk_requests"][0]["raw_response"] == (
+        '{"translation": "T1", "literal_translation": "L1", '
+        '"scores": {"1_0": {"score": 10}, "2_0": {"score": 10}}}'
+    )
+    assert "raw_response" not in debug
+    assert debug["retry_requests"] == []
+
+
 def test_translate_sentence_retries_missing_component_scores(monkeypatch) -> None:
     calls: list[str] = []
 
@@ -904,6 +1052,46 @@ def test_translate_sentence_reformat_debug_keys_populated(monkeypatch) -> None:
     assert "reformat_status_message" in debug
     assert "reformat_parse_error" in debug
     assert debug["reformat_parse_error"] == ""
+
+
+def test_translate_sentence_reformat_keeps_salvaged_scores(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Reformat should not discard scores salvaged from a truncated first response."""
+    calls: list[dict[str, Any]] = []
+    _patch_sammasambuddhassa_analysis(monkeypatch)
+
+    class FakeAIManager:
+        def request(self, **kwargs: Any) -> object:
+            calls.append(kwargs)
+            if len(calls) == 1:
+                content = (
+                    '{"translation": "x", "literal_translation": "y", '
+                    '"scores": {"60847_0": {"score": 1}, '
+                    '"60789_0": {"score": 7}, "60693_0": {"sco'
+                )
+            else:
+                content = (
+                    '{"translation": "reformatted", "literal_translation": "lit", '
+                    '"scores": {"60847_0": {"score": 8}, '
+                    '"60693_0": {"score": 3}}}'
+                )
+            return type("R", (), {"content": content, "status_message": "ok"})()
+
+    debug: dict[str, Any] = {}
+    result = translate_sentence(
+        "sammāsambuddhassa",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        debug=debug,
+    )
+
+    assert len(calls) == 2
+    assert debug["final_scores"]["60847_0"]["score"] == 8
+    assert debug["final_scores"]["60693_0"]["score"] == 3
+    assert debug["final_scores"]["60789_0"]["score"] == 7
+    component_options = result["analysis"][0]["data"][0]["components"][0]
+    assert component_options[1]["ai_score"] == 7
 
 
 def test_extract_word_key_map_detects_disambiguation_map() -> None:

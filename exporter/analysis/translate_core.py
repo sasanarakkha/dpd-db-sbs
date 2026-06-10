@@ -13,6 +13,10 @@ from tools.ai_manager import AIManager
 from tools.printer import printer as pr
 
 
+MAX_FIRST_CONTEXT_CHARS = 250_000
+_SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+")
+
+
 def extract_variant_options(text: str) -> tuple[str, dict[str, list[str]]]:
     """Resolve GUI-style // variants to first choices and collect options."""
     parts = re.split(r"(\s+)", text)
@@ -477,42 +481,111 @@ Missing dictionary option scores:
 """
 
 
-def translate_sentence(
-    sentence: str,
-    db_session: Session,
-    ai_manager: AIManager | None = None,
-    model: str | None = None,
-    verse_source: str | None = None,
-    speech_mark_options: dict[str, list[str]] | None = None,
-    progress: Callable[[str], None] | None = None,
-    verbose: bool = False,
-    debug: dict[str, Any] | None = None,
+def _analysis_context_len(analysis: list[dict[str, Any]]) -> int:
+    return len(json.dumps(analysis, ensure_ascii=False, separators=(",", ":")))
+
+
+def _split_into_sentence_chunks(
+    resolved_sentence: str,
+    analysis: list[dict[str, Any]],
+    max_context_chars: int,
+) -> list[tuple[str, list[dict[str, Any]]]]:
+    whole = json.dumps(analysis, ensure_ascii=False, separators=(",", ":"))
+    if len(whole) <= max_context_chars:
+        return [(resolved_sentence, analysis)]
+
+    sentences = [
+        sentence
+        for sentence in _SENTENCE_SPLIT_RE.split(resolved_sentence)
+        if sentence.strip()
+    ]
+    if len(sentences) < 2:
+        return [(resolved_sentence, analysis)]
+
+    counts = [len(tokenize_sentence(sentence)) for sentence in sentences]
+    if sum(counts) != len(analysis):
+        return [(resolved_sentence, analysis)]
+
+    sentence_slices: list[tuple[str, list[dict[str, Any]]]] = []
+    start = 0
+    for sentence, count in zip(sentences, counts, strict=True):
+        end = start + count
+        sentence_slices.append((sentence, analysis[start:end]))
+        start = end
+
+    chunks: list[tuple[str, list[dict[str, Any]]]] = []
+    current_sentences: list[str] = []
+    current_analysis: list[dict[str, Any]] = []
+    for sentence, sentence_analysis in sentence_slices:
+        candidate_analysis = [*current_analysis, *sentence_analysis]
+        if (
+            current_analysis
+            and _analysis_context_len(candidate_analysis) > max_context_chars
+        ):
+            chunks.append((" ".join(current_sentences), current_analysis))
+            current_sentences = [sentence]
+            current_analysis = list(sentence_analysis)
+        else:
+            current_sentences.append(sentence)
+            current_analysis = candidate_analysis
+
+    if current_sentences:
+        chunks.append((" ".join(current_sentences), current_analysis))
+    return chunks or [(resolved_sentence, analysis)]
+
+
+def _merge_chunk_ai_data(chunk_datas: list[dict[str, Any]]) -> dict[str, Any]:
+    merged: dict[str, Any] = {
+        "translation": "",
+        "literal_translation": "",
+        "scores": {},
+        "variant_choices": {},
+    }
+    translations: list[str] = []
+    literals: list[str] = []
+    for data in chunk_datas:
+        translation = data.get("translation")
+        if isinstance(translation, str) and translation.strip():
+            translations.append(translation.strip())
+        literal = data.get("literal_translation")
+        if isinstance(literal, str) and literal.strip():
+            literals.append(literal.strip())
+        scores = data.get("scores")
+        if isinstance(scores, dict):
+            for key, value in scores.items():
+                merged["scores"].setdefault(key, value)
+        variant_choices = data.get("variant_choices")
+        if isinstance(variant_choices, dict):
+            for key, value in variant_choices.items():
+                merged["variant_choices"].setdefault(key, value)
+    merged["translation"] = " ".join(translations)
+    merged["literal_translation"] = " ".join(literals)
+    return merged
+
+
+def _request_first_pass(
+    chunk_sentence: str,
+    full_sentence: str,
+    analysis: list[dict[str, Any]],
+    ai_manager: AIManager,
+    model: str | None,
+    speech_mark_options: dict[str, list[str]] | None,
+    progress: Callable[[str], None] | None,
+    verbose: bool,
+    debug: dict[str, Any] | None,
 ) -> dict[str, Any]:
-    """Full pipeline: Analyze → AI Translate → Merge. Returns the enriched analysis object."""
-    if ai_manager is None:
-        ai_manager = AIManager()
-
-    resolved_sentence, extracted_options = extract_variant_options(sentence)
-    if speech_mark_options:
-        speech_mark_options = {**extracted_options, **speech_mark_options}
-    else:
-        speech_mark_options = extracted_options or None
-
-    if progress:
-        progress("json_start")
-    analysis = analyze_sentence(resolved_sentence, db_session)
-
-    if verse_source:
-        pre_match_db_examples(analysis, verse_source, resolved_sentence)
-
     sys_prompt = build_system_prompt(analysis, speech_mark_options)
-    user_prompt = f"Return JSON for: {resolved_sentence}"
+    if chunk_sentence == full_sentence:
+        user_prompt = f"Return JSON for: {chunk_sentence}"
+    else:
+        user_prompt = (
+            f"Return JSON for: {chunk_sentence}\n"
+            "Full passage for context (score ONLY the words in your part): "
+            f"{full_sentence}"
+        )
     if debug is not None:
         debug["system_prompt"] = sys_prompt
         debug["user_prompt"] = user_prompt
-        debug["retry_requests"] = []
-    if progress:
-        progress("json_done")
 
     if progress:
         progress("ai_start")
@@ -540,9 +613,6 @@ def translate_sentence(
     word_key_map = _extract_word_key_map(ai_data, analysis) if not parse_error else None
 
     if word_key_map is not None:
-        # First call returned a usable word→key disambiguation map. Use it directly for
-        # scores and fetch only the translation, instead of discarding it and paying a
-        # full prose-reformat round-trip.
         if verbose:
             pr.amber(
                 "  Word→key disambiguation map detected — using it for scores, "
@@ -559,7 +629,7 @@ def translate_sentence(
         if progress:
             progress("ai_translation_start")
         translation_response = ai_manager.request(
-            prompt=_build_translation_prompt(resolved_sentence, list(word_key_map)),
+            prompt=_build_translation_prompt(chunk_sentence, list(word_key_map)),
             model=model,
             prompt_sys="Return only a JSON object with translation, literal_translation, and meanings. No prose. No markdown.",
         )
@@ -615,7 +685,7 @@ def translate_sentence(
         if progress:
             progress("ai_reformat_start")
         reformat_response = ai_manager.request(
-            prompt=_build_reformat_prompt(resolved_sentence, response.content),
+            prompt=_build_reformat_prompt(chunk_sentence, response.content),
             prompt_sys="Return only a valid JSON object. No prose. No markdown.",
         )
         if progress:
@@ -628,6 +698,12 @@ def translate_sentence(
                 reformat_data.get("scores"), dict
             )
             if reformat_ok:
+                salvaged_scores = ai_data.get("scores")
+                if isinstance(salvaged_scores, dict) and salvaged_scores:
+                    reformat_data["scores"] = {
+                        **salvaged_scores,
+                        **reformat_data["scores"],
+                    }
                 ai_data = reformat_data
                 if verbose:
                     pr.yes("  Reformat succeeded — scores dict present")
@@ -642,6 +718,83 @@ def translate_sentence(
                 debug["reformat_status_message"] = reformat_response.status_message
                 debug["reformat_parsed_response"] = copy.deepcopy(reformat_data)
                 debug["reformat_parse_error"] = reformat_error
+
+    return ai_data
+
+
+def translate_sentence(
+    sentence: str,
+    db_session: Session,
+    ai_manager: AIManager | None = None,
+    model: str | None = None,
+    verse_source: str | None = None,
+    speech_mark_options: dict[str, list[str]] | None = None,
+    progress: Callable[[str], None] | None = None,
+    verbose: bool = False,
+    debug: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Full pipeline: Analyze → AI Translate → Merge. Returns the enriched analysis object."""
+    if ai_manager is None:
+        ai_manager = AIManager()
+
+    resolved_sentence, extracted_options = extract_variant_options(sentence)
+    if speech_mark_options:
+        speech_mark_options = {**extracted_options, **speech_mark_options}
+    else:
+        speech_mark_options = extracted_options or None
+
+    if progress:
+        progress("json_start")
+    analysis = analyze_sentence(resolved_sentence, db_session)
+
+    if verse_source:
+        pre_match_db_examples(analysis, verse_source, resolved_sentence)
+
+    if progress:
+        progress("json_done")
+
+    chunks = _split_into_sentence_chunks(
+        resolved_sentence,
+        analysis,
+        MAX_FIRST_CONTEXT_CHARS,
+    )
+    if len(chunks) == 1:
+        ai_data = _request_first_pass(
+            resolved_sentence,
+            resolved_sentence,
+            analysis,
+            ai_manager,
+            model,
+            speech_mark_options,
+            progress,
+            verbose,
+            debug,
+        )
+    else:
+        chunk_debugs: list[dict[str, Any]] = []
+        chunk_datas: list[dict[str, Any]] = []
+        for chunk_text, chunk_analysis in chunks:
+            chunk_debug: dict[str, Any] | None = {} if debug is not None else None
+            chunk_data = _request_first_pass(
+                chunk_text,
+                resolved_sentence,
+                chunk_analysis,
+                ai_manager,
+                model,
+                speech_mark_options,
+                progress,
+                verbose,
+                chunk_debug,
+            )
+            chunk_datas.append(_normalize_ai_response(chunk_data))
+            if chunk_debug is not None:
+                chunk_debugs.append(chunk_debug)
+        ai_data = _merge_chunk_ai_data(chunk_datas)
+        if debug is not None:
+            debug["chunk_requests"] = chunk_debugs
+
+    if debug is not None:
+        debug["retry_requests"] = []
 
     ai_data = _normalize_ai_response(ai_data)
     scores_map = ai_data.setdefault("scores", {})

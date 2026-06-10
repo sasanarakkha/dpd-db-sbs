@@ -164,13 +164,14 @@ def _build_raw_responses_log(source: str, ai_debug: dict) -> str:
         body = content if content else "(no content)"
         return f"## {title}\nStatus: {status}\n\n{body}\n"
 
-    sections.append(
-        _section(
-            "First response",
-            ai_debug.get("status_message", ""),
-            ai_debug.get("raw_response"),
+    if "raw_response" in ai_debug:
+        sections.append(
+            _section(
+                "First response",
+                ai_debug.get("status_message", ""),
+                ai_debug.get("raw_response"),
+            )
         )
-    )
 
     if "reformat_raw_response" in ai_debug:
         sections.append(
@@ -189,6 +190,31 @@ def _build_raw_responses_log(source: str, ai_debug: dict) -> str:
                 ai_debug.get("translation_raw_response"),
             )
         )
+
+    for i, chunk in enumerate(ai_debug.get("chunk_requests", []), start=1):
+        sections.append(
+            _section(
+                f"Chunk {i} first response",
+                chunk.get("status_message", ""),
+                chunk.get("raw_response"),
+            )
+        )
+        if "reformat_raw_response" in chunk:
+            sections.append(
+                _section(
+                    f"Chunk {i} reformat response",
+                    chunk.get("reformat_status_message", ""),
+                    chunk.get("reformat_raw_response"),
+                )
+            )
+        if "translation_raw_response" in chunk:
+            sections.append(
+                _section(
+                    f"Chunk {i} translation response (word→key map path)",
+                    chunk.get("translation_status_message", ""),
+                    chunk.get("translation_raw_response"),
+                )
+            )
 
     for i, retry in enumerate(ai_debug.get("retry_requests", []), start=1):
         sections.append(
