@@ -8,10 +8,19 @@ from tools.ai_deepseek_manager import DeepseekManager
 
 
 class _FakeResponse(requests.Response):
-    def __init__(self, content: str = '{"ok": true}') -> None:
+    def __init__(
+        self,
+        content: str = '{"ok": true}',
+        finish_reason: str = "stop",
+        reasoning_content: str = "",
+        usage: dict[str, Any] | None = None,
+    ) -> None:
         super().__init__()
         self.status_code = 200
         self.json_content = content
+        self.finish_reason = finish_reason
+        self.reasoning_content = reasoning_content
+        self.usage = usage or {}
 
     def json(self, **kwargs: Any) -> dict[str, Any]:
         return {
@@ -19,10 +28,12 @@ class _FakeResponse(requests.Response):
                 {
                     "message": {
                         "content": self.json_content,
+                        "reasoning_content": self.reasoning_content,
                     },
-                    "finish_reason": "stop",
+                    "finish_reason": self.finish_reason,
                 }
-            ]
+            ],
+            "usage": self.usage,
         }
 
 
@@ -92,3 +103,50 @@ def test_request_allows_explicit_max_tokens_override() -> None:
     assert response.content == '{"ok": true}'
     assert manager.captured_payload is not None
     assert manager.captured_payload["max_tokens"] == 512
+
+
+def test_request_empty_content_status_message_is_compact() -> None:
+    class EmptyContentDeepseekManager(_CapturingDeepseekManager):
+        def _post_request(
+            self, api_url: str, payload: dict[str, Any], timeout: float = 60.0
+        ) -> _FakeResponse:
+            self.captured_payload = payload
+            return _FakeResponse(
+                content="",
+                finish_reason="length",
+                reasoning_content="x" * 2001,
+                usage={"completion_tokens": 2048},
+            )
+
+    manager = EmptyContentDeepseekManager()
+
+    response = manager.request(prompt="Return JSON.", model="deepseek-v4-flash")
+
+    assert response.content is None
+    assert "finish_reason=length" in response.status_message
+    assert len(response.status_message) < 500
+
+
+def test_request_non_empty_content_status_includes_non_stop_finish_reason() -> None:
+    class LengthFinishedDeepseekManager(_CapturingDeepseekManager):
+        def _post_request(
+            self, api_url: str, payload: dict[str, Any], timeout: float = 60.0
+        ) -> _FakeResponse:
+            self.captured_payload = payload
+            return _FakeResponse(content='{"ok": true}', finish_reason="length")
+
+    manager = LengthFinishedDeepseekManager()
+
+    response = manager.request(prompt="Return JSON.", model="deepseek-v4-flash")
+
+    assert response.content == '{"ok": true}'
+    assert "finish_reason=length" in response.status_message
+
+
+def test_request_non_empty_content_status_omits_stop_finish_reason() -> None:
+    manager = _CapturingDeepseekManager()
+
+    response = manager.request(prompt="Return JSON.", model="deepseek-v4-flash")
+
+    assert response.content == '{"ok": true}'
+    assert response.status_message == "200"

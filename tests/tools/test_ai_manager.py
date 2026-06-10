@@ -138,7 +138,7 @@ def test_request_keeps_informative_success_provider_detail() -> None:
 
 
 def test_antigravity_has_per_model_timeout() -> None:
-    """antigravity_cli model entry must carry a 90s per-model timeout."""
+    """antigravity_cli model entry must carry a 150s per-model timeout."""
     models = _load_models_from_json()
     agy_entries = [m for m in models["default"] if m[0] == "antigravity_cli"]
     assert len(agy_entries) == 1, (
@@ -147,7 +147,7 @@ def test_antigravity_has_per_model_timeout() -> None:
     assert len(agy_entries[0]) == 4, (
         "model tuple must be (provider, model, delay, timeout)"
     )
-    assert agy_entries[0][3] == 90.0
+    assert agy_entries[0][3] == 150.0
 
 
 def test_request_uses_per_model_timeout() -> None:

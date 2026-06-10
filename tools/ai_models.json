@@ -4,7 +4,7 @@
       "provider": "antigravity_cli",
       "model": "Gemini 3.5 Flash (High)",
       "delay": 5,
-      "timeout": 90
+      "timeout": 150
     }
   ],
   "default_models": [
