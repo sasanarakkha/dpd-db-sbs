@@ -21,11 +21,28 @@ _ANALYSIS_DIRS = ensure_analysis_dirs()
 _INPUT_DIR = _ANALYSIS_DIRS.input_dir
 _REPORTS_DIR = _ANALYSIS_DIRS.reports_dir
 _OUTPUT_DIR = _ANALYSIS_DIRS.output_dir
+_SELECTION_PREVIEW_WORD_LIMIT = 12
 
 
 def _format_selection_preview(result: PassageResult) -> str:
-    """Return the same extraction preview used by the extraction-only CLI."""
-    return format_extraction_report(result)
+    """Format compact passage units for interactive selection."""
+    unit = "verse" if result.is_verse else "paragraph"
+    plural_unit = unit if len(result.paragraphs) == 1 else f"{unit}s"
+    lines = [
+        f"Source: {result.source}",
+        f"Vagga/Sutta: {result.vagga}",
+        f"Units: {len(result.paragraphs)} {plural_unit}",
+        "",
+    ]
+
+    for index, paragraph in enumerate(result.paragraphs, 1):
+        words = paragraph.split()
+        preview = " ".join(words[:_SELECTION_PREVIEW_WORD_LIMIT])
+        if len(words) > _SELECTION_PREVIEW_WORD_LIMIT:
+            preview = f"{preview}…"
+        lines.append(f"## {unit.title()} {index} ({len(words)} words): {preview}")
+
+    return "\n".join(lines).rstrip()
 
 
 def _parse_selection_indices(raw: str, count: int) -> list[int] | None:

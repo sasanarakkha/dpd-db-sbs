@@ -1,4 +1,4 @@
-"""Verify Stage 1 passage preview parity and multi-select parsing."""
+"""Verify Stage 1 passage preview truncation and multi-select parsing."""
 
 from exporter.analysis.passage_extraction import format_extraction_report
 from exporter.analysis.study_passage import (
@@ -9,7 +9,41 @@ from exporter.analysis.study_passage import (
 from exporter.analysis.passage_by_code import PassageResult
 
 
-def test_format_selection_preview_matches_extraction_preview() -> None:
+def test_format_selection_preview_truncates_long_units() -> None:
+    result = PassageResult(
+        source="AN3.12",
+        vagga="rathakāravaggo, sāraṇīyasuttaṃ",
+        paragraphs=[
+            "one two three four five six seven eight nine ten eleven twelve "
+            "thirteen fourteen",
+        ],
+        is_verse=False,
+    )
+
+    preview = _format_selection_preview(result)
+
+    assert (
+        "## Paragraph 1 (14 words): one two three four five six seven eight "
+        "nine ten eleven twelve…"
+    ) in preview
+    assert "thirteen fourteen" not in preview
+
+
+def test_format_selection_preview_keeps_short_units_untruncated() -> None:
+    result = PassageResult(
+        source="DHP1",
+        vagga="yamakavaggo",
+        paragraphs=["one two three"],
+        is_verse=True,
+    )
+
+    preview = _format_selection_preview(result)
+
+    assert "## Verse 1 (3 words): one two three" in preview
+    assert "…" not in preview
+
+
+def test_format_selection_preview_header_matches_extraction_preview() -> None:
     result = PassageResult(
         source="AN3.12",
         vagga="rathakāravaggo, sāraṇīyasuttaṃ",
@@ -20,7 +54,10 @@ def test_format_selection_preview_matches_extraction_preview() -> None:
         is_verse=False,
     )
 
-    assert _format_selection_preview(result) == format_extraction_report(result)
+    selection_header = _format_selection_preview(result).splitlines()[:3]
+    extraction_header = format_extraction_report(result).splitlines()[:3]
+
+    assert selection_header == extraction_header
 
 
 def test_parse_selection_indices_supports_ranges_and_mixed_input() -> None:
