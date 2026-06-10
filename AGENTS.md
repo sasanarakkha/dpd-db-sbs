@@ -67,7 +67,19 @@ Existing tables have extra `*_ru` columns (e.g., `root_ru_meaning`, `html_ru`).
 - The SMD `Category` line MUST exactly match the `registry.json` category. Do not rely on memory or chat context; update the registry and SMD while making the code change.
 
 ## Engineering Standards
-- **Request Scope Discipline:** Only implement the change explicitly requested by the user. Do not make adjacent improvements, cleanups, restorations, formatting changes, or "while here" fixes unless the user asked for them. If an unrequested change seems useful, necessary, or safer, stop and ask before implementing it.
+- **Request Scope Boundary (Hard Stop):** Only implement the exact change
+  explicitly requested by the user. Do not make adjacent improvements,
+  cleanups, restorations, formatting changes, test rewrites, dependency
+  changes, workflow changes, or "while here" fixes unless the user explicitly
+  asked for them.
+- If an unrequested edit appears useful, necessary, safer, or required to make
+  progress, HARD STOP before editing. Explain the out-of-scope edit, why it is
+  needed, which files or behavior it would affect, and ask for explicit
+  approval. No approval means no change; either continue with an in-scope
+  approach or report the blocker.
+- Do not infer permission from urgency, broken nearby code, failing unrelated
+  tests, quality preferences, or previous similar work. Scope expansion always
+  requires explicit user approval first.
 - **Surgical Logic Layering**: Avoid rewriting core logic in shadow copies. Layer localized changes (RU/SBS) clearly on top of the original structure for easy sync.
 - **Namespace Isolation**:
   - **Tier 1 (Upstream copy)**: Exact upstream name, NO markers.
@@ -78,9 +90,30 @@ Existing tables have extra `*_ru` columns (e.g., `root_ru_meaning`, `html_ru`).
 - **UI Migrations**: When migrating UI or logging (e.g., to `printer.py`), perform a "runtime sweep" to catch undefined variables (`NameError`) in callbacks or rarely-triggered code paths.
 
 ## Clean Root Folder Protocol
-- The root directory MUST remain free of temporary scripts, logs, and artifacts.
+- The repository root is NOT a scratch area. Never create ad hoc scripts, logs,
+  transcripts, dumps, downloaded files, generated reports, test probes, or
+  temporary artifacts in the root directory.
+- All temporary or scratch work MUST live under `temp/`, preferably in a
+  descriptive subdirectory such as `temp/<task_name>/`.
+- `temp/` is disposable trashcan storage, not project memory. Temporary files
+  that have fulfilled their purpose MUST be deleted before the final response.
+  Do not keep temporary files for handoff; durable state belongs in the
+  appropriate tracked file, such as a test, source file, `kamma/threads/*`, or
+  project documentation.
+- All tests MUST live under `tests/` or an existing nested test package inside
+  `tests/`. Do not create root-level `test_*.py`, probe scripts, fixtures, or
+  test output files.
+- Before reporting work complete, run `git status --short` and verify there are
+  no new root-level untracked scratch files. Move or remove agent-created
+  scratch files before the final response.
 - Run `tests/test_shadow_cleanup.py` during Sync/Cleanup to identify orphaned files. Archive unused scripts to `scripts/dps_archive/` and others to `archive/dps/`.
 - Re-map or promote STILL IN USE orphans in `kamma/upstream_sync/registry.json`.
+
+## Commit Scope
+- When planning, preparing, or discussing commits, never suggest staging or
+  committing `resources/` submodule pointer changes unless the user explicitly
+  asks for submodule updates. If `git status` shows dirty `resources/*`
+  submodules, report them separately as excluded from the proposed commit scope.
 
 ## Atomic Rename Protocol
 Renames/moves are atomic. You MUST:

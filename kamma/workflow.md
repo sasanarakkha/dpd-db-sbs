@@ -4,6 +4,15 @@
 
 1. **The Plan is the Source of Truth:** All work must be tracked in `plan.md`.
 2. **Task Sequentiality:** Choose the next available task from `plan.md` in sequential order.
+3. **Scope Hard Stop:** Implement only what the user explicitly requested and
+   what the active plan/spec explicitly requires. If any unrequested edit seems
+   useful, necessary, safer, or required to proceed, stop before editing and ask
+   the user for explicit approval. Without approval, do not make that edit.
+4. **Root Hygiene:** The repository root is never a scratch directory. Temporary
+   scripts, logs, probes, transcripts, dumps, and generated artifacts must go
+   under `temp/`. Tests must go under `tests/`. Treat `temp/` as disposable
+   trashcan storage: delete temporary files once they have fulfilled their
+   purpose.
 
 
 ## Task Lifecycle (TDD)
@@ -17,7 +26,11 @@ All tasks follow a strict lifecycle:
 3. **Green Phase (Implementation):** Write minimum code to pass tests.
 4. **Refactor Phase:** Clean up code while keeping tests green.
 5. **Empirical Validation:** Run the script against a real test target and verify output. Confirm all **Quality Gates** pass.
-6. **Completion:** Mark task as complete `[x]` in `plan.md`. Do NOT commit yet.
+6. **Root Hygiene Check:** Run `git status --short` and confirm no new
+   root-level untracked scratch files were created. Move or remove any
+   agent-created scratch files before completion. Delete temporary files in
+   `temp/` once they have fulfilled their purpose; do not keep them for handoff.
+7. **Completion:** Mark task as complete `[x]` in `plan.md`. Do NOT commit yet.
 
 ### Phase Completion Verification and Checkpointing Protocol
 
@@ -62,6 +75,11 @@ Before marking any task complete, verify:
       parallel bash calls spawn concurrent processes and cause macOS memory
       explosions (91 GB+). Enforced by `~/.claude/hooks/guard_pytest.sh`.**
 - [ ] **Structural Integrity**: For all renames/moves, confirmed via `grep` that 100% of references (imports, scripts, workflows, docs) are updated.
+- [ ] **Root Hygiene**: No new temporary scripts, logs, probes, transcripts,
+      dumps, generated reports, fixtures, or test output files exist in the
+      repository root. Scratch artifacts are in `temp/`; tests are in `tests/`.
+      Temporary files in `temp/` that have fulfilled their purpose are deleted,
+      not kept as hidden handoff state.
 - [ ] Code follows project style guides (see `conductor/code_styleguides/`).
 - [ ] No security vulnerabilities introduced.
 - [ ] Documentation updated if needed.
@@ -142,6 +160,13 @@ uv run pytest tests/test_<specific>.py -v
 - Test both success and failure cases.
 
 ## Commit Guidelines (For User)
+
+### Submodule Scope
+When preparing commit plans, checkpoint commits, draft commit messages, or any
+discussion of what to commit, exclude `resources/` submodule pointer changes by
+default. Mention dirty `resources/*` submodules separately and never suggest
+staging or committing them unless the user explicitly asks for submodule
+updates.
 
 ### Message Format
 ```

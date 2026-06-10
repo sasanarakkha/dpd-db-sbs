@@ -28,8 +28,15 @@ GUI onboarding workflow.
 - **Inspired-by Files**: Files in the `inspired_by_upstream` category may diverge from upstream structure but must document the `divergence_reason` in the registry and explain the divergence in their SMD.
 - **Upstream Sync Workflow**: All sync operations MUST follow the 5-Stage workflow defined in `kamma/upstream_sync/guide.md`. This includes Stage 4 (Docs Translation Parity) which ensures `docs_rus/` stays in sync with `docs/` using the `check_docs_parity.py` tool.
 - All changes must pass `ruff check --fix` and `ruff format` before completion.
-- The root directory must stay clean — no temporary scripts or artifacts.
-- **No Inline Scripting**: NEVER use `python -c "..."` or `python3 -c "..."` in Bash. If you need a one-shot script, write it to `temp/<descriptive_name>.py` and run `uv run python temp/<descriptive_name>.py`. Delete the file when done.
+- The root directory must stay clean. Never write temporary scripts, logs,
+  probes, transcripts, dumps, generated reports, fixtures, or test output files
+  to the repository root.
+- All temporary or scratch artifacts belong under `temp/`. `temp/` is
+  disposable trashcan storage: delete temporary files once they have fulfilled
+  their purpose. Anything that must survive belongs in an appropriate tracked
+  source, test, `kamma/threads/*`, or documentation file instead.
+- All tests belong under `tests/` or an existing nested test package inside
+  `tests/`.
 - **Atomic Rename Protocol**: Renames/moves are atomic. All imports, paths, scripts, registries, and docs MUST be updated and staged in the same commit as the `git mv`.
 - **Mandatory UI Tooling**: All Python scripts MUST use `tools.printer` (`pr`) for console output (UI, status, timing) instead of standard `print()`. Use `pr.tic()` / `pr.toc()` for script-level timing and `pr.bip()` / `pr.yes()` etc. for step-level timing. Standard `print()` is only allowed for outputting structured data intended for piping or when explicitly marked as debug (e.g., using `icecream`).
 - Releases are time-boxed to Uposatha days (~monthly).

@@ -153,3 +153,5 @@ agents
 skills
 memory
 NOTES.md
+dpd.db-shm
+dpd.db-wal
