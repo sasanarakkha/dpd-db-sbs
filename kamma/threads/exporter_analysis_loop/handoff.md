@@ -1,117 +1,384 @@
 # Handoff: exporter_analysis_loop
 
 ## Current Status
-- Thread scaffold created.
-- Issues 1, 2, 3, 4, 5, and 6 have been implemented and locally verified.
-- Future sessions should handle one reported issue per session.
-- Implementation must not start until the per-issue plan is explicitly approved.
-- `plan.md` is an ongoing feedback-loop plan, not a one-time completion plan.
-- The loop instructions in `plan.md` are plain bullets, not completable checkbox tasks.
-- Record completed work only in this handoff. Keep `plan.md` stable; do not append per-issue history there.
+- This is an ongoing Kamma feedback-loop thread for `exporter/analysis/` under GitHub issue
+  `#197`.
+- This file is now a historical handoff for old sessions, not an execution queue.
+- Issues 1-20 are implemented. No approved queued finding remains.
+- Latest preparation-only live-run evidence was added on 2026-06-10 for
+  `TH66`, `DHP77`, `AN4.43_p1`, `MN122_p2`, and `DN2_p3`; see
+  "Live Debug Prep Session - 2026-06-10" below.
+- For the next session, ask the user for one concrete `exporter/analysis/` issue, inspect
+  current source/tests, propose a focused plan, and stop for explicit approval before edits.
+- 2026-06-10: Finding 11 was implemented as Issue 20. Findings 12-14 remain in
+  `kamma/threads/exporter_analysis_loop/findings_11_14_plans.md` and are PENDING USER
+  APPROVAL — do not implement without it; one finding per session.
+- Keep `plan.md` stable. Do not add recurring task-list checkboxes to this loop thread.
 
-## Completed Issues
-- Issue 1: added `UD` and `ITI` passage-code support for `exporter/analysis/`.
-  - Report: `uv run python exporter/analysis/study_passage.py` rejected `UD12` with `Unknown or unsupported prefix: 'UD'`.
-  - Approved approach: add failing indexed-verse tests for `UD12` and `ITI37`, map `UD -> kn3` and `ITI -> kn4`, classify both as verse-style sources, update CLI examples, then run targeted tests, ruff, and extraction smoke checks.
-  - Changed `exporter/analysis/passage_by_code.py` to map `UD -> kn3`, `ITI -> kn4`, and treat both as verse-style sources.
-  - Updated CLI examples in `exporter/analysis/study_passage.py` and `exporter/analysis/passage_extraction.py`.
-  - Added focused tests in `tests/exporter/analysis/test_passage_by_code.py`.
-  - Outcome: `UD` and `ITI` are now accepted passage prefixes and extract from KN3/KN4 as verse-style passages.
-- Issue 2: filtered synthetic particle-expanded headword candidates from analyzer output.
-  - Report: `UD12_study.md` showed `yañ'ca` as base pronoun `53444`, even though real sandhi headword `53493 yañca` exists.
-  - Approved approach: do not change the database; filter analyzer candidates when lookup rows have `api/ca/eva/iti/iva/hi` deconstructors, preserving direct grammar matches and real sandhi headwords while dropping synthetic base headword noise.
-  - Changed `exporter/analysis/analyzer.py` to classify particle deconstructor rows and keep only real sandhi or direct grammar-supported headword options.
-  - Added focused integration tests in `tests/exporter/analysis/test_analyzer.py` for `yañ'ca`, `yañcidaṃ`, `soḷasinti`, `jānāti`, and `bhavissanti`.
-  - Outcome: `yañ'ca` keeps `53493` and drops base `53444`; deconstructor-only forms still use deconstructor rows; legitimate direct forms like `jānāti` and ambiguous forms like `bhavissanti` keep grammar-supported candidates.
-- Issue 3: printed explicit local JSON analysis progress in `study_passage.py`.
-  - Report: CLI output showed passage retrieval and AI analysis timing, but the local analyzer/JSON preparation stage was invisible.
-  - Approved approach: add optional progress events to `translate_sentence()` and wire only `study_passage.py` to print timed `Building analysis JSON` and `Analyzing '<source>'` stages.
-  - Changed `exporter/analysis/translate_core.py` to emit `json_start`, `json_done`, `ai_start`, and `ai_done` events when a progress callback is supplied.
-  - Changed `exporter/analysis/study_passage.py` to print timed status lines from those events.
-  - Added a focused progress-event test in `tests/exporter/analysis/test_translate_core.py`.
-  - Outcome: `study_passage.py` now shows the missing local analysis stage without changing batch or direct translation callers.
-- Issue 4: fixed `exporter/analysis/` example bolding for database-inflection matches inside compound/sandhi verse tokens.
-  - Report: `UD12_words.csv` bolded `kāma<b>sukha</b>ṃ` instead of `kāma<b>sukhaṃ</b>`, and failed to bold nested `taṇhakkhaya`, `taṇha`, and `khaya` components inside `taṇhakkhayasukhass'ete`.
-  - Approved approach: touch only the bolding utility, rely on database inflections, sort inflections longest-first so bigger matches win, and preserve existing standalone and apostrophe-sandhi behavior.
-  - Changed `exporter/analysis/example_bolding.py` to centralize DB inflection lookup, sort inflections by descending length, prefer DB inflection matches before fallback heuristics, and rediscover the actual verse token from DB inflections when the report parent token is not a standalone verse token.
-  - Added focused tests in `tests/exporter/analysis/test_example_bolding.py` for `sukhaṃ`, `taṇhakkhaya`, `taṇha`, `khaya`, and existing apostrophe behavior.
-  - Correction after user verification: the first implementation did not test `is_first_component=True`, so real export output still over-bolded `29334` and `29346` as `<b>taṇhakkhayasukhass</b>'ete`.
-  - Fixed the DB-inflection apostrophe path so first components expand to the full left side only when the left side is an inflected spelling of the component itself, not when the component is merely a prefix inside a larger compound.
-  - Regenerated `exporter/analysis/output/UD12_words.csv` and verified rows `63456`, `29334`, `29346`, and `23520`.
-  - Outcome: bolding remains inside `example_bolding.py` and now uses the longest available DB inflection present in the actual passage token without over-bolding compound prefixes.
+## Completed History
+- Issue 1: added `UD` and `ITI` passage-code support.
+  - Achieved: `UD12` and `ITI37` are accepted prefixes and extract from KN3/KN4 as
+    verse-style sources.
+  - Main files: `exporter/analysis/passage_by_code.py`,
+    `exporter/analysis/study_passage.py`, `exporter/analysis/passage_extraction.py`,
+    `tests/exporter/analysis/test_passage_by_code.py`.
+  - Validation included focused passage-code tests and extraction smoke checks for `UD12`
+    and `ITI37`.
+
+- Issue 2: filtered synthetic particle-expanded headword candidates.
+  - Achieved: analyzer output keeps real sandhi/direct grammar matches while dropping noisy
+    particle-deconstructor base headwords such as the wrong base candidate for `yañ'ca`.
+  - Main files: `exporter/analysis/analyzer.py`,
+    `tests/exporter/analysis/test_analyzer.py`.
+  - Validation covered `yañ'ca`, `yañcidaṃ`, `soḷasinti`, `jānāti`, and `bhavissanti`.
+
+- Issue 3: printed explicit local JSON analysis progress.
+  - Achieved: `study_passage.py` shows the local analysis stage separately from AI analysis.
+  - Main files: `exporter/analysis/translate_core.py`,
+    `exporter/analysis/study_passage.py`,
+    `tests/exporter/analysis/test_translate_core.py`.
+  - Validation covered progress events and targeted exporter-analysis tests.
+
+- Issue 4: fixed example bolding inside compound/sandhi verse tokens.
+  - Achieved: database-inflection matches such as `sukhaṃ`, `taṇhakkhaya`, `taṇha`, and
+    `khaya` are bolded correctly without over-bolding compound prefixes.
+  - Main files: `exporter/analysis/example_bolding.py`,
+    `tests/exporter/analysis/test_example_bolding.py`.
+  - Validation included focused tests plus regenerated `UD12_words.csv` inspection.
+
 - Issue 5: fixed missing AI-score handling and fallback selection for compound components.
-  - Report: `exporter/analysis/reports/SN12.4_p1-2_study.md` showed `60693 - sammā | nt | cymbal` under `sammāsambuddhassa`, even though the context is clearly `sammā + sambuddha`.
-  - Approved approach: save raw AI debug output, distinguish missing AI scores from explicit zero scores, retry once for option groups with no AI score, treat curated example text overlap as deterministic evidence, add raw `meaning_1` to analyzer options, and make fallback ranking prefer numeric AI scores, curated example overlap, direct keys, sane component POS, and `meaning_1` quality.
-  - Changed `exporter/analysis/translate_core.py` to write debug data through an optional `debug` dict, store missing scores as `None`, retry missing-score groups once, preselect curated example text overlaps, and replace the noun-parent component fallback with deterministic option ranking.
-  - Changed `exporter/analysis/analyzer.py` to emit raw `meaning_1` for headword-derived options so fallback quality does not infer from `meaning_combo`.
-  - Changed `exporter/analysis/study_passage.py` to save `exporter/analysis/output/<source>_ai_debug.json`.
-  - Added focused tests in `tests/exporter/analysis/test_translate_core.py` and `tests/exporter/analysis/test_analyzer.py`.
-  - Outcome: missing AI responses are auditable and represented as `None`; curated example text overlap overrides AI uncertainty; `sammā` component fallback no longer selects `nt cymbal`.
+  - Achieved: missing AI scores are auditable as missing, retryable once, and fallback
+    selection no longer chooses implausible component meanings such as `sammā | nt | cymbal`
+    in `sammāsambuddhassa`.
+  - Main files: `exporter/analysis/translate_core.py`,
+    `exporter/analysis/analyzer.py`, `exporter/analysis/study_passage.py`,
+    `tests/exporter/analysis/test_translate_core.py`,
+    `tests/exporter/analysis/test_analyzer.py`.
+  - Validation included targeted tests, ruff, pyright, and debug artifact generation.
+
 - Issue 6: clipped exported word-card examples to the relevant bolded context.
-  - Report: `exporter/analysis/output/SN12.4_words.csv` examples included the full prose passage instead of only the sentence containing the bolded word; requested rule was one sentence for prose, and maximum four lines for gāthā.
-  - Approved approach: add focused tests for prose and gāthā clipping, clip after existing bolding runs, keep `example_bolding.py` unchanged, and regenerate `SN12.4_words.csv`.
-  - Changed `exporter/analysis/export_words_csv.py` to limit bolded examples to the first prose sentence containing `<b>` or to a four-line gāthā window containing the first bolded line.
-  - Added focused tests in `tests/exporter/analysis/test_export_words_csv.py`.
-  - Regenerated `exporter/analysis/output/SN12.4_words.csv` from `SN12.4_p1-2` with the basic profile.
-  - Outcome: SN12.4 exported examples are one bolded prose sentence each; gāthā examples are constrained to at most four lines around the bolded line.
+  - Achieved: prose exports use the sentence containing the bolded word; gāthā exports use a
+    bounded line window instead of whole passages.
+  - Main files: `exporter/analysis/export_words_csv.py`,
+    `tests/exporter/analysis/test_export_words_csv.py`.
+  - Validation included focused CSV tests and regenerated `SN12.4_words.csv` inspection.
 
-## Pending / Suggested Next Issues
-- Ask the user to manually verify regenerated `UD12` analysis, especially `yañ'ca`, `yañc'idaṃ`, `soḷasin'ti`, and any normal verb/deconstructor ambiguities noticed in context.
-- Wait for the user to report the next `exporter/analysis/` issue in a fresh session.
-- If the user reports multiple unrelated issues, choose the clearest/highest-confidence issue for the current session and defer the rest as next-session suggestions.
+- Issue 7: strengthened AI response handling for wrong-format responses.
+  - Achieved: prompts were tightened, non-contract JSON can go through reformat fallback,
+    and `--debug` can write raw response logs.
+  - Main files: `exporter/analysis/translate_core.py`,
+    `exporter/analysis/study_passage.py`,
+    `tests/exporter/analysis/test_translate_core.py`.
+  - Validation included mocked regression tests and real `study_passage.py --debug` runs.
 
-## Important Context For Next Session
-- Primary scope is `exporter/analysis/`.
-- Likely tests live under `tests/exporter/analysis/`.
-- Related helper files may be touched only when required by the selected issue.
-- Keep history concise. Record what was done, what was tested, remaining risks, and only necessary next-session context.
-- Validation run for Issue 1:
-  - `uv run pytest tests/exporter/analysis/test_passage_by_code.py`
-  - `uv run ruff check exporter/analysis/passage_by_code.py exporter/analysis/study_passage.py exporter/analysis/passage_extraction.py tests/exporter/analysis/test_passage_by_code.py`
-  - `uv run python exporter/analysis/passage_extraction.py UD12`
-  - `uv run python exporter/analysis/passage_extraction.py ITI37`
-- Validation run for Issue 2:
-  - `uv run pytest tests/exporter/analysis/test_analyzer.py`
-  - `uv run pytest tests/exporter/analysis/`
-  - `uv run ruff check exporter/analysis/analyzer.py tests/exporter/analysis/test_analyzer.py`
-- Validation run for Issue 3:
-  - `uv run pytest tests/exporter/analysis/test_translate_core.py`
-  - `uv run pytest tests/exporter/analysis/`
-  - `uv run ruff check exporter/analysis/translate_core.py exporter/analysis/study_passage.py tests/exporter/analysis/test_translate_core.py`
-- Validation run for Issue 4:
-  - `uv run pytest tests/exporter/analysis/test_example_bolding.py`
-  - `uv run pytest tests/exporter/analysis/`
-  - `uv run ruff check exporter/analysis/example_bolding.py tests/exporter/analysis/test_example_bolding.py`
-  - `printf 'UD12\n1\n' | UV_CACHE_DIR=/private/tmp/uv-cache uv run python exporter/analysis/export_words_csv.py`
-  - `rg -n -A2 "^(63456|29334|29346|23520)\t" exporter/analysis/output/UD12_words.csv`
-- Validation run for Issue 5:
-  - `UV_CACHE_DIR=/private/tmp/uv-cache uv run pytest tests/exporter/analysis/test_translate_core.py`
-  - `UV_CACHE_DIR=/private/tmp/uv-cache uv run pytest tests/exporter/analysis/test_analyzer.py`
-  - `UV_CACHE_DIR=/private/tmp/uv-cache uv run pytest tests/exporter/analysis/`
-  - `UV_CACHE_DIR=/private/tmp/uv-cache uv run ruff check exporter/analysis/translate_core.py exporter/analysis/analyzer.py exporter/analysis/study_passage.py tests/exporter/analysis/test_translate_core.py tests/exporter/analysis/test_analyzer.py`
-  - `UV_CACHE_DIR=/private/tmp/uv-cache uv run pyright exporter/analysis/translate_core.py exporter/analysis/analyzer.py exporter/analysis/study_passage.py tests/exporter/analysis/test_translate_core.py tests/exporter/analysis/test_analyzer.py`
-- Validation run for Issue 6:
-  - `UV_CACHE_DIR=/private/tmp/uv-cache uv run pytest tests/exporter/analysis/test_export_words_csv.py -v`
-  - `UV_CACHE_DIR=/private/tmp/uv-cache uv run ruff check --fix exporter/analysis/export_words_csv.py tests/exporter/analysis/test_export_words_csv.py`
-  - `UV_CACHE_DIR=/private/tmp/uv-cache uv run ruff format exporter/analysis/export_words_csv.py tests/exporter/analysis/test_export_words_csv.py`
-  - `UV_CACHE_DIR=/private/tmp/uv-cache uv run pyright exporter/analysis/export_words_csv.py tests/exporter/analysis/test_export_words_csv.py`
-  - `printf 'SN12.4_p1-2\n1\n' | UV_CACHE_DIR=/private/tmp/uv-cache uv run python exporter/analysis/export_words_csv.py`
-  - `UV_CACHE_DIR=/private/tmp/uv-cache uv run python temp/check_sn124_examples.py` (temporary script deleted after it confirmed all SN12.4 examples contain bold, no newline, and no multiple prose sentences)
+- Issue 8 / Finding 1: accepted compact `{surface_word: option_key}` maps.
+  - Achieved: antigravity's common compact map response can be used directly, deriving score
+    selections and using a lighter translation-only follow-up.
+  - Main files: `exporter/analysis/translate_core.py`,
+    `tests/exporter/analysis/test_translate_core.py`.
+  - Validation included focused map-path tests and live passage analysis.
 
-## Errors / Issues / Repeated Mistakes
-- Initial red phase failed as expected for `UD12` and `ITI37` with `Unknown or unsupported prefix`.
-- `rg` checks referenced legacy paths from the thread spec that no longer exist (`tools/passage_by_code.py`, `scripts/change_in_db/preview_dhp_changes.py`, `scripts/change_in_db/fill_dhp_examples.py`); no code change was needed for those missing files.
-- Previous session marked recurring Phase 4 and Phase 5 loop tasks as complete after Issue 1. That was incorrect for this standing feedback loop.
-- Do not add recurring markdown task-list markers to the loop plan; they invite future agents to complete the loop instead of continuing it.
-- Initial Issue 2 assumption focused too much on markdown tie-breaking. The source JSON showed `53493` was present but unscored; deeper review showed the better fix was analyzer candidate filtering before AI scoring.
-- The old particle-deconstructor skip rule was too broad: it removed valid direct grammar matches like `jānāti`. The corrected rule preserves direct grammar-supported candidates and real sandhi headwords.
-- Issue 4 red phase failed as expected for shorter `sukha` winning over `sukhaṃ` and for `khaya` not being found as a component inside `taṇhakkhayasukhass'ete`.
-- During Issue 4 implementation, an initial guard checked raw substring presence, so `khaya` was treated as present even though it was not a standalone verse token. The fix changed that guard to compare against parsed verse tokens.
-- During Issue 4 inspection, a shell `sed` read command was used despite the global rule prohibiting `sed`/`awk` bash commands. Avoid `sed` in future sessions.
-- Initial Issue 4 completion was reported after tests only, without regenerating and inspecting `UD12_words.csv`. That was wrong for an output bug. Always regenerate and inspect the reported artifact before claiming success.
-- Initial Issue 4 tests missed the real exporter state where `29334` and `29346` are `is_first_component=True`, so they failed to catch over-bolding. Add tests that match real parsed/exported flags.
-- First regeneration attempt failed because `uv` tried to use `/Users/deva/.cache/uv`, which is blocked in this sandbox. Retried successfully with `UV_CACHE_DIR=/private/tmp/uv-cache`.
-- Issue 5 red phase failed as expected for missing-score `0` defaults, source-only example matching, absent retry/debug support, component fallback selecting `samma 2 / cymbal`, and missing raw `meaning_1`.
-- Required protocol path `/Users/deva/agents/protocol-fix.md` was missing; the same protocol existed at `agents/protocol-fix.md` and `/Users/deva/.agents/protocol-fix.md`, so work proceeded using that protocol.
-- Issue 6 red phase failed as expected with `ImportError: cannot import name '_clip_example_to_bold_context'`.
-- During Issue 6 output inspection, an `rg` command attempted to match a literal newline without multiline mode and failed; verification continued with a temporary CSV parser script instead.
+- Issue 9 / Finding 2: raised the global AI request cap from 60s to 150s.
+  - Achieved: working CLI responses that exceed 60 seconds no longer fail prematurely.
+  - Main files: `tools/ai_manager.py`, related tests.
+  - Validation included focused tests and live TH52 evidence that the previous cap was too
+    short.
+
+- Issue 10: added per-model timeout support and set antigravity timeout to 90s.
+  - Achieved: `antigravity_cli` gets an effective hard kill near 100s instead of inheriting
+    the global 150s cap plus subprocess margin.
+  - Main files: `tools/ai_manager.py`, `tools/ai_models.json`,
+    `tools/ai_antigravity_cli.py`, related tests.
+  - Validation included timeout tests and live provider behavior.
+
+- Issue 11 / Finding 3B: fixed the missing-scores retry schema prompt.
+  - Achieved: retry responses are instructed to return `{"score": N}` objects and to include
+    `contextual_meaning` for `decon_` keys.
+  - Main files: `exporter/analysis/translate_core.py`,
+    `tests/exporter/analysis/test_translate_core.py`.
+  - Validation included prompt-shape regression tests.
+
+- Issue 12 / Finding 3A: handled nested `{"disambiguation": {...}}` maps.
+  - Achieved: nested disambiguation maps use the same translation-only word-key path as flat
+    maps.
+  - Main files: `exporter/analysis/translate_core.py`,
+    `tests/exporter/analysis/test_translate_core.py`.
+  - Validation included unit coverage. Important caveat: one live smoke passed through a
+    fallback path and did not prove this exact nested-map path live.
+
+- Issue 13 / Finding 4: preserved AI metadata when deterministic scoring overrides score.
+  - Achieved: deterministic `db_example_match` score/source overrides do not discard useful
+    AI `contextual_meaning` and `selected_pos` from full-schema responses.
+  - Main files: `exporter/analysis/translate_core.py`,
+    `tests/exporter/analysis/test_translate_core.py`.
+  - Validation included targeted regression tests.
+
+- Issue 14 / Finding 6: added contextual meanings to the compact word-key map path.
+  - Achieved: compact map responses now request and apply short contextual meanings before
+    deterministic DB-example scoring, so mapped rows do not fall back to verbose DB glosses.
+  - Main files: `exporter/analysis/translate_core.py`,
+    `tests/exporter/analysis/test_translate_core.py`.
+  - Validation included red/green tests and a live TH50 run that exercised the compact map
+    path.
+
+- Issue 15: removed the deprecated `gemini_cli` provider.
+  - Achieved: deleted the dead `tools/ai_gemini_cli.py` provider, removed
+    `gemini_cli_work_models`, and removed provider initialization from `AIManager`.
+  - Main files: `tools/ai_gemini_cli.py` deleted, `tools/ai_models.json`,
+    `tools/ai_manager.py`, `tests/tools/test_ai_manager.py`.
+  - Validation passed ruff, pyright, pyrefly, focused `tests/tools/test_ai_manager.py`, and a
+    source sweep. The only tolerated remaining `gemini_cli` string was a historical output
+    artifact: `exporter/analysis/output/TH52_ai_debug.json`.
+
+- Issue 16 / Finding 7: compacted dictionary-context JSON.
+  - Achieved: first prompts and missing-scores retry prompts use
+    `json.dumps(..., separators=(",", ":"))`, reducing prompt size by roughly 24-36%.
+  - Main files: `exporter/analysis/translate_core.py`,
+    `tests/exporter/analysis/test_translate_core.py`.
+  - Validation passed ruff, format, pyright, pyrefly, full
+    `tests/exporter/analysis/test_translate_core.py`, and live TH50 plus MN12 paragraph 2
+    gates. MN12_p2 system prompt size after the change was 509,171 chars.
+
+- Issue 17 / Finding 8: added pre-flight argv-size guard for `antigravity_cli`.
+  - Achieved: prompts over 700,000 UTF-8 bytes fail immediately with a provider error before
+    `agy` lookup/spawn, avoiding macOS `E2BIG` crashes.
+  - Main files: `tools/ai_antigravity_cli.py`,
+    `tests/tools/test_ai_antigravity_cli.py`.
+  - Validation passed ruff, format, pyright, pyrefly, focused tests, and a live AN4.12
+    paragraph 1 gate where the guard triggered and fallback completed.
+
+- Issue 18 / Finding 9: kept failed-provider details in fallback success statuses.
+  - Achieved: when one provider fails and a later provider succeeds, the success
+    `status_message` now includes the earlier failed attempt details while preserving the
+    clean-success format when there were no prior failures.
+  - Main files: `tools/ai_manager.py`, `tests/tools/test_ai_manager.py`.
+  - Validation passed ruff, format, pyright, pyrefly, and focused
+    `tests/tools/test_ai_manager.py`.
+
+- Issue 19 / Finding 10: shortened the interactive passage-selection preview.
+  - Achieved: `study_passage.py` selector prints the same header as extraction preview, then
+    one counted, truncated line per unit; extraction-only full previews are unchanged.
+  - Main files: `exporter/analysis/study_passage.py`,
+    `tests/exporter/analysis/test_study_passage.py`.
+  - Validation passed red/green truncation test, ruff, format, pyright, pyrefly, focused
+    `tests/exporter/analysis/test_study_passage.py`, and a live DN14 paragraph 3 gate. The
+    first live attempt hit the known uv cache permission issue; rerun with
+    `UV_CACHE_DIR=/private/tmp/uv-cache` passed.
+
+- Issue 20 / Finding 11: classified `agy` timeout/auth stdout as provider failure.
+  - Achieved: short single-line `Error:` responses and Google OAuth login prompts printed
+    by `agy` on stdout with exit code 0 now become `AntigravityCliProviderError`, allowing
+    `AIManager` fallback instead of treating them as successful model content.
+  - Main files: `tools/ai_antigravity_cli.py`,
+    `tests/tools/test_ai_antigravity_cli.py`.
+  - Validation passed red/green tests, ruff check --fix, ruff format, pyright, pyrefly, and
+    focused `tests/tools/test_ai_antigravity_cli.py`.
+  - No live smoke was run; the approved plan marked it optional and not deterministic for
+    the error-classification path.
+
+## Live Debug Prep Session - 2026-06-10
+- Purpose: preparation evidence for a later advanced-model analysis, not an approved code
+  change. No source or test files were edited. `plan.md` was left stable.
+- Requested latest targets superseded the earlier interrupted target list:
+  `TH66`, `DHP77`, `AN4.43` paragraph 1, `MN122` paragraph 2, and `DN2` paragraph 3.
+- Extraction previews confirmed target units:
+  - `TH66`: 1 verse.
+  - `DHP77`: 1 verse.
+  - `AN4.43`: 6 paragraphs; selected paragraph 1.
+  - `MN122`: 25 paragraphs; selected paragraph 2.
+  - `DN2`: 117 paragraphs; selected paragraph 3.
+- Commands run, each as a separate `study_passage.py --debug` invocation:
+  - `printf 'TH66\n' | UV_CACHE_DIR=/private/tmp/uv-cache uv run python exporter/analysis/study_passage.py --debug`
+  - `printf 'DHP77\n' | UV_CACHE_DIR=/private/tmp/uv-cache uv run python exporter/analysis/study_passage.py --debug`
+  - `printf 'AN4.43\n1\n' | UV_CACHE_DIR=/private/tmp/uv-cache uv run python exporter/analysis/study_passage.py --debug`
+  - `printf 'MN122\n2\n' | UV_CACHE_DIR=/private/tmp/uv-cache uv run python exporter/analysis/study_passage.py --debug`
+  - `printf 'DN2\n3\n' | UV_CACHE_DIR=/private/tmp/uv-cache uv run python exporter/analysis/study_passage.py --debug`
+- Artifact references:
+  - Markdown reports: `exporter/analysis/reports/TH66_study.md`,
+    `exporter/analysis/reports/DHP77_study.md`,
+    `exporter/analysis/reports/AN4.43_p1_study.md`,
+    `exporter/analysis/reports/MN122_p2_study.md`,
+    `exporter/analysis/reports/DN2_p3_study.md`.
+  - Raw AI logs: `exporter/analysis/reports/TH66_ai_raw.txt`,
+    `exporter/analysis/reports/DHP77_ai_raw.txt`,
+    `exporter/analysis/reports/AN4.43_p1_ai_raw.txt`,
+    `exporter/analysis/reports/MN122_p2_ai_raw.txt`,
+    `exporter/analysis/reports/DN2_p3_ai_raw.txt`.
+  - Debug JSON: `exporter/analysis/output/TH66_ai_debug.json`,
+    `exporter/analysis/output/DHP77_ai_debug.json`,
+    `exporter/analysis/output/AN4.43_p1_ai_debug.json`,
+    `exporter/analysis/output/MN122_p2_ai_debug.json`,
+    `exporter/analysis/output/DN2_p3_ai_debug.json`.
+  - Study JSON: `exporter/analysis/output/TH66_study.json`,
+    `exporter/analysis/output/DHP77_study.json`,
+    `exporter/analysis/output/AN4.43_p1_study.json`,
+    `exporter/analysis/output/MN122_p2_study.json`,
+    `exporter/analysis/output/DN2_p3_study.json`.
+
+### Prep Findings
+- `TH66`:
+  - First, reformat, and retry requests all went through
+    `antigravity_cli/Gemini 3.5 Flash (High)`.
+  - Prompt sizes from debug JSON: system prompt 244,652 bytes; user prompt 177 bytes;
+    retry prompt 181,821 bytes.
+  - First response status: `SUCCESS in 87.83s`; raw response used an ad-hoc
+    `sentence` + `disambiguation` shape and covered only the opening phrase, not the full
+    six-line verse.
+  - Reformat status: `SUCCESS in 35.96s`, but debug recorded parse error
+    `Expecting value: line 1 column 1 (char 0)`.
+  - Pre-retry missing scores: 56 groups / 362 keys. Retry status:
+    `SUCCESS in 27.82s`; retry returned a usable `scores` object with 54 entries.
+  - Generated report has empty `Translation` and `Literal Translation`.
+
+- `DHP77`:
+  - First, reformat, and retry requests all went through
+    `antigravity_cli/Gemini 3.5 Flash (High)`.
+  - Prompt sizes: system prompt 75,585 bytes; user prompt 108 bytes; retry prompt
+    16,129 bytes.
+  - First response status: `SUCCESS in 19.25s`; raw response used an ad-hoc
+    `sentence` + nested `disambiguation` shape.
+  - Reformat status: `SUCCESS in 38.71s`; reformat succeeded with
+    `translation`, `literal_translation`, and `scores`.
+  - Pre-retry missing scores: 7 groups / 35 keys. Retry status:
+    `SUCCESS in 15.03s`; retry returned a usable `scores` object with 32 entries.
+  - Generated report includes non-empty translation and literal translation.
+
+- `AN4.43_p1`:
+  - The script attempted antigravity first, but the preflight argv guard blocked the first
+    call before launching `agy`: 1,365,996 bytes > 700,000.
+  - The first request then completed through fallback provider chain in 121.72s. The
+    debug status preserved the failed antigravity attempt but the success portion reads
+    only `Success in 121.72s`, without a clear provider name.
+  - Prompt sizes from debug JSON: system prompt 1,365,423 bytes; user prompt 292 bytes;
+    retry prompt 723,139 bytes. The retry antigravity wrapper size was 723,466 bytes, so
+    it also hit the argv guard before launching `agy`.
+  - First fallback response used the expected top-level contract
+    `translation`, `literal_translation`, and `scores`; no reformat section was written.
+  - Pre-retry missing scores: 168 groups / 1,506 keys. Retry fallback status:
+    `SUCCESS in 73.71s`, but the raw retry response was a flat key-score map without the
+    required top-level `scores` wrapper, so it contributed 0 usable retry scores.
+  - Generated report includes non-empty translation and literal translation.
+  - Important distinction: this run is evidence for the antigravity prompt-size guard and
+    fallback behavior, not live `agy` subprocess quality for this passage.
+
+- `MN122_p2`:
+  - First, reformat, and retry requests all went through
+    `antigravity_cli/Gemini 3.5 Flash (High)`.
+  - Prompt sizes: system prompt 469,499 bytes; user prompt 666 bytes; retry prompt
+    201,208 bytes.
+  - First response status: `SUCCESS in 23.96s`; raw response used
+    `sentence`, `disambiguation`, and `translation`, and covered only the opening sentence
+    up through `cīvarakammaṃ`, not the whole selected paragraph.
+  - Reformat status: `SUCCESS in 13.91s`; reformat succeeded with the expected top-level
+    keys.
+  - Pre-retry missing scores: 88 groups / 399 keys. Retry status:
+    `SUCCESS in 98.84s`, but raw retry content was `Error: timed out waiting for response`;
+    it contributed 0 usable retry scores.
+  - Generated report translation covers only the opening sentence, while the analyzed
+    passage has 64 tokens.
+
+- `DN2_p3`:
+  - First, reformat, and retry requests all went through
+    `antigravity_cli/Gemini 3.5 Flash (High)`.
+  - Prompt sizes: system prompt 689,777 bytes; user prompt 495 bytes; retry prompt
+    492,995 bytes. This first prompt is close to the 700,000-byte antigravity guard but
+    still launched.
+  - First response status: `SUCCESS in 24.74s`; raw response used an ad-hoc
+    `sentence_analysis` shape with `selected_key` fields and partial coverage of the
+    passage.
+  - Reformat status: `SUCCESS in 14.50s`; reformat succeeded with the expected top-level
+    keys.
+  - Pre-retry missing scores: 109 groups / 955 keys. Retry status:
+    `SUCCESS in 98.92s`, but raw retry content was `Error: timed out waiting for response`;
+    it contributed 0 usable retry scores.
+  - Generated report includes non-empty full-paragraph translation and literal
+    translation, but final score coverage remained very sparse.
+
+### Candidate Issues For Advanced Analysis
+- Antigravity wrong-contract first responses remain frequent. Fresh evidence includes
+  `disambiguation` lists/maps, `sentence_analysis`, and first responses that cover only an
+  opening clause/sentence.
+- Some retry calls are classified as `SUCCESS` even when raw antigravity content is
+  `Error: timed out waiting for response`. This looks like provider-output classification,
+  not model-quality analysis.
+- Missing-score retry handling may silently waste successful-looking responses:
+  `AN4.43_p1` returned a flat key-score map without `scores`, and `MN122_p2`/`DN2_p3`
+  returned timeout text; all three contributed 0 usable retry scores.
+- `AN4.43_p1` shows that selected prose paragraphs can exceed the argv guard even after
+  compact JSON. It completed by fallback, not by actual `agy` subprocess.
+- Debug JSON caveat: original raw response shape should be read from `*_ai_raw.txt`.
+  `debug["parsed_response"]` and related parsed dicts are mutable objects in the current
+  code path and can be misleading after later normalization or fallback mutation.
+
+## Inactive / Not Approved / Do Not Execute Automatically
+- Finding 5, Pāḷi grammar accuracy:
+  - Status: deferred indefinitely unless the user explicitly asks to revisit it.
+  - Reason: observed grammar mistakes and non-determinism look like model-quality behavior,
+    not a straightforward deterministic code bug.
+  - Examples seen: near-identical TH51/TH52 verses parsed the same words differently; `me`
+    was tagged instr/acc instead of gen/dat; TH52 `kāye` was tagged masc acc pl instead of
+    loc sg; `sukhā` varied between correct fem nom sg and wrong masc nom pl.
+
+- Wrong-schema first responses correlate with prompt size:
+  - Status: observation only, not a queued fix.
+  - Evidence: DHP30 around 30 KB returned the expected contract schema; larger prompts such
+    as TH40, DN14_p3, and MN12_p2 returned valid but ad-hoc JSON schemas covering only the
+    opening clause.
+  - Existing reformat plus missing-scores retry recovered those runs. Do not add chunking,
+    example trimming, or prompt-shape redesign without a new issue and explicit approval.
+
+- Example/context trimming and chunking:
+  - Status: out of scope for completed findings.
+  - Reason: examples are large, but they support disambiguation quality. Any trimming is a
+    quality tradeoff and needs a separate plan.
+
+## Future-Session Guardrails
+- One issue per session by default. If the user reports several unrelated issues, choose one
+  and explicitly defer the rest.
+- Do not implement before a focused per-issue plan is approved.
+- Read current source and tests before describing behavior. Do not trust this handoff for
+  line numbers or exact current code shape.
+- For Python changes, run exact-file quality gates: `ruff check --fix`, `ruff format`,
+  `pyright`, `pyrefly`, and targeted pytest.
+- Never run bare `uv run pytest`; always pass a specific test path.
+- If `uv run ...` fails on `/Users/deva/.cache/uv` permissions, retry with
+  `UV_CACHE_DIR=/private/tmp/uv-cache`.
+- Use `study_passage.py --debug` for live AI checks. It writes
+  `reports/<source>_ai_raw.txt` and `output/<source>_ai_debug.json`.
+- Do not claim live proof when the live run only exercised fallback behavior. Record which
+  provider path actually ran.
+- For original AI response shape, prefer `reports/<source>_ai_raw.txt` over
+  `output/<source>_ai_debug.json` parsed-response fields.
+- Watch for `Error: timed out waiting for response` in antigravity stdout; current live
+  evidence shows it can be logged under a success status and then parse as zero usable
+  scores.
+- `AIManager.request(provider_preference=...)` only constrains provider when a model is also
+  supplied; provider preference alone can fall through to the default model list.
+- Effective antigravity hard kill is model timeout plus 10 seconds. With a 90s model timeout,
+  expect termination near 100s.
+- For user-visible output bugs, regenerate and inspect the relevant artifact before claiming
+  completion.
+- For this loop thread, keep `plan.md` stable and keep issue history in `handoff.md`.
+
+## Useful Historical Artifacts
+- Debug JSON and raw logs from analysis runs may exist under:
+  - `exporter/analysis/output/*_ai_debug.json`
+  - `exporter/analysis/reports/*_ai_raw.txt`
+  - `exporter/analysis/reports/*_study.md`
+- Particularly useful old evidence:
+  - `TH50`: compact map path and contextual-meaning validation.
+  - `TH52`: old `gemini_cli` historical artifact and timeout evidence.
+  - `AN4.12_p1`: oversized prompt / argv guard / fallback status evidence.
+  - `MN12_p2`: compact prompt size and wrong-schema recovery evidence.
+  - `DN14_p3`: interactive selector preview and wrong-schema recovery evidence.
+  - `TH66`: fresh wrong-schema + failed reformat + empty translation evidence.
+  - `DHP77`: fresh wrong-schema + successful reformat/retry evidence.
+  - `AN4.43_p1`: fresh argv-guard + fallback + flat retry-map evidence.
+  - `MN122_p2`: fresh partial first response + retry timeout-content evidence.
+  - `DN2_p3`: fresh near-guard antigravity launch + `sentence_analysis` + retry
+    timeout-content evidence.
+
+## Review Readiness
+- No approved implementation task remains in this handoff.
+- If the user says all `exporter/analysis/` issues are resolved, the next process step is
+  `/kamma:3-review` for `kamma/threads/exporter_analysis_loop`.
