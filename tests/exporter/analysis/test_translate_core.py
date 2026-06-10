@@ -1,6 +1,6 @@
 """Test Pāḷi passage variant handling in AI analysis reports."""
 
-from typing import cast
+from typing import Any, cast
 
 import pytest
 
@@ -500,6 +500,38 @@ def test_translate_sentence_retry_accepts_flat_score_map(
 
     component_options = result["analysis"][0]["data"][0]["components"][0]
     assert component_options[1]["ai_score"] == 10
+
+
+def test_debug_parsed_response_is_snapshot_not_live_reference(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[str] = []
+    _patch_sammasambuddhassa_analysis(monkeypatch)
+
+    class FakeAIManager:
+        def request(self, **kwargs: Any) -> object:
+            calls.append(kwargs["prompt"])
+            content = (
+                '{"translation": "", "literal_translation": "", '
+                '"scores": {"60847_0": {"score": 10}}}'
+            )
+            if len(calls) == 2:
+                content = '{"scores": {"60789_0": {"score": 10}}}'
+            return type(
+                "FakeResponse",
+                (),
+                {"content": content, "status_message": "ok"},
+            )()
+
+    debug: dict[str, Any] = {}
+    translate_sentence(
+        "sammāsambuddhassa",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        debug=debug,
+    )
+
+    assert "60789_0" not in debug["parsed_response"]["scores"]
 
 
 def test_translate_sentence_retry_ignores_unrelated_flat_score_map(

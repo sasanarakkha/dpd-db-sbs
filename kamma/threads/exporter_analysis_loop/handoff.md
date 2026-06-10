@@ -4,15 +4,14 @@
 - This is an ongoing Kamma feedback-loop thread for `exporter/analysis/` under GitHub issue
   `#197`.
 - This file is now a historical handoff for old sessions, not an execution queue.
-- Issues 1-22 are implemented. No approved queued finding remains.
+- Issues 1-23 are implemented. No approved queued finding remains.
 - Latest preparation-only live-run evidence was added on 2026-06-10 for
   `TH66`, `DHP77`, `AN4.43_p1`, `MN122_p2`, and `DN2_p3`; see
   "Live Debug Prep Session - 2026-06-10" below.
 - For the next session, ask the user for one concrete `exporter/analysis/` issue, inspect
   current source/tests, propose a focused plan, and stop for explicit approval before edits.
-- 2026-06-10: Findings 11-13 were implemented as Issues 20-22. Finding 14 remains in
-  `kamma/threads/exporter_analysis_loop/findings_11_14_plans.md` and is PENDING USER
-  APPROVAL — do not implement without it; one finding per session.
+- 2026-06-10: Findings 11-14 were implemented as Issues 20-23. No approved queued
+  finding remains; one finding per session.
 - Keep `plan.md` stable. Do not add recurring task-list checkboxes to this loop thread.
 
 ## Completed History
@@ -197,6 +196,17 @@
     `tests/tools/test_ai_antigravity_cli.py`.
   - No live smoke was run; this issue changes deterministic status-message composition and
     is covered by unit tests.
+
+- Issue 23 / Finding 14: snapshot debug captures with `copy.deepcopy`.
+  - Achieved: mutable parsed AI response dictionaries, retry parsed responses, and final
+    scores are copied before storing in `debug`, so later retry/final merge mutations do not
+    rewrite earlier `*_ai_debug.json` snapshots.
+  - Main files: `exporter/analysis/translate_core.py`,
+    `tests/exporter/analysis/test_translate_core.py`.
+  - Validation passed red/green regression test, ruff check --fix, ruff format, pyright,
+    pyrefly, and focused `tests/exporter/analysis/test_translate_core.py`.
+  - No live smoke was run; this issue changes deterministic debug-object snapshot behavior
+    and is covered by unit tests.
 
 ## Live Debug Prep Session - 2026-06-10
 - Purpose: preparation evidence for a later advanced-model analysis, not an approved code

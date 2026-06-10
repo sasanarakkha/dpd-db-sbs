@@ -530,7 +530,7 @@ def translate_sentence(
     if debug is not None:
         debug["raw_response"] = response.content
         debug["status_message"] = response.status_message
-        debug["parsed_response"] = ai_data
+        debug["parsed_response"] = copy.deepcopy(ai_data)
         debug["parse_error"] = parse_error
 
     word_key_map = _extract_word_key_map(ai_data, analysis) if not parse_error else None
@@ -588,7 +588,7 @@ def translate_sentence(
         if debug is not None:
             debug["translation_raw_response"] = translation_response.content
             debug["translation_status_message"] = translation_response.status_message
-            debug["translation_parsed_response"] = translation_data
+            debug["translation_parsed_response"] = copy.deepcopy(translation_data)
             debug["translation_parse_error"] = translation_error
         needs_reformat = False
     else:
@@ -636,7 +636,7 @@ def translate_sentence(
             if debug is not None:
                 debug["reformat_raw_response"] = reformat_response.content
                 debug["reformat_status_message"] = reformat_response.status_message
-                debug["reformat_parsed_response"] = reformat_data
+                debug["reformat_parsed_response"] = copy.deepcopy(reformat_data)
                 debug["reformat_parse_error"] = reformat_error
 
     ai_data = _normalize_ai_response(ai_data)
@@ -674,14 +674,14 @@ def translate_sentence(
                     "prompt": retry_prompt,
                     "raw_response": retry_response.content,
                     "status_message": retry_response.status_message,
-                    "parsed_response": retry_data,
+                    "parsed_response": copy.deepcopy(retry_data),
                     "parse_error": retry_parse_error,
                     "missing_keys": missing_keys,
                 }
             )
 
     if debug is not None:
-        debug["final_scores"] = scores_map
+        debug["final_scores"] = copy.deepcopy(scores_map)
     merged = merge_ai_selections(analysis, ai_data)
     merged["speech_mark_options"] = speech_mark_options or {}
     merged["variant_choices"] = ai_data.get("variant_choices", {})

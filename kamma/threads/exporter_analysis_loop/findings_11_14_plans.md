@@ -1,8 +1,8 @@
 # Detailed Implementation Plans: Findings 11–14
 
-Status: Findings 11-13 were implemented on 2026-06-10 as Issues 20-22. Finding 14 remains
-PENDING USER APPROVAL. Do not implement any remaining finding until the user approves it
-explicitly. One finding per session unless the user explicitly overrides the one-issue rule.
+Status: Findings 11-14 were implemented on 2026-06-10 as Issues 20-23. Do not implement
+any future finding until the user approves it explicitly. One finding per session unless
+the user explicitly overrides the one-issue rule.
 
 These plans were written on 2026-06-10 against the working tree at commit `8880da34` plus
 uncommitted changes. All code anchors below were verified by reading the actual source on
@@ -461,6 +461,8 @@ Also run `uv run pytest tests/tools/test_ai_antigravity_cli.py -v` (same subsyst
 ---
 
 ## Finding 14 (minor) — snapshot debug captures with deepcopy
+
+Status: IMPLEMENTED on 2026-06-10 as Issue 23. This plan is retained for audit history.
 
 ### Problem
 `translate_sentence` stores live references into the `debug` dict
