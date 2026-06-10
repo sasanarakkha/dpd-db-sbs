@@ -1,6 +1,6 @@
 # Detailed Implementation Plans: Findings 11–14
 
-Status: Findings 11-12 were implemented on 2026-06-10 as Issues 20-21. Findings 13-14 remain
+Status: Findings 11-13 were implemented on 2026-06-10 as Issues 20-22. Finding 14 remains
 PENDING USER APPROVAL. Do not implement any remaining finding until the user approves it
 explicitly. One finding per session unless the user explicitly overrides the one-issue rule.
 
@@ -364,6 +364,8 @@ do not treat a non-reproduction as failure; the unit tests are the primary evide
 ---
 
 ## Finding 13 — name the succeeding provider/model in AIManager success statuses
+
+Status: IMPLEMENTED on 2026-06-10 as Issue 22. This plan is retained for audit history.
 
 ### Problem
 `AIManager.request` composes `f"SUCCESS in {duration:.2f}s. {ai_response.status_message}"`.

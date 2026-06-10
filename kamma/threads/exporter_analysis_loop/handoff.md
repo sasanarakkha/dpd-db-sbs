@@ -4,14 +4,14 @@
 - This is an ongoing Kamma feedback-loop thread for `exporter/analysis/` under GitHub issue
   `#197`.
 - This file is now a historical handoff for old sessions, not an execution queue.
-- Issues 1-21 are implemented. No approved queued finding remains.
+- Issues 1-22 are implemented. No approved queued finding remains.
 - Latest preparation-only live-run evidence was added on 2026-06-10 for
   `TH66`, `DHP77`, `AN4.43_p1`, `MN122_p2`, and `DN2_p3`; see
   "Live Debug Prep Session - 2026-06-10" below.
 - For the next session, ask the user for one concrete `exporter/analysis/` issue, inspect
   current source/tests, propose a focused plan, and stop for explicit approval before edits.
-- 2026-06-10: Findings 11-12 were implemented as Issues 20-21. Findings 13-14 remain in
-  `kamma/threads/exporter_analysis_loop/findings_11_14_plans.md` and are PENDING USER
+- 2026-06-10: Findings 11-13 were implemented as Issues 20-22. Finding 14 remains in
+  `kamma/threads/exporter_analysis_loop/findings_11_14_plans.md` and is PENDING USER
   APPROVAL — do not implement without it; one finding per session.
 - Keep `plan.md` stable. Do not add recurring task-list checkboxes to this loop thread.
 
@@ -186,6 +186,17 @@
     focused `tests/exporter/analysis/test_translate_core.py`.
   - No live smoke was run; the approved plan marked it optional because the flat-map retry
     shape is model-nondeterministic.
+
+- Issue 22 / Finding 13: named the succeeding provider/model in `AIManager` success statuses.
+  - Achieved: successful AI responses now report `provider/model` from the actual successful
+    fallback candidate, drop bland provider details such as `Success in 1.00s`, preserve
+    informative provider details in parentheses, and keep failed-attempt suffixes intact.
+  - Main files: `tools/ai_manager.py`, `tests/tools/test_ai_manager.py`.
+  - Validation passed red/green tests, ruff check --fix, ruff format, pyright, pyrefly,
+    focused `tests/tools/test_ai_manager.py`, and adjacent
+    `tests/tools/test_ai_antigravity_cli.py`.
+  - No live smoke was run; this issue changes deterministic status-message composition and
+    is covered by unit tests.
 
 ## Live Debug Prep Session - 2026-06-10
 - Purpose: preparation evidence for a later advanced-model analysis, not an approved code
@@ -370,6 +381,13 @@
 - For user-visible output bugs, regenerate and inspect the relevant artifact before claiming
   completion.
 - For this loop thread, keep `plan.md` stable and keep issue history in `handoff.md`.
+
+## Errors / Issues / Repeated Mistakes
+- 2026-06-10 Finding 13 session: initial Kamma setup checks used Fish-style `and`/`or`
+  under zsh and failed syntactically; retried with POSIX `if` checks successfully.
+- 2026-06-10 Finding 13 session: red-state `tests/tools/test_ai_manager.py` failed for the
+  expected provider/model status-message assertions before implementation; all validation
+  passed after the minimal fix.
 
 ## Useful Historical Artifacts
 - Debug JSON and raw logs from analysis runs may exist under:

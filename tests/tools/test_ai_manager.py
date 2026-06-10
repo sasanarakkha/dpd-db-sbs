@@ -13,12 +13,13 @@ class _StubResponse(NamedTuple):
 class _RecordingProvider:
     """Provider stub that records the timeout it was called with."""
 
-    def __init__(self) -> None:
+    def __init__(self, status_message: str = "stub") -> None:
         self.received_timeout: float | None = None
+        self.status_message = status_message
 
     def request(self, **kwargs: Any) -> _StubResponse:
         self.received_timeout = kwargs.get("timeout")
-        return _StubResponse(content="ok", status_message="stub")
+        return _StubResponse(content="ok", status_message=self.status_message)
 
 
 class _FailingProvider:
@@ -82,6 +83,16 @@ def test_request_clean_success_omits_failed_attempt_suffix() -> None:
     assert "failed attempt" not in response.status_message
 
 
+def test_request_success_status_names_provider_and_model() -> None:
+    provider = _RecordingProvider()
+    manager = _make_manager(provider)
+
+    response = manager.request(prompt="hi")
+
+    assert response.content == "ok"
+    assert "stub/stub-model" in response.status_message
+
+
 def test_request_success_after_failure_includes_failed_attempt_details() -> None:
     failing_provider = _FailingProvider()
     success_provider = _RecordingProvider()
@@ -94,6 +105,36 @@ def test_request_success_after_failure_includes_failed_attempt_details() -> None
     assert "after 1 failed attempt(s):" in response.status_message
     assert "failing/failing-model ERROR" in response.status_message
     assert "first provider failed" in response.status_message
+
+
+def test_request_fallback_success_names_succeeding_provider() -> None:
+    manager = _make_fallback_manager(_FailingProvider(), _RecordingProvider())
+
+    response = manager.request(prompt="hi")
+
+    assert response.content == "ok"
+    assert "stub/stub-model" in response.status_message
+    assert "after 1 failed attempt(s):" in response.status_message
+
+
+def test_request_drops_bland_success_provider_detail() -> None:
+    provider = _RecordingProvider(status_message="Success in 1.00s")
+    manager = _make_manager(provider)
+
+    response = manager.request(prompt="hi")
+
+    assert response.content == "ok"
+    assert "(Success" not in response.status_message
+
+
+def test_request_keeps_informative_success_provider_detail() -> None:
+    provider = _RecordingProvider(status_message="model: special-variant")
+    manager = _make_manager(provider)
+
+    response = manager.request(prompt="hi")
+
+    assert response.content == "ok"
+    assert "(model: special-variant)" in response.status_message
 
 
 def test_antigravity_has_per_model_timeout() -> None:

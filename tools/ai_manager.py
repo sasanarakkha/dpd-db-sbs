@@ -204,8 +204,15 @@ class AIManager:
 
                 if ai_response.content is not None:
                     status_message = (
-                        f"SUCCESS in {duration:.2f}s. {ai_response.status_message}"
+                        f"SUCCESS in {duration:.2f}s. {provider_name}/{model_name}"
                     )
+                    provider_detail = ai_response.status_message
+                    if (
+                        provider_detail
+                        and provider_detail not in status_message
+                        and not provider_detail.startswith("Success")
+                    ):
+                        status_message = f"{status_message} ({provider_detail})"
                     if errors:
                         status_message = (
                             f"{status_message} (after {len(errors)} failed attempt(s): "
