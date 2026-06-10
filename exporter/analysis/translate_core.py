@@ -121,6 +121,30 @@ def _normalize_ai_response(ai_data: dict[str, Any]) -> dict[str, Any]:
     return ai_data
 
 
+def _coerce_flat_score_map(
+    ai_data: dict[str, Any],
+    expected_keys: set[str],
+) -> dict[str, Any]:
+    """Wrap a bare ``{key: {"score": N}}`` response in the ``scores`` contract."""
+    if not ai_data or "scores" in ai_data:
+        return ai_data
+
+    matched: dict[str, Any] = {}
+    for key, value in ai_data.items():
+        if key not in expected_keys:
+            continue
+        if isinstance(value, dict):
+            score = value.get("score")
+            if isinstance(score, int | float) and not isinstance(score, bool):
+                matched[key] = value
+        elif isinstance(value, int | float) and not isinstance(value, bool):
+            matched[key] = {"score": value}
+
+    if not matched or len(matched) * 2 < len(ai_data):
+        return ai_data
+    return {"scores": matched}
+
+
 def _clean_meaning(meaning: str) -> str:
     """Strip trailing grammar parentheticals that duplicate the Grammar column.
 
@@ -626,6 +650,9 @@ def translate_sentence(
     if debug is not None:
         debug["missing_score_groups_after_first_response"] = missing_groups
     if missing_groups:
+        missing_keys = [
+            key for group in missing_groups for key in group["missing_keys"]
+        ]
         retry_prompt = _build_missing_scores_prompt(resolved_sentence, missing_groups)
         retry_response = ai_manager.request(
             prompt=retry_prompt,
@@ -637,6 +664,7 @@ def translate_sentence(
         if retry_response.content:
             retry_data, retry_parse_error = _parse_ai_json(retry_response.content)
             retry_data = _normalize_ai_response(retry_data)
+            retry_data = _coerce_flat_score_map(retry_data, set(missing_keys))
             retry_scores = retry_data.get("scores", {})
             if isinstance(retry_scores, dict):
                 scores_map.update(retry_scores)
@@ -648,9 +676,7 @@ def translate_sentence(
                     "status_message": retry_response.status_message,
                     "parsed_response": retry_data,
                     "parse_error": retry_parse_error,
-                    "missing_keys": [
-                        key for group in missing_groups for key in group["missing_keys"]
-                    ],
+                    "missing_keys": missing_keys,
                 }
             )
 

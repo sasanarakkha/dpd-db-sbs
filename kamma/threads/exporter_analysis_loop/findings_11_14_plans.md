@@ -1,6 +1,6 @@
 # Detailed Implementation Plans: Findings 11–14
 
-Status: Finding 11 was implemented on 2026-06-10 as Issue 20. Findings 12-14 remain
+Status: Findings 11-12 were implemented on 2026-06-10 as Issues 20-21. Findings 13-14 remain
 PENDING USER APPROVAL. Do not implement any remaining finding until the user approves it
 explicitly. One finding per session unless the user explicitly overrides the one-issue rule.
 
@@ -200,6 +200,8 @@ proof of the error classification itself; the unit tests are the evidence.
 ---
 
 ## Finding 12 — accept flat retry score maps without the `scores` wrapper
+
+Status: IMPLEMENTED on 2026-06-10 as Issue 21. This plan is retained for audit history.
 
 ### Problem
 The missing-scores retry can return the flat scores map directly, e.g.

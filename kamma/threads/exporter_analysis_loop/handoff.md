@@ -4,13 +4,13 @@
 - This is an ongoing Kamma feedback-loop thread for `exporter/analysis/` under GitHub issue
   `#197`.
 - This file is now a historical handoff for old sessions, not an execution queue.
-- Issues 1-20 are implemented. No approved queued finding remains.
+- Issues 1-21 are implemented. No approved queued finding remains.
 - Latest preparation-only live-run evidence was added on 2026-06-10 for
   `TH66`, `DHP77`, `AN4.43_p1`, `MN122_p2`, and `DN2_p3`; see
   "Live Debug Prep Session - 2026-06-10" below.
 - For the next session, ask the user for one concrete `exporter/analysis/` issue, inspect
   current source/tests, propose a focused plan, and stop for explicit approval before edits.
-- 2026-06-10: Finding 11 was implemented as Issue 20. Findings 12-14 remain in
+- 2026-06-10: Findings 11-12 were implemented as Issues 20-21. Findings 13-14 remain in
   `kamma/threads/exporter_analysis_loop/findings_11_14_plans.md` and are PENDING USER
   APPROVAL — do not implement without it; one finding per session.
 - Keep `plan.md` stable. Do not add recurring task-list checkboxes to this loop thread.
@@ -175,6 +175,17 @@
     focused `tests/tools/test_ai_antigravity_cli.py`.
   - No live smoke was run; the approved plan marked it optional and not deterministic for
     the error-classification path.
+
+- Issue 21 / Finding 12: accepted flat retry score maps without a `scores` wrapper.
+  - Achieved: missing-scores retry responses shaped like
+    `{"60789_0": {"score": 10}}` are coerced into the normal `scores` contract when the
+    keys match the expected missing option keys, while unrelated flat maps stay ignored.
+  - Main files: `exporter/analysis/translate_core.py`,
+    `tests/exporter/analysis/test_translate_core.py`.
+  - Validation passed red/green tests, ruff check --fix, ruff format, pyright, pyrefly, and
+    focused `tests/exporter/analysis/test_translate_core.py`.
+  - No live smoke was run; the approved plan marked it optional because the flat-map retry
+    shape is model-nondeterministic.
 
 ## Live Debug Prep Session - 2026-06-10
 - Purpose: preparation evidence for a later advanced-model analysis, not an approved code
