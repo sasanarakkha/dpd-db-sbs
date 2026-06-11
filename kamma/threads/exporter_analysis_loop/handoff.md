@@ -4,17 +4,17 @@
 - Thread: ongoing `exporter/analysis/` feedback loop for GitHub issue `#197`.
 - Purpose: handle one focused analyzer issue or approved issue set per session.
 - Stable workflow lives in `plan.md`; keep per-issue history out of `plan.md`.
-- All approved implementation work through Finding 60 is complete.
-- Finding 61 live evidence collection is complete. It is mostly clean, but
+- All approved implementation work through Finding 64 is complete.
+- Finding 65 remains a design deferral: no retry semantics were changed. The
+  observed Low `TH215` all-zero component group is handled by Finding 64's
+  parent-meaning tie-break.
+- Finding 62-64 live evidence collection is complete. It is mostly clean, but
   DeepSeek `TH215` still selects nominative duration for
-  `paṇṇavīsativassāni` and component `vassāni`.
-- 2026-06-12: manual analysis of the Finding 61 artifacts found three
-  pipeline defects (not model limitations) and produced a proposed queue,
-  Findings 62-65, in
-  `kamma/threads/exporter_analysis_loop/plan-history/findings_62_65_plans.md`.
-  It is NOT approved and NOT implemented.
-- Review is pending behind two user decisions: the Findings 62-65 queue and
-  the DeepSeek `TH215` duration residual.
+  `paṇṇavīsativassāni` and component `vassāni`, and Low `SN15.1_p2` still
+  displays dat pl rows for the db-example refrain words because Low provided
+  no positive intra-headword grammar signal.
+- Review is pending behind user/manual confirmation of the remaining residuals
+  and release of preserved `temp/tier_eval/` artifacts when no longer needed.
 
 ## Handoff Hygiene Rule
 - Keep this handoff tight. It is active session memory, not a full transcript.
@@ -49,24 +49,80 @@ Also required:
   `git status --short`; do not claim Python validation was run.
 
 ## Next Decision
-- Approve, trim, or reject the proposed Findings 62-65 queue
-  (`plan-history/findings_62_65_plans.md`). Summary:
-  - Finding 62: empty AI `contextual_meaning`/`selected_pos` strings overwrite
-    dictionary meanings → blank Meaning cells (`merge_ai_selections` and the
-    inline field copy in `_apply_deterministic_scores_to_map`).
-  - Finding 63: db-example promotion flattens the AI's correct intra-headword
-    grammar choice (four "dat pl" rows in both SN15.1 reports should be gen
-    pl; DeepSeek had selected gen pl before being stomped).
-  - Finding 64: component homonym tie-break prefers `ind`, rendering `santi`
-    inside `cetosanti` ("peace of mind") as "own; personal; self-" on Low.
-  - Finding 65: deferred design question (all-zero retry groups count as
-    resolved); recommendation is to implement 62-64 first.
+- Decide whether the remaining visible residuals are acceptable for review:
+  - Low `SN15.1_p2` still displays dat pl for `avijjānīvaraṇānaṃ`,
+    `taṇhāsaṃyojanānaṃ`, `sandhāvataṃ`, and `saṃsarataṃ`. This is expected
+    under the approved Finding 63 rule: if the AI gives no positive
+    intra-headword grammar selection, db-example protection keeps all variants
+    promoted.
+  - A deterministic agreement heuristic for this Low case would be a new
+    focused issue, not part of Findings 62-64.
+  - DeepSeek component placeholder rows with no ID (`idha`, `anamata`) still
+    have blank Meaning cells. These are missing-component placeholders, not
+    the empty-AI-string overwrite fixed by Finding 62.
 - Decide whether DeepSeek `TH215` nominative duration is acceptable:
   - Accept as a model limitation and proceed to manual confirmation/review.
   - Or queue a focused follow-up for duration-grammar selection.
 - Do not make model-default changes from this thread. User decision on
   2026-06-11: keep `Gemini 3.5 Flash (Low)` as default and keep
   `deepseek/deepseek-v4-flash` as an occasional second model.
+
+## Recent Completed Queue: Findings 62-65
+User approved the proposed Findings 62-65 queue for `#197`. Implemented code
+changes are Findings 62-64; Finding 65 remains deferred by the proposal's own
+recommendation.
+
+Implemented in `exporter/analysis/translate_core.py` and
+`tests/exporter/analysis/test_translate_core.py`:
+- Finding 62: `merge_ai_selections` now ignores empty
+  `contextual_meaning`/`selected_pos` strings, and deterministic db-example
+  score copying now reuses the non-empty context-field copier.
+- Finding 63: db-example promotion now groups matched options by headword id.
+  If the AI has a positive intra-headword grammar choice, only the top
+  AI-positive variant is forced to score 10; absent sibling variants are
+  zeroed so stale pre-promoted scores cannot leak through. If there is no
+  positive AI signal for that headword, the old all-variant promotion is
+  preserved.
+- Finding 64: component fallback ranking now checks overlap between the parent
+  meaning and component meanings before using the `ind` tie-break, so
+  `cetosanti` chooses `santi` = "peace" while particle cases like `api` =
+  "even" remain stable.
+- Finding 65: no all-zero retry semantics change. Post-fix live proof showed
+  the observed `TH215` all-zero component case is resolved by Finding 64.
+
+Validation summary:
+- Red phase confirmed for the new failing Finding 62-64 tests:
+  `uv run pytest tests/exporter/analysis/test_translate_core.py -k
+  "empty_contextual_fields or preserve_ai_positive_variant_choice or
+  zero_missing_variants_when_ai_selects_sibling or
+  component_overlap_prefers_parent_meaning" -v` failed with the expected five
+  failures before implementation, then passed after implementation.
+- Exact-file gates passed separately for `exporter/analysis/translate_core.py`
+  and `tests/exporter/analysis/test_translate_core.py`: `ruff check --fix`,
+  `ruff format`, `pyright`, `pyrefly`.
+- `uv run pytest tests/exporter/analysis/test_translate_core.py -v` passed:
+  109 passed, with one upstream `aksharamukha` deprecation warning.
+
+Live evaluation summary:
+- Re-ran the same three targets on Low and DeepSeek after implementation:
+  `MN41_p2`, `SN15.1_p2`, and `TH215`.
+- New artifacts are preserved under
+  `temp/tier_eval/final_eval_62_64_low/` and
+  `temp/tier_eval/final_eval_62_64_deepseek/`.
+- All six runs exited 0. Debug summaries show zero unresolved
+  `missing_score_groups_after_retry`, zero skipped retry groups, zero
+  bare-number `final_scores`, and no parse/reformat parse errors.
+- DeepSeek `SN15.1_p2` now selects gen pl with non-empty meanings for the four
+  db-example refrain words in both repeated occurrences.
+- Low `TH215` now selects component `santi` id 58258 "peace" inside
+  `cetosanti`; `api` remains "even" and duration remains accusative on Low.
+- Top-level empty Meaning cells from the Finding 62 symptom are fixed, e.g.
+  DeepSeek `MN41_p2` `nu` now renders with dictionary fallback text. The only
+  remaining empty Meaning cells found by the broad markdown scan are
+  no-ID component placeholders (`idha`, `anamata`) in DeepSeek output.
+- Remaining risks: DeepSeek `TH215` duration grammar is still nominative, and
+  Low `SN15.1_p2` still displays dat pl where Low provides no AI-positive
+  grammar signal.
 
 ## Recent Completed Queue: Findings 56-61
 User approved implementing Findings 56-61 as one issue set for `#197`.
@@ -201,7 +257,7 @@ sessions can load only the level of history they need.
   `kamma/threads/exporter_analysis_loop/plan-history/findings_45_50_plans.md`
 - Findings 51-55:
   `kamma/threads/exporter_analysis_loop/plan-history/findings_51_55_plans.md`
-- Findings 62-65 (PROPOSED, awaiting approval):
+- Findings 62-65 proposal / implementation notes:
   `kamma/threads/exporter_analysis_loop/plan-history/findings_62_65_plans.md`
 
 Important historical note: Finding 38 was merged into Finding 35 and must not
@@ -214,6 +270,9 @@ be executed separately.
 - Finding 61 artifacts:
   `temp/tier_eval/final_eval_56_61_low/` and
   `temp/tier_eval/final_eval_56_61_deepseek/`.
+- Finding 62-64 artifacts:
+  `temp/tier_eval/final_eval_62_64_low/` and
+  `temp/tier_eval/final_eval_62_64_deepseek/`.
 - Current report outputs: `exporter/analysis/reports/*_study.md`.
 - Raw AI logs: `exporter/analysis/reports/*_ai_raw.txt`.
 - Debug JSON: `exporter/analysis/output/*_ai_debug.json`.
@@ -270,12 +329,13 @@ be executed separately.
   array. Use names like `src` instead.
 
 ## Review Readiness
-- Implementation queues through Finding 60 are complete.
-- Finding 61 evidence collection is complete, but DeepSeek `TH215` remains a
-  not-clean pass on duration grammar.
-- Remaining before review: user decision on the proposed Findings 62-65
-  queue; user decision on accepting the DeepSeek `TH215` residual or queuing a
-  focused follow-up; manual confirmation/testing; release `temp/tier_eval/`
-  when no longer needed.
+- Implementation queues through Finding 64 are complete.
+- Finding 62-64 evidence collection is complete, but DeepSeek `TH215` remains
+  a not-clean pass on duration grammar and Low `SN15.1_p2` remains not-clean
+  on visible dat/gen grammar when the AI provides no positive intra-headword
+  signal.
+- Remaining before review: user decision on accepting the live residuals or
+  queuing focused follow-ups; manual confirmation/testing; release
+  `temp/tier_eval/` when no longer needed.
 - After user confirmation, run:
   `/kamma:3-review kamma/threads/exporter_analysis_loop`

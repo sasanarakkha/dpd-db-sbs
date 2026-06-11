@@ -78,6 +78,8 @@ _FINITE_VERB_GRAMMAR_RE = re.compile(
     r"\b(?:pr|aor|fut|cond|imp|opt)\s+\d(?:st|nd|rd)\b"
 )
 _QUOTATIVE_TI_SELECTION_SOURCE = "deterministic_quotative_ti_deconstruction"
+_PARENT_MEANING_TOKEN_RE = re.compile(r"[a-z][a-z'’-]*")
+_PARENT_MEANING_STOPWORDS = {"of", "the", "a", "an", "to", "in", "is", "one's"}
 
 
 def extract_variant_options(text: str) -> tuple[str, dict[str, list[str]]]:
@@ -680,6 +682,44 @@ def _copy_score_context_fields(
             target_score[field] = value
 
 
+def _numeric_score_value(score_data: Any) -> int | float | None:
+    if isinstance(score_data, dict):
+        score = score_data.get("score")
+    else:
+        score = score_data
+    if isinstance(score, int | float) and not isinstance(score, bool):
+        return score
+    return None
+
+
+def _positive_ai_score_value(score_data: Any) -> float | None:
+    score = _numeric_score_value(score_data)
+    if score is None or score <= 0:
+        return None
+    return float(score)
+
+
+def _deterministic_score_value(option: dict[str, Any]) -> int | float | None:
+    return _numeric_score_value(option.get("ai_score"))
+
+
+def _db_example_group_key(option: dict[str, Any]) -> str:
+    option_id = option.get("id")
+    if isinstance(option_id, int | str) and not isinstance(option_id, bool):
+        return str(option_id)
+    key = option.get("key")
+    if isinstance(key, str):
+        return key.split("_", 1)[0]
+    return ""
+
+
+def _deterministic_selection_source(option: dict[str, Any]) -> str:
+    selection_source = option.get("selection_source")
+    if isinstance(selection_source, str) and selection_source:
+        return selection_source
+    return "deterministic"
+
+
 def _apply_quotative_ti_deconstruction_score(
     token_data: dict[str, Any],
     scores_map: dict[str, Any],
@@ -735,28 +775,83 @@ def _apply_deterministic_scores_to_map(
 ) -> None:
     for token_data in analysis:
         _apply_quotative_ti_deconstruction_score(token_data, scores_map)
+        preexisting_scores = dict(scores_map)
+        db_example_groups: dict[str, list[dict[str, Any]]] = {}
+        handled_db_keys: set[str] = set()
         for option in _iter_options(token_data.get("data", [])):
             key = option.get("key")
-            score = option.get("ai_score")
-            if (
-                key
-                and option.get("db_example_match")
-                and isinstance(score, int | float)
-            ):
-                deterministic_score: dict[str, Any] = {
-                    "score": score,
-                    "selection_source": option.get("selection_source", "deterministic"),
+            if not isinstance(key, str):
+                continue
+            score = _deterministic_score_value(option)
+            if option.get("db_example_match") and score is not None:
+                group_key = _db_example_group_key(option)
+                if group_key:
+                    db_example_groups.setdefault(group_key, []).append(option)
+                    handled_db_keys.add(key)
+
+        for group_options in db_example_groups.values():
+            positive_scores: dict[str, float] = {}
+            for option in group_options:
+                key = option.get("key")
+                if not isinstance(key, str):
+                    continue
+                positive_score = _positive_ai_score_value(preexisting_scores.get(key))
+                if positive_score is not None:
+                    positive_scores[key] = positive_score
+
+            if positive_scores:
+                top_score = max(positive_scores.values())
+                winner_keys = {
+                    key for key, score in positive_scores.items() if score == top_score
                 }
-                existing_score = scores_map.get(key)
-                if isinstance(existing_score, dict):
-                    for field in ("contextual_meaning", "selected_pos"):
-                        if field in existing_score:
-                            deterministic_score[field] = existing_score[field]
+                for option in group_options:
+                    key = option.get("key")
+                    if not isinstance(key, str):
+                        continue
+                    if key in winner_keys:
+                        deterministic_score: dict[str, Any] = {
+                            "score": 10,
+                            "selection_source": _deterministic_selection_source(option),
+                        }
+                        _copy_score_context_fields(
+                            preexisting_scores.get(key),
+                            deterministic_score,
+                        )
+                        scores_map[key] = deterministic_score
+                    elif key not in preexisting_scores:
+                        scores_map[key] = {
+                            "score": 0,
+                            "selection_source": "db_example_variant_not_selected",
+                        }
+                continue
+
+            for option in group_options:
+                key = option.get("key")
+                score = _deterministic_score_value(option)
+                if not isinstance(key, str) or score is None:
+                    continue
+                deterministic_score = {
+                    "score": score,
+                    "selection_source": _deterministic_selection_source(option),
+                }
+                _copy_score_context_fields(
+                    preexisting_scores.get(key),
+                    deterministic_score,
+                )
                 scores_map[key] = deterministic_score
-            elif key and key not in scores_map and isinstance(score, int | float):
+
+        for option in _iter_options(token_data.get("data", [])):
+            key = option.get("key")
+            score = _deterministic_score_value(option)
+            if (
+                isinstance(key, str)
+                and key not in handled_db_keys
+                and key not in scores_map
+                and score is not None
+            ):
                 scores_map[key] = {
                     "score": score,
-                    "selection_source": option.get("selection_source", "deterministic"),
+                    "selection_source": _deterministic_selection_source(option),
                 }
 
 
@@ -1637,7 +1732,34 @@ def _dictionary_quality_rank(option: dict[str, Any]) -> int:
     return 1
 
 
-def _option_rank(option: dict[str, Any], is_component: bool = False) -> tuple:
+def _meaning_tokens(text: str) -> set[str]:
+    return {
+        token
+        for token in _PARENT_MEANING_TOKEN_RE.findall(text.lower())
+        if token not in _PARENT_MEANING_STOPWORDS
+    }
+
+
+def _parent_meaning_overlap_rank(
+    option: dict[str, Any],
+    parent_meaning: str,
+) -> int:
+    parent_tokens = _meaning_tokens(parent_meaning)
+    if not parent_tokens:
+        return 0
+    option_tokens: set[str] = set()
+    for field in ("meaning_combo", "meaning_1"):
+        meaning = option.get(field)
+        if isinstance(meaning, str):
+            option_tokens.update(_meaning_tokens(meaning))
+    return 1 if parent_tokens & option_tokens else 0
+
+
+def _option_rank(
+    option: dict[str, Any],
+    is_component: bool = False,
+    parent_meaning: str = "",
+) -> tuple:
     ai_score = option.get("ai_score")
     numeric_score_rank = 1 if _is_numeric_score(ai_score) else 0
     score = ai_score if _is_numeric_score(ai_score) else -1
@@ -1649,6 +1771,7 @@ def _option_rank(option: dict[str, Any], is_component: bool = False) -> tuple:
         score,
         _db_example_rank(option),
         _direct_key_rank(option),
+        _parent_meaning_overlap_rank(option, parent_meaning),
         component_pos_rank,
         _dictionary_quality_rank(option),
         option.get("score", 0),
@@ -1659,10 +1782,15 @@ def _option_rank(option: dict[str, Any], is_component: bool = False) -> tuple:
 def _select_best_option(
     options: list[dict[str, Any]],
     is_component: bool = False,
+    parent_meaning: str = "",
 ) -> dict[str, Any] | None:
     return max(
         options,
-        key=lambda option: _option_rank(option, is_component=is_component),
+        key=lambda option: _option_rank(
+            option,
+            is_component=is_component,
+            parent_meaning=parent_meaning,
+        ),
         default=None,
     )
 
@@ -1688,7 +1816,14 @@ def format_markdown_table(enriched_analysis: list[dict[str, Any]]) -> str:
                 # Each part has multiple lookups (homonyms). Pick the best scored one.
                 # If all options have the same ai_score (e.g., 0 for sub-components),
                 # prefer noun forms when parent is a noun compound.
-                best_part = _select_best_option(part_options, is_component=True)
+                parent_meaning = option.get("meaning_combo", "")
+                if not isinstance(parent_meaning, str):
+                    parent_meaning = ""
+                best_part = _select_best_option(
+                    part_options,
+                    is_component=True,
+                    parent_meaning=parent_meaning,
+                )
                 if not best_part:
                     continue
 
@@ -1817,10 +1952,15 @@ def merge_ai_selections(
 
                     # Apply contextual info if score is positive (implying relevance)
                     if update.get("score", 0) > 0:
-                        if "contextual_meaning" in update:
-                            item["meaning_combo"] = update["contextual_meaning"]
-                        if "selected_pos" in update:
-                            item["selected_pos"] = update["selected_pos"]
+                        contextual_meaning = update.get("contextual_meaning")
+                        if (
+                            isinstance(contextual_meaning, str)
+                            and contextual_meaning.strip()
+                        ):
+                            item["meaning_combo"] = contextual_meaning
+                        selected_pos = update.get("selected_pos")
+                        if isinstance(selected_pos, str) and selected_pos.strip():
+                            item["selected_pos"] = selected_pos
             else:
                 item["ai_score"] = item.get("ai_score")
 

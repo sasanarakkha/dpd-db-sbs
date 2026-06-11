@@ -439,6 +439,69 @@ def test_merge_ai_selections_preserves_missing_scores_as_none() -> None:
     assert options[1]["ai_score"] == 0
 
 
+def test_merge_ai_selections_ignores_empty_contextual_fields() -> None:
+    analysis = [
+        {
+            "word": "nu",
+            "status": "found",
+            "data": [
+                {
+                    "key": "38664_default",
+                    "meaning_combo": "now; surely",
+                    "grammar": "ind",
+                }
+            ],
+        }
+    ]
+    ai_response = {
+        "scores": {
+            "38664_default": {
+                "score": 10,
+                "contextual_meaning": "",
+                "selected_pos": "",
+            }
+        }
+    }
+
+    merged = merge_ai_selections(analysis, ai_response)
+    option = merged["analysis"][0]["data"][0]
+
+    assert option["ai_score"] == 10
+    assert option["meaning_combo"] == "now; surely"
+    assert "selected_pos" not in option
+
+
+def test_merge_ai_selections_applies_non_empty_contextual_fields() -> None:
+    analysis = [
+        {
+            "word": "nu",
+            "status": "found",
+            "data": [
+                {
+                    "key": "38664_default",
+                    "meaning_combo": "now; surely",
+                    "grammar": "sandhi/compound",
+                }
+            ],
+        }
+    ]
+    ai_response = {
+        "scores": {
+            "38664_default": {
+                "score": 10,
+                "contextual_meaning": "then",
+                "selected_pos": "ind",
+            }
+        }
+    }
+
+    merged = merge_ai_selections(analysis, ai_response)
+    option = merged["analysis"][0]["data"][0]
+
+    assert option["meaning_combo"] == "then"
+    assert option["selected_pos"] == "ind"
+
+
 def test_find_missing_score_groups_deduplicates_repeated_words() -> None:
     option = {"key": "1_0", "pali": "ca", "pos": "ind"}
     token = {"word": "ca", "data": [option]}
@@ -1800,6 +1863,160 @@ def test_deterministic_scores_do_not_boost_feminine_quotative_ti_deconstruction(
     assert scores_map == {}
 
 
+def _db_example_option(key: str, option_id: int, grammar: str) -> dict[str, Any]:
+    return {
+        "key": key,
+        "id": option_id,
+        "pali": "avijjānīvaraṇānaṃ",
+        "pos": "adj",
+        "grammar": grammar,
+        "meaning_1": "hindered by ignorance",
+        "meaning_combo": "hindered by ignorance",
+        "ai_score": 10,
+        "db_example_match": True,
+        "db_example_match_type": "source_text_overlap",
+        "selection_source": "db_example_source_text_overlap",
+    }
+
+
+def test_deterministic_scores_ignore_empty_contextual_fields() -> None:
+    analysis = [
+        {
+            "word": "avijjānīvaraṇānaṃ",
+            "status": "found",
+            "data": [_db_example_option("10531_0", 10531, "masc dat pl")],
+        }
+    ]
+    scores_map: dict[str, Any] = {
+        "10531_0": {"score": 10, "contextual_meaning": "", "selected_pos": ""}
+    }
+
+    translate_core._apply_deterministic_scores_to_map(analysis, scores_map)
+
+    assert scores_map["10531_0"] == {
+        "score": 10,
+        "selection_source": "db_example_source_text_overlap",
+    }
+
+
+def test_deterministic_scores_preserve_ai_positive_variant_choice() -> None:
+    analysis = [
+        {
+            "word": "avijjānīvaraṇānaṃ",
+            "status": "found",
+            "data": [
+                _db_example_option("10531_0", 10531, "masc dat pl"),
+                _db_example_option("10531_1", 10531, "fem gen pl"),
+                _db_example_option("10531_2", 10531, "nt dat pl"),
+            ],
+        }
+    ]
+    scores_map: dict[str, Any] = {
+        "10531_0": {"score": 0},
+        "10531_1": {
+            "score": 10,
+            "contextual_meaning": "hindered by ignorance",
+            "selected_pos": "adj",
+        },
+        "10531_2": {"score": 0},
+    }
+
+    translate_core._apply_deterministic_scores_to_map(analysis, scores_map)
+    merged = merge_ai_selections(
+        analysis,
+        {"translation": "", "literal_translation": "", "scores": scores_map},
+    )
+    best = translate_core._select_best_option(merged["analysis"][0]["data"])
+
+    assert scores_map["10531_0"]["score"] == 0
+    assert scores_map["10531_1"] == {
+        "score": 10,
+        "selection_source": "db_example_source_text_overlap",
+        "contextual_meaning": "hindered by ignorance",
+        "selected_pos": "adj",
+    }
+    assert scores_map["10531_2"]["score"] == 0
+    assert best is not None
+    assert best["key"] == "10531_1"
+
+
+def test_deterministic_scores_promote_all_db_variants_without_ai_positive() -> None:
+    analysis = [
+        {
+            "word": "avijjānīvaraṇānaṃ",
+            "status": "found",
+            "data": [
+                _db_example_option("10531_0", 10531, "masc dat pl"),
+                _db_example_option("10531_1", 10531, "fem gen pl"),
+            ],
+        }
+    ]
+    scores_map: dict[str, Any] = {}
+
+    translate_core._apply_deterministic_scores_to_map(analysis, scores_map)
+
+    assert scores_map["10531_0"]["score"] == 10
+    assert scores_map["10531_1"]["score"] == 10
+
+
+def test_deterministic_scores_zero_missing_variants_when_ai_selects_sibling() -> None:
+    analysis = [
+        {
+            "word": "avijjānīvaraṇānaṃ",
+            "status": "found",
+            "data": [
+                _db_example_option("10531_0", 10531, "masc dat pl"),
+                _db_example_option("10531_1", 10531, "fem gen pl"),
+                _db_example_option("10531_2", 10531, "nt dat pl"),
+            ],
+        }
+    ]
+    scores_map: dict[str, Any] = {"10531_1": {"score": 10}}
+
+    translate_core._apply_deterministic_scores_to_map(analysis, scores_map)
+
+    assert scores_map["10531_0"] == {
+        "score": 0,
+        "selection_source": "db_example_variant_not_selected",
+    }
+    assert scores_map["10531_1"]["score"] == 10
+    assert scores_map["10531_2"] == {
+        "score": 0,
+        "selection_source": "db_example_variant_not_selected",
+    }
+
+
+def test_deterministic_scores_db_match_still_outranks_other_ai_id() -> None:
+    analysis = [
+        {
+            "word": "avijjānīvaraṇānaṃ",
+            "status": "found",
+            "data": [
+                _db_example_option("10531_0", 10531, "masc dat pl"),
+                {
+                    "key": "99999_0",
+                    "id": 99999,
+                    "pali": "avijjānīvaraṇānaṃ",
+                    "pos": "adj",
+                    "grammar": "masc nom pl",
+                    "meaning_combo": "different homonym",
+                },
+            ],
+        }
+    ]
+    scores_map: dict[str, Any] = {"99999_0": {"score": 10}}
+
+    translate_core._apply_deterministic_scores_to_map(analysis, scores_map)
+    merged = merge_ai_selections(
+        analysis,
+        {"translation": "", "literal_translation": "", "scores": scores_map},
+    )
+    best = translate_core._select_best_option(merged["analysis"][0]["data"])
+
+    assert best is not None
+    assert best["key"] == "10531_0"
+
+
 def test_translate_sentence_curated_example_match_overrides_ai_score(
     monkeypatch,
 ) -> None:
@@ -2012,6 +2229,142 @@ def test_format_markdown_table_fallback_uses_meaning_1_quality() -> None:
     table = format_markdown_table(analysis)
 
     assert "| 11 | - part | nt | real meaning |" in table
+
+
+def test_format_markdown_table_component_overlap_prefers_parent_meaning() -> None:
+    analysis = [
+        {
+            "word": "cetosanti",
+            "status": "found",
+            "data": [
+                {
+                    "key": "1_0",
+                    "id": 1,
+                    "pali": "cetosanti",
+                    "pos": "noun",
+                    "meaning_combo": "peace of mind",
+                    "ai_score": 10,
+                    "components": [
+                        [
+                            {
+                                "key": "61527_0",
+                                "id": 61527,
+                                "pali": "santi",
+                                "pos": "ind",
+                                "meaning_1": "own; personal; self-",
+                                "meaning_combo": "own; personal; self-",
+                                "ai_score": 0,
+                            },
+                            {
+                                "key": "58258_0",
+                                "id": 58258,
+                                "pali": "santi",
+                                "pos": "fem",
+                                "meaning_1": "peace",
+                                "meaning_combo": "peace; calm; tranquillity",
+                                "ai_score": 0,
+                            },
+                        ]
+                    ],
+                }
+            ],
+        }
+    ]
+
+    table = format_markdown_table(analysis)
+
+    assert "| 58258 | - santi | fem | peace; calm; tranquillity |" in table
+    assert "| 61527 | - santi | ind | own; personal; self- |" not in table
+
+
+def test_format_markdown_table_component_overlap_keeps_matching_ind() -> None:
+    analysis = [
+        {
+            "word": "mattam'pi",
+            "status": "found",
+            "data": [
+                {
+                    "key": "1_0",
+                    "id": 1,
+                    "pali": "mattam'pi",
+                    "pos": "sandhi",
+                    "meaning_combo": "even a finger-snap measure",
+                    "ai_score": 10,
+                    "components": [
+                        [
+                            {
+                                "key": "13469_0",
+                                "id": 13469,
+                                "pali": "api",
+                                "pos": "ind",
+                                "meaning_1": "even",
+                                "meaning_combo": "even",
+                                "ai_score": 0,
+                            },
+                            {
+                                "key": "999_0",
+                                "id": 999,
+                                "pali": "api",
+                                "pos": "fem",
+                                "meaning_1": "water",
+                                "meaning_combo": "water",
+                                "ai_score": 0,
+                            },
+                        ]
+                    ],
+                }
+            ],
+        }
+    ]
+
+    table = format_markdown_table(analysis)
+
+    assert "| 13469 | - api | ind | even |" in table
+
+
+def test_format_markdown_table_component_no_overlap_keeps_ind_fallback() -> None:
+    analysis = [
+        {
+            "word": "testcompound",
+            "status": "found",
+            "data": [
+                {
+                    "key": "1_0",
+                    "id": 1,
+                    "pali": "testcompound",
+                    "pos": "noun",
+                    "meaning_combo": "unrelated compound",
+                    "ai_score": 10,
+                    "components": [
+                        [
+                            {
+                                "key": "61527_0",
+                                "id": 61527,
+                                "pali": "santi",
+                                "pos": "ind",
+                                "meaning_1": "own; personal; self-",
+                                "meaning_combo": "own; personal; self-",
+                                "ai_score": 0,
+                            },
+                            {
+                                "key": "58258_0",
+                                "id": 58258,
+                                "pali": "santi",
+                                "pos": "fem",
+                                "meaning_1": "peace",
+                                "meaning_combo": "peace; calm; tranquillity",
+                                "ai_score": 0,
+                            },
+                        ]
+                    ],
+                }
+            ],
+        }
+    ]
+
+    table = format_markdown_table(analysis)
+
+    assert "| 61527 | - santi | ind | own; personal; self- |" in table
 
 
 def test_build_system_prompt_json_instruction_at_start() -> None:
