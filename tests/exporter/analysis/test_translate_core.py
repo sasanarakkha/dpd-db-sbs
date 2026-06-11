@@ -1,6 +1,7 @@
 """Test Pāḷi passage variant handling in AI analysis reports."""
 
 import copy
+import json
 from typing import Any, cast
 
 import pytest
@@ -21,6 +22,12 @@ from exporter.analysis.translate_core import (
     pre_match_db_examples,
     sync_analysis_words_to_sentence,
     translate_sentence,
+)
+
+
+EXPECTED_NO_TOOLS_INSTRUCTION = (
+    "Do not use tools, do not plan tasks, and do not wait for anything. "
+    "Produce the complete JSON directly in this single response."
 )
 
 
@@ -213,6 +220,125 @@ def test_build_system_prompt_uses_compact_context_json() -> None:
     assert '  "missing_keys"' not in missing_scores_prompt
 
 
+def test_build_system_prompt_schema_example_is_not_markdown_fenced() -> None:
+    prompt = build_system_prompt([])
+
+    assert "```" not in prompt
+    assert '"scores"' in prompt
+
+
+def test_build_system_prompt_ends_with_schema_reminder() -> None:
+    prompt = build_system_prompt([])
+
+    final_line = next(line for line in reversed(prompt.splitlines()) if line.strip())
+    assert "Your response MUST be exactly one JSON object" in final_line
+
+
+def test_system_prompt_contains_no_tools_instruction() -> None:
+    prompt = build_system_prompt([])
+
+    assert translate_core.NO_TOOLS_INSTRUCTION == EXPECTED_NO_TOOLS_INSTRUCTION
+    assert EXPECTED_NO_TOOLS_INSTRUCTION in prompt
+
+
+def test_system_prompt_contains_common_pali_rules() -> None:
+    prompt = build_system_prompt([])
+
+    assert translate_core.COMMON_PALI_RULES in prompt
+
+
+def test_common_pali_rules_cover_known_failures() -> None:
+    assert "kāyassa bhedā" in translate_core.COMMON_PALI_RULES
+    assert "'ti" in translate_core.COMMON_PALI_RULES
+    assert "yena" in translate_core.COMMON_PALI_RULES
+    assert "vocative" in translate_core.COMMON_PALI_RULES
+
+
+def test_strip_grammar_annotations_removes_case_notes() -> None:
+    assert (
+        translate_core._strip_grammar_annotations("the Blessed One (accusative)")
+        == "the Blessed One"
+    )
+    assert (
+        translate_core._strip_grammar_annotations(
+            "beings (nominative plural masculine)"
+        )
+        == "beings"
+    )
+    assert (
+        translate_core._strip_grammar_annotations(
+            "then (enclitic emphasizing the transition)"
+        )
+        == "then"
+    )
+
+
+def test_strip_grammar_annotations_preserves_legitimate_parentheticals() -> None:
+    assert (
+        translate_core._strip_grammar_annotations("talk (of conversation)")
+        == "talk (of conversation)"
+    )
+    assert (
+        translate_core._strip_grammar_annotations("honor (as a token of respect)")
+        == "honor (as a token of respect)"
+    )
+    assert translate_core._strip_grammar_annotations("chapter (25)") == "chapter (25)"
+
+
+def test_strip_grammar_annotations_cleans_whitespace() -> None:
+    assert (
+        translate_core._strip_grammar_annotations("the Blessed One  (accusative)")
+        == "the Blessed One"
+    )
+    assert (
+        translate_core._strip_grammar_annotations("the Blessed One, (accusative)")
+        == "the Blessed One"
+    )
+    assert (
+        translate_core._strip_grammar_annotations("goes - (nominative singular)")
+        == "goes"
+    )
+
+
+def test_normalize_ai_response_strips_grammar_annotations() -> None:
+    ai_data = {
+        "scores": {
+            "1_0": {
+                "score": 10,
+                "contextual_meaning": "the Blessed One (accusative)",
+            },
+            "2_0": {
+                "score": 10,
+                "contextual_meaning": "talk (of conversation)",
+            },
+        }
+    }
+
+    normalized = translate_core._normalize_ai_response(ai_data)
+
+    assert normalized["scores"]["1_0"]["contextual_meaning"] == "the Blessed One"
+    assert normalized["scores"]["2_0"]["contextual_meaning"] == "talk (of conversation)"
+
+
+def test_normalize_ai_response_coerces_bare_number_scores() -> None:
+    ai_data = {"scores": {"123_0": 7, "124_0": {"score": 10}}}
+
+    normalized = translate_core._normalize_ai_response(ai_data)
+
+    assert normalized["scores"] == {
+        "123_0": {"score": 7},
+        "124_0": {"score": 10},
+    }
+
+
+def test_normalize_ai_response_ignores_bool_score_values() -> None:
+    ai_data = {"scores": {"123_0": True}}
+
+    normalized = translate_core._normalize_ai_response(ai_data)
+
+    assert normalized["scores"] == {"123_0": True}
+
+
 def test_translate_sentence_reports_json_and_ai_progress(monkeypatch) -> None:
     events: list[str] = []
 
@@ -279,6 +405,526 @@ def test_find_missing_score_groups_deduplicates_repeated_words() -> None:
     groups = translate_core._find_missing_score_groups(analysis, scores_map={})
 
     assert len(groups) == 1
+
+
+def test_batch_missing_groups_packs_by_size() -> None:
+    groups = [
+        {"word": "eka", "context": "eka", "missing_keys": ["1_0"], "options": []},
+        {"word": "dve", "context": "dve", "missing_keys": ["2_0"], "options": []},
+        {"word": "tayo", "context": "tayo", "missing_keys": ["3_0"], "options": []},
+    ]
+    first_len = len(json.dumps(groups[0], ensure_ascii=False, separators=(",", ":")))
+    second_len = len(json.dumps(groups[1], ensure_ascii=False, separators=(",", ":")))
+
+    batches = translate_core._batch_missing_groups(groups, first_len + second_len)
+
+    assert batches == [groups[:2], groups[2:]]
+    assert translate_core._batch_missing_groups([groups[0]], max_chars=1) == [
+        [groups[0]]
+    ]
+
+
+def test_trim_groups_for_retry_drops_example_fields() -> None:
+    missing_groups = [
+        {
+            "word": "samma",
+            "context": "samma",
+            "missing_keys": ["1_0"],
+            "options": [
+                {
+                    "key": "1_0",
+                    "id": 1,
+                    "pali": "samma",
+                    "pos": "ind",
+                    "grammar": "adv",
+                    "meaning_1": "properly",
+                    "meaning_combo": "properly; rightly",
+                    "example_1": "distinctive example text",
+                    "source_1": "DHP1",
+                    "example_2": "another example",
+                    "source_2": "DHP2",
+                }
+            ],
+        }
+    ]
+    original = copy.deepcopy(missing_groups)
+
+    trimmed = translate_core._trim_groups_for_retry(missing_groups)
+
+    assert missing_groups == original
+    assert tuple(trimmed[0]["options"][0].keys()) == translate_core._RETRY_OPTION_FIELDS
+    assert "example_1" not in trimmed[0]["options"][0]
+    assert "source_2" not in trimmed[0]["options"][0]
+
+
+def test_translate_sentence_retry_prompt_excludes_examples(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    distinctive_example = "distinctive retry-only example"
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: [
+            {
+                "word": "samma",
+                "status": "found",
+                "data": [
+                    {
+                        "key": "1_0",
+                        "id": 1,
+                        "pali": "samma",
+                        "pos": "ind",
+                        "grammar": "adv",
+                        "meaning_1": "properly",
+                        "meaning_combo": "properly; rightly",
+                        "example_1": distinctive_example,
+                        "source_1": "DHP1",
+                        "example_2": "second distinctive example",
+                        "source_2": "DHP2",
+                    }
+                ],
+            }
+        ],
+    )
+    calls: list[dict[str, Any]] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs: Any) -> object:
+            calls.append(kwargs)
+            if len(calls) == 1:
+                content = (
+                    '{"translation": "done", "literal_translation": "done", '
+                    '"scores": {}}'
+                )
+            else:
+                content = '{"scores": {"1_0": {"score": 10}}}'
+            return type(
+                "FakeResponse", (), {"content": content, "status_message": "ok"}
+            )()
+
+    translate_sentence(
+        "samma",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+    )
+
+    retry_prompt = calls[1]["prompt"]
+    assert distinctive_example not in retry_prompt
+    assert '"source_1"' not in retry_prompt
+    assert "adv" in retry_prompt
+    assert "properly; rightly" in retry_prompt
+
+
+def test_retry_request_sys_prompt_contains_no_tools_instruction(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: [
+            {
+                "word": "samma",
+                "status": "found",
+                "data": [{"key": "1_0", "meaning_combo": "properly"}],
+            }
+        ],
+    )
+    calls: list[dict[str, Any]] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs: Any) -> object:
+            calls.append(kwargs)
+            if len(calls) == 1:
+                content = (
+                    '{"translation": "done", "literal_translation": "done", '
+                    '"scores": {}}'
+                )
+            else:
+                content = '{"scores": {"1_0": {"score": 10}}}'
+            return type(
+                "FakeResponse", (), {"content": content, "status_message": "ok"}
+            )()
+
+    translate_sentence(
+        "samma",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+    )
+
+    assert EXPECTED_NO_TOOLS_INSTRUCTION in calls[1]["prompt_sys"]
+
+
+def test_missing_scores_prompt_contains_no_grammar_notes_rule() -> None:
+    missing_groups = [
+        {
+            "word": "samma",
+            "context": "samma",
+            "missing_keys": ["1_0"],
+            "options": [{"key": "1_0", "meaning_combo": "properly"}],
+        }
+    ]
+
+    prompt = _build_missing_scores_prompt("samma", missing_groups)
+
+    assert (
+        "Provide ONLY the core meaning. Do NOT append grammatical case notes "
+        "in parentheses."
+    ) in prompt
+
+
+def test_missing_scores_prompt_requests_contextual_meaning_for_best_option() -> None:
+    missing_groups = [
+        {
+            "word": "satta",
+            "context": "satta",
+            "missing_keys": ["123_0"],
+            "options": [{"key": "123_0", "meaning_combo": "being; creature"}],
+        }
+    ]
+
+    prompt = _build_missing_scores_prompt("satta", missing_groups)
+
+    assert (
+        'For the single best option per word (score 10), also include "contextual_meaning"'
+        in prompt
+    )
+
+
+def _analysis_with_missing_retry_keys(keys: list[str]) -> list[dict[str, Any]]:
+    return [
+        {
+            "word": f"word{index}",
+            "status": "found",
+            "data": [
+                {
+                    "key": key,
+                    "id": index,
+                    "pali": f"pali{index}",
+                    "pos": "noun",
+                    "grammar": "nom sg",
+                    "meaning_combo": f"meaning {index}",
+                    "example_1": "",
+                    "example_2": "",
+                }
+            ],
+        }
+        for index, key in enumerate(keys, start=1)
+    ]
+
+
+def test_retry_scores_merge_contextual_meanings(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: _analysis_with_missing_retry_keys(["123_0"]),
+    )
+    calls: list[dict[str, Any]] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs: Any) -> object:
+            calls.append(kwargs)
+            if len(calls) == 1:
+                content = (
+                    '{"translation": "done", "literal_translation": "done", '
+                    '"scores": {}}'
+                )
+            else:
+                content = (
+                    '{"scores": {"123_0": {"score": 10, "contextual_meaning": "some"}}}'
+                )
+            return type(
+                "FakeResponse", (), {"content": content, "status_message": "ok"}
+            )()
+
+    debug: dict[str, Any] = {}
+    result = translate_sentence(
+        "satta",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        debug=debug,
+    )
+
+    option = result["analysis"][0]["data"][0]
+    assert option["ai_score"] == 10
+    assert option["meaning_combo"] == "some"
+    assert debug["final_scores"]["123_0"]["contextual_meaning"] == "some"
+
+
+def test_retry_flat_shape_meanings_are_grammar_stripped(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: _analysis_with_missing_retry_keys(["123_0"]),
+    )
+    calls: list[dict[str, Any]] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs: Any) -> object:
+            calls.append(kwargs)
+            if len(calls) == 1:
+                content = (
+                    '{"translation": "done", "literal_translation": "done", '
+                    '"scores": {}}'
+                )
+            else:
+                content = (
+                    '{"123_0": {"score": 10, '
+                    '"contextual_meaning": "the Blessed One (accusative)"}}'
+                )
+            return type(
+                "FakeResponse", (), {"content": content, "status_message": "ok"}
+            )()
+
+    debug: dict[str, Any] = {}
+    result = translate_sentence(
+        "bhagavantaṃ",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        debug=debug,
+    )
+
+    option = result["analysis"][0]["data"][0]
+    assert option["ai_score"] == 10
+    assert option["meaning_combo"] == "the Blessed One"
+    assert debug["final_scores"]["123_0"]["contextual_meaning"] == "the Blessed One"
+
+
+def _missing_keys_from_retry_prompt(prompt: str) -> list[str]:
+    context = prompt.split("Missing dictionary option scores:\n", maxsplit=1)[1]
+    groups = cast(list[dict[str, Any]], json.loads(context.strip()))
+    return [key for group in groups for key in cast(list[str], group["missing_keys"])]
+
+
+def test_translate_sentence_passes_provider_and_model_to_every_request(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: _analysis_with_missing_retry_keys(["1_0"]),
+    )
+    calls: list[dict[str, Any]] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs: Any) -> object:
+            calls.append(kwargs)
+            if len(calls) == 1:
+                content = "Here is prose instead of JSON."
+            elif len(calls) == 2:
+                content = (
+                    '{"translation": "done", "literal_translation": "done", '
+                    '"scores": {}}'
+                )
+            else:
+                content = '{"scores": {"1_0": {"score": 10}}}'
+            return type(
+                "FakeResponse", (), {"content": content, "status_message": "ok"}
+            )()
+
+    translate_sentence(
+        "eka",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        model="m-x",
+        provider="prov-x",
+    )
+
+    assert len(calls) >= 3
+    for call in calls:
+        assert call["provider_preference"] == "prov-x"
+        assert call["model"] == "m-x"
+
+
+def test_translate_sentence_default_provider_is_none(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: _analysis_with_missing_retry_keys(["1_0"]),
+    )
+    calls: list[dict[str, Any]] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs: Any) -> object:
+            calls.append(kwargs)
+            if len(calls) == 1:
+                content = (
+                    '{"translation": "done", "literal_translation": "done", '
+                    '"scores": {}}'
+                )
+            else:
+                content = '{"scores": {"1_0": {"score": 10}}}'
+            return type(
+                "FakeResponse", (), {"content": content, "status_message": "ok"}
+            )()
+
+    translate_sentence(
+        "eka",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+    )
+
+    assert len(calls) >= 2
+    for call in calls:
+        assert call.get("provider_preference") is None
+
+
+def test_translate_sentence_batches_oversized_retry(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: _analysis_with_missing_retry_keys(
+            ["1_0", "2_0", "3_0"]
+        ),
+    )
+    monkeypatch.setattr(translate_core, "MAX_RETRY_CONTEXT_CHARS", 1, raising=False)
+    calls: list[dict[str, Any]] = []
+    retry_key_batches: list[list[str]] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs: Any) -> object:
+            calls.append(kwargs)
+            if len(calls) == 1:
+                content = (
+                    '{"translation": "done", "literal_translation": "done", '
+                    '"scores": {}}'
+                )
+            else:
+                batch_keys = _missing_keys_from_retry_prompt(kwargs["prompt"])
+                retry_key_batches.append(batch_keys)
+                scores = {key: {"score": 10} for key in batch_keys}
+                content = json.dumps({"scores": scores})
+            return type(
+                "FakeResponse", (), {"content": content, "status_message": "ok"}
+            )()
+
+    debug: dict[str, Any] = {}
+    result = translate_sentence(
+        "eka dve tayo",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        debug=debug,
+    )
+
+    assert len(calls) >= 3
+    assert retry_key_batches == [["1_0"], ["2_0"], ["3_0"]]
+    assert [entry["data"][0]["ai_score"] for entry in result["analysis"]] == [
+        10,
+        10,
+        10,
+    ]
+    assert len(debug["retry_requests"]) == 3
+    assert debug["missing_score_groups_after_retry"] == []
+
+
+def test_translate_sentence_runs_second_retry_pass_for_leftovers(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: _analysis_with_missing_retry_keys(
+            ["1_0", "2_0"]
+        ),
+    )
+    calls: list[dict[str, Any]] = []
+    retry_key_batches: list[list[str]] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs: Any) -> object:
+            calls.append(kwargs)
+            if len(calls) == 1:
+                content = (
+                    '{"translation": "done", "literal_translation": "done", '
+                    '"scores": {}}'
+                )
+            elif len(calls) == 2:
+                batch_keys = _missing_keys_from_retry_prompt(kwargs["prompt"])
+                retry_key_batches.append(batch_keys)
+                content = '{"scores": {"1_0": {"score": 10}}}'
+            else:
+                batch_keys = _missing_keys_from_retry_prompt(kwargs["prompt"])
+                retry_key_batches.append(batch_keys)
+                scores = {key: {"score": 10} for key in batch_keys}
+                content = json.dumps({"scores": scores})
+            return type(
+                "FakeResponse", (), {"content": content, "status_message": "ok"}
+            )()
+
+    debug: dict[str, Any] = {}
+    result = translate_sentence(
+        "eka dve",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        debug=debug,
+    )
+
+    assert retry_key_batches == [["1_0", "2_0"], ["2_0"]]
+    assert [entry["data"][0]["ai_score"] for entry in result["analysis"]] == [
+        10,
+        10,
+    ]
+    assert len(debug["retry_requests"]) == 2
+    assert debug["retry_requests"][1]["pass"] == 2
+    assert debug["missing_score_groups_after_retry"] == []
+
+
+def test_translate_sentence_retry_batch_cap(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: _analysis_with_missing_retry_keys(
+            ["1_0", "2_0", "3_0"]
+        ),
+    )
+    monkeypatch.setattr(translate_core, "MAX_RETRY_CONTEXT_CHARS", 1, raising=False)
+    monkeypatch.setattr(translate_core, "MAX_RETRY_BATCHES", 1, raising=False)
+    calls: list[dict[str, Any]] = []
+    retry_key_batches: list[list[str]] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs: Any) -> object:
+            calls.append(kwargs)
+            if len(calls) == 1:
+                content = (
+                    '{"translation": "done", "literal_translation": "done", '
+                    '"scores": {}}'
+                )
+            else:
+                batch_keys = _missing_keys_from_retry_prompt(kwargs["prompt"])
+                retry_key_batches.append(batch_keys)
+                content = json.dumps(
+                    {"scores": {key: {"score": 10} for key in batch_keys}}
+                )
+            return type(
+                "FakeResponse", (), {"content": content, "status_message": "ok"}
+            )()
+
+    debug: dict[str, Any] = {}
+    result = translate_sentence(
+        "eka dve",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        debug=debug,
+    )
+
+    assert len(calls) == 3
+    assert retry_key_batches == [["1_0"], ["2_0"]]
+    assert len(debug["retry_requests"]) == 2
+    assert debug["retry_requests"][1]["pass"] == 2
+    assert [entry["data"][0]["ai_score"] for entry in result["analysis"]] == [
+        10,
+        10,
+        None,
+    ]
+    assert [
+        key for group in debug["retry_skipped_groups"] for key in group["missing_keys"]
+    ] == ["3_0"]
+    assert [
+        key
+        for group in debug["missing_score_groups_after_retry"]
+        for key in group["missing_keys"]
+    ] == ["3_0"]
 
 
 def test_pre_match_db_examples_requires_text_overlap() -> None:
@@ -409,6 +1055,214 @@ def test_split_into_sentence_chunks_falls_back_on_token_mismatch() -> None:
     assert chunks == [(sentence, analysis)]
 
 
+def _patch_basic_chunked_analysis(monkeypatch: pytest.MonkeyPatch) -> None:
+    analysis = [
+        {
+            "word": "buddho",
+            "status": "found",
+            "data": [
+                {
+                    "key": "1_0",
+                    "pali": "buddho",
+                    "pos": "noun",
+                    "meaning_combo": "awakened one",
+                }
+            ],
+        },
+        {
+            "word": "bhagavā",
+            "status": "found",
+            "data": [
+                {
+                    "key": "2_0",
+                    "pali": "bhagavā",
+                    "pos": "noun",
+                    "meaning_combo": "blessed one",
+                }
+            ],
+        },
+        {
+            "word": "dhammo",
+            "status": "found",
+            "data": [
+                {
+                    "key": "3_0",
+                    "pali": "dhammo",
+                    "pos": "noun",
+                    "meaning_combo": "teaching",
+                }
+            ],
+        },
+    ]
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: analysis,
+    )
+    monkeypatch.setattr(translate_core, "MAX_FIRST_CONTEXT_CHARS", 10, raising=False)
+
+
+def test_translate_sentence_tolerates_single_chunk_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _patch_basic_chunked_analysis(monkeypatch)
+    calls: list[str] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs: Any) -> object:
+            prompt = kwargs["prompt"]
+            calls.append(prompt)
+            if prompt.startswith("Return JSON for: buddho bhagavā."):
+                return type(
+                    "FakeResponse",
+                    (),
+                    {"content": "", "status_message": "chunk timed out"},
+                )()
+            if prompt.startswith("Return JSON for: dhammo."):
+                content = (
+                    '{"translation": "T2", "literal_translation": "L2", '
+                    '"scores": {"3_0": {"score": 10}}}'
+                )
+            else:
+                content = '{"scores": {"1_0": {"score": 10}, "2_0": {"score": 9}}}'
+            return type(
+                "FakeResponse",
+                (),
+                {"content": content, "status_message": "ok"},
+            )()
+
+    debug: dict[str, Any] = {}
+    result = translate_sentence(
+        "buddho bhagavā. dhammo.",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        debug=debug,
+    )
+
+    assert [entry["data"][0]["ai_score"] for entry in result["analysis"]] == [
+        10,
+        9,
+        10,
+    ]
+    assert (
+        len(
+            [
+                call
+                for call in calls
+                if call.startswith("Return JSON for: buddho bhagavā.")
+            ]
+        )
+        == 2
+    )
+    assert debug["chunk_requests"][0]["chunk_sentence"] == "buddho bhagavā."
+    assert "chunk_error" in debug["chunk_requests"][0]
+    assert debug["retry_requests"][0]["missing_keys"] == ["1_0", "2_0"]
+
+
+def test_translate_sentence_retries_failed_chunk_once(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _patch_basic_chunked_analysis(monkeypatch)
+    first_chunk_attempts = 0
+
+    class FakeAIManager:
+        def request(self, **kwargs: Any) -> object:
+            nonlocal first_chunk_attempts
+            prompt = kwargs["prompt"]
+            if prompt.startswith("Return JSON for: buddho bhagavā."):
+                first_chunk_attempts += 1
+                if first_chunk_attempts == 1:
+                    return type(
+                        "FakeResponse",
+                        (),
+                        {"content": "", "status_message": "chunk timed out"},
+                    )()
+                content = (
+                    '{"translation": "T1", "literal_translation": "L1", '
+                    '"scores": {"1_0": {"score": 10}, "2_0": {"score": 10}}}'
+                )
+            else:
+                content = (
+                    '{"translation": "T2", "literal_translation": "L2", '
+                    '"scores": {"3_0": {"score": 10}}}'
+                )
+            return type(
+                "FakeResponse",
+                (),
+                {"content": content, "status_message": "ok"},
+            )()
+
+    debug: dict[str, Any] = {}
+    result = translate_sentence(
+        "buddho bhagavā. dhammo.",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        debug=debug,
+    )
+
+    assert first_chunk_attempts == 2
+    assert [entry["data"][0]["ai_score"] for entry in result["analysis"]] == [
+        10,
+        10,
+        10,
+    ]
+    assert "chunk_error" not in debug["chunk_requests"][0]
+    assert "chunk_error_attempt_1" in debug["chunk_requests"][0]
+
+
+def test_translate_sentence_raises_when_all_chunks_fail(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _patch_basic_chunked_analysis(monkeypatch)
+    call_count = 0
+
+    class FakeAIManager:
+        def request(self, **_kwargs: Any) -> object:
+            nonlocal call_count
+            call_count += 1
+            return type(
+                "FakeResponse",
+                (),
+                {"content": "", "status_message": "chunk timed out"},
+            )()
+
+    with pytest.raises(ValueError, match="AI Request Failed"):
+        translate_sentence(
+            "buddho bhagavā. dhammo.",
+            cast(Session, object()),
+            ai_manager=cast(AIManager, FakeAIManager()),
+        )
+
+    assert call_count == 4
+
+
+def test_single_chunk_failure_still_raises(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: [
+            {
+                "word": "buddho",
+                "status": "found",
+                "data": [{"key": "1_0", "meaning_combo": "awakened"}],
+            }
+        ],
+    )
+
+    class FakeAIManager:
+        def request(self, **_kwargs: Any) -> object:
+            return type(
+                "FakeResponse",
+                (),
+                {"content": "", "status_message": "empty"},
+            )()
+
+    with pytest.raises(ValueError, match="AI Request Failed"):
+        translate_sentence(
+            "buddho",
+            cast(Session, object()),
+            ai_manager=cast(AIManager, FakeAIManager()),
+        )
+
+
 def test_translate_sentence_chunks_oversized_passage(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -502,6 +1356,45 @@ def test_translate_sentence_chunks_oversized_passage(
     )
     assert "raw_response" not in debug
     assert debug["retry_requests"] == []
+
+
+def test_first_pass_debug_records_chunk_sentence() -> None:
+    class FakeAIManager:
+        def request(self, **_kwargs: Any) -> object:
+            return type(
+                "FakeResponse",
+                (),
+                {
+                    "content": (
+                        '{"translation": "Awake.", '
+                        '"literal_translation": "Awake.", '
+                        '"scores": {"1_0": {"score": 10}}}'
+                    ),
+                    "status_message": "ok",
+                },
+            )()
+
+    debug: dict[str, Any] = {}
+    translate_core._request_first_pass(
+        chunk_sentence="buddho.",
+        full_sentence="buddho. dhammo.",
+        analysis=[
+            {
+                "word": "buddho",
+                "status": "found",
+                "data": [{"key": "1_0", "meaning_combo": "awakened"}],
+            }
+        ],
+        ai_manager=cast(AIManager, FakeAIManager()),
+        model=None,
+        provider=None,
+        speech_mark_options=None,
+        progress=None,
+        verbose=False,
+        debug=debug,
+    )
+
+    assert debug["chunk_sentence"] == "buddho."
 
 
 def test_translate_sentence_retries_missing_component_scores(monkeypatch) -> None:
@@ -740,6 +1633,129 @@ def test_coerce_flat_score_map_shapes() -> None:
     assert translate_core._coerce_flat_score_map(untouched, expected) is untouched
     prose_like = {"x": "y", "z": "w", "a_0": {"score": 1}}
     assert translate_core._coerce_flat_score_map(prose_like, expected) is prose_like
+
+
+def test_deterministic_scores_promote_finite_verb_quotative_ti_deconstruction() -> None:
+    analysis = [
+        {
+            "word": "upapajjantī'ti",
+            "status": "found",
+            "data": [
+                {
+                    "key": "decon_upapajjantīti_0",
+                    "pali": "upapajjantīti",
+                    "pos": "sandhi",
+                    "grammar": "sandhi/compound",
+                    "meaning_combo": "[Deconstructed]",
+                    "construction": "upapajjantī + iti",
+                    "components": [
+                        [
+                            {
+                                "key": "79845_0",
+                                "pali": "upapajjantī",
+                                "pos": "prp",
+                                "grammar": "fem nom sg of upapajjanta",
+                                "meaning_combo": "being reborn",
+                            }
+                        ],
+                        [
+                            {
+                                "key": "13466_default",
+                                "pali": "iti",
+                                "pos": "ind",
+                                "grammar": "ind, adv",
+                            }
+                        ],
+                    ],
+                },
+                {
+                    "key": "decon_upapajjantīti_1",
+                    "pali": "upapajjantīti",
+                    "pos": "sandhi",
+                    "grammar": "sandhi/compound",
+                    "meaning_combo": "[Deconstructed]",
+                    "construction": "upapajjanti + iti",
+                    "components": [
+                        [
+                            {
+                                "key": "15855_0",
+                                "pali": "upapajjanti",
+                                "pos": "verb",
+                                "grammar": "pr 3rd pl of upapajjati",
+                                "meaning_combo": "are reborn",
+                            }
+                        ],
+                        [
+                            {
+                                "key": "13466_default",
+                                "pali": "iti",
+                                "pos": "ind",
+                                "grammar": "ind, adv",
+                            }
+                        ],
+                    ],
+                },
+            ],
+        }
+    ]
+    scores_map: dict[str, Any] = {
+        "decon_upapajjantīti_0": {"score": 10, "contextual_meaning": "being reborn"},
+        "decon_upapajjantīti_1": {"score": 0},
+    }
+
+    translate_core._apply_deterministic_scores_to_map(analysis, scores_map)
+
+    assert scores_map["decon_upapajjantīti_0"]["score"] == 0
+    assert scores_map["decon_upapajjantīti_1"] == {
+        "score": 10,
+        "selection_source": "deterministic_quotative_ti_deconstruction",
+        "contextual_meaning": "are reborn",
+    }
+
+
+def test_deterministic_scores_do_not_boost_feminine_quotative_ti_deconstruction() -> (
+    None
+):
+    analysis = [
+        {
+            "word": "dharaṇī'ti",
+            "status": "found",
+            "data": [
+                {
+                    "key": "decon_dharaṇīti_0",
+                    "pali": "dharaṇīti",
+                    "pos": "sandhi",
+                    "grammar": "sandhi/compound",
+                    "meaning_combo": "[Deconstructed]",
+                    "construction": "dharaṇī + iti",
+                    "components": [
+                        [
+                            {
+                                "key": "35009_0",
+                                "pali": "dharaṇī",
+                                "pos": "fem",
+                                "grammar": "fem nom sg of dharaṇī",
+                                "meaning_combo": "earth",
+                            }
+                        ],
+                        [
+                            {
+                                "key": "13466_default",
+                                "pali": "iti",
+                                "pos": "ind",
+                                "grammar": "ind, adv",
+                            }
+                        ],
+                    ],
+                }
+            ],
+        }
+    ]
+    scores_map: dict[str, Any] = {}
+
+    translate_core._apply_deterministic_scores_to_map(analysis, scores_map)
+
+    assert scores_map == {}
 
 
 def test_translate_sentence_curated_example_match_overrides_ai_score(
@@ -991,6 +2007,36 @@ def test_translate_sentence_reformat_triggered_when_prose_returned(
     assert result["translation"] == "reformatted"
 
 
+def test_reformat_request_sys_prompt_contains_no_tools_instruction(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: [],
+    )
+    calls: list[dict[str, Any]] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs: Any) -> object:
+            calls.append(kwargs)
+            if len(calls) == 1:
+                content = "Here is a detailed prose analysis of the verse..."
+            else:
+                content = (
+                    '{"translation": "reformatted", "literal_translation": "lit", '
+                    '"scores": {}}'
+                )
+            return type("R", (), {"content": content, "status_message": "ok"})()
+
+    translate_sentence(
+        "sabbaṃ",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+    )
+
+    assert EXPECTED_NO_TOOLS_INSTRUCTION in calls[1]["prompt_sys"]
+
+
 def test_translate_sentence_reformat_progress_events(monkeypatch) -> None:
     """Reformat path emits ai_reformat_start and ai_reformat_done progress events."""
     monkeypatch.setattr(
@@ -1094,6 +2140,61 @@ def test_translate_sentence_reformat_keeps_salvaged_scores(
     assert component_options[1]["ai_score"] == 7
 
 
+def test_build_reformat_prompt_includes_valid_keys_block() -> None:
+    word_keys_json = '{"atha":["2794_default"],"puriso":["29188_3"]}'
+
+    prompt = translate_core._build_reformat_prompt(
+        "atha puriso",
+        "Use atha and puriso.",
+        word_keys_json,
+    )
+
+    assert (
+        'Valid option keys per word (keys in "scores" MUST come from these lists):'
+        in prompt
+    )
+    assert word_keys_json in prompt
+
+
+def test_build_reformat_prompt_without_keys_unchanged() -> None:
+    prompt = translate_core._build_reformat_prompt(
+        "atha puriso",
+        "Use atha and puriso.",
+        "",
+    )
+
+    assert "Valid option keys per word" not in prompt
+
+
+def test_word_keys_overview_top_level_only() -> None:
+    analysis = [
+        {
+            "word": "sammāsambuddhassa",
+            "data": [
+                {
+                    "key": "60847_0",
+                    "components": [[{"key": "60693_0"}, {"key": "60789_0"}]],
+                },
+                {"key": "60847_1"},
+            ],
+        }
+    ]
+
+    assert (
+        translate_core._word_keys_overview(analysis)
+        == '{"sammāsambuddhassa":["60847_0","60847_1"]}'
+    )
+
+
+def test_word_keys_overview_oversize_returns_empty(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(translate_core, "REFORMAT_KEYS_MAX_CHARS", 10, raising=False)
+    analysis = [{"word": "sammā", "data": [{"key": "60847_0"}]}]
+
+    assert translate_core._word_keys_overview(analysis) == ""
+
+
 def test_extract_word_key_map_detects_disambiguation_map() -> None:
     """A flat {word: option_key} map whose values are real keys is recognised."""
     analysis = [
@@ -1131,6 +2232,342 @@ def test_extract_word_key_map_rejects_non_map_shapes() -> None:
     assert _extract_word_key_map({}, analysis) is None
     # No analysis keys to match against → never a map.
     assert _extract_word_key_map({"dharaṇī": "35009_0"}, []) is None
+
+
+def _structured_selection_analysis() -> list[dict[str, Any]]:
+    return [
+        {
+            "word": "atha",
+            "status": "found",
+            "data": [
+                {
+                    "key": "2794_default",
+                    "id": 2794,
+                    "lemma": "atha",
+                    "meaning_combo": "then",
+                },
+                {
+                    "key": "2794_1",
+                    "id": 2794,
+                    "lemma": "atha 2",
+                    "meaning_combo": "moreover",
+                },
+            ],
+        },
+        {
+            "word": "puriso",
+            "status": "found",
+            "data": [
+                {
+                    "key": "29188_3",
+                    "id": 29188,
+                    "lemma": "purisa 1",
+                    "meaning_combo": "man",
+                },
+                {
+                    "key": "29189_0",
+                    "id": 29189,
+                    "lemma": "purisa 2",
+                    "meaning_combo": "soul",
+                },
+            ],
+        },
+        {
+            "word": "taṃ",
+            "status": "found",
+            "data": [
+                {
+                    "key": "42000_0",
+                    "id": 42000,
+                    "lemma": "ta 1.1",
+                    "meaning_combo": "that",
+                }
+            ],
+        },
+    ]
+
+
+def test_structured_selection_disambiguation_list_with_selected_key() -> None:
+    ai_data = {
+        "disambiguation": [
+            {"word": "atha", "selected_key": "2794_default", "meaning": "then"},
+            {"word": "puriso", "selected_key": "29188_3", "meaning": "man"},
+        ]
+    }
+
+    assert translate_core._extract_structured_selection_map(
+        ai_data, _structured_selection_analysis()
+    ) == (
+        {"atha": "2794_default", "puriso": "29188_3"},
+        {"atha": "then", "puriso": "man"},
+    )
+
+
+def test_structured_selection_meanings_are_stripped() -> None:
+    ai_data = {
+        "disambiguation": [
+            {
+                "word": "atha",
+                "selected_key": "2794_default",
+                "meaning": "then (enclitic emphasizing the transition)",
+            },
+            {
+                "word": "puriso",
+                "selected_key": "29188_3",
+                "meaning": "man (nominative singular masculine)",
+            },
+        ]
+    }
+
+    assert translate_core._extract_structured_selection_map(
+        ai_data, _structured_selection_analysis()
+    ) == (
+        {"atha": "2794_default", "puriso": "29188_3"},
+        {"atha": "then", "puriso": "man"},
+    )
+
+
+def test_structured_selection_sentence_analysis_selected_lemma_key() -> None:
+    ai_data = {
+        "sentence_analysis": [
+            {
+                "word": "puriso",
+                "selected_lemma_key": "29188_3",
+                "meaning": "a person",
+            }
+        ]
+    }
+
+    assert translate_core._extract_structured_selection_map(
+        ai_data, _structured_selection_analysis()
+    ) == ({"puriso": "29188_3"}, {"puriso": "a person"})
+
+
+def test_structured_selection_selected_id_unique_match() -> None:
+    ai_data = {"selected_meanings": [{"word": "taṃ", "selected_id": 42000}]}
+
+    assert translate_core._extract_structured_selection_map(
+        ai_data, _structured_selection_analysis()
+    ) == ({"taṃ": "42000_0"}, {})
+
+
+def test_structured_selection_selected_id_ambiguous_skipped() -> None:
+    ai_data = {
+        "selected_meanings": [
+            {"word": "atha", "selected_id": 2794},
+            {"word": "taṃ", "selected_id": 42000},
+        ]
+    }
+
+    assert translate_core._extract_structured_selection_map(
+        ai_data, _structured_selection_analysis()
+    ) == ({"taṃ": "42000_0"}, {})
+
+
+def test_structured_selection_gloss_map_lemma_match() -> None:
+    ai_data = {
+        "puriso": {"lemma": "purisa 1", "meaning": "man"},
+        "taṃ": {"lemma": "ta 1.1", "meaning": "that"},
+    }
+
+    assert translate_core._extract_structured_selection_map(
+        ai_data, _structured_selection_analysis()
+    ) == (
+        {"puriso": "29188_3", "taṃ": "42000_0"},
+        {"puriso": "man", "taṃ": "that"},
+    )
+
+
+def test_structured_selection_gloss_map_ambiguous_lemma_skipped() -> None:
+    analysis = _structured_selection_analysis()
+    analysis[0]["data"][1]["lemma"] = "atha"
+    ai_data = {
+        "atha": {"lemma": "atha", "meaning": "then"},
+        "taṃ": {"lemma": "ta 1.1", "meaning": "that"},
+    }
+
+    assert translate_core._extract_structured_selection_map(ai_data, analysis) == (
+        {"taṃ": "42000_0"},
+        {"taṃ": "that"},
+    )
+
+
+def test_structured_selection_rejects_proper_schema() -> None:
+    ai_data = {
+        "translation": "Then the man saw that.",
+        "scores": {"29188_3": {"score": 10}},
+    }
+
+    assert (
+        translate_core._extract_structured_selection_map(
+            ai_data, _structured_selection_analysis()
+        )
+        is None
+    )
+
+
+def test_structured_selection_low_match_ratio_returns_none() -> None:
+    ai_data = {
+        "selected_meanings": [
+            {"word": "atha", "selected_key": "2794_default"},
+            {"word": "puriso", "selected_key": "not_real"},
+            {"word": "taṃ", "selected_key": "also_not_real"},
+        ]
+    }
+
+    assert (
+        translate_core._extract_structured_selection_map(
+            ai_data, _structured_selection_analysis()
+        )
+        is None
+    )
+
+
+def test_first_pass_routes_structured_selection_to_compact_path(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: [
+            {
+                "word": "atha",
+                "status": "found",
+                "data": [
+                    {
+                        "key": "2794_default",
+                        "id": 2794,
+                        "lemma": "atha",
+                        "meaning_combo": "then",
+                    }
+                ],
+            },
+            {
+                "word": "puriso",
+                "status": "found",
+                "data": [
+                    {
+                        "key": "29188_3",
+                        "id": 29188,
+                        "lemma": "purisa 1",
+                        "meaning_combo": "man",
+                    }
+                ],
+            },
+        ],
+    )
+    calls: list[dict[str, Any]] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs: Any) -> object:
+            calls.append(kwargs)
+            if len(calls) == 1:
+                content = (
+                    '{"disambiguation": ['
+                    '{"word": "atha", "selected_key": "2794_default"},'
+                    '{"word": "puriso", "selected_key": "29188_3"}]}'
+                )
+            else:
+                content = (
+                    '{"translation": "Then the man.", '
+                    '"literal_translation": "then man.", "meanings": {}}'
+                )
+            return type(
+                "FakeResponse", (), {"content": content, "status_message": "ok"}
+            )()
+
+    debug: dict[str, Any] = {}
+    result = translate_sentence(
+        "atha puriso",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        debug=debug,
+    )
+
+    assert len(calls) == 2
+    assert "Translate" in calls[1]["prompt"]
+    assert "did not match" not in calls[1]["prompt"]
+    assert "reformat_raw_response" not in debug
+    assert debug["final_scores"]["2794_default"]["score"] == 10
+    assert debug["final_scores"]["29188_3"]["score"] == 10
+    assert result["analysis"][0]["data"][0]["ai_score"] == 10
+    assert result["analysis"][1]["data"][0]["ai_score"] == 10
+
+
+def test_compact_map_prefills_contextual_meaning_from_word_meanings() -> None:
+    calls: list[dict[str, Any]] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs: Any) -> object:
+            calls.append(kwargs)
+            return type(
+                "FakeResponse",
+                (),
+                {
+                    "content": (
+                        '{"translation": "Done.", "literal_translation": "Done.", '
+                        '"meanings": {"override": "translation meaning"}}'
+                    ),
+                    "status_message": "ok",
+                },
+            )()
+
+    ai_data = translate_core._handle_compact_map_response(
+        chunk_sentence="prefill override",
+        word_key_map={"prefill": "1_0", "override": "2_0"},
+        word_meanings={"prefill": "structured meaning", "override": "old meaning"},
+        ai_manager=cast(AIManager, FakeAIManager()),
+        model=None,
+        provider=None,
+        progress=None,
+        verbose=False,
+        debug={},
+    )
+
+    scores = ai_data["scores"]
+    assert len(calls) == 1
+    assert scores["1_0"]["contextual_meaning"] == "structured meaning"
+    assert scores["2_0"]["contextual_meaning"] == "translation meaning"
+
+
+def test_translation_prompt_contains_no_grammar_notes_rule() -> None:
+    prompt = translate_core._build_translation_prompt("samma")
+
+    assert (
+        "Provide ONLY the core meaning. Do NOT append grammatical case notes "
+        "in parentheses."
+    ) in prompt
+
+
+def test_translation_request_sys_prompt_contains_no_tools_instruction() -> None:
+    calls: list[dict[str, Any]] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs: Any) -> object:
+            calls.append(kwargs)
+            return type(
+                "FakeResponse",
+                (),
+                {
+                    "content": (
+                        '{"translation": "Done.", "literal_translation": "Done.", '
+                        '"meanings": {}}'
+                    ),
+                    "status_message": "ok",
+                },
+            )()
+
+    translate_core._handle_compact_map_response(
+        chunk_sentence="atha puriso",
+        word_key_map={"atha": "1_0"},
+        ai_manager=cast(AIManager, FakeAIManager()),
+        model=None,
+        provider=None,
+        progress=None,
+        verbose=False,
+        debug={},
+    )
+
+    assert EXPECTED_NO_TOOLS_INSTRUCTION in calls[0]["prompt_sys"]
 
 
 def test_translate_sentence_uses_word_key_map_skips_reformat(monkeypatch) -> None:

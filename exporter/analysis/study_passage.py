@@ -4,6 +4,7 @@ import argparse
 import json
 import re
 from pathlib import Path
+from typing import Any
 
 from db.db_helpers import get_db_session
 from exporter.analysis.paths import ensure_analysis_dirs
@@ -156,7 +157,7 @@ def _print_translation_progress(source: str, event: str) -> None:
         pr.yes("done")
 
 
-def _build_raw_responses_log(source: str, ai_debug: dict) -> str:
+def _build_raw_responses_log(source: str, ai_debug: dict[str, Any]) -> str:
     """Collect all raw AI responses from a debug dict into one readable text file."""
     sections: list[str] = [f"# Raw AI responses for {source}\n"]
 
@@ -228,14 +229,49 @@ def _build_raw_responses_log(source: str, ai_debug: dict) -> str:
     return "\n".join(sections)
 
 
-def main() -> None:
+def _write_ai_debug_artifacts(
+    source: str,
+    ai_debug: dict[str, Any],
+    include_raw: bool,
+) -> None:
+    """Write AI debug JSON and optionally the readable raw-response log."""
+    debug_path = _OUTPUT_DIR / f"{source}_ai_debug.json"
+    debug_path.write_text(
+        json.dumps(ai_debug, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    if include_raw:
+        raw_path = _REPORTS_DIR / f"{source}_ai_raw.txt"
+        raw_path.write_text(
+            _build_raw_responses_log(source, ai_debug),
+            encoding="utf-8",
+        )
+        pr.green(f"Raw AI responses: {raw_path}")
+
+
+def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Pāḷi passage analyzer — Stage 1")
     parser.add_argument(
         "--debug",
         action="store_true",
         help="Print raw AI responses and parse errors to the terminal",
     )
-    args = parser.parse_args()
+    parser.add_argument(
+        "--provider",
+        help="Force one AI provider for every request (requires --model), e.g. antigravity_cli",
+    )
+    parser.add_argument(
+        "--model",
+        help='Force one model for every request (requires --provider), e.g. "GPT-OSS 120B (Medium)"',
+    )
+    args = parser.parse_args(argv)
+    if bool(args.provider) != bool(args.model):
+        parser.error("--provider and --model must be used together")
+    return args
+
+
+def main() -> None:
+    args = _parse_args()
 
     paths = ProjectPaths()
     if not paths.dpd_db_path.exists():
@@ -275,19 +311,25 @@ def main() -> None:
 
     db_session = get_db_session(paths.dpd_db_path)
     ai_manager = AIManager()
-    ai_debug: dict = {}
+    ai_debug: dict[str, Any] = {}
 
     try:
         merged = translate_sentence(
             passage,
             db_session,
             ai_manager,
+            model=args.model,
+            provider=args.provider,
             verse_source=source,
             speech_mark_options=speech_mark_options,
             progress=lambda event: _print_translation_progress(source, event),
             debug=ai_debug,
             verbose=args.debug,
         )
+    except Exception:
+        if args.debug or ai_debug:
+            _write_ai_debug_artifacts(source, ai_debug, args.debug)
+        raise
     finally:
         db_session.close()
 
@@ -299,17 +341,7 @@ def main() -> None:
     json_path.write_text(
         json.dumps(merged, ensure_ascii=False, indent=2), encoding="utf-8"
     )
-    debug_path = _OUTPUT_DIR / f"{source}_ai_debug.json"
-    debug_path.write_text(
-        json.dumps(ai_debug, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
-
-    if args.debug:
-        raw_path = _REPORTS_DIR / f"{source}_ai_raw.txt"
-        raw_path.write_text(
-            _build_raw_responses_log(source, ai_debug), encoding="utf-8"
-        )
-        pr.green(f"Raw AI responses: {raw_path}")
+    _write_ai_debug_artifacts(source, ai_debug, args.debug)
 
     pr.green("")
     pr.green(f"Report: {report_path}")

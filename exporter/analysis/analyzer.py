@@ -1,11 +1,12 @@
 """Analyze Pali sentences against DPD lookup and headword data."""
 
 import re
-from typing import Any
+from typing import Any, cast
 
 from sqlalchemy.orm import Session
 
 from db.models import DpdHeadword, Lookup
+from exporter.analysis.types import AnalysisOption, AnalysisResult
 from tools.clean_machine import clean_machine
 from tools.pali_alphabet import pali_alphabet
 
@@ -118,26 +119,30 @@ def _has_particle_deconstructor(lookup_entry: Lookup) -> bool:
 
     for deconstruction in lookup_entry.deconstructor_unpack:
         clean_deconstruction = re.sub(r" \[.+", "", deconstruction)
-        if any(clean_deconstruction.endswith(particle) for particle in sandhi_particles):
+        if any(
+            clean_deconstruction.endswith(particle) for particle in sandhi_particles
+        ):
             return True
     return False
 
 
-def _is_real_sandhi_option(option: dict[str, Any]) -> bool:
+def _is_real_sandhi_option(option: AnalysisOption) -> bool:
     """Return true for whole-token sandhi headword options."""
     return option.get("pos") == "sandhi" or "sandhi" in option.get("grammar", "")
 
 
-def _is_direct_grammar_option(option: dict[str, Any]) -> bool:
+def _is_direct_grammar_option(option: AnalysisOption) -> bool:
     """Return true for options produced from lookup grammar, not fallback headwords."""
-    key = str(option.get("key", ""))
-    return "_" in key and not key.endswith("_default") and not key.endswith("_inflection")
+    key = str(cast(Any, option.get("key", "")))
+    return (
+        "_" in key and not key.endswith("_default") and not key.endswith("_inflection")
+    )
 
 
 def _filter_particle_lookup_headwords(
-    headword_details: list[dict[str, Any]],
+    headword_details: list[AnalysisOption],
     lookup_entry: Lookup,
-) -> list[dict[str, Any]]:
+) -> list[AnalysisOption]:
     """Remove synthetic particle-expanded headwords while preserving real candidates."""
     if not _has_particle_deconstructor(lookup_entry):
         return headword_details
@@ -290,7 +295,7 @@ def _strip_bold(text: str | None) -> str:
 
 
 def _is_neg_kammadhāraya_components(
-    compound_type: str, components: list[list[dict[str, Any]]]
+    compound_type: str, components: list[list[AnalysisOption]]
 ) -> bool:
     """True if components are na + X where X is not itself a compound."""
     if compound_type.lower() != "kammadhāraya":
@@ -328,7 +333,7 @@ def get_word_details(
     grammatical: bool = False,
     is_compound_part: bool = False,
     is_inflected_part: bool = True,
-) -> list[dict[str, Any]]:
+) -> list[AnalysisOption]:
     """Helper to get word details for a given token, generating specific options based on lookup grammar."""
     lookup_entry = db_session.query(Lookup).filter(Lookup.lookup_key == token).first()
     if not lookup_entry or not lookup_entry.headwords:
@@ -636,7 +641,7 @@ def get_word_details(
     return word_details
 
 
-def get_completeness(i: DpdHeadword):
+def get_completeness(i: DpdHeadword) -> tuple[int, str]:
     """
     Return score and string for degree of completion.
     2: complete = meaning_1 and source_1
@@ -658,7 +663,7 @@ def get_components_from_construction(
     grammatical: bool = False,
     is_compound_part: bool = False,
     force_inflected: bool = False,
-) -> list[list[dict[str, Any]]]:
+) -> list[list[AnalysisOption]]:
     """Helper to break down a construction string into component details."""
     components = []
     parts = construction.split(" + ")
@@ -747,7 +752,7 @@ def get_components_from_construction(
 
 def analyze_sentence(
     sentence: str, db_session: Session, grammatical: bool = False
-) -> list[dict[str, Any]]:
+) -> list[AnalysisResult]:
     """Analyze a Pāḷi sentence and return grammatical details for each word, including components."""
     tokens = tokenize_sentence(sentence)
     results = []
@@ -793,8 +798,9 @@ def analyze_sentence(
 
                     # Collect constructions from sandhi headwords
                     for item in filtered_headword_details:
-                        if item["pos"] == "sandhi" and item["construction"]:
-                            existing_constructions.add(item["construction"])
+                        item_map = cast(dict[str, Any], item)
+                        if item_map["pos"] == "sandhi" and item_map["construction"]:
+                            existing_constructions.add(item_map["construction"])
 
             # 2. Check for Deconstructor
             if lookup_entry.deconstructor:
@@ -832,7 +838,7 @@ def analyze_sentence(
     return results
 
 
-def root_combo(i: DpdHeadword):
+def root_combo(i: DpdHeadword) -> str:
     # uniting root info into one line
     root_combo = ""
     if i.rt:

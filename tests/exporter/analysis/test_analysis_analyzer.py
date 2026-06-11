@@ -1,7 +1,17 @@
 """Verify basic tokenizer and analyzer behavior in the analysis package."""
 
+from types import SimpleNamespace
+from typing import cast, get_type_hints
+
+from db.models import DpdHeadword
 from exporter.analysis.analyzer import (
     _normalize_kammadharaya_construction,
+    get_completeness,
+    get_grammar_from_inflections_html,
+    get_in_comp_forms,
+    is_pos_compatible,
+    is_stem_compatible,
+    root_combo,
     tokenize_sentence,
 )
 
@@ -33,6 +43,111 @@ def test_tokenize_sentence_punctuation() -> None:
 def test_tokenize_sentence_empty() -> None:
     assert tokenize_sentence("") == []
     assert tokenize_sentence("   ") == []
+
+
+def test_helper_return_annotations_present() -> None:
+    assert get_type_hints(get_completeness)["return"] == tuple[int, str]
+    assert get_type_hints(root_combo)["return"] is str
+
+
+def test_get_completeness_complete() -> None:
+    headword = cast(DpdHeadword, SimpleNamespace(meaning_1="test", source_1="SN1.1"))
+
+    assert get_completeness(headword) == (2, "complete")
+
+
+def test_get_completeness_semi_complete() -> None:
+    headword = cast(DpdHeadword, SimpleNamespace(meaning_1="test", source_1=""))
+
+    assert get_completeness(headword) == (1, "semi-complete")
+
+
+def test_get_completeness_incomplete() -> None:
+    headword = cast(DpdHeadword, SimpleNamespace(meaning_1="", source_1="SN1.1"))
+
+    assert get_completeness(headword) == (0, "incomplete")
+
+
+def test_root_combo_with_root() -> None:
+    root = SimpleNamespace(root_group="1", root_meaning="to go")
+    headword = cast(
+        DpdHeadword,
+        SimpleNamespace(
+            rt=root,
+            root_clean="√gam",
+            root_sign="gacchati",
+        ),
+    )
+
+    assert root_combo(headword) == "√gam 1 gacchati (to go)"
+
+
+def test_root_combo_without_root() -> None:
+    headword = cast(DpdHeadword, SimpleNamespace(rt=None))
+
+    assert root_combo(headword) == ""
+
+
+def test_is_stem_compatible_in_comp() -> None:
+    assert is_stem_compatible("masc in comp") is True
+
+
+def test_is_stem_compatible_inflected() -> None:
+    assert is_stem_compatible("masc nom sg") is False
+
+
+def test_is_stem_compatible_no_case() -> None:
+    assert is_stem_compatible("adj") is True
+
+
+def test_get_in_comp_forms_found() -> None:
+    html = "<tr><th>in comps</th><td>dhamma<br>buddha</td></tr>"
+
+    assert get_in_comp_forms(html) == {"dhamma", "buddha"}
+
+
+def test_get_in_comp_forms_not_found() -> None:
+    html = "<tr><th>nom sg</th><td>dhammo</td></tr>"
+
+    assert get_in_comp_forms(html) == set()
+
+
+def test_get_grammar_from_inflections_html_found() -> None:
+    html = "<tr><td title='masc acc sg'>dhammaṃ</td></tr>"
+    headword = cast(
+        DpdHeadword,
+        SimpleNamespace(lemma_clean="dhamma", inflections_html=html),
+    )
+
+    assert get_grammar_from_inflections_html("dhammaṃ", headword) == (
+        "masc acc sg of dhamma"
+    )
+
+
+def test_get_grammar_from_inflections_html_not_found() -> None:
+    html = "<tr><td title='masc acc sg'>dhammaṃ</td></tr>"
+    headword = cast(
+        DpdHeadword,
+        SimpleNamespace(lemma_clean="dhamma", inflections_html=html),
+    )
+
+    assert get_grammar_from_inflections_html("buddhaṃ", headword) is None
+
+
+def test_is_pos_compatible_exact_match() -> None:
+    assert is_pos_compatible("masc", "masc") is True
+
+
+def test_is_pos_compatible_noun_gender() -> None:
+    assert is_pos_compatible("masc", "noun") is True
+
+
+def test_is_pos_compatible_verb_tense() -> None:
+    assert is_pos_compatible("aor", "verb") is True
+
+
+def test_is_pos_compatible_mismatch() -> None:
+    assert is_pos_compatible("masc", "verb") is False
 
 
 def test_analyze_sentence() -> None:
