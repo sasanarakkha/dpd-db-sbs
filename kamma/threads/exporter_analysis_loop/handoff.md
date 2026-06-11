@@ -1,423 +1,260 @@
 # Handoff: exporter_analysis_loop
 
 ## Current Status
-- This is an ongoing Kamma feedback-loop thread for `exporter/analysis/` under GitHub issue
-  `#197`.
-- This file is now a historical handoff for old sessions, not an execution queue.
-- Issues 1-23 are implemented. No approved queued finding remains.
-- Latest preparation-only live-run evidence was added on 2026-06-10 for
-  `TH66`, `DHP77`, `AN4.43_p1`, `MN122_p2`, and `DN2_p3`; see
-  "Live Debug Prep Session - 2026-06-10" below.
-- For the next session, ask the user for one concrete `exporter/analysis/` issue, inspect
-  current source/tests, propose a focused plan, and stop for explicit approval before edits.
-- 2026-06-10: Findings 11-14 were implemented as Issues 20-23. No approved queued
-  finding remains; one finding per session.
-- Keep `plan.md` stable. Do not add recurring task-list checkboxes to this loop thread.
+- Thread: ongoing `exporter/analysis/` feedback loop for GitHub issue `#197`.
+- Purpose: handle one focused analyzer issue or approved issue set per session.
+- Stable workflow lives in `plan.md`; keep per-issue history out of `plan.md`.
+- All approved implementation work through Finding 60 is complete.
+- Finding 61 live evidence collection is complete. It is mostly clean, but
+  DeepSeek `TH215` still selects nominative duration for
+  `paṇṇavīsativassāni` and component `vassāni`.
+- Review is pending. Before `/kamma:3-review`, user should decide whether to
+  accept the DeepSeek `TH215` residual as a model limitation or queue a focused
+  follow-up.
 
-## Completed History
-- Issue 1: added `UD` and `ITI` passage-code support.
-  - Achieved: `UD12` and `ITI37` are accepted prefixes and extract from KN3/KN4 as
-    verse-style sources.
-  - Main files: `exporter/analysis/passage_by_code.py`,
-    `exporter/analysis/study_passage.py`, `exporter/analysis/passage_extraction.py`,
-    `tests/exporter/analysis/test_passage_by_code.py`.
-  - Validation included focused passage-code tests and extraction smoke checks for `UD12`
-    and `ITI37`.
+## Handoff Hygiene Rule
+- Keep this handoff tight. It is active session memory, not a full transcript.
+- Once a proposed finding or issue is implemented, replace proposal details
+  with a short historical summary: problem, change, files, validation, outcome,
+  remaining risk, and artifact/history pointers.
+- Preserve detailed evidence in `plan-history/` files or `temp/tier_eval/`
+  artifacts when useful. Do not keep long completed plans, raw metrics tables,
+  or analysis chains in the active handoff unless they are needed for the next
+  decision.
+- Future sessions should only expand this handoff for active decisions,
+  unresolved risks, or concise completed-work summaries.
 
-- Issue 2: filtered synthetic particle-expanded headword candidates.
-  - Achieved: analyzer output keeps real sandhi/direct grammar matches while dropping noisy
-    particle-deconstructor base headwords such as the wrong base candidate for `yañ'ca`.
-  - Main files: `exporter/analysis/analyzer.py`,
-    `tests/exporter/analysis/test_analyzer.py`.
-  - Validation covered `yañ'ca`, `yañcidaṃ`, `soḷasinti`, `jānāti`, and `bhavissanti`.
+## Implementation Validation Rule
+Every future implementation started from this handoff must be fully validated
+before it is reported complete.
 
-- Issue 3: printed explicit local JSON analysis progress.
-  - Achieved: `study_passage.py` shows the local analysis stage separately from AI analysis.
-  - Main files: `exporter/analysis/translate_core.py`,
-    `exporter/analysis/study_passage.py`,
-    `tests/exporter/analysis/test_translate_core.py`.
-  - Validation covered progress events and targeted exporter-analysis tests.
+For Python changes, run each command separately on the exact changed file(s):
+- `uv run ruff check --fix <file>`
+- `uv run ruff format <file>`
+- `uv run pyright <file>`
+- `uv run --with pyrefly pyrefly check --min-severity warn <file>`
+- a targeted `uv run pytest <specific test path> -v`
 
-- Issue 4: fixed example bolding inside compound/sandhi verse tokens.
-  - Achieved: database-inflection matches such as `sukhaṃ`, `taṇhakkhaya`, `taṇha`, and
-    `khaya` are bolded correctly without over-bolding compound prefixes.
-  - Main files: `exporter/analysis/example_bolding.py`,
-    `tests/exporter/analysis/test_example_bolding.py`.
-  - Validation included focused tests plus regenerated `UD12_words.csv` inspection.
-
-- Issue 5: fixed missing AI-score handling and fallback selection for compound components.
-  - Achieved: missing AI scores are auditable as missing, retryable once, and fallback
-    selection no longer chooses implausible component meanings such as `sammā | nt | cymbal`
-    in `sammāsambuddhassa`.
-  - Main files: `exporter/analysis/translate_core.py`,
-    `exporter/analysis/analyzer.py`, `exporter/analysis/study_passage.py`,
-    `tests/exporter/analysis/test_translate_core.py`,
-    `tests/exporter/analysis/test_analyzer.py`.
-  - Validation included targeted tests, ruff, pyright, and debug artifact generation.
-
-- Issue 6: clipped exported word-card examples to the relevant bolded context.
-  - Achieved: prose exports use the sentence containing the bolded word; gāthā exports use a
-    bounded line window instead of whole passages.
-  - Main files: `exporter/analysis/export_words_csv.py`,
-    `tests/exporter/analysis/test_export_words_csv.py`.
-  - Validation included focused CSV tests and regenerated `SN12.4_words.csv` inspection.
-
-- Issue 7: strengthened AI response handling for wrong-format responses.
-  - Achieved: prompts were tightened, non-contract JSON can go through reformat fallback,
-    and `--debug` can write raw response logs.
-  - Main files: `exporter/analysis/translate_core.py`,
-    `exporter/analysis/study_passage.py`,
-    `tests/exporter/analysis/test_translate_core.py`.
-  - Validation included mocked regression tests and real `study_passage.py --debug` runs.
-
-- Issue 8 / Finding 1: accepted compact `{surface_word: option_key}` maps.
-  - Achieved: antigravity's common compact map response can be used directly, deriving score
-    selections and using a lighter translation-only follow-up.
-  - Main files: `exporter/analysis/translate_core.py`,
-    `tests/exporter/analysis/test_translate_core.py`.
-  - Validation included focused map-path tests and live passage analysis.
-
-- Issue 9 / Finding 2: raised the global AI request cap from 60s to 150s.
-  - Achieved: working CLI responses that exceed 60 seconds no longer fail prematurely.
-  - Main files: `tools/ai_manager.py`, related tests.
-  - Validation included focused tests and live TH52 evidence that the previous cap was too
-    short.
-
-- Issue 10: added per-model timeout support and set antigravity timeout to 90s.
-  - Achieved: `antigravity_cli` gets an effective hard kill near 100s instead of inheriting
-    the global 150s cap plus subprocess margin.
-  - Main files: `tools/ai_manager.py`, `tools/ai_models.json`,
-    `tools/ai_antigravity_cli.py`, related tests.
-  - Validation included timeout tests and live provider behavior.
-
-- Issue 11 / Finding 3B: fixed the missing-scores retry schema prompt.
-  - Achieved: retry responses are instructed to return `{"score": N}` objects and to include
-    `contextual_meaning` for `decon_` keys.
-  - Main files: `exporter/analysis/translate_core.py`,
-    `tests/exporter/analysis/test_translate_core.py`.
-  - Validation included prompt-shape regression tests.
-
-- Issue 12 / Finding 3A: handled nested `{"disambiguation": {...}}` maps.
-  - Achieved: nested disambiguation maps use the same translation-only word-key path as flat
-    maps.
-  - Main files: `exporter/analysis/translate_core.py`,
-    `tests/exporter/analysis/test_translate_core.py`.
-  - Validation included unit coverage. Important caveat: one live smoke passed through a
-    fallback path and did not prove this exact nested-map path live.
-
-- Issue 13 / Finding 4: preserved AI metadata when deterministic scoring overrides score.
-  - Achieved: deterministic `db_example_match` score/source overrides do not discard useful
-    AI `contextual_meaning` and `selected_pos` from full-schema responses.
-  - Main files: `exporter/analysis/translate_core.py`,
-    `tests/exporter/analysis/test_translate_core.py`.
-  - Validation included targeted regression tests.
-
-- Issue 14 / Finding 6: added contextual meanings to the compact word-key map path.
-  - Achieved: compact map responses now request and apply short contextual meanings before
-    deterministic DB-example scoring, so mapped rows do not fall back to verbose DB glosses.
-  - Main files: `exporter/analysis/translate_core.py`,
-    `tests/exporter/analysis/test_translate_core.py`.
-  - Validation included red/green tests and a live TH50 run that exercised the compact map
-    path.
-
-- Issue 15: removed the deprecated `gemini_cli` provider.
-  - Achieved: deleted the dead `tools/ai_gemini_cli.py` provider, removed
-    `gemini_cli_work_models`, and removed provider initialization from `AIManager`.
-  - Main files: `tools/ai_gemini_cli.py` deleted, `tools/ai_models.json`,
-    `tools/ai_manager.py`, `tests/tools/test_ai_manager.py`.
-  - Validation passed ruff, pyright, pyrefly, focused `tests/tools/test_ai_manager.py`, and a
-    source sweep. The only tolerated remaining `gemini_cli` string was a historical output
-    artifact: `exporter/analysis/output/TH52_ai_debug.json`.
-
-- Issue 16 / Finding 7: compacted dictionary-context JSON.
-  - Achieved: first prompts and missing-scores retry prompts use
-    `json.dumps(..., separators=(",", ":"))`, reducing prompt size by roughly 24-36%.
-  - Main files: `exporter/analysis/translate_core.py`,
-    `tests/exporter/analysis/test_translate_core.py`.
-  - Validation passed ruff, format, pyright, pyrefly, full
-    `tests/exporter/analysis/test_translate_core.py`, and live TH50 plus MN12 paragraph 2
-    gates. MN12_p2 system prompt size after the change was 509,171 chars.
-
-- Issue 17 / Finding 8: added pre-flight argv-size guard for `antigravity_cli`.
-  - Achieved: prompts over 700,000 UTF-8 bytes fail immediately with a provider error before
-    `agy` lookup/spawn, avoiding macOS `E2BIG` crashes.
-  - Main files: `tools/ai_antigravity_cli.py`,
-    `tests/tools/test_ai_antigravity_cli.py`.
-  - Validation passed ruff, format, pyright, pyrefly, focused tests, and a live AN4.12
-    paragraph 1 gate where the guard triggered and fallback completed.
-
-- Issue 18 / Finding 9: kept failed-provider details in fallback success statuses.
-  - Achieved: when one provider fails and a later provider succeeds, the success
-    `status_message` now includes the earlier failed attempt details while preserving the
-    clean-success format when there were no prior failures.
-  - Main files: `tools/ai_manager.py`, `tests/tools/test_ai_manager.py`.
-  - Validation passed ruff, format, pyright, pyrefly, and focused
-    `tests/tools/test_ai_manager.py`.
-
-- Issue 19 / Finding 10: shortened the interactive passage-selection preview.
-  - Achieved: `study_passage.py` selector prints the same header as extraction preview, then
-    one counted, truncated line per unit; extraction-only full previews are unchanged.
-  - Main files: `exporter/analysis/study_passage.py`,
-    `tests/exporter/analysis/test_study_passage.py`.
-  - Validation passed red/green truncation test, ruff, format, pyright, pyrefly, focused
-    `tests/exporter/analysis/test_study_passage.py`, and a live DN14 paragraph 3 gate. The
-    first live attempt hit the known uv cache permission issue; rerun with
-    `UV_CACHE_DIR=/private/tmp/uv-cache` passed.
-
-- Issue 20 / Finding 11: classified `agy` timeout/auth stdout as provider failure.
-  - Achieved: short single-line `Error:` responses and Google OAuth login prompts printed
-    by `agy` on stdout with exit code 0 now become `AntigravityCliProviderError`, allowing
-    `AIManager` fallback instead of treating them as successful model content.
-  - Main files: `tools/ai_antigravity_cli.py`,
-    `tests/tools/test_ai_antigravity_cli.py`.
-  - Validation passed red/green tests, ruff check --fix, ruff format, pyright, pyrefly, and
-    focused `tests/tools/test_ai_antigravity_cli.py`.
-  - No live smoke was run; the approved plan marked it optional and not deterministic for
-    the error-classification path.
-
-- Issue 21 / Finding 12: accepted flat retry score maps without a `scores` wrapper.
-  - Achieved: missing-scores retry responses shaped like
-    `{"60789_0": {"score": 10}}` are coerced into the normal `scores` contract when the
-    keys match the expected missing option keys, while unrelated flat maps stay ignored.
-  - Main files: `exporter/analysis/translate_core.py`,
-    `tests/exporter/analysis/test_translate_core.py`.
-  - Validation passed red/green tests, ruff check --fix, ruff format, pyright, pyrefly, and
-    focused `tests/exporter/analysis/test_translate_core.py`.
-  - No live smoke was run; the approved plan marked it optional because the flat-map retry
-    shape is model-nondeterministic.
-
-- Issue 22 / Finding 13: named the succeeding provider/model in `AIManager` success statuses.
-  - Achieved: successful AI responses now report `provider/model` from the actual successful
-    fallback candidate, drop bland provider details such as `Success in 1.00s`, preserve
-    informative provider details in parentheses, and keep failed-attempt suffixes intact.
-  - Main files: `tools/ai_manager.py`, `tests/tools/test_ai_manager.py`.
-  - Validation passed red/green tests, ruff check --fix, ruff format, pyright, pyrefly,
-    focused `tests/tools/test_ai_manager.py`, and adjacent
-    `tests/tools/test_ai_antigravity_cli.py`.
-  - No live smoke was run; this issue changes deterministic status-message composition and
-    is covered by unit tests.
-
-- Issue 23 / Finding 14: snapshot debug captures with `copy.deepcopy`.
-  - Achieved: mutable parsed AI response dictionaries, retry parsed responses, and final
-    scores are copied before storing in `debug`, so later retry/final merge mutations do not
-    rewrite earlier `*_ai_debug.json` snapshots.
-  - Main files: `exporter/analysis/translate_core.py`,
-    `tests/exporter/analysis/test_translate_core.py`.
-  - Validation passed red/green regression test, ruff check --fix, ruff format, pyright,
-    pyrefly, and focused `tests/exporter/analysis/test_translate_core.py`.
-  - No live smoke was run; this issue changes deterministic debug-object snapshot behavior
-    and is covered by unit tests.
-
-## Live Debug Prep Session - 2026-06-10
-- Purpose: preparation evidence for a later advanced-model analysis, not an approved code
-  change. No source or test files were edited. `plan.md` was left stable.
-- Requested latest targets superseded the earlier interrupted target list:
-  `TH66`, `DHP77`, `AN4.43` paragraph 1, `MN122` paragraph 2, and `DN2` paragraph 3.
-- Extraction previews confirmed target units:
-  - `TH66`: 1 verse.
-  - `DHP77`: 1 verse.
-  - `AN4.43`: 6 paragraphs; selected paragraph 1.
-  - `MN122`: 25 paragraphs; selected paragraph 2.
-  - `DN2`: 117 paragraphs; selected paragraph 3.
-- Commands run, each as a separate `study_passage.py --debug` invocation:
-  - `printf 'TH66\n' | UV_CACHE_DIR=/private/tmp/uv-cache uv run python exporter/analysis/study_passage.py --debug`
-  - `printf 'DHP77\n' | UV_CACHE_DIR=/private/tmp/uv-cache uv run python exporter/analysis/study_passage.py --debug`
-  - `printf 'AN4.43\n1\n' | UV_CACHE_DIR=/private/tmp/uv-cache uv run python exporter/analysis/study_passage.py --debug`
-  - `printf 'MN122\n2\n' | UV_CACHE_DIR=/private/tmp/uv-cache uv run python exporter/analysis/study_passage.py --debug`
-  - `printf 'DN2\n3\n' | UV_CACHE_DIR=/private/tmp/uv-cache uv run python exporter/analysis/study_passage.py --debug`
-- Artifact references:
-  - Markdown reports: `exporter/analysis/reports/TH66_study.md`,
-    `exporter/analysis/reports/DHP77_study.md`,
-    `exporter/analysis/reports/AN4.43_p1_study.md`,
-    `exporter/analysis/reports/MN122_p2_study.md`,
-    `exporter/analysis/reports/DN2_p3_study.md`.
-  - Raw AI logs: `exporter/analysis/reports/TH66_ai_raw.txt`,
-    `exporter/analysis/reports/DHP77_ai_raw.txt`,
-    `exporter/analysis/reports/AN4.43_p1_ai_raw.txt`,
-    `exporter/analysis/reports/MN122_p2_ai_raw.txt`,
-    `exporter/analysis/reports/DN2_p3_ai_raw.txt`.
-  - Debug JSON: `exporter/analysis/output/TH66_ai_debug.json`,
-    `exporter/analysis/output/DHP77_ai_debug.json`,
-    `exporter/analysis/output/AN4.43_p1_ai_debug.json`,
-    `exporter/analysis/output/MN122_p2_ai_debug.json`,
-    `exporter/analysis/output/DN2_p3_ai_debug.json`.
-  - Study JSON: `exporter/analysis/output/TH66_study.json`,
-    `exporter/analysis/output/DHP77_study.json`,
-    `exporter/analysis/output/AN4.43_p1_study.json`,
-    `exporter/analysis/output/MN122_p2_study.json`,
-    `exporter/analysis/output/DN2_p3_study.json`.
-
-### Prep Findings
-- `TH66`:
-  - First, reformat, and retry requests all went through
-    `antigravity_cli/Gemini 3.5 Flash (High)`.
-  - Prompt sizes from debug JSON: system prompt 244,652 bytes; user prompt 177 bytes;
-    retry prompt 181,821 bytes.
-  - First response status: `SUCCESS in 87.83s`; raw response used an ad-hoc
-    `sentence` + `disambiguation` shape and covered only the opening phrase, not the full
-    six-line verse.
-  - Reformat status: `SUCCESS in 35.96s`, but debug recorded parse error
-    `Expecting value: line 1 column 1 (char 0)`.
-  - Pre-retry missing scores: 56 groups / 362 keys. Retry status:
-    `SUCCESS in 27.82s`; retry returned a usable `scores` object with 54 entries.
-  - Generated report has empty `Translation` and `Literal Translation`.
-
-- `DHP77`:
-  - First, reformat, and retry requests all went through
-    `antigravity_cli/Gemini 3.5 Flash (High)`.
-  - Prompt sizes: system prompt 75,585 bytes; user prompt 108 bytes; retry prompt
-    16,129 bytes.
-  - First response status: `SUCCESS in 19.25s`; raw response used an ad-hoc
-    `sentence` + nested `disambiguation` shape.
-  - Reformat status: `SUCCESS in 38.71s`; reformat succeeded with
-    `translation`, `literal_translation`, and `scores`.
-  - Pre-retry missing scores: 7 groups / 35 keys. Retry status:
-    `SUCCESS in 15.03s`; retry returned a usable `scores` object with 32 entries.
-  - Generated report includes non-empty translation and literal translation.
-
-- `AN4.43_p1`:
-  - The script attempted antigravity first, but the preflight argv guard blocked the first
-    call before launching `agy`: 1,365,996 bytes > 700,000.
-  - The first request then completed through fallback provider chain in 121.72s. The
-    debug status preserved the failed antigravity attempt but the success portion reads
-    only `Success in 121.72s`, without a clear provider name.
-  - Prompt sizes from debug JSON: system prompt 1,365,423 bytes; user prompt 292 bytes;
-    retry prompt 723,139 bytes. The retry antigravity wrapper size was 723,466 bytes, so
-    it also hit the argv guard before launching `agy`.
-  - First fallback response used the expected top-level contract
-    `translation`, `literal_translation`, and `scores`; no reformat section was written.
-  - Pre-retry missing scores: 168 groups / 1,506 keys. Retry fallback status:
-    `SUCCESS in 73.71s`, but the raw retry response was a flat key-score map without the
-    required top-level `scores` wrapper, so it contributed 0 usable retry scores.
-  - Generated report includes non-empty translation and literal translation.
-  - Important distinction: this run is evidence for the antigravity prompt-size guard and
-    fallback behavior, not live `agy` subprocess quality for this passage.
-
-- `MN122_p2`:
-  - First, reformat, and retry requests all went through
-    `antigravity_cli/Gemini 3.5 Flash (High)`.
-  - Prompt sizes: system prompt 469,499 bytes; user prompt 666 bytes; retry prompt
-    201,208 bytes.
-  - First response status: `SUCCESS in 23.96s`; raw response used
-    `sentence`, `disambiguation`, and `translation`, and covered only the opening sentence
-    up through `cīvarakammaṃ`, not the whole selected paragraph.
-  - Reformat status: `SUCCESS in 13.91s`; reformat succeeded with the expected top-level
-    keys.
-  - Pre-retry missing scores: 88 groups / 399 keys. Retry status:
-    `SUCCESS in 98.84s`, but raw retry content was `Error: timed out waiting for response`;
-    it contributed 0 usable retry scores.
-  - Generated report translation covers only the opening sentence, while the analyzed
-    passage has 64 tokens.
-
-- `DN2_p3`:
-  - First, reformat, and retry requests all went through
-    `antigravity_cli/Gemini 3.5 Flash (High)`.
-  - Prompt sizes: system prompt 689,777 bytes; user prompt 495 bytes; retry prompt
-    492,995 bytes. This first prompt is close to the 700,000-byte antigravity guard but
-    still launched.
-  - First response status: `SUCCESS in 24.74s`; raw response used an ad-hoc
-    `sentence_analysis` shape with `selected_key` fields and partial coverage of the
-    passage.
-  - Reformat status: `SUCCESS in 14.50s`; reformat succeeded with the expected top-level
-    keys.
-  - Pre-retry missing scores: 109 groups / 955 keys. Retry status:
-    `SUCCESS in 98.92s`, but raw retry content was `Error: timed out waiting for response`;
-    it contributed 0 usable retry scores.
-  - Generated report includes non-empty full-paragraph translation and literal
-    translation, but final score coverage remained very sparse.
-
-### Candidate Issues For Advanced Analysis
-- Antigravity wrong-contract first responses remain frequent. Fresh evidence includes
-  `disambiguation` lists/maps, `sentence_analysis`, and first responses that cover only an
-  opening clause/sentence.
-- Some retry calls are classified as `SUCCESS` even when raw antigravity content is
-  `Error: timed out waiting for response`. This looks like provider-output classification,
-  not model-quality analysis.
-- Missing-score retry handling may silently waste successful-looking responses:
-  `AN4.43_p1` returned a flat key-score map without `scores`, and `MN122_p2`/`DN2_p3`
-  returned timeout text; all three contributed 0 usable retry scores.
-- `AN4.43_p1` shows that selected prose paragraphs can exceed the argv guard even after
-  compact JSON. It completed by fallback, not by actual `agy` subprocess.
-- Debug JSON caveat: original raw response shape should be read from `*_ai_raw.txt`.
-  `debug["parsed_response"]` and related parsed dicts are mutable objects in the current
-  code path and can be misleading after later normalization or fallback mutation.
-
-## Inactive / Not Approved / Do Not Execute Automatically
-- Finding 5, Pāḷi grammar accuracy:
-  - Status: deferred indefinitely unless the user explicitly asks to revisit it.
-  - Reason: observed grammar mistakes and non-determinism look like model-quality behavior,
-    not a straightforward deterministic code bug.
-  - Examples seen: near-identical TH51/TH52 verses parsed the same words differently; `me`
-    was tagged instr/acc instead of gen/dat; TH52 `kāye` was tagged masc acc pl instead of
-    loc sg; `sukhā` varied between correct fem nom sg and wrong masc nom pl.
-
-- Wrong-schema first responses correlate with prompt size:
-  - Status: observation only, not a queued fix.
-  - Evidence: DHP30 around 30 KB returned the expected contract schema; larger prompts such
-    as TH40, DN14_p3, and MN12_p2 returned valid but ad-hoc JSON schemas covering only the
-    opening clause.
-  - Existing reformat plus missing-scores retry recovered those runs. Do not add chunking,
-    example trimming, or prompt-shape redesign without a new issue and explicit approval.
-
-- Example/context trimming and chunking:
-  - Status: out of scope for completed findings.
-  - Reason: examples are large, but they support disambiguation quality. Any trimming is a
-    quality tradeoff and needs a separate plan.
-
-## Future-Session Guardrails
-- One issue per session by default. If the user reports several unrelated issues, choose one
-  and explicitly defer the rest.
-- Do not implement before a focused per-issue plan is approved.
-- Read current source and tests before describing behavior. Do not trust this handoff for
-  line numbers or exact current code shape.
-- For Python changes, run exact-file quality gates: `ruff check --fix`, `ruff format`,
-  `pyright`, `pyrefly`, and targeted pytest.
+Also required:
+- Add or update focused tests first where practical and confirm the red phase.
+- Run relevant smoke/live commands when behavior cannot be proven by unit tests.
 - Never run bare `uv run pytest`; always pass a specific test path.
-- If `uv run ...` fails on `/Users/deva/.cache/uv` permissions, retry with
+- If a validation command fails after reasonable fixes, document the exact
+  failure and remaining risk in this handoff before stopping.
+- For non-Python/doc-only handoff updates, verify with focused text checks and
+  `git status --short`; do not claim Python validation was run.
+
+## Next Decision
+- Decide whether DeepSeek `TH215` nominative duration is acceptable:
+  - Accept as a model limitation and proceed to manual confirmation/review.
+  - Or queue a focused follow-up for duration-grammar selection.
+- Do not make model-default changes from this thread. User decision on
+  2026-06-11: keep `Gemini 3.5 Flash (Low)` as default and keep
+  `deepseek/deepseek-v4-flash` as an occasional second model.
+
+## Recent Completed Queue: Findings 56-61
+User approved implementing Findings 56-61 as one issue set for `#197`.
+
+Implemented in `exporter/analysis/translate_core.py` and
+`tests/exporter/analysis/test_translate_core.py`:
+- Finding 56: reformat merge now lets first-pass salvaged scores win conflicts;
+  reformat scores still fill keys absent from salvage.
+- Finding 57: reformat key overview now includes `key (grammar)` context, and
+  the reformat prompt includes the no-grammar-parenthetical instruction.
+- Finding 58: main prompt now tells models not to enumerate score-0 options;
+  only the selected key and plausible 1-9 alternatives should be listed.
+- Finding 59: sanitizer strips abbreviated grammar parentheticals such as
+  `(abl. sg.)`, `(masc. gen. sg.)`, and interrogative-pronoun grammar notes
+  while preserving useful notes such as `(lit. accumulation)`.
+- Finding 60: main prompt explains same-id grammar variants, and common Pali
+  rules include accusative duration for counted time-spans such as `vassāni`.
+- Finding 61: live re-evaluation ran the same three targets on Low and
+  DeepSeek, preserving artifacts under `temp/tier_eval/final_eval_56_61_low/`
+  and `temp/tier_eval/final_eval_56_61_deepseek/`.
+
+Validation summary:
+- Red phase confirmed for the new/updated tests.
+- Exact-file gates passed for `exporter/analysis/translate_core.py` and
+  `tests/exporter/analysis/test_translate_core.py`: `ruff check --fix`,
+  `ruff format`, `pyright`, `pyrefly`.
+- `uv run pytest tests/exporter/analysis/test_translate_core.py -v` passed:
+  99 passed, with one upstream `aksharamukha` deprecation warning.
+
+Live evaluation summary:
+- All six runs completed on first attempt; no repeat was needed.
+- All six had zero hard failures, zero missing-score groups after retry, and
+  zero bare-number `final_scores` values.
+- No generated grammar-label parentheticals were found in the six `_study.md`
+  reports.
+- `MN41_p2` stock phrase is clean on both models: genitive `kāyassa`,
+  ablative `bhedā`, prepositional `paraṃ` = "after", ablative `maraṇā`.
+- `upapajjantī'ti` selected `upapajjanti + iti` on both models.
+- Low `TH215` is clean: accusative `paṇṇavīsativassāni` and component
+  `vassāni`, `api` = "even", finger-snap nuance preserved.
+- DeepSeek `TH215` is not a clean pass: it keeps nominative
+  `paṇṇavīsativassāni` and component `vassāni`, though `api` = "even" and the
+  finger-snap nuance are preserved.
+
+## Prior Completed Work Summary
+- Passage access and analyzer output: added `UD`/`ITI` support, reduced noisy
+  synthetic particle-expanded candidates, improved example bolding, clipped
+  word-card examples, shortened passage previews, and added analyzer result
+  typing/coverage.
+- AI response recovery: hardened wrong-schema responses, compact maps, nested
+  `disambiguation`, flat retry maps, score salvage, debug snapshots, and
+  failed debug artifact writing.
+- Provider behavior: fixed forced provider/model routing, added paired
+  `study_passage.py --provider/--model`, removed `gemini_cli`, raised
+  timeouts, added GPT-OSS as Antigravity fallback, isolated `agy` scratch cwd,
+  classified timeout/auth stdout correctly, and moved rate limiting to the
+  actual attempted provider/model.
+- Prompt and retry size: compacted context JSON, added sentence-level first-pass
+  chunking, deduplicated missing-score groups, bounded retry batches, trimmed
+  retry context, added one supplemental retry pass, tolerated one failed
+  first-pass chunk, and hardened prompts against tool-planning/idling responses.
+- Quality fixes: retry-recovered score-10 selections now request contextual
+  meanings, common Pali disambiguation rules were added, quote-final `'ti`
+  deconstruction gets deterministic promotion when safe, bare numeric `scores`
+  values are normalized, and grammar-variant/reformat handling is improved.
+- Maintainability: extracted focused helpers from `translate_core.py`, added
+  constants and return typing, and documented the one-selection-per-surface-word
+  limitation.
+
+## Key Findings For Future Work
+- Low stayed default after manual comparison: Low won `TH215`, `DHP211`, and
+  `SN15.1_p2`; DeepSeek won `MN41_p2`; `AN3.33_p1` was roughly even.
+- DeepSeek's characteristic bad failures were wrong-homonym picks such as
+  `agga` = "hall", `kaṭā` = "winning dice", `chavā` = "worthless",
+  `apāya` = "downfall", and `api` = "just; only". Treat these as high-risk for
+  a dictionary tool.
+- Low's largest previous visible defect was pipeline-caused: retry-recovered
+  score-10 selections lacked `contextual_meaning` and fell back to raw
+  dictionary strings. Finding 51 addressed this.
+- The `app'ekacce` `(singular)/(plural)` row was dictionary fallback text, not
+  AI grammar-note pollution. Do not widen the grammar-note sanitizer to general
+  dictionary text without a new approved plan.
+- The AN3.33 `bhagavā` nominative-for-vocative issue is structurally blocked by
+  one selection per surface word when the same chunk also has a real nominative
+  `bhagavā`. Only per-occurrence keys could fix it.
+- Hybrid provider routing was considered and rejected for now: complexity
+  outweighed benefit after the 2026-06-11 evidence.
+
+## Wrong-Schema Shapes
+Already handled or partly handled:
+- flat `{surface_word: option_key}` maps;
+- selection lists under `disambiguation`, `sentence_analysis`, or
+  `selected_meanings`;
+- list items using `selected_key`, `selected_lemma_key`, `key`, or unique
+  `selected_id`;
+- word-to-gloss dict maps with exact unambiguous `lemma` matches.
+
+Worth future analysis only with a new focused plan:
+- `sentence_disambiguation`;
+- top-level `selected_keys`;
+- nested `sentence_analysis.words`;
+- `words[].analysis`;
+- dict-valued `disambiguation`;
+- mixed payloads containing a recoverable map plus explanatory fields.
+
+Do not widen salvage blindly. Accept only shapes whose option keys or exact
+unambiguous lemma/id matches can be verified against current analyzer output.
+
+## History Index
+Detailed completed queues have been moved out of the active handoff so future
+sessions can load only the level of history they need.
+
+- Findings 11-14:
+  `kamma/threads/exporter_analysis_loop/plan-history/findings_11_14_plans.md`
+- Findings 15-18:
+  `kamma/threads/exporter_analysis_loop/plan-history/findings_15_18_plans.md`
+- Findings 19-23:
+  `kamma/threads/exporter_analysis_loop/plan-history/findings_19_23_plans.md`
+- Findings 24-27:
+  `kamma/threads/exporter_analysis_loop/plan-history/findings_24_27_plans.md`
+- Findings 28-30:
+  `kamma/threads/exporter_analysis_loop/plan-history/findings_28_30_plans.md`
+- Findings 31-38:
+  `kamma/threads/exporter_analysis_loop/plan-history/findings_31_38.md`
+- Findings 40-44:
+  `kamma/threads/exporter_analysis_loop/plan-history/findings_40_44_plans.md`
+- Finding 45 higher-model summary:
+  `kamma/threads/exporter_analysis_loop/plan-history/finding_45_higher_model_summary.md`
+- Findings 45-50:
+  `kamma/threads/exporter_analysis_loop/plan-history/findings_45_50_plans.md`
+- Findings 51-55:
+  `kamma/threads/exporter_analysis_loop/plan-history/findings_51_55_plans.md`
+
+Important historical note: Finding 38 was merged into Finding 35 and must not
+be executed separately.
+
+## Artifact Locations
+- Finding 55 artifacts:
+  `temp/tier_eval/final_eval_low/` and
+  `temp/tier_eval/final_eval_deepseek/`.
+- Finding 61 artifacts:
+  `temp/tier_eval/final_eval_56_61_low/` and
+  `temp/tier_eval/final_eval_56_61_deepseek/`.
+- Current report outputs: `exporter/analysis/reports/*_study.md`.
+- Raw AI logs: `exporter/analysis/reports/*_ai_raw.txt`.
+- Debug JSON: `exporter/analysis/output/*_ai_debug.json`.
+- Study JSON: `exporter/analysis/output/*_study.json`.
+- Current README context: `exporter/analysis/README.md`.
+
+`temp/tier_eval/` is intentionally preserved until the user releases it.
+
+## Future Session Guardrails
+- At startup, read `spec.md`, `plan.md`, this handoff, relevant
+  `exporter/analysis/` source, and related `tests/exporter/analysis/` files.
+- If no concrete issue is reported, ask the user for one `exporter/analysis/`
+  issue or approved issue set and stop.
+- Before code edits, inspect/reproduce where practical, propose a focused plan,
+  and hard stop for explicit user approval.
+- Use TDD where practical: failing test first, minimal implementation, focused
+  validation.
+- Keep changed files limited to the approved issue scope.
+- After implementing, update this handoff as a concise completed summary, not a
+  full transcript or repeated proposal text.
+- If callback, CLI, import, or logging paths change, do a runtime sweep with a
+  focused `rg` search or import/smoke command.
+- For live AI checks, use `study_passage.py --debug` and inspect both raw logs
+  and debug JSON before claiming live proof.
+- Do not describe a live run as a pure Antigravity success unless raw/debug
+  statuses show that provider/model path actually ran.
+- If `uv run ...` hits `/Users/deva/.cache/uv` permission problems, retry with
   `UV_CACHE_DIR=/private/tmp/uv-cache`.
-- Use `study_passage.py --debug` for live AI checks. It writes
-  `reports/<source>_ai_raw.txt` and `output/<source>_ai_debug.json`.
-- Do not claim live proof when the live run only exercised fallback behavior. Record which
-  provider path actually ran.
-- For original AI response shape, prefer `reports/<source>_ai_raw.txt` over
-  `output/<source>_ai_debug.json` parsed-response fields.
-- Watch for `Error: timed out waiting for response` in antigravity stdout; current live
-  evidence shows it can be logged under a success status and then parse as zero usable
-  scores.
-- `AIManager.request(provider_preference=...)` only constrains provider when a model is also
-  supplied; provider preference alone can fall through to the default model list.
-- Effective antigravity hard kill is model timeout plus 10 seconds. With a 90s model timeout,
-  expect termination near 100s.
-- For user-visible output bugs, regenerate and inspect the relevant artifact before claiming
-  completion.
-- For this loop thread, keep `plan.md` stable and keep issue history in `handoff.md`.
+- When preparing a commit message for this thread, include `#197`.
+- Do not commit autonomously unless the user explicitly asks.
 
-## Errors / Issues / Repeated Mistakes
-- 2026-06-10 Finding 13 session: initial Kamma setup checks used Fish-style `and`/`or`
-  under zsh and failed syntactically; retried with POSIX `if` checks successfully.
-- 2026-06-10 Finding 13 session: red-state `tests/tools/test_ai_manager.py` failed for the
-  expected provider/model status-message assertions before implementation; all validation
-  passed after the minimal fix.
-
-## Useful Historical Artifacts
-- Debug JSON and raw logs from analysis runs may exist under:
-  - `exporter/analysis/output/*_ai_debug.json`
-  - `exporter/analysis/reports/*_ai_raw.txt`
-  - `exporter/analysis/reports/*_study.md`
-- Particularly useful old evidence:
-  - `TH50`: compact map path and contextual-meaning validation.
-  - `TH52`: old `gemini_cli` historical artifact and timeout evidence.
-  - `AN4.12_p1`: oversized prompt / argv guard / fallback status evidence.
-  - `MN12_p2`: compact prompt size and wrong-schema recovery evidence.
-  - `DN14_p3`: interactive selector preview and wrong-schema recovery evidence.
-  - `TH66`: fresh wrong-schema + failed reformat + empty translation evidence.
-  - `DHP77`: fresh wrong-schema + successful reformat/retry evidence.
-  - `AN4.43_p1`: fresh argv-guard + fallback + flat retry-map evidence.
-  - `MN122_p2`: fresh partial first response + retry timeout-content evidence.
-  - `DN2_p3`: fresh near-guard antigravity launch + `sentence_analysis` + retry
-    timeout-content evidence.
+## Errors, Issues, And Repeated Mistakes
+- Use POSIX-compatible shell under zsh; do not use Fish-style `and` / `or`.
+- Do not use root-level scratch files. Temporary probes/logs belong under
+  `temp/` and should be deleted when no longer needed. `temp/tier_eval/` is the
+  explicit exception until manual review is complete.
+- Do not use plain `python` or inline `python -c`; use project-approved
+  `uv run python` commands or a temporary script under `temp/`.
+- Current analyzer token shape is top-level `[option]`; component groups are
+  nested. Do not copy old synthetic `analysis` nesting blindly.
+- When narrowing option keys, use explicit type checks so `pyright` sees `str`.
+- Preserve clean retry prompt formatting; accidental tabs before retry context
+  were introduced and fixed in prior sessions.
+- `exporter/analysis/README.md` previously said to use `agy --list-models`;
+  local `agy` 1.0.7 reports that flag as unsupported and uses `agy models`
+  instead.
+- Pyright may require internal helper annotations after adding TypedDict return
+  types.
+- Pyrefly may reject unnecessary casts or `str()` calls that Pyright tolerates.
+- `translate_core.py` may need local type-only `cast()` boundaries where
+  `analyze_sentence()` returns `list[AnalysisResult]` but helper APIs accept
+  `list[dict[str, Any]]`.
+- In zsh, do not use `path` as a loop variable; it shadows the tied `$PATH`
+  array. Use names like `src` instead.
 
 ## Review Readiness
-- No approved implementation task remains in this handoff.
-- If the user says all `exporter/analysis/` issues are resolved, the next process step is
-  `/kamma:3-review` for `kamma/threads/exporter_analysis_loop`.
+- Implementation queues through Finding 60 are complete.
+- Finding 61 evidence collection is complete, but DeepSeek `TH215` remains a
+  not-clean pass on duration grammar.
+- Remaining before review: user decision on accepting the DeepSeek `TH215`
+  residual or queuing a focused follow-up; manual confirmation/testing; release
+  `temp/tier_eval/` when no longer needed.
+- After user confirmation, run:
+  `/kamma:3-review kamma/threads/exporter_analysis_loop`

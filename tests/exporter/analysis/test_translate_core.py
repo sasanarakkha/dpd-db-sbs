@@ -252,6 +252,24 @@ def test_common_pali_rules_cover_known_failures() -> None:
     assert "'ti" in translate_core.COMMON_PALI_RULES
     assert "yena" in translate_core.COMMON_PALI_RULES
     assert "vocative" in translate_core.COMMON_PALI_RULES
+    assert "vassāni" in translate_core.COMMON_PALI_RULES
+    assert "accusative of duration" in translate_core.COMMON_PALI_RULES
+
+
+def test_system_prompt_discourages_zero_score_enumeration() -> None:
+    prompt = build_system_prompt([])
+
+    assert "Do not list options you would score 0" in prompt
+    assert "genuinely plausible alternatives" in prompt
+    assert "lower scores (1-9)" in prompt
+
+
+def test_system_prompt_explains_same_id_grammar_variants() -> None:
+    prompt = build_system_prompt([])
+
+    assert "same id" in prompt
+    assert "grammar variants" in prompt
+    assert "score-10 variant's grammar" in prompt
 
 
 def test_strip_grammar_annotations_removes_case_notes() -> None:
@@ -271,6 +289,26 @@ def test_strip_grammar_annotations_removes_case_notes() -> None:
         )
         == "then"
     )
+    assert (
+        translate_core._strip_grammar_annotations("who (interrogative pronoun)")
+        == "who"
+    )
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        ("after (abl. sg.)", "after"),
+        ("of the body (masc. gen. sg.)", "of the body"),
+        ("death (nom. sg.)", "death"),
+        ("who (masc. nom. sg. interrogative pronoun)", "who"),
+    ],
+)
+def test_strip_grammar_annotations_removes_abbreviated_case_notes(
+    raw: str,
+    expected: str,
+) -> None:
+    assert translate_core._strip_grammar_annotations(raw) == expected
 
 
 def test_strip_grammar_annotations_preserves_legitimate_parentheticals() -> None:
@@ -281,6 +319,10 @@ def test_strip_grammar_annotations_preserves_legitimate_parentheticals() -> None
     assert (
         translate_core._strip_grammar_annotations("honor (as a token of respect)")
         == "honor (as a token of respect)"
+    )
+    assert (
+        translate_core._strip_grammar_annotations("increase (lit. accumulation)")
+        == "increase (lit. accumulation)"
     )
     assert translate_core._strip_grammar_annotations("chapter (25)") == "chapter (25)"
 
@@ -2100,10 +2142,10 @@ def test_translate_sentence_reformat_debug_keys_populated(monkeypatch) -> None:
     assert debug["reformat_parse_error"] == ""
 
 
-def test_translate_sentence_reformat_keeps_salvaged_scores(
+def test_translate_sentence_reformat_prefers_salvaged_score_conflicts(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Reformat should not discard scores salvaged from a truncated first response."""
+    """Reformat should not overwrite scores salvaged from full-context output."""
     calls: list[dict[str, Any]] = []
     _patch_sammasambuddhassa_analysis(monkeypatch)
 
@@ -2133,11 +2175,42 @@ def test_translate_sentence_reformat_keeps_salvaged_scores(
     )
 
     assert len(calls) == 2
-    assert debug["final_scores"]["60847_0"]["score"] == 8
+    assert debug["final_scores"]["60847_0"]["score"] == 1
     assert debug["final_scores"]["60693_0"]["score"] == 3
     assert debug["final_scores"]["60789_0"]["score"] == 7
     component_options = result["analysis"][0]["data"][0]["components"][0]
     assert component_options[1]["ai_score"] == 7
+
+
+def test_reformat_merge_fills_gaps_from_reformat_response() -> None:
+    class FakeAIManager:
+        def request(self, **_kwargs: Any) -> object:
+            content = (
+                '{"translation": "reformatted", "literal_translation": "lit", '
+                '"scores": {"gap_0": {"score": 9}}}'
+            )
+            return type("R", (), {"content": content, "status_message": "ok"})()
+
+    result = translate_core._handle_reformat_response(
+        chunk_sentence="atha puriso",
+        raw_response='{"translation": "x", "scores": {"kept_0": {"score": 10}',
+        analysis=[],
+        ai_data={
+            "translation": "x",
+            "literal_translation": "y",
+            "scores": {"kept_0": {"score": 10}},
+        },
+        parse_error="truncated",
+        ai_manager=cast(AIManager, FakeAIManager()),
+        model=None,
+        provider=None,
+        progress=None,
+        verbose=False,
+        debug={},
+    )
+
+    assert result["scores"]["kept_0"]["score"] == 10
+    assert result["scores"]["gap_0"]["score"] == 9
 
 
 def test_build_reformat_prompt_includes_valid_keys_block() -> None:
@@ -2149,10 +2222,8 @@ def test_build_reformat_prompt_includes_valid_keys_block() -> None:
         word_keys_json,
     )
 
-    assert (
-        'Valid option keys per word (keys in "scores" MUST come from these lists):'
-        in prompt
-    )
+    assert 'entries may be shown as "key (grammar)"' in prompt
+    assert 'keys in "scores" MUST use the key before the first space' in prompt
     assert word_keys_json in prompt
 
 
@@ -2164,6 +2235,33 @@ def test_build_reformat_prompt_without_keys_unchanged() -> None:
     )
 
     assert "Valid option keys per word" not in prompt
+
+
+def test_build_reformat_prompt_contains_no_grammar_notes_instruction() -> None:
+    prompt = translate_core._build_reformat_prompt(
+        "atha puriso",
+        "Use atha and puriso.",
+        "",
+    )
+
+    assert translate_core.NO_GRAMMAR_NOTES_INSTRUCTION in prompt
+
+
+def test_word_keys_overview_includes_grammar_context() -> None:
+    analysis = [
+        {
+            "word": "kāyassa",
+            "data": [
+                {"key": "21131_0", "grammar": "masc dat sg"},
+                {"key": "21131_1", "grammar": "masc gen sg"},
+            ],
+        }
+    ]
+
+    assert (
+        translate_core._word_keys_overview(analysis)
+        == '{"kāyassa":["21131_0 (masc dat sg)","21131_1 (masc gen sg)"]}'
+    )
 
 
 def test_word_keys_overview_top_level_only() -> None:

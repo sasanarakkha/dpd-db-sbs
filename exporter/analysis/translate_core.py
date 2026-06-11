@@ -32,6 +32,7 @@ COMMON_PALI_RULES = """### Common Pāḷi Disambiguation Rules:
 - Final-vowel lengthening before quotative `'ti` is sandhi: prefer the deconstruction restoring the short final vowel (e.g., `upapajjanti + iti`) at the end of a quotation unless context clearly requires a long-vowel reading.
 - In `yena <person/place> tena upasaṅkami`, `yena` and `tena` are adverbial "where ... there" rows, not plain instrumental pronouns.
 - Inside direct speech, a comma-set-off word addressing the listener (e.g., `bho` or a teacher's name) is usually vocative.
+- Counted time-spans such as `paṇṇavīsativassāni` / `vassāni` ("for twenty-five years") are accusative of duration, not nominative.
 """
 _GRAMMAR_ANNOTATION_KEYWORDS = (
     "nominative",
@@ -55,6 +56,10 @@ _GRAMMAR_ANNOTATION_KEYWORDS = (
     "participle",
     "component of",
     "grammatical",
+    "interrogative",
+)
+_GRAMMAR_ABBREVIATION_RE = re.compile(
+    r"\b(?:masc|fem|nt|nom|acc|gen|dat|abl|instr|loc|voc|sg|pl)\."
 )
 _TRAILING_PUNCTUATION = '.,;:!?)]}”’"'
 _RETRY_OPTION_FIELDS = (
@@ -232,7 +237,9 @@ def _strip_grammar_annotations(text: str) -> str:
 
     def replace_annotation(match: re.Match[str]) -> str:
         content = match.group(1).lower()
-        if any(keyword in content for keyword in _GRAMMAR_ANNOTATION_KEYWORDS):
+        if any(
+            keyword in content for keyword in _GRAMMAR_ANNOTATION_KEYWORDS
+        ) or _GRAMMAR_ABBREVIATION_RE.search(content):
             return ""
         return match.group(0)
 
@@ -376,7 +383,15 @@ def _word_keys_overview(analysis: list[dict[str, Any]]) -> str:
             if not isinstance(option, dict):
                 continue
             key = option.get("key")
-            if isinstance(key, str) and key not in keys:
+            if not isinstance(key, str):
+                continue
+            seen_keys = {display_key.split(" ", 1)[0] for display_key in keys}
+            if key in seen_keys:
+                continue
+            grammar = option.get("grammar")
+            if isinstance(grammar, str) and grammar.strip():
+                keys.append(f"{key} ({grammar.strip()})")
+            else:
                 keys.append(key)
 
         if not keys:
@@ -837,7 +852,8 @@ def _build_reformat_prompt(
     keys_block = ""
     if word_keys_json:
         keys_block = (
-            '\n\nValid option keys per word (keys in "scores" MUST come from these lists):\n'
+            '\n\nValid option keys per word (entries may be shown as "key (grammar)"; '
+            'keys in "scores" MUST use the key before the first space):\n'
             f"{word_keys_json}"
         )
 
@@ -854,6 +870,7 @@ def _build_reformat_prompt(
         "}\n\n"
         "Extract the translation from your previous analysis and convert each selected "
         "lemma to a score entry of 10 with its key. "
+        f"{NO_GRAMMAR_NOTES_INSTRUCTION} "
         "Return only the JSON object. No prose, no markdown fences."
         f"{keys_block}\n\n"
         "Your previous analysis:\n"
@@ -1180,8 +1197,8 @@ def _handle_reformat_response(
             salvaged_scores = ai_data.get("scores")
             if isinstance(salvaged_scores, dict) and salvaged_scores:
                 reformat_data["scores"] = {
-                    **salvaged_scores,
                     **reformat_data["scores"],
+                    **salvaged_scores,
                 }
             ai_data = reformat_data
             if verbose:
@@ -1544,7 +1561,9 @@ Your task is to analyze a Pāḷi sentence and perform word-sense disambiguation
 2. **Disambiguate:** For each word in the sentence, identify the correct dictionary option (`key`).
 3. **Score Options:**
    - Assign a score of **10** to the correct `key` for the context.
-   - Assign lower scores (0-9) to alternative options if there is ambiguity.
+   - If multiple keys share the same id, treat them as grammar variants; choose the variant whose grammar matches your parse because the score-10 variant's grammar is what readers see in the table.
+   - Assign lower scores (1-9) only to genuinely plausible alternatives if there is ambiguity.
+   - Do not list options you would score 0; omitted options are treated as unselected.
    - Assign **10** to the correct `key` for *components* of compounds as well.
 4. **Contextualize:**
    - **`contextual_meaning`**: Adjust the dictionary `meaning_combo` to fit the grammar (e.g., "dwells" -> "I would dwell").
