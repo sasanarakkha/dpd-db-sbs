@@ -34,12 +34,14 @@ def main():
         help="Checking mode: meaning (default), meaning_raw, meaning_ru_raw, meaning_raw_list, meaning_lit, meaning_lit_list, notes, or notes_raw",
     )
     parser.add_argument(
-        "--batch", action="store_true", help="Use batch processing (default: True)"
+        "--batch",
+        action="store_true",
+        help="Use batch processing (default: individual)",
     )
     parser.add_argument(
         "--individual",
         action="store_true",
-        help="Use individual processing (slower but more precise)",
+        help="Use individual processing (the default; flag kept for compatibility)",
     )
     parser.add_argument(
         "--limit", type=int, help="Limit number of words to analyze (for testing)"
@@ -49,18 +51,37 @@ def main():
         type=str,
         help="Output report filename (auto-generated if not specified)",
     )
+    parser.add_argument(
+        "--reset",
+        action="store_true",
+        help="Delete the checked-IDs snapshot for the given mode and exit",
+    )
+    parser.add_argument(
+        "--no-auto-invalidate",
+        action="store_true",
+        help="Skip invalidation of checked IDs whose English content changed",
+    )
 
     args = parser.parse_args()
 
-    # Determine processing mode
-    use_batch = True
-    if args.individual:
-        use_batch = False
-    elif args.batch:
-        use_batch = True
+    # Determine processing mode (default: individual; batch is opt-in)
+    use_batch = args.batch and not args.individual
 
     # Create checker with specified mode
     checker = RussianMeaningChecker(mode=args.mode)
+
+    if args.reset:
+        checker.checked_ids_file.unlink(missing_ok=True)
+        pr.yes(f"checked-IDs snapshot reset for mode '{args.mode}'")
+        pr.toc()
+        return
+
+    if not args.no_auto_invalidate:
+        n_invalidated, n_seeded = checker.apply_invalidation(db_session)
+        pr.white(
+            f"Invalidated {n_invalidated} IDs (English changed), "
+            f"seeded {n_seeded} baseline hashes"
+        )
 
     total_count = checker.get_total_count_with_session(db_session)
 
@@ -75,7 +96,10 @@ def main():
         # Run the analysis
         pr.green_tmr("running analysis")
         checker.run_analysis(
-            db_session=db_session, use_batch=use_batch, limit=args.limit
+            db_session=db_session,
+            use_batch=use_batch,
+            limit=args.limit,
+            auto_invalidate=False,
         )
         pr.yes("ok")
 

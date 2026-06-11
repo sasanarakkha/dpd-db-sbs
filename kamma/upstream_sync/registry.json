@@ -228,6 +228,7 @@
     "tools/ai_meaning_checker.py",
     "tools/ai_openai_manager.py",
     "tools/ai_related.py",
+    "tools/meaning_snapshot_ru.py",
     "tools/ask.py",
     "tools/deepseek.py",
     "tools/duplicates.py",

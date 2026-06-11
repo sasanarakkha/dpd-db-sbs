@@ -6,8 +6,10 @@ import os
 import json
 import glob
 import re
+from collections.abc import Callable
+from pathlib import Path
 
-from typing import List, Dict
+from typing import Any, TypedDict
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword, Russian, Tamil
@@ -26,6 +28,7 @@ from tools.ai_related import (
     load_ai_config,
 )
 from tools.ai_manager import AIManager
+from tools.meaning_snapshot_ru import remove_ids_from_snapshot
 from tools.printer import printer as pr
 
 from tools.paths_dps import DPSPaths
@@ -42,8 +45,18 @@ date = year_month_day_hour_minute_dash()
 ai_manager = AIManager()
 api_key, provider, model = load_ai_config()
 
+
 # Language routing configuration for meaning mode
-LANG_CONFIG = {
+class LangConfig(TypedDict):
+    """Configuration for language-specific translation generation."""
+
+    orm_model: Any
+    rel_name: str
+    field_name: str
+    prompt_builder: Callable[..., list[dict[str, str]]]
+
+
+LANG_CONFIG: dict[str, LangConfig] = {
     "ru": {
         "orm_model": Russian,
         "rel_name": "ru",
@@ -58,8 +71,15 @@ LANG_CONFIG = {
     },
 }
 
+# generation mode -> checker snapshot files holding verdicts for the regenerated field
+SNAPSHOTS_BY_MODE: dict[str, list[Path]] = {
+    "meaning": [dpspth.ai_meaning_raw_checked, dpspth.ai_meaning_ru_raw_checked],
+    "lit": [dpspth.ai_meaning_lit_checked],
+    "note": [dpspth.ai_notes_raw_checked],
+}
 
-def remove_irrelevant(limit: int, lang: str = "ru"):
+
+def remove_irrelevant(limit: int, lang: str = "ru") -> None:
     # Query the database to fetch words based on language
     if lang == "ru":
         db = (
@@ -110,8 +130,8 @@ def remove_irrelevant(limit: int, lang: str = "ru"):
 
 
 def filter_words_for_translation(
-    mode, limit: int, lang: str = "ru"
-) -> List[DpdHeadword]:
+    mode: str, limit: int, lang: str = "ru"
+) -> list[DpdHeadword]:
     """Filter words that need translation for specified language."""
 
     # Get language-specific configuration
@@ -173,7 +193,7 @@ def filter_words_for_translation(
         #         )
         #     ).order_by(DpdHeadword.ebt_count.desc()).all()
 
-    if mode == "lit":
+    elif mode == "lit":
         #! filter for lit meaning
         db = (
             db_session.query(DpdHeadword)
@@ -189,7 +209,7 @@ def filter_words_for_translation(
             .all()
         )
 
-    if mode == "note":
+    elif mode == "note":
         #! for filling notes those which has Russian table and does not have ru_notes
         db = (
             db_session.query(DpdHeadword)
@@ -210,6 +230,8 @@ def filter_words_for_translation(
             .order_by(DpdHeadword.ebt_count.desc())
             .all()
         )
+    else:
+        raise ValueError(f"Invalid mode: {mode}")
 
     total_row_count = len(db)
     db = db[:limit]
@@ -219,7 +241,9 @@ def filter_words_for_translation(
     return db
 
 
-def create_translation_prompt(word: DpdHeadword, mode, lang: str = "ru") -> Dict:
+def create_translation_prompt(
+    word: DpdHeadword, mode: str, lang: str = "ru"
+) -> dict[str, Any]:
     """Create a translation prompt for a given word."""
     pos_example_map = load_translation_examples(dpspth, lang=lang)
     meaning = make_meaning_combo(word)
@@ -243,6 +267,8 @@ def create_translation_prompt(word: DpdHeadword, mode, lang: str = "ru") -> Dict
         )
     elif mode == "note":
         messages = generate_messages_for_notes(word.lemma_1, grammar, word.notes)
+    else:
+        raise ValueError(f"Invalid mode: {mode}")
 
     return {
         "custom_id": f"request-{word.id}",
@@ -253,7 +279,14 @@ def create_translation_prompt(word: DpdHeadword, mode, lang: str = "ru") -> Dict
 
 
 def translate(
-    lemma_1, grammar, pos, meaning, sentence, notes, mode, lang: str = "ru"
+    lemma_1: str,
+    grammar: str,
+    pos: str,
+    meaning: str,
+    sentence: str,
+    notes: str,
+    mode: str,
+    lang: str = "ru",
 ) -> str | None:
     pos_example_map = load_translation_examples(dpspth, lang=lang)
     translation_example = pos_example_map.get(pos, "")
@@ -294,7 +327,7 @@ def translate(
         raise ValueError(f"Invalid mode: {mode}")
 
 
-def save_prompts_to_json(prompts: List[Dict], filename):
+def save_prompts_to_json(prompts: list[dict[str, Any]], filename: str | Path) -> None:
     """Save prompts to a JSON file for Batch API use."""
     with open(filename, "w", encoding="utf-8") as f:
         for prompt in prompts:
@@ -303,7 +336,7 @@ def save_prompts_to_json(prompts: List[Dict], filename):
     print(f"prompts saved to {filename}")
 
 
-def make_json(mode, limit: int, lang: str = "ru"):
+def make_json(mode: str, limit: int, lang: str = "ru") -> None:
     words = filter_words_for_translation(mode, limit, lang=lang)
     prompts = [create_translation_prompt(word, mode, lang=lang) for word in words]
 
@@ -311,8 +344,9 @@ def make_json(mode, limit: int, lang: str = "ru"):
     save_prompts_to_json(prompts, file_name)
 
 
-def translation_generate(mode, limit: int, lang: str = "ru"):
+def translation_generate(mode: str, limit: int, lang: str = "ru") -> None:
     words = filter_words_for_translation(mode, limit, lang=lang)
+    regenerated_ids: set[int] = set()
     for word in words:
         meaning_result = translate(
             word.lemma_1,
@@ -325,6 +359,7 @@ def translation_generate(mode, limit: int, lang: str = "ru"):
             lang=lang,
         )
         if meaning_result:
+            regenerated_ids.add(word.id)
             if mode == "meaning":
                 if lang not in LANG_CONFIG:
                     raise ValueError(f"Unsupported language: {lang}")
@@ -370,8 +405,17 @@ def translation_generate(mode, limit: int, lang: str = "ru"):
 
                 print(f"{word.id}, {word.ebt_count} {word.lemma_1} {meaning_result}")
 
+    if lang == "ru" and regenerated_ids:
+        for snapshot_path in SNAPSHOTS_BY_MODE.get(mode, []):
+            removed = remove_ids_from_snapshot(snapshot_path, regenerated_ids)
+            if removed:
+                pr.white(
+                    f"{removed} regenerated IDs dropped from "
+                    f"{snapshot_path.name} (will be re-checked)"
+                )
 
-def read_exclude_ids_from_tsv(file_path) -> set[str]:
+
+def read_exclude_ids_from_tsv(file_path: str | Path) -> set[str]:
     exclude_ids = set()
     with open(file_path, "r", encoding="utf-8") as file:
         for line in file:
@@ -381,7 +425,7 @@ def read_exclude_ids_from_tsv(file_path) -> set[str]:
 
 
 def read_exclude_ids_from_json(
-    dir_path, mode: str = "meaning", lang: str = "ru"
+    dir_path: str | Path, mode: str = "meaning", lang: str = "ru"
 ) -> set[int]:
     """Read queued IDs from JSONL batch files. Extracts numeric ID from custom_id field like 'request-12345'."""
     exclude_ids: set[int] = set()

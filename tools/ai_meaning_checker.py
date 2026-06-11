@@ -11,9 +11,10 @@ Russian translations in the DPD database. It supports multiple checking modes:
 The checker uses AI models to identify mismatches and generates detailed reports.
 """
 
+import json
+import os
 from sqlalchemy import and_
 from typing import List, Optional
-import os
 
 from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
@@ -22,6 +23,14 @@ from db.db_helpers import get_db_session
 
 from tools.ai_batch_processor import BatchProcessor, WordComparison, ComparisonResult
 from tools.ai_related import replace_abbreviations
+from tools.meaning_snapshot_ru import (
+    compose_english_content,
+    compute_field_hash,
+    invalidate_changed,
+    load_snapshot,
+    save_snapshot,
+)
+from tools.printer import printer as pr
 
 pth = ProjectPaths()
 dpspth = DPSPaths()
@@ -93,36 +102,45 @@ class RussianMeaningChecker:
             self.checked_ids_file = dpspth.ai_meaning_checked
             self.output_txt_folder = dpspth.ai_meaning_report_dir
 
+        self.snapshot: dict[int, str] = {}
+        self.english_by_id: dict[int, str] = {}
         self.checked_ids = self.load_checked_ids()
 
     def load_checked_ids(self) -> set[int]:
-        """Load previously checked IDs from file"""
+        """Load the snapshot (v2, auto-migrating v1) and return its IDs."""
+        self.snapshot = load_snapshot(self.checked_ids_file)
+        return set(self.snapshot.keys())
+
+    def save_checked_ids(self) -> None:
+        """Reconcile newly checked IDs into the snapshot and persist it."""
         try:
-            import json
-
-            if os.path.exists(self.checked_ids_file):
-                with open(self.checked_ids_file, "r", encoding="utf-8") as f:
-                    return set(json.load(f))
-            else:
-                return set()
-        except (json.JSONDecodeError, FileNotFoundError):
-            return set()
-
-    def save_checked_ids(self):
-        """Save checked IDs to file"""
-        try:
-            import json
-
-            with open(self.checked_ids_file, "w", encoding="utf-8") as f:
-                json.dump(list(self.checked_ids), f, indent=2)
+            for headword_id in self.checked_ids:
+                if headword_id not in self.snapshot:
+                    english = self.english_by_id.get(headword_id)
+                    # "" = baseline-unknown sentinel; seeded from DB next run
+                    self.snapshot[headword_id] = (
+                        compute_field_hash(english) if english else ""
+                    )
+            save_snapshot(self.checked_ids_file, self.snapshot)
         except Exception as e:
-            print(f"Warning: Could not save checked IDs: {e}")
+            pr.amber(f"Could not save checked IDs: {e}")
+
+    def apply_invalidation(self, db_session) -> tuple[int, int]:
+        """Drop snapshot entries whose English content changed in the DB.
+
+        Returns (n_invalidated, n_seeded). Persists immediately so an
+        interrupted run loses nothing (invalidated IDs simply re-check later).
+        """
+        n_invalidated, n_seeded = invalidate_changed(
+            self.snapshot, db_session, self.mode
+        )
+        self.checked_ids = set(self.snapshot.keys())
+        save_snapshot(self.checked_ids_file, self.snapshot)
+        return n_invalidated, n_seeded
 
     def load_list_ids(self) -> set[int]:
         """Load IDs from the ai_processed_ids_json file for meaning_raw_list mode"""
         try:
-            import json
-
             if hasattr(self, "list_ids_file") and os.path.exists(self.list_ids_file):
                 with open(self.list_ids_file, "r", encoding="utf-8") as f:
                     return set(json.load(f))
@@ -314,19 +332,7 @@ class RussianMeaningChecker:
 
         comparisons = []
         for headword, russian in results:
-            # For notes modes, use notes as the English content
-            if self.mode in ["notes", "notes_raw"]:
-                english_content = headword.notes
-            # For literal meaning modes, use meaning_lit as the English content
-            elif self.mode in ["meaning_lit", "meaning_lit_list"]:
-                english_content = headword.meaning_lit
-            else:
-                if headword.meaning_lit:
-                    english_content = (
-                        f"{headword.meaning_1}; lit. {headword.meaning_lit}"
-                    )
-                else:
-                    english_content = headword.meaning_1
+            english_content = compose_english_content(headword, self.mode)
 
             if self.mode in ["notes", "notes_raw", "meaning_lit", "meaning_lit_list"]:
                 russian_meaning = getattr(russian, russian_field)
@@ -516,7 +522,11 @@ class RussianMeaningChecker:
         self.save_checked_ids()
 
     def run_analysis(
-        self, db_session=None, use_batch: bool = True, limit: Optional[int] = None
+        self,
+        db_session=None,
+        use_batch: bool = True,
+        limit: Optional[int] = None,
+        auto_invalidate: bool = True,
     ):
         """Run the complete analysis"""
         print("Starting Russian meaning mismatch analysis...")
@@ -525,8 +535,16 @@ class RussianMeaningChecker:
         session = db_session or globals()["db_session"]
 
         try:
+            if auto_invalidate:
+                n_invalidated, n_seeded = self.apply_invalidation(session)
+                pr.white(
+                    f"Invalidated {n_invalidated} IDs (English changed), "
+                    f"seeded {n_seeded} baseline hashes"
+                )
+
             # Get words for comparison
             comparisons = self.get_words_for_comparison_with_session(session)
+            self.english_by_id = {c.headword_id: c.english_meaning for c in comparisons}
 
             if limit:
                 comparisons = comparisons[:limit]
