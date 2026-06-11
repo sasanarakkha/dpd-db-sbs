@@ -3,7 +3,7 @@
 ## Architecture Decisions
 - **Standing workflow thread, not a feature implementation**: this thread defines how future sessions handle `exporter/analysis/` feedback. It does not change analyzer code during setup.
 - **No task checkboxes in the loop**: this is an ongoing feedback loop, so reusable instructions must stay as plain bullets. Do not use markdown task-list markers for recurring loop work.
-- **One issue per session**: future agents must keep each session focused. If the user reports several unrelated issues, pick the most obvious/highest-confidence issue first, solve it fully, then suggest the next issue for a new session.
+- **Focused approved scope**: future agents must keep work limited to the issue(s) explicitly included in the approved plan. If the user reports several unrelated issues, group related issues where practical and state which ones are in scope before implementation.
 - **Approval gate before implementation**: each issue requires analysis and a focused implementation plan first. The agent must stop before code edits until the user explicitly approves that per-issue plan.
 - **Concise handoff history**: `handoff.md` should preserve only what future sessions need: issue summary, files changed, tests run, remaining risk, and errors/mistakes. It should not become a full transcript.
 - **Issue history lives in handoff only**: completed issue work is recorded in `handoff.md`. Keep this plan stable and do not append per-issue history here.
@@ -14,7 +14,6 @@
 - `spec.md` describes the ongoing `exporter/analysis/` feedback-loop scope, issue routing rules, approval gate, testing expectations, and handoff expectations.
 - `plan.md` is this reusable loop guide, not a finite implementation task list.
 - `handoff.md` exists with current status, completed issues, pending/suggested next issues, important context, and errors/issues/repeated mistakes.
-- Legacy `kamma/threads.md` did not need to remain as active state.
 
 ## Session Startup Rules
 - At the start of every future session, read:
@@ -24,9 +23,9 @@
   - relevant files under `exporter/analysis/`
   - relevant tests under `tests/exporter/analysis/`
 - Before proposing a fix, cite the relevant current code paths and any handoff constraints.
-- If no concrete issue is reported, ask the user for one `exporter/analysis/` issue and stop.
-- If multiple unrelated issues are reported, select the most obvious/highest-confidence issue for the current session and state which reported issues are being deferred.
-- The current session plan must name exactly one issue as in scope and list unrelated reported issues as deferred/suggested next-session items.
+- If no concrete issue is reported, ask the user for an `exporter/analysis/` issue or issue set and stop.
+- If multiple unrelated issues are reported, state which reported issues are included in the current approved scope and which are being deferred.
+- The current session plan must name the issue(s) in scope and list unrelated reported issues as deferred unless the user explicitly approves them for the same scope.
 
 ## Per-Issue Planning Gate
 - Inspect the affected `exporter/analysis/` files and any related tests before stating behavior or proposing changes.
@@ -74,8 +73,8 @@
   - errors / issues / repeated mistakes
 - Keep `handoff.md` concise and preserve its dedicated errors/mistakes section.
 - Do not append issue history, issue queues, task markers, or session results to this plan.
-- Stop after the issue is complete and suggest starting a new session for the next issue.
-- Do not begin another unrelated fix in the same session unless the user explicitly overrides the one-issue rule.
+- Stop after the approved issue scope is complete unless the user explicitly approves expanding the scope.
+- Do not begin another unrelated fix unless the user explicitly approves it.
 - When preparing a manual commit for work from this thread, include issue `#197` in the commit message.
 
 ## Final Loop Completion

@@ -8,9 +8,13 @@
 - Finding 61 live evidence collection is complete. It is mostly clean, but
   DeepSeek `TH215` still selects nominative duration for
   `paṇṇavīsativassāni` and component `vassāni`.
-- Review is pending. Before `/kamma:3-review`, user should decide whether to
-  accept the DeepSeek `TH215` residual as a model limitation or queue a focused
-  follow-up.
+- 2026-06-12: manual analysis of the Finding 61 artifacts found three
+  pipeline defects (not model limitations) and produced a proposed queue,
+  Findings 62-65, in
+  `kamma/threads/exporter_analysis_loop/plan-history/findings_62_65_plans.md`.
+  It is NOT approved and NOT implemented.
+- Review is pending behind two user decisions: the Findings 62-65 queue and
+  the DeepSeek `TH215` duration residual.
 
 ## Handoff Hygiene Rule
 - Keep this handoff tight. It is active session memory, not a full transcript.
@@ -45,6 +49,18 @@ Also required:
   `git status --short`; do not claim Python validation was run.
 
 ## Next Decision
+- Approve, trim, or reject the proposed Findings 62-65 queue
+  (`plan-history/findings_62_65_plans.md`). Summary:
+  - Finding 62: empty AI `contextual_meaning`/`selected_pos` strings overwrite
+    dictionary meanings → blank Meaning cells (`merge_ai_selections` and the
+    inline field copy in `_apply_deterministic_scores_to_map`).
+  - Finding 63: db-example promotion flattens the AI's correct intra-headword
+    grammar choice (four "dat pl" rows in both SN15.1 reports should be gen
+    pl; DeepSeek had selected gen pl before being stomped).
+  - Finding 64: component homonym tie-break prefers `ind`, rendering `santi`
+    inside `cetosanti` ("peace of mind") as "own; personal; self-" on Low.
+  - Finding 65: deferred design question (all-zero retry groups count as
+    resolved); recommendation is to implement 62-64 first.
 - Decide whether DeepSeek `TH215` nominative duration is acceptable:
   - Accept as a model limitation and proceed to manual confirmation/review.
   - Or queue a focused follow-up for duration-grammar selection.
@@ -89,8 +105,10 @@ Live evaluation summary:
 - `MN41_p2` stock phrase is clean on both models: genitive `kāyassa`,
   ablative `bhedā`, prepositional `paraṃ` = "after", ablative `maraṇā`.
 - `upapajjantī'ti` selected `upapajjanti + iti` on both models.
-- Low `TH215` is clean: accusative `paṇṇavīsativassāni` and component
-  `vassāni`, `api` = "even", finger-snap nuance preserved.
+- Low `TH215` is mostly clean: accusative `paṇṇavīsativassāni` and component
+  `vassāni`, `api` = "even", finger-snap nuance preserved. Correction
+  2026-06-12: its component `santi` inside `cetosanti` is the wrong homonym
+  ("own; personal; self-" instead of "peace") — see Finding 64.
 - DeepSeek `TH215` is not a clean pass: it keeps nominative
   `paṇṇavīsativassāni` and component `vassāni`, though `api` = "even" and the
   finger-snap nuance are preserved.
@@ -183,6 +201,8 @@ sessions can load only the level of history they need.
   `kamma/threads/exporter_analysis_loop/plan-history/findings_45_50_plans.md`
 - Findings 51-55:
   `kamma/threads/exporter_analysis_loop/plan-history/findings_51_55_plans.md`
+- Findings 62-65 (PROPOSED, awaiting approval):
+  `kamma/threads/exporter_analysis_loop/plan-history/findings_62_65_plans.md`
 
 Important historical note: Finding 38 was merged into Finding 35 and must not
 be executed separately.
@@ -253,8 +273,9 @@ be executed separately.
 - Implementation queues through Finding 60 are complete.
 - Finding 61 evidence collection is complete, but DeepSeek `TH215` remains a
   not-clean pass on duration grammar.
-- Remaining before review: user decision on accepting the DeepSeek `TH215`
-  residual or queuing a focused follow-up; manual confirmation/testing; release
-  `temp/tier_eval/` when no longer needed.
+- Remaining before review: user decision on the proposed Findings 62-65
+  queue; user decision on accepting the DeepSeek `TH215` residual or queuing a
+  focused follow-up; manual confirmation/testing; release `temp/tier_eval/`
+  when no longer needed.
 - After user confirmation, run:
   `/kamma:3-review kamma/threads/exporter_analysis_loop`
