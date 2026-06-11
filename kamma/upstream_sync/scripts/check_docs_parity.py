@@ -47,11 +47,7 @@ def load_docs_sync_range(thread_dir: Path | None) -> tuple[str, str]:
         return load_accepted_sha(), "HEAD"
 
     manifest = load_prep_manifest(get_prep_manifest_path(thread_dir))
-    from_ref = manifest["from_upstream_sha"]
-    to_ref = manifest["to_upstream_sha"]
-    if not isinstance(from_ref, str) or not isinstance(to_ref, str):
-        raise ValueError("prep manifest sync range must contain string refs")
-    return from_ref, to_ref
+    return manifest.from_upstream_sha, manifest.to_upstream_sha
 
 
 def get_docs_changed_since(

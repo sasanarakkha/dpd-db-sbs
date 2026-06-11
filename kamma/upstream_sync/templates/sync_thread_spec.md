@@ -28,43 +28,8 @@ SBS, DPS, and Tamil localized additions.
 - `new_improvements.md` was reviewed, valuable items were promoted, and the temporary file was deleted if present.
 - Commit messages were prepared and presented for manual execution; no autonomous commit, pull, or push was performed.
 
-## Iron Rule
-
-When a shadow file breaks after sync, the ONLY fix is:
-1. Open the upstream source.
-2. See exactly how upstream implements it.
-3. Copy that exact solution.
-4. Re-apply ONLY the local changes from `smd/`.
-
-FORBIDDEN: workarounds, alternative imports, try/except papering, or restructuring differently from upstream. The sources are correct. Broken means sync is incomplete.
-
-## Model Boundaries
-
-| Stage | Owner | Responsibility |
-|---|---|---|
-| Stage 1 Prep | FAST | Run commands, generate factual reports, record failures |
-| Stage 2 Analysis | ADVANCED | Interpret reports, resolve strategy, write `dynamic_plan.md` |
-| Stage 3 Execution | FAST | Execute `dynamic_plan.md` literally and run tests |
-| Stage 4.A Docs Analysis | ADVANCED | Analyze docs parity and write `docs_translation_plan.md` |
-| Stage 4.B Docs Translation | FAST | Execute `docs_translation_plan.md` literally |
-| Stage 5 Verification | ADVANCED | Decide acceptance after user verification |
-
-FAST must stop if analysis, planning, judgment, conflict resolution, or plan repair is needed.
-ADVANCED must stop if mechanical editing, command execution, formatting, testing, file copying, or bulk translation is needed.
-
-## Handoff Requirements
-
-Every hard stop must update `<thread_dir>/handoff.md` with:
-- Current stage and owner model.
-- Completed work.
-- Exact commands already run.
-- Exact outputs or failures summarized.
-- Files changed.
-- Open decisions.
-- Errors, issues, and repeated mistakes.
-- Next model to use.
-- Exact restart prompt for a fresh session.
-- Instruction: `Do not continue in this session.`
+For the Iron Rule, model responsibilities, handoff requirements, and subagent dispatch protocol,
+see **[guide.md](../guide.md)**.
 
 ## Commit Gates
 

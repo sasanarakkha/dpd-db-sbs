@@ -224,6 +224,7 @@ class PrepManifest:
     blocker_paths: list[str]
     discuss_paths: list[str]
     mapped_actions: dict[str, list[MappedAction]]
+    needs_classification_paths: list[str]
 
     @classmethod
     def from_raw(cls, raw: object) -> "PrepManifest":
@@ -237,10 +238,16 @@ class PrepManifest:
         deleted_upstream_paths = _string_list(data, "deleted_upstream_paths")
         blocker_paths = _optional_string_list(data, "blocker_paths")
         discuss_paths = _string_list(data, "discuss_paths")
+        needs_classification_paths = _optional_string_list(
+            data, "needs_classification_paths"
+        )
         validate_repo_relative_paths(changed_upstream_paths, "changed_upstream_paths")
         validate_repo_relative_paths(deleted_upstream_paths, "deleted_upstream_paths")
         validate_repo_relative_paths(blocker_paths, "blocker_paths")
         validate_repo_relative_paths(discuss_paths, "discuss_paths")
+        validate_repo_relative_paths(
+            needs_classification_paths, "needs_classification_paths"
+        )
         return cls(
             from_upstream_sha=from_upstream_sha,
             to_upstream_sha=to_upstream_sha,
@@ -251,6 +258,7 @@ class PrepManifest:
             blocker_paths=blocker_paths,
             discuss_paths=discuss_paths,
             mapped_actions=cls._mapped_actions(data),
+            needs_classification_paths=needs_classification_paths,
         )
 
     @staticmethod
@@ -286,6 +294,7 @@ class PrepManifest:
             "changed_upstream_paths": self.changed_upstream_paths,
             "deleted_upstream_paths": self.deleted_upstream_paths,
             "blocker_paths": self.blocker_paths,
+            "needs_classification_paths": self.needs_classification_paths,
             "mapped_actions": {
                 path: [action.to_json() for action in actions]
                 for path, actions in self.mapped_actions.items()

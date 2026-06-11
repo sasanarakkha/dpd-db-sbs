@@ -133,15 +133,34 @@ ADVANCED must stop when mechanical work is needed: broad file reading, command e
 - ADVANCED decides a shadow must be updated -> write exact instructions, then stop and hand off to FAST.
 - ADVANCED sees docs need translation -> write `docs_translation_plan.md`, then stop and hand off to FAST.
 
-**MANDATORY MODEL SWITCH TRIGGERS — never skip these:**
+**Subagent Dispatch (Primary Path):**
 
-| Transition | Recommended model | Instruction to give user |
-|---|---|---|
-| End of Stage 1, before Stage 2 | ADVANCED | "Please switch to ADVANCED model. Restart. Next prompt: [exact prompt]." |
-| End of Stage 2, before Stage 3 | FAST (execution) | "Please switch to FAST model. Restart. Next prompt: [exact prompt]." |
-| End of Stage 3, before Stage 4.A | ADVANCED | "Please switch to ADVANCED model. Restart. Next prompt: [exact prompt]." |
-| End of Stage 4.A, before Stage 4.B | FAST (execution) | "Please switch to FAST model. Restart. Next prompt: [exact prompt]." |
-| End of Stage 4.B, before Stage 5 | ADVANCED | "Please switch to ADVANCED model. Restart. Next prompt: [exact prompt]." |
+The orchestrating session (Opus / ADVANCED) dispatches mechanical work to the `sync-fast` subagent (`.claude/agents/sync-fast.md`):
+- **Stage 1** (entire stage): dispatch to `sync-fast` after thread init.
+- **Stage 3** (batches of ≤5 plan items): dispatch sequential batches to `sync-fast`.
+- **Stage 4.B** (entire docs translation stage): dispatch to `sync-fast`.
+
+All user-facing gates remain in the orchestrating session: Stage 2 approval, Stage 4.A discussion, commit gates, and Stage 5 acceptance. Subagent work is verified from files — read `handoff.md` and stage outputs after each dispatch; subagent self-reports are not trusted.
+
+**Manual fallback** (when running without subagent support — e.g., CI, non-Claude-Code environments):
+
+Use fresh-session model restarts following this prompt template:
+
+```text
+Switch to <FAST|ADVANCED>. Start a fresh session.
+
+Continue upstream sync thread: <thread_dir>.
+First read:
+1. <thread_dir>/handoff.md
+2. kamma/upstream_sync/guide.md
+3. <stage-specific file>
+
+Your task:
+<exact next task>
+
+Do not perform <forbidden model responsibility>.
+Stop if <specific stop condition>.
+```
 
 - **Stage 1 (Prep)** — FAST model; factual collection only.
 - **Stage 2 (Analysis)** — ADVANCED model; strategic planning, resolve `discuss` flags, draft `dynamic_plan.md`.
@@ -186,14 +205,15 @@ Stage 4 is split into two model-bound substages: ADVANCED analysis and FAST tran
    - Generate `prep_report.md` and `prep_manifest.json` from the explicit upstream range in `accepted_sync.json`.
    - Identify all modified, added, and deleted upstream files relative to the registry.
    - If `prep_manifest.json.discuss_paths` is non-empty, STOP before `execute_sync.py`.
-   - If `prep_manifest.json.blocker_paths` is non-empty, STOP before `execute_sync.py`.
-     Resolve by updating registry/SMD or run-specific scope, then rerun prep.
+   - If `prep_manifest.json.needs_classification_paths` is non-empty, those upstream additions have no local collision; register them in `registry.json`/SMD during Stage 2. They do NOT block `execute_sync.py`.
+   - If `prep_manifest.json.blocker_paths` is non-empty, STOP before `execute_sync.py`. Deletion blockers may be acknowledged by creating `<thread_dir>/run_acknowledged_blockers.txt` (one path per line; `#` comments allowed); `verify_manifest` warns but does not block on acknowledged paths. Collision blockers require registry/SMD changes before `execute_sync.py`.
 3. **Automated Pull**:
    - Perform the automated sync by running `uv run python3 kamma/upstream_sync/scripts/execute_sync.py <thread_dir>`.
    - Review and add any run-specific exclusions to `<thread_dir>/run_exclusions.txt` before execution if needed.
    - `execute_sync.py` pins `as_upstream` directly to the verified manifest SHA without switching branches.
    - (Commit 1 gate). Message format: `#sync: upstream pull <from>..<to>, <N> files, YYYY-MM-DD`
    - `execute_sync.py <thread_dir>` leaves changes unstaged by default. Review `git diff` before manual staging; use `--stage` only when you intentionally want the script to run `git add .`.
+   - **Upstream deletions propagate.** Files deleted upstream (and acknowledged via `run_acknowledged_blockers.txt`) are removed from the worktree as an unstaged deletion you review in `git diff` — no separate manual "verify-then-remove" pass is required for upstream-tracked paths. Permanent exclusions and run-specific exclusions are still restored from the local branch afterward, so protected files are never dropped.
    - **Staging rule:** NEVER use `git add -A -- <file list>` — gitignore'd paths will trigger errors. If you stage all sync changes manually, use `git add .` which respects `.gitignore` automatically. If you must stage selectively, pre-filter with `git add <file>` one path at a time or check first with `git check-ignore -v <path>`.
 
 ### Stage 2: Analysis (ADVANCED Strategic Planning)

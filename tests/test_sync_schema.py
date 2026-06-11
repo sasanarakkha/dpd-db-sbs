@@ -326,6 +326,60 @@ def test_prep_manifest_from_raw_accepts_legacy_payload_without_blockers() -> Non
     assert manifest.to_json()["blocker_paths"] == []
 
 
+def test_prep_manifest_needs_classification_paths_defaults_to_empty() -> None:
+    manifest = PrepManifest.from_raw(valid_manifest_payload())
+
+    assert manifest.needs_classification_paths == []
+    assert manifest.to_json()["needs_classification_paths"] == []
+
+
+def test_prep_manifest_needs_classification_paths_round_trips() -> None:
+    payload = valid_manifest_payload()
+    payload["needs_classification_paths"] = ["new_upstream.py", "tools/new_tool.py"]
+
+    manifest = PrepManifest.from_raw(payload)
+
+    assert manifest.needs_classification_paths == [
+        "new_upstream.py",
+        "tools/new_tool.py",
+    ]
+    assert manifest.to_json()["needs_classification_paths"] == [
+        "new_upstream.py",
+        "tools/new_tool.py",
+    ]
+
+
+@pytest.mark.parametrize(
+    ("paths", "expected_error"),
+    [
+        (
+            ["exporter/**/*.py"],
+            "needs_classification_paths\\[0\\] must not contain git pathspec metacharacters",
+        ),
+        (
+            ["../outside.py"],
+            "needs_classification_paths\\[0\\] must stay inside the repository",
+        ),
+        (
+            ["/tmp/outside.py"],
+            "needs_classification_paths\\[0\\] must be a repo-relative path",
+        ),
+        (
+            [" spaced.py "],
+            "needs_classification_paths\\[0\\] must not contain surrounding whitespace",
+        ),
+    ],
+)
+def test_prep_manifest_rejects_invalid_needs_classification_paths(
+    paths: list[str], expected_error: str
+) -> None:
+    payload = valid_manifest_payload()
+    payload["needs_classification_paths"] = paths
+
+    with pytest.raises(ValueError, match=expected_error):
+        PrepManifest.from_raw(payload)
+
+
 def valid_registry_payload() -> dict[str, object]:
     return {
         "modified_upstream_files": [

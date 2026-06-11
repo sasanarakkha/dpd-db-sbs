@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import pytest
+from kamma.upstream_sync.scripts.sync_schema import RegistryData
 from kamma.upstream_sync.scripts.verify_smd_coverage import (
     check_category_alignment,
     check_unregistered_smd_entries,
@@ -98,14 +99,19 @@ def test_check_rubric_rejects_unknown_sync_rule() -> None:
 
 
 def test_collect_registry_paths_includes_russian_copies() -> None:
-    data: dict[str, object] = {
-        "modified_upstream_files": [],
-        "russian_copies": {"exporter/webapp/main_ru.py": "exporter/webapp/main.py"},
-        "sbs_copies": {},
-        "dps_copies": {},
-        "tamil_copies": {},
-        "inspired_by_upstream": {},
-    }
+    data = RegistryData.from_raw(
+        {
+            "modified_upstream_files": [],
+            "russian_copies": {"exporter/webapp/main_ru.py": "exporter/webapp/main.py"},
+            "sbs_copies": {},
+            "dps_copies": {},
+            "tamil_copies": {},
+            "inspired_by_upstream": {},
+            "unique_paths": [],
+            "no_sync_files": [],
+            "skip_sync_patterns": [],
+        }
+    )
 
     paths = collect_registry_paths(data)
 
@@ -113,14 +119,19 @@ def test_collect_registry_paths_includes_russian_copies() -> None:
 
 
 def test_collect_registry_paths_includes_tamil_copies() -> None:
-    data: dict[str, object] = {
-        "modified_upstream_files": [],
-        "russian_copies": {},
-        "sbs_copies": {},
-        "dps_copies": {},
-        "tamil_copies": {"db/tpd/tpd_to_lookup.py": "db/epd/epd_to_lookup.py"},
-        "inspired_by_upstream": {},
-    }
+    data = RegistryData.from_raw(
+        {
+            "modified_upstream_files": [],
+            "russian_copies": {},
+            "sbs_copies": {},
+            "dps_copies": {},
+            "tamil_copies": {"db/tpd/tpd_to_lookup.py": "db/epd/epd_to_lookup.py"},
+            "inspired_by_upstream": {},
+            "unique_paths": [],
+            "no_sync_files": [],
+            "skip_sync_patterns": [],
+        }
+    )
 
     paths = collect_registry_paths(data)
 

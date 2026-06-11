@@ -76,10 +76,8 @@ def run_git(args: list[str], check: bool = True) -> subprocess.CompletedProcess:
 def get_permanent_exclusions() -> list[str]:
     """Load permanent exclusions from registry.json."""
     registry = load_registry()
-    no_sync_files = registry.get("no_sync_files", [])
     exclusions = get_modified_upstream_paths(registry)
-    if isinstance(no_sync_files, list):
-        exclusions.extend(path for path in no_sync_files if isinstance(path, str))
+    exclusions.extend(registry.no_sync_files)
     return validate_repo_relative_paths(exclusions, "permanent exclusions")
 
 
@@ -174,7 +172,7 @@ def execute_sync(
         # 1. Discover target ref
         pr.green("discovering target ref")
         state = load_accepted_sync_state()
-        target_ref = state["last_accepted_upstream_ref"]
+        target_ref = state.last_accepted_upstream_ref
         run_git(["git", "fetch", "upstream"])
         target_sha = run_git(["git", "rev-parse", target_ref]).stdout.strip()
         pr.yes(f"{target_ref} -> {target_sha}")
@@ -219,9 +217,9 @@ def execute_sync(
         run_git(["git", "update-ref", "refs/heads/as_upstream", target_sha])
         pr.yes("ok")
 
-        # 5. Sync upstream-tracked paths into the current sbs-ru worktree
-        pr.green("performing checkout from as_upstream")
-        run_git(["git", "checkout", "as_upstream", "--", "."])
+        # 5. Sync upstream-tracked paths into the current sbs-ru worktree (worktree only — leaves index unchanged so changes remain unstaged for review)
+        pr.green("performing restore from as_upstream")
+        run_git(["git", "restore", "--source", "as_upstream", "--worktree", "--", "."])
         pr.yes("ok")
 
         # 6. Restore excluded files

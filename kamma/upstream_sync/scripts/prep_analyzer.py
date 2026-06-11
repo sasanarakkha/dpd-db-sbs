@@ -10,15 +10,16 @@ from datetime import datetime
 from pathlib import Path
 
 from kamma.upstream_sync.scripts.registry_helper import (
-    AcceptedSyncState,
     get_inspired_by_upstream_mapping,
     get_modified_upstream_paths,
     get_no_sync_files,
+    get_registry_path,
     get_shadow_mappings_by_category,
     get_skip_sync_patterns,
     load_accepted_sync_state,
     load_registry,
 )
+from kamma.upstream_sync.scripts.sync_schema import AcceptedSyncState
 from kamma.upstream_sync.scripts.validate_registry import validate_registry_core
 from kamma.upstream_sync.scripts.verify_smd_coverage import (
     check_rubric,
@@ -30,6 +31,18 @@ from tools.printer import printer as pr
 type GitChange = tuple[str, str]
 type MappedAction = dict[str, str]
 type SourceAction = dict[str, str]
+
+
+def match_sources(
+    path: str, source_map: dict[str, list[SourceAction]]
+) -> list[SourceAction] | None:
+    """Return actions for *path* from *source_map*, or None if no mapping matches."""
+    for src, actions in source_map.items():
+        if src.endswith("/") and path.startswith(src):
+            return actions
+        if path == src:
+            return actions
+    return None
 
 
 def resolve_target_upstream_sha(ref: str = "upstream/main") -> str:
@@ -109,6 +122,36 @@ class PrepAnalyzer:
         )
         self.inspired_mappings = get_inspired_by_upstream_mapping(self.registry)
 
+    def _path_exists(self, path: str) -> bool:
+        """Return True if path exists in the local worktree."""
+        return Path(path).exists()
+
+    def _all_registered_local_paths(self) -> list[str]:
+        """Return all registered local paths from the registry."""
+        paths: list[str] = []
+        for mapping in [
+            self.registry.russian_copies,
+            self.registry.sbs_copies,
+            self.registry.dps_copies,
+            self.registry.tamil_copies,
+        ]:
+            paths.extend(mapping.keys())
+        paths.extend(self.registry.inspired_by_upstream.keys())
+        paths.extend(self.registry.unique_paths)
+        return paths
+
+    def _is_collision(self, path: str) -> tuple[bool, str]:
+        """Return (collides, reason) for an added upstream path."""
+        if self._path_exists(path):
+            return True, "exists in local worktree"
+        for local_path in self._all_registered_local_paths():
+            if local_path.endswith("/"):
+                if path.startswith(local_path):
+                    return True, f"collides with registered local path '{local_path}'"
+            elif path == local_path:
+                return True, f"collides with registered local path '{local_path}'"
+        return False, ""
+
     def is_skipped(self, path: str) -> bool:
         """Return True when the path is outside sync scanning scope."""
         for entry in self.no_sync_files:
@@ -149,11 +192,11 @@ class PrepAnalyzer:
 
     def run(self) -> None:
         """Generate the Stage 1 report and manifest in the thread folder."""
-        from_sha = self.accepted_sync["last_accepted_upstream_sha"]
+        from_sha = self.accepted_sync.last_accepted_upstream_sha
         if from_sha == "BOOTSTRAP_REQUIRED":
             raise ValueError("accepted sync state is not bootstrapped")
 
-        target_ref = self.accepted_sync["last_accepted_upstream_ref"]
+        target_ref = self.accepted_sync.last_accepted_upstream_ref
         to_sha = resolve_target_upstream_sha(target_ref)
         changes = get_upstream_changes(from_sha, to_sha)
 
@@ -164,6 +207,8 @@ class PrepAnalyzer:
         deleted: list[str] = []
         blocker_paths: list[str] = []
         discuss_paths: list[str] = []
+        needs_classification_paths: list[str] = []
+        collision_reasons: dict[str, str] = {}
 
         source_to_shadows: dict[str, list[SourceAction]] = {}
         for category, mapping in self.shadow_mappings_by_category.items():
@@ -187,9 +232,9 @@ class PrepAnalyzer:
             )
 
         discuss_lookup = {
-            entry["path"]
-            for entry in self.registry.get("modified_upstream_files", [])  # type: ignore[union-attr]
-            if isinstance(entry, dict) and entry.get("discuss") is True
+            entry.path
+            for entry in self.registry.modified_upstream_files
+            if entry.discuss
         }
 
         mapped_actions: dict[str, list[MappedAction]] = {}
@@ -202,25 +247,16 @@ class PrepAnalyzer:
             if status == "D":
                 deleted.append(path)
                 blocker_paths.append(path)
-                for src, actions in source_to_shadows.items():
-                    if src.endswith("/") and path.startswith(src):
-                        mapped_actions[path] = self.build_mapped_actions(actions, path)
-                        break
-                    if path == src:
-                        mapped_actions[path] = self.build_mapped_actions(actions, path)
-                        break
-
-                for src, actions in source_to_inspired.items():
-                    if src.endswith("/") and path.startswith(src):
-                        mapped_actions.setdefault(path, []).extend(
-                            self.build_mapped_actions(actions, path)
-                        )
-                        break
-                    if path == src:
-                        mapped_actions.setdefault(path, []).extend(
-                            self.build_mapped_actions(actions, path)
-                        )
-                        break
+                shadow_actions = match_sources(path, source_to_shadows)
+                if shadow_actions is not None:
+                    mapped_actions[path] = self.build_mapped_actions(
+                        shadow_actions, path
+                    )
+                inspired_actions = match_sources(path, source_to_inspired)
+                if inspired_actions is not None:
+                    mapped_actions.setdefault(path, []).extend(
+                        self.build_mapped_actions(inspired_actions, path)
+                    )
                 continue
 
             changed_upstream_paths.add(path)
@@ -232,48 +268,37 @@ class PrepAnalyzer:
 
             found_source = False
 
-            for src, actions in source_to_shadows.items():
-                if src.endswith("/") and path.startswith(src):
-                    manifest_actions = self.build_mapped_actions(actions, path)
-                    shadow_sources_modified.append(
-                        (path, [action["local_path"] for action in manifest_actions])
-                    )
-                    mapped_actions[path] = manifest_actions
-                    found_source = True
-                    break
-                if path == src:
-                    manifest_actions = self.build_mapped_actions(actions, path)
-                    shadow_sources_modified.append(
-                        (path, [action["local_path"] for action in manifest_actions])
-                    )
-                    mapped_actions[path] = manifest_actions
-                    found_source = True
-                    break
+            shadow_actions = match_sources(path, source_to_shadows)
+            if shadow_actions is not None:
+                manifest_actions = self.build_mapped_actions(shadow_actions, path)
+                shadow_sources_modified.append(
+                    (path, [action["local_path"] for action in manifest_actions])
+                )
+                mapped_actions[path] = manifest_actions
+                found_source = True
 
-            for src, actions in source_to_inspired.items():
-                if src.endswith("/") and path.startswith(src):
-                    manifest_actions = self.build_mapped_actions(actions, path)
-                    inspired_sources_modified.append(
-                        (path, [action["local_path"] for action in manifest_actions])
-                    )
-                    mapped_actions.setdefault(path, []).extend(manifest_actions)
-                    found_source = True
-                    break
-                if path == src:
-                    manifest_actions = self.build_mapped_actions(actions, path)
-                    inspired_sources_modified.append(
-                        (path, [action["local_path"] for action in manifest_actions])
-                    )
-                    mapped_actions.setdefault(path, []).extend(manifest_actions)
-                    found_source = True
-                    break
+            inspired_actions = match_sources(path, source_to_inspired)
+            if inspired_actions is not None:
+                manifest_actions = self.build_mapped_actions(inspired_actions, path)
+                inspired_sources_modified.append(
+                    (path, [action["local_path"] for action in manifest_actions])
+                )
+                mapped_actions.setdefault(path, []).extend(manifest_actions)
+                found_source = True
 
-            if status == "A" or (
-                not found_source and path not in self.modified_upstream
+            if not found_source and (
+                status == "A" or path not in self.modified_upstream
             ):
-                untracked.append(path)
-                if status == "A" and not found_source:
-                    blocker_paths.append(path)
+                if status == "A":
+                    collides, reason = self._is_collision(path)
+                    if collides:
+                        untracked.append(path)
+                        blocker_paths.append(path)
+                        collision_reasons[path] = reason
+                    else:
+                        needs_classification_paths.append(path)
+                else:
+                    untracked.append(path)
 
         report = self.generate_report(
             tracked=tracked_modified,
@@ -282,6 +307,8 @@ class PrepAnalyzer:
             untracked=untracked,
             deleted=deleted,
             blockers=sorted(set(blocker_paths)),
+            needs_classification=sorted(needs_classification_paths),
+            collision_reasons=collision_reasons,
             from_sha=from_sha,
             to_sha=to_sha,
         )
@@ -291,6 +318,7 @@ class PrepAnalyzer:
             changed_upstream_paths=sorted(changed_upstream_paths),
             deleted_upstream_paths=sorted(set(deleted)),
             blocker_paths=sorted(set(blocker_paths)),
+            needs_classification_paths=sorted(needs_classification_paths),
             mapped_actions=mapped_actions,
             discuss_paths=sorted(set(discuss_paths)),
         )
@@ -313,6 +341,8 @@ class PrepAnalyzer:
         untracked: list[str],
         deleted: list[str],
         blockers: list[str],
+        needs_classification: list[str],
+        collision_reasons: dict[str, str],
         from_sha: str,
         to_sha: str,
     ) -> str:
@@ -324,7 +354,10 @@ class PrepAnalyzer:
         lines.append("")
 
         lines.append("## Registry Validation Status")
-        errors = validate_registry_core(self.registry)
+        raw_registry: dict[str, object] = json.loads(
+            get_registry_path().read_text(encoding="utf-8")
+        )
+        errors = validate_registry_core(raw_registry)
         if not errors:
             lines.append("OK: Registry is valid.\n")
         else:
@@ -399,13 +432,26 @@ class PrepAnalyzer:
                 lines.append(f"- {path}")
             lines.append("")
 
+        lines.append("## Needs Classification (Stage 2)")
+        if needs_classification:
+            lines.append(
+                "These upstream additions have no local collision. Register them in `registry.json` during Stage 2."
+            )
+            for path in needs_classification:
+                lines.append(f"- {path}")
+        else:
+            lines.append("_No paths need classification._")
+        lines.append("")
+
         lines.append("## Stage 1 Blocker Paths")
         if blockers:
             lines.append(
                 "Resolve these paths before running `execute_sync.py`; rerun prep after registry/SMD or run-specific scope changes."
             )
             for path in blockers:
-                lines.append(f"- {path}")
+                reason = collision_reasons.get(path)
+                suffix = f" ({reason})" if reason else ""
+                lines.append(f"- {path}{suffix}")
         else:
             lines.append("_No Stage 1 blockers._")
         lines.append("")
@@ -419,6 +465,7 @@ class PrepAnalyzer:
         changed_upstream_paths: list[str],
         deleted_upstream_paths: list[str],
         blocker_paths: list[str],
+        needs_classification_paths: list[str],
         mapped_actions: dict[str, list[MappedAction]],
         discuss_paths: list[str],
     ) -> dict[str, object]:
@@ -426,11 +473,12 @@ class PrepAnalyzer:
         return {
             "from_upstream_sha": from_sha,
             "to_upstream_sha": to_sha,
-            "target_upstream_ref": self.accepted_sync["last_accepted_upstream_ref"],
+            "target_upstream_ref": self.accepted_sync.last_accepted_upstream_ref,
             "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
             "changed_upstream_paths": changed_upstream_paths,
             "deleted_upstream_paths": deleted_upstream_paths,
             "blocker_paths": blocker_paths,
+            "needs_classification_paths": needs_classification_paths,
             "mapped_actions": mapped_actions,
             "discuss_paths": discuss_paths,
         }

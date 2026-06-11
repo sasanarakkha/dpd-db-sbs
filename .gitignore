@@ -130,7 +130,9 @@ typescript
 
 # --- DPS / SBS / RU UNIQUE patterns ---
 
-.claude/
+# .claude/ is tracked (agent definitions, project commands, settings) but
+# machine-local overrides stay out of git.
+.claude/settings.local.json
 .gemini/
 kamma/upstream_sync/new_improvements.md
 archive
@@ -152,6 +154,9 @@ exporter/kindle/ru_components/epub/OEBPS/Text/rpd_*.xhtml
 agents
 skills
 memory
+# Re-include the committed sync subagent (the bare `agents` rule above hides it).
+!.claude/agents/
+!.claude/agents/sync-fast.md
 NOTES.md
 dpd.db-shm
 dpd.db-wal

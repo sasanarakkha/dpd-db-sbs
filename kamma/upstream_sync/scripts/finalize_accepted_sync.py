@@ -31,17 +31,6 @@ def resolve_commit_date(commit_sha: str) -> str:
     return result.stdout.strip()
 
 
-def resolve_commit_sha(commit_ref: str) -> str:
-    """Resolve the accepted target ref to a full commit SHA."""
-    result = subprocess.run(
-        ["git", "rev-parse", commit_ref],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    return result.stdout.strip()
-
-
 def finalize_accepted_sync(thread_dir: str, state_path: Path, notes: str) -> int:
     """Verify the prep manifest, then advance accepted upstream sync metadata."""
     pr.green_title("finalize_accepted_sync.py")
@@ -66,13 +55,8 @@ def finalize_accepted_sync(thread_dir: str, state_path: Path, notes: str) -> int
     manifest = load_prep_manifest(manifest_path)
     pr.yes("ok")
 
-    pr.green("resolving full upstream sha")
-    full_sha = resolve_commit_sha(str(manifest["to_upstream_sha"]))
-    manifest["to_upstream_sha"] = full_sha
-    pr.yes(full_sha)
-
     pr.green("resolving upstream date")
-    commit_date = resolve_commit_date(full_sha)
+    commit_date = resolve_commit_date(manifest.to_upstream_sha)
     pr.yes("ok")
 
     pr.green("writing accepted sync")

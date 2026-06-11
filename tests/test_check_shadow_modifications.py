@@ -10,6 +10,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from kamma.upstream_sync.scripts.registry_helper import get_shadow_mappings_by_category
+from kamma.upstream_sync.scripts.sync_schema import RegistryData
 
 
 def load_shadow_modification_script() -> ModuleType:
@@ -27,11 +28,17 @@ def load_shadow_modification_script() -> ModuleType:
 
 
 def test_get_shadow_mappings_by_category_includes_dps() -> None:
-    data: dict[str, object] = {
-        "russian_copies": {"a_ru.py": "a.py"},
-        "sbs_copies": {"a_sbs.py": "a.py"},
-        "dps_copies": {"a_dps.py": "a.py"},
-    }
+    data = RegistryData(
+        modified_upstream_files=[],
+        russian_copies={"a_ru.py": "a.py"},
+        sbs_copies={"a_sbs.py": "a.py"},
+        dps_copies={"a_dps.py": "a.py"},
+        tamil_copies={},
+        inspired_by_upstream={},
+        unique_paths=[],
+        no_sync_files=[],
+        skip_sync_patterns=[],
+    )
 
     mappings = get_shadow_mappings_by_category(data)
 
@@ -245,6 +252,21 @@ def test_check_shadows_skips_reviewed_noop(
         module,
         "get_modified_files",
         MagicMock(side_effect=[{"source/a.py"}, set()]),
+    )
+    monkeypatch.setattr(
+        module,
+        "load_registry",
+        lambda: RegistryData(
+            modified_upstream_files=[],
+            russian_copies={"shadow/": "source/"},
+            sbs_copies={},
+            dps_copies={},
+            tamil_copies={},
+            inspired_by_upstream={},
+            unique_paths=[],
+            no_sync_files=[],
+            skip_sync_patterns=[],
+        ),
     )
 
     with pytest.raises(SystemExit) as exc_info:

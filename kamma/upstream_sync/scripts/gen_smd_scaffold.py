@@ -48,14 +48,11 @@ def main() -> None:
             sections.append(make_stub(shadow, category))
             count += 1
 
-    inspired = data.get("inspired_by_upstream", {})
-    if isinstance(inspired, dict):
-        for path, entry in inspired.items():
-            reason = (
-                entry.get("divergence_reason", "") if isinstance(entry, dict) else ""
-            )
-            sections.append(make_stub(path, "inspired_by_upstream", reason))
-            count += 1
+    for path, entry in data.inspired_by_upstream.items():
+        sections.append(
+            make_stub(path, "inspired_by_upstream", entry.divergence_reason)
+        )
+        count += 1
 
     _stderr.write(f"gen_smd_scaffold: {count} stubs\n")
     sys.stdout.write("\n".join(sections))

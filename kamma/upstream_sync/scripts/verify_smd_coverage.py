@@ -12,6 +12,7 @@ from kamma.upstream_sync.scripts.registry_helper import (
     get_shadow_mappings_by_category,
     load_registry,
 )
+from kamma.upstream_sync.scripts.sync_schema import RegistryData
 from tools.printer import printer as pr
 
 # Quality rubric minimums (unless sync_rule is MIRROR_EXACTLY or inspired_only)
@@ -74,7 +75,7 @@ def extract_all_smd_entries(smd_dir: Path) -> dict[str, dict[str, object]]:
     return all_entries
 
 
-def collect_registry_paths(data: dict[str, object]) -> list[tuple[str, str]]:
+def collect_registry_paths(data: RegistryData) -> list[tuple[str, str]]:
     """Return list of (path, category) for every entry in all categories."""
     items: list[tuple[str, str]] = []
 

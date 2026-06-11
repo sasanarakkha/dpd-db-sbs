@@ -24,7 +24,7 @@
 - [ ] **1.4 Factual Diff**:
   - [ ] `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py <thread_dir>` — generates `prep_report.md` and `prep_manifest.json`.
   - [ ] If `prep_manifest.json.discuss_paths` is non-empty, stop before `execute_sync.py`.
-  - [ ] If `prep_manifest.json.blocker_paths` is non-empty, STOP before `execute_sync.py`.
+  - [ ] If `prep_manifest.json.blocker_paths` is non-empty, STOP before `execute_sync.py`. To acknowledge deletion blockers you intend to handle in Stage 2, create `<thread_dir>/run_acknowledged_blockers.txt` (one path per line; `#` comments allowed). `verify_manifest` will warn for each acknowledged path but will not block on them. Collision blockers still require registry/SMD changes before `execute_sync.py`.
   - [ ] Record unexpected command failures exactly in `handoff.md`.
 - [ ] **1.5 Automated Pull + Commit 1 Gate**:
   - [ ] Review `<thread_dir>/run_exclusions.txt` if needed.

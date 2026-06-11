@@ -79,50 +79,36 @@ def test_stage_1_requires_api_health_check() -> None:
     plan = Path("kamma/upstream_sync/templates/sync_thread_plan.md").read_text(
         encoding="utf-8"
     )
-    prep_stage = Path("kamma/upstream_sync/stages/prep.md").read_text(encoding="utf-8")
     command = (
         "uv run ruff check tools/ scripts/ db/ exporter/ --select F821,E999 --quiet"
     )
 
     assert command in guide
     assert command in plan
-    assert command in prep_stage
 
 
 def test_smd_coverage_wording_matches_checker_scope() -> None:
     readme = Path("kamma/upstream_sync/README.md").read_text(encoding="utf-8")
-    infrastructure = Path("kamma/upstream_sync/infrastructure.md").read_text(
-        encoding="utf-8"
-    )
     checker = Path("kamma/upstream_sync/scripts/verify_smd_coverage.py").read_text(
         encoding="utf-8"
     )
 
     assert "every sync-relevant registry entry" in readme
-    assert "every sync-relevant registry entry" in infrastructure
     assert "Verify sync-relevant registry entries" in checker
     assert "every registry entry has" not in readme
-    assert "every registry entry has" not in infrastructure
 
 
 def test_unique_paths_are_documented_as_cleanup_inventory_not_sync_targets() -> None:
     readme = Path("kamma/upstream_sync/README.md").read_text(encoding="utf-8")
-    infrastructure = Path("kamma/upstream_sync/infrastructure.md").read_text(
-        encoding="utf-8"
-    )
     guide = Path("kamma/upstream_sync/guide.md").read_text(encoding="utf-8")
 
     expected = "cleanup inventory, not sync targets"
     assert expected in readme
-    assert expected in infrastructure
     assert expected in guide
 
 
 def test_reviewed_shadow_noop_ledger_is_documented() -> None:
     readme = Path("kamma/upstream_sync/README.md").read_text(encoding="utf-8")
-    infrastructure = Path("kamma/upstream_sync/infrastructure.md").read_text(
-        encoding="utf-8"
-    )
     guide = Path("kamma/upstream_sync/guide.md").read_text(encoding="utf-8")
     plan = Path("kamma/upstream_sync/templates/sync_thread_plan.md").read_text(
         encoding="utf-8"
@@ -131,7 +117,6 @@ def test_reviewed_shadow_noop_ledger_is_documented() -> None:
 
     assert ledger.exists()
     assert "reviewed_shadow_noops.json" in readme
-    assert "reviewed_shadow_noops.json" in infrastructure
     assert "reviewed_shadow_noops.json" in guide
     assert "reviewed_shadow_noops.json" in plan
 
@@ -172,17 +157,6 @@ def test_archive_improvements_is_marked_historical_only() -> None:
     assert "Current canonical instructions live in `guide.md`" in archive
 
 
-def test_infrastructure_marks_stage_docs_as_legacy_reference() -> None:
-    infrastructure = Path("kamma/upstream_sync/infrastructure.md").read_text(
-        encoding="utf-8"
-    )
-
-    assert (
-        "Legacy Stage 1-3 reference checklists; `guide.md` and `templates/` "
-        "are canonical for current 5-stage syncs"
-    ) in infrastructure
-
-
 def test_empty_suggestions_file_is_not_kept() -> None:
     assert not Path("kamma/upstream_sync/suggestions.md").exists()
 
@@ -190,14 +164,10 @@ def test_empty_suggestions_file_is_not_kept() -> None:
 def test_docs_define_single_category_dps_shadow_policy() -> None:
     guide = Path("kamma/upstream_sync/guide.md").read_text(encoding="utf-8")
     readme = Path("kamma/upstream_sync/README.md").read_text(encoding="utf-8")
-    infrastructure = Path("kamma/upstream_sync/infrastructure.md").read_text(
-        encoding="utf-8"
-    )
 
     required = "`dps_copies` is the single category for mixed/shared fork shadows"
     assert required in guide
     assert required in readme
-    assert required in infrastructure
 
 
 def test_agents_requires_shadow_documentation_gate() -> None:
@@ -230,9 +200,6 @@ def test_commit_policy_is_inherited_from_global_rules() -> None:
     agents = Path("AGENTS.md").read_text(encoding="utf-8")
     guide = Path("kamma/upstream_sync/guide.md").read_text(encoding="utf-8")
     readme = Path("kamma/upstream_sync/README.md").read_text(encoding="utf-8")
-    infrastructure = Path("kamma/upstream_sync/infrastructure.md").read_text(
-        encoding="utf-8"
-    )
     wrapper = Path("scripts/cl_dps/dpd-kamma-sync").read_text(encoding="utf-8")
     python_sync_scripts = [
         path.read_text(encoding="utf-8")
@@ -244,7 +211,6 @@ def test_commit_policy_is_inherited_from_global_rules() -> None:
     assert "Only human-run Bash scripts under `scripts/cl_dps/`" not in agents
     assert expected in guide
     assert expected in readme
-    assert expected in infrastructure
     assert 'git commit -m "$BACKUP_COMMIT_MESSAGE"' in wrapper
     assert all("git commit" not in script for script in python_sync_scripts)
 
@@ -266,7 +232,7 @@ def test_init_sync_thread_prints_exact_stage_one_restart_prompt() -> None:
     )
     legacy_index = "kamma/" + "threads" + ".md"
 
-    assert "Switch to FAST. Start a fresh session." in init_script
+    assert "Dispatch Stage 1 to the sync-fast subagent" in init_script
     assert "Run `/kamma:2-do` to start the sync." not in init_script
     assert legacy_index not in init_script
     assert "THREADS_FILE" not in init_script
@@ -327,9 +293,6 @@ def test_execute_sync_assertions_are_python_owned() -> None:
 
 def test_sync_docs_document_single_bash_wrapper() -> None:
     readme = Path("kamma/upstream_sync/README.md").read_text(encoding="utf-8")
-    infrastructure = Path("kamma/upstream_sync/infrastructure.md").read_text(
-        encoding="utf-8"
-    )
     guide = Path("kamma/upstream_sync/guide.md").read_text(encoding="utf-8")
     product_guidelines = Path("conductor/product-guidelines.md").read_text(
         encoding="utf-8"
@@ -337,7 +300,6 @@ def test_sync_docs_document_single_bash_wrapper() -> None:
 
     wrapper = "scripts/cl_dps/dpd-kamma-sync"
     assert wrapper in readme
-    assert wrapper in infrastructure
     assert wrapper in guide
     assert wrapper in product_guidelines
     assert "scripts/cl/dpd-sync-folders" not in product_guidelines

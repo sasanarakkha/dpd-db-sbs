@@ -23,8 +23,8 @@ def short_sha(commit_sha: str) -> str:
 def render_spec_template(content: str, date_human: str) -> str:
     """Fill the sync spec template with date and accepted upstream state."""
     accepted_sync = load_accepted_sync_state(ACCEPTED_SYNC_PATH)
-    from_sha = accepted_sync["last_accepted_upstream_sha"]
-    target_ref = accepted_sync["last_accepted_upstream_ref"]
+    from_sha = accepted_sync.last_accepted_upstream_sha
+    target_ref = accepted_sync.last_accepted_upstream_ref
 
     return (
         content.replace("<DATE>", date_human)
@@ -39,9 +39,9 @@ def render_spec_template(content: str, date_human: str) -> str:
 def render_handoff(date_human: str) -> str:
     """Build the initial restartable handoff for a new sync thread."""
     accepted_sync = load_accepted_sync_state(ACCEPTED_SYNC_PATH)
-    from_sha = accepted_sync["last_accepted_upstream_sha"]
-    from_date = accepted_sync["last_accepted_upstream_date"]
-    target_ref = accepted_sync["last_accepted_upstream_ref"]
+    from_sha = accepted_sync.last_accepted_upstream_sha
+    from_date = accepted_sync.last_accepted_upstream_date
+    target_ref = accepted_sync.last_accepted_upstream_ref
 
     return (
         f"# Handoff: Upstream Sync {date_human}\n\n"
@@ -70,15 +70,16 @@ def render_handoff(date_human: str) -> str:
         "FAST\n\n"
         "## Restart Prompt\n\n"
         "```text\n"
-        "Switch to FAST. Start a fresh session.\n\n"
+        "Dispatch Stage 1 to the sync-fast subagent (.claude/agents/sync-fast.md).\n\n"
         "Continue upstream sync thread: <thread_dir>.\n"
         "First read:\n"
         "1. <thread_dir>/handoff.md\n"
         "2. kamma/upstream_sync/guide.md\n"
         "3. <thread_dir>/plan.md\n\n"
-        "Your task: run Stage 1 FAST Prep exactly as defined in the plan.\n"
+        "Task: run Stage 1 FAST Prep exactly as defined in the plan.\n"
         "Do not perform analysis or strategic planning.\n"
-        "Stop before Stage 2 and update handoff.md.\n"
+        "Stop before Stage 2 and update handoff.md.\n\n"
+        "Manual fallback: Switch to FAST. Start a fresh session with the same prompt.\n"
         "```\n\n"
         "Do not continue in this session.\n"
     )
@@ -130,15 +131,18 @@ def main() -> None:
     pr.green(f"Thread ready: {thread_dir}")
     pr.green("Next steps:")
     pr.green(f"  1. Fill in the upstream diff range in {thread_dir}/spec.md")
-    pr.green("  2. Switch to FAST. Start a fresh session.")
-    pr.green(f"  3. Continue upstream sync thread: {thread_dir}.")
-    pr.green("  4. First read:")
-    pr.green(f"     - {thread_dir}/handoff.md")
-    pr.green("     - kamma/upstream_sync/guide.md")
-    pr.green(f"     - {thread_dir}/plan.md")
-    pr.green("  5. Your task: run Stage 1 FAST Prep exactly as defined in the plan.")
+    pr.green(
+        "  2. Dispatch Stage 1 to the sync-fast subagent (.claude/agents/sync-fast.md)."
+    )
+    pr.green(f"     Continue upstream sync thread: {thread_dir}.")
+    pr.green("     First read:")
+    pr.green(f"       - {thread_dir}/handoff.md")
+    pr.green("       - kamma/upstream_sync/guide.md")
+    pr.green(f"       - {thread_dir}/plan.md")
+    pr.green("     Task: run Stage 1 FAST Prep exactly as defined in the plan.")
     pr.green("     Do not perform analysis or strategic planning.")
     pr.green("     Stop before Stage 2 and update handoff.md.")
+    pr.green("     (Manual fallback: Switch to FAST. Start a fresh session.)")
     pr.green("After the sync completes:")
     pr.green(
         "  6. Write kamma/upstream_sync/new_improvements.md with lessons from this run."

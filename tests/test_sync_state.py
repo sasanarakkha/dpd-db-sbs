@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
@@ -9,9 +10,11 @@ from kamma.upstream_sync.scripts.registry_helper import (
     build_accepted_sync_state,
     load_accepted_sync_state,
     load_prep_manifest,
+    load_registry,
     write_accepted_sync_state,
 )
 from kamma.upstream_sync.scripts.sync_runtime import verify_manifest
+from kamma.upstream_sync.scripts.sync_schema import AcceptedSyncState, PrepManifest
 
 FULL_OLD_SHA = "a" * 40
 FULL_NEW_SHA = "b" * 40
@@ -34,8 +37,8 @@ def test_load_accepted_sync_state_valid(tmp_path: Path) -> None:
 
     state = load_accepted_sync_state(state_path)
 
-    assert state["last_accepted_upstream_sha"] == FULL_OLD_SHA
-    assert state["last_accepted_upstream_ref"] == "upstream/main"
+    assert state.last_accepted_upstream_sha == FULL_OLD_SHA
+    assert state.last_accepted_upstream_ref == "upstream/main"
 
 
 @pytest.mark.parametrize(
@@ -110,8 +113,8 @@ def test_load_prep_manifest_valid(tmp_path: Path) -> None:
 
     manifest = load_prep_manifest(manifest_path)
 
-    assert manifest["to_upstream_sha"] == FULL_NEW_SHA
-    assert manifest["target_upstream_ref"] == "upstream/main"
+    assert manifest.to_upstream_sha == FULL_NEW_SHA
+    assert manifest.target_upstream_ref == "upstream/main"
 
 
 @pytest.mark.parametrize(
@@ -204,16 +207,18 @@ def test_load_prep_manifest_rejects_invalid_mapped_actions(
 
 
 def test_build_and_write_accepted_sync_state(tmp_path: Path) -> None:
-    manifest: dict[str, object] = {
-        "from_upstream_sha": FULL_OLD_SHA,
-        "to_upstream_sha": FULL_NEW_SHA,
-        "target_upstream_ref": "upstream/main",
-        "generated_at": "2026-04-08T10:00:00+08:00",
-        "changed_upstream_paths": [],
-        "deleted_upstream_paths": [],
-        "mapped_actions": {},
-        "discuss_paths": [],
-    }
+    manifest = PrepManifest(
+        from_upstream_sha=FULL_OLD_SHA,
+        to_upstream_sha=FULL_NEW_SHA,
+        target_upstream_ref="upstream/main",
+        generated_at="2026-04-08T10:00:00+08:00",
+        changed_upstream_paths=[],
+        deleted_upstream_paths=[],
+        blocker_paths=[],
+        discuss_paths=[],
+        mapped_actions={},
+        needs_classification_paths=[],
+    )
 
     state = build_accepted_sync_state(
         manifest=manifest,
@@ -225,9 +230,9 @@ def test_build_and_write_accepted_sync_state(tmp_path: Path) -> None:
     write_accepted_sync_state(state_path, state)
 
     written = load_accepted_sync_state(state_path)
-    assert written["last_accepted_upstream_sha"] == FULL_NEW_SHA
-    assert written["last_accepted_upstream_date"] == "2026-04-09T12:00:00+08:00"
-    assert written["last_accepted_upstream_ref"] == "upstream/main"
+    assert written.last_accepted_upstream_sha == FULL_NEW_SHA
+    assert written.last_accepted_upstream_date == "2026-04-09T12:00:00+08:00"
+    assert written.last_accepted_upstream_ref == "upstream/main"
 
 
 def write_manifest(thread_dir: Path, payload: dict[str, object]) -> None:
@@ -276,11 +281,11 @@ def test_verify_manifest_rejects_accepted_state_mismatch(tmp_path: Path) -> None
 
     result = verify_manifest(
         str(tmp_path),
-        accepted_sync_state={
-            "last_accepted_upstream_sha": FULL_OTHER_SHA,
-            "last_accepted_upstream_date": "2026-04-08",
-            "last_accepted_upstream_ref": "upstream/main",
-        },
+        accepted_sync_state=AcceptedSyncState(
+            last_accepted_upstream_sha=FULL_OTHER_SHA,
+            last_accepted_upstream_date="2026-04-08",
+            last_accepted_upstream_ref="upstream/main",
+        ),
     )
 
     assert result == 1
@@ -294,15 +299,51 @@ def test_verify_manifest_rejects_target_sha_mismatch(tmp_path: Path) -> None:
     assert result == 1
 
 
-def test_verify_manifest_rejects_malformed_accepted_sync_state(tmp_path: Path) -> None:
-    write_manifest(tmp_path, valid_manifest_payload())
+def test_verify_manifest_rejects_malformed_accepted_sync_state() -> None:
+    with pytest.raises(
+        ValueError, match="missing required field 'last_accepted_upstream_sha'"
+    ):
+        AcceptedSyncState.from_raw(
+            {
+                "last_accepted_upstream_date": "2026-04-08",
+                "last_accepted_upstream_ref": "upstream/main",
+            }
+        )
 
-    result = verify_manifest(
-        str(tmp_path),
-        accepted_sync_state={
-            "last_accepted_upstream_date": "2026-04-08",
-            "last_accepted_upstream_ref": "upstream/main",
-        },
+
+@patch("kamma.upstream_sync.scripts.registry_helper.get_registry_path")
+def test_load_registry_rejects_malformed_json(mock_get_path, tmp_path: Path) -> None:
+    registry_path = tmp_path / "registry.json"
+    registry_path.write_text(
+        json.dumps({"russian_copies": "not-a-dict"}), encoding="utf-8"
     )
+    mock_get_path.return_value = registry_path
+
+    with pytest.raises(ValueError):
+        load_registry()
+
+
+def test_acknowledged_blocker_passes_verify_manifest(tmp_path: Path) -> None:
+    payload = valid_manifest_payload()
+    payload["blocker_paths"] = ["old_deleted.py"]
+    write_manifest(tmp_path, payload)
+    ack_path = tmp_path / "run_acknowledged_blockers.txt"
+    ack_path.write_text(
+        "# acknowledge this deletion\nold_deleted.py\n", encoding="utf-8"
+    )
+
+    result = verify_manifest(str(tmp_path), allow_blockers=False)
+
+    assert result == 0
+
+
+def test_stale_ack_fails_verify_manifest(tmp_path: Path) -> None:
+    payload = valid_manifest_payload()
+    payload["blocker_paths"] = []
+    write_manifest(tmp_path, payload)
+    ack_path = tmp_path / "run_acknowledged_blockers.txt"
+    ack_path.write_text("not_in_blockers.py\n", encoding="utf-8")
+
+    result = verify_manifest(str(tmp_path), allow_blockers=False)
 
     assert result == 1

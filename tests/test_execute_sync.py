@@ -1,5 +1,6 @@
 """Verify automated upstream sync execution refuses unsafe repository states."""
 
+import subprocess
 import unittest
 import shutil
 import tempfile
@@ -13,6 +14,31 @@ from kamma.upstream_sync.scripts.execute_sync import (
     get_run_specific_exclusions,
     run_sync_assertions,
     validate_repo_relative_paths,
+)
+from kamma.upstream_sync.scripts.sync_schema import (
+    AcceptedSyncState,
+    ModifiedUpstreamEntry,
+    RegistryData,
+)
+
+FULL_OLD_SHA = "a" * 40
+
+_ACCEPTED_STATE = AcceptedSyncState(
+    last_accepted_upstream_sha=FULL_OLD_SHA,
+    last_accepted_upstream_date="2026-04-08",
+    last_accepted_upstream_ref="upstream/main",
+)
+
+_REGISTRY_EMPTY = RegistryData(
+    modified_upstream_files=[],
+    russian_copies={},
+    sbs_copies={},
+    dps_copies={},
+    tamil_copies={},
+    inspired_by_upstream={},
+    unique_paths=[],
+    no_sync_files=[],
+    skip_sync_patterns=[],
 )
 
 
@@ -133,13 +159,22 @@ class TestExecuteSync(unittest.TestCase):
 
     @patch("kamma.upstream_sync.scripts.execute_sync.load_registry")
     def test_get_permanent_exclusions(self, mock_load_registry):
-        mock_load_registry.return_value = {
-            "no_sync_files": ["infra/file1"],
-            "modified_upstream_files": [
-                "db/models.py",
-                {"path": "exporter/goldendict/export_goldendict.py"},
+        mock_load_registry.return_value = RegistryData(
+            modified_upstream_files=[
+                ModifiedUpstreamEntry(path="db/models.py", discuss=False),
+                ModifiedUpstreamEntry(
+                    path="exporter/goldendict/export_goldendict.py", discuss=False
+                ),
             ],
-        }
+            russian_copies={},
+            sbs_copies={},
+            dps_copies={},
+            tamil_copies={},
+            inspired_by_upstream={},
+            unique_paths=[],
+            no_sync_files=["infra/file1"],
+            skip_sync_patterns=[],
+        )
 
         exclusions = get_permanent_exclusions()
         self.assertIn("infra/file1", exclusions)
@@ -181,7 +216,7 @@ class TestExecuteSync(unittest.TestCase):
         context.is_dirty = False
         context.original_branch = "sbs-ru"
         mock_context_class.return_value = context
-        mock_load_state.return_value = {"last_accepted_upstream_ref": "upstream/main"}
+        mock_load_state.return_value = _ACCEPTED_STATE
         mock_run_git.side_effect = [
             MagicMock(stdout=""),  # git fetch upstream
             MagicMock(stdout="newsha456\n"),  # rev-parse upstream/main
@@ -192,7 +227,7 @@ class TestExecuteSync(unittest.TestCase):
         self.assertEqual(result, 1)
         mock_verify_manifest.assert_called_once_with(
             str(self.thread_dir),
-            accepted_sync_state={"last_accepted_upstream_ref": "upstream/main"},
+            accepted_sync_state=_ACCEPTED_STATE,
             target_sha="newsha456",
             allow_discuss=False,
             allow_blockers=False,
@@ -233,11 +268,8 @@ class TestExecuteSync(unittest.TestCase):
         context.is_dirty = False
         context.original_branch = "sbs-ru"
         mock_context_class.return_value = context
-        mock_load_state.return_value = {"last_accepted_upstream_ref": "upstream/main"}
-        mock_load_registry.return_value = {
-            "modified_upstream_files": [],
-            "no_sync_files": [],
-        }
+        mock_load_state.return_value = _ACCEPTED_STATE
+        mock_load_registry.return_value = _REGISTRY_EMPTY
 
         mock_run_git.side_effect = [
             MagicMock(stdout=""),  # git fetch upstream
@@ -252,7 +284,7 @@ class TestExecuteSync(unittest.TestCase):
         self.assertEqual(result, 0)
         mock_verify_manifest.assert_called_once_with(
             str(self.thread_dir),
-            accepted_sync_state={"last_accepted_upstream_ref": "upstream/main"},
+            accepted_sync_state=_ACCEPTED_STATE,
             target_sha="newsha456",
             allow_discuss=False,
             allow_blockers=False,
@@ -293,11 +325,8 @@ class TestExecuteSync(unittest.TestCase):
         context.is_dirty = False
         context.original_branch = "sbs-ru"
         mock_context_class.return_value = context
-        mock_load_state.return_value = {"last_accepted_upstream_ref": "upstream/main"}
-        mock_load_registry.return_value = {
-            "modified_upstream_files": [],
-            "no_sync_files": [],
-        }
+        mock_load_state.return_value = _ACCEPTED_STATE
+        mock_load_registry.return_value = _REGISTRY_EMPTY
         mock_run_git.side_effect = [
             MagicMock(stdout=""),
             MagicMock(stdout="newsha456\n"),
@@ -338,11 +367,20 @@ class TestExecuteSync(unittest.TestCase):
         context.is_dirty = False
         context.original_branch = "sbs-ru"
         mock_context_class.return_value = context
-        mock_load_state.return_value = {"last_accepted_upstream_ref": "upstream/main"}
-        mock_load_registry.return_value = {
-            "modified_upstream_files": [{"path": "db/models.py"}],
-            "no_sync_files": [],
-        }
+        mock_load_state.return_value = _ACCEPTED_STATE
+        mock_load_registry.return_value = RegistryData(
+            modified_upstream_files=[
+                ModifiedUpstreamEntry(path="db/models.py", discuss=False),
+            ],
+            russian_copies={},
+            sbs_copies={},
+            dps_copies={},
+            tamil_copies={},
+            inspired_by_upstream={},
+            unique_paths=[],
+            no_sync_files=[],
+            skip_sync_patterns=[],
+        )
         mock_run_git.side_effect = [
             MagicMock(stdout=""),
             MagicMock(stdout="newsha456\n"),
@@ -391,11 +429,8 @@ class TestExecuteSync(unittest.TestCase):
         context.is_dirty = False
         context.original_branch = "sbs-ru"
         mock_context_class.return_value = context
-        mock_load_state.return_value = {"last_accepted_upstream_ref": "upstream/main"}
-        mock_load_registry.return_value = {
-            "modified_upstream_files": [],
-            "no_sync_files": [],
-        }
+        mock_load_state.return_value = _ACCEPTED_STATE
+        mock_load_registry.return_value = _REGISTRY_EMPTY
         mock_run_git.side_effect = [
             MagicMock(stdout=""),
             MagicMock(stdout="newsha456\n"),
@@ -408,6 +443,52 @@ class TestExecuteSync(unittest.TestCase):
 
         self.assertEqual(result, 1)
         mock_run_assertions.assert_called_once_with("localsha789")
+
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_registry")
+    @patch(
+        "kamma.upstream_sync.scripts.execute_sync.run_sync_assertions", return_value=0
+    )
+    @patch("kamma.upstream_sync.scripts.execute_sync.verify_manifest", return_value=0)
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_accepted_sync_state")
+    @patch("kamma.upstream_sync.scripts.execute_sync.run_git")
+    @patch("kamma.upstream_sync.scripts.execute_sync.Path.exists", return_value=False)
+    @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
+    def test_execute_sync_uses_restore_worktree_not_checkout(
+        self,
+        mock_context_class,
+        mock_path_exists,
+        mock_run_git,
+        mock_load_state,
+        mock_verify_manifest,
+        mock_run_assertions,
+        mock_load_registry,
+    ):
+        context = MagicMock()
+        context.is_dirty = False
+        context.original_branch = "sbs-ru"
+        mock_context_class.return_value = context
+        mock_load_state.return_value = _ACCEPTED_STATE
+        mock_load_registry.return_value = _REGISTRY_EMPTY
+        mock_run_git.side_effect = [
+            MagicMock(stdout=""),  # git fetch upstream
+            MagicMock(stdout="newsha456\n"),  # rev-parse upstream/main
+            MagicMock(stdout="localsha789\n"),  # rev-parse HEAD
+            MagicMock(stdout=""),  # update-ref
+            MagicMock(stdout=""),  # restore/checkout
+        ]
+
+        result = execute_sync(str(self.thread_dir))
+
+        self.assertEqual(result, 0)
+        called_commands = [call.args[0] for call in mock_run_git.call_args_list]
+        self.assertIn(
+            ["git", "restore", "--source", "as_upstream", "--worktree", "--", "."],
+            called_commands,
+        )
+        self.assertNotIn(
+            ["git", "checkout", "as_upstream", "--", "."],
+            called_commands,
+        )
 
     @patch("kamma.upstream_sync.scripts.execute_sync.run_git")
     def test_run_sync_assertions_uses_python_git_checks(self, mock_run_git):
@@ -428,6 +509,76 @@ class TestExecuteSync(unittest.TestCase):
                 ["git", "diff", "--name-only", "--diff-filter=A", "oldsha123"],
             ],
         )
+
+
+class RealGitRestoreBehaviorTest(unittest.TestCase):
+    """Empirically pin the git contract that execute_sync.py step 5 depends on.
+
+    execute_sync.py:222 runs `git restore --source as_upstream --worktree -- .`.
+    These tests run that exact command against a real throwaway repository and
+    assert the two properties the sync relies on: (1) the index is left
+    untouched so sync changes stay unstaged for review, and (2) files deleted
+    upstream are removed from the worktree (an accepted behavior change from the
+    old `git checkout as_upstream -- .`, which left them in place).
+    """
+
+    def _git(self, *args: str) -> str:
+        result = subprocess.run(
+            ["git", *args],
+            cwd=self.repo,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        return result.stdout.strip()
+
+    def setUp(self) -> None:
+        self.tmp = tempfile.mkdtemp()
+        self.repo = Path(self.tmp)
+        self._git("init", "-q")
+        self._git("config", "user.email", "t@t.t")
+        self._git("config", "user.name", "t")
+        (self.repo / "a.txt").write_text("orig\n", encoding="utf-8")
+        (self.repo / "b.txt").write_text("keep\n", encoding="utf-8")
+        self._git("add", ".")
+        self._git("commit", "-qm", "base")
+        self.base_branch = self._git("rev-parse", "--abbrev-ref", "HEAD")
+        self._git("checkout", "-q", "-b", "as_upstream")
+        (self.repo / "a.txt").write_text("changed\n", encoding="utf-8")
+        (self.repo / "c.txt").write_text("new\n", encoding="utf-8")
+        self._git("rm", "-q", "b.txt")
+        self._git("add", "-A")
+        self._git("commit", "-qm", "upstream")
+        self._git("checkout", "-q", self.base_branch)
+
+    def tearDown(self) -> None:
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def test_restore_worktree_leaves_index_unstaged_and_propagates_deletion(
+        self,
+    ) -> None:
+        # Exact command from execute_sync.py step 5.
+        self._git("restore", "--source", "as_upstream", "--worktree", "--", ".")
+
+        # 1. Index untouched -> nothing staged.
+        self.assertEqual(self._git("diff", "--cached", "--name-only"), "")
+        # 2. Worktree-vs-index diff (unstaged) covers the modification and the
+        #    deletion; both land in the worktree, neither in the index.
+        unstaged = set(self._git("diff", "--name-only").splitlines())
+        self.assertEqual(unstaged, {"a.txt", "b.txt"})
+        self.assertEqual((self.repo / "a.txt").read_text(encoding="utf-8"), "changed\n")
+        # 3. Upstream-deleted file removed from the worktree.
+        self.assertFalse((self.repo / "b.txt").exists())
+        # 4. Upstream-added file present but untracked (unstaged).
+        self.assertTrue((self.repo / "c.txt").exists())
+        self.assertEqual(self._git("ls-files", "c.txt"), "")
+
+    def test_old_checkout_did_not_propagate_deletion(self) -> None:
+        # Documents the contrast with the previous command, which left the
+        # upstream-deleted file in place (the behavior the spec assumed but
+        # which was changed deliberately).
+        self._git("checkout", "as_upstream", "--", ".")
+        self.assertTrue((self.repo / "b.txt").exists())
 
 
 if __name__ == "__main__":

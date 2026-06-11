@@ -57,6 +57,28 @@ For the full protocol, see **[guide.md](./guide.md)**.
 - **[registry.json](./registry.json)**: Source of truth for file mappings and categories.
 - **[archive_improvements.md](./archive_improvements.md)**: Accumulated lessons from past runs. (Note: `new_improvements.md` is a strictly temporary file used during syncs and must not be committed).
 
+## File Inventory
+
+| File | Purpose |
+|---|---|
+| `registry.json` | Machine-readable map of every file that diverges from upstream |
+| `accepted_sync.json` | Last accepted upstream SHA/date/ref used to anchor Stage 1 |
+| `reviewed_shadow_noops.json` | Exact reviewed no-op ledger for changed upstream sources that intentionally need no shadow edit |
+| `smd/` | Shadow Module Descriptions (Directory) — per-file merge guidance |
+| `guide.md` | Canonical process reference: Iron Rule, 5-stage workflow, model responsibilities, naming policy |
+| `archive_improvements.md` | Accumulated lessons from all past sync runs |
+| `new_improvements.md` | Strictly temporary intake file during an active sync; must be deleted after promotion to `archive_improvements.md`; ignored by git |
+| `templates/` | `plan.md` / `spec.md` starters for new sync kamma threads |
+| `scripts/init_sync_thread.py` | Creates the Kamma sync thread after `scripts/cl_dps/dpd-kamma-sync` backs up DPS data |
+| `scripts/registry_helper.py` | Shared Python helper to load the registry and extract paths |
+| `scripts/validate_registry.py` | Schema and data-quality validator for `registry.json` |
+| `scripts/verify_smd_coverage.py` | Coverage checker — ensures every sync-relevant registry entry has an SMD entry in `smd/` |
+| `scripts/prep_analyzer.py` | Generates factual Stage 1 report and manifest from the accepted sync range |
+| `scripts/execute_sync.py` | Robustly executes selective sync from upstream (Stage 1 automation) |
+| `scripts/finalize_accepted_sync.py` | Advances `accepted_sync.json` from a verified prep manifest |
+| `scripts/sync_runtime.py` | Runtime manifest verification for shell automation |
+| `README.md` | Folder-level quick-start and file inventory |
+
 ## Registry Categories
 
 - `modified_upstream_files`: Direct divergences (Manual porting).

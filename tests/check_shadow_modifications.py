@@ -7,7 +7,10 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from kamma.upstream_sync.scripts.registry_helper import get_shadow_mappings_by_category
+from kamma.upstream_sync.scripts.registry_helper import (
+    get_shadow_mappings_by_category,
+    load_registry,
+)
 from kamma.upstream_sync.scripts.sync_schema import (
     FULL_SHA_RE,
     validate_repo_relative_paths,
@@ -159,7 +162,7 @@ def check_shadows() -> None:
         pr.red(f"Error: Registry not found at {REGISTRY_PATH}")
         sys.exit(1)
 
-    registry: dict[str, object] = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+    registry = load_registry()
     try:
         reviewed_noops = load_reviewed_shadow_noops(NOOP_LEDGER_PATH)
     except ValueError as exc:
