@@ -2,7 +2,7 @@
   "antigravity_cli_work_models": [
     {
       "provider": "antigravity_cli",
-      "model": "Gemini 3.5 Flash (High)",
+      "model": "Gemini 3.5 Flash (Low)",
       "delay": 5,
       "timeout": 150
     }

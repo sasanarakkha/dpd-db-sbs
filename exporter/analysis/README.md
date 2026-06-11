@@ -11,15 +11,21 @@ out of MCP so it can run as ordinary command-line exporter tools.
 ## AI Provider Setup
 
 The passage analysis pipeline sends scoring prompts to an AI provider. It tries
-providers in this priority order:
+models from `tools/ai_models.json` in this priority order:
 
-1. **Antigravity CLI** (`agy`) — primary, free, no API key required
-2. **OpenRouter** — secondary, paid, requires an API key
+1. `antigravity_cli` / `Gemini 3.5 Flash (Low)`
+2. `deepseek` / `deepseek-v4-flash`
+3. `openrouter` / `deepseek/deepseek-v4-flash`
+4. `openrouter` / `meta-llama/llama-4-scout`
+5. `openrouter` / `openai/gpt-4.1-nano`
+
+Only initialized providers are used. Antigravity requires the local `agy`
+executable; DeepSeek and OpenRouter require API keys in `config.ini`.
 
 ### Antigravity CLI (primary)
 
-Antigravity CLI is a local command-line tool that runs Gemini models through
-your Google account without a paid API key.
+Antigravity CLI is a local command-line tool that runs supported work models
+without a project API key.
 
 Install it from <https://antigravity.dev> and make sure the `agy` executable is
 on your PATH. Verify it works:
@@ -29,52 +35,69 @@ agy --version
 ```
 
 When `agy` is found on PATH it is used automatically. No config file change is
-needed.
+needed. The provider runs `agy --sandbox --print` from a temporary scratch
+directory, not from the repository root. Prompts over 700,000 UTF-8 bytes are
+rejected before calling `agy`, because the current transport passes the full
+prompt through argv.
 
-### OpenRouter (secondary / fallback)
+### API-key fallbacks
 
-OpenRouter is used when Antigravity CLI is not installed or fails.
+DeepSeek and OpenRouter are used after the Antigravity work models fail or are
+unavailable.
 
 1. Create an account at <https://openrouter.ai> and generate an API key.
-2. Open `config.ini` at the project root and paste your key into the `[apis]`
-   section:
+2. If using DeepSeek directly, create a DeepSeek API key.
+3. Open `config.ini` at the project root and paste keys into the `[apis]`
+   section as needed:
 
 ```ini
 [apis]
+deepseek = sk-...your-key-here...
 openrouter = sk-or-v1-...your-key-here...
 ```
 
-OpenRouter is initialized automatically when that key is present.
+Configured providers are initialized automatically at runtime.
 
 ### Changing the AI model
 
 Model choices are stored in `tools/ai_models.json`. The active Antigravity
-model is in `antigravity_cli_work_models`:
+fallback sequence starts with `antigravity_cli_work_models`:
 
 ```json
 {
   "antigravity_cli_work_models": [
     {
       "provider": "antigravity_cli",
-      "model": "Gemini 3.5 Flash (Medium)",
-      "delay": 5
+      "model": "Gemini 3.5 Flash (Low)",
+      "delay": 5,
+      "timeout": 150
     }
   ]
 }
 ```
 
-If translation quality is poor, change the `model` string. Two practical
-upgrade steps:
+Edit this list to change the normal fallback order. No restart is needed; the
+file is read fresh each run.
 
-| Model string | Notes |
-|---|---|
-| `"Gemini 3.5 Flash (High)"` | faster, cheaper — try this first |
-| `"Gemini 3.1 Pro (Low)"` | slower, higher quality |
+For a one-off run with a specific model, pass both `--provider` and `--model`.
+When these flags are used together, only that provider/model is tried; the
+normal fallback list is bypassed.
 
-Edit the `model` field in `tools/ai_models.json` and re-run the analysis script
-— no restart needed, the file is read fresh each run.
+```bash
+printf 'DHP23\n' | uv run python exporter/analysis/study_passage.py --debug \
+  --provider antigravity_cli \
+  --model "Gemini 3.5 Flash (Low)"
+```
 
-To check what models are currently available, run `agy --list-models` or see
+For multi-paragraph passages, pipe the passage code and paragraph selection:
+
+```bash
+printf 'MN4\n2\n' | uv run python exporter/analysis/study_passage.py --debug \
+  --provider antigravity_cli \
+  --model "Gemini 3.5 Flash (Low)"
+```
+
+To check what models are currently available, run `agy models` or see
 the Antigravity documentation at <https://antigravity.dev>. Model names change
 as new versions are released; the names above were current at the time of
 writing.
@@ -150,10 +173,18 @@ uv run python exporter/analysis/study_passage.py
 
 Enter a passage code such as `DHP1`, `SNP1`, `SN12.3`, or `AN3.12`. For multi-unit passages, select paragraphs or verses with inputs such as `1`, `1-3`, or `1-2 4`.
 
+Use `--debug` when diagnosing model behavior:
+
+```bash
+uv run python exporter/analysis/study_passage.py --debug
+```
+
 Stage 1 writes:
 
 - `reports/<source>_study.md`
 - `output/<source>_study.json`
+- `output/<source>_ai_debug.json`
+- `reports/<source>_ai_raw.txt` when `--debug` is enabled
 
 3. Edit the markdown report:
 
@@ -189,10 +220,29 @@ For passage selections, Stage 2 keeps the selected report lookup (`SN12.3_p1`) b
    - `reports/<source>_study.md`
    - `output/<source>_study.json`
    - `output/<source>_ai_debug.json`
+   - `reports/<source>_ai_raw.txt` when `--debug` is enabled
 
 The debug JSON keeps the prompt, raw AI response, parsed response, retry
 requests, missing score groups, and final scores. It is meant for diagnosing
 bad or missing AI choices.
+
+The AI recovery path is intentionally tolerant:
+
+- Accepts normal `scores` JSON.
+- Accepts compact word-to-option-key maps and fetches translation separately.
+- Reformats valid-but-wrong-schema or non-standard responses.
+- Retries missing score groups, with a supplemental retry pass when needed.
+- Splits oversized first-pass work into sentence-level chunks.
+- Records provider/model status for first responses, reformats, translations,
+  and retry requests in the debug JSON and raw debug log.
+
+## Known Limitations
+
+- AI scores are keyed by dictionary option key, not by token occurrence. If the
+  same surface word appears more than once in one sentence or chunk with
+  different grammatical functions, every occurrence receives the same shared
+  selection and contextual meaning. For example, AN3.33 paragraph 1 contains
+  `bhagavā` as both nominative narrative text and vocative address.
 
 ## Stage 2 Details
 
