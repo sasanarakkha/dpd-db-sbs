@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 from typing import NamedTuple
 
@@ -38,6 +39,7 @@ def run_antigravity_print(
     """Run agy in print (non-interactive) mode and return stdout/stderr/returncode."""
     command = [
         str(agy_path),
+        "--sandbox",
         "--model",
         model,
         "--print",
@@ -45,14 +47,16 @@ def run_antigravity_print(
         "--print-timeout",
         f"{timeout}s",
     ]
-    result = subprocess.run(
-        command,
-        capture_output=True,
-        check=False,
-        stdin=subprocess.DEVNULL,
-        text=True,
-        timeout=timeout + 10,
-    )
+    with tempfile.TemporaryDirectory(prefix="agy_print_") as scratch_dir:
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            check=False,
+            cwd=scratch_dir,
+            stdin=subprocess.DEVNULL,
+            text=True,
+            timeout=timeout + 10,
+        )
     return RunResult(
         returncode=result.returncode,
         stdout=result.stdout,

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+import time
 from pathlib import Path
 from typing import Any, NamedTuple, cast
 
@@ -20,6 +21,8 @@ PROBE_SYSTEM_INSTRUCTION = "Return exactly OK and nothing else."
 MAX_ARGV_PROMPT_BYTES = 700_000
 AUTH_PROMPT_MARKERS = ("Authentication required", "accounts.google.com")
 MAX_ERROR_LINE_LENGTH = 200
+IMMEDIATE_EMPTY_SECONDS = 10.0
+TOOL_CALL_MARKER = "include:default_api:"
 
 
 class _Response(NamedTuple):
@@ -43,7 +46,16 @@ class AntigravityCliManager:
                 model=model,
                 timeout=int(timeout),
             )
-            return _Response(content=content, status_message=f"antigravity_cli/{model}")
+            warnings: list[str] = []
+            content, trailing_error = _split_trailing_error(content)
+            if trailing_error:
+                warnings.append(f"partial: {trailing_error}")
+            if TOOL_CALL_MARKER in content:
+                warnings.append("tool-call text in response")
+            status_message = (
+                "; ".join(warnings) if warnings else f"antigravity_cli/{model}"
+            )
+            return _Response(content=content, status_message=status_message)
         except AntigravityCliProviderError as e:
             return _Response(content=None, status_message=str(e))
 
@@ -93,12 +105,14 @@ def generate_content(
 
     pr.green(f"  -> antigravity-cli {model} (timeout={timeout}s)...")
     try:
+        started_at = time.monotonic()
         result = run_antigravity_print(
             agy_path,
             model,
             prompt,
             timeout=timeout,
         )
+        elapsed = time.monotonic() - started_at
     except subprocess.TimeoutExpired as error:
         raise AntigravityCliProviderError(
             f"{model} timed out after {timeout}s"
@@ -113,6 +127,11 @@ def generate_content(
 
     response = _extract_response(result.stdout)
     if response is None or not response.strip():
+        if elapsed < IMMEDIATE_EMPTY_SECONDS:
+            raise AntigravityCliProviderError(
+                f"{model} returned an immediate empty response "
+                "(possible quota exhaustion)"
+            )
         raise AntigravityCliProviderError(f"{model} returned an empty response")
     error_reason = _classify_error_text(response)
     if error_reason:
@@ -188,6 +207,21 @@ def _classify_error_text(response: str) -> str | None:
     ):
         return stripped
     return None
+
+
+def _split_trailing_error(response: str) -> tuple[str, str | None]:
+    """Split a trailing single-line agy error off partial streamed content."""
+    lines = response.rstrip().splitlines()
+    if len(lines) < 2:
+        return response, None
+
+    last = lines[-1].strip()
+    if last.startswith("Error:") and len(last) <= MAX_ERROR_LINE_LENGTH:
+        content = "\n".join(lines[:-1]).rstrip()
+        if content:
+            return content, last
+
+    return response, None
 
 
 def _brief_command_error(
