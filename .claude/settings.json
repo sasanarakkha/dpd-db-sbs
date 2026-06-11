@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gemini *)"
+    ]
+  },
+  "autoMode": {
+    "allow": [
+      "Bash(gemini *)",
+      "Bash(cat * | gemini *)",
+      "$defaults"
+    ]
+  }
+}
