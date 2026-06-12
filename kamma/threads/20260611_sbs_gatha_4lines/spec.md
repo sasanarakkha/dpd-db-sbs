@@ -40,18 +40,31 @@ legitimate 6-pāda verses (e.g. Ratana Sutta) become/stay 6 lines.
 
 1. **One-time data migration script** (local text transform, no LLM/CST
    re-extraction):
+   - Before relying on heuristic punctuation splitting, generate a dry-run TSV
+     of SBS example fields that can be copied from the matching
+     `DpdHeadword.example_1/2`: same `id`, same source, and same text after
+     stripping tags, punctuation, spaces, and case. This writes a TSV only; it
+     does not write the DB.
    - Target rows:
      a. any of the 8 example fields already containing `\n` (known verse), and
      b. flat entries whose corresponding source field references a verse-only
         text (DHP, SNP, THAG, THIG, and similar verse-only source prefixes —
         exact prefix list compiled during implementation from distinct source
         values in the table).
-   - Transform: normalize to one pāda per line using the `clean_gatha` comma
-     rule (`", "` → `",\n"` after collapsing existing `\n`), idempotent on
-     already-correct entries.
+   - Transform: normalize to one pāda per line inside each existing line:
+     split at `", "` and at internal `". "`, while preserving existing `\n`
+     exactly; never collapse or join existing lines. Do not split runs of
+     short comma phrases (e.g. `asambādhaṃ, averaṃ, asapattaṃ.` or
+     `kayirā ce, kayirāth'enaṃ,`)
+     into separate lines. Flat entries become multiple lines by the same rules.
+     Already-correct entries must be byte-for-byte idempotent.
    - Apply the transform even when the resulting line count is unusual
      (not 4 or 6), but write every unusual result to a review TSV
      (entry id, field, source, before, after) for manual checking.
+   - Write a separate concern TSV for narrow high-risk results: changed output
+     with more than 4 lines that still contains a genuinely short phrase line
+     after the short-phrase merge. Long one-word pādas are valid and are not
+     concern rows.
    - Bold markup (`<b>…</b>`) inside examples must be preserved untouched.
 2. **Backup sync:** after the DB update, regenerate `db/backup_tsv/sbs.tsv` via
    `scripts/backup/backup_dps.py` logic so the change is durable across rebuilds.
@@ -67,11 +80,15 @@ legitimate 6-pāda verses (e.g. Ratana Sutta) become/stay 6 lines.
 
 - "4-line format" = one pāda per line (comma rule), not literally forcing 4
   lines; 6-pāda verses keep 6 lines. (Inferred from data + `clean_gatha`.)
+- Existing DB line breaks are meaningful formatting and must not be converted
+  to spaces. The migration only adds new line breaks where a single existing
+  line contains multiple comma-separated pādas.
 - The verse-source prefix list for flat-entry detection is a heuristic; entries
   it selects are verses by definition of the source text. Mixed prose/verse
   sources (e.g. AN, MN suttas) are NOT auto-detected when flat — out of scope.
-- Pādas with genuine internal `", "` will over-split; accepted (user decision:
-  "apply + report"), caught via the review TSV.
+- Pādas with genuine internal `", "` can over-split; the migration avoids the
+  most obvious short comma-phrase runs, and remaining unusual results are
+  caught via the review TSV.
 - `ru_notes` newlines (35 rows) are intentional formatting that should render
   as line breaks, as webapp already does.
 
@@ -94,6 +111,8 @@ legitimate 6-pāda verses (e.g. Ratana Sutta) become/stay 6 lines.
 - The flat verse-source entries (DHP191, DHP406, DHP88 in `dhp_example`) are
   split into one pāda per line.
 - Review TSV exists listing all unusual line counts.
+- DPD→SBS transfer TSV exists listing same-id/source/text candidates
+  that can reduce heuristic migration risk.
 - `db/backup_tsv/sbs.tsv` regenerated and diff reflects only the line-break
   changes.
 - Webapp + GoldenDict render `<br>` for all 8 example fields,

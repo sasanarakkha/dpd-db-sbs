@@ -9,8 +9,10 @@
   re-cleans raw CST text (lowercasing, `".."` → `"."`, abbreviation stripping)
   — destructive on already-clean DB text containing `<b>` markup. The migration
   reimplements only its line rule as a pure function
-  `split_gatha_lines(text: str) -> str`: `text.replace("\n", " ")` to collapse
-  existing breaks, normalize double spaces, then `", "` → `",\n"`.
+  `split_gatha_lines(text: str) -> str`: preserve every existing `\n`; inside
+  each existing line, split at `", "` and internal `". "`. Existing lines are
+  never joined. Runs of short comma phrases stay together rather than becoming
+  short isolated lines.
 - **Script placement:** one-shot migration in
   `scripts/change_in_db/rearrange_sbs_gatha_lines.py` (existing pattern for DB
   data fixes; root folder stays clean). Pure transform lives in the script, not
@@ -28,6 +30,15 @@
 - **Apply + report:** transform applied unconditionally to detected verses;
   results with line counts ∉ {4, 6} written to
   `temp/sbs_gatha_review.tsv` (id, field, source, before, after).
+  Narrow high-risk outputs are also written to
+  `temp/sbs_gatha_concerns.tsv`: changed output with more than 4 lines that
+  still contains a genuinely short phrase line. Long one-word pādas are not
+  concerns.
+- **DPD transfer generation before apply:** dry-run helper
+  `scripts/change_in_db/sbs_dpd_example_transfers.py` finds SBS example fields
+  that can be replaced by `DpdHeadword.example_1/2` when `id`, source, and
+  punctuation-stripped text match. It writes
+  `temp/sbs_dpd_example_transfers.tsv`; it does not write the DB.
 - **Durability:** DB update → regenerate `db/backup_tsv/sbs.tsv` via existing
   `backup_sbs()` in `scripts/backup/backup_dps.py`. User commits. The
   embedded git-commit step in `backup_dps.py` (~line 177) must NOT run —
@@ -39,16 +50,17 @@
 
 ## Phase 1: Transform logic + migration script (TDD)
 
-- [ ] **1.1 Pure transform + tests.** Create
+- [x] **1.1 Pure transform + tests.** Create
   `tests/test_rearrange_sbs_gatha_lines.py` first (Red), then implement
   `split_gatha_lines()` and `is_verse_source()` in
   `scripts/change_in_db/rearrange_sbs_gatha_lines.py` (Green). Test cases:
   2-pādas-per-line → 4 lines; flat 4-pāda → 4 lines; already-correct 4-line
   idempotent; 6-pāda idempotent; `<b>` markup preserved byte-for-byte aside
-  from line breaks; internal-comma pāda → 5 lines (over-split accepted);
-  trailing `.`/`,` untouched; empty string → empty.
+  from added line breaks; existing period-separated lines remain unjoined;
+  internal `. ` splits; short comma phrase runs stay together; trailing
+  `.`/`,` untouched; empty string → empty.
   → verify: `uv run pytest tests/test_rearrange_sbs_gatha_lines.py -v`, all pass
-- [ ] **1.2 Migration script body.** Iterate `sbs` rows via SQLAlchemy
+- [x] **1.2 Migration script body.** Iterate `sbs` rows via SQLAlchemy
   (`db_session`, model `SBS` from `db/models.py`); select targets per detection
   rules; `--dry-run` flag (default) prints per-field change counts via `pr`
   (`tools/printer`, call `pr.bip()` before timed work) and writes
@@ -57,9 +69,15 @@
   → verify: `uv run python scripts/change_in_db/rearrange_sbs_gatha_lines.py`
   (dry-run) — counts plausible (~888 newlined + flat verse-source entries),
   review TSV written, DB unchanged (re-query shows same data)
-- [ ] **1.3 Phase validation.** Run all 5 quality-gate commands on the new
+- [x] **1.3 Phase validation.** Run all 5 quality-gate commands on the new
   script and test file, one at a time.
   → verify: ruff check/format, pyright, pyrefly clean; targeted pytest passes
+- [x] **1.4 DPD transfer generator helper.** Create a dry-run script that finds
+  safe same-id/source/text SBS examples that can be copied from DPD
+  `example_1/2`, using punctuation/tag/space-insensitive text matching. Write
+  the candidates to `temp/sbs_dpd_example_transfers.tsv` with before and
+  after text; do not write to the DB.
+  → verify: targeted pytest passes; dry-run TSV generated; DB unchanged
 
 ## Phase 2: Run migration + backup
 
