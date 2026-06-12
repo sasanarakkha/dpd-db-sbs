@@ -184,7 +184,7 @@ before starting Phase 2.
 
 ## Phase 2 — Behavior-preserving module split
 
-- [ ] 2.1 Map every top-level `def`/`class` and module constant in
+- [x] 2.1 Map every top-level `def`/`class` and module constant in
   `translate_core.py` to a target module. Intended seams (adjust names freely):
   - `prompts.py` — `build_system_prompt`, `_build_translation_prompt`,
     `_build_reformat_prompt`, `_build_missing_scores_prompt`,
@@ -212,14 +212,14 @@ before starting Phase 2.
     `_handle_reformat_response`, chunking glue, variant helpers.
   → verify: every current symbol appears in exactly one target; no symbol
   dropped. Record the mapping in `handoff.md`.
-- [ ] 2.2 Move one cluster at a time, leaf-most first as determined by
+- [x] 2.2 Move one cluster at a time, leaf-most first as determined by
   inspecting the actual intra-module call graph during 2.1 (the expected order
   is roughly `prompts.py` → `rendering.py` → `ranking.py` → `ai_response.py` →
   `retry.py` → `scoring.py`, but the verified dependency order wins). Each new
   file starts with a one-sentence purpose docstring. Keep moved code
   identical — no edits beyond imports.
   → verify after each move: `uv run pytest tests/exporter/analysis/test_passage_regression.py tests/exporter/analysis/test_translate_core.py -q` stays green.
-- [ ] 2.3 Re-point imports. Update `tests/exporter/analysis/test_translate_core.py`
+- [x] 2.3 Re-point imports. Update `tests/exporter/analysis/test_translate_core.py`
   and all callers found by grep
   (`exporter/analysis/study_passage.py`, `exporter/analysis/ai_pali_translate.py`,
   and any others). Apply the Atomic Rename Protocol: grep old import paths
@@ -227,19 +227,19 @@ before starting Phase 2.
   → verify: `rg "from .*translate_core import|translate_core\." ` shows only the
   intended public symbols; no test or caller imports a moved private helper from
   the old location.
-- [ ] 2.4 Prove output unchanged.
+- [x] 2.4 Prove output unchanged.
   → verify: `uv run pytest tests/exporter/analysis/test_passage_regression.py -v`
   passes with the **unmodified** goldens (no `UPDATE_GOLDENS`); full analysis
   unit suite green:
   `uv run pytest tests/exporter/analysis/ -q`.
-- [ ] 2.5 Per-file validation gates on every new/changed Python file.
+- [x] 2.5 Per-file validation gates on every new/changed Python file.
   → verify: ruff check --fix, ruff format, pyright, pyrefly (min-severity warn)
   pass on each.
-- [ ] 2.6 Registry/SMD check for the new source modules.
+- [x] 2.6 Registry/SMD check for the new source modules.
   → verify: `validate_registry.py` and `verify_smd_coverage.py` pass; confirm
   `no_sync_files` directory coverage is sufficient or add entries if the scripts
-  demand them.
-- [ ] 2.7 Update `exporter/analysis/README.md` with the new module map and the
+  complain.
+- [x] 2.7 Update `exporter/analysis/README.md` with the new module map and the
   fixture-refresh procedure from Phase 1.
   → verify: README lists each module's responsibility and the
   `UPDATE_GOLDENS` workflow.

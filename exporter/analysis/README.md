@@ -315,3 +315,27 @@ The server now imports the analyzer from `exporter.analysis.analyzer`.
 The old MCP-local AI translation script was removed from `exporter/mcp/`.
 Use the command-line tools in `exporter/analysis/` for AI passage analysis,
 markdown reports, and vocabulary export.
+
+
+## Developer Notes: Pipeline Architecture
+
+The core pipeline (`translate_core.py`) orchestrates several internal modules:
+- `prompts.py` — Builds the prompts and manages formatting constants.
+- `ai_response.py` — Parses and normalizes AI JSON output into maps.
+- `scoring.py` — Applies deterministic scoring rules and tie-breaks.
+- `retry.py` — Manages batching and fan-out for targeted retry queries.
+- `ranking.py` — Evaluates options based on heuristics to select the winner.
+- `rendering.py` — Cleans text and formats the final Markdown report.
+
+### Regression Harness
+
+The analysis engine is protected by a zero-network regression harness in
+`tests/exporter/analysis/test_passage_regression.py`. It tests five canonical
+passages (`TH215`, `MN41_p2`, `SN15.1_p2`, `DHP211`, `AN3.33_p1`)
+against byte-accurate goldens stored in `tests/exporter/analysis/fixtures/passages/`.
+
+To update the goldens after an intentional behavior change:
+1. Ensure your local `dpd.db` is current.
+2. Run: `UPDATE_GOLDENS=1 uv run pytest tests/exporter/analysis/test_passage_regression.py -s`
+3. Review the `distilled.json` git diffs to ensure only the intended logical changes occurred.
+4. Commit the updated goldens.
