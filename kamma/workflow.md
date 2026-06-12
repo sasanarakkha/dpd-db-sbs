@@ -75,6 +75,14 @@ Before marking any task complete, verify:
       parallel bash calls spawn concurrent processes and cause macOS memory
       explosions (91 GB+). Enforced by `~/.claude/hooks/guard_pytest.sh`.**
 - [ ] **Structural Integrity**: For all renames/moves, confirmed via `grep` that 100% of references (imports, scripts, workflows, docs) are updated.
+- [ ] **Blast-Radius (Shared Code)**: When the behavior, signature, return
+      shape, or contract of a shared symbol changed (anything under `tools/`, or
+      any module imported in more than one place), `grep`ed for every
+      importer/caller, read each call site, and ran the tests/entrypoints that
+      exercise them — not just the edited file. Dependents checked are listed in
+      the completion report; any caller that cannot be verified is called out.
+      A clean static check on the edited file says nothing about its callers;
+      this applies even when the symbol name is unchanged.
 - [ ] **Root Hygiene**: No new temporary scripts, logs, probes, transcripts,
       dumps, generated reports, fixtures, or test output files exist in the
       repository root. Scratch artifacts are in `temp/`; tests are in `tests/`.

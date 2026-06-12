@@ -125,6 +125,23 @@ Renames/moves are atomic. You MUST:
 3. Run a final verification search to empirically prove zero stale references remain.
 4. Stage `registry.json` and all affected `kamma/upstream_sync/smd/*.md` files **in the same commit** as the `git mv`. Never let a rename land in git while its registry/SMD documentation is still in the working tree.
 
+## Blast-Radius Check (Shared Code)
+When you change the **behavior, signature, return shape, or contract** of any
+function/constant in a shared module (anything under `tools/`, or any module
+imported in more than one place), you MUST:
+1. `grep` the repo for every importer/caller of the changed symbol.
+2. Read each call site and confirm it still works with the new behavior — do
+   not assume; check the actual usage.
+3. Run the tests and entrypoints that exercise those call sites, not just the
+   file you edited.
+4. List the dependents you checked in your completion report. If a caller
+   cannot be verified (no test, no runnable path), say so explicitly.
+
+A clean static check (`ruff`/`pyright`) on the edited file says nothing about
+its callers. This applies even when the function name is unchanged — a
+behavioral break is invisible to the pre-commit hook, which only checks staged
+files.
+
 ## Economy & Cost Management
 - NEVER re-run batch LLM processing for trivial changes like filename dates or field labels. Use local text manipulation (e.g., regex, rename) instead.
 
@@ -148,3 +165,16 @@ Renames/moves are atomic. You MUST:
 - **Verification:** Write tests for accurate data output (not UI components). Readme MUST be updated.
 - **Research:** Always perform Google Search for framework/OS quirks.
 - **Sync Tracking:** Only track and update exporters in the sync registry that contain localized data (Russian, SBS, or DPS-specific).
+
+## Pre-Commit Sanity Checks
+
+This repo enforces quality via `.pre-commit-config.yaml` (ruff lint, ruff format, pyright). Install once per clone with `pre-commit install`; run manually with `pre-commit run --all-files`. Static checks are necessary but NOT sufficient.
+
+Before committing, especially after refactors or dependency changes:
+
+- **Run the app end-to-end at least once.** A clean `ruff`/`pyright` pass does not mean the code runs — import errors and runtime crashes won't show up in static checks.
+- **Never name a module after a stdlib module** (e.g. `types.py`, `re.py`, `json.py`). If it's importable from the project root, it shadows the real one and breaks unrelated imports in confusing, cascading ways.
+- **Double-check dependency names**, especially for SDKs with similarly-named packages (e.g. `google-generativeai` vs `google-genai` — these are different packages with different APIs).
+- **Lazy (function-local) imports and bottom-of-file `# noqa: E402` imports are a circular-import smell, not a fix.** If you need one to make imports work, the module dependency graph has a cycle — restructure (e.g. extract shared code into a leaf module) rather than work around it.
+- **Don't mutate shared module-level constants** (dicts/lists) at runtime — copy them first.
+- **Check `finish_reason`/status fields on AI responses** before treating truncated output as a success.
