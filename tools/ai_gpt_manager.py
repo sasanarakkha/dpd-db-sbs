@@ -17,7 +17,7 @@ class GptManager:
         prompt_sys: str | None = None,
         timeout: float = 60.0,
         grounding: bool = False,
-        **kwargs,
+        **_kwargs,
     ) -> AIResponse:
         if grounding:
             return AIResponse(
@@ -71,7 +71,7 @@ class GptManager:
                 )
 
             try:
-                content = output_path.read_text().strip()
+                content = output_path.read_text(encoding="utf-8").strip()
             except Exception as e:
                 return AIResponse(
                     content=None,

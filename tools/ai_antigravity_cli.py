@@ -8,8 +8,9 @@ import time
 from pathlib import Path
 from typing import Any, NamedTuple, cast
 
-from tools.antigravity_cli_models import (
+from tools.ai_antigravity_cli_models import (
     AntigravityCliModelError,
+    agy_supports_model,
     clean_terminal_output,
     locate_executable,
     run_antigravity_print,
@@ -24,6 +25,8 @@ MAX_ERROR_LINE_LENGTH = 200
 IMMEDIATE_EMPTY_SECONDS = 10.0
 TOOL_CALL_MARKER = "include:default_api:"
 
+_warned_model_unsupported = False
+
 
 class _Response(NamedTuple):
     content: str | None
@@ -36,8 +39,8 @@ class AntigravityCliManager:
         prompt: str,
         prompt_sys: str | None = None,
         model: str = "Gemini 3.5 Flash (Low)",
-        timeout: float = 120.0,
-        **kwargs: Any,
+        timeout: float = 150.0,
+        **_kwargs: Any,
     ) -> _Response:
         try:
             content = generate_content(
@@ -76,7 +79,7 @@ def get_working_key(model: str = "Gemini 3.5 Flash (Low)") -> bool:
             temperature=0.0,
             timeout=60,
         )
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         pr.red(f"Antigravity CLI model {model} failed: {e}")
         return False
 
@@ -89,7 +92,7 @@ def generate_content(
     model: str,
     max_output_tokens: int = 32768,
     temperature: float = 0.1,
-    timeout: int = 120,
+    timeout: int = 150,
 ) -> str:
     """Generate content using Antigravity CLI print mode."""
 
@@ -103,12 +106,23 @@ def generate_content(
 
     agy_path = _locate_antigravity()
 
+    model_to_use: str | None = model
+    if not agy_supports_model(agy_path):
+        global _warned_model_unsupported
+        if not _warned_model_unsupported:
+            pr.amber(
+                "agy does not support --model (run `agy update` to upgrade); "
+                f"ignoring requested model {model!r} and using agy's default model"
+            )
+            _warned_model_unsupported = True
+        model_to_use = None
+
     pr.green(f"  -> antigravity-cli {model} (timeout={timeout}s)...")
     try:
         started_at = time.monotonic()
         result = run_antigravity_print(
             agy_path,
-            model,
+            model_to_use,
             prompt,
             timeout=timeout,
         )

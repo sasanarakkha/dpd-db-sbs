@@ -5,9 +5,21 @@ import sys
 from pathlib import Path
 from types import ModuleType, SimpleNamespace
 
+import pytest
+
 aksharamukha_stub = ModuleType("aksharamukha")
 setattr(aksharamukha_stub, "transliterate", SimpleNamespace())
 sys.modules.setdefault("aksharamukha", aksharamukha_stub)
+
+FIXTURES = json.loads(
+    (Path(__file__).parent / "test_mobile_exporter_fixtures.json").read_text(
+        encoding="utf-8"
+    )
+)
+
+
+def _mod() -> ModuleType:
+    return importlib.import_module("exporter.mobile.mobile_exporter")
 
 
 def _export_other_dictionaries(*args, **kwargs) -> None:
@@ -41,13 +53,21 @@ def _make_paths(tmp_path: Path) -> SimpleNamespace:
         mw_css_path=tmp_path / "mw.css",
         cpd_source_path=tmp_path / "cpd_clean.db",
         cpd_css_path=tmp_path / "cpd.css",
+        bhs_source_path=tmp_path / "bhs.xml",
     )
 
 
-def _export(tmp_path: Path, *, include_cone: bool = True) -> sqlite3.Connection:
+def _export(
+    tmp_path: Path, *, include_cone: bool = True, default_bhs: bool = True
+) -> sqlite3.Connection:
+    paths = _make_paths(tmp_path)
+    # Missing sources now raise; give tests a minimal valid BHS source
+    # unless they exercise the missing-BHS failure path themselves.
+    if default_bhs and not paths.bhs_source_path.exists():
+        paths.bhs_source_path.write_text("<bhs></bhs>", encoding="utf-8")
     dest = sqlite3.connect(":memory:")
     _export_other_dictionaries(
-        SimpleNamespace(pth=_make_paths(tmp_path)),
+        SimpleNamespace(pth=paths),
         dest,
         include_cone=include_cone,
     )
@@ -112,9 +132,7 @@ def test_exports_cpd_metadata_with_sanitized_css(tmp_path: Path) -> None:
     assert row[4] == 1
 
 
-def test_skips_missing_cpd_source_and_keeps_existing_dictionary_exports(
-    tmp_path: Path,
-) -> None:
+def test_missing_cpd_source_raises_with_remediation_hint(tmp_path: Path) -> None:
     paths = _make_paths(tmp_path)
     _write_json(paths.cone_source_path, {"1kamma": "<p>Cone entry</p>"})
     paths.cone_css_path.write_text(".cone { color: blue; }", encoding="utf-8")
@@ -124,22 +142,26 @@ def test_skips_missing_cpd_source_and_keeps_existing_dictionary_exports(
     )
     paths.mw_css_path.write_text(".mw { color: green; }", encoding="utf-8")
 
-    dest = _export(tmp_path)
+    with pytest.raises(FileNotFoundError, match="prepare_sources.py"):
+        _export(tmp_path)
 
-    dict_ids = {
-        row[0]
-        for row in dest.execute(
-            "SELECT dict_id FROM dict_meta ORDER BY dict_id"
-        ).fetchall()
-    }
 
-    assert dict_ids == {"cone", "mw"}
-    assert (
-        dest.execute(
-            "SELECT COUNT(*) FROM dict_entries WHERE dict_id = 'cpd'"
-        ).fetchone()[0]
-        == 0
-    )
+def test_missing_mw_source_raises(tmp_path: Path) -> None:
+    paths = _make_paths(tmp_path)
+    _write_cpd_db(paths.cpd_source_path, [("aṁga", "<p>entry</p>")])
+
+    with pytest.raises(FileNotFoundError, match="MW source not found"):
+        _export(tmp_path, include_cone=False)
+
+
+def test_missing_bhs_source_raises(tmp_path: Path) -> None:
+    paths = _make_paths(tmp_path)
+    _write_cpd_db(paths.cpd_source_path, [("aṁga", "<p>entry</p>")])
+    _write_json(paths.mw_source_json_path, [])
+    paths.mw_css_path.write_text(".mw { color: green; }", encoding="utf-8")
+
+    with pytest.raises(FileNotFoundError, match="BHS source not found"):
+        _export(tmp_path, include_cone=False, default_bhs=False)
 
 
 def test_preserves_duplicate_cpd_source_rows_without_alias_rows(tmp_path: Path) -> None:
@@ -231,3 +253,157 @@ def test_paths_point_to_cpd_sqlite_source_and_stylesheet() -> None:
     assert paths.cpd_css_path == Path(
         "/repo/resources/other-dictionaries/dictionaries/cpd/cpd.css"
     )
+
+
+@pytest.mark.parametrize(
+    "text,expected", list(FIXTURES["strip_diacritics_mobile"].items())
+)
+def test_strip_diacritics_mobile_matches_fixture(text: str, expected: str) -> None:
+    assert _mod()._strip_diacritics_mobile(text) == expected
+
+
+@pytest.mark.parametrize("lemma,expected", list(FIXTURES["lemma_clean"].items()))
+def test_lemma_clean_matches_fixture(lemma: str, expected: str) -> None:
+    assert _mod()._lemma_clean(lemma) == expected
+
+
+def _make_source_db(tmp_path: Path) -> Path:
+    src_path = tmp_path / "source.db"
+    con = sqlite3.connect(src_path)
+    con.executescript(
+        """
+        CREATE TABLE lookup (lookup_key TEXT, headwords TEXT, deconstructor TEXT);
+        CREATE INDEX idx_src_lookup_headwords ON lookup (headwords);
+        CREATE TABLE db_info (key TEXT PRIMARY KEY, value TEXT);
+        CREATE INDEX idx_src_dbinfo_value ON db_info (value);
+        CREATE TABLE inflection_templates (pattern TEXT, data TEXT);
+        CREATE TABLE family_root (
+            root_family_key TEXT, root_key TEXT, root_family TEXT,
+            root_meaning TEXT, html TEXT, data TEXT, count INTEGER
+        );
+        CREATE TABLE family_word (word_family TEXT, data TEXT, count INTEGER, extra TEXT);
+        CREATE TABLE family_compound (compound_family TEXT, data TEXT, count INTEGER);
+        CREATE TABLE family_idiom (idiom TEXT, data TEXT, count INTEGER);
+        CREATE TABLE "family_set" ("set" TEXT, data TEXT, count INTEGER);
+        """
+    )
+    con.executemany(
+        "INSERT INTO lookup VALUES (?, ?, ?)",
+        [("saṃyutta", "[1,2]", ""), ("√gam", "[3]", "x"), ("buddha", "[4]", "")],
+    )
+    con.executemany("INSERT INTO db_info VALUES (?, ?)", [("a", "1"), ("b", "2")])
+    con.execute("INSERT INTO inflection_templates VALUES (?, ?)", ("masc", "grid"))
+    con.execute(
+        "INSERT INTO family_root VALUES (?, ?, ?, ?, ?, ?, ?)",
+        ("√gam 1", "√gam", "√gam group", "go", "<b>h</b>", "d", 5),
+    )
+    con.execute(
+        "INSERT INTO family_word VALUES (?, ?, ?, ?)", ("gam", "d", 3, "DROPME")
+    )
+    con.execute("INSERT INTO family_compound VALUES (?, ?, ?)", ("cpd", "d", 2))
+    con.execute("INSERT INTO family_idiom VALUES (?, ?, ?)", ("idi", "d", 1))
+    con.execute('INSERT INTO "family_set" VALUES (?, ?, ?)', ("set1", "d", 4))
+    con.commit()
+    con.close()
+    return src_path
+
+
+def _g_for(src_path: Path) -> SimpleNamespace:
+    src = sqlite3.connect(src_path)
+    src.row_factory = sqlite3.Row
+    return SimpleNamespace(pth=SimpleNamespace(dpd_db_path=src_path), src=src)
+
+
+def test_export_lookup_adds_fuzzy_key_primary_key_and_replicates_index(
+    tmp_path: Path,
+) -> None:
+    module = _mod()
+    g = _g_for(_make_source_db(tmp_path))
+    dest = sqlite3.connect(":memory:")
+
+    module.export_lookup(g, dest)
+
+    rows = {
+        r[0]: (r[1], r[2], r[3])
+        for r in dest.execute(
+            "SELECT lookup_key, headwords, deconstructor, fuzzy_key FROM lookup"
+        ).fetchall()
+    }
+    assert rows == {
+        "saṃyutta": ("[1,2]", "", module._strip_diacritics_mobile("saṃyutta")),
+        "√gam": ("[3]", "x", module._strip_diacritics_mobile("√gam")),
+        "buddha": ("[4]", "", module._strip_diacritics_mobile("buddha")),
+    }
+
+    with pytest.raises(sqlite3.IntegrityError):
+        dest.execute("INSERT INTO lookup VALUES ('buddha', '[9]', '', 'x')")
+
+    indexes = {
+        r[0]
+        for r in dest.execute(
+            "SELECT name FROM sqlite_master WHERE type='index'"
+        ).fetchall()
+    }
+    assert "idx_lookup_fuzzy_key" in indexes
+    assert "idx_src_lookup_headwords" in indexes
+
+
+def test_copy_passthrough_copies_present_tables_and_skips_absent(
+    tmp_path: Path,
+) -> None:
+    module = _mod()
+    g = _g_for(_make_source_db(tmp_path))
+    dest = sqlite3.connect(":memory:")
+
+    module.copy_passthrough_tables(g, dest)
+
+    names = {
+        r[0]
+        for r in dest.execute(
+            "SELECT name FROM sqlite_master WHERE type='table'"
+        ).fetchall()
+    }
+    assert "db_info" in names
+    assert "inflection_templates" in names
+    assert "sutta_info" not in names
+
+    assert dest.execute("SELECT key, value FROM db_info ORDER BY key").fetchall() == [
+        ("a", "1"),
+        ("b", "2"),
+    ]
+    with pytest.raises(sqlite3.IntegrityError):
+        dest.execute("INSERT INTO db_info VALUES ('a', 'dup')")
+
+    indexes = {
+        r[0]
+        for r in dest.execute(
+            "SELECT name FROM sqlite_master WHERE type='index'"
+        ).fetchall()
+    }
+    assert "idx_src_dbinfo_value" in indexes
+
+
+def test_copy_family_tables_selects_columns_and_drops_extras(tmp_path: Path) -> None:
+    module = _mod()
+    g = _g_for(_make_source_db(tmp_path))
+    dest = sqlite3.connect(":memory:")
+
+    module.copy_family_tables(g, dest)
+
+    word_cols = [
+        r[1] for r in dest.execute("PRAGMA table_info(family_word)").fetchall()
+    ]
+    assert word_cols == ["word_family", "data", "count"]
+    assert dest.execute("SELECT * FROM family_word").fetchall() == [("gam", "d", 3)]
+    assert dest.execute(
+        "SELECT root_family_key, html, count FROM family_root"
+    ).fetchone() == ("√gam 1", "<b>h</b>", 5)
+
+    for table in (
+        "family_root",
+        "family_word",
+        "family_compound",
+        "family_idiom",
+        "family_set",
+    ):
+        assert dest.execute(f'SELECT COUNT(*) FROM "{table}"').fetchone()[0] == 1

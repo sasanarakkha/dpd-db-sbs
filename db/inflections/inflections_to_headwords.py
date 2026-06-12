@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 Save a TSV of every inflection found in texts or deconstructed compounds
@@ -9,41 +8,40 @@ Add the same data to the lookup table of the db.
 """
 
 import csv
+from dataclasses import dataclass, field
 
+from sqlalchemy.orm import Session
 
 from db.db_helpers import get_db_session
-from db.models import DpdHeadword, Lookup
+from db.models import DpdHeadword
 
 from tools.all_tipitaka_words import make_all_tipitaka_word_set
 from tools.configger import config_read
 from tools.deconstructed_words import make_words_in_deconstructions
 from tools.headwords_clean_set import make_clean_headwords_set
-from tools.lookup_is_another_value import is_another_value
+from tools.lookup_sync import sync_lookup_column
 from tools.pali_sort_key import pali_list_sorter
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
-from tools.update_test_add import update_test_add
 
 
+@dataclass
 class GlobalVars:
-    pth = ProjectPaths()
-    db_session = get_db_session(pth.dpd_db_path)
-    dpd_db = db_session.query(DpdHeadword).all()
-    all_tipitaka_word_set: set
-    deconstructions_word_set: set
-    clean_headwords_set: set
-    all_words_set: set
-    i2h_dict: dict
-    i2h_dict_tpr: dict
+    pth: ProjectPaths
+    db_session: Session
+    dpd_db: list[DpdHeadword]
+    all_tipitaka_word_set: set[str] = field(default_factory=set)
+    deconstructions_word_set: set[str] = field(default_factory=set)
+    clean_headwords_set: set[str] = field(default_factory=set)
+    all_words_set: set[str] = field(default_factory=set)
+    i2h_dict: dict[str, list[int]] = field(default_factory=dict)
+    i2h_dict_tpr: dict[str, list[str]] = field(default_factory=dict)
 
 
-def inflection_to_headwords(g: GlobalVars):
+def inflection_to_headwords(g: GlobalVars) -> None:
     """Make a dictionary of inflections: [headwords]."""
 
     pr.green_tmr("making inflections2headwords dict")
-
-    g.i2h_dict = {}
-    g.i2h_dict_tpr = {}
 
     for i in g.dpd_db:
         inflections = i.inflections_list_all  # include api ca eva iti as well
@@ -59,59 +57,32 @@ def inflection_to_headwords(g: GlobalVars):
     pr.yes(len(g.i2h_dict))
 
 
-def save_i2h_for_tpr(g: GlobalVars):
+def save_i2h_for_tpr(g: GlobalVars) -> None:
     """Save inflections2headwords for Tipitaka Pali Reader."""
 
     pr.green_tmr("saving to tsv for tpr")
 
-    with open(g.pth.tpr_i2h_tsv_path, "w") as f:
+    with g.pth.tpr_i2h_tsv_path.open("w", encoding="utf-8", newline="") as f:
         writer = csv.writer(f, delimiter="\t")
         writer.writerow(["inflection", "headwords"])
 
         for inflection, headwords in g.i2h_dict_tpr.items():
-            headwords = pali_list_sorter(headwords)
-            headwords = ",".join(headwords)
-            writer.writerow([inflection, headwords])
+            writer.writerow([inflection, ",".join(pali_list_sorter(headwords))])
 
     pr.yes(len(g.i2h_dict_tpr))
 
 
-def add_i2h_to_db(g: GlobalVars):
+def add_i2h_to_db(g: GlobalVars) -> None:
     """Add inflections2headwords to the lookup table."""
 
-    lookup_table = g.db_session.query(Lookup).all()
-    update_set, test_set, add_set = update_test_add(lookup_table, g.i2h_dict)
-
-    pr.green_tmr("updating db")
-    # update test add
-    for i in lookup_table:
-        if i.lookup_key in update_set:
-            i.headwords_pack(sorted(g.i2h_dict[i.lookup_key]))
-        elif i.lookup_key in test_set:
-            if is_another_value(i, "headwords"):
-                i.headwords = ""
-            else:
-                g.db_session.delete(i)
-
-    g.db_session.commit()
-    pr.yes(len(update_set) + len(test_set))
-
-    pr.green_tmr("adding to db")
-    add_to_db = []
-    for inflection, ids in g.i2h_dict.items():
-        if inflection in add_set:
-            add_me = Lookup()
-            add_me.lookup_key = inflection
-            add_me.headwords_pack(sorted(set(ids)))
-            add_to_db.append(add_me)
-
-    g.db_session.add_all(add_to_db)
-    g.db_session.commit()
+    pr.green_tmr("syncing headwords column")
+    data = {inflection: sorted(set(ids)) for inflection, ids in g.i2h_dict.items()}
+    result = sync_lookup_column(g.db_session, "headwords", data)
     g.db_session.close()
-    pr.yes(len(add_set))
+    pr.yes(result.updated + result.inserted)
 
 
-def main():
+def main() -> None:
     pr.tic()
     pr.yellow_title("inflection to headwords")
     if config_read("generate", "inflections_to_headwords", "yes") == "no":
@@ -119,7 +90,9 @@ def main():
         pr.toc()
         return
 
-    g = GlobalVars()
+    pth = ProjectPaths()
+    db_session = get_db_session(pth.dpd_db_path)
+    g = GlobalVars(pth, db_session, db_session.query(DpdHeadword).all())
 
     pr.green_tmr("making all all_tipitaka_word_set")
     g.all_tipitaka_word_set = make_all_tipitaka_word_set()

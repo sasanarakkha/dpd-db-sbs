@@ -12,8 +12,7 @@ import pandas as pd
 import pickle
 import re
 
-from pandas.core.frame import DataFrame
-from pandas.core.series import Series
+from pandas import DataFrame, Series
 
 from db.db_helpers import get_db_session
 from db.models import InflectionTemplates, DbInfo
@@ -24,9 +23,6 @@ from tools.printer import printer as pr
 
 class GlobalVars:
     """Variables used globally."""
-
-    pth = ProjectPaths()
-    db_session = get_db_session(pth.dpd_db_path)
 
     # main dataframes
     index_df: DataFrame
@@ -45,11 +41,15 @@ class GlobalVars:
 
     # add to the db
     infl_templ: InflectionTemplates
-    added_templates: list[str] = []
-    changed_templates: list[str] = []
+
+    def __init__(self) -> None:
+        self.pth = ProjectPaths()
+        self.db_session = get_db_session(self.pth.dpd_db_path)
+        self.added_templates: list[str] = []
+        self.changed_templates: list[str] = []
 
 
-def make_index_dataframe(g: GlobalVars):
+def make_index_dataframe(g: GlobalVars) -> None:
     """
     The index contains
     1. inflection pattern name
@@ -63,7 +63,7 @@ def make_index_dataframe(g: GlobalVars):
     g.index_df.fillna("", inplace=True)
 
 
-def make_infl_templ_dataframe(g: GlobalVars):
+def make_infl_templ_dataframe(g: GlobalVars) -> None:
     """A massive xy spread of inflection templates."""
 
     g.infl_templ_df: DataFrame = pd.read_excel(  # type: ignore[assignment]
@@ -193,7 +193,7 @@ def make_infl_templ_dataframe(g: GlobalVars):
     ]
 
 
-def extract_template_df(g: GlobalVars):
+def extract_template_df(g: GlobalVars) -> None:
     """Extract the template_df from the main df."""
 
     # parse data
@@ -223,7 +223,7 @@ def extract_template_df(g: GlobalVars):
     g.template_df.iloc[0, 0] = ""
 
 
-def convert_template_df_to_datalist(g: GlobalVars):
+def convert_template_df_to_datalist(g: GlobalVars) -> None:
     """Convert dataframe to nested list.
     table   [
     row         [ [cell], [cell], ... ],
@@ -245,7 +245,7 @@ def convert_template_df_to_datalist(g: GlobalVars):
         g.data_list += [new_row]
 
 
-def make_inflection_template(g: GlobalVars):
+def make_inflection_template(g: GlobalVars) -> None:
     """Make an InflectionTemplates and add to db_session"""
 
     g.infl_templ = InflectionTemplates(pattern=g.inflection_name, like=g.like)
@@ -254,7 +254,7 @@ def make_inflection_template(g: GlobalVars):
     g.added_templates.append(g.infl_templ.pattern)
 
 
-def add_to_db(g: GlobalVars):
+def add_to_db(g: GlobalVars) -> None:
     """
     Add the template to the database if
     1. changed or
@@ -287,7 +287,7 @@ def add_to_db(g: GlobalVars):
             g.changed_templates.append(g.inflection_name)
 
 
-def test_deleted_templates(g: GlobalVars):
+def test_deleted_templates(g: GlobalVars) -> None:
     """
     Test if there are extra templates in the db
     and delete them.
@@ -301,10 +301,10 @@ def test_deleted_templates(g: GlobalVars):
             g.changed_templates.append(t.pattern)
 
 
-def save_changed_templates(g: GlobalVars):
+def save_changed_templates(g: GlobalVars) -> None:
     """Save changed templates to pickle."""
 
-    with open(g.pth.template_changed_path, "wb") as f:
+    with g.pth.template_changed_path.open("wb") as f:
         pickle.dump(g.changed_templates, f)
 
     # save to db_info tables
@@ -317,7 +317,7 @@ def save_changed_templates(g: GlobalVars):
     g.db_session.add(changed_templates_list)
 
 
-def main():
+def main() -> None:
     pr.tic()
     pr.yellow_title("create inflection templates")
     g = GlobalVars()
