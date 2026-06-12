@@ -16,5 +16,14 @@
       "db/backup_tsv/backup_dpd_headwords_and_roots.py"
     ],
     "reason": "Upstream split_tsv_file chunking changes are intentionally not ported because DPS shadow backups are small localized TSV files and do not need chunk splitting."
+  },
+  {
+    "sync_commit": "5799afbb57f493accda30813e32982112c6e18c7",
+    "source": "gui2/dpd_fields_examples.py",
+    "shadow": "gui2/dps_example_field.py",
+    "changed_paths": [
+      "gui2/dpd_fields_examples.py"
+    ],
+    "reason": "Shadow DpsExampleField subclasses upstream DpdExampleField and imports book_codes from it. The added book codes (ADha, ttikas) flow in via import; the _toggle_tools_visibility signature change is inherited (shadow only calls the method, never redefines it); the import-block whitespace change does not map to the shadow's divergent import block. No shadow edit required."
   }
 ]

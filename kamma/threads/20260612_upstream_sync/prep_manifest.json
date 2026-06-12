@@ -1,0 +1,616 @@
+{
+  "blocker_paths": [
+    "exporter/analysis/ai_response.py",
+    "exporter/analysis/prompts.py",
+    "exporter/analysis/ranking.py",
+    "exporter/analysis/rendering.py",
+    "exporter/analysis/retry.py",
+    "exporter/analysis/scoring.py",
+    "exporter/kindle/tests/test_epd.py",
+    "tools/ai_antigravity_cli.py",
+    "tools/update_test_add.py"
+  ],
+  "changed_upstream_paths": [
+    ".github/workflows/draft_release.yml",
+    ".github/workflows/mobile_release.yml",
+    "AGENTS.md",
+    "audio/archive/generate_audio_11_labs.py",
+    "audio/bhashini/generate_dpd.py",
+    "audio/db_create.py",
+    "audio/db_release_upload.py",
+    "audio/error_check/delete_silent_files.py",
+    "audio/error_check/trim_audio.py",
+    "db/backup_tsv/backup_dpd_headwords_and_roots.py",
+    "db/backup_tsv/dpd_headwords_part_001.tsv",
+    "db/backup_tsv/dpd_headwords_part_002.tsv",
+    "db/backup_tsv/dpd_headwords_part_003.tsv",
+    "db/backup_tsv/dpd_roots_part_001.tsv",
+    "db/bold_definitions/extract_bold_definitions.py",
+    "db/db_helpers.py",
+    "db/epd/epd_to_lookup.py",
+    "db/families/family_compound.py",
+    "db/families/family_idiom.py",
+    "db/families/family_root.py",
+    "db/families/family_set.py",
+    "db/families/family_word.py",
+    "db/grammar/grammar_to_lookup.py",
+    "db/inflections/create_inflection_templates.py",
+    "db/inflections/generate_inflection_tables.py",
+    "db/inflections/inflections_to_headwords.py",
+    "db/inflections/transliterate_inflections.py",
+    "db/lookup/help_abbrev_add_to_lookup.py",
+    "db/lookup/see.py",
+    "db/lookup/spelling_mistakes.py",
+    "db/lookup/transliterate_lookup_table.py",
+    "db/models.py",
+    "db/sanskrit/root_families_sanskrit.tsv",
+    "db/suttas/suttas_to_lookup.py",
+    "db/suttas/suttas_update.py",
+    "db/variants/add_to_db.py",
+    "db/variants/extract_variants_from_bjt.py",
+    "db/variants/extract_variants_from_cst.py",
+    "db/variants/extract_variants_from_sc.py",
+    "db/variants/extract_variants_from_sya.py",
+    "db/variants/find_examples.py",
+    "db/variants/main.py",
+    "db/variants/variants_modules.py",
+    "db_tests_gui/add_antonyms.py",
+    "db_tests_gui/add_antonyms_sync.py",
+    "db_tests_gui/add_hyphenations.py",
+    "docs/technical/quick_start.md",
+    "exporter/analysis/README.md",
+    "exporter/analysis/_base.py",
+    "exporter/analysis/ai_response.py",
+    "exporter/analysis/analysis_types.py",
+    "exporter/analysis/analyzer.py",
+    "exporter/analysis/example_bolding.py",
+    "exporter/analysis/prompts.py",
+    "exporter/analysis/ranking.py",
+    "exporter/analysis/rendering.py",
+    "exporter/analysis/retry.py",
+    "exporter/analysis/scoring.py",
+    "exporter/analysis/study_passage.py",
+    "exporter/analysis/translate_core.py",
+    "exporter/deconstructor/deconstructor_exporter.py",
+    "exporter/goldendict/data_classes.py",
+    "exporter/goldendict/export_dpd.py",
+    "exporter/goldendict/export_epd.py",
+    "exporter/goldendict/export_help.py",
+    "exporter/goldendict/export_roots.py",
+    "exporter/goldendict/export_variant_spelling.py",
+    "exporter/goldendict/helpers.py",
+    "exporter/goldendict/main.py",
+    "exporter/goldendict/templates/dpd_header.jinja",
+    "exporter/goldendict/templates/dpd_headword.jinja",
+    "exporter/goldendict/templates/dpd_root.jinja",
+    "exporter/goldendict/templates/dpd_see.jinja",
+    "exporter/goldendict/templates/dpd_spelling_mistake.jinja",
+    "exporter/goldendict/templates/dpd_variant_reading.jinja",
+    "exporter/goldendict/templates/epd.jinja",
+    "exporter/goldendict/templates/help_abbrev.jinja",
+    "exporter/goldendict/templates/help_abbrev_other.jinja",
+    "exporter/goldendict/templates/help_help.jinja",
+    "exporter/grammar_dict/grammar_dict.py",
+    "exporter/kindle/epub/OEBPS/Text/titlepage.xhtml",
+    "exporter/kindle/kindle_exporter.py",
+    "exporter/tbw/tbw_exporter.py",
+    "exporter/tpr/templates/tpr_headword.jinja",
+    "exporter/tpr/tpr_exporter.py",
+    "exporter/txt/export_txt.py",
+    "exporter/variants/variants_exporter.py",
+    "exporter/webapp/data_classes.py",
+    "exporter/webapp/generate_search_index.py",
+    "exporter/webapp/main.py",
+    "exporter/webapp/preloads.py",
+    "exporter/webapp/scripts/process_logs.py",
+    "go_modules/frequency/main.go",
+    "gui2/additions_manager.py",
+    "gui2/ai_search.py",
+    "gui2/corrections_manager.py",
+    "gui2/daily_log.py",
+    "gui2/data/pass2_exceptions.json",
+    "gui2/database_manager.py",
+    "gui2/dpd_fields.py",
+    "gui2/dpd_fields_commentary.py",
+    "gui2/dpd_fields_examples.py",
+    "gui2/dpd_fields_lists.py",
+    "gui2/filter_presets_manager.py",
+    "gui2/global_tab_view.py",
+    "gui2/mixins.py",
+    "gui2/pass1_auto_controller.py",
+    "gui2/pass1_auto_view.py",
+    "gui2/pass2_auto_control.py",
+    "gui2/pass2_auto_view.py",
+    "gui2/sandhi_files_manager.py",
+    "gui2/utilities/find_words_with_examples.py",
+    "pyproject.toml",
+    "resources/deconstructor_output",
+    "resources/fdg_dpd",
+    "resources/other-dictionaries",
+    "resources/tpr_downloads",
+    "scripts/bash/generate_components.py",
+    "scripts/build/api_ca_eva_iti_iva_hi.py",
+    "scripts/build/config_github_release.py",
+    "scripts/build/config_quick_profile.py",
+    "scripts/build/config_uposatha_day.py",
+    "scripts/build/cst4_xml_to_txt.py",
+    "scripts/build/db_rebuild_from_tsv.py",
+    "scripts/build/dealbreakers.py",
+    "scripts/build/deconstructor_extract_archive.py",
+    "scripts/build/deconstructor_output_add_to_db.py",
+    "scripts/build/docs_add_indexes.py",
+    "scripts/build/ebt_counter.py",
+    "scripts/build/families_to_json.py",
+    "scripts/build/newsletter_scraper.py",
+    "scripts/build/root_has_verb_updater.py",
+    "scripts/build/sanskrit_root_families_updater.py",
+    "scripts/build/tarball_db.py",
+    "scripts/build/tarball_deconstructor_output.py",
+    "scripts/build/transliterate_bjt.py",
+    "scripts/build/zip_goldendict_mdict.py",
+    "scripts/export/sanskrit_export.py",
+    "scripts/extractor/_output.py",
+    "scripts/extractor/extract_cone.py",
+    "scripts/extractor/extract_cpd.py",
+    "scripts/fix/fix_synonym_entries.py",
+    "scripts/fix/sanskrit_sutra_bsk.py",
+    "scripts/onboarding/desktop_shortcut.py",
+    "scripts/project_management/project_health_check.py",
+    "shared_data/deconstructor/manual_corrections.tsv",
+    "shared_data/user_dictionary.txt",
+    "tools/ai_antigravity_cli.py",
+    "tools/ai_antigravity_cli_models.py",
+    "tools/ai_deepseek_manager.py",
+    "tools/ai_gpt_manager.py",
+    "tools/ai_manager.py",
+    "tools/ai_models.json",
+    "tools/all_tipitaka_words.py",
+    "tools/bjt.py",
+    "tools/bold_definitions_search.py",
+    "tools/cache_load.py",
+    "tools/compound_type_manager.tsv",
+    "tools/configger.py",
+    "tools/css_manager.py",
+    "tools/cst_sc_text_sets.py",
+    "tools/cst_source_sutta_example.py",
+    "tools/docs_changelog_and_release_notes.py",
+    "tools/docs_update_abbreviations.py",
+    "tools/docs_update_bibliography.py",
+    "tools/docs_update_thanks.py",
+    "tools/lookup_sync.py",
+    "tools/phonetic_changes.tsv",
+    "tools/script_runner.py",
+    "tools/speech_marks.json",
+    "tools/spelling.py",
+    "tools/tsv_read_write.py",
+    "tools/uposatha_day.py",
+    "tools/utils.py",
+    "tools/version.py",
+    "tools/wordfinder_manager.py",
+    "uv.lock"
+  ],
+  "deleted_upstream_paths": [
+    "exporter/kindle/tests/test_epd.py",
+    "tools/update_test_add.py"
+  ],
+  "discuss_paths": [
+    "AGENTS.md",
+    "db/models.py",
+    "pyproject.toml"
+  ],
+  "from_upstream_sha": "0ea5883380f56b682cf8574043afb8e66cca3260",
+  "generated_at": "2026-06-12T20:48:06+08:00",
+  "mapped_actions": {
+    ".github/workflows/draft_release.yml": [
+      {
+        "category": "inspired_by_upstream",
+        "local_path": ".github/workflows/ru_release.yml",
+        "local_target_path": ".github/workflows/ru_release.yml"
+      },
+      {
+        "category": "inspired_by_upstream",
+        "local_path": ".github/workflows/ru_release_test.yml",
+        "local_target_path": ".github/workflows/ru_release_test.yml"
+      }
+    ],
+    "db/backup_tsv/backup_dpd_headwords_and_roots.py": [
+      {
+        "category": "dps_copies",
+        "local_path": "scripts/backup/backup_dps.py",
+        "local_target_path": "scripts/backup/backup_dps.py"
+      }
+    ],
+    "db/epd/epd_to_lookup.py": [
+      {
+        "category": "russian_copies",
+        "local_path": "db/rpd/rpd_to_lookup.py",
+        "local_target_path": "db/rpd/rpd_to_lookup.py"
+      },
+      {
+        "category": "tamil_copies",
+        "local_path": "db/tpd/tpd_to_lookup.py",
+        "local_target_path": "db/tpd/tpd_to_lookup.py"
+      }
+    ],
+    "db/families/family_compound.py": [
+      {
+        "category": "russian_copies",
+        "local_path": "db/families/family_compound_ru.py",
+        "local_target_path": "db/families/family_compound_ru.py"
+      }
+    ],
+    "db/families/family_idiom.py": [
+      {
+        "category": "russian_copies",
+        "local_path": "db/families/family_idiom_ru.py",
+        "local_target_path": "db/families/family_idiom_ru.py"
+      }
+    ],
+    "db/families/family_root.py": [
+      {
+        "category": "russian_copies",
+        "local_path": "db/families/family_root_ru.py",
+        "local_target_path": "db/families/family_root_ru.py"
+      }
+    ],
+    "db/families/family_set.py": [
+      {
+        "category": "russian_copies",
+        "local_path": "db/families/family_set_ru.py",
+        "local_target_path": "db/families/family_set_ru.py"
+      }
+    ],
+    "db/families/family_word.py": [
+      {
+        "category": "russian_copies",
+        "local_path": "db/families/family_word_ru.py",
+        "local_target_path": "db/families/family_word_ru.py"
+      }
+    ],
+    "db/lookup/help_abbrev_add_to_lookup.py": [
+      {
+        "category": "russian_copies",
+        "local_path": "db/lookup/help_abbrev_add_to_lookup_ru.py",
+        "local_target_path": "db/lookup/help_abbrev_add_to_lookup_ru.py"
+      }
+    ],
+    "docs/technical/quick_start.md": [
+      {
+        "category": "inspired_by_upstream",
+        "local_path": "docs_rus/",
+        "local_target_path": "docs_rus/technical/quick_start.md"
+      }
+    ],
+    "exporter/deconstructor/deconstructor_exporter.py": [
+      {
+        "category": "russian_copies",
+        "local_path": "exporter/deconstructor/deconstructor_exporter_ru.py",
+        "local_target_path": "exporter/deconstructor/deconstructor_exporter_ru.py"
+      }
+    ],
+    "exporter/goldendict/data_classes.py": [
+      {
+        "category": "dps_copies",
+        "local_path": "exporter/goldendict/data_classes_dps.py",
+        "local_target_path": "exporter/goldendict/data_classes_dps.py"
+      }
+    ],
+    "exporter/goldendict/export_dpd.py": [
+      {
+        "category": "inspired_by_upstream",
+        "local_path": "exporter/goldendict/export_dpd_ru.py",
+        "local_target_path": "exporter/goldendict/export_dpd_ru.py"
+      },
+      {
+        "category": "inspired_by_upstream",
+        "local_path": "exporter/goldendict/export_dpd_sbs.py",
+        "local_target_path": "exporter/goldendict/export_dpd_sbs.py"
+      }
+    ],
+    "exporter/goldendict/export_epd.py": [
+      {
+        "category": "russian_copies",
+        "local_path": "exporter/goldendict/export_rpd.py",
+        "local_target_path": "exporter/goldendict/export_rpd.py"
+      },
+      {
+        "category": "inspired_by_upstream",
+        "local_path": "exporter/goldendict/export_epd_sbs.py",
+        "local_target_path": "exporter/goldendict/export_epd_sbs.py"
+      }
+    ],
+    "exporter/goldendict/export_help.py": [
+      {
+        "category": "inspired_by_upstream",
+        "local_path": "exporter/goldendict/export_help_ru.py",
+        "local_target_path": "exporter/goldendict/export_help_ru.py"
+      },
+      {
+        "category": "inspired_by_upstream",
+        "local_path": "exporter/goldendict/export_help_sbs.py",
+        "local_target_path": "exporter/goldendict/export_help_sbs.py"
+      }
+    ],
+    "exporter/goldendict/export_roots.py": [
+      {
+        "category": "inspired_by_upstream",
+        "local_path": "exporter/goldendict/export_roots_ru.py",
+        "local_target_path": "exporter/goldendict/export_roots_ru.py"
+      },
+      {
+        "category": "inspired_by_upstream",
+        "local_path": "exporter/goldendict/export_roots_sbs.py",
+        "local_target_path": "exporter/goldendict/export_roots_sbs.py"
+      }
+    ],
+    "exporter/goldendict/export_variant_spelling.py": [
+      {
+        "category": "inspired_by_upstream",
+        "local_path": "exporter/goldendict/export_variant_spelling_ru.py",
+        "local_target_path": "exporter/goldendict/export_variant_spelling_ru.py"
+      }
+    ],
+    "exporter/goldendict/main.py": [
+      {
+        "category": "inspired_by_upstream",
+        "local_path": "exporter/goldendict/main_ru.py",
+        "local_target_path": "exporter/goldendict/main_ru.py"
+      },
+      {
+        "category": "inspired_by_upstream",
+        "local_path": "exporter/goldendict/main_sbs.py",
+        "local_target_path": "exporter/goldendict/main_sbs.py"
+      }
+    ],
+    "exporter/goldendict/templates/dpd_header.jinja": [
+      {
+        "category": "russian_copies",
+        "local_path": "exporter/goldendict/ru_components/templates/",
+        "local_target_path": "exporter/goldendict/ru_components/templates/dpd_header.jinja"
+      },
+      {
+        "category": "sbs_copies",
+        "local_path": "exporter/goldendict/sbs_templates/",
+        "local_target_path": "exporter/goldendict/sbs_templates/dpd_header.jinja"
+      }
+    ],
+    "exporter/goldendict/templates/dpd_headword.jinja": [
+      {
+        "category": "russian_copies",
+        "local_path": "exporter/goldendict/ru_components/templates/",
+        "local_target_path": "exporter/goldendict/ru_components/templates/dpd_headword.jinja"
+      },
+      {
+        "category": "sbs_copies",
+        "local_path": "exporter/goldendict/sbs_templates/",
+        "local_target_path": "exporter/goldendict/sbs_templates/dpd_headword.jinja"
+      }
+    ],
+    "exporter/goldendict/templates/dpd_root.jinja": [
+      {
+        "category": "russian_copies",
+        "local_path": "exporter/goldendict/ru_components/templates/",
+        "local_target_path": "exporter/goldendict/ru_components/templates/dpd_root.jinja"
+      },
+      {
+        "category": "sbs_copies",
+        "local_path": "exporter/goldendict/sbs_templates/",
+        "local_target_path": "exporter/goldendict/sbs_templates/dpd_root.jinja"
+      }
+    ],
+    "exporter/goldendict/templates/dpd_see.jinja": [
+      {
+        "category": "russian_copies",
+        "local_path": "exporter/goldendict/ru_components/templates/",
+        "local_target_path": "exporter/goldendict/ru_components/templates/dpd_see.jinja"
+      },
+      {
+        "category": "sbs_copies",
+        "local_path": "exporter/goldendict/sbs_templates/",
+        "local_target_path": "exporter/goldendict/sbs_templates/dpd_see.jinja"
+      }
+    ],
+    "exporter/goldendict/templates/dpd_spelling_mistake.jinja": [
+      {
+        "category": "russian_copies",
+        "local_path": "exporter/goldendict/ru_components/templates/",
+        "local_target_path": "exporter/goldendict/ru_components/templates/dpd_spelling_mistake.jinja"
+      },
+      {
+        "category": "sbs_copies",
+        "local_path": "exporter/goldendict/sbs_templates/",
+        "local_target_path": "exporter/goldendict/sbs_templates/dpd_spelling_mistake.jinja"
+      }
+    ],
+    "exporter/goldendict/templates/dpd_variant_reading.jinja": [
+      {
+        "category": "russian_copies",
+        "local_path": "exporter/goldendict/ru_components/templates/",
+        "local_target_path": "exporter/goldendict/ru_components/templates/dpd_variant_reading.jinja"
+      },
+      {
+        "category": "sbs_copies",
+        "local_path": "exporter/goldendict/sbs_templates/",
+        "local_target_path": "exporter/goldendict/sbs_templates/dpd_variant_reading.jinja"
+      }
+    ],
+    "exporter/goldendict/templates/epd.jinja": [
+      {
+        "category": "russian_copies",
+        "local_path": "exporter/goldendict/ru_components/templates/",
+        "local_target_path": "exporter/goldendict/ru_components/templates/epd.jinja"
+      },
+      {
+        "category": "sbs_copies",
+        "local_path": "exporter/goldendict/sbs_templates/",
+        "local_target_path": "exporter/goldendict/sbs_templates/epd.jinja"
+      }
+    ],
+    "exporter/goldendict/templates/help_abbrev.jinja": [
+      {
+        "category": "russian_copies",
+        "local_path": "exporter/goldendict/ru_components/templates/",
+        "local_target_path": "exporter/goldendict/ru_components/templates/help_abbrev.jinja"
+      },
+      {
+        "category": "sbs_copies",
+        "local_path": "exporter/goldendict/sbs_templates/",
+        "local_target_path": "exporter/goldendict/sbs_templates/help_abbrev.jinja"
+      }
+    ],
+    "exporter/goldendict/templates/help_abbrev_other.jinja": [
+      {
+        "category": "russian_copies",
+        "local_path": "exporter/goldendict/ru_components/templates/",
+        "local_target_path": "exporter/goldendict/ru_components/templates/help_abbrev_other.jinja"
+      },
+      {
+        "category": "sbs_copies",
+        "local_path": "exporter/goldendict/sbs_templates/",
+        "local_target_path": "exporter/goldendict/sbs_templates/help_abbrev_other.jinja"
+      }
+    ],
+    "exporter/goldendict/templates/help_help.jinja": [
+      {
+        "category": "russian_copies",
+        "local_path": "exporter/goldendict/ru_components/templates/",
+        "local_target_path": "exporter/goldendict/ru_components/templates/help_help.jinja"
+      },
+      {
+        "category": "sbs_copies",
+        "local_path": "exporter/goldendict/sbs_templates/",
+        "local_target_path": "exporter/goldendict/sbs_templates/help_help.jinja"
+      }
+    ],
+    "exporter/grammar_dict/grammar_dict.py": [
+      {
+        "category": "russian_copies",
+        "local_path": "exporter/grammar_dict/grammar_dict_ru.py",
+        "local_target_path": "exporter/grammar_dict/grammar_dict_ru.py"
+      }
+    ],
+    "exporter/kindle/epub/OEBPS/Text/titlepage.xhtml": [
+      {
+        "category": "russian_copies",
+        "local_path": "exporter/kindle/ru_components/epub/",
+        "local_target_path": "exporter/kindle/ru_components/epub/OEBPS/Text/titlepage.xhtml"
+      }
+    ],
+    "exporter/kindle/kindle_exporter.py": [
+      {
+        "category": "russian_copies",
+        "local_path": "exporter/kindle/kindle_exporter_ru.py",
+        "local_target_path": "exporter/kindle/kindle_exporter_ru.py"
+      }
+    ],
+    "exporter/tbw/tbw_exporter.py": [
+      {
+        "category": "russian_copies",
+        "local_path": "exporter/tbw/tbw_exporter_ru.py",
+        "local_target_path": "exporter/tbw/tbw_exporter_ru.py"
+      }
+    ],
+    "exporter/tpr/tpr_exporter.py": [
+      {
+        "category": "russian_copies",
+        "local_path": "exporter/tpr/tpr_exporter_ru.py",
+        "local_target_path": "exporter/tpr/tpr_exporter_ru.py"
+      }
+    ],
+    "exporter/webapp/data_classes.py": [
+      {
+        "category": "russian_copies",
+        "local_path": "exporter/webapp/data_classes_ru.py",
+        "local_target_path": "exporter/webapp/data_classes_ru.py"
+      }
+    ],
+    "exporter/webapp/main.py": [
+      {
+        "category": "russian_copies",
+        "local_path": "exporter/webapp/main_ru.py",
+        "local_target_path": "exporter/webapp/main_ru.py"
+      }
+    ],
+    "exporter/webapp/preloads.py": [
+      {
+        "category": "russian_copies",
+        "local_path": "exporter/webapp/preloads_ru.py",
+        "local_target_path": "exporter/webapp/preloads_ru.py"
+      }
+    ],
+    "gui2/dpd_fields.py": [
+      {
+        "category": "inspired_by_upstream",
+        "local_path": "gui2/dps_fields.py",
+        "local_target_path": "gui2/dps_fields.py"
+      }
+    ],
+    "gui2/dpd_fields_examples.py": [
+      {
+        "category": "dps_copies",
+        "local_path": "gui2/dps_example_field.py",
+        "local_target_path": "gui2/dps_example_field.py"
+      }
+    ],
+    "gui2/dpd_fields_lists.py": [
+      {
+        "category": "inspired_by_upstream",
+        "local_path": "gui2/dps_fields_lists.py",
+        "local_target_path": "gui2/dps_fields_lists.py"
+      }
+    ],
+    "scripts/bash/generate_components.py": [
+      {
+        "category": "inspired_by_upstream",
+        "local_path": "scripts/bash/generate_components.sh",
+        "local_target_path": "scripts/bash/generate_components.sh"
+      }
+    ],
+    "scripts/build/db_rebuild_from_tsv.py": [
+      {
+        "category": "dps_copies",
+        "local_path": "scripts/build/db_rebuild_from_tsv_dps.py",
+        "local_target_path": "scripts/build/db_rebuild_from_tsv_dps.py"
+      }
+    ],
+    "scripts/build/families_to_json.py": [
+      {
+        "category": "russian_copies",
+        "local_path": "scripts/build/families_to_json_ru.py",
+        "local_target_path": "scripts/build/families_to_json_ru.py"
+      }
+    ],
+    "tools/spelling.py": [
+      {
+        "category": "russian_copies",
+        "local_path": "tools/ru_spelling.py",
+        "local_target_path": "tools/ru_spelling.py"
+      }
+    ],
+    "tools/utils.py": [
+      {
+        "category": "sbs_copies",
+        "local_path": "tools/utils_sbs.py",
+        "local_target_path": "tools/utils_sbs.py"
+      }
+    ],
+    "tools/version.py": [
+      {
+        "category": "russian_copies",
+        "local_path": "tools/version_ru.py",
+        "local_target_path": "tools/version_ru.py"
+      }
+    ]
+  },
+  "needs_classification_paths": [
+    ".github/workflows/mobile_release.yml",
+    "exporter/analysis/_base.py",
+    "exporter/analysis/analysis_types.py",
+    "scripts/fix/sanskrit_sutra_bsk.py",
+    "scripts/project_management/project_health_check.py",
+    "tools/ai_antigravity_cli_models.py",
+    "tools/lookup_sync.py"
+  ],
+  "target_upstream_ref": "upstream/main",
+  "to_upstream_sha": "518672a65fa3ea7c36c4c754dc5276bb41f92da7"
+}
