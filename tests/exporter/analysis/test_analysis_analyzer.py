@@ -16,6 +16,21 @@ from exporter.analysis.analyzer import (
 )
 
 
+def _collect_analysis_keys(options: list[dict[str, object]]) -> list[str]:
+    keys: list[str] = []
+    for option in options:
+        key = option.get("key")
+        if isinstance(key, str):
+            keys.append(key)
+        components = option.get("components")
+        if not isinstance(components, list):
+            continue
+        for component_group in components:
+            if isinstance(component_group, list):
+                keys.extend(_collect_analysis_keys(component_group))
+    return keys
+
+
 def test_normalize_kammadharaya_construction() -> None:
     assert _normalize_kammadharaya_construction("paññā eva āvudha") == "paññā + āvudha"
     assert _normalize_kammadharaya_construction("īsā viya danta") == "īsā + danta"
@@ -132,6 +147,30 @@ def test_get_grammar_from_inflections_html_not_found() -> None:
     )
 
     assert get_grammar_from_inflections_html("buddhaṃ", headword) is None
+
+
+def test_analyze_sentence_keys_are_unique_per_word_occurrence() -> None:
+    from db.db_helpers import get_db_session
+    from exporter.analysis.analyzer import analyze_sentence
+    from exporter.mcp.config import mcp_config
+
+    db_session = get_db_session(mcp_config.db_path)
+
+    try:
+        results = analyze_sentence("tassa tassa", db_session)
+    finally:
+        db_session.close()
+
+    keys = [
+        key
+        for token_data in results
+        for key in _collect_analysis_keys(
+            cast(list[dict[str, object]], token_data["data"])
+        )
+    ]
+
+    assert keys
+    assert len(keys) == len(set(keys))
 
 
 def test_is_pos_compatible_exact_match() -> None:

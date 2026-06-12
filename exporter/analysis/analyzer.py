@@ -154,6 +154,23 @@ def _filter_particle_lookup_headwords(
     ]
 
 
+def _prefix_analysis_option_keys(
+    options: list[AnalysisOption],
+    occurrence_prefix: str,
+) -> None:
+    """Prefix option keys recursively with the source word occurrence id."""
+    for option in options:
+        key = option.get("key")
+        if isinstance(key, str) and not key.startswith(f"{occurrence_prefix}_"):
+            option["key"] = f"{occurrence_prefix}_{key}"
+
+        components = option.get("components")
+        if not isinstance(components, list):
+            continue
+        for component_group in components:
+            _prefix_analysis_option_keys(component_group, occurrence_prefix)
+
+
 def is_pos_compatible(hw_pos: str, grammar_pos: str, grammar_string: str = "") -> bool:
     """Check if the Headword POS is compatible with the Lookup Grammar POS."""
     # Normalize
@@ -757,7 +774,7 @@ def analyze_sentence(
     tokens = tokenize_sentence(sentence)
     results = []
 
-    for token in tokens:
+    for occurrence_index, token in enumerate(tokens):
         lookup_entry = (
             db_session.query(Lookup).filter(Lookup.lookup_key == token).first()
         )
@@ -831,6 +848,7 @@ def analyze_sentence(
                     word_data.append(entry)
 
             if word_data:
+                _prefix_analysis_option_keys(word_data, f"w{occurrence_index}")
                 status = "found"
 
         results.append({"word": token, "status": status, "data": word_data})

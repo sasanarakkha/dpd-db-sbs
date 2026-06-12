@@ -140,8 +140,8 @@ def test_merge_deconstruction_selection() -> None:
     assert comp_entry["meaning_combo"] == "I would dwell"
 
 
-def test_merge_missing_score_defaults_to_zero() -> None:
-    """Options not in scores map get ai_score=0."""
+def test_merge_missing_score_defaults_to_none() -> None:
+    """Options not in scores map get ai_score=None."""
     analysis_data = [
         {
             "word": "test",
@@ -159,7 +159,7 @@ def test_merge_missing_score_defaults_to_zero() -> None:
     result = merge_ai_selections(analysis_data, ai_response)
     data = result["analysis"][0]["data"]
     assert data[0]["ai_score"] == 7
-    assert data[1]["ai_score"] == 0
+    assert data[1]["ai_score"] is None
 
 
 def test_pre_match_db_examples_source_1() -> None:
@@ -168,12 +168,22 @@ def test_pre_match_db_examples_source_1() -> None:
         {
             "word": "susamāhito",
             "data": [
-                {"key": "64447_default", "source_1": "DHP5", "source_2": ""},
-                {"key": "64446_default", "source_1": "DHP10", "source_2": ""},
+                {
+                    "key": "64447_default",
+                    "source_1": "DHP5",
+                    "source_2": "",
+                    "example_1": "not matching",
+                },
+                {
+                    "key": "64446_default",
+                    "source_1": "DHP10",
+                    "source_2": "",
+                    "example_1": "susamāhito",
+                },
             ],
         }
     ]
-    pre_match_db_examples(analysis, "DHP10")
+    pre_match_db_examples(analysis, "DHP10", "susamāhito")
     data = analysis[0]["data"]
     assert data[0].get("ai_score", 0) == 0
     assert "db_example_match" not in data[0]
@@ -187,11 +197,16 @@ def test_pre_match_db_examples_source_2() -> None:
         {
             "word": "damma",
             "data": [
-                {"key": "99_default", "source_1": "DHP1", "source_2": "DHP10"},
+                {
+                    "key": "99_default",
+                    "source_1": "DHP1",
+                    "source_2": "DHP10",
+                    "example_2": "damma",
+                },
             ],
         }
     ]
-    pre_match_db_examples(analysis, "DHP10")
+    pre_match_db_examples(analysis, "DHP10", "damma")
     assert analysis[0]["data"][0]["ai_score"] == 10
     assert analysis[0]["data"][0]["db_example_match"] is True
 
@@ -201,10 +216,12 @@ def test_pre_match_db_examples_no_match() -> None:
     analysis = [
         {
             "word": "test",
-            "data": [{"key": "1_0", "source_1": "MN1", "source_2": ""}],
+            "data": [
+                {"key": "1_0", "source_1": "MN1", "source_2": "", "example_1": "test"}
+            ],
         }
     ]
-    pre_match_db_examples(analysis, "DHP10")
+    pre_match_db_examples(analysis, "DHP10", "mismatch")
     assert "ai_score" not in analysis[0]["data"][0]
     assert "db_example_match" not in analysis[0]["data"][0]
 

@@ -254,6 +254,8 @@ def test_common_pali_rules_cover_known_failures() -> None:
     assert "vocative" in translate_core.COMMON_PALI_RULES
     assert "vassāni" in translate_core.COMMON_PALI_RULES
     assert "accusative of duration" in translate_core.COMMON_PALI_RULES
+    assert "prefer the genitive" in translate_core.COMMON_PALI_RULES
+    assert "recipient, purpose, or benefit" in translate_core.COMMON_PALI_RULES
 
 
 def test_system_prompt_discourages_zero_score_enumeration() -> None:
@@ -512,6 +514,18 @@ def test_find_missing_score_groups_deduplicates_repeated_words() -> None:
     assert len(groups) == 1
 
 
+def test_find_missing_score_groups_deduplicates_occurrence_prefixed_keys() -> None:
+    analysis = [
+        {"word": "ca", "data": [{"key": "w0_1_0", "pali": "ca", "pos": "ind"}]},
+        {"word": "ca", "data": [{"key": "w1_1_0", "pali": "ca", "pos": "ind"}]},
+    ]
+
+    groups = translate_core._find_missing_score_groups(analysis, scores_map={})
+
+    assert len(groups) == 1
+    assert groups[0]["missing_keys"] == ["w0_1_0"]
+
+
 def test_batch_missing_groups_packs_by_size() -> None:
     groups = [
         {"word": "eka", "context": "eka", "missing_keys": ["1_0"], "options": []},
@@ -675,6 +689,25 @@ def test_missing_scores_prompt_contains_no_grammar_notes_rule() -> None:
     ) in prompt
 
 
+def test_missing_scores_prompt_contains_common_pali_rules() -> None:
+    missing_groups = [
+        {
+            "word": "avijjānīvaraṇānaṃ",
+            "context": "avijjānīvaraṇānaṃ",
+            "missing_keys": ["10531_0", "10531_1"],
+            "options": [
+                {"key": "10531_0", "grammar": "masc dat pl"},
+                {"key": "10531_1", "grammar": "fem gen pl"},
+            ],
+        }
+    ]
+
+    prompt = _build_missing_scores_prompt("avijjānīvaraṇānaṃ", missing_groups)
+
+    assert "Common Pāḷi Disambiguation Rules" in prompt
+    assert "prefer the genitive" in prompt
+
+
 def test_missing_scores_prompt_requests_contextual_meaning_for_best_option() -> None:
     missing_groups = [
         {
@@ -792,6 +825,58 @@ def test_retry_flat_shape_meanings_are_grammar_stripped(
     assert option["ai_score"] == 10
     assert option["meaning_combo"] == "the Blessed One"
     assert debug["final_scores"]["123_0"]["contextual_meaning"] == "the Blessed One"
+
+
+def test_retry_scores_fan_out_to_equivalent_occurrence_keys(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: [
+            {
+                "word": "ca",
+                "status": "found",
+                "data": [{"key": "w0_1_0", "pali": "ca", "meaning_combo": "and"}],
+            },
+            {
+                "word": "ca",
+                "status": "found",
+                "data": [{"key": "w1_1_0", "pali": "ca", "meaning_combo": "and"}],
+            },
+        ],
+    )
+    retry_key_batches: list[list[str]] = []
+    calls: list[dict[str, Any]] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs: Any) -> object:
+            calls.append(kwargs)
+            if len(calls) == 1:
+                content = (
+                    '{"translation": "done", "literal_translation": "done", '
+                    '"scores": {}}'
+                )
+            else:
+                retry_key_batches.append(
+                    _missing_keys_from_retry_prompt(kwargs["prompt"])
+                )
+                content = '{"scores": {"w0_1_0": {"score": 10}}}'
+            return type(
+                "FakeResponse", (), {"content": content, "status_message": "ok"}
+            )()
+
+    debug: dict[str, Any] = {}
+    result = translate_sentence(
+        "ca ca",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        debug=debug,
+    )
+
+    assert retry_key_batches == [["w0_1_0"]]
+    assert [entry["data"][0]["ai_score"] for entry in result["analysis"]] == [10, 10]
+    assert debug["final_scores"]["w1_1_0"]["score"] == 10
+    assert debug["missing_score_groups_after_retry"] == []
 
 
 def _missing_keys_from_retry_prompt(prompt: str) -> list[str]:
@@ -1443,10 +1528,13 @@ def test_translate_sentence_chunks_oversized_passage(
 
     assert len(calls) == 2
     assert "buddho bhagavā." in calls[0]["prompt"]
+    assert "Earlier sentences of this passage" not in calls[0]["prompt"]
     assert (
         "Full passage for context (score ONLY the words in your part)"
         in calls[0]["prompt"]
     )
+    assert "Earlier sentences of this passage" in calls[1]["prompt"]
+    assert "T1" in calls[1]["prompt"]
     assert result["translation"] == "T1 T2"
     assert result["literal_translation"] == "L1 L2"
     assert [entry["data"][0]["ai_score"] for entry in result["analysis"]] == [
@@ -1500,6 +1588,39 @@ def test_first_pass_debug_records_chunk_sentence() -> None:
     )
 
     assert debug["chunk_sentence"] == "buddho."
+
+
+def test_merge_chunk_ai_data_drops_contained_duplicate_translation() -> None:
+    merged = translate_core._merge_chunk_ai_data(
+        [
+            {
+                "translation": "Who goes to the lower realm? Who goes to heaven?",
+                "literal_translation": "who lower-realm goes who heaven goes",
+                "scores": {"1_0": {"score": 10}},
+            },
+            {
+                "translation": "who goes to heaven?",
+                "literal_translation": "who heaven goes",
+                "scores": {"2_0": {"score": 10}},
+            },
+        ]
+    )
+
+    assert merged["translation"] == "Who goes to the lower realm? Who goes to heaven?"
+    assert merged["literal_translation"] == "who lower-realm goes who heaven goes"
+    assert merged["scores"] == {"1_0": {"score": 10}, "2_0": {"score": 10}}
+
+
+def test_merge_chunk_ai_data_keeps_distinct_translations() -> None:
+    merged = translate_core._merge_chunk_ai_data(
+        [
+            {"translation": "The first sentence.", "literal_translation": "first"},
+            {"translation": "The second sentence.", "literal_translation": "second"},
+        ]
+    )
+
+    assert merged["translation"] == "The first sentence. The second sentence."
+    assert merged["literal_translation"] == "first second"
 
 
 def test_translate_sentence_retries_missing_component_scores(monkeypatch) -> None:
@@ -1957,6 +2078,28 @@ def test_deterministic_scores_promote_all_db_variants_without_ai_positive() -> N
 
     assert scores_map["10531_0"]["score"] == 10
     assert scores_map["10531_1"]["score"] == 10
+    assert scores_map["10531_0"]["selection_source"] == "db_example_all_variants_tied"
+    assert scores_map["10531_1"]["selection_source"] == "db_example_all_variants_tied"
+
+
+def test_find_missing_score_groups_includes_db_example_tied_variants() -> None:
+    analysis = [
+        {
+            "word": "avijjānīvaraṇānaṃ",
+            "status": "found",
+            "data": [
+                _db_example_option("10531_0", 10531, "masc dat pl"),
+                _db_example_option("10531_1", 10531, "fem gen pl"),
+            ],
+        }
+    ]
+    scores_map: dict[str, Any] = {}
+
+    translate_core._apply_deterministic_scores_to_map(analysis, scores_map)
+    groups = translate_core._find_missing_score_groups(analysis, scores_map)
+
+    assert len(groups) == 1
+    assert groups[0]["missing_keys"] == ["10531_0", "10531_1"]
 
 
 def test_deterministic_scores_zero_missing_variants_when_ai_selects_sibling() -> None:
@@ -2015,6 +2158,67 @@ def test_deterministic_scores_db_match_still_outranks_other_ai_id() -> None:
 
     assert best is not None
     assert best["key"] == "10531_0"
+
+
+def test_translate_sentence_retries_db_example_tie_and_preserves_context(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: [
+            {
+                "word": "avijjānīvaraṇānaṃ",
+                "status": "found",
+                "data": [
+                    _db_example_option("10531_0", 10531, "masc dat pl"),
+                    _db_example_option("10531_1", 10531, "fem gen pl"),
+                ],
+            }
+        ],
+    )
+    calls: list[dict[str, Any]] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs: Any) -> object:
+            calls.append(kwargs)
+            if len(calls) == 1:
+                content = '{"translation": "", "literal_translation": "", "scores": {}}'
+            else:
+                content = (
+                    '{"scores": {"10531_1": {"score": 10, '
+                    '"contextual_meaning": "hindered by ignorance", '
+                    '"selected_pos": "adj"}}}'
+                )
+            return type(
+                "FakeResponse", (), {"content": content, "status_message": "ok"}
+            )()
+
+    debug: dict[str, Any] = {}
+    result = translate_sentence(
+        "avijjānīvaraṇānaṃ",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        debug=debug,
+    )
+
+    assert len(calls) == 2
+    assert '"missing_keys":["10531_0","10531_1"]' in calls[1]["prompt"]
+    assert debug["final_scores"]["10531_0"] == {
+        "score": 0,
+        "selection_source": "db_example_variant_not_selected",
+    }
+    assert debug["final_scores"]["10531_1"] == {
+        "score": 10,
+        "selection_source": "db_example_source_text_overlap",
+        "contextual_meaning": "hindered by ignorance",
+        "selected_pos": "adj",
+    }
+    assert debug["missing_score_groups_after_retry"] == []
+    assert result["analysis"][0]["data"][0]["ai_score"] == 0
+    assert result["analysis"][0]["data"][1]["ai_score"] == 10
+    assert result["analysis"][0]["data"][1]["meaning_combo"] == (
+        "hindered by ignorance"
+    )
 
 
 def test_translate_sentence_curated_example_match_overrides_ai_score(
@@ -2229,6 +2433,83 @@ def test_format_markdown_table_fallback_uses_meaning_1_quality() -> None:
     table = format_markdown_table(analysis)
 
     assert "| 11 | - part | nt | real meaning |" in table
+
+
+def test_format_markdown_table_hides_deconstructed_placeholder() -> None:
+    analysis = [
+        {
+            "word": "okassa",
+            "status": "found",
+            "data": [
+                {
+                    "key": "w0_decon_okassa_0",
+                    "id": "",
+                    "pali": "okassa",
+                    "pos": "sandhi",
+                    "grammar": "sandhi/compound",
+                    "meaning_combo": "[Deconstructed]",
+                    "construction": "oka + assa",
+                    "components": [
+                        [
+                            {
+                                "key": "w0_1_0",
+                                "id": 1,
+                                "pali": "oka",
+                                "pos": "nt",
+                                "meaning_combo": "dwelling; home",
+                                "ai_score": 10,
+                            }
+                        ],
+                        [
+                            {
+                                "key": "w0_2_0",
+                                "id": 2,
+                                "pali": "assa",
+                                "pos": "pron",
+                                "meaning_combo": "of him; his",
+                                "ai_score": 10,
+                            }
+                        ],
+                    ],
+                    "ai_score": 10,
+                }
+            ],
+        }
+    ]
+
+    table = format_markdown_table(analysis)
+
+    assert "[Deconstructed]" not in table
+    assert "*(AI analysis of deconstruction)*" not in table
+    assert "dwelling + of him" in table
+
+
+def test_format_markdown_table_deconstructed_without_component_meaning_uses_placeholder() -> (
+    None
+):
+    analysis = [
+        {
+            "word": "okassa",
+            "status": "found",
+            "data": [
+                {
+                    "key": "w0_decon_okassa_0",
+                    "id": "",
+                    "pali": "okassa",
+                    "pos": "sandhi",
+                    "grammar": "sandhi/compound",
+                    "meaning_combo": "[Deconstructed]",
+                    "construction": "oka + assa",
+                    "components": [],
+                    "ai_score": 10,
+                }
+            ],
+        }
+    ]
+
+    table = format_markdown_table(analysis)
+
+    assert "*(AI analysis of deconstruction)*" in table
 
 
 def test_format_markdown_table_component_overlap_prefers_parent_meaning() -> None:
@@ -2566,6 +2847,94 @@ def test_reformat_merge_fills_gaps_from_reformat_response() -> None:
     assert result["scores"]["gap_0"]["score"] == 9
 
 
+def test_reformat_strips_contextual_meaning_for_key_only_wrong_schema() -> None:
+    class FakeAIManager:
+        def request(self, **_kwargs: Any) -> object:
+            content = (
+                '{"translation": "reformatted", "literal_translation": "lit", '
+                '"scores": {"w68_18134_default": {"score": 10, '
+                '"contextual_meaning": "disaster", "selected_pos": "noun"}}}'
+            )
+            return type("R", (), {"content": content, "status_message": "ok"})()
+
+    result = translate_core._handle_reformat_response(
+        chunk_sentence="evaṃ",
+        raw_response='{"selected_keys": ["w68_18134_default"]}',
+        analysis=_selected_keys_analysis(),
+        ai_data={"selected_keys": ["w68_18134_default"]},
+        parse_error="",
+        ai_manager=cast(AIManager, FakeAIManager()),
+        model=None,
+        provider=None,
+        progress=None,
+        verbose=False,
+        debug={},
+    )
+
+    score = result["scores"]["w68_18134_default"]
+    assert score["score"] == 10
+    assert "contextual_meaning" not in score
+    assert "selected_pos" not in score
+
+
+def test_reformat_preserves_contextual_meaning_when_source_had_meaning() -> None:
+    class FakeAIManager:
+        def request(self, **_kwargs: Any) -> object:
+            content = (
+                '{"translation": "reformatted", "literal_translation": "lit", '
+                '"scores": {"w68_18134_default": {"score": 10, '
+                '"contextual_meaning": "thus", "selected_pos": "ind"}}}'
+            )
+            return type("R", (), {"content": content, "status_message": "ok"})()
+
+    result = translate_core._handle_reformat_response(
+        chunk_sentence="evaṃ",
+        raw_response='{"selected_meanings": [{"word": "evaṃ", "meaning": "thus"}]}',
+        analysis=_selected_keys_analysis(),
+        ai_data={"selected_meanings": [{"word": "evaṃ", "meaning": "thus"}]},
+        parse_error="",
+        ai_manager=cast(AIManager, FakeAIManager()),
+        model=None,
+        provider=None,
+        progress=None,
+        verbose=False,
+        debug={},
+    )
+
+    score = result["scores"]["w68_18134_default"]
+    assert score["contextual_meaning"] == "thus"
+    assert score["selected_pos"] == "ind"
+
+
+def test_reformat_preserves_contextual_meaning_for_parse_error() -> None:
+    class FakeAIManager:
+        def request(self, **_kwargs: Any) -> object:
+            content = (
+                '{"translation": "reformatted", "literal_translation": "lit", '
+                '"scores": {"w68_18134_default": {"score": 10, '
+                '"contextual_meaning": "thus", "selected_pos": "ind"}}}'
+            )
+            return type("R", (), {"content": content, "status_message": "ok"})()
+
+    result = translate_core._handle_reformat_response(
+        chunk_sentence="evaṃ",
+        raw_response='{"translation": "thus", "scores": {"w68_18134_default": {"sco',
+        analysis=_selected_keys_analysis(),
+        ai_data={"translation": "thus", "scores": {}},
+        parse_error="truncated",
+        ai_manager=cast(AIManager, FakeAIManager()),
+        model=None,
+        provider=None,
+        progress=None,
+        verbose=False,
+        debug={},
+    )
+
+    score = result["scores"]["w68_18134_default"]
+    assert score["contextual_meaning"] == "thus"
+    assert score["selected_pos"] == "ind"
+
+
 def test_build_reformat_prompt_includes_valid_keys_block() -> None:
     word_keys_json = '{"atha":["2794_default"],"puriso":["29188_3"]}'
 
@@ -2598,6 +2967,16 @@ def test_build_reformat_prompt_contains_no_grammar_notes_instruction() -> None:
     )
 
     assert translate_core.NO_GRAMMAR_NOTES_INSTRUCTION in prompt
+
+
+def test_build_reformat_prompt_contains_no_invented_context_instruction() -> None:
+    prompt = translate_core._build_reformat_prompt(
+        "atha puriso",
+        "Use atha and puriso.",
+        "",
+    )
+
+    assert "Do not invent contextual_meaning" in prompt
 
 
 def test_word_keys_overview_includes_grammar_context() -> None:
@@ -2874,6 +3253,99 @@ def test_structured_selection_low_match_ratio_returns_none() -> None:
     )
 
 
+def _selected_keys_analysis() -> list[dict[str, Any]]:
+    return [
+        {
+            "word": "evaṃ",
+            "status": "found",
+            "data": [
+                {
+                    "key": "w68_18134_default",
+                    "id": 18134,
+                    "lemma": "evaṃ",
+                    "meaning_combo": "thus",
+                },
+                {
+                    "key": "w68_18135_default",
+                    "id": 18135,
+                    "lemma": "evaṃ 2",
+                    "meaning_combo": "in this way",
+                },
+            ],
+        },
+        {
+            "word": "dīgharattaṃ",
+            "status": "found",
+            "data": [
+                {
+                    "key": "w69_32757_default",
+                    "id": 32757,
+                    "lemma": "dīgharattaṃ",
+                    "meaning_combo": "for a long time",
+                }
+            ],
+        },
+        {
+            "word": "vo",
+            "status": "found",
+            "data": [
+                {
+                    "key": "w70_31017_2",
+                    "id": 31017,
+                    "lemma": "tumha 2",
+                    "meaning_combo": "your",
+                }
+            ],
+        },
+    ]
+
+
+def test_structured_selection_selected_keys_list_maps_top_level_keys() -> None:
+    assert translate_core._extract_selected_keys_map(
+        {
+            "selected_keys": [
+                "w68_18134_default",
+                "w69_32757_default",
+                "w70_31017_2",
+            ]
+        },
+        _selected_keys_analysis(),
+    ) == (
+        {
+            "evaṃ": "w68_18134_default",
+            "dīgharattaṃ": "w69_32757_default",
+            "vo": "w70_31017_2",
+        },
+        {},
+    )
+
+
+def test_structured_selection_selected_keys_rejects_duplicate_surface_word() -> None:
+    assert (
+        translate_core._extract_selected_keys_map(
+            {"selected_keys": ["w68_18134_default", "w68_18135_default"]},
+            _selected_keys_analysis(),
+        )
+        is None
+    )
+
+
+def test_structured_selection_selected_keys_requires_enough_valid_keys() -> None:
+    assert (
+        translate_core._extract_selected_keys_map(
+            {
+                "selected_keys": [
+                    "w68_18134_default",
+                    "unknown_1",
+                    "unknown_2",
+                ]
+            },
+            _selected_keys_analysis(),
+        )
+        is None
+    )
+
+
 def test_first_pass_routes_structured_selection_to_compact_path(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -2944,6 +3416,55 @@ def test_first_pass_routes_structured_selection_to_compact_path(
     assert result["analysis"][1]["data"][0]["ai_score"] == 10
 
 
+def test_first_pass_routes_selected_keys_to_compact_path(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "exporter.analysis.translate_core.analyze_sentence",
+        lambda _sentence, _db_session: _selected_keys_analysis(),
+    )
+    calls: list[dict[str, Any]] = []
+
+    class FakeAIManager:
+        def request(self, **kwargs: Any) -> object:
+            calls.append(kwargs)
+            if len(calls) == 1:
+                content = (
+                    '{"selected_keys": ['
+                    '"w68_18134_default",'
+                    '"w69_32757_default",'
+                    '"w70_31017_2"]}'
+                )
+            else:
+                content = (
+                    '{"translation": "Thus, for a long time, your ...", '
+                    '"literal_translation": "thus long-time your", '
+                    '"meanings": {}}'
+                )
+            return type(
+                "FakeResponse", (), {"content": content, "status_message": "ok"}
+            )()
+
+    debug: dict[str, Any] = {}
+    result = translate_sentence(
+        "evaṃ dīgharattaṃ vo",
+        cast(Session, object()),
+        ai_manager=cast(AIManager, FakeAIManager()),
+        debug=debug,
+    )
+
+    assert len(calls) == 2
+    assert "Translate" in calls[1]["prompt"]
+    assert "did not match" not in calls[1]["prompt"]
+    assert "reformat_raw_response" not in debug
+    assert debug["final_scores"]["w68_18134_default"]["score"] == 10
+    assert debug["final_scores"]["w69_32757_default"]["score"] == 10
+    assert debug["final_scores"]["w70_31017_2"]["score"] == 10
+    assert result["analysis"][0]["data"][0]["meaning_combo"] == "thus"
+    assert result["analysis"][1]["data"][0]["meaning_combo"] == "for a long time"
+    assert result["analysis"][2]["data"][0]["meaning_combo"] == "your"
+
+
 def test_compact_map_prefills_contextual_meaning_from_word_meanings() -> None:
     calls: list[dict[str, Any]] = []
 
@@ -2987,6 +3508,20 @@ def test_translation_prompt_contains_no_grammar_notes_rule() -> None:
         "Provide ONLY the core meaning. Do NOT append grammatical case notes "
         "in parentheses."
     ) in prompt
+
+
+def test_translation_prompt_includes_truncated_previous_translation() -> None:
+    previous_translation = "start " + ("middle " * 250) + "final sentence."
+
+    prompt = translate_core._build_translation_prompt(
+        "dhammo",
+        previous_translation=previous_translation,
+    )
+
+    assert "Earlier sentences of this passage were already translated as:" in prompt
+    assert "Translate ONLY the Pāḷi text given above" in prompt
+    assert "final sentence." in prompt
+    assert "start" not in prompt
 
 
 def test_translation_request_sys_prompt_contains_no_tools_instruction() -> None:

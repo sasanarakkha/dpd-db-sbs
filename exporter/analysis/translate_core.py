@@ -19,6 +19,7 @@ REFORMAT_KEYS_MAX_CHARS = 6000
 MAX_RETRY_CONTEXT_CHARS = 60_000
 MAX_RETRY_BATCHES = 8
 CHUNK_FIRST_PASS_ATTEMPTS = 2
+PREVIOUS_TRANSLATION_CONTEXT_CHARS = 1200
 NO_TOOLS_INSTRUCTION = (
     "Do not use tools, do not plan tasks, and do not wait for anything. "
     "Produce the complete JSON directly in this single response."
@@ -33,6 +34,7 @@ COMMON_PALI_RULES = """### Common Pāḷi Disambiguation Rules:
 - In `yena <person/place> tena upasaṅkami`, `yena` and `tena` are adverbial "where ... there" rows, not plain instrumental pronouns.
 - Inside direct speech, a comma-set-off word addressing the listener (e.g., `bho` or a teacher's name) is usually vocative.
 - Counted time-spans such as `paṇṇavīsativassāni` / `vassāni` ("for twenty-five years") are accusative of duration, not nominative.
+- When dative and genitive variants of the same surface form are offered, prefer the genitive for possession or relation ("of X"); select dative only when the context expresses a recipient, purpose, or benefit ("for/to X").
 """
 _GRAMMAR_ANNOTATION_KEYWORDS = (
     "nominative",
@@ -80,6 +82,11 @@ _FINITE_VERB_GRAMMAR_RE = re.compile(
 _QUOTATIVE_TI_SELECTION_SOURCE = "deterministic_quotative_ti_deconstruction"
 _PARENT_MEANING_TOKEN_RE = re.compile(r"[a-z][a-z'’-]*")
 _PARENT_MEANING_STOPWORDS = {"of", "the", "a", "an", "to", "in", "is", "one's"}
+_OCCURRENCE_KEY_PREFIX_RE = re.compile(r"^w\d+_(.+)$")
+_RETRY_EQUIVALENT_KEY_GROUPS = "_equivalent_missing_key_groups"
+_DECONSTRUCTED_PLACEHOLDER = "[Deconstructed]"
+_DB_EXAMPLE_ALL_VARIANTS_TIED_SOURCE = "db_example_all_variants_tied"
+_DB_EXAMPLE_VARIANT_NOT_SELECTED_SOURCE = "db_example_variant_not_selected"
 
 
 def extract_variant_options(text: str) -> tuple[str, dict[str, list[str]]]:
@@ -263,6 +270,74 @@ def _texts_overlap(first_text: str, second_text: str) -> bool:
     first = _normalize_example_text(first_text)
     second = _normalize_example_text(second_text)
     return bool(first and second and (first in second or second in first))
+
+
+def _strip_occurrence_key_prefix(key: str) -> str:
+    match = _OCCURRENCE_KEY_PREFIX_RE.match(key)
+    if not match:
+        return key
+    return match.group(1)
+
+
+def _is_deconstruction_key(key: Any) -> bool:
+    if not isinstance(key, str):
+        return False
+    return key.startswith("decon_") or "_decon_" in key
+
+
+def _is_missing_key(key: Any) -> bool:
+    if not isinstance(key, str):
+        return False
+    return key.startswith("missing_") or "_missing_" in key
+
+
+def _is_deconstructed_placeholder(meaning: Any) -> bool:
+    return isinstance(meaning, str) and meaning.strip() == _DECONSTRUCTED_PLACEHOLDER
+
+
+def _score_selection_source(score_data: Any) -> str:
+    if not isinstance(score_data, dict):
+        return ""
+    selection_source = score_data.get("selection_source")
+    if not isinstance(selection_source, str):
+        return ""
+    return selection_source
+
+
+def _is_db_example_tied_score(score_data: Any) -> bool:
+    return _score_selection_source(score_data) == _DB_EXAMPLE_ALL_VARIANTS_TIED_SOURCE
+
+
+def _normalize_containment_text(text: str) -> str:
+    return re.sub(r"\s+", " ", text).strip().casefold()
+
+
+def _append_unique_text_part(parts: list[str], text: Any) -> None:
+    if not isinstance(text, str):
+        return
+    candidate = re.sub(r"\s+", " ", text).strip()
+    if not candidate:
+        return
+    accumulated = _normalize_containment_text(" ".join(parts))
+    candidate_normalized = _normalize_containment_text(candidate)
+    if accumulated and candidate_normalized in accumulated:
+        return
+    parts.append(candidate)
+
+
+def _previous_translation_block(previous_translation: str) -> str:
+    normalized = re.sub(r"\s+", " ", previous_translation).strip()
+    if not normalized:
+        return ""
+    context = normalized[-PREVIOUS_TRANSLATION_CONTEXT_CHARS:]
+    return (
+        "\n\nEarlier sentences of this passage were already translated as:\n"
+        f"{context}\n"
+        "Translate ONLY the Pāḷi text given above, as a continuation. Do not "
+        "repeat already-translated sentences. Keep names, forms of address "
+        "(e.g. 'monks'), and recurring terminology consistent with the earlier "
+        "translation."
+    )
 
 
 def _iter_options(options: list[dict[str, Any]]) -> Iterator[dict[str, Any]]:
@@ -500,6 +575,51 @@ def _structured_selection_result(
     return word_key_map, word_meaning_map
 
 
+def _top_level_key_words(analysis: list[dict[str, Any]]) -> dict[str, set[str]]:
+    key_words: dict[str, set[str]] = {}
+    for token_data in analysis:
+        word = token_data.get("word")
+        options = token_data.get("data", [])
+        if not isinstance(word, str) or not word or not isinstance(options, list):
+            continue
+        for option in options:
+            if not isinstance(option, dict):
+                continue
+            key = option.get("key")
+            if isinstance(key, str):
+                key_words.setdefault(key, set()).add(word)
+    return key_words
+
+
+def _extract_selected_keys_map(
+    ai_data: dict[str, Any],
+    analysis: list[dict[str, Any]],
+) -> tuple[dict[str, str], dict[str, str]] | None:
+    """Recover a top-level ``selected_keys`` list into a word-key map."""
+    if not isinstance(ai_data, dict) or set(ai_data) != {"selected_keys"}:
+        return None
+    raw_keys = ai_data["selected_keys"]
+    if (
+        not isinstance(raw_keys, list)
+        or not raw_keys
+        or not all(isinstance(key, str) for key in raw_keys)
+    ):
+        return None
+
+    key_words = _top_level_key_words(analysis)
+    word_key_map: dict[str, str] = {}
+    for raw_key in raw_keys:
+        words = key_words.get(raw_key)
+        if not words or len(words) != 1:
+            continue
+        word = next(iter(words))
+        if word in word_key_map:
+            return None
+        word_key_map[word] = raw_key
+
+    return _structured_selection_result(word_key_map, {}, len(raw_keys))
+
+
 def _extract_structured_selection_map(
     ai_data: dict[str, Any],
     analysis: list[dict[str, Any]],
@@ -586,6 +706,7 @@ def _extract_structured_selection_map(
 def _build_translation_prompt(
     sentence: str,
     surface_words: list[str] | None = None,
+    previous_translation: str = "",
 ) -> str:
     """Build a lightweight translation-only follow-up prompt.
 
@@ -599,8 +720,11 @@ def _build_translation_prompt(
         surface_words_instruction = (
             f"\nUse exactly these surface-word keys in meanings: {surface_words_json}\n"
         )
+    continuation_block = _previous_translation_block(previous_translation)
+    continuation_section = f"{continuation_block}\n\n" if continuation_block else ""
     return (
         f'Translate this Pāḷi sentence into English: "{sentence}"\n\n'
+        f"{continuation_section}"
         "Return ONLY a JSON object with these three keys and nothing else:\n"
         "{\n"
         '  "translation": "Fluent English translation of the sentence",\n'
@@ -634,7 +758,7 @@ def _construction_parts(option: dict[str, Any]) -> list[str]:
 
 def _is_iti_final_deconstruction(option: dict[str, Any]) -> bool:
     key = option.get("key")
-    if not isinstance(key, str) or not key.startswith("decon_"):
+    if not _is_deconstruction_key(key):
         return False
     parts = _construction_parts(option)
     return len(parts) >= 2 and parts[-1] == "iti"
@@ -821,7 +945,7 @@ def _apply_deterministic_scores_to_map(
                     elif key not in preexisting_scores:
                         scores_map[key] = {
                             "score": 0,
-                            "selection_source": "db_example_variant_not_selected",
+                            "selection_source": _DB_EXAMPLE_VARIANT_NOT_SELECTED_SOURCE,
                         }
                 continue
 
@@ -830,9 +954,12 @@ def _apply_deterministic_scores_to_map(
                 score = _deterministic_score_value(option)
                 if not isinstance(key, str) or score is None:
                     continue
+                selection_source = _deterministic_selection_source(option)
+                if len(group_options) > 1:
+                    selection_source = _DB_EXAMPLE_ALL_VARIANTS_TIED_SOURCE
                 deterministic_score = {
                     "score": score,
-                    "selection_source": _deterministic_selection_source(option),
+                    "selection_source": selection_source,
                 }
                 _copy_score_context_fields(
                     preexisting_scores.get(key),
@@ -860,7 +987,29 @@ def _find_missing_score_groups(
     scores_map: dict[str, Any],
 ) -> list[dict[str, Any]]:
     missing_groups: list[dict[str, Any]] = []
-    seen: set[tuple[str, tuple[str, ...]]] = set()
+    seen: dict[tuple[str, tuple[str, ...]], dict[str, Any]] = {}
+
+    def record_equivalent_key_group(
+        group: dict[str, Any],
+        option_keys: list[str],
+    ) -> None:
+        equivalent_groups = group.get(_RETRY_EQUIVALENT_KEY_GROUPS)
+        if not isinstance(equivalent_groups, list):
+            equivalent_groups = []
+            group[_RETRY_EQUIVALENT_KEY_GROUPS] = equivalent_groups
+        equivalent_groups.append(option_keys)
+
+    def group_needs_scores(option_keys: list[str]) -> bool:
+        score_entries = [scores_map[key] for key in option_keys if key in scores_map]
+        if not score_entries:
+            return True
+        if any(_is_db_example_tied_score(score_entry) for score_entry in score_entries):
+            return not any(
+                _positive_ai_score_value(score_entry) is not None
+                and not _is_db_example_tied_score(score_entry)
+                for score_entry in score_entries
+            )
+        return False
 
     def inspect_group(
         word: str,
@@ -874,36 +1023,42 @@ def _find_missing_score_groups(
             key = option.get("key")
             if isinstance(key, str):
                 option_keys.append(key)
-        if option_keys and not any(key in scores_map for key in option_keys):
-            signature = (word, tuple(option_keys))
-            if signature not in seen:
-                seen.add(signature)
-                missing_groups.append(
-                    {
-                        "word": word,
-                        "context": context,
-                        "missing_keys": option_keys,
-                        "options": [
-                            {
-                                key: option.get(key, "")
-                                for key in (
-                                    "key",
-                                    "id",
-                                    "pali",
-                                    "pos",
-                                    "grammar",
-                                    "meaning_1",
-                                    "meaning_combo",
-                                    "example_1",
-                                    "source_1",
-                                    "example_2",
-                                    "source_2",
-                                )
-                            }
-                            for option in options
-                        ],
-                    }
-                )
+        if option_keys and group_needs_scores(option_keys):
+            signature = (
+                word,
+                tuple(_strip_occurrence_key_prefix(key) for key in option_keys),
+            )
+            existing_group = seen.get(signature)
+            if existing_group is not None:
+                record_equivalent_key_group(existing_group, option_keys)
+            else:
+                group = {
+                    "word": word,
+                    "context": context,
+                    "missing_keys": option_keys,
+                    "options": [
+                        {
+                            key: option.get(key, "")
+                            for key in (
+                                "key",
+                                "id",
+                                "pali",
+                                "pos",
+                                "grammar",
+                                "meaning_1",
+                                "meaning_combo",
+                                "example_1",
+                                "source_1",
+                                "example_2",
+                                "source_2",
+                            )
+                        }
+                        for option in options
+                    ],
+                }
+                record_equivalent_key_group(group, option_keys)
+                seen[signature] = group
+                missing_groups.append(group)
 
         for option in options:
             option_context = str(option.get("pali") or option.get("key") or context)
@@ -916,6 +1071,72 @@ def _find_missing_score_groups(
         inspect_group(word, token_data.get("data", []), word)
 
     return missing_groups
+
+
+def _narrow_db_example_tied_groups(
+    analysis: list[dict[str, Any]],
+    scores_map: dict[str, Any],
+) -> None:
+    for token_data in analysis:
+        db_example_groups: dict[str, list[dict[str, Any]]] = {}
+        for option in _iter_options(token_data.get("data", [])):
+            key = option.get("key")
+            if not isinstance(key, str):
+                continue
+            if not option.get("db_example_match"):
+                continue
+            if _deterministic_score_value(option) is None:
+                continue
+            group_key = _db_example_group_key(option)
+            if group_key:
+                db_example_groups.setdefault(group_key, []).append(option)
+
+        for group_options in db_example_groups.values():
+            tied_keys = [
+                key
+                for option in group_options
+                if isinstance(key := option.get("key"), str)
+                and _is_db_example_tied_score(scores_map.get(key))
+            ]
+            if not tied_keys:
+                continue
+
+            positive_scores: dict[str, float] = {}
+            for option in group_options:
+                key = option.get("key")
+                if not isinstance(key, str):
+                    continue
+                score_data = scores_map.get(key)
+                if _is_db_example_tied_score(score_data):
+                    continue
+                positive_score = _positive_ai_score_value(score_data)
+                if positive_score is not None:
+                    positive_scores[key] = positive_score
+
+            if not positive_scores:
+                continue
+
+            top_score = max(positive_scores.values())
+            winner_keys = {
+                key for key, score in positive_scores.items() if score == top_score
+            }
+            for option in group_options:
+                key = option.get("key")
+                if not isinstance(key, str):
+                    continue
+                score_data = scores_map.get(key)
+                if key in winner_keys:
+                    winning_score: dict[str, Any] = {
+                        "score": 10,
+                        "selection_source": _deterministic_selection_source(option),
+                    }
+                    _copy_score_context_fields(score_data, winning_score)
+                    scores_map[key] = winning_score
+                elif _is_db_example_tied_score(score_data):
+                    scores_map[key] = {
+                        "score": 0,
+                        "selection_source": _DB_EXAMPLE_VARIANT_NOT_SELECTED_SOURCE,
+                    }
 
 
 def _batch_missing_groups(
@@ -959,13 +1180,15 @@ def _build_reformat_prompt(
         '  "translation": "Fluent English translation of the sentence",\n'
         '  "literal_translation": "Literal word-by-word English translation",\n'
         '  "scores": {\n'
-        '    "key_0": {"score": 10, "contextual_meaning": "..."},\n'
+        '    "w0_12345_0": {"score": 10, "contextual_meaning": "..."},\n'
         "    ...\n"
         "  }\n"
         "}\n\n"
         "Extract the translation from your previous analysis and convert each selected "
         "lemma to a score entry of 10 with its key. "
         f"{NO_GRAMMAR_NOTES_INSTRUCTION} "
+        "Do not invent contextual_meaning; include contextual_meaning only when it "
+        "appeared explicitly in the previous analysis for that selected word/key. "
         "Return only the JSON object. No prose, no markdown fences."
         f"{keys_block}\n\n"
         "Your previous analysis:\n"
@@ -973,43 +1196,97 @@ def _build_reformat_prompt(
     )
 
 
+def _has_non_empty_string(value: Any) -> bool:
+    return isinstance(value, str) and bool(value.strip())
+
+
+def _wrong_schema_has_meaning_evidence(ai_data: dict[str, Any]) -> bool:
+    scores = ai_data.get("scores")
+    if isinstance(scores, dict):
+        for value in scores.values():
+            if isinstance(value, dict) and _has_non_empty_string(
+                value.get("contextual_meaning")
+            ):
+                return True
+
+    for value in ai_data.values():
+        if isinstance(value, list):
+            for item in value:
+                if isinstance(item, dict) and _has_non_empty_string(
+                    item.get("meaning")
+                ):
+                    return True
+        elif isinstance(value, dict) and _has_non_empty_string(value.get("meaning")):
+            return True
+    return False
+
+
+def _strip_reformat_context_fields(scores: dict[str, Any]) -> None:
+    for value in scores.values():
+        if isinstance(value, dict):
+            value.pop("contextual_meaning", None)
+            value.pop("selected_pos", None)
+
+
 def _trim_groups_for_retry(
     missing_groups: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     trimmed: list[dict[str, Any]] = []
     for group in missing_groups:
-        trimmed.append(
-            {
-                "word": group.get("word", ""),
-                "context": group.get("context", ""),
-                "missing_keys": group.get("missing_keys", []),
-                "options": [
-                    {field: option.get(field, "") for field in _RETRY_OPTION_FIELDS}
-                    for option in group.get("options", [])
-                    if isinstance(option, dict)
-                ],
-            }
-        )
+        trimmed_group = {
+            "word": group.get("word", ""),
+            "context": group.get("context", ""),
+            "missing_keys": group.get("missing_keys", []),
+            "options": [
+                {field: option.get(field, "") for field in _RETRY_OPTION_FIELDS}
+                for option in group.get("options", [])
+                if isinstance(option, dict)
+            ],
+        }
+        equivalent_groups = group.get(_RETRY_EQUIVALENT_KEY_GROUPS)
+        if isinstance(equivalent_groups, list):
+            trimmed_group[_RETRY_EQUIVALENT_KEY_GROUPS] = copy.deepcopy(
+                equivalent_groups
+            )
+        trimmed.append(trimmed_group)
     return trimmed
+
+
+def _retry_prompt_groups(
+    missing_groups: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    return [
+        {
+            "word": group.get("word", ""),
+            "context": group.get("context", ""),
+            "missing_keys": group.get("missing_keys", []),
+            "options": group.get("options", []),
+        }
+        for group in missing_groups
+    ]
 
 
 def _build_missing_scores_prompt(
     sentence: str,
     missing_groups: list[dict[str, Any]],
 ) -> str:
-    context = json.dumps(missing_groups, ensure_ascii=False, separators=(",", ":"))
+    context = json.dumps(
+        _retry_prompt_groups(missing_groups),
+        ensure_ascii=False,
+        separators=(",", ":"),
+    )
 
     has_decon = any(
-        key.startswith("decon_")
+        _is_deconstruction_key(key)
         for group in missing_groups
         for key in group.get("missing_keys", [])
     )
     decon_instruction = ""
     if has_decon:
         decon_instruction = (
-            '\nFor keys starting with "decon_", you MUST include "contextual_meaning" '
+            '\nFor deconstruction keys containing "decon_", you MUST include "contextual_meaning" '
             "with a full English translation of that sandhi/compound in the context of the sentence. "
-            'Example: "decon_okassa_0": {"score": 10, "contextual_meaning": "to the dwelling"}\n'
+            'Example: "w0_decon_okassa_0": {"score": 10, "contextual_meaning": "to the dwelling"}\n'
         )
 
     return f"""Please supply missing dictionary option scores for this Pāḷi sentence:
@@ -1020,9 +1297,43 @@ object where each value is {{"score": N}} (an integer 0–10). Do not translate 
 For the single best option per word (score 10), also include "contextual_meaning": a short English meaning fitted to this sentence.
 {NO_GRAMMAR_NOTES_INSTRUCTION}
 {decon_instruction}
+{COMMON_PALI_RULES}
 Missing dictionary option scores:
 {context}
 """
+
+
+def _fan_out_retry_scores(
+    retry_scores: dict[str, Any],
+    retry_groups: list[dict[str, Any]],
+) -> None:
+    for group in retry_groups:
+        representative_keys = group.get("missing_keys", [])
+        equivalent_groups = group.get(_RETRY_EQUIVALENT_KEY_GROUPS, [])
+        if not isinstance(representative_keys, list) or not isinstance(
+            equivalent_groups, list
+        ):
+            continue
+
+        for representative_key in representative_keys:
+            if not isinstance(representative_key, str):
+                continue
+            if representative_key not in retry_scores:
+                continue
+            canonical_key = _strip_occurrence_key_prefix(representative_key)
+            for equivalent_group in equivalent_groups:
+                if not isinstance(equivalent_group, list):
+                    continue
+                for equivalent_key in equivalent_group:
+                    if (
+                        isinstance(equivalent_key, str)
+                        and equivalent_key not in retry_scores
+                        and _strip_occurrence_key_prefix(equivalent_key)
+                        == canonical_key
+                    ):
+                        retry_scores[equivalent_key] = copy.deepcopy(
+                            retry_scores[representative_key]
+                        )
 
 
 def _request_missing_score_retry_pass(
@@ -1042,10 +1353,22 @@ def _request_missing_score_retry_pass(
 
     for batch in batches[:MAX_RETRY_BATCHES]:
         batch_keys: list[str] = []
+        expected_keys: set[str] = set()
         for group in batch:
             missing_keys = group.get("missing_keys", [])
             if isinstance(missing_keys, list):
-                batch_keys.extend(key for key in missing_keys if isinstance(key, str))
+                valid_missing_keys = [
+                    key for key in missing_keys if isinstance(key, str)
+                ]
+                batch_keys.extend(valid_missing_keys)
+                expected_keys.update(valid_missing_keys)
+            equivalent_groups = group.get(_RETRY_EQUIVALENT_KEY_GROUPS, [])
+            if isinstance(equivalent_groups, list):
+                for equivalent_group in equivalent_groups:
+                    if isinstance(equivalent_group, list):
+                        expected_keys.update(
+                            key for key in equivalent_group if isinstance(key, str)
+                        )
 
         retry_prompt = _build_missing_scores_prompt(resolved_sentence, batch)
         retry_response = ai_manager.request(
@@ -1061,10 +1384,11 @@ def _request_missing_score_retry_pass(
         if retry_response.content:
             retry_data, retry_parse_error = _parse_ai_json(retry_response.content)
             retry_data = _normalize_ai_response(retry_data)
-            retry_data = _coerce_flat_score_map(retry_data, set(batch_keys))
+            retry_data = _coerce_flat_score_map(retry_data, expected_keys)
             retry_data = _normalize_ai_response(retry_data)
             retry_scores = retry_data.get("scores", {})
             if isinstance(retry_scores, dict):
+                _fan_out_retry_scores(retry_scores, batch)
                 scores_map.update(retry_scores)
         if debug is not None:
             retry_debug: dict[str, Any] = {
@@ -1146,11 +1470,9 @@ def _merge_chunk_ai_data(chunk_datas: list[dict[str, Any]]) -> dict[str, Any]:
     literals: list[str] = []
     for data in chunk_datas:
         translation = data.get("translation")
-        if isinstance(translation, str) and translation.strip():
-            translations.append(translation.strip())
+        _append_unique_text_part(translations, translation)
         literal = data.get("literal_translation")
-        if isinstance(literal, str) and literal.strip():
-            literals.append(literal.strip())
+        _append_unique_text_part(literals, literal)
         scores = data.get("scores")
         if isinstance(scores, dict):
             for key, value in scores.items():
@@ -1169,6 +1491,7 @@ def _handle_compact_map_response(
     chunk_sentence: str,
     word_key_map: dict[str, str],
     word_meanings: dict[str, str] | None = None,
+    previous_translation: str = "",
     ai_manager: AIManager,
     model: str | None,
     provider: str | None,
@@ -1197,7 +1520,11 @@ def _handle_compact_map_response(
     if progress:
         progress("ai_translation_start")
     translation_response = ai_manager.request(
-        prompt=_build_translation_prompt(chunk_sentence, list(word_key_map)),
+        prompt=_build_translation_prompt(
+            chunk_sentence,
+            list(word_key_map),
+            previous_translation=previous_translation,
+        ),
         model=model,
         provider_preference=provider,
         prompt_sys=(
@@ -1285,14 +1612,16 @@ def _handle_reformat_response(
         pr.green(f"  Reformat response: {reformat_response.status_message}")
     if reformat_response.content:
         reformat_data, reformat_error = _parse_ai_json(reformat_response.content)
-        reformat_ok = not reformat_error and isinstance(
-            reformat_data.get("scores"), dict
-        )
+        reformat_scores = reformat_data.get("scores")
+        reformat_ok = not reformat_error and isinstance(reformat_scores, dict)
         if reformat_ok:
+            reformat_scores = cast(dict[str, Any], reformat_scores)
+            if not parse_error and not _wrong_schema_has_meaning_evidence(ai_data):
+                _strip_reformat_context_fields(reformat_scores)
             salvaged_scores = ai_data.get("scores")
             if isinstance(salvaged_scores, dict) and salvaged_scores:
                 reformat_data["scores"] = {
-                    **reformat_data["scores"],
+                    **reformat_scores,
                     **salvaged_scores,
                 }
             ai_data = reformat_data
@@ -1324,8 +1653,10 @@ def _request_first_pass(
     progress: Callable[[str], None] | None,
     verbose: bool,
     debug: dict[str, Any] | None,
+    previous_translation: str = "",
 ) -> dict[str, Any]:
     sys_prompt = build_system_prompt(analysis, speech_mark_options)
+    continuation_block = _previous_translation_block(previous_translation)
     if chunk_sentence == full_sentence:
         user_prompt = f"Return JSON for: {chunk_sentence}"
     else:
@@ -1334,6 +1665,8 @@ def _request_first_pass(
             "Full passage for context (score ONLY the words in your part): "
             f"{full_sentence}"
         )
+    if continuation_block:
+        user_prompt = f"{user_prompt}{continuation_block}"
     if debug is not None:
         debug["chunk_sentence"] = chunk_sentence
         debug["system_prompt"] = sys_prompt
@@ -1369,12 +1702,17 @@ def _request_first_pass(
         structured = _extract_structured_selection_map(ai_data, analysis)
         if structured is not None:
             word_key_map, word_meanings = structured
+    if word_key_map is None and not parse_error:
+        selected_keys = _extract_selected_keys_map(ai_data, analysis)
+        if selected_keys is not None:
+            word_key_map, word_meanings = selected_keys
 
     if word_key_map is not None:
         ai_data = _handle_compact_map_response(
             chunk_sentence=chunk_sentence,
             word_key_map=word_key_map,
             word_meanings=word_meanings,
+            previous_translation=previous_translation,
             ai_manager=ai_manager,
             model=model,
             provider=provider,
@@ -1461,11 +1799,13 @@ def translate_sentence(
     else:
         chunk_debugs: list[dict[str, Any]] = []
         chunk_datas: list[dict[str, Any]] = []
+        previous_translation_parts: list[str] = []
         last_chunk_error: ValueError | None = None
         for chunk_index, (chunk_text, chunk_analysis) in enumerate(chunks, start=1):
             chunk_data: dict[str, Any] | None = None
             chunk_debug: dict[str, Any] | None = None
             first_error: ValueError | None = None
+            previous_translation = " ".join(previous_translation_parts)
             for attempt in range(1, CHUNK_FIRST_PASS_ATTEMPTS + 1):
                 attempt_debug: dict[str, Any] | None = {} if debug is not None else None
                 try:
@@ -1480,6 +1820,7 @@ def translate_sentence(
                         progress,
                         verbose,
                         attempt_debug,
+                        previous_translation=previous_translation,
                     )
                 except ValueError as error:
                     if attempt == 1:
@@ -1506,7 +1847,12 @@ def translate_sentence(
                     break
             if chunk_data is None:
                 continue
-            chunk_datas.append(_normalize_ai_response(chunk_data))
+            normalized_chunk_data = _normalize_ai_response(chunk_data)
+            chunk_datas.append(normalized_chunk_data)
+            _append_unique_text_part(
+                previous_translation_parts,
+                normalized_chunk_data.get("translation"),
+            )
             if chunk_debug is not None:
                 chunk_debugs.append(chunk_debug)
         if not chunk_datas and last_chunk_error is not None:
@@ -1552,6 +1898,8 @@ def translate_sentence(
                 debug=debug,
                 pass_number=2,
             )
+
+    _narrow_db_example_tied_groups(analysis, scores_map)
 
     if debug is not None:
         if retry_skipped_groups:
@@ -1653,7 +2001,7 @@ Your task is to analyze a Pāḷi sentence and perform word-sense disambiguation
 
 ### Instructions:
 1. **Analyze the Sentence:** Use the context to understand grammatical relationships.
-2. **Disambiguate:** For each word in the sentence, identify the correct dictionary option (`key`).
+2. **Disambiguate:** For each word in the sentence, identify the correct dictionary option (`key`). Some keys include a word-occurrence prefix; always echo the full key verbatim.
 3. **Score Options:**
    - Assign a score of **10** to the correct `key` for the context.
    - If multiple keys share the same id, treat them as grammar variants; choose the variant whose grammar matches your parse because the score-10 variant's grammar is what readers see in the table.
@@ -1666,8 +2014,8 @@ Your task is to analyze a Pāḷi sentence and perform word-sense disambiguation
      - You do NOT need to adjust meanings for standard compound components unless necessary for clarity.
      - **CRITICAL:** Provide ONLY the core meaning. Do NOT append grammatical case notes in parentheses — never add phrases like "(masculine nominative plural of 'X')" or "(component of compound 'X')". The Grammar column already shows this information.
    - **`selected_pos`**: If `pos` is "sandhi/compound", specify "sandhi" or "compound".
-5. **Handle Deconstructions (MANDATORY):** If an option key starts with `decon_` or has `meaning_combo: "[Deconstructed]"`, you **MUST** provide a full English translation of that sandhi/compound in the `contextual_meaning` field.
-   - **NEVER** leave a `decon_` key with a score of 10 without providing its `contextual_meaning`.
+5. **Handle Deconstructions (MANDATORY):** If an option key contains `decon_` or has `meaning_combo: "[Deconstructed]"`, you **MUST** provide a full English translation of that sandhi/compound in the `contextual_meaning` field.
+   - **NEVER** leave a deconstruction key with a score of 10 without providing its `contextual_meaning`.
    - **Example:** If `okassa` is deconstructed as `oka + assa`, `contextual_meaning` should be something like "to the house" or "of the dwelling".
 6. **Use Existing Examples for Disambiguation:**
    - Each option includes `example_1`/`source_1` and `example_2`/`source_2` — real curated examples from the dictionary that illustrate the exact meaning of that entry.
@@ -1682,12 +2030,12 @@ Return a JSON object with translations and a flat map of **scores** keyed by the
   "translation": "Fluent English translation",
   "literal_translation": "Literal English translation",{verse_text_field}
   "scores": {{
-    "decon_word_0": {{
+    "w0_decon_word_0": {{
       "score": 10,
       "contextual_meaning": "Full meaning of the deconstruction",
       "selected_pos": "sandhi"
     }},
-    "12345_0": {{
+    "w0_12345_0": {{
       "score": 10,
       "contextual_meaning": "I would dwell",
       "selected_pos": "verb"
@@ -1708,7 +2056,7 @@ def _is_numeric_score(score: Any) -> bool:
 
 def _direct_key_rank(option: dict[str, Any]) -> int:
     key = str(option.get("key", ""))
-    if not key or key.startswith(("decon_", "missing_")):
+    if not key or _is_deconstruction_key(key) or _is_missing_key(key):
         return 0
     if key.endswith(("_default", "_inflection")):
         return 0
@@ -1795,6 +2143,50 @@ def _select_best_option(
     )
 
 
+def _first_meaning_sense(option: dict[str, Any]) -> str:
+    for field in ("meaning_combo", "meaning_1"):
+        meaning = option.get(field)
+        if not isinstance(meaning, str):
+            continue
+        first_sense = meaning.split(";", maxsplit=1)[0]
+        cleaned = _clean_meaning(_strip_grammar_annotations(first_sense))
+        if cleaned and not _is_deconstructed_placeholder(cleaned):
+            return cleaned
+    return ""
+
+
+def _component_join_fallback_meaning(option: dict[str, Any]) -> str:
+    components = option.get("components")
+    if not isinstance(components, list):
+        return ""
+    parent_meaning = option.get("meaning_combo", "")
+    if not isinstance(parent_meaning, str):
+        parent_meaning = ""
+
+    meanings: list[str] = []
+    for component_group in components:
+        if not isinstance(component_group, list):
+            continue
+        best_part = _select_best_option(
+            component_group,
+            is_component=True,
+            parent_meaning=parent_meaning,
+        )
+        if best_part is None:
+            continue
+        meaning = _first_meaning_sense(best_part)
+        if meaning:
+            meanings.append(meaning)
+    return " + ".join(meanings)
+
+
+def _deconstruction_fallback_meaning(option: dict[str, Any]) -> str:
+    meaning = _component_join_fallback_meaning(option)
+    if meaning:
+        return meaning
+    return "*(AI analysis of deconstruction)*"
+
+
 def format_markdown_table(enriched_analysis: list[dict[str, Any]]) -> str:
     """
     Reconstruct the Markdown table using the enriched Python structure.
@@ -1834,8 +2226,10 @@ def format_markdown_table(enriched_analysis: list[dict[str, Any]]) -> str:
                 comp_meaning = best_part.get("meaning_combo", "")
 
                 # Cleanup if AI failed to provide a meaning for a deconstruction
-                if not comp_meaning and best_part.get("key", "").startswith("decon_"):
-                    comp_meaning = "*(AI analysis of deconstruction)*"
+                if (
+                    not comp_meaning or _is_deconstructed_placeholder(comp_meaning)
+                ) and _is_deconstruction_key(best_part.get("key")):
+                    comp_meaning = _deconstruction_fallback_meaning(best_part)
 
                 comp_meaning = _clean_meaning(comp_meaning)
 
@@ -1863,7 +2257,7 @@ def format_markdown_table(enriched_analysis: list[dict[str, Any]]) -> str:
                 if (
                     best_part.get("compound_type", "")
                     or best_part.get("pos", "") in {"sandhi", "sandhi/compound"}
-                    or best_part.get("key", "").startswith("decon_")
+                    or _is_deconstruction_key(best_part.get("key"))
                 ):
                     add_rows_recursive(best_part, depth + 1, best_part.get("pos", ""))
 
@@ -1887,8 +2281,10 @@ def format_markdown_table(enriched_analysis: list[dict[str, Any]]) -> str:
         meaning = best_option.get("meaning_combo", "")
 
         # Cleanup if AI failed to provide a meaning for a deconstruction
-        if not meaning and best_option.get("key", "").startswith("decon_"):
-            meaning = "*(AI analysis of deconstruction)*"
+        if (
+            not meaning or _is_deconstructed_placeholder(meaning)
+        ) and _is_deconstruction_key(best_option.get("key")):
+            meaning = _deconstruction_fallback_meaning(best_option)
 
         meaning = _clean_meaning(meaning)
 

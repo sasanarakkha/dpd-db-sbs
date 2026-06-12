@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from db.db_helpers import get_db_session
 from exporter.analysis.analyzer import analyze_sentence
+from exporter.analysis.types import AnalysisOption
 
 
 @pytest.fixture
@@ -20,15 +21,19 @@ def db_session() -> Iterator[Session]:
         db.close()
 
 
-def _first_token_options(sentence: str, db_session: Session) -> list[dict]:
+def _first_token_options(sentence: str, db_session: Session) -> list[AnalysisOption]:
     result = analyze_sentence(sentence, db_session)
     assert len(result) == 1
     assert result[0]["status"] == "found"
     return result[0]["data"]
 
 
-def _top_level_ids(options: list[dict]) -> set[int]:
+def _top_level_ids(options: list[AnalysisOption]) -> set[int]:
     return {option["id"] for option in options if isinstance(option.get("id"), int)}
+
+
+def _is_deconstruction_key(key: str) -> bool:
+    return key.startswith("decon_") or "_decon_" in key
 
 
 def test_particle_sandhi_keeps_real_sandhi_and_drops_base_noise(
@@ -41,7 +46,7 @@ def test_particle_sandhi_keeps_real_sandhi_and_drops_base_noise(
     assert 53493 in ids
     assert 53444 not in ids
     assert all(
-        option["pos"] == "sandhi" or option["key"].startswith("decon_")
+        option["pos"] == "sandhi" or _is_deconstruction_key(option["key"])
         for option in options
     )
 
@@ -51,7 +56,7 @@ def test_particle_sandhi_without_headword_uses_deconstructor(
 ) -> None:
     options = _first_token_options("yañcidaṃ", db_session)
 
-    assert [option["key"] for option in options] == ["decon_yañcidaṃ_0"]
+    assert [option["key"] for option in options] == ["w0_decon_yañcidaṃ_0"]
     assert options[0]["construction"] == "yaṃ + ca + idaṃ"
 
 
@@ -60,7 +65,7 @@ def test_particle_sandhi_with_component_headword_uses_deconstructor(
 ) -> None:
     options = _first_token_options("soḷasinti", db_session)
 
-    assert [option["key"] for option in options] == ["decon_soḷasinti_0"]
+    assert [option["key"] for option in options] == ["w0_decon_soḷasinti_0"]
     assert options[0]["construction"] == "soḷasiṃ + iti"
     component_ids = {
         part["id"]

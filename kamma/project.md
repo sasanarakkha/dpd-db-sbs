@@ -26,6 +26,7 @@ Upstream sync runs continuously: upstream dpd-db/main → local `as_upstream` br
 ## What it will produce
 - A SQLite database with DPD headwords extended by Russian and SBS tables
 - Multi-format dictionary exports (GoldenDict, MDict, Kindle, Kobo, PDF)
+- A Pāḷi analysis and translation pipeline for automated sutta study
 - A Flet-based GUI for lexicographers
 - A FastAPI webapp and MCP server for programmatic access
 - Anki decks and SBS study materials for the study-tools repo

@@ -183,3 +183,16 @@ def test_collect_all_ids_nested_components() -> None:
         (222, "diṭṭhi", "micchādiṭṭhisamādānā", True, False),
         (333, "samādāna", "micchādiṭṭhisamādānā", False, False),
     ]
+
+
+def test_collect_all_ids_occurrence_prefixed_decon_key_skips_parent() -> None:
+    """Occurrence-prefixed deconstruction keys recurse without bolding the parent ID."""
+    option = {
+        "id": 999,
+        "key": "w0_decon_okassa_0",
+        "pali": "okassa",
+        "pos": "sandhi",
+        "components": [[{"id": 111, "key": "w0_111_0", "pali": "oka"}]],
+    }
+
+    assert collect_all_ids(option, "okassa") == [(111, "oka", "okassa", True, False)]

@@ -75,7 +75,7 @@ def test_get_passage_by_code_keeps_opening_prose_sentences(monkeypatch) -> None:
 
     result = passage_by_code.get_passage_by_code("AN3.12")
 
-    assert result.paragraphs[0].startswith("tīṇimāni, bhikkhave")
+    assert result.paragraphs[0].startswith("tīṇ'imāni, bhikkhave")
     assert "katamāni tīṇi?" in result.paragraphs[0]
 
 

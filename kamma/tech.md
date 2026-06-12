@@ -1,7 +1,7 @@
 # tech.md — DPS Fork Tech Notes
 
 ## Tools & Platforms
-- **Python 3.13** — database management, exporters, GUI, webapp, MCP server
+- **Python 3.13** — database management, exporters, analysis pipeline, GUI, webapp, MCP server
 - **Go 1.22+** — performance-critical modules (compound deconstruction)
 - **SQLite + SQLAlchemy** — primary database and ORM
 - **Flet** — cross-platform GUI for lexicographers
