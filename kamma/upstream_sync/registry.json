@@ -23,7 +23,7 @@
     {
       "path": "gui2/main.py",
       "discuss": true,
-      "discuss_reason": "Imports fast_api_utils_dps (DPS-specific) and adds DpsView and AnalysisView tabs. Blind porting would remove these tabs and break the DPS GUI."
+      "discuss_reason": "Imports fast_api_utils_dps (DPS-specific) and adds DpsView tab. Blind porting would remove this tab and break the DPS GUI."
     },
     {
       "path": "gui2/pass2_add_view.py",
@@ -151,10 +151,7 @@
   "no_sync_files": [
     "conductor/",
     "kamma/",
-    "exporter/mcp",
-    "exporter/analysis",
     "exporter/archive/",
-    "tools/ai_models.json",
     "gui2/data/additions_deva.json",
     "gui2/data/corrections_deva.json"
   ],

@@ -3,13 +3,12 @@
 **File**: `gui2/main.py`
 - **Category**: modified_upstream_files
 - **Sync Rule**: DISCUSS
-- **Why DISCUSS**: Imports `fast_api_utils_dps` (DPS-specific server launcher) instead of upstream's `fast_api_utils`, and adds `DpsView` and `AnalysisView` tabs. Blind porting removes DPS GUI entirely.
+- **Why DISCUSS**: Imports `fast_api_utils_dps` (DPS-specific server launcher) instead of upstream's `fast_api_utils`, and adds `DpsView` tab. Blind porting removes DPS GUI entirely.
 - **Local Changes**:
   1. `from tools.fast_api_utils_dps import start_dpd_server` (line ~11) replaces upstream's `fast_api_utils` import.
   2. `DpsView` tab (line ~91): `self.dps_view = DpsView(self.page, self.toolkit)`.
-  3. `AnalysisView` tab (line ~92): `self.analysis_view = AnalysisView(...)`.
-  4. Conditional imports for `DpsView`/`AnalysisView` inside the class body (lines ~26-27).
-  5. Runtime font scaling patch (module level, after all imports, before `class App`): patches `ft.Text.__init__`, `ft.TextStyle.__init__`, `ft.TextField.__init__`, and `ft.Dropdown.__init__` via `_make_font_scaler` to multiply `size=` / `text_size=` kwargs by `_DPS_FONT_SCALE = 1.4` (using `round()`). No exclusions — all tabs are scaled uniformly. Adjust `_DPS_FONT_SCALE` in `main.py` to retune the app-wide font size. Also patches `DpdTextField.__init__` (post-init): sets `text_size = round(14 * _DPS_FONT_SCALE)` when `text_size is None`, covering fields that omit an explicit `text_size`. DPS files (`dps_view.py`, `dps_fields.py`, `dps_field_mapping.py`) were normalized to upstream-matching explicit sizes (`text_size=14`, `size=12`, etc.) so the global scale renders them at a consistent visual size.
+  3. Conditional import for `DpsView` inside the class body (line ~26).
+  4. Runtime font scaling patch (module level, after all imports, before `class App`): patches `ft.Text.__init__`, `ft.TextStyle.__init__`, `ft.TextField.__init__`, and `ft.Dropdown.__init__` via `_make_font_scaler` to multiply `size=` / `text_size=` kwargs by `_DPS_FONT_SCALE = 1.4` (using `round()`). No exclusions — all tabs are scaled uniformly. Adjust `_DPS_FONT_SCALE` in `main.py` to retune the app-wide font size. Also patches `DpdTextField.__init__` (post-init): sets `text_size = round(14 * _DPS_FONT_SCALE)` when `text_size is None`, covering fields that omit an explicit `text_size`. DPS files (`dps_view.py`, `dps_fields.py`, `dps_field_mapping.py`) were normalized to upstream-matching explicit sizes (`text_size=14`, `size=12`, etc.) so the global scale renders them at a consistent visual size.
 - **Watch For**:
   - Upstream GUI refactors that change the tab initialization pattern will break DPS tab injection — check constructor signature.
   - If upstream switches from `fast_api_utils` to another server module, `fast_api_utils_dps` must be updated to match the new API.

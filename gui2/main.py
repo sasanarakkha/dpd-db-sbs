@@ -52,7 +52,6 @@ DpdTextField.__init__ = _dpd_tf_init_scaled
 
 class App:
     def __init__(self, page: ft.Page) -> None:
-        from gui2.analysis_view import AnalysisView
         from gui2.bold_search_view import BoldSearchView
         from gui2.dps_view import DpsView
         from gui2.filter_tab_view import FilterTabView
@@ -127,7 +126,6 @@ class App:
         self.translations_view = TranslationsView(self.page, self.toolkit)
         self.bold_search_view = BoldSearchView(self.page, self.toolkit)
         self.dps_view: DpsView = DpsView(self.page, self.toolkit)
-        self.analysis_view = AnalysisView(self.page, self.toolkit)
         self.roots_view = RootsTabView(self.page, self.toolkit)
         self.compound_type_view = CompoundTypeTabView(self.page, self.toolkit)
 
@@ -302,10 +300,6 @@ class App:
                 ft.Tab(
                     text="Bold Search",
                     content=self.bold_search_view,
-                ),
-                ft.Tab(
-                    text="Analysis",
-                    content=self.analysis_view,
                 ),
                 ft.Tab(
                     text="√",
