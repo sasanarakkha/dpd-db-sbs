@@ -17,3 +17,5 @@
 - 2026-06-12 [BEHAVIOR] When multiple remotes (origin/upstream) exist, `gh` may require explicit repository context (`-R`) to ensure comments and closures target the correct project issue.
 - 2026-06-12 [WORKFLOW] For Kamma finalize cleanup, use narrow sequential filesystem commands; combined archive/delete commands can be blocked by execution policy.
 - 2026-06-12 [POSITIVE] Freezing regression goldens against a specific commit hash before refactoring ensures high-confidence, byte-identical migrations.
+- 2026-06-12 [WORKFLOW] The Audit-before-Port pattern for cross-folder deps effectively prevents "reconcile-everything" bloat by isolating breakage risks to a minimal edit set.
+- 2026-06-12 [BEHAVIOR] Ensure the thread review accurately lists ALL changed files, including documentation, to avoid surprises during the final commit proposal.

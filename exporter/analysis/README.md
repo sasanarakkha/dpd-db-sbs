@@ -8,19 +8,60 @@ for Anki or another flashcard workflow. The MCP server still lives in
 `exporter/mcp/`, but the passage-analysis and AI-translation logic has moved
 out of MCP so it can run as ordinary command-line exporter tools.
 
+---
+
+## Quick Start (new machine)
+
+**Prerequisites:** `uv` installed, repo cloned, `dpd.db` present at the path
+`tools/paths.py` returns (typically `dpd.db` in the project root).
+
+**Step 1 — pick an AI provider** (only one is required):
+
+| Option | What to do |
+|--------|-----------|
+| **Antigravity CLI** (preferred, no API key) | Install `agy` from <https://antigravity.dev> and verify with `agy --version` |
+| **OpenRouter** (API key) | Add `openrouter = sk-or-v1-…` to `config.ini` under `[apis]` |
+| **DeepSeek** (API key) | Add `deepseek = sk-…` to `config.ini` under `[apis]` |
+
+**Step 2 — run the analyzer:**
+
+```bash
+uv run python exporter/analysis/study_passage.py
+```
+
+Enter a passage code such as `DHP1`, `MN4`, `SN12.3`, or `AN3.12`.
+The report lands in `reports/<source>_study.md`.
+
+**Step 3 — export vocabulary:**
+
+Edit the report (delete unwanted rows, fix IDs), then:
+
+```bash
+uv run python exporter/analysis/export_words_csv.py
+```
+
+Output goes to `output/<source>_words.csv`.
+
+---
+
 ## AI Provider Setup
 
 The passage analysis pipeline sends scoring prompts to an AI provider. It tries
 models from `tools/ai_models.json` in this priority order:
 
-1. `antigravity_cli` / `Gemini 3.5 Flash (Low)`
-2. `deepseek` / `deepseek-v4-flash`
-3. `openrouter` / `deepseek/deepseek-v4-flash`
-4. `openrouter` / `meta-llama/llama-4-scout`
-5. `openrouter` / `openai/gpt-4.1-nano`
+The pipeline tries providers in this order:
+
+1. `antigravity_cli` — work models (tried first)
+2. `deepseek` — direct API fallback
+3. `openrouter` — multiple model fallbacks
 
 Only initialized providers are used. Antigravity requires the local `agy`
 executable; DeepSeek and OpenRouter require API keys in `config.ini`.
+
+Additional providers (`claude`, `gemini`, `nvidia`, `codex`) are supported if
+their API keys are present in `config.ini`, but they are not in the default
+model list used by `study_passage.py`. Use `--provider`/`--model` flags to
+reach them explicitly.
 
 ### Antigravity CLI (primary)
 
@@ -52,32 +93,30 @@ unavailable.
 
 ```ini
 [apis]
-deepseek = sk-...your-key-here...
-openrouter = sk-or-v1-...your-key-here...
+deepseek    = sk-...your-key-here...
+openrouter  = sk-or-v1-...your-key-here...
+gemini      = AIza...your-key-here...
+nvidia      = nvapi-...your-key-here...
 ```
+
+For Anthropic Claude (`claude` provider) the key is read from the
+`ANTHROPIC_API_KEY` environment variable, not from `config.ini`.
 
 Configured providers are initialized automatically at runtime.
 
 ### Changing the AI model
 
-Model choices are stored in `tools/ai_models.json`. The active Antigravity
-fallback sequence starts with `antigravity_cli_work_models`:
+Model choices are stored in `tools/ai_models.json`. The file has three lists:
+`antigravity_cli_work_models`, `default_models`, and `grounded_models`.
+`study_passage.py` uses the first two (in order); `grounded_models` is a
+separate list for web-search-backed queries and is not used by the passage
+analysis flow.
 
-```json
-{
-  "antigravity_cli_work_models": [
-    {
-      "provider": "antigravity_cli",
-      "model": "Gemini 3.5 Flash (Low)",
-      "delay": 5,
-      "timeout": 150
-    }
-  ]
-}
-```
+For the current model names and fallback order, see the upstream source:
+<https://github.com/digitalpalidictionary/dpd-db/blob/main/tools/ai_models.json>
 
-Edit this list to change the normal fallback order. No restart is needed; the
-file is read fresh each run.
+Edit the file to change the fallback order. No restart is needed; the file is
+read fresh each run.
 
 For a one-off run with a specific model, pass both `--provider` and `--model`.
 When these flags are used together, only that provider/model is tried; the
@@ -134,28 +173,34 @@ source code.
 
 ## File Map
 
-- `README.md` - this overview.
-- `paths.py` - creates and returns `input/`, `reports/`, and `output/`.
-- `passage_by_code.py` - resolves passage codes like `DHP1`, `UD12`,
-  `ITI37`, `SN12.3`, and `AN3.12` into CST passage text.
-- `passage_extraction.py` - previews extracted passages without DB lookup or
-  AI calls.
-- `book_to_verses.py` - extracts a whole CST book into structured JSON for
-  batch verse analysis.
-- `analyzer.py` - tokenizes Pali, looks up DPD headwords, expands compounds
-  and sandhi, and returns candidate dictionary options.
-- `translate_core.py` - shared AI workflow: builds prompts, merges AI scores,
-  retries missing score groups, handles variant choices, and renders markdown.
-- `study_passage.py` - Stage 1 interactive tool for creating a study report.
-- `export_words_csv.py` - Stage 2 interactive tool for exporting edited report
-  rows to TSV/CSV.
-- `example_bolding.py` - bolds the selected word or component inside the
-  source passage example.
-- `column_options.py` - defines export column presets and custom columns.
-- `ai_batch_translate.py` - batch-analyzes extracted verse JSON.
-- `ai_pali_translate.py` - direct interactive sentence translator or renderer
-  for one batch-analyzed verse.
-- `examples.md` - examples moved from the old MCP analysis location.
+**Entry points:**
+- `study_passage.py` — Stage 1 interactive tool for creating a study report.
+- `export_words_csv.py` — Stage 2 interactive tool for exporting edited report rows to TSV/CSV.
+- `passage_extraction.py` — previews extracted passages without DB lookup or AI calls.
+- `ai_batch_translate.py` — batch-analyzes extracted verse JSON.
+- `ai_pali_translate.py` — direct interactive sentence translator or renderer for one batch-analyzed verse.
+
+**Pipeline modules (called by entry points):**
+- `translate_core.py` — orchestrates the full AI workflow: prompts → AI call → score merge → retry → render.
+- `analyzer.py` — tokenizes Pali, looks up DPD headwords, expands compounds and sandhi, returns candidate options.
+- `prompts.py` — builds AI prompts and manages formatting constants.
+- `ai_response.py` — parses and normalizes AI JSON output into score maps.
+- `scoring.py` — applies deterministic scoring rules and tie-breaks.
+- `retry.py` — manages batching and fan-out for targeted retry queries.
+- `ranking.py` — evaluates options based on heuristics to select the winner.
+- `rendering.py` — cleans text and formats the final Markdown report.
+- `types.py` — shared type definitions used across pipeline modules.
+
+**Support:**
+- `paths.py` — creates and returns `input/`, `reports/`, and `output/`.
+- `passage_by_code.py` — resolves passage codes like `DHP1`, `UD12`, `ITI37`, `SN12.3`, `AN3.12` into CST passage text.
+- `book_to_verses.py` — extracts a whole CST book into structured JSON for batch verse analysis.
+- `example_bolding.py` — bolds the selected word or component inside the source passage example.
+- `column_options.py` — defines export column presets and custom columns.
+
+**Docs:**
+- `README.md` — this overview.
+- `examples.md` — worked examples.
 
 ## Main Passage Workflow
 

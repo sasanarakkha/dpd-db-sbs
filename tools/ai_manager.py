@@ -17,7 +17,7 @@ def _load_models_from_json() -> dict[str, list[tuple[str, str, int, float]]]:
         return (m["provider"], m["model"], m["delay"], float(m.get("timeout", 150.0)))
 
     try:
-        data = json.loads(AI_MODELS_PATH.read_text())
+        data = json.loads(AI_MODELS_PATH.read_text(encoding="utf-8"))
         antigravity_cli_work = [
             _entry(m) for m in data.get("antigravity_cli_work_models", [])
         ]
@@ -112,8 +112,8 @@ class AIManager:
     def reload_models(self) -> None:
         """Reload model lists from tools/ai_models.json."""
         models = _load_models_from_json()
-        self.DEFAULT_MODELS: list[tuple[str, str, int, float]] = models["default"]
-        self.GROUNDED_MODELS: list[tuple[str, str, int, float]] = models["grounded"]
+        self.DEFAULT_MODELS = models["default"]
+        self.GROUNDED_MODELS = models["grounded"]
         pr.green(
             f"reloaded {len(self.DEFAULT_MODELS)} default models, {len(self.GROUNDED_MODELS)} grounded models"
         )
