@@ -193,11 +193,7 @@
     "exporter/kindle/tests/test_epd.py",
     "tools/update_test_add.py"
   ],
-  "discuss_paths": [
-    "AGENTS.md",
-    "db/models.py",
-    "pyproject.toml"
-  ],
+  "discuss_paths": [],
   "from_upstream_sha": "0ea5883380f56b682cf8574043afb8e66cca3260",
   "generated_at": "2026-06-12T20:48:06+08:00",
   "mapped_actions": {
