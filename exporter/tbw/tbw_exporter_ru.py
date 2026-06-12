@@ -191,7 +191,7 @@ def deconstructor_dict_add_variants(g: ProgData_ru):
     var_counter = 0
     for i in g.variants_db:
         if i.lookup_key in g.word_set:
-            variant_string = f"variant reading of <i>{i.variants_unpack[0]}</i>"
+            variant_string = f"variant reading of <i>{i.variant_unpack[0]}</i>"
             if i.lookup_key in g.deconstructor_dict:
                 g.deconstructor_dict[i.lookup_key] += f"<br>{variant_string}"
                 var_counter += 1
@@ -234,11 +234,11 @@ def save_js_files_for_fdg(g: ProgData_ru):
     pr.green_tmr("saving .js files for fdg")
 
     i2h_json_dump = json.dumps(g.i2h_dict, ensure_ascii=False, indent=2)
-    with open(g.pth.fdg_i2h_js_path, "w") as f:
+    with open(g.pth.fdg_i2h_js_path, "w", encoding="utf-8") as f:
         f.write(f"dpd_i2h = {i2h_json_dump}")
 
     dpd_json_dump = json.dumps(g.dpd_dict, ensure_ascii=False, indent=2)
-    with open(g.rupth.fdg_dpd_ebts_js_ru_path, "w") as f:
+    with open(g.rupth.fdg_dpd_ebts_js_ru_path, "w", encoding="utf-8") as f:
         f.write(f"let dpd_ebts = {dpd_json_dump}")
 
     pr.yes("ok")
@@ -269,6 +269,7 @@ def main():
     save_js_files_for_fdg(g)
 
     pr.toc()
+
 
 if __name__ == "__main__":
     main()

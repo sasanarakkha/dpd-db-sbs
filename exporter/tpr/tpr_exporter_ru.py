@@ -63,7 +63,7 @@ def generate_tpr_data(g: GlobalVars):
 
     for counter, i in enumerate(g.dpd_db):
         # Add helper for template
-        i.compound_type_has_digit = bool(re.findall(r"\d", i.compound_type or ""))
+        i.compound_type_has_digit = bool(re.findall(r"\d", i.compound_type or ""))  # pyright: ignore[reportAttributeAccessIssue]
 
         html_string = template.render(i=i, today=TODAY)
 
@@ -164,7 +164,7 @@ def add_variants(g):
     variants_db = sorted(variants_db, key=lambda x: pali_sort_key(x.lookup_key))
 
     for i in variants_db:
-        variant = f"variant reading of <i>{i.variants_unpack[0]}</i>"
+        variant = f"variant reading of <i>{i.variant_unpack[0]}</i>"
         g.deconstructor_data_list += [{"word": i.lookup_key, "breakup": variant}]
 
     pr.yes(len(variants_db))
@@ -219,7 +219,7 @@ def write_tsvs(g: GlobalVars):
     pr.green_tmr("writing tsv files")
 
     # write dpd_tsv
-    with open(g.pth.tpr_dpd_tsv_path, "w") as f:
+    with open(g.pth.tpr_dpd_tsv_path, "w", encoding="utf-8") as f:
         f.write("id\tword\tdefinition\tbook_id\n")
         for i in g.tpr_data_list:
             f.write(f"{i['id']}\t{i['word']}\t{i['definition']}\t{i['book_id']}\n")
@@ -328,7 +328,7 @@ def tpr_updater(g: GlobalVars):
 
     sql_string += "COMMIT;\n"
 
-    with open(g.pth.tpr_sql_file_path, "w") as f:
+    with open(g.pth.tpr_sql_file_path, "w", encoding="utf-8") as f:
         f.write(sql_string)
     pr.yes("OK")
 
@@ -348,7 +348,7 @@ def copy_zip_to_tpr_downloads(g: GlobalVars):
         pr.red("https://github.com/bksubhuti/tpr_downloads")
         pr.red("to /resources/ folder")
     else:
-        with open(g.pth.tpr_download_list_path) as f:
+        with open(g.pth.tpr_download_list_path, encoding="utf-8") as f:
             download_list = json.load(f)
 
         day = TODAY.day
@@ -383,7 +383,7 @@ def copy_zip_to_tpr_downloads(g: GlobalVars):
 
         download_list = update_tpr_download_list_ru(download_list, dpd_with_rus_info)
 
-        with open(g.pth.tpr_download_list_path, "w") as f:
+        with open(g.pth.tpr_download_list_path, "w", encoding="utf-8") as f:
             f.write(json.dumps(download_list, indent=4, ensure_ascii=False))
 
     pr.yes("OK")
