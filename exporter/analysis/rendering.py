@@ -1,4 +1,4 @@
-"""See translate_core.py for context."""
+"""Markdown rendering helpers for Pāḷi study reports."""
 
 import re
 from typing import Any
@@ -208,6 +208,15 @@ def format_markdown_table(enriched_analysis: list[dict[str, Any]]) -> str:
     return "\n".join(table_rows)
 
 
-from .prompts import _GRAMMAR_ANNOTATION_KEYWORDS, _GRAMMAR_ABBREVIATION_RE
-from .ai_response import _is_deconstructed_placeholder, _is_deconstruction_key
-from .ranking import _select_best_option, _deconstruction_fallback_meaning
+from .prompts import (  # noqa: E402
+    _GRAMMAR_ANNOTATION_KEYWORDS,
+    _GRAMMAR_ABBREVIATION_RE,
+)
+from .ai_response import (  # noqa: E402
+    _is_deconstructed_placeholder,
+    _is_deconstruction_key,
+)
+from .ranking import (  # noqa: E402
+    _select_best_option,
+    _deconstruction_fallback_meaning,
+)

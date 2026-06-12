@@ -30,15 +30,15 @@ sayan'ti//sayanti
 | 22964 | koṭi | fem nom sg of koṭi | limit | √kuṭ + *i | √kuṭ 1 a (be crooked, be bent) |
 | 35345 | na | ind | not |  |  |
 | 40072 | paññāyati | pr 3rd sg of paññāyati | is known | pa + √ñā + ya + ti | √ñā 5 ya (know) |
-| 10531 | avijjānīvaraṇānaṃ | adj, masc dat pl of avijjānīvaraṇa | impeded by ignorance; obstructed by not understanding | avijjāya + nīvaraṇa |  |
-| 10520 | - avijjāya | fem instr sg of avijjā | ignorance; illusion; not knowing; not understanding | na + vijjā | √vid 3 ya (know, understand) |
+| 10531 | avijjānīvaraṇānaṃ | adj, masc gen pl of avijjānīvaraṇa | impeded by ignorance; obstructed by not understanding | avijjāya + nīvaraṇa |  |
+| 10520 | - avijjāya | fem gen sg of avijjā | ignorance; illusion; not knowing; not understanding | na + vijjā | √vid 3 ya (know, understand) |
 | 38615 | - nīvaraṇa | masc | hindrance | ni + √var + *aṇa | √var 1 a (cover, dress, restrain) |
 | 57676 | sattānaṃ | masc gen pl of satta | of beings | √as + a + tta | √as 1 a (be) |
-| 29404 | taṇhāsaṃyojanānaṃ | adj, masc dat pl of taṇhāsaṃyojana | with craving as fetter; having desire as a bond | taṇhā + saṃyojana |  |
+| 29404 | taṇhāsaṃyojanānaṃ | adj, masc gen pl of taṇhāsaṃyojana | with craving as fetter; having desire as a bond | taṇhā + saṃyojana |  |
 | 29346 | - taṇhā | fem | craving | √tas + ṇhā + ā | √tas 6 ṇhā (thirst) |
 | 61682 | - saṃyojana | nt | fetter | saṃ + √yuj + *e + ana | √yuj 2 *e (yoke, join) |
-| 58457 | sandhāvataṃ | masc dat pl of sandhāvanta | wandering; drifting; transmigrating; lit. running along | saṃ + √dhāv + a + nta | √dhāv 1 a (run, flow) |
-| 61773 | saṃsarataṃ | masc dat pl of saṃsaranta | wandering on; moving on continuously; transmigrating; lit. flowing together | saṃ + √sar + a + nta | √sar 1 a (go, flow) |
+| 58457 | sandhāvataṃ | masc gen pl of sandhāvanta | wandering; drifting; transmigrating; lit. running along | saṃ + √dhāv + a + nta | √dhāv 1 a (run, flow) |
+| 61773 | saṃsarataṃ | masc gen pl of saṃsaranta | wandering on; moving on continuously; transmigrating; lit. flowing together | saṃ + √sar + a + nta | √sar 1 a (go, flow) |
 | 64953 | seyyathā'pi | sandhi, pron + adv + ind | just as if | se + yathā + api |  |
 | 29188 | - se | masc nom pl of ta | that |  |  |
 | 53575 | - yathā | ind, adv, from ya | just as | ya + thā |  |
@@ -48,7 +48,7 @@ sayan'ti//sayanti
 | 53444 | yaṃ | nt acc sg of ya | whatever |  |  |
 | 13779 | imasmiṃ | masc loc sg of ima | this |  |  |
 | 27978 | jambudīpe | masc loc sg of jambudīpa | continent of India | jambūnaṃ + dīpa |  |
-| 27967 | - jambūnaṃ | fem dat pl of jambu | rose-apple tree; Syzygium jambos |  |  |
+| 27967 | - jambūnaṃ | fem gen pl of jambu | rose-apple tree; Syzygium jambos |  |  |
 | 32798 | - dīpa | masc | land; island; continent; peninsula; lit. two waters | dvi + āpā |  |
 | 34379 | - - dvi | card | two (2) |  |  |
 | 11828 | - - āpā | nt | water; liquid | √āp + a | √āp 4 uṇā (be wet) |
@@ -92,13 +92,13 @@ sayan'ti//sayanti
 | 29188 | tassa | masc gen sg of ta | of that |  |  |
 | 47031 | purisassa | masc gen sg of purisa | of the person |  |  |
 | 52240 | mātumātaro | fem nom pl of mātumātar | mothers and mothers' mothers | mātu + mātar |  |
-| 52175 | - mātu | fem dat sg of mātar | mother |  |  |
+| 52175 | - mātu | fem gen sg of mātar | mother |  |  |
 | 52175 | - mātar | fem | mother |  |  |
 | 9915 | assu | opt 3rd pl of assa | would be | √as + a | √as 1 a (be) |
 | 2794 | atha | ind | yet |  |  |
 | 13779 | imasmiṃ | masc loc sg of ima | this |  |  |
 | 27978 | jambudīpe | masc loc sg of jambudīpa | continent of India | jambūnaṃ + dīpa |  |
-| 27967 | - jambūnaṃ | fem dat pl of jambu | rose-apple tree; Syzygium jambos |  |  |
+| 27967 | - jambūnaṃ | fem gen pl of jambu | rose-apple tree; Syzygium jambos |  |  |
 | 32798 | - dīpa | masc | land; island; continent; peninsula; lit. two waters | dvi + āpā |  |
 | 34379 | - - dvi | card | two (2) |  |  |
 | 11828 | - - āpā | nt | water; liquid | √āp + a | √āp 4 uṇā (be wet) |
@@ -124,15 +124,15 @@ sayan'ti//sayanti
 | 22964 | koṭi | fem nom sg of koṭi | limit | √kuṭ + *i | √kuṭ 1 a (be crooked, be bent) |
 | 35345 | na | ind | not |  |  |
 | 40072 | paññāyati | pr 3rd sg of paññāyati | is known | pa + √ñā + ya + ti | √ñā 5 ya (know) |
-| 10531 | avijjānīvaraṇānaṃ | adj, masc dat pl of avijjānīvaraṇa | impeded by ignorance; obstructed by not understanding | avijjāya + nīvaraṇa |  |
-| 10520 | - avijjāya | fem instr sg of avijjā | ignorance; illusion; not knowing; not understanding | na + vijjā | √vid 3 ya (know, understand) |
+| 10531 | avijjānīvaraṇānaṃ | adj, masc gen pl of avijjānīvaraṇa | impeded by ignorance; obstructed by not understanding | avijjāya + nīvaraṇa |  |
+| 10520 | - avijjāya | fem gen sg of avijjā | ignorance; illusion; not knowing; not understanding | na + vijjā | √vid 3 ya (know, understand) |
 | 38615 | - nīvaraṇa | masc | hindrance | ni + √var + *aṇa | √var 1 a (cover, dress, restrain) |
 | 57676 | sattānaṃ | masc gen pl of satta | of beings | √as + a + tta | √as 1 a (be) |
-| 29404 | taṇhāsaṃyojanānaṃ | adj, masc dat pl of taṇhāsaṃyojana | with craving as fetter; having desire as a bond | taṇhā + saṃyojana |  |
+| 29404 | taṇhāsaṃyojanānaṃ | adj, masc gen pl of taṇhāsaṃyojana | with craving as fetter; having desire as a bond | taṇhā + saṃyojana |  |
 | 29346 | - taṇhā | fem | craving | √tas + ṇhā + ā | √tas 6 ṇhā (thirst) |
 | 61682 | - saṃyojana | nt | fetter | saṃ + √yuj + *e + ana | √yuj 2 *e (yoke, join) |
-| 58457 | sandhāvataṃ | masc dat pl of sandhāvanta | wandering; drifting; transmigrating; lit. running along | saṃ + √dhāv + a + nta | √dhāv 1 a (run, flow) |
-| 61773 | saṃsarataṃ | masc dat pl of saṃsaranta | wandering on; moving on continuously; transmigrating; lit. flowing together | saṃ + √sar + a + nta | √sar 1 a (go, flow) |
+| 58457 | sandhāvataṃ | masc gen pl of sandhāvanta | wandering; drifting; transmigrating; lit. running along | saṃ + √dhāv + a + nta | √dhāv 1 a (run, flow) |
+| 61773 | saṃsarataṃ | masc gen pl of saṃsaranta | wandering on; moving on continuously; transmigrating; lit. flowing together | saṃ + √sar + a + nta | √sar 1 a (go, flow) |
 | 18134 | evaṃ | ind, adv | thus; this; like this; similarly; in the same manner; just as; such | eva + aṃ |  |
 | 32757 | dīgharattaṃ | ind, adv, comp, acc sg of digharatta | for a long time | dīgha + rattaṃ |  |
 | 32721 | - dīgha | adj | long |  |  |

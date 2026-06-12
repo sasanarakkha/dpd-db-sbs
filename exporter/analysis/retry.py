@@ -1,4 +1,4 @@
-"""See translate_core.py for context."""
+"""Retry orchestration for missing score groups in Pāḷi translation."""
 
 import copy
 import json
@@ -337,7 +337,7 @@ def _request_missing_score_retry_pass(
     return skipped_groups
 
 
-from .prompts import (
+from .prompts import (  # noqa: E402
     MAX_RETRY_CONTEXT_CHARS,
     MAX_RETRY_BATCHES,
     NO_TOOLS_INSTRUCTION,
@@ -346,14 +346,14 @@ from .prompts import (
     _DB_EXAMPLE_VARIANT_NOT_SELECTED_SOURCE,
     _build_missing_scores_prompt,
 )
-from .ai_response import (
+from .ai_response import (  # noqa: E402
     _parse_ai_json,
     _normalize_ai_response,
     _coerce_flat_score_map,
     _strip_occurrence_key_prefix,
     _iter_options,
 )
-from .scoring import (
+from .scoring import (  # noqa: E402
     _db_example_group_key,
     _positive_ai_score_value,
     _deterministic_score_value,

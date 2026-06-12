@@ -1,9 +1,11 @@
-"""See translate_core.py for context."""
+"""Option ranking and fallback meaning helpers for Pāḷi translation."""
 
 from typing import Any
 
 
 def _component_contextual_meaning(component: dict[str, Any]) -> str:
+    from .rendering import _strip_grammar_annotations
+
     for field in ("meaning_combo", "meaning_1"):
         meaning = component.get(field)
         if isinstance(meaning, str) and meaning.strip():
@@ -35,6 +37,19 @@ def _dictionary_quality_rank(option: dict[str, Any]) -> int:
     if option.get("example_1") or option.get("example_2"):
         return 2
     return 1
+
+
+def _grammar_case_rank(option: dict[str, Any]) -> int:
+    grammar = option.get("grammar")
+    if not isinstance(grammar, str):
+        return 0
+
+    tokens = {token.lower() for token in grammar.split()}
+    if "gen" in tokens:
+        return 2
+    if "dat" in tokens:
+        return 1
+    return 0
 
 
 def _meaning_tokens(text: str) -> set[str]:
@@ -79,6 +94,7 @@ def _option_rank(
         _parent_meaning_overlap_rank(option, parent_meaning),
         component_pos_rank,
         _dictionary_quality_rank(option),
+        _grammar_case_rank(option),
         option.get("score", 0),
         stable_id_rank,
     )
@@ -101,6 +117,8 @@ def _select_best_option(
 
 
 def _first_meaning_sense(option: dict[str, Any]) -> str:
+    from .rendering import _clean_meaning, _strip_grammar_annotations
+
     for field in ("meaning_combo", "meaning_1"):
         meaning = option.get(field)
         if not isinstance(meaning, str):
@@ -144,11 +162,13 @@ def _deconstruction_fallback_meaning(option: dict[str, Any]) -> str:
     return "*(AI analysis of deconstruction)*"
 
 
-from .prompts import _PARENT_MEANING_TOKEN_RE, _PARENT_MEANING_STOPWORDS
-from .ai_response import (
+from .prompts import (  # noqa: E402
+    _PARENT_MEANING_TOKEN_RE,
+    _PARENT_MEANING_STOPWORDS,
+)
+from .ai_response import (  # noqa: E402
     _is_deconstructed_placeholder,
     _is_deconstruction_key,
     _is_missing_key,
 )
-from .scoring import _is_numeric_score
-from .rendering import _clean_meaning, _strip_grammar_annotations
+from .scoring import _is_numeric_score  # noqa: E402

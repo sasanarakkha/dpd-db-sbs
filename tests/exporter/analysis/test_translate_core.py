@@ -967,7 +967,9 @@ def test_translate_sentence_batches_oversized_retry(
             ["1_0", "2_0", "3_0"]
         ),
     )
-    monkeypatch.setattr(translate_core, "MAX_RETRY_CONTEXT_CHARS", 1, raising=False)
+    monkeypatch.setattr(
+        "exporter.analysis.retry.MAX_RETRY_CONTEXT_CHARS", 1, raising=False
+    )
     calls: list[dict[str, Any]] = []
     retry_key_batches: list[list[str]] = []
 
@@ -1067,8 +1069,12 @@ def test_translate_sentence_retry_batch_cap(
             ["1_0", "2_0", "3_0"]
         ),
     )
-    monkeypatch.setattr(translate_core, "MAX_RETRY_CONTEXT_CHARS", 1, raising=False)
-    monkeypatch.setattr(translate_core, "MAX_RETRY_BATCHES", 1, raising=False)
+    monkeypatch.setattr(
+        "exporter.analysis.retry.MAX_RETRY_CONTEXT_CHARS", 1, raising=False
+    )
+    monkeypatch.setattr(
+        "exporter.analysis.retry.MAX_RETRY_BATCHES", 1, raising=False
+    )
     calls: list[dict[str, Any]] = []
     retry_key_batches: list[list[str]] = []
 
@@ -3019,7 +3025,9 @@ def test_word_keys_overview_top_level_only() -> None:
 def test_word_keys_overview_oversize_returns_empty(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(translate_core, "REFORMAT_KEYS_MAX_CHARS", 10, raising=False)
+    monkeypatch.setattr(
+        "exporter.analysis.prompts.REFORMAT_KEYS_MAX_CHARS", 10, raising=False
+    )
     analysis = [{"word": "sammā", "data": [{"key": "60847_0"}]}]
 
     assert translate_core._word_keys_overview(analysis) == ""

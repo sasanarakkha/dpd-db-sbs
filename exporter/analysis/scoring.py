@@ -1,4 +1,4 @@
-"""See translate_core.py for context."""
+"""Deterministic scoring and AI score merge helpers for Pāḷi translation."""
 
 import copy
 from typing import Any
@@ -351,12 +351,16 @@ def merge_ai_selections(
     }
 
 
-from .prompts import (
+from .prompts import (  # noqa: E402
     _TRAILING_PUNCTUATION,
     _FINITE_VERB_GRAMMAR_RE,
     _QUOTATIVE_TI_SELECTION_SOURCE,
     _DB_EXAMPLE_ALL_VARIANTS_TIED_SOURCE,
     _DB_EXAMPLE_VARIANT_NOT_SELECTED_SOURCE,
 )
-from .ai_response import _texts_overlap, _is_deconstruction_key, _iter_options
-from .ranking import _component_contextual_meaning
+from .ai_response import (  # noqa: E402
+    _texts_overlap,
+    _is_deconstruction_key,
+    _iter_options,
+)
+from .ranking import _component_contextual_meaning  # noqa: E402

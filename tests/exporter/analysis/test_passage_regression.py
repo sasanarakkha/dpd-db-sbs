@@ -138,14 +138,7 @@ def test_passage_regression(
         ]
         for word in gen_pl_words:
             matching = [r for r in distilled_rows if r[0] == word]
-            # Known issue: currently produces dat pl due to AI truncation/tie-break bug.
-            # We assert it to track when it gets fixed, but xfail it for now.
-            try:
-                assert any("gen pl" in r[3] for r in matching), (
-                    f"{word} should be gen pl"
-                )
-            except AssertionError as e:
-                pytest.xfail(str(e))
+            assert any("gen pl" in r[3] for r in matching), f"{word} should be gen pl"
 
     # F66 no fan-out for tassa/tassā (independent selections)
     if passage_name == "SN15.1_p2":

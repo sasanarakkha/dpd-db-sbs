@@ -1,4 +1,4 @@
-"""See translate_core.py for context."""
+"""AI response parsing and normalization helpers for Pāḷi translation."""
 
 import json
 import re
@@ -12,6 +12,8 @@ def _normalize_ai_response(ai_data: dict[str, Any]) -> dict[str, Any]:
     Some AI models return scores in a nested structure like {"scores": {"scores": {...}}}.
     This function flattens that to the expected {"scores": {...}} format.
     """
+    from .rendering import _strip_grammar_annotations
+
     scores = ai_data.get("scores", {})
     if (
         isinstance(scores, dict)
@@ -329,6 +331,8 @@ def _extract_structured_selection_map(
     analysis: list[dict[str, Any]],
 ) -> tuple[dict[str, str], dict[str, str]] | None:
     """Recover wrong-schema structured selections into a word-key map."""
+    from .rendering import _strip_grammar_annotations
+
     if not isinstance(ai_data, dict) or not ai_data:
         return None
     if "scores" in ai_data or "translation" in ai_data:
@@ -408,6 +412,8 @@ def _extract_structured_selection_map(
 
 
 def _wrong_schema_has_meaning_evidence(ai_data: dict[str, Any]) -> bool:
+    from .retry import _has_non_empty_string
+
     scores = ai_data.get("scores")
     if isinstance(scores, dict):
         for value in scores.values():
@@ -428,11 +434,9 @@ def _wrong_schema_has_meaning_evidence(ai_data: dict[str, Any]) -> bool:
     return False
 
 
-from .prompts import (
+from .prompts import (  # noqa: E402
     _SELECTION_LIST_KEYS,
     _SELECTION_KEY_FIELDS,
     _OCCURRENCE_KEY_PREFIX_RE,
     _DECONSTRUCTED_PLACEHOLDER,
 )
-from .retry import _has_non_empty_string
-from .rendering import _strip_grammar_annotations

@@ -1,4 +1,24 @@
-from .prompts import (
+"""Shared prompt-building and analysis utilities for Pāḷi AI translation."""
+
+import copy
+
+import json
+
+import re
+
+from collections.abc import Callable
+
+from typing import Any, cast
+
+from sqlalchemy.orm import Session
+
+from exporter.analysis.analyzer import analyze_sentence, tokenize_sentence
+
+from tools.ai_manager import AIManager
+
+from tools.printer import printer as pr
+
+from .prompts import (  # noqa: F401
     CHUNK_FIRST_PASS_ATTEMPTS,
     COMMON_PALI_RULES,
     MAX_FIRST_CONTEXT_CHARS,
@@ -32,7 +52,7 @@ from .prompts import (
     _word_keys_overview,
     build_system_prompt,
 )
-from .ai_response import (
+from .ai_response import (  # noqa: F401
     _append_unique_text_part,
     _coerce_flat_score_map,
     _collect_option_keys,
@@ -57,7 +77,7 @@ from .ai_response import (
     _top_level_options_for_word,
     _wrong_schema_has_meaning_evidence,
 )
-from .scoring import (
+from .scoring import (  # noqa: F401
     _apply_deterministic_scores_to_map,
     _apply_quotative_ti_deconstruction_score,
     _construction_parts,
@@ -76,7 +96,7 @@ from .scoring import (
     merge_ai_selections,
     pre_match_db_examples,
 )
-from .retry import (
+from .retry import (  # noqa: F401
     _batch_missing_groups,
     _fan_out_retry_scores,
     _find_missing_score_groups,
@@ -87,7 +107,7 @@ from .retry import (
     _strip_reformat_context_fields,
     _trim_groups_for_retry,
 )
-from .ranking import (
+from .ranking import (  # noqa: F401
     _component_contextual_meaning,
     _component_join_fallback_meaning,
     _db_example_rank,
@@ -100,32 +120,12 @@ from .ranking import (
     _parent_meaning_overlap_rank,
     _select_best_option,
 )
-from .rendering import (
+from .rendering import (  # noqa: F401
     _clean_meaning,
     _strip_grammar_annotations,
     format_markdown_table,
     generate_markdown_report,
 )
-
-"""Shared prompt-building and analysis utilities for Pāḷi AI translation."""
-
-import copy
-
-import json
-
-import re
-
-from collections.abc import Callable, Iterator
-
-from typing import Any, cast
-
-from sqlalchemy.orm import Session
-
-from exporter.analysis.analyzer import analyze_sentence, tokenize_sentence
-
-from tools.ai_manager import AIManager
-
-from tools.printer import printer as pr
 
 
 def extract_variant_options(text: str) -> tuple[str, dict[str, list[str]]]:

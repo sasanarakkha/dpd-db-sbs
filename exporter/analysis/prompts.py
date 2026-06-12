@@ -1,4 +1,4 @@
-"""See translate_core.py for context."""
+"""Prompt builders and shared constants for the Pāḷi translation pipeline."""
 
 import json
 import re
@@ -233,6 +233,9 @@ def _build_missing_scores_prompt(
     sentence: str,
     missing_groups: list[dict[str, Any]],
 ) -> str:
+    from .ai_response import _is_deconstruction_key
+    from .retry import _retry_prompt_groups
+
     context = json.dumps(
         _retry_prompt_groups(missing_groups),
         ensure_ascii=False,
@@ -347,7 +350,3 @@ Return a JSON object with translations and a flat map of **scores** keyed by the
 Your response MUST be exactly one JSON object with translation, literal_translation, and scores.
 """
     return prompt
-
-
-from .ai_response import _is_deconstruction_key
-from .retry import _retry_prompt_groups

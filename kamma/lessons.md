@@ -16,3 +16,4 @@
 - 2026-06-12 [WORKFLOW] Using a long-running "loop" thread for open-ended bug fixing works well but requires a meta-review phase to determine the stopping point (e.g., Findings 1-74).
 - 2026-06-12 [BEHAVIOR] When multiple remotes (origin/upstream) exist, `gh` may require explicit repository context (`-R`) to ensure comments and closures target the correct project issue.
 - 2026-06-12 [WORKFLOW] For Kamma finalize cleanup, use narrow sequential filesystem commands; combined archive/delete commands can be blocked by execution policy.
+- 2026-06-12 [POSITIVE] Freezing regression goldens against a specific commit hash before refactoring ensures high-confidence, byte-identical migrations.
