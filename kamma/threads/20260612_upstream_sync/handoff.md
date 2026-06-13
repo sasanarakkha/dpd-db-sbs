@@ -2,16 +2,16 @@
 
 ## Status
 
-Stage 2d COMPLETE — approval gate passed (ADVANCED/Opus, 2026-06-13). User approved the
-full plan and all 4 surfaced decisions (B6.4 SKIP, B6.10 SKIP, tpr_headword_ru.jinja
-REGISTER, B5.8 APPLY-BY-ANALOGY). Resolution recorded in `dynamic_plan.md` "Stage 2d —
-APPROVAL GATE RESOLVED". Next: **Stage 3 = Batch 0** (`execute_sync.py`, Commit 1) — FAST.
+**Stage 3 COMPLETE.** All batches 0–6 committed (2026-06-13):
+- Commit 1 (`9f09d926`): Batch 0 (execute_sync pull) + Batch 1 (deterministic reconciliation)
+- Commit 2 (`dfeb5997`): Batches 2–6 (family sync, _NewlineView, extract_body, TemplateResponse, N+1 fix)
+
+Next: **Batch 7 — Stage 2d approval gate** (4 deferred decisions, present to user for final review).
 
 ## Current Stage
 
-Stage 2 (all sub-stages 2a–2d) COMPLETE. `dynamic_plan.md` is the approved, self-contained
-execution plan (Batches 0–6). Next: **Stage 3 (FAST)** — execute Batch 0 first
-(`execute_sync.py` → Commit 1), then hard stop per the Commit-1 session boundary.
+Stage 3 COMPLETE. Batches 0–6 all committed. Next: **Batch 7** — surface the 4 explicit
+2d decisions for user approval before any further work.
 
 ## Stage 2c progress (batch ledger — full detail in dynamic_plan.md "Batch ledger")
 
