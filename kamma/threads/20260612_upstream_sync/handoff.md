@@ -2,16 +2,147 @@
 
 ## Status
 
-**Stage 3 COMPLETE.** All batches 0–6 committed (2026-06-13):
+**Stage 3 COMPLETE. Stages 4 and 5 SKIPPED (see below).**
+
 - Commit 1 (`9f09d926`): Batch 0 (execute_sync pull) + Batch 1 (deterministic reconciliation)
 - Commit 2 (`dfeb5997`): Batches 2–6 (family sync, _NewlineView, extract_body, TemplateResponse, N+1 fix)
 
-Next: **Batch 7 — Stage 2d approval gate** (4 deferred decisions, present to user for final review).
+**⚠️ SKIPPED STAGES:**
+- **Stage 4** (Docs Translation Parity check) — not run this sync.
+- **Stage 5** (Final acceptance + `new_improvements.md` → `archive_improvements.md` promotion) — not run this sync.
+  These stages were omitted without a formal decision. This must be considered when redesigning
+  the workflow: either enforce them as hard gates or explicitly drop them from the protocol.
+
+**NEXT SESSION PURPOSE: Error Analysis.**
+Do NOT continue sync work. The next session should open this handoff, read the
+"Errors & Friction Log" section below, and produce a structured improvement proposal
+for the workflow. Use ADVANCED (Opus) for that session.
 
 ## Current Stage
 
-Stage 3 COMPLETE. Batches 0–6 all committed. Next: **Batch 7** — surface the 4 explicit
-2d decisions for user approval before any further work.
+Stage 3 COMPLETE. Stages 4–5 skipped. Sync is functionally done (all code committed).
+The outstanding work is a retrospective/improvement session, not more sync execution.
+
+## Errors & Friction Log — This Sync (for next-session analysis)
+
+All errors, friction points, and process gaps from Stages 2–3. The next session should
+read this section in full and produce improvement proposals before doing anything else.
+
+### CRITICAL ERRORS
+
+**[CE-1 — Stage 2a — Agent scope overreach]**
+When the user scoped "take upstream wholesale" to **exactly the last 5 upstream commits**
+(exception: `pyproject.toml`), the agent over-extended that scope to the entire 145-commit
+change set and proposed treating `db/models.py` under it. Blindly taking upstream
+`db/models.py` would have deleted the fork's localized `SBS`/`Russian`/`Tamil`/`Sinhala`
+tables and `*_ru` columns. The agent caught and self-corrected, but only after the wrong
+proposal and a user-flagged round-trip.
+- Root cause: treated a scope-qualified instruction as a general rule; did not first
+  resolve the exact file set before reasoning.
+- Fix applied: memory entry `feedback_apply_scoped_instructions_literally`. Stage 2a
+  improvement idea: pin "last-N-commits scope" to a concrete file list before classifying.
+
+### ERRORS (correctness impact)
+
+**[E-1 — Stage 3 — Stale handoff on session resume]**
+The handoff said "Batch 1 is next" but Batch 1 was already committed in `9f09d926`.
+The resuming agent had to detect this from `git log` rather than trusting the handoff.
+- Root cause: the session that committed Batch 1 wrote the restart prompt but did not
+  update the handoff's "Next Action" section to reflect the completed commit.
+- Impact: would have caused a double-apply of Batch 1 edits if the agent had not verified.
+- Fix: always update the handoff's Status + Next Action immediately after a commit lands,
+  before writing the restart prompt.
+
+**[E-2 — Stage 3 — test_shadow_parity.py whitelist used stale relative import paths]**
+The whitelist for `db/families/family_root_ru.py` had entries like
+`root_info.generate_root_info_html` but upstream changed from relative to absolute imports.
+The AST extractor generates `db.families.root_info.generate_root_info_html`. The whitelist
+silently stopped filtering, producing false test failures. Additionally,
+`tools.lookup_sync.sync_lookup_column` (a new upstream import, intentionally N-A in the
+shadow) was never added to the whitelist when B3 work was planned.
+- Root cause: whitelist entries were written in relative-import form; no process to verify
+  whitelist entries match the actual AST output format after an upstream import-style change.
+- Fix applied this session: updated whitelist to FQ paths + added sync_lookup_column.
+- Improvement: whitelist entries should always be FQ (`module.symbol`) — add a note to the
+  guide or a validator.
+
+**[E-3 — Stage 3 — RootsData.pth type too narrow (DPSPaths rejected by pyright)]**
+`RootsData.__init__` had `pth: ProjectPaths` but `export_roots_sbs.py` passes `DPSPaths`.
+Not caught until pyright ran on B6.5 files. `HeadwordData` already had the correct wide
+union type; `RootsData` was never updated when the DPS shadow was created.
+- Root cause: shadow setup didn't propagate the `ProjectPaths | RuPaths | DPSPaths` union
+  to all classes in `data_classes_dps.py` — only `HeadwordData` got it.
+- Fix applied: widened `RootsData.pth` to `ProjectPaths | RuPaths | DPSPaths`.
+
+**[E-4 — Stage 3 — tpr_headword_ru.jinja unregistered when its Python file was edited]**
+The B5.2 edit deleted `compound_type_has_digit` from `tpr_exporter_ru.py`, which forced a
+coupled template change in `exporter/tpr/templates/tpr_headword_ru.jinja`. That template had
+no registry entry — discovered mid-execution. Had to register it on the fly (same commit).
+- Root cause: the plan noted the coupled edit but did not flag the missing registry entry
+  early enough to pre-register before Stage 3 began. The Shadow Documentation Gate caught it,
+  but only at execution time, not planning time.
+- Improvement: during Stage 2 planning, for every Python shadow that has a coupled Jinja
+  template, check registry for the template too — not just the `.py` file.
+
+### FRICTION (no correctness impact, but cost time or clarity)
+
+**[F-1 — Stage 3 — Template parallel edit without prior read]**
+Attempted to edit 8 Jinja template files in parallel without reading them first. Got
+"File has not been read yet" tool errors for all 8. Had to read them first, then re-edit.
+- Fix: always read before editing; for batch template edits, issue parallel reads first.
+
+**[F-2 — Stage 3 — extract_body import source ambiguity for SBS files]**
+SBS exporter files normally import only from `tools.utils_sbs`. `extract_body` lives in
+`tools.utils` only (not forwarded). SBS files that previously had no `tools.utils` import
+needed a new dual-import line, which was not obvious from the plan's instructions.
+- Improvement: the B6 plan should explicitly note "SBS files need a NEW `from tools.utils
+  import extract_body` line — do not assume it is re-exported via utils_sbs."
+
+**[F-3 — Stage 3 — rg 'open\\(' false positive in B5.1 verification]**
+The verify command `rg -n 'open\('` matches both `path.open(` (correct Path.open) and bare
+`open()` (what we were checking for). All matches in tbw_exporter_ru.py were `.open(` calls,
+but the agent had to inspect each hit manually to confirm.
+- Improvement: use a more precise pattern: `rg -n '[^.]open\('` or `rg -n '\bopen\('` to
+  exclude method-call forms.
+
+**[F-4 — Stage 3 — "Batch 7 TODO" stale entry caused end-of-session confusion]**
+The batch ledger had "TODO Batch 7 — 2d approval gate" but those 4 decisions were resolved
+in Stage 2d before Stage 3 began. At session end, this created ambiguity about whether work
+remained. The Status and Next Action sections gave conflicting signals.
+- Root cause: the ledger's TODO was not cleared when Stage 2d was resolved.
+- Fix: when an approval gate resolves, mark the corresponding ledger entry DONE immediately.
+
+**[F-5 — Stage 3 — kindle pathlib.Path import dropped → parity test failure]**
+B5.3 correctly dropped `from pathlib import Path` from `kindle_exporter_ru.py` (no longer
+used after `Path(pth.epub_dir)` → `pth.epub_dir`). But upstream still has it as a dead
+import. The parity test reported it as missing; needed a whitelist addition.
+- Improvement: when dropping an import that upstream retains (even dead), note it in the
+  plan as "will require whitelist update."
+
+**[F-6 — Context compaction × multiple sessions]**
+The prior session hit context limits and produced a compacted summary. This session also
+compacted. Work completed correctly because all state was in files (working tree, handoff,
+dynamic_plan), not in-context memory. However, the stale handoff (E-1) was a near-miss
+that compaction made more likely — the resuming agent could have trusted the summary over
+git log.
+- Observation: the workflow is resilient to compaction when durable files are authoritative,
+  but any stale handoff entry becomes a risk at session boundaries.
+
+### SKIPPED STAGES (process gap)
+
+**[S-1 — Stage 4 (Docs Translation Parity) — not run]**
+No docs parity check or translation plan was produced for this sync.
+
+**[S-2 — Stage 5 (Final acceptance + retrospective) — not run]**
+No `new_improvements.md` was written; no `archive_improvements.md` promotion happened.
+The retrospective mechanism exists in the workflow but was bypassed without a formal
+decision. This is a recurring risk: Stage 5 requires extra time and a separate session,
+making it easy to skip when the code work feels done.
+- The next session's improvement analysis should propose either: (a) a lightweight mandatory
+  Stage 5 that takes ≤15 min, or (b) explicit removal from the protocol with a replacement
+  mechanism (e.g., this Errors & Friction Log written inline in the handoff, as done here).
+
+---
 
 ## Stage 2c progress (batch ledger — full detail in dynamic_plan.md "Batch ledger")
 
@@ -311,43 +442,33 @@ before execute_sync.py could run. Those decisions were already recorded in Stage
 
 ## Next Action
 
-**Stage 3 = Batch 1** (FAST). Start at B1.2 — B1.1 already done in Commit 1.
-
-**Approved 2d decisions carried into Stage 3:** B6.4 SKIP · B6.10 SKIP (no full-suite pytest) ·
-register `tpr_headword_ru.jinja` (`russian_copies`) during B5.2 · B5.8 apply-by-analogy (6 TSV opens).
+**Error analysis session.** Do not run any sync work. Read the "Errors & Friction Log"
+section above and produce a structured improvement proposal for the workflow.
 
 ## Next Model
 
-FAST — Stage 3, Batch 1. Mechanical implementation per `dynamic_plan.md` BATCH 1.
-Start at B1.2 (B1.1 done). STOP → ADVANCED on any missing anchor or unexpected failure.
+**ADVANCED (Opus)** — analysis and judgment, not mechanical execution.
 
 ## Restart Prompt
 
 ```text
-Switch to FAST. Start a fresh session.
+Retrospective session for upstream sync 2026-06-12.
 
-Continue upstream sync thread: kamma/threads/20260612_upstream_sync (Stage 3, Batch 1 — FAST).
-First read:
-1. kamma/threads/20260612_upstream_sync/handoff.md  (Batch 0 notes — MANDATORY)
-2. kamma/threads/20260612_upstream_sync/dynamic_plan.md  (BATCH 1 section)
+The sync is complete (Commits 9f09d926 + dfeb5997 on branch sbs-ru, 2026-06-13).
+Stages 4 and 5 were skipped. This session's purpose is to analyze the errors from
+the sync and propose workflow improvements — do NOT run any sync execution.
 
-CRITICAL: B1.1 (db/models.py variant rename) is ALREADY DONE in Commit 1. Start at B1.2.
+Read in full:
+  kamma/threads/20260612_upstream_sync/handoff.md
+  — focus on the "Errors & Friction Log" section (CE-*, E-*, F-*, S-* entries)
+  — also read the existing kamma/upstream_sync/archive_improvements.md for context
+    on what lessons have already been captured from prior runs
 
-Batch 1 tasks (in order):
-- B1.2 — variant rename fan-out: 4 files (data_classes.py:88, data_classes_ru.py:89,
-  tpr_exporter_ru.py:167, tbw_exporter_ru.py:194). VERIFY: rg "variants_pack|variants_unpack"
-  returns zero rows (excluding dps_archive).
-- B1.3 — pyproject.toml merge (7 hunks per plan). STOP → ADVANCED if num2words or typst
-  positions differ from expected.
-- B1.4 — `uv lock` (regenerate, do NOT take upstream verbatim). VERIFY: uv lock --check exits 0;
-  rg 'num2words' uv.lock ≥1; rg 'google-genai' uv.lock ≥1.
-- B1.5 — `git rm exporter/analysis/types.py`. VERIFY: rg "exporter\.analysis\.types" returns 0.
-- Then prepare Commit 2 and HARD STOP (Commit 2 is a session boundary).
+Then produce a structured improvement proposal covering:
+1. Which errors are symptoms of a missing workflow rule vs. a one-off agent mistake?
+2. Which friction points are worth adding to guide.md or templates/?
+3. What should change about Stages 4 and 5 given they are consistently skipped?
+4. Any other patterns worth capturing in archive_improvements.md?
 
-R=0ea5883380f56b682cf8574043afb8e66cca3260..518672a65fa3ea7c36c4c754dc5276bb41f92da7
-
-Do NOT proceed to Batch 2. STOP → ADVANCED on any missing anchor, preservation failure,
-or unexpected test failure. Never stage resources/* submodule pointers.
+Do not write to any files yet — present the proposal for user approval first.
 ```
-
-Do not continue in this session.
