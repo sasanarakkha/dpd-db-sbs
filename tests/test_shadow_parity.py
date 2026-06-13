@@ -117,7 +117,12 @@ WHITELIST: dict[str, WhitelistEntry] = {
     },
     "db/rpd/rpd_to_lookup_ru.py": {"missing": True},
     "exporter/deconstructor/deconstructor_exporter_ru.py": {
-        "functions": ["generate_deconstructor_html"],
+        "functions": [
+            "generate_deconstructor_html",
+            "_make_synonyms",
+            "_make_dict_info",
+            "_make_dict_vars",
+        ],
         "classes": ["GlobalVars"],
     },
     "exporter/goldendict/export_dpd_ru.py": {
@@ -249,17 +254,18 @@ WHITELIST: dict[str, WhitelistEntry] = {
         ],
     },
     "exporter/webapp/preloads_ru.py": {
+        "imports": [
+            "db.db_helpers.make_roots_count_dict",
+            "collections.defaultdict",
+            "typing.Dict",
+            "tools.pali_sort_key.pali_list_sorter",
+            "unidecode.unidecode",
+        ],
         "functions": [
             "load_data",
             "make_ascii_to_unicode_dict",
             "make_headwords_clean_set",
             "make_roots_count_dict",
-        ],
-        "imports": [
-            "collections.defaultdict",
-            "typing.Dict",
-            "tools.pali_sort_key.pali_list_sorter",
-            "unidecode.unidecode",
         ],
     },
     "exporter/webapp/toolkit_ru.py": {
@@ -333,6 +339,57 @@ WHITELIST: dict[str, WhitelistEntry] = {
     },
     "tools/utils_sbs.py": {
         "functions": ["list_into_batches", "squash_whitespaces", "extract_body"]
+    },
+    "gui2/dps_example_field.py": {
+        "imports": [
+            "gui2.dpd_fields_functions.remove_bold_tags",
+            "tools.clean_sentence.split_pali_sentence_into_words",
+            "gui2.pass2_add_view.Pass2AddView",
+            "gui2.dpd_fields.DpdFields",
+            "gui2.example_stash_manager.ExampleStashManager",
+            "gui2.pass1_add_view.Pass1AddView",
+            "tools.cst_source_sutta_example.find_cst_source_sutta_example",
+            "gui2.dpd_fields_functions.remove_brackets",
+            "gui2.flet_functions.highlight_word_in_sentence",
+        ],
+        "functions": [
+            "value",
+            "click_book_and_word",
+            "update_example_index",
+            "_handle_hyphens_and_apostrophes",
+            "click_bold_example",
+            "click_choose_example_cancel",
+            "click_remove_bold_tags",
+            "field",
+            "choose_example",
+            "click_remove_brackets",
+            "error_text",
+            "update_counter",
+            "_handle_book_blur",
+            "_click_search_dialog_ok",
+            "_toggle_tools_visibility",
+        ],
+        "classes": ["DpdExampleField"],
+    },
+    "gui2/dps_example_stash_manager.py": {
+        "imports": ["gui2.toolkit.ToolKit"],
+        "classes": ["ExampleStashManager"],
+    },
+    "gui2/dps_meaning_field.py": {
+        "imports": [
+            "gui2.dpd_fields.DpdFields",
+            "tools.spelling.CustomSpellChecker",
+            "gui2.pass1_add_view.Pass1AddView",
+            "gui2.pass2_add_view.Pass2AddView",
+        ],
+        "functions": [
+            "_handle_on_focus",
+            "_handle_on_blur",
+            "helper_text",
+            "color",
+            "_remove_word_from_spell_errors",
+        ],
+        "classes": ["DpdMeaningField"],
     },
 }
 

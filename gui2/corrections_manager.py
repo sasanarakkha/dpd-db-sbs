@@ -29,10 +29,14 @@ class CorrectionsManager:
             for contrib_file in sorted(data_dir.glob("corrections_*.json")):
                 if "corrections_added" in contrib_file.name:
                     continue
+                if "corrections_processed" in contrib_file.name:
+                    continue
                 try:
                     with open(contrib_file, encoding="utf-8") as f:
                         contrib_data = json.load(f)
                 except (FileNotFoundError, json.JSONDecodeError):
+                    continue
+                if isinstance(contrib_data, list):
                     continue
                 for key, value in contrib_data.items():
                     if key in merged:

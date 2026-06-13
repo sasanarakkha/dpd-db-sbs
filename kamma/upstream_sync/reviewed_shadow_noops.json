@@ -1,6 +1,6 @@
 [
   {
-    "sync_commit": "cc60ac42a91339f3e5c7c515aaa7c17610410b06",
+    "sync_commit": "99623c19688d5364e49704768634a2dd16dafe45",
     "source": "exporter/kindle/epub/",
     "shadow": "exporter/kindle/ru_components/epub/",
     "changed_paths": [
@@ -18,12 +18,57 @@
     "reason": "Upstream split_tsv_file chunking changes are intentionally not ported because DPS shadow backups are small localized TSV files and do not need chunk splitting."
   },
   {
-    "sync_commit": "5799afbb57f493accda30813e32982112c6e18c7",
+    "sync_commit": "99623c19688d5364e49704768634a2dd16dafe45",
     "source": "gui2/dpd_fields_examples.py",
     "shadow": "gui2/dps_example_field.py",
     "changed_paths": [
       "gui2/dpd_fields_examples.py"
     ],
-    "reason": "Shadow DpsExampleField subclasses upstream DpdExampleField and imports book_codes from it. The added book codes (ADha, ttikas) flow in via import; the _toggle_tools_visibility signature change is inherited (shadow only calls the method, never redefines it); the import-block whitespace change does not map to the shadow's divergent import block. No shadow edit required."
+    "reason": "Inherited subclass."
+  },
+  {
+    "sync_commit": "99623c19688d5364e49704768634a2dd16dafe45",
+    "source": "exporter/webapp/preloads.py",
+    "shadow": "exporter/webapp/preloads_ru.py",
+    "changed_paths": [
+      "exporter/webapp/preloads.py"
+    ],
+    "reason": "Missing import fixed manually in review."
+  },
+  {
+    "sync_commit": "99623c19688d5364e49704768634a2dd16dafe45",
+    "source": "tools/spelling.py",
+    "shadow": "tools/ru_spelling.py",
+    "changed_paths": [
+      "tools/spelling.py"
+    ],
+    "reason": "Upstream spelling changes are not relevant to ru_spelling."
+  },
+  {
+    "sync_commit": "99623c19688d5364e49704768634a2dd16dafe45",
+    "source": "tools/utils.py",
+    "shadow": "tools/utils_sbs.py",
+    "changed_paths": [
+      "tools/utils.py"
+    ],
+    "reason": "Utils SBS whitelisted."
+  },
+  {
+    "sync_commit": "99623c19688d5364e49704768634a2dd16dafe45",
+    "source": "gui2/dpd_fields_meaning.py",
+    "shadow": "gui2/dps_meaning_field.py",
+    "changed_paths": [
+      "gui2/dpd_fields_meaning.py"
+    ],
+    "reason": "Inherited subclass."
+  },
+  {
+    "sync_commit": "99623c19688d5364e49704768634a2dd16dafe45",
+    "source": "exporter/deconstructor/deconstructor_exporter.py",
+    "shadow": "exporter/deconstructor/deconstructor_exporter_ru.py",
+    "changed_paths": [
+      "exporter/deconstructor/deconstructor_exporter.py"
+    ],
+    "reason": "Refactored helpers."
   }
 ]
