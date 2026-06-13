@@ -19,3 +19,5 @@
 - 2026-06-12 [POSITIVE] Freezing regression goldens against a specific commit hash before refactoring ensures high-confidence, byte-identical migrations.
 - 2026-06-12 [WORKFLOW] The Audit-before-Port pattern for cross-folder deps effectively prevents "reconcile-everything" bloat by isolating breakage risks to a minimal edit set.
 - 2026-06-12 [BEHAVIOR] Ensure the thread review accurately lists ALL changed files, including documentation, to avoid surprises during the final commit proposal.
+- 2026-06-13 [POSITIVE] Switching agy transport to stdin (--print -) bypasses OS-level argv limits (MAX_ARG_STRLEN), enabling the analysis of large verses that previously failed.
+- 2026-06-13 [POSITIVE] JSON-size-driven chunking with grounded-translation fallback provides a robust safety net for lone oversize sentences without requiring model-specific tokenizers.

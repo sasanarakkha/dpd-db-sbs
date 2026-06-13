@@ -76,10 +76,10 @@ agy --version
 ```
 
 When `agy` is found on PATH it is used automatically. No config file change is
-needed. The provider runs `agy --sandbox --print` from a temporary scratch
-directory, not from the repository root. Prompts over 700,000 UTF-8 bytes are
-rejected before calling `agy`, because the current transport passes the full
-prompt through argv.
+needed. The provider runs `agy --sandbox --print -` from a temporary scratch
+directory, not from the repository root; the prompt is piped via stdin, not
+passed as an argv argument. Prompts exceeding 4,000,000 UTF-8 bytes are
+rejected as a sanity ceiling.
 
 ### API-key fallbacks
 
@@ -277,7 +277,7 @@ The AI recovery path is intentionally tolerant:
 - Accepts compact word-to-option-key maps and fetches translation separately.
 - Reformats valid-but-wrong-schema or non-standard responses.
 - Retries missing score groups, with a supplemental retry pass when needed.
-- Splits oversized first-pass work into sentence-level chunks.
+- Splits oversized first-pass work into JSON-size-driven, sentence-boundary chunks (threshold: 900,000 compact-JSON chars). For a single lone sentence whose JSON alone exceeds the threshold, splits by word for scoring only and then issues one grounded whole-sentence translation built from the chosen senses.
 - Records provider/model status for first responses, reformats, translations,
   and retry requests in the debug JSON and raw debug log.
 

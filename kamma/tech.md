@@ -13,6 +13,7 @@
 - **ty** — type checker
 - **Pytest** — testing framework
 - **Typst** — PDF generation
+- **antigravity-cli (agy)** — AI model transport provider for the analysis pipeline (uses stdin transport).
 
 ## Who This Is For
 Internal development, with occasional external contributors submitting data via the
