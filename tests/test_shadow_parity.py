@@ -99,13 +99,10 @@ WHITELIST: dict[str, WhitelistEntry] = {
         ],
         "imports": [
             "collections.defaultdict",
-            "db.models.Lookup",
             "db.families.root_info.generate_root_info_html",
             "db.families.root_matrix.generate_root_matrix",
-            "tools.lookup_is_another_value.is_another_value",
             "tools.lookup_sync.sync_lookup_column",
             "tools.pali_sort_key.pali_list_sorter",
-            "tools.update_test_add.update_test_add",
         ],
     },
     "db/families/family_set_ru.py": {"functions": ["compile_sf_html"]},
@@ -118,7 +115,6 @@ WHITELIST: dict[str, WhitelistEntry] = {
     "db/rpd/rpd_to_lookup_ru.py": {"missing": True},
     "exporter/deconstructor/deconstructor_exporter_ru.py": {
         "functions": [
-            "generate_deconstructor_html",
             "_make_synonyms",
             "_make_dict_info",
             "_make_dict_vars",
@@ -199,7 +195,6 @@ WHITELIST: dict[str, WhitelistEntry] = {
         ]
     },
     "exporter/grammar_dict/grammar_dict_ru.py": {
-        "functions": ["generate_grammar_dict"],
         "classes": ["GlobalVars"],
     },
     "exporter/kindle/kindle_exporter_ru.py": {
@@ -227,11 +222,10 @@ WHITELIST: dict[str, WhitelistEntry] = {
         ],
     },
     "exporter/tbw/tbw_exporter_ru.py": {
-        "functions": ["generate_tbw_html", "save_js_files_for_tbw"],
+        "functions": ["save_js_files_for_tbw"],
         "classes": ["GlobalVars"],
     },
     "exporter/tpr/tpr_exporter_ru.py": {
-        "functions": ["generate_tpr_html"],
         "imports": ["tools.uposatha_day.UposathaManger"],
     },
     "exporter/webapp/data_classes_ru.py": {
@@ -243,7 +237,6 @@ WHITELIST: dict[str, WhitelistEntry] = {
     },
     "exporter/webapp/main_ru.py": {
         "imports": [
-            "exporter.webapp.preloads.load_data",
             "tools.translit.auto_translit_to_roman",
         ],
         "functions": [
@@ -257,25 +250,17 @@ WHITELIST: dict[str, WhitelistEntry] = {
         "imports": [
             "db.db_helpers.make_roots_count_dict",
             "collections.defaultdict",
-            "typing.Dict",
             "tools.pali_sort_key.pali_list_sorter",
             "unidecode.unidecode",
         ],
         "functions": [
-            "load_data",
             "make_ascii_to_unicode_dict",
             "make_headwords_clean_set",
-            "make_roots_count_dict",
         ],
     },
     "exporter/webapp/toolkit_ru.py": {
         "functions": [
             "make_dpd_html",
-            "get_dpd_html",
-            "get_epd_html",
-            "get_help_html",
-            "get_root_html",
-            "get_variant_spelling_html",
         ],
         "imports": [
             "exporter.webapp.data_classes.AbbreviationsData",
@@ -312,7 +297,6 @@ WHITELIST: dict[str, WhitelistEntry] = {
             "tools.configger.config_test",
             "db.db_helpers.create_db_if_not_exists",
             "tools.configger.config_update",
-            "rich.print",
         ],
     },
     "scripts/export/dps_anki_updater.py": {

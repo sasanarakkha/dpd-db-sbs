@@ -80,6 +80,8 @@ continue from files only.
 
 Hard stop procedure: save artifacts -> update `handoff.md` -> state the exact restart prompt and required model -> STOP. Do not continue in the same session.
 
+**Commit-closeout checklist (mandatory after each commit lands):** Before writing the restart prompt, update `handoff.md` Status + Next Action to reflect the commit that just landed, and mark resolved ledger/approval items DONE. A restart prompt written before the handoff is updated causes the next session to re-do already-finished work.
+
 **Fresh restart prompt template:**
 
 ```text
@@ -213,7 +215,7 @@ Stage 4 is split into two model-bound substages: ADVANCED analysis and FAST tran
    - `execute_sync.py` pins `as_upstream` directly to the verified manifest SHA without switching branches.
    - (Commit 1 gate). Message format: `#sync: upstream pull <from>..<to>, <N> files, YYYY-MM-DD`
    - `execute_sync.py <thread_dir>` leaves changes unstaged by default. Review `git diff` before manual staging; use `--stage` only when you intentionally want the script to run `git add .`.
-   - **Upstream deletions propagate.** Files deleted upstream (and acknowledged via `run_acknowledged_blockers.txt`) are removed from the worktree as an unstaged deletion you review in `git diff` — no separate manual "verify-then-remove" pass is required for upstream-tracked paths. Permanent exclusions and run-specific exclusions are still restored from the local branch afterward, so protected files are never dropped.
+   - **Upstream deletions propagate.** After the exclusion-restore step, `execute_sync.py` runs `propagate_upstream_deletions` which computes `git diff --no-renames --diff-filter=D <last_accepted_sha>..<target_sha>` and removes any resulting candidate that is not in the protected set (shadows, `no_sync_files`, `modified_upstream_files`, `unique_paths`, and run-specific exclusions). Each removal is worktree-only (`Path.unlink`), never staged — it surfaces as an unstaged deletion in `git diff` for human review before Commit 1. Renamed-away files are covered because `--no-renames` decomposes renames into add+delete.
    - **Staging rule:** NEVER use `git add -A -- <file list>` — gitignore'd paths will trigger errors. If you stage all sync changes manually, use `git add .` which respects `.gitignore` automatically. If you must stage selectively, pre-filter with `git add <file>` one path at a time or check first with `git check-ignore -v <path>`.
 
 ### Stage 2: Analysis (ADVANCED Strategic Planning)
@@ -239,6 +241,8 @@ A session must be restartable at any sub-stage boundary from files alone — nev
      - Exact code to insert, replace, or delete (literal, not paraphrased).
      - Verification command to confirm the change landed correctly.
    - If any item says "figure out X", "determine Y", or "check Z" — the plan is incomplete. ADVANCED must resolve those before handing off.
+   - **Coupled `.jinja` template pre-registration (MANDATORY):** For every Python shadow in the plan, check `registry.json` for a coupled `.jinja` template (same base name, different extension). If one is found, pre-register the coupled .jinja template in `registry.json` and add it to the plan. Jinja templates silently break when their paired Python file is updated without them.
+   - **Union-type propagation (MANDATORY):** When an upstream type or union changes (e.g., a `TypeAlias`, `Literal`, or `TypedDict` field), propagate the change to ALL sibling localized data classes (`_ru`, `_sbs`, `_dps`, `_ta`). Applying the change to only one sibling silently breaks the others.
    - **Shadow/inspired refactor porting check (MANDATORY when upstream change is structural):** For every upstream file in the dynamic plan whose diff shows structural refactoring — type hint modernisation, `os` → `pathlib`, `print()` / `rich.print()` → `pr.*`, dead code removal, method signature cleanup, or similar quality improvements — check `registry.json` for registered shadow copies (`russian_copies`, `sbs_copies`, `dps_copies`, `tamil_copies`) and `inspired_by_upstream` entries with that file as counterpart. If any exist, the `dynamic_plan.md` item for each copy must include those structural changes in addition to any feature change. Do not port a feature change in isolation when the upstream source was also structurally improved in the same commit range.
 2. **Discussion Flags**:
    - Check `discuss` flags in `registry.json`. If `true`, resolve with the user before planning.
@@ -274,8 +278,18 @@ A session must be restartable at any sub-stage boundary from files alone — nev
      - If upstream **does** have an equivalent → investigate: was it replaced by inline rendering? If so, delete the local dead copy.
    - Document findings and decisions in `handoff.md` before deleting anything.
 
-### Stage 4: Docs Translation Parity (ADVANCED Analysis -> FAST Execution)
-**Goal**: Ensure `docs_rus/` is a complete, up-to-date Russian translation of `docs/`.
+### Stage 4: Docs Translation Parity (Async Queue)
+**Goal**: Track `docs/` changes that need Russian translation without blocking the code sync.
+
+**Stage 4 is decoupled from the code sync.** During Stage 3, FAST appends any changed `docs/`
+paths to `kamma/upstream_sync/docs_translation_queue.md` (one unchecked item per path). The
+code sync commit does **not** block on translation — the queue is drained in a separate session.
+ADVANCED reviews the queue and assigns a strategy (full translation, targeted update, or
+no-translate redirect); FAST executes translations and checks items off.
+
+See the queue file for pending items: `kamma/upstream_sync/docs_translation_queue.md`.
+
+**Original goal (still applies when draining the queue):** Ensure `docs_rus/` is a complete, up-to-date Russian translation of `docs/`.
 
 `docs/` is upstream-owned and accepted verbatim during sync. `docs_rus/` is the maintained Russian translation — every file in `docs/` must have a counterpart in `docs_rus/` (except `docs_rus/dpd_rus.md`, `docs_rus/contributing/rus_collaboration.md`, and `docs_rus/technical/dpd_headwords_table_ru.md` which are local-only). Never add local content to `docs/`.
 
@@ -310,9 +324,37 @@ The script reads `<thread_dir>/prep_manifest.json` and reports docs changes from
 
 1. **Full manual verification**
    - Ask user to verify everything and stay back for feedback. After correcting it, do not proceed until user explicitly says "all is good, proceed."
-2. **After sync**
-   - If accepted, write exact FAST handoff instructions to run `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>`.
+2. **Write retrospective.md (REQUIRED before finalize)**
+   - Copy `kamma/upstream_sync/templates/retrospective.md` to `<thread_dir>/retrospective.md`.
+   - Fill the three buckets: **landed** (fixed in code this sync), **promote** (becomes a guide rule / validator / archive entry — do it now), **drop** (genuine one-off, with reason).
+   - Promote any `promote` items to `archive_improvements.md` before running finalize.
+   - `finalize_accepted_sync.py` will refuse to run if `retrospective.md` is absent (hard code gate).
+3. **After sync**
+   - Write exact FAST handoff instructions to run `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>`.
    - Review the temporary `new_improvements.md`, promote accepted items to `archive_improvements.md`, and delete the file.
+
+---
+
+## Stage 3 gotchas
+
+Recurring pitfalls captured from past sync runs. Check these before declaring a shadow clean.
+
+- **SBS files may need an explicit `from tools.utils import …` (F-2).** When upstream adds a
+  utility import, the SBS shadow does not inherit it automatically. If upstream adds
+  `from tools.utils import some_helper`, also add `from tools.utils import some_helper` to the
+  SBS shadow manually — do not assume it comes for free via the restore.
+
+- **Use `\bopen\(` or `[^.]open\(` when grepping for bare `open()` (F-3).** A plain `grep open`
+  also matches `pathlib.Path.open(`, `re.compile("open")`, and method names like `is_open`.
+  Use `rg '\bopen\('` or `rg '[^.]open\('` to find only unqualified `open()` calls that may need
+  to be ported to `Path.open()` or `pathlib.Path.open`.
+
+- **Dropping an upstream import requires a parity whitelist addition (F-5).** If the shadow
+  intentionally omits an import that upstream retains (e.g., a deprecated helper that the
+  shadow replaces with its own logic), add a `WHITELIST` entry to
+  `tests/test_shadow_parity.py` for that import, or the parity test will fail on every future
+  sync. Run `uv run pytest tests/test_whitelist_liveness.py` afterward to confirm the entry is
+  in the correct FQ form.
 
 ---
 

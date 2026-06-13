@@ -20,6 +20,11 @@ from tools.printer import printer as pr
 DEFAULT_ACCEPTANCE_NOTES = "Accepted after Stage 5 verification."
 
 
+def retrospective_exists(thread_dir: str | Path) -> bool:
+    """Return True if <thread_dir>/retrospective.md exists."""
+    return (Path(thread_dir) / "retrospective.md").exists()
+
+
 def resolve_commit_date(commit_sha: str) -> str:
     """Resolve the upstream commit date for the accepted target SHA."""
     result = subprocess.run(
@@ -34,6 +39,14 @@ def resolve_commit_date(commit_sha: str) -> str:
 def finalize_accepted_sync(thread_dir: str, state_path: Path, notes: str) -> int:
     """Verify the prep manifest, then advance accepted upstream sync metadata."""
     pr.green_title("finalize_accepted_sync.py")
+
+    if not retrospective_exists(thread_dir):
+        pr.red(
+            "Stage 5 retrospective.md missing — write it before finalizing. "
+            f"Expected: {Path(thread_dir) / 'retrospective.md'}"
+        )
+        return 1
+
     pr.green("verifying prep manifest")
     accepted_sync_state = load_accepted_sync_state(state_path)
     if (

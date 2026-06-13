@@ -8,6 +8,7 @@ from pathlib import Path
 
 from kamma.upstream_sync.scripts.registry_helper import (
     get_modified_upstream_paths,
+    get_strict_shadow_mappings,
     load_accepted_sync_state,
     load_registry,
 )
@@ -71,6 +72,97 @@ def run_git(args: list[str], check: bool = True) -> subprocess.CompletedProcess:
         if e.stderr:
             pr.red(f"Error output: {e.stderr.strip()}")
         raise GitError(f"Command failed: {' '.join(args)}") from e
+
+
+def get_protected_paths(run_exclusions: list[str] | None = None) -> set[str]:
+    """Build the full protected set for the deletion pass from the registry."""
+    registry = load_registry()
+    protected: set[str] = set()
+    protected.update(registry.no_sync_files)
+    protected.update(get_modified_upstream_paths(registry))
+    protected.update(get_strict_shadow_mappings(registry).keys())
+    protected.update(registry.unique_paths)
+    protected.update(registry.inspired_by_upstream.keys())
+    if run_exclusions:
+        protected.update(run_exclusions)
+    return protected
+
+
+def _is_protected(candidate: str, protected: set[str]) -> bool:
+    """Return True if candidate equals or is nested under any protected entry."""
+    if candidate in protected:
+        return True
+    candidate_path = Path(candidate)
+    for entry in protected:
+        entry_path = Path(entry)
+        try:
+            candidate_path.relative_to(entry_path)
+            return True
+        except ValueError:
+            pass
+    return False
+
+
+def propagate_upstream_deletions(
+    last_accepted_sha: str,
+    target_sha: str,
+    protected: set[str],
+    repo_root: Path | None = None,
+) -> None:
+    """Remove worktree files that upstream deleted or renamed away since last_accepted_sha.
+
+    Candidates come from git diff --no-renames --diff-filter=D, which decomposes renames into
+    add+delete so renamed-away paths appear as deleted. Protected files are never removed.
+    Removals are worktree-only (Path.unlink); the index is never touched.
+
+    Raises SystemExit(1) if last_accepted_sha does not resolve in the object store.
+    """
+    cwd = repo_root  # None = subprocess uses process CWD
+
+    # Guard missing base SHA before diffing
+    check = subprocess.run(
+        ["git", "cat-file", "-e", f"{last_accepted_sha}^{{commit}}"],
+        capture_output=True,
+        cwd=cwd,
+    )
+    if check.returncode != 0:
+        pr.red(
+            f"P0 deletion pass aborted: base SHA '{last_accepted_sha}' does not resolve "
+            "in the object store. Verify accepted_sync.json or re-run git fetch upstream."
+        )
+        raise SystemExit(1)
+
+    result = subprocess.run(
+        [
+            "git",
+            "diff",
+            "--no-renames",
+            "--name-only",
+            "--diff-filter=D",
+            f"{last_accepted_sha}..{target_sha}",
+        ],
+        capture_output=True,
+        text=True,
+        cwd=cwd,
+    )
+    if result.returncode != 0:
+        pr.red(f"P0 deletion diff failed: {result.stderr.strip()}")
+        raise SystemExit(1)
+
+    candidates = [p for p in result.stdout.splitlines() if p.strip()]
+    removed = 0
+    for candidate in candidates:
+        if _is_protected(candidate, protected):
+            continue
+        target = (repo_root / candidate) if repo_root else Path(candidate)
+        if target.exists():
+            target.unlink()
+            pr.amber(f"  P0 removed: {candidate}")
+            removed += 1
+
+    pr.yes(
+        f"P0 deletion pass: {removed} upstream-deleted file(s) removed from worktree"
+    )
 
 
 def get_permanent_exclusions() -> list[str]:
@@ -279,6 +371,15 @@ def execute_sync(
                     removed_count += 1
 
         pr.yes(f"restored {restored_count}, removed {removed_count}")
+
+        # 6b. Propagate upstream deletions (files upstream removed/renamed since last sync)
+        pr.green("propagating upstream deletions")
+        protected = get_protected_paths(run_specific)
+        propagate_upstream_deletions(
+            last_accepted_sha=state.last_accepted_upstream_sha,
+            target_sha=target_sha,
+            protected=protected,
+        )
 
         # 7. Optional staging
         if stage:
