@@ -21,3 +21,4 @@
 - 2026-06-12 [BEHAVIOR] Ensure the thread review accurately lists ALL changed files, including documentation, to avoid surprises during the final commit proposal.
 - 2026-06-13 [POSITIVE] Switching agy transport to stdin (--print -) bypasses OS-level argv limits (MAX_ARG_STRLEN), enabling the analysis of large verses that previously failed.
 - 2026-06-13 [POSITIVE] JSON-size-driven chunking with grounded-translation fallback provides a robust safety net for lone oversize sentences without requiring model-specific tokenizers.
+- 2026-06-13 [POSITIVE] Anchoring internal module paths to `__file__` and deferring side-effect-heavy initialization (like directory creation) to runtime ensures cross-platform robustness and clean test isolation.

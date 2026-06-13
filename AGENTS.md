@@ -88,6 +88,8 @@ Existing tables have extra `*_ru` columns (e.g., `root_ru_meaning`, `html_ru`).
   - **HTML IDs**: Always prefix with `ru_`, `sbs_`, or `dps_`.
 - **Clean Codebase**: Prefer modular abstractions. Use modern type hints and pathlib. Remove unused dependencies.
 - **UI Migrations**: When migrating UI or logging (e.g., to `printer.py`), perform a "runtime sweep" to catch undefined variables (`NameError`) in callbacks or rarely-triggered code paths.
+- **Path Anchoring**: Internal module paths MUST be anchored to `__file__` (e.g., `Path(__file__).resolve().parent`) to ensure they resolve correctly regardless of the process CWD.
+- **Side-Effect-Free Imports**: Avoid heavy initialization (directory creation, network calls, large file reads) at module level. Defer these to runtime (e.g., inside `main()` or via lazy-initialization) to ensure clean test isolation and predictable import behavior.
 
 ## Refactoring Safety
 - **Zero-Network Regression Harness**: When refactoring complex logic that depends on external APIs (e.g., AI providers), establish a regression harness using recorded fixtures (goldens) to ensure behavior is preserved byte-for-byte before proceeding with the architectural split.
