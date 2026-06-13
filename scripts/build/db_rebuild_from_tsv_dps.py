@@ -61,7 +61,7 @@ def main():
     # --- SBS: print missing, ask, remove if yes ---
     sbs_missing_rows = []
     sbs_rows = []
-    with open(dpspth.sbs_path, "r", newline="") as f:
+    with open(dpspth.sbs_path, "r", newline="", encoding="utf-8") as f:
         reader = csv.reader(f, delimiter="\t", quotechar='"')
         sbs_columns = next(reader)
         sbs_rows.append(sbs_columns)
@@ -79,7 +79,7 @@ def main():
         if answer == "y":
             # Remove missing rows from SBS TSV
             new_sbs_rows = [row for row in sbs_rows[1:] if row[0] in pali_word_ids]
-            with open(dpspth.sbs_path, "w", newline="") as f:
+            with open(dpspth.sbs_path, "w", newline="", encoding="utf-8") as f:
                 csvwriter = csv.writer(
                     f, delimiter="\t", quotechar='"', quoting=csv.QUOTE_ALL
                 )
@@ -94,7 +94,7 @@ def main():
     # --- Russian: print missing, remove silently ---
     russian_missing_rows = []
     russian_rows = []
-    with open(dpspth.russian_path, "r", newline="") as f:
+    with open(dpspth.russian_path, "r", newline="", encoding="utf-8") as f:
         reader = csv.reader(f, delimiter="\t", quotechar='"')
         ru_columns = next(reader)
         russian_rows.append(ru_columns)
@@ -107,14 +107,14 @@ def main():
         pr.red("IDs in Russian TSV not found in pali_word_path:")
         for row in russian_missing_rows:
             pr.red("  - " + "\t".join(row))
-    with open(dpspth.russian_path, "w", newline="") as f:
+    with open(dpspth.russian_path, "w", newline="", encoding="utf-8") as f:
         csvwriter = csv.writer(f, delimiter="\t", quotechar='"', quoting=csv.QUOTE_ALL)
         csvwriter.writerows(russian_rows)
 
     # --- Tamil: print missing, remove silently ---
     tamil_missing_rows = []
     tamil_rows = []
-    with open(dpspth.tamil_path, "r", newline="") as f:
+    with open(dpspth.tamil_path, "r", newline="", encoding="utf-8") as f:
         reader = csv.reader(f, delimiter="\t", quotechar='"')
         ta_columns = next(reader)
         tamil_rows.append(ta_columns)
@@ -127,7 +127,7 @@ def main():
         pr.red("IDs in Tamil TSV not found in pali_word_path:")
         for row in tamil_missing_rows:
             pr.red("  - " + "\t".join(row))
-    with open(dpspth.tamil_path, "w", newline="") as f:
+    with open(dpspth.tamil_path, "w", newline="", encoding="utf-8") as f:
         csvwriter = csv.writer(f, delimiter="\t", quotechar='"', quoting=csv.QUOTE_ALL)
         csvwriter.writerows(tamil_rows)
 
@@ -175,7 +175,7 @@ def read_tsv_files(file_paths: List[Path]) -> Iterator[Tuple[List[str], List[str
     columns = None
 
     for file_path in file_paths:
-        with open(file_path, "r", newline="") as tsv_file:
+        with open(file_path, "r", newline="", encoding="utf-8") as tsv_file:
             csvreader = csv.reader(tsv_file, delimiter="\t", quotechar='"')
             columns = next(csvreader)
 

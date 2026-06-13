@@ -20,7 +20,7 @@ from tools.tools_for_ru_exporter import (
     populate_set_ru_and_check_errors,
 )
 
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import Session, joinedload
 
 SORT_STRATEGIES: dict[str, list[str]] = {
     "natsort_prefixes": [
@@ -84,7 +84,7 @@ def _day_sort_key(meaning_1: str) -> int:
     return DAY_ORDER.get(meaning_1.strip().lower(), 99)
 
 
-def main():
+def main() -> None:
     pr.tic()
     pr.yellow_title("sets generator (ru)")
 
@@ -110,15 +110,16 @@ def main():
     sets_dict = make_sets_dict(sets_db)
     sets_dict = compile_sf_html_ru(sets_db, sets_dict)
     errors_list = add_sf_to_db(db_session, sets_dict)
+    db_session.close()
     print_errors_list(errors_list)
 
     pr.toc()
 
 
-def make_sets_dict(sets_db):
+def make_sets_dict(sets_db: list[DpdHeadword]) -> dict[str, dict]:
     pr.green_tmr("extracting set names")
 
-    sets_dict: dict = {}
+    sets_dict: dict[str, dict] = {}
 
     for i in sets_db:
         for fs in i.family_set_list:
@@ -143,7 +144,9 @@ def make_sets_dict(sets_db):
     return sets_dict
 
 
-def compile_sf_html_ru(sets_db: list[DpdHeadword], sets_dict):
+def compile_sf_html_ru(
+    sets_db: list[DpdHeadword], sets_dict: dict[str, dict]
+) -> dict[str, dict]:
     pr.green_tmr("compiling html ru")
 
     populate_set_ru_and_check_errors(sets_dict)
@@ -191,7 +194,7 @@ def compile_sf_html_ru(sets_db: list[DpdHeadword], sets_dict):
     return sets_dict
 
 
-def add_sf_to_db(db_session, sets_dict):
+def add_sf_to_db(db_session: Session, sets_dict: dict[str, dict]) -> list[str]:
     pr.green_tmr("updating db")
 
     errors_list = []
@@ -208,7 +211,7 @@ def add_sf_to_db(db_session, sets_dict):
             db_session.add(sf_data)
 
             if count < 3:
-                errors_list += [sf]
+                errors_list.append(sf)
         else:
             pr.red(f"{sf} not found in db")
 
@@ -218,8 +221,8 @@ def add_sf_to_db(db_session, sets_dict):
     return errors_list
 
 
-def print_errors_list(errors_list):
-    if errors_list != []:
+def print_errors_list(errors_list: list[str]) -> None:
+    if errors_list:
         pr.red("ERROR: less than 3 names in set: ")
         for error in sorted(errors_list):
             pr.red(f"{error}")

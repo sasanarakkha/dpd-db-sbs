@@ -3,7 +3,10 @@
 """Export family data to JSON."""
 
 import json
+from dataclasses import dataclass
 from pathlib import Path
+
+from sqlalchemy.orm import Session
 
 from db.db_helpers import get_db_session
 from db.models import FamilyCompound, FamilyIdiom, FamilyRoot, FamilySet, FamilyWord
@@ -12,23 +15,32 @@ from tools.paths_ru import RuPaths
 from tools.printer import printer as pr
 
 
+@dataclass
 class GlobalVars:
-    pth = ProjectPaths()
-    rupth = RuPaths()
-    db_session = get_db_session(pth.dpd_db_path)
-    fc_db = db_session.query(FamilyCompound).all()
-    fi_db = db_session.query(FamilyIdiom).all()
-    fr_db = db_session.query(FamilyRoot).all()
-    fs_db = db_session.query(FamilySet).all()
-    fw_db = db_session.query(FamilyWord).all()
-
-    paths = rupth
+    paths: RuPaths
+    db_session: Session
+    fc_db: list[FamilyCompound]
+    fi_db: list[FamilyIdiom]
+    fr_db: list[FamilyRoot]
+    fs_db: list[FamilySet]
+    fw_db: list[FamilyWord]
 
 
-def main():
+def main() -> None:
     pr.tic()
     pr.yellow_title("exporting families .json")
-    g = GlobalVars()
+    paths = ProjectPaths()
+    rupth = RuPaths()
+    db_session = get_db_session(paths.dpd_db_path)
+    g = GlobalVars(
+        paths=rupth,
+        db_session=db_session,
+        fc_db=db_session.query(FamilyCompound).all(),
+        fi_db=db_session.query(FamilyIdiom).all(),
+        fr_db=db_session.query(FamilyRoot).all(),
+        fs_db=db_session.query(FamilySet).all(),
+        fw_db=db_session.query(FamilyWord).all(),
+    )
     export_family_compound(g)
     export_family_idiom(g)
     export_family_root(g)
@@ -37,16 +49,14 @@ def main():
     pr.toc()
 
 
-def json_dumper(filepath: Path, dict: dict[str, str]):
+def json_dumper(filepath: Path, data: dict[str, object]) -> None:
     js_content = (
-        f"""var {filepath.stem} = {json.dumps(dict, ensure_ascii=False, indent=1)}"""
+        f"""var {filepath.stem} = {json.dumps(data, ensure_ascii=False, indent=1)}"""
     )
-
-    with open(filepath, "w") as f:
-        f.write(js_content)
+    filepath.write_text(js_content, encoding="utf-8")
 
 
-def export_family_compound(g: GlobalVars):
+def export_family_compound(g: GlobalVars) -> None:
     pr.green_tmr("exporting family_compound.json")
     fc_dict = {}
     for i in g.fc_db:
@@ -55,7 +65,7 @@ def export_family_compound(g: GlobalVars):
     pr.yes(len(fc_dict))
 
 
-def export_family_idiom(g: GlobalVars):
+def export_family_idiom(g: GlobalVars) -> None:
     pr.green_tmr("exporting family_idiom.json")
     fi_dict = {}
     for i in g.fi_db:
@@ -64,7 +74,7 @@ def export_family_idiom(g: GlobalVars):
     pr.yes(len(fi_dict))
 
 
-def export_family_root(g: GlobalVars):
+def export_family_root(g: GlobalVars) -> None:
     pr.green_tmr("exporting family_root.json")
     fr_dict = {}
     for i in g.fr_db:
@@ -80,7 +90,7 @@ def export_family_root(g: GlobalVars):
     pr.yes(len(fr_dict))
 
 
-def export_family_set(g: GlobalVars):
+def export_family_set(g: GlobalVars) -> None:
     pr.green_tmr("exporting family_set.json")
     fs_dict = {}
     for i in g.fs_db:
@@ -89,7 +99,7 @@ def export_family_set(g: GlobalVars):
     pr.yes(len(fs_dict))
 
 
-def export_family_word(g: GlobalVars):
+def export_family_word(g: GlobalVars) -> None:
     pr.green_tmr("exporting family_word.json")
     fw_dict = {}
     for i in g.fw_db:

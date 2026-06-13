@@ -7,7 +7,6 @@ import re
 
 from db.db_helpers import get_db_session
 from db.models import DbInfo, DpdHeadword, FamilyCompound
-from exporter.anki.anki_updater import family_updater
 from tools.configger import config_test
 from tools.degree_of_completion_ru import degree_of_completion_ru
 from tools.pali_sort_key import pali_sort_key
@@ -20,10 +19,10 @@ from tools.tools_for_ru_exporter import (
     ru_replace_abbreviations,
 )
 
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import Session, joinedload
 
 
-def main():
+def main() -> None:
     pr.tic()
     pr.yellow_title("compound families generator (ru)")
 
@@ -52,8 +51,12 @@ def main():
     add_cf_to_db(db_session, cf_dict)
     update_db_cache(db_session, cf_dict)
 
+    db_session.close()
+
     # update anki
     if config_test("anki", "update", "yes"):
+        from exporter.anki.anki_updater import family_updater
+
         anki_data_list = make_anki_data(cf_dict)
         deck = ["Family Compound RU"]
         family_updater(anki_data_list, deck)
@@ -61,12 +64,12 @@ def main():
     pr.toc()
 
 
-def create_comp_fam_dict(dpd_db: list[DpdHeadword]):
+def create_comp_fam_dict(dpd_db: list[DpdHeadword]) -> dict[str, dict]:
     pr.green_tmr("extracting compound families")
 
-    cf_dict: dict = {}
+    cf_dict: dict[str, dict] = {}
 
-    for __counter__, i in enumerate(dpd_db):
+    for i in dpd_db:
         for cf in i.family_compound_list:
             if cf == " ":
                 pr.red("ERROR: spaces found please remove!")
@@ -94,10 +97,12 @@ def create_comp_fam_dict(dpd_db: list[DpdHeadword]):
     return cf_dict
 
 
-def compile_cf_html_ru(dpd_db: list[DpdHeadword], cf_dict):
+def compile_cf_html_ru(
+    dpd_db: list[DpdHeadword], cf_dict: dict[str, dict]
+) -> dict[str, dict]:
     pr.green_tmr("compiling html ru")
 
-    for __counter__, i in enumerate(dpd_db):
+    for i in dpd_db:
         for cf in i.family_compound_list:
             if cf in cf_dict:
                 if i.lemma_1 in cf_dict[cf]["headwords"]:
@@ -128,10 +133,8 @@ def compile_cf_html_ru(dpd_db: list[DpdHeadword], cf_dict):
                                 degree_of_completion_ru(i, html=False),
                             )
                         )
-
-                    # anki data
-                    if i.meaning_1:
-                        construction = i.construction_clean if i.meaning_1 else ""
+                        # anki data
+                        construction = i.construction_clean
                         cf_dict[cf]["anki"] += [
                             (i.lemma_1, pos, ru_meaning, construction)
                         ]
@@ -142,10 +145,10 @@ def compile_cf_html_ru(dpd_db: list[DpdHeadword], cf_dict):
     return cf_dict
 
 
-def add_cf_to_db(db_session, cf_dict):
+def add_cf_to_db(db_session: Session, cf_dict: dict[str, dict]) -> None:
     pr.green_tmr("updating db")
 
-    for __counter__, cf in enumerate(cf_dict):
+    for cf in cf_dict:
         # find in db
         cf_data = db_session.query(FamilyCompound).filter_by(compound_family=cf).first()
         if cf_data:
@@ -159,7 +162,7 @@ def add_cf_to_db(db_session, cf_dict):
     pr.yes("ok")
 
 
-def make_anki_data(cf_dict):
+def make_anki_data(cf_dict: dict[str, dict]) -> list[tuple[str, str]]:
     """Make data list for anki updater."""
 
     anki_data_list = []
@@ -185,14 +188,12 @@ def make_anki_data(cf_dict):
     return anki_data_list
 
 
-def update_db_cache(db_session, cf_dict):
+def update_db_cache(db_session: Session, cf_dict: dict[str, dict]) -> None:
     """Update the db_info with cf_set for use in the exporter."""
 
     pr.green_tmr("adding DbInfo cache item")
 
-    cf_set = set()
-    for i in cf_dict:
-        cf_set.add(i)
+    cf_set = set(cf_dict)
 
     cf_set_cache = db_session.query(DbInfo).filter_by(key="cf_set").first()
 
@@ -200,7 +201,7 @@ def update_db_cache(db_session, cf_dict):
         cf_set_cache = DbInfo()
 
     cf_set_cache.key = "cf_set"
-    cf_set_cache.value = json.dumps(list(cf_set), ensure_ascii=False, indent=1)
+    cf_set_cache.value = json.dumps(sorted(cf_set), ensure_ascii=False, indent=1)
     db_session.add(cf_set_cache)
     db_session.commit()
     pr.yes("ok")

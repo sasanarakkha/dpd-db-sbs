@@ -16,10 +16,10 @@ from tools.tools_for_ru_exporter import (
     ru_replace_abbreviations,
 )
 
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import Session, joinedload
 
 
-def main():
+def main() -> None:
     pr.tic()
     pr.yellow_title("idioms generator (ru)")
 
@@ -45,14 +45,15 @@ def main():
     idioms_dict = create_idioms_dict(dpd_db)
     idioms_dict = compile_idioms_html_ru(dpd_db, idioms_dict)
     add_idioms_to_db(db_session, idioms_dict)
+    db_session.close()
 
     pr.toc()
 
 
-def create_idioms_dict(dpd_db):
+def create_idioms_dict(dpd_db: list[DpdHeadword]) -> dict[str, dict]:
     pr.green_tmr("extracting idioms and headwords")
 
-    idioms_dict: dict = {}
+    idioms_dict: dict[str, dict] = {}
     for i in dpd_db:
         for word in i.family_idioms_list:
             if i.meaning_1:
@@ -69,7 +70,9 @@ def create_idioms_dict(dpd_db):
     return idioms_dict
 
 
-def compile_idioms_html_ru(dpd_db: list[DpdHeadword], idioms_dict):
+def compile_idioms_html_ru(
+    dpd_db: list[DpdHeadword], idioms_dict: dict[str, dict]
+) -> dict[str, dict]:
     pr.green_tmr("compiling html ru")
 
     for i in dpd_db:
@@ -113,15 +116,15 @@ def compile_idioms_html_ru(dpd_db: list[DpdHeadword], idioms_dict):
     return idioms_dict
 
 
-def add_idioms_to_db(db_session, idioms_dict):
+def add_idioms_to_db(db_session: Session, idioms_dict: dict[str, dict]) -> None:
     pr.green_tmr("adding to db")
 
-    for idiom in idioms_dict:
+    for idiom, data in idioms_dict.items():
         # find in db
         idiom_data = db_session.query(FamilyIdiom).filter_by(idiom=idiom).first()
         if idiom_data:
-            idiom_data.html_ru = idioms_dict[idiom]["html_ru"]
-            idiom_data.data_ru_pack(idioms_dict[idiom]["data_ru"])
+            idiom_data.html_ru = data["html_ru"]
+            idiom_data.data_ru_pack(data["data_ru"])
             db_session.add(idiom_data)
 
     db_session.commit()

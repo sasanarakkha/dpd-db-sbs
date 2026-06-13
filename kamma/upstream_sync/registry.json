@@ -283,6 +283,7 @@
     "exporter/kindle/ru_components/templates/": "exporter/kindle/templates/",
     "exporter/tbw/tbw_exporter_ru.py": "exporter/tbw/tbw_exporter.py",
     "exporter/tpr/tpr_exporter_ru.py": "exporter/tpr/tpr_exporter.py",
+    "exporter/tpr/templates/tpr_headword_ru.jinja": "exporter/tpr/templates/tpr_headword.jinja",
     "exporter/webapp/data_classes_ru.py": "exporter/webapp/data_classes.py",
     "exporter/webapp/preloads_ru.py": "exporter/webapp/preloads.py",
     "exporter/webapp/toolkit_ru.py": "exporter/webapp/toolkit.py",

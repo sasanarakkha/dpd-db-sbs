@@ -8,7 +8,6 @@ import re
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword, DpdRoot, FamilyRoot
-from exporter.anki.anki_updater import family_updater
 from tools.configger import config_test
 from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
@@ -22,10 +21,10 @@ from tools.tools_for_ru_exporter import (
     ru_replace_abbreviations,
 )
 
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import Session, joinedload
 
 
-def main():
+def main() -> None:
     pr.tic()
     pr.yellow_title("root families (ru)")
 
@@ -64,6 +63,8 @@ def main():
     db_session.close()
 
     if config_test("anki", "update", "yes"):
+        from exporter.anki.anki_updater import family_updater
+
         anki_data_list = make_anki_data(rf_dict)
         deck = ["Family Root RU"]
         family_updater(anki_data_list, deck)
@@ -71,12 +72,13 @@ def main():
     pr.toc()
 
 
-def make_roots_family_dict_and_bases_dict(dpd_db):
+def make_roots_family_dict_and_bases_dict(
+    dpd_db: list[DpdHeadword],
+) -> tuple[dict[str, dict], dict[str, set[str]]]:
     pr.green_tmr("extracting root families and bases")
-    rf_dict = {}
-    bases_dict = {}
+    rf_dict: dict[str, dict] = {}
+    bases_dict: dict[str, set[str]] = {}
     for i in dpd_db:
-        # compile root subfamilies
         family = i.root_family_key
 
         if family not in rf_dict:
@@ -87,7 +89,6 @@ def make_roots_family_dict_and_bases_dict(dpd_db):
                 "headwords": [i.lemma_1],
                 "html_ru": "",
                 "count": 1,
-                "meaning_ru": i.rt.root_ru_meaning,
                 "data_ru": [],
                 "anki": [],
             }
@@ -95,7 +96,6 @@ def make_roots_family_dict_and_bases_dict(dpd_db):
             rf_dict[family]["headwords"] += [i.lemma_1]
             rf_dict[family]["count"] += 1
 
-        # compile bases
         base = re.sub("^.+> ", "", i.root_base)
 
         if base:
@@ -108,44 +108,45 @@ def make_roots_family_dict_and_bases_dict(dpd_db):
     return rf_dict, bases_dict
 
 
-def compile_rf_html_ru(dpd_db: list[DpdHeadword], rf_dict):
+def compile_rf_html_ru(
+    dpd_db: list[DpdHeadword], rf_dict: dict[str, dict]
+) -> dict[str, dict]:
     pr.green_tmr("compiling html ru")
 
-    for __counter__, i in enumerate(dpd_db):
+    for i in dpd_db:
         family = i.root_family_key
 
-        if i.lemma_1 in rf_dict[family]["headwords"]:
-            # rus
-            if not rf_dict[family]["html_ru"]:
-                ru_html_string = "<table class='family'>"
-            else:
-                ru_html_string = rf_dict[family]["html_ru"]
+        # rus
+        if not rf_dict[family]["html_ru"]:
+            ru_html_string = "<table class='family'>"
+        else:
+            ru_html_string = rf_dict[family]["html_ru"]
 
-            ru_meaning = make_short_ru_meaning(i, i.ru)
-            pos = ru_replace_abbreviations(i.pos)
-            ru_html_string += "<tr>"
-            ru_html_string += f"<th>{superscripter_uni(i.lemma_1)}</th>"
-            ru_html_string += f"<td><b>{pos}</b></td>"
-            ru_html_string += f"<td>{ru_meaning}</td>"
-            ru_html_string += f"<td>{degree_of_completion_ru(i)}</td>"
-            ru_html_string += "</tr>"
+        ru_meaning = make_short_ru_meaning(i, i.ru)
+        pos = ru_replace_abbreviations(i.pos)
+        ru_html_string += "<tr>"
+        ru_html_string += f"<th>{superscripter_uni(i.lemma_1)}</th>"
+        ru_html_string += f"<td><b>{pos}</b></td>"
+        ru_html_string += f"<td>{ru_meaning}</td>"
+        ru_html_string += f"<td>{degree_of_completion_ru(i)}</td>"
+        ru_html_string += "</tr>"
 
-            rf_dict[family]["html_ru"] = ru_html_string
+        rf_dict[family]["html_ru"] = ru_html_string
 
-            # rus data
-            rf_dict[family]["data_ru"].append(
-                (i.lemma_1, pos, ru_meaning, degree_of_completion_ru(i, html=False))
-            )
+        # rus data
+        rf_dict[family]["data_ru"].append(
+            (i.lemma_1, pos, ru_meaning, degree_of_completion_ru(i, html=False))
+        )
 
-            # anki data
-            anki_family = f"<b>{i.family_root}</b> "
-            anki_family += f"{i.rt.root_group} ({i.rt.root_ru_meaning})"
-            cf_construction = i.construction_clean
-            if not i.meaning_1:
-                cf_construction = f"-{cf_construction}"
-            rf_dict[family]["anki"].append(
-                (anki_family, i.lemma_1, pos, ru_meaning, cf_construction)
-            )
+        # anki data
+        anki_family = f"<b>{i.family_root}</b> "
+        anki_family += f"{i.rt.root_group} ({i.rt.root_ru_meaning})"
+        cf_construction = i.construction_clean
+        if not i.meaning_1:
+            cf_construction = f"-{cf_construction}"
+        rf_dict[family]["anki"].append(
+            (anki_family, i.lemma_1, pos, ru_meaning, cf_construction)
+        )
 
     for rf in rf_dict:
         header_ru = make_root_header_ru(rf_dict, rf)
@@ -156,17 +157,19 @@ def compile_rf_html_ru(dpd_db: list[DpdHeadword], rf_dict):
     return rf_dict
 
 
-def make_root_header_ru(rf_dict, rf):
+def make_root_header_ru(rf_dict: dict[str, dict], rf: str) -> str:
     header = "<p class='heading underlined'>"
     if rf_dict[rf]["count"] == 1:
         header += "<b>1</b> слово принадлежит к семье корня "
     else:
         header += f"<b>{rf_dict[rf]['count']}</b> слов(а) принадлежат к семье корня "
-    header += f"<b>{rf_dict[rf]['root_family']}</b> ({rf_dict[rf]['meaning_ru']})</p>"
+    header += (
+        f"<b>{rf_dict[rf]['root_family']}</b> ({rf_dict[rf]['root_ru_meaning']})</p>"
+    )
     return header
 
 
-def add_rf_to_db(db_session, rf_dict):
+def add_rf_to_db(db_session: Session, rf_dict: dict[str, dict]) -> None:
     pr.green_tmr("updating db")
 
     for rf in rf_dict:
@@ -189,7 +192,7 @@ def add_rf_to_db(db_session, rf_dict):
     pr.yes("ok")
 
 
-def make_anki_data(rf_dict):
+def make_anki_data(rf_dict: dict[str, dict]) -> list[tuple[str, str]]:
     """Create anki_data_list for updating"""
 
     pr.green_tmr("making anki data")

@@ -35,6 +35,7 @@ from tools.paths_dps import DPSPaths
 from tools.printer import printer as pr
 from tools.speech_marks import SpeechMarksDict
 from tools.utils import (
+    extract_body,
     list_into_batches,
     squash_whitespaces,
 )
@@ -133,8 +134,7 @@ def render_pali_word_dpd_html(
 
     # Re-calculate parts for parity
     header = data.header
-    body_start = html.find("<body>")
-    body = html[body_start:]
+    body = extract_body(html)
 
     final_html = squash_whitespaces(header) + minify(body)
 

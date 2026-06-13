@@ -78,13 +78,13 @@ css_manager = CSSManager()
 css_manager.update_webapp_css()
 
 # Global CSS and JS
-with open(pth.webapp_css_path) as f:
+with open(pth.webapp_css_path, encoding="utf-8") as f:
     dpd_css = f.read()
 
-with open(pth.webapp_js_path) as f:
+with open(pth.webapp_js_path, encoding="utf-8") as f:
     dpd_js = f.read()
 
-with open(pth.webapp_home_simple_css_path) as f:
+with open(pth.webapp_home_simple_css_path, encoding="utf-8") as f:
     home_simple_css = f.read()
 
 
@@ -97,9 +97,9 @@ def home_page_ru(request: Request, response_class=HTMLResponse):
     """Russian home page"""
 
     return templates_ru.TemplateResponse(
+        request,
         "home.html",
         {
-            "request": request,
             "dpd_results": "",
             "bd_count": bd_count,
             "book_options": list(cst_texts.keys()),
@@ -113,9 +113,9 @@ def home_page_sbs(request: Request, response_class=HTMLResponse):
     """SBS home page."""
 
     return templates_sbs.TemplateResponse(
+        request,
         "home.html",
         {
-            "request": request,
             "dpd_results": "",
             "bd_count": bd_count,
             "book_options": list(cst_texts.keys()),
@@ -129,9 +129,9 @@ def bold_definitions_page(request: Request, response_class=HTMLResponse):
     """Bold definitions landing page"""
 
     return templates_ru.TemplateResponse(
+        request,
         "home.html",
         {
-            "request": request,
             "dpd_results": "",
             "bd_count": bd_count,
             "book_options": list(cst_texts.keys()),
@@ -155,9 +155,9 @@ def db_search_html_sbs(request: Request, q: str):
         ascii_to_unicode_dict,
     )
     return templates_sbs.TemplateResponse(
+        request,
         "home.html",
         {
-            "request": request,
             "q": q,
             "dpd_results": dpd_html,
             "book_options": list(cst_texts.keys()),
@@ -222,9 +222,9 @@ def db_search_gd_ru(request: Request, search: str):
     global dpd_css, dpd_js, home_simple_css
 
     return templates_ru.TemplateResponse(
+        request,
         "home_simple.html",
         {
-            "request": request,
             "search": search,
             "dpd_results": dpd_html,
             "summary": summary_html,
@@ -252,9 +252,9 @@ def db_search_gd_sbs(request: Request, search: str):
     global dpd_css, dpd_js, home_simple_css
 
     return templates_sbs.TemplateResponse(
+        request,
         "home_simple.html",
         {
-            "request": request,
             "search": search,
             "dpd_results": dpd_html,
             "summary": summary_html,
@@ -302,9 +302,9 @@ def db_search_bd(
         too_many_results = True
 
     return templates_ru.TemplateResponse(
+        request,
         "bold_definitions.html",
         {
-            "request": request,
             "results": results,
             "search_1": q1,
             "search_2": q2,
@@ -568,9 +568,9 @@ def status_page(request: Request):
     }
 
     return templates_ru.TemplateResponse(
+        request,
         "status.html",
         {
-            "request": request,
             "stats": stats,
         },
     )

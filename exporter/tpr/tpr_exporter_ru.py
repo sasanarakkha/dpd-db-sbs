@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """Export simplified DPD data for integration with Tipitaka Pali Reader (TPR)."""
 
 import csv
 import json
-import os
-import re
 import sqlite3
+from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 
 import pandas as pd
@@ -43,7 +41,7 @@ class GlobalVars:
         self.i2h_df: pd.DataFrame
         self.deconstructor_df: pd.DataFrame
 
-    def make_dpd_db(self):
+    def make_dpd_db(self) -> list[DpdHeadword]:
         from sqlalchemy.orm import joinedload
 
         dpd_db = (
@@ -53,7 +51,7 @@ class GlobalVars:
         return dpd_db
 
 
-def generate_tpr_data(g: GlobalVars):
+def generate_tpr_data(g: GlobalVars) -> None:
     pr.green_tmr("compiling dpd headword data")
     dpd_length = len(g.dpd_db)
     tpr_data_list = []
@@ -62,27 +60,19 @@ def generate_tpr_data(g: GlobalVars):
     template = jinja_env.get_template("tpr_headword_ru.jinja")
 
     for counter, i in enumerate(g.dpd_db):
-        # Add helper for template
-        i.compound_type_has_digit = bool(re.findall(r"\d", i.compound_type or ""))  # pyright: ignore[reportAttributeAccessIssue]
-
         html_string = template.render(i=i, today=TODAY)
 
-        # Original code did some replacements after rendering
         html_string = html_string.replace("\n", "").replace("    ", "")
-        # The template already removes the span class='g' part because we don't include it
-        # but for 100% byte-parity with the baseline we might need to be careful.
+        html_string = html_string.replace("’", "’")
 
-        # Replicate the specific ' quote to ’ replacement
-        html_string = re.sub("'", "’", html_string)
-
-        tpr_data_list += [
+        tpr_data_list.append(
             {
                 "id": i.id,
                 "word": i.lemma_1,
                 "definition": f"<p>{html_string}</p>",
                 "book_id": 11,
             }
-        ]
+        )
     pr.yes(dpd_length)
 
     # add roots
@@ -107,7 +97,7 @@ def generate_tpr_data(g: GlobalVars):
 
         try:
             next_root_clean = roots_db[counter + 1].root_clean
-        except Exception:
+        except IndexError:
             next_root_clean = ""
 
         if r.root_clean == next_root_clean:
@@ -116,14 +106,14 @@ def generate_tpr_data(g: GlobalVars):
         else:
             html_string += """</p></div>"""
 
-            tpr_data_list += [
+            tpr_data_list.append(
                 {
                     "id": 0,
                     "word": r.root_clean,
                     "definition": f"{html_string}",
                     "book_id": 11,
                 }
-            ]
+            )
 
             html_string = ""
             new_root = True
@@ -132,7 +122,7 @@ def generate_tpr_data(g: GlobalVars):
     pr.yes(counter)
 
 
-def generate_deconstructor_data(g: GlobalVars):
+def generate_deconstructor_data(g: GlobalVars) -> None:
     """Compile deconstructor data."""
     pr.green_tmr("compiling deconstructor data")
 
@@ -148,15 +138,15 @@ def generate_deconstructor_data(g: GlobalVars):
         if i.lookup_key not in g.all_headwords_clean:
             deconstruction = ",".join(i.deconstructor_unpack).strip()  # remove stray \r
 
-            deconstructor_data_list += [
+            deconstructor_data_list.append(
                 {"word": i.lookup_key, "breakup": deconstruction}
-            ]
+            )
 
     g.deconstructor_data_list = deconstructor_data_list
     pr.yes(len(deconstructor_data_list))
 
 
-def add_variants(g):
+def add_variants(g: GlobalVars) -> None:
     """Add variant readings to deconstructor data"""
     pr.green_tmr("compiling variants")
 
@@ -165,12 +155,12 @@ def add_variants(g):
 
     for i in variants_db:
         variant = f"variant reading of <i>{i.variant_unpack[0]}</i>"
-        g.deconstructor_data_list += [{"word": i.lookup_key, "breakup": variant}]
+        g.deconstructor_data_list.append({"word": i.lookup_key, "breakup": variant})
 
     pr.yes(len(variants_db))
 
 
-def add_spelling_mistakes(g):
+def add_spelling_mistakes(g: GlobalVars) -> None:
     """Add spelling mistakes to deconstructor data"""
     pr.green_tmr("compiling spelling mistakes")
 
@@ -179,12 +169,12 @@ def add_spelling_mistakes(g):
 
     for i in spelling_db:
         spelling = f"incorrect spelling of <i>{i.spelling_unpack[0]}</i>"
-        g.deconstructor_data_list += [{"word": i.lookup_key, "breakup": spelling}]
+        g.deconstructor_data_list.append({"word": i.lookup_key, "breakup": spelling})
 
     pr.yes(len(spelling_db))
 
 
-def add_roots_to_i2h(g):
+def add_roots_to_i2h(g: GlobalVars) -> None:
     """Add roots to inflections to headwords"""
     pr.green_tmr("adding roots to lookup")
 
@@ -214,26 +204,26 @@ def add_roots_to_i2h(g):
     pr.yes(len(roots_db))
 
 
-def write_tsvs(g: GlobalVars):
+def write_tsvs(g: GlobalVars) -> None:
     """Write TSV files of dpd, deconstructor."""
     pr.green_tmr("writing tsv files")
 
     # write dpd_tsv
-    with open(g.pth.tpr_dpd_tsv_path, "w", encoding="utf-8") as f:
+    with g.pth.tpr_dpd_tsv_path.open("w", encoding="utf-8") as f:
         f.write("id\tword\tdefinition\tbook_id\n")
         for i in g.tpr_data_list:
             f.write(f"{i['id']}\t{i['word']}\t{i['definition']}\t{i['book_id']}\n")
 
     # write deconstructor tsv
     field_names = ["word", "breakup"]
-    with open(g.pth.tpr_deconstructor_tsv_path, "w", newline="", encoding="utf-8") as f:
+    with g.pth.tpr_deconstructor_tsv_path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=field_names, delimiter="\t")
         writer.writeheader()
         writer.writerows(g.deconstructor_data_list)
     pr.yes("OK")
 
 
-def copy_to_sqlite_db(g: GlobalVars):
+def copy_to_sqlite_db(g: GlobalVars) -> None:
     pr.green_tmr("copying data_list to tpr db")
 
     # data frames
@@ -293,7 +283,7 @@ def copy_to_sqlite_db(g: GlobalVars):
     g.deconstructor_df = deconstructor_df
 
 
-def tpr_updater(g: GlobalVars):
+def tpr_updater(g: GlobalVars) -> None:
     pr.green_tmr("making tpr sql updater")
 
     sql_string = ""
@@ -328,7 +318,7 @@ def tpr_updater(g: GlobalVars):
 
     sql_string += "COMMIT;\n"
 
-    with open(g.pth.tpr_sql_file_path, "w", encoding="utf-8") as f:
+    with g.pth.tpr_sql_file_path.open("w", encoding="utf-8") as f:
         f.write(sql_string)
     pr.yes("OK")
 
@@ -340,7 +330,7 @@ def update_tpr_download_list_ru(download_list: list[dict], info: dict) -> list[d
     return download_list
 
 
-def copy_zip_to_tpr_downloads(g: GlobalVars):
+def copy_zip_to_tpr_downloads(g: GlobalVars) -> None:
     pr.green_tmr("updating tpr_downloads")
 
     if not g.pth.tpr_download_list_path.exists():
@@ -348,7 +338,7 @@ def copy_zip_to_tpr_downloads(g: GlobalVars):
         pr.red("https://github.com/bksubhuti/tpr_downloads")
         pr.red("to /resources/ folder")
     else:
-        with open(g.pth.tpr_download_list_path, encoding="utf-8") as f:
+        with g.pth.tpr_download_list_path.open(encoding="utf-8") as f:
             download_list = json.load(f)
 
         day = TODAY.day
@@ -358,13 +348,12 @@ def copy_zip_to_tpr_downloads(g: GlobalVars):
         file_path = g.pth.tpr_sql_file_path
         file_name = "dpd.sql"
 
-        def _zip_it_up(file_path, file_name, output_file):
+        def _zip_it_up(file_path: Path, file_name: str, output_file: Path) -> None:
             with ZipFile(output_file, "w", ZIP_DEFLATED) as zipfile:
                 zipfile.write(file_path, file_name)
 
-        def _file_size(output_file):
-            filestat = os.stat(output_file)
-            filesize = f"{filestat.st_size / 1000 / 1000:.1f}"
+        def _file_size(output_file: Path) -> str:
+            filesize = f"{output_file.stat().st_size / 1000 / 1000:.1f}"
             return filesize
 
         output_file = g.rupth.tpr_with_rus_path
@@ -383,13 +372,13 @@ def copy_zip_to_tpr_downloads(g: GlobalVars):
 
         download_list = update_tpr_download_list_ru(download_list, dpd_with_rus_info)
 
-        with open(g.pth.tpr_download_list_path, "w", encoding="utf-8") as f:
+        with g.pth.tpr_download_list_path.open("w", encoding="utf-8") as f:
             f.write(json.dumps(download_list, indent=4, ensure_ascii=False))
 
     pr.yes("OK")
 
 
-def main():
+def main() -> None:
     pr.tic()
 
     pr.yellow_title("generate tpr data")

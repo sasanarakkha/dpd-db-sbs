@@ -9,7 +9,7 @@ from tools.goldendict_exporter import DictEntry
 from tools.paths_dps import DPSPaths
 from tools.printer import printer as pr
 from tools.tsv_read_write import read_tsv_dict, read_tsv_dot_dict
-from tools.utils import squash_whitespaces
+from tools.utils import extract_body, squash_whitespaces
 from tools.utils_sbs import RenderedSizes, default_rendered_sizes
 from exporter.jinja2_env import get_jinja2_env
 from exporter.goldendict.data_classes_dps import (
@@ -125,8 +125,7 @@ def add_abbrev_other_html(
         html_rendered = template.render(d=data)
 
         header = data.header
-        body_start = html_rendered.find("<body>")
-        body = html_rendered[body_start:]
+        body = extract_body(html_rendered)
 
         final_html = squash_whitespaces(header) + minify(body)
 

@@ -39,11 +39,7 @@ class GrammarData_ru(GrammarData):
 
 class ProgData_ru:
     def __init__(self) -> None:
-        if config_test("dictionary", "make_mdict", "yes"):
-            self.make_mdict = True
-        else:
-            self.make_mdict = False
-
+        self.make_mdict = config_test("dictionary", "make_mdict", "yes")
         self.make_slob = config_read("goldendict", "make_slob", "no") == "yes"
 
         self.pth = ProjectPaths()
@@ -56,14 +52,11 @@ class ProgData_ru:
         # goldendict and mdict data_list
         self.dict_data: list[DictEntry] = []
 
-    def close_db(self):
+    def close_db(self) -> None:
         self.db_session.close()
 
-    def commit_db(self):
-        self.db_session.commit()
 
-
-def main():
+def main() -> None:
     pr.tic()
     pr.yellow_title("exporting grammar dictionary (ru)")
 
@@ -84,7 +77,7 @@ def main():
     pr.toc()
 
 
-def generate_html_from_lookup(g: ProgData_ru):
+def generate_html_from_lookup(g: ProgData_ru) -> None:
     """Generate HTML grammar tables from Lookup table data."""
     pr.green_tmr("querying database")
 
@@ -94,7 +87,7 @@ def generate_html_from_lookup(g: ProgData_ru):
         .all()
     )
 
-    pr.yes(f"{len(lookup_results)}")
+    pr.yes(len(lookup_results))
 
     pr.green_tmr("compiling html")
 
@@ -104,7 +97,7 @@ def generate_html_from_lookup(g: ProgData_ru):
     jinja_env = get_jinja2_env("exporter/grammar_dict")
     template = jinja_env.get_template("grammar.jinja")
 
-    html_dict = {}
+    html_dict: dict[str, str] = {}
     grammar_cache: dict[str, str] = {}
 
     for lookup_entry in lookup_results:
@@ -136,7 +129,7 @@ def generate_html_from_lookup(g: ProgData_ru):
     pr.yes(len(html_dict))
 
 
-def make_data_lists(g: ProgData_ru):
+def make_data_lists(g: ProgData_ru) -> None:
     """Make the data_lists to be consumed by GoldenDict and MDict"""
     pr.green_tmr("making data lists")
 
@@ -144,17 +137,17 @@ def make_data_lists(g: ProgData_ru):
     for word, html in g.html_dict.items():
         synonyms = add_niggahitas([word])
 
-        dict_data += [
+        dict_data.append(
             DictEntry(
                 word=word, definition_html=html, definition_plain="", synonyms=synonyms
             )
-        ]
+        )
 
     g.dict_data = dict_data
     pr.yes("ok")
 
 
-def prepare_gd_mdict_and_export(g: ProgData_ru):
+def prepare_gd_mdict_and_export(g: ProgData_ru) -> None:
     """Prepare the metadata and export to goldendict & mdict."""
 
     dict_info = DictInfo(

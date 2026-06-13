@@ -1,6 +1,7 @@
 """Compile HTML data for Roots dictionary."""
 
 import re
+from collections import defaultdict
 from typing import Dict, List, Tuple
 
 from minify_html import minify
@@ -11,7 +12,7 @@ from tools.goldendict_exporter import DictEntry
 from tools.niggahitas import add_niggahitas
 from tools.paths_dps import DPSPaths
 from tools.printer import printer as pr
-from tools.utils import squash_whitespaces
+from tools.utils import extract_body, squash_whitespaces
 from tools.utils_sbs import RenderedSizes, default_rendered_sizes
 from exporter.jinja2_env import get_jinja2_env
 from exporter.goldendict.data_classes_dps import RootsData
@@ -32,9 +33,12 @@ def generate_root_html(
     jinja_env = get_jinja2_env("exporter/goldendict/sbs_templates")
 
     roots_db = db_session.query(DpdRoot).all()
+    frs_by_root: dict[str, list[FamilyRoot]] = defaultdict(list)
+    for fr in db_session.query(FamilyRoot).all():
+        frs_by_root[fr.root_key].append(fr)
 
     for counter, r in enumerate(roots_db):
-        frs = db_session.query(FamilyRoot).filter(FamilyRoot.root_key == r.root).all()
+        frs = frs_by_root.get(r.root, [])
 
         data = RootsData(
             r=r,
@@ -49,8 +53,7 @@ def generate_root_html(
 
         # Re-calculate parts for parity
         header = data.header
-        body_start = html.find("<body>")
-        body = html[body_start:]
+        body = extract_body(html)
 
         final_html = squash_whitespaces(header) + minify(body)
 
@@ -79,4 +82,3 @@ def generate_root_html(
 
     pr.yes(len(root_data_list))
     return root_data_list, size_dict
-

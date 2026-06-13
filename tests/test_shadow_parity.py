@@ -100,9 +100,10 @@ WHITELIST: dict[str, WhitelistEntry] = {
         "imports": [
             "collections.defaultdict",
             "db.models.Lookup",
-            "root_info.generate_root_info_html",
-            "root_matrix.generate_root_matrix",
+            "db.families.root_info.generate_root_info_html",
+            "db.families.root_matrix.generate_root_matrix",
             "tools.lookup_is_another_value.is_another_value",
+            "tools.lookup_sync.sync_lookup_column",
             "tools.pali_sort_key.pali_list_sorter",
             "tools.update_test_add.update_test_add",
         ],
@@ -214,7 +215,11 @@ WHITELIST: dict[str, WhitelistEntry] = {
             "save_title_page_xhtml",
             "zip_epub",
         ],
-        "imports": ["argparse", "exporter.kindle.data_classes.KindleData"],
+        "imports": [
+            "argparse",
+            "exporter.kindle.data_classes.KindleData",
+            "pathlib.Path",
+        ],
     },
     "exporter/tbw/tbw_exporter_ru.py": {
         "functions": ["generate_tbw_html", "save_js_files_for_tbw"],
@@ -326,7 +331,9 @@ WHITELIST: dict[str, WhitelistEntry] = {
         "functions": ["add_to_dictionary"],
         "imports": ["tools.paths.ProjectPaths"],
     },
-    "tools/utils_sbs.py": {"functions": ["list_into_batches", "squash_whitespaces"]},
+    "tools/utils_sbs.py": {
+        "functions": ["list_into_batches", "squash_whitespaces", "extract_body"]
+    },
 }
 
 

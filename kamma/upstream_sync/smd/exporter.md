@@ -290,6 +290,18 @@
 ---
 
 
+**File**: `exporter/tpr/templates/tpr_headword_ru.jinja`
+- **Category**: russian_copies
+- **Sync Rule**: PORT
+- **Local Changes**:
+  1. Template uses Russian-localized POS and meaning fields.
+  2. Drops `compound_type_has_digit` guard (attribute was computed by `generate_tpr_data`; upstream removed the helper, shadow mirrors this).
+- **Watch For**:
+  - Structural changes to `tpr_headword.jinja` must be ported here.
+
+---
+
+
 **File**: `exporter/webapp/data_classes_ru.py`
 - **Category**: russian_copies
 - **Sync Rule**: PORT

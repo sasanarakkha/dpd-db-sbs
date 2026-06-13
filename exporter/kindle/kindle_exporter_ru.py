@@ -9,10 +9,9 @@ import subprocess
 import platform
 import shutil
 
-from pathlib import Path
-
 from datetime import datetime
-from rich import print
+from jinja2 import Environment
+from rich.markup import escape
 from zipfile import ZipFile, ZIP_DEFLATED
 
 from db.db_helpers import get_db_session
@@ -45,7 +44,7 @@ from tools.tools_for_ru_exporter import (
 from exporter.jinja2_env import get_jinja2_env
 
 
-def render_dpd_xhtml_ru(pth: ProjectPaths, rupth: RuPaths):
+def render_dpd_xhtml_ru(pth: ProjectPaths, rupth: RuPaths) -> int:
     pr.green_tmr("querying dpd db")
     db_session = get_db_session(pth.dpd_db_path)
     dpd_db = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.ru)).all()
@@ -134,7 +133,7 @@ def render_dpd_xhtml_ru(pth: ProjectPaths, rupth: RuPaths):
     jinja_env = get_jinja2_env("exporter/kindle/ru_components/templates")
 
     pr.green_title("creating letter dict entries")
-    letter_dict: dict = {}
+    letter_dict: dict[str, list[str]] = {}
     for letter in pali_alphabet:
         letter_dict[letter] = []
 
@@ -144,7 +143,7 @@ def render_dpd_xhtml_ru(pth: ProjectPaths, rupth: RuPaths):
         inflection_list: list[str] = inflections_dict[i.id]
         first_letter = find_first_letter(i.lemma_1)
         entry = render_ebook_entry_ru(jinja_env, id_counter, i, inflection_list)
-        letter_dict[first_letter] += [entry]
+        letter_dict[first_letter].append(entry)
         id_counter += 1
         if counter % 5000 == 0:
             pr.counter(counter, len(dpd_db), i.lemma_1)
@@ -152,11 +151,10 @@ def render_dpd_xhtml_ru(pth: ProjectPaths, rupth: RuPaths):
     # add deconstructor words
     pr.green_title("add deconstructor words")
     for counter, i in enumerate(deconstructor_db):
-        if bool(set(i.lookup_key) & all_words_set):
-            first_letter = find_first_letter(i.lookup_key)
-            entry = render_deconstructor_entry_ru(jinja_env, id_counter, i)
-            letter_dict[first_letter] += [entry]
-            id_counter += 1
+        first_letter = find_first_letter(i.lookup_key)
+        entry = render_deconstructor_entry_ru(jinja_env, id_counter, i)
+        letter_dict[first_letter].append(entry)
+        id_counter += 1
         if counter % 5000 == 0:
             pr.counter(counter, len(deconstructor_db), i.lookup_key)
 
@@ -169,7 +167,7 @@ def render_dpd_xhtml_ru(pth: ProjectPaths, rupth: RuPaths):
         entries_str = "".join(entries)
         xhtml = render_ebook_letter_templ_ru(jinja_env, letter, entries_str)
         output_path = rupth.epub_text_dir.joinpath(f"{counter}_{ascii_letter}.xhtml")
-        with open(output_path, "w") as f:
+        with output_path.open("w", encoding="utf-8") as f:
             f.write(xhtml)
     pr.yes(total)
 
@@ -178,10 +176,10 @@ def render_dpd_xhtml_ru(pth: ProjectPaths, rupth: RuPaths):
 
 
 def render_ebook_entry_ru(
-    jinja_env,
+    jinja_env: Environment,
     counter: int,
     i: DpdHeadword,
-    inflections: list,
+    inflections: list[str],
 ) -> str:
     """Render single word entry."""
     summary = f"{i.pos}. "
@@ -234,7 +232,7 @@ def render_ebook_entry_ru(
     )
 
 
-def render_grammar_templ_ru(jinja_env, i: DpdHeadword) -> str:
+def render_grammar_templ_ru(jinja_env: Environment, i: DpdHeadword) -> str:
     """html table of grammatical information"""
     if i.meaning_1:
         grammar = ru_make_grammar_line(i)
@@ -244,7 +242,7 @@ def render_grammar_templ_ru(jinja_env, i: DpdHeadword) -> str:
     return ""
 
 
-def render_example_templ_ru(jinja_env, i: DpdHeadword) -> str:
+def render_example_templ_ru(jinja_env: Environment, i: DpdHeadword) -> str:
     """render sutta examples html"""
     if i.meaning_1 and i.example_1:
         template = jinja_env.get_template("ebook_ru_example.jinja")
@@ -252,7 +250,9 @@ def render_example_templ_ru(jinja_env, i: DpdHeadword) -> str:
     return ""
 
 
-def render_deconstructor_entry_ru(jinja_env, counter: int, i: Lookup) -> str:
+def render_deconstructor_entry_ru(
+    jinja_env: Environment, counter: int, i: Lookup
+) -> str:
     """Render deconstructor word entry."""
     construction = i.lookup_key
     deconstruction = "<br/>".join(i.deconstructor_unpack)
@@ -262,13 +262,15 @@ def render_deconstructor_entry_ru(jinja_env, counter: int, i: Lookup) -> str:
     )
 
 
-def render_ebook_letter_templ_ru(jinja_env, letter: str, entries: str) -> str:
+def render_ebook_letter_templ_ru(
+    jinja_env: Environment, letter: str, entries: str
+) -> str:
     """Render all entries for a single letter."""
     template = jinja_env.get_template("ebook_ru_letter.jinja")
     return template.render(letter=letter, entries=entries)
 
 
-def save_abbreviations_xhtml_page(rupth: RuPaths, id_counter):
+def save_abbreviations_xhtml_page(rupth: RuPaths, id_counter: int) -> None:
     """Render xhtml of all DPD abbreviations and save as a page."""
     pr.green_tmr("saving abbrev xhtml")
     jinja_env = get_jinja2_env("exporter/kindle/ru_components/templates")
@@ -280,23 +282,27 @@ def save_abbreviations_xhtml_page(rupth: RuPaths, id_counter):
             if value == ">":
                 value = "&gt;"
             i[key] = html_friendly(value)
-        abbreviation_entries += [render_abbreviation_entry_ru(jinja_env, id_counter, i)]
+        abbreviation_entries.append(
+            render_abbreviation_entry_ru(jinja_env, id_counter, i)
+        )
         id_counter += 1
 
     entries = "".join(abbreviation_entries)
     xhtml = render_ebook_letter_templ_ru(jinja_env, "Сокращения", entries)
-    with open(rupth.epub_abbreviations_path, "w") as f:
+    with rupth.epub_abbreviations_path.open("w", encoding="utf-8") as f:
         f.write(xhtml)
     pr.yes(len(abbreviations_list))
 
 
-def render_abbreviation_entry_ru(jinja_env, counter: int, i: dict) -> str:
+def render_abbreviation_entry_ru(
+    jinja_env: Environment, counter: int, i: dict[str, str]
+) -> str:
     """Render a single abbreviations entry."""
     template = jinja_env.get_template("ebook_ru_abbreviation_entry.jinja")
     return template.render(counter=counter, i=i)
 
 
-def save_title_page_xhtml(rupth: RuPaths):
+def save_title_page_xhtml(rupth: RuPaths) -> None:
     """Save date and time in title page xhtml."""
     pr.green_tmr("saving titlepage xhtml")
     jinja_env = get_jinja2_env("exporter/kindle/ru_components/templates")
@@ -305,28 +311,28 @@ def save_title_page_xhtml(rupth: RuPaths):
     time = current_datetime.strftime("%H:%M")
     template = jinja_env.get_template("ebook_ru_titlepage.jinja")
     xhtml = template.render(date=date, time=time)
-    with open(rupth.epub_titlepage_path, "w") as f:
+    with rupth.epub_titlepage_path.open("w", encoding="utf-8") as f:
         f.write(xhtml)
     pr.yes("OK")
     save_content_opf_xhtml(rupth, current_datetime)
 
 
-def save_content_opf_xhtml(rupth: RuPaths, current_datetime):
+def save_content_opf_xhtml(rupth: RuPaths, current_datetime: datetime) -> None:
     """Save date and time in content.opf."""
     pr.green_tmr("saving content.opf")
     jinja_env = get_jinja2_env("exporter/kindle/ru_components/templates")
     date_time_zulu = current_datetime.strftime("%Y-%m-%dT%H:%M:%SZ")
     template = jinja_env.get_template("ebook_ru_content_opf.jinja")
     content = template.render(date_time_zulu=date_time_zulu)
-    with open(rupth.epub_content_opf_path, "w") as f:
+    with rupth.epub_content_opf_path.open("w", encoding="utf-8") as f:
         f.write(content)
     pr.yes("OK")
 
 
-def zip_epub(pth: RuPaths):
+def zip_epub(pth: RuPaths) -> None:
     """Zip up the epub dir and name it dpd-kindle.epub."""
     pr.green_tmr("zipping up epub")
-    epub_dir_path = Path(pth.epub_dir)
+    epub_dir_path = pth.epub_dir
     with ZipFile(pth.dpd_epub_path, "w", ZIP_DEFLATED) as zipf:
         for file_path in epub_dir_path.rglob("*"):
             if file_path.is_file():
@@ -334,7 +340,7 @@ def zip_epub(pth: RuPaths):
     pr.yes("OK")
 
 
-def make_mobi(pth: RuPaths):
+def make_mobi(pth: RuPaths) -> None:
     """Convert epub to mobi using available tool."""
     pr.green_title("converting epub to mobi")
     system = platform.system()
@@ -349,7 +355,7 @@ def make_mobi(pth: RuPaths):
             )
             if process.stdout:
                 for line in process.stdout:
-                    print(line, end="")
+                    pr.white(escape(line.rstrip()))
             process.wait()
             pr.yes("Converted with Calibre")
             return
@@ -362,12 +368,12 @@ def make_mobi(pth: RuPaths):
         )
         if process.stdout:
             for line in process.stdout:
-                print(line, end="")
+                pr.white(escape(line.rstrip()))
         process.wait()
         pr.yes("Converted with kindlegen")
 
 
-def html_friendly(text: str):
+def html_friendly(text: str) -> str:
     try:
         text = text.replace("\n", "<br/>")
         text = text.replace(" > ", " &gt; ")
@@ -447,7 +453,7 @@ def render_rpd_xhtml_ru(pth: ProjectPaths, rupth: RuPaths, id_counter: int) -> i
         entries_str = "".join(entries_list)
         xhtml = render_rpd_letter_templ_ru(jinja_env, letter, entries_str)
         output_path = rupth.epub_text_dir.joinpath(f"rpd_{counter}_{letter}.xhtml")
-        with open(output_path, "w") as f:
+        with output_path.open("w", encoding="utf-8") as f:
             f.write(xhtml)
     pr.yes(total)
     db_session.close()
@@ -455,7 +461,7 @@ def render_rpd_xhtml_ru(pth: ProjectPaths, rupth: RuPaths, id_counter: int) -> i
 
 
 def render_rpd_entry_ru(
-    jinja_env, counter: int, russian_headword: str, pali_equivalents: str
+    jinja_env: Environment, counter: int, russian_headword: str, pali_equivalents: str
 ) -> str:
     """Render single RPD entry."""
     template = jinja_env.get_template("ebook_ru_rpd_entry.jinja")
@@ -466,13 +472,15 @@ def render_rpd_entry_ru(
     )
 
 
-def render_rpd_letter_templ_ru(jinja_env, letter: str, entries: str) -> str:
+def render_rpd_letter_templ_ru(
+    jinja_env: Environment, letter: str, entries: str
+) -> str:
     """Render all RPD entries for a Russian letter."""
     template = jinja_env.get_template("ebook_ru_rpd_letter.jinja")
     return template.render(letter=letter, entries=entries)
 
 
-def main():
+def main() -> None:
     pr.tic()
     pr.yellow_title("rendering dpd for ebook")
     if config_test("exporter", "make_ebook", "yes"):
@@ -487,6 +495,7 @@ def main():
     else:
         pr.green_title("disabled in config.ini")
     pr.toc()
+
 
 if __name__ == "__main__":
     main()
