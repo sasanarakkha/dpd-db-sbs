@@ -189,7 +189,8 @@ source code.
 - `retry.py` — manages batching and fan-out for targeted retry queries.
 - `ranking.py` — evaluates options based on heuristics to select the winner.
 - `rendering.py` — cleans text and formats the final Markdown report.
-- `types.py` — shared type definitions used across pipeline modules.
+- `analysis_types.py` — shared type definitions used across pipeline modules.
+- `_base.py` — pure constants and functions used to avoid circular imports.
 
 **Support:**
 - `paths.py` — creates and returns `input/`, `reports/`, and `output/`.
