@@ -42,6 +42,17 @@ proposal and a user-flagged round-trip.
 - Fix applied: memory entry `feedback_apply_scoped_instructions_literally`. Stage 2a
   improvement idea: pin "last-N-commits scope" to a concrete file list before classifying.
 
+**[CE-2 — Stage 1/3 — Untracked exclusions leak (execute_sync.py design flaw)]**
+Upstream added new files in `conductor/` and `kamma/` (which are in `no_sync_files`).
+`execute_sync.py` uses `git restore --source as_upstream --worktree -- .` to pull upstream changes,
+making those new files UNTRACKED in the worktree. It then tries to exclude them by restoring the
+original state with `git restore --source sbs_ru_original_sha --staged --worktree -- conductor/`.
+Because `git restore` ignores untracked files, the new upstream files remained in the worktree.
+Later, `git add .` staged them, sneaking them into the sync commit.
+- Root cause: `git restore` cannot clean up untracked files added by the initial upstream restore step.
+- Fix applied: `execute_sync.py` now runs `git clean -f -d -- <path>` before restoring the original SHA
+  for directories.
+
 ### ERRORS (correctness impact)
 
 **[E-1 — Stage 3 — Stale handoff on session resume]**
@@ -472,3 +483,16 @@ Then produce a structured improvement proposal covering:
 
 Do not write to any files yet — present the proposal for user approval first.
 ```
+
+**[CE-3 — Stage 1/3 — Deleted upstream files not removed by execute_sync.py]**
+Upstream renamed `tools/antigravity_cli_models.py` to `tools/ai_antigravity_cli_models.py`. The pull introduced the new file but failed to delete the old one.
+- Root cause: `git restore --source as_upstream --worktree -- .` does NOT remove tracked files from the worktree that are absent in the source tree. It only overwrites existing or adds new files.
+- Fix applied: Manually removed the stale `tools/antigravity_cli_models.py` and committed.
+- Improvement idea: Add a cleanup step in `execute_sync.py` using `git diff --name-only --diff-filter=D sbs_ru_original_sha as_upstream` to explicitly `git rm` files deleted/renamed upstream (if they aren't protected exclusions).
+
+## Final Cleanup (2026-06-13)
+
+- **Archived `gui/` directory**: Entire contents moved to `archive/dps/gui/`. This directory was stale (moved to `gui2/` upstream).
+- **Removed duplicate `Justfile`**: Only lowercase `justfile` remains (upstream standard).
+- **Cleaned root-level `tests/`**: Removed 9 root-level test files that were duplicates of files already moved to `tests/tools/`.
+- **Fixed paths**: Updated `tools/paths_dps.py` to point to the new location of the `gui/stash` (now in `archive/dps/gui/stash/`).

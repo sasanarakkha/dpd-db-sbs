@@ -133,6 +133,17 @@ This document provides a unified, exhaustive post-mortem of the Upstream Sync Re
 - Superseded scope note: `gui/` remains out of sync scope; `docs/` is upstream-owned and accepted verbatim, while `docs_rus/` is handled by Stage 4 Docs Translation Parity.
 - The guide now has an explicit `## Sync Scope` note. Consult it at the start of every stage.
 
+## 19. Execute_sync.py Untracked Exclusions Flaw (June 2026)
+**Issue:** `execute_sync.py` leaked new upstream files from excluded directories into the sync commit. `git restore --source as_upstream` added them as untracked files, and the subsequent `git restore` from the original SHA ignored them because they were not tracked.
+**Recommendation:**
+- **Explicit Clean Gate**: `execute_sync.py` must run `git clean -f -d -- <path>` before restoring the original state for any directory in the exclusion list. This ensures the worktree matches the original state exactly, including the absence of new upstream files.
+
+## 20. Workflow Decoupling: Docs & Retrospectives (June 2026)
+**Issue:** Stages 4 (Docs) and 5 (Retrospective) are consistently skipped due to fatigue or time constraints at the end of a long code sync.
+**Recommendation:**
+- **Asynchronous Docs Sync**: Decouple Stage 4. Stage 3 should merely log changed docs to `kamma/upstream_sync/docs_translation_queue.md`.
+- **Inline Retrospective**: Replace Stage 5's standalone report with a mandatory "Errors & Friction Log" maintained *during* the sync in `handoff.md`. Finalize the sync with a 10-minute retrospective session that pushes these logs into `archive_improvements.md` and `guide.md`.
+
 ---
 
 ## Historical: Legacy 7-Phase Workflow (Pre-April 2026)

@@ -1,8 +1,8 @@
 """All file paths that get used in the dps related codes."""
 
 import os
-from typing import Optional
 from pathlib import Path
+from typing import Optional
 
 
 class DPSPaths:
@@ -251,10 +251,6 @@ class DPSPaths:
         self.ai_notes_raw_report_dir = base_dir.joinpath(
             Path("temp/ai_notes_raw_check/")
         )
-
-        # /gui/stash
-        self.dps_stash_path = base_dir.joinpath(Path("gui/stash/dps_stash.json"))
-        self.dps_save_state_path = base_dir.joinpath(Path("gui/stash/dps_gui_state"))
 
         # /gui2
         self.history_json_path: Path = base_dir.joinpath(

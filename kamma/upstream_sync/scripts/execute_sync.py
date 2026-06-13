@@ -238,6 +238,10 @@ def execute_sync(
 
             if check_result.returncode == 0:
                 # File existed, restore it
+                # If it is a directory, clean it first to remove untracked upstream additions
+                if Path(path).is_dir():
+                    run_git(["git", "clean", "-f", "-d", "--", path])
+
                 run_git(
                     [
                         "git",
