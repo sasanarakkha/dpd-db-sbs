@@ -3,11 +3,12 @@
 """Update SBS Anki collection from DB and CSV sources."""
 
 import copy
-import os
+import csv
+import datetime
 import re
 import shutil
-import csv
 import unicodedata
+from pathlib import Path
 from typing import Any, cast
 
 from anki.collection import Collection
@@ -73,11 +74,9 @@ def backup_anki_db() -> bool:
         pr.red("Paths not found in config.ini")
         return False
 
-    os.makedirs(backup_dir, exist_ok=True)
-    import datetime
-
+    Path(backup_dir).mkdir(parents=True, exist_ok=True)
     timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-    backup_path = os.path.join(backup_dir, f"collection_{timestamp}.anki2")
+    backup_path = Path(backup_dir) / f"collection_{timestamp}.anki2"
 
     try:
         shutil.copy2(anki_db_path, backup_path)
@@ -93,10 +92,10 @@ def setup_anki_updater(
     decks: list[str],
 ) -> tuple[
     Collection | None,
-    dict | None,
-    list | None,
-    dict | None,
-    dict | None,
+    dict[str, list[dict[str, Any]]] | None,
+    list[dict[str, Any]] | None,
+    dict[str | int, Any] | None,
+    dict[str, Any] | None,
 ]:
     """Setup Anki collection and return all required dicts."""
     col = get_anki_collection()
@@ -157,7 +156,7 @@ def get_cards(col: Collection, decks: list[str]) -> list[Card]:
     return cards
 
 
-def get_decks(col: Collection) -> dict:
+def get_decks(col: Collection) -> dict[str | int, Any]:
     """Get all decks and their IDs."""
     pr.green("get decks")
     decks = col.decks.all()
@@ -168,7 +167,7 @@ def get_decks(col: Collection) -> dict:
     return deck_dict
 
 
-def get_models(col: Collection) -> dict:
+def get_models(col: Collection) -> dict[str, Any]:
     """Get all models and their IDs."""
     pr.green("get models")
     models = col.models.all()
@@ -178,8 +177,8 @@ def get_models(col: Collection) -> dict:
 
 
 def make_data_dict(
-    notes: list[Note], cards: list[Card], deck_dict: dict
-) -> tuple[dict, list]:
+    notes: list[Note], cards: list[Card], deck_dict: dict[str | int, Any]
+) -> tuple[dict[str, list[dict[str, Any]]], list[dict[str, Any]]]:
     """Make data dict keyed by headword ID and a flat list of all note data."""
     pr.green("make data dict")
 
@@ -265,13 +264,7 @@ def deck_selector(i: DpdHeadword) -> list[str]:
     ):
         target_decks.append("Пали Словарь")
 
-    seen = set()
-    result = []
-    for d in target_decks:
-        if d not in seen:
-            seen.add(d)
-            result.append(d)
-    return result
+    return list(dict.fromkeys(target_decks))
 
 
 def normalize_anki_text(value: Any) -> str:
@@ -279,7 +272,7 @@ def normalize_anki_text(value: Any) -> str:
     return unicodedata.normalize("NFC", str(value)) if value is not None else ""
 
 
-def update_note_values(note, i, deck_config: DeckSpec) -> bool:
+def update_note_values(note: Note, i: DpdHeadword, deck_config: DeckSpec) -> bool:
     """Update note fields using deck_config.field_map. Returns True if changed."""
     old_fields = copy.copy(note.fields)
 
@@ -304,7 +297,9 @@ def update_note_values(note, i, deck_config: DeckSpec) -> bool:
     return note.fields != old_fields
 
 
-def update_note_values_csv(note: Note, row: dict, deck_config: DeckSpec) -> bool:
+def update_note_values_csv(
+    note: Note, row: dict[str, Any], deck_config: DeckSpec
+) -> bool:
     """Update note fields from CSV row. Returns True if changed."""
     old_fields = copy.copy(note.fields)
 
@@ -325,9 +320,9 @@ def update_deck(
     note: Note,
     i: DpdHeadword,
     target_deck_name: str,
-    item_data: dict,
-    deck_dict: dict,
-    model_dict: dict,
+    item_data: dict[str, Any],
+    deck_dict: dict[str | int, Any],
+    model_dict: dict[str, Any],
 ) -> bool:
     """Move note to target deck if needed. Returns True if moved."""
     old_deck = item_data["deck"]
@@ -374,8 +369,8 @@ def update_deck(
 def make_new_note(
     col: Collection,
     deck_name: str,
-    model_dict: dict,
-    deck_dict: dict,
+    model_dict: dict[str, Any],
+    deck_dict: dict[str | int, Any],
     i: DpdHeadword,
     deck_config: DeckSpec,
 ) -> Note | None:
@@ -397,9 +392,9 @@ def make_new_note(
 def update_from_db(
     db: list[DpdHeadword],
     col: Collection,
-    data_dict: dict,
-    deck_dict: dict,
-    model_dict: dict,
+    data_dict: dict[str, list[dict[str, Any]]],
+    deck_dict: dict[str | int, Any],
+    model_dict: dict[str, Any],
     stats: UpdateStats,
 ):
     """Update Anki notes from DB headwords."""
@@ -471,17 +466,17 @@ def update_from_db(
 def update_from_csv(
     col: Collection,
     deck_name: str,
-    csv_path: str,
+    csv_path: Path,
     deck_config: DeckSpec,
-    all_data: list,
-    deck_dict: dict,
-    model_dict: dict,
+    all_data: list[dict[str, Any]],
+    deck_dict: dict[str | int, Any],
+    model_dict: dict[str, Any],
     stats: UpdateStats,
 ) -> set[str]:
     """Update Anki notes from a CSV source. Return set of CSV key values seen."""
     pr.green(f"updating {deck_name} from {csv_path}")
 
-    if not os.path.exists(csv_path):
+    if not csv_path.exists():
         pr.no("skipped (csv missing)")
         return set()
 
@@ -531,7 +526,7 @@ def update_from_csv(
 
 def delete_stale_csv_notes(
     col: Collection,
-    all_data: list,
+    all_data: list[dict[str, Any]],
     top_level: str,
     csv_keys: set[str],
     stats: UpdateStats,
@@ -736,12 +731,14 @@ def run_pipeline(skip_collection: bool = False):
                 if grammar_dir.exists():
                     grammar_csv_keys: set[str] = set()
                     # for files starting only with "cl_"
-                    for csv_file in os.listdir(grammar_dir):
-                        if csv_file.endswith(".csv") and csv_file.startswith("cl_"):
+                    for csv_file in grammar_dir.iterdir():
+                        if csv_file.suffix == ".csv" and csv_file.name.startswith(
+                            "cl_"
+                        ):
                             seen = update_from_csv(
                                 col,
                                 deck_name,
-                                str(grammar_dir / csv_file),
+                                csv_file,
                                 deck_config,
                                 all_data,
                                 deck_dict,
@@ -757,7 +754,7 @@ def run_pipeline(skip_collection: bool = False):
                 seen = update_from_csv(
                     col,
                     deck_name,
-                    str(csv_path),
+                    csv_path,
                     deck_config,
                     all_data,
                     deck_dict,
