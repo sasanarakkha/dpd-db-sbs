@@ -93,7 +93,7 @@ def recalculate_meaning_en(meaning: str, old_base: int, new_base: int) -> str:
         rf"\b({PHRASE})\s+(?:to\s+({PHRASE})\s+)?(kilometres?)\b", re.IGNORECASE
     )
 
-    def replace_match(match):
+    def replace_match(match: re.Match[str]) -> str:
         p1 = match.group(1)
         p2 = match.group(2)
         unit = match.group(3)
@@ -214,7 +214,7 @@ def recalculate_meaning_ru(meaning: str, old_base: int, new_base: int) -> str:
         rf"\b(?:(?:{RU_PREFIX_WORDS})\s+)*(\d+)\s*(?:км|километр\w*)", re.IGNORECASE
     )
 
-    def replace_digit(match):
+    def replace_digit(match: re.Match[str]) -> str:
         old_km = int(match.group(1))
         new_km = round(old_km * new_base / old_base)
         return f"примерно {format_ru_km(new_km)}"
@@ -227,7 +227,7 @@ def recalculate_meaning_ru(meaning: str, old_base: int, new_base: int) -> str:
         re.IGNORECASE,
     )
 
-    def replace_ru_range(match):
+    def replace_ru_range(match: re.Match[str]) -> str:
         p1, p2 = match.group(1).lower(), match.group(2).lower()
         v1 = round(RU_WORD_TO_NUM[p1] * new_base / old_base)
         v2 = round(RU_WORD_TO_NUM[p2] * new_base / old_base)
@@ -243,7 +243,7 @@ def recalculate_meaning_ru(meaning: str, old_base: int, new_base: int) -> str:
         re.IGNORECASE,
     )
 
-    def replace_word(match):
+    def replace_word(match: re.Match[str]) -> str:
         phrase = match.group(1).lower()
         new_km = round(RU_WORD_TO_NUM[phrase] * new_base / old_base)
         return f"примерно {format_ru_km(new_km)}"
@@ -348,10 +348,7 @@ def main() -> None:
     # Phase 2: Print all changes
     for hw, ru, entry_changes in changes:
         for col, (old_val, new_val) in entry_changes.items():
-            if col in ("meaning_1", "meaning_2"):
-                pr.amber(f"{hw.lemma_1} [{col}]")
-            else:
-                pr.amber(f"{hw.lemma_1} [{col}]")
+            pr.amber(f"{hw.lemma_1} [{col}]")
             pr.amber(f"  OLD: {old_val}")
             pr.green(f"  NEW: {new_val}")
 

@@ -21,20 +21,59 @@ Review everything; change only what genuinely needs it. Coverage over churn.
 Read `.claude/pipeline-improvement-queue.md`.
 Find the current **Pointer** value. That is the next script to review.
 
-### 2. Review forward
+### 2. Archive check
+
+Before any review work, read the next pending `[ ]` script and write a short
+summary (2–4 paragraphs) covering:
+
+- **What it does** — its purpose and the problem it solves.
+- **Where it fits** — what calls it, what it calls, who uses it.
+- **Current status** — does it still appear active and needed, or does it look
+  stale/superseded/unused?
+
+This summary is **reused verbatim** as the "What it does" block in the step 4
+output template — do not re-derive it. The file is already in context; step 3
+does not need to re-read it.
+
+Then present the summary to the user and use the `AskUserQuestion` tool to ask:
+
+> **Proceed with improvement, or move to archive?**
+> - **Improve** — continue with the full review below.
+> - **Archive** — move the file, update the queue, end session.
+
+**If the user chooses Archive:**
+
+1. Determine the target:
+   - File is under `scripts/` → move to `scripts/dps_archive/`
+   - File is under any other folder → move to `archive/`
+2. Run `git mv <source> <target>` to move it.
+3. Mark the script `[x] archived` in the queue and advance the Pointer.
+4. Append a decision log entry: `archived — <one-line reason>`.
+5. Output exactly:
+   > **Archived.** `<source>` → `<target>`. Queue pointer advanced to #N.
+   > Start a fresh session and run `/pipeline-improvement` to continue.
+6. **Stop. Do not proceed to the review steps.**
+
+**If the user chooses Improve:** continue to step 3.
+
+---
+
+### 3. Review forward
 
 Starting from the Pointer, review each pending `[ ]` script in order.
 For each script:
 
 **FIRST — the moment you know the Python file path, launch the second-opinion
 reviewer in the BACKGROUND, before you read or analyse anything.** Run the
-opencode command from step 3 with `run_in_background: true` so it reviews the
+opencode command from step 4 with `run_in_background: true` so it reviews the
 file in parallel while you do your own analysis. The point is that you and the
 reviewer reach conclusions at the same time — do NOT wait until you have finished
 your own review to start it, or you pay the full reviewer latency in series. You
-collect its output in step 3 (it will already be done, or nearly so).
+collect its output in step 4 (it will already be done, or nearly so).
 
-**a. Read the file** (and any files it imports from this repo).
+**a. Read the file** (and any files it imports from this repo). The script
+itself is already in context from step 2 — do not re-read it, only read
+imported local modules that were not yet loaded.
 
 **b. Review across all five angles:**
 
@@ -75,12 +114,12 @@ collect its output in step 3 (it will already be done, or nearly so).
 **d. Decide:**
 - **Clean** → log it as `passed` in the decisions log. Advance the Pointer. Continue
   to the next script.
-- **Needs a change** → stop. Do not review further. Go to step 3.
+- **Needs a change** → stop. Do not review further. Go to step 4.
 
-### 3. Present all changes for this file
+### 4. Present all changes for this file
 
 By now the second-opinion reviewer you launched in the background at the start of
-step 2 should be finished. Collect its output. If you have not launched it yet
+step 3 should be finished. Collect its output. If you have not launched it yet
 (e.g. you only realised the file needed changes late), run it now on the
 **current, unedited file** — but the intent is that it has been running in
 parallel the whole time, so this is the fallback path, not the norm.
@@ -136,7 +175,7 @@ footnote at the very bottom, never the opening.
 ```
 ## #N <path>
 
-**What it does:** <one sentence on the file's role.>
+**What it does:** <reuse the summary written in step 2 — do not rewrite it.>
 
 ### Proposed changes
 Grouped by theme (e.g. Type safety · Dead code · Consistency · Simplification).
@@ -177,10 +216,10 @@ not apply — <one compressed clause each>.*
 - **What:** <one sentence on the simpler/more elegant approach and the gain>
 - **Drawbacks:** <risk of behaviour change, migration cost, readability tradeoffs, anything that could go wrong>
 
-**`approve`** — apply the changes listed above. Tests first, then edits, then commit.
-**`approve all`** — apply the changes listed above AND the approach suggestion. Tests first, then edits, then commit.
-**`skip`** — log `skipped`, advance Pointer.
-**`defer`** — mark `[>]`, log `deferred`, move Pointer past it.
+**`1` / `approve`** — apply the changes listed above. Tests first, then edits, then commit.
+**`2` / `approve all`** — apply the changes listed above AND the approach suggestion. Tests first, then edits, then commit.
+**`3` / `skip`** — log `skipped`, advance Pointer.
+**`4` / `defer`** — mark `[>]`, log `deferred`, move Pointer past it.
 ```
 
 #### Highlighting decisions — make choices impossible to miss
@@ -195,10 +234,10 @@ A wall of terminal text buries the one thing the user must act on. So:
 - The final approve / skip / defer prompt is itself a decision: put it last, on its
   own, clearly separated — never trailing a paragraph.
 
-### 3b. Write tests — golden master FIRST, then edit
+### 4b. Write tests — golden master FIRST, then edit
 
 **Order is not optional. Do these in sequence. Do NOT touch the source file until
-step 2 passes against the current, unedited code.**
+step 3 passes against the current, unedited code.**
 
 A characterization test is worthless if written after the change — it would just
 freeze whatever the edit produced. The whole point is to freeze the CURRENT output,
@@ -260,7 +299,7 @@ Rules:
 
 #### Step 3 — Apply the approved source edits (only now)
 
-The test is green against the current code. Now apply the changes from step 3.
+The test is green against the current code. Now apply the changes from step 4.
 
 #### Step 4 — Re-run the full gate
 
@@ -317,7 +356,7 @@ After a successful live run (or a confirmed skip):
    Output exactly:
    > **Done.** Queue updated — pointer is at #N (`path/to/next/script.py`). Start a fresh session and run `/pipeline-improvement` to continue.
 
-### 4. Update queue.md
+### 5. Update queue.md
 
 After every run (whether a change was made or not), write back to `.claude/pipeline-improvement-queue.md`:
 - Update the Pointer to the next pending script.
@@ -326,7 +365,7 @@ After every run (whether a change was made or not), write back to `.claude/pipel
 - Mark deferred scripts `[>]`.
 - Append all decisions to the decisions log.
 
-### 5. End-of-queue
+### 6. End-of-queue
 
 If the Pointer reaches the end with no change needed (and no deferred items remain),
 report: **"Pipeline review complete — all 80 scripts passed. Queue will reset."**

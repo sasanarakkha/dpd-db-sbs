@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 21
+Pointer: 25
 
 ## Scripts (76 total, local unique_paths)
 
@@ -31,10 +31,10 @@ Pointer: 21
 - [x] 18. scripts/change_in_db/sbs_class_sutta_linker.py
 - [x] 19. scripts/change_in_db/dhp_examples_copy.py
 - [x] 20. scripts/change_in_db/source_cleanup.py
-- [ ] 21. scripts/change_in_db/update_examples_from_csv.py
-- [ ] 22. scripts/change_in_db/update_ru_db_from_csv.py
-- [ ] 23. scripts/change_in_db/update_sbs_chants_in_db.py
-- [ ] 24. scripts/change_in_db/update_yojana_km.py
+- [x] 21. scripts/change_in_db/update_examples_from_csv.py
+- [x] 22. scripts/change_in_db/update_ru_db_from_csv.py
+- [x] 23. scripts/change_in_db/update_sbs_chants_in_db.py
+- [x] 24. scripts/change_in_db/update_yojana_km.py
 - [ ] 25. scripts/change_in_db/vib_rule_workflow.py
 
 ### scripts/export
@@ -127,3 +127,7 @@ Pointer: 21
 2026-06-09 | #18 scripts/change_in_db/sbs_class_sutta_linker.py | changed | one-time job already done — moved to scripts/dps_archive/
 2026-06-09 | #19 scripts/change_in_db/dhp_examples_copy.py | changed | module-level DB → inside dhp(), remove unused Russian join, fix outerjoin+joinedload conflict (eliminates dedup block), remove N+1 in-loop SBS query, extract _find_dhp_source_idx() helper, unify two duplicate branches, rich print→pr.*, setattr→direct, compile regex
 2026-06-09 | #20 scripts/change_in_db/source_cleanup.py | changed | list[str]→tuple[str,...] for SOURCE_FIELDS and EXEMPTS, add db_session.close()
+2026-06-14 | #21 scripts/change_in_db/update_examples_from_csv.py | passed | already archived to scripts/dps_archive/ before review cycle reached it — unfinished script with placeholder "suttas" mode, not in registry
+2026-06-14 | #22 scripts/change_in_db/update_ru_db_from_csv.py | changed | not in use — moved to scripts/dps_archive/ via git mv
+2026-06-14 | #23 scripts/change_in_db/update_sbs_chants_in_db.py | changed | query SBS directly (drop DpdHeadword+joinedload), remove dead guard, rename result→found, extract attr vars, remove or "" redundancy, explicit None checks, type annotations
+2026-06-14 | #24 scripts/change_in_db/update_yojana_km.py | changed | collapse dead if/else in Phase 2 printing, add re.Match[str]/->str type hints to 4 closure callbacks; golden-master tests added (5 tests, 28+50+54+32 fixture cases); word2number approach rejected — returns wrong value for "one million one hundred and seventy-six thousand" (1176001 vs 1176000)
