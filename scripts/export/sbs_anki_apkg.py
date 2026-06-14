@@ -2,7 +2,7 @@
 
 """Export SBS Anki decks to .apkg files."""
 
-import os
+from pathlib import Path
 import argparse
 from anki.collection import Collection
 from tools.configger import config_read
@@ -26,10 +26,8 @@ def get_anki_collection() -> Collection | None:
 def main(output_dir: str | None = None, with_scheduling: bool = False) -> None:
     pr.tic()
 
-    if output_dir is None:
-        output_dir = "temp/anki_decks"
-
-    os.makedirs(output_dir, exist_ok=True)
+    out_dir = Path(output_dir) if output_dir is not None else Path("temp/anki_decks")
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     col = get_anki_collection()
     if not col:
@@ -50,7 +48,7 @@ def main(output_dir: str | None = None, with_scheduling: bool = False) -> None:
             if deck_name in deck_name_to_id:
                 deck_id = deck_name_to_id[deck_name]
                 slug = deck_config.slug
-                output_path = os.path.join(output_dir, f"{slug}.apkg")
+                output_path = out_dir / f"{slug}.apkg"
 
                 pr.green(f"exporting {deck_name}")
 
@@ -59,7 +57,7 @@ def main(output_dir: str | None = None, with_scheduling: bool = False) -> None:
                 exporter.includeSched = with_scheduling
                 exporter.includeMedia = True
 
-                exporter.exportInto(output_path)
+                exporter.exportInto(str(output_path))
                 pr.yes(f"saved to {output_path}")
             else:
                 pr.amber(f"Deck '{deck_name}' not found in collection")
