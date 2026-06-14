@@ -20,7 +20,9 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import TextIO
+from typing import Any, TextIO
+
+from sqlalchemy.orm import Session
 
 from db.db_helpers import get_db_session
 from scripts.change_in_db.copy_examples import update_column_for_some_criteria
@@ -34,7 +36,7 @@ from tools.printer import printer as pr
 VIB_PROGRESS_PATH = Path("misc/pat/vib_progress.json")
 
 
-def load_progress() -> dict:
+def load_progress() -> dict[str, Any]:
     """Load progress from JSON file."""
     if VIB_PROGRESS_PATH.exists():
         try:
@@ -58,7 +60,8 @@ def save_progress(source: str, pat_file: str, complete: bool = True) -> None:
 
 def suggest_next_pat_file(last_pat: str) -> str:
     """Suggest the next PAT file name based on the last one."""
-    match = re.search(r"([a-z]+)(\d+)\.txt$", last_pat)
+    stem = Path(last_pat).stem
+    match = re.match(r"^([a-z]+)(\d+)$", stem)
     if match:
         prefix = match.group(1)
         num = int(match.group(2))
@@ -142,7 +145,7 @@ def run_rule(
     pat_file: str,
     pth: ProjectPaths,
     dpspth: DPSPaths,
-    db_session,
+    db_session: Session,
     resume: bool = False,
 ) -> bool:
     """Run the workflow for a single rule. Returns False if user wants to quit."""
@@ -150,12 +153,14 @@ def run_rule(
         # Steps 1–3b already ran in the previous session; re-copy PAT → temp/text.txt
         # so word extraction sees the saved text without re-running copy_examples.
         pr.amber(f"Resuming rule {source} — re-running word extraction...")
-        Path(dpspth.text_to_add_path).write_text(Path(pat_file).read_text())
+        Path(dpspth.text_to_add_path).write_text(
+            Path(pat_file).read_text(encoding="utf-8"), encoding="utf-8"
+        )
     else:
         # Step 1 — Get text
         if Path(pat_file).exists():
             pr.green(f"Reading existing file: {pat_file}")
-            text = Path(pat_file).read_text()
+            text = Path(pat_file).read_text(encoding="utf-8")
         else:
             text = accept_pasted_text()
             if not text.strip():
@@ -167,8 +172,8 @@ def run_rule(
 
         # Step 3 — Save
         Path(pat_file).parent.mkdir(parents=True, exist_ok=True)
-        Path(pat_file).write_text(text)
-        Path(dpspth.text_to_add_path).write_text(text)
+        Path(pat_file).write_text(text, encoding="utf-8")
+        Path(dpspth.text_to_add_path).write_text(text, encoding="utf-8")
         pr.yes(f"Saved to {pat_file}:")
         pr.cyan(text)
 
@@ -185,23 +190,26 @@ def run_rule(
     words = dps_make_words_to_add_list_from_text_no_field(
         pth, dpspth, db_session, ["vib_source", "pat_source"]
     )
-    if words:
+
+    if not words:
+        pr.yes("All words already covered — skipping GUI pause.")
+    else:
         pr.cyan("")
         for word in words:
             pr.cyan(f"  {word}")
         pr.cyan("")
 
-    # Step 5 — GUI pause
-    pr.green("Add the above words in gui2/main.py → Pass2Add tab.")
-    choice = input("Press Enter when done (or type 'q' to quit): ").strip().lower()
-    if choice == "q":
-        save_progress(source, pat_file, complete=False)
-        return False
+        # Step 5 — GUI pause
+        pr.green("Add the above words in gui2/main.py → Pass2Add tab.")
+        choice = input("Press Enter when done (or type 'q' to quit): ").strip().lower()
+        if choice == "q":
+            save_progress(source, pat_file, complete=False)
+            return False
 
-    # Step 6 — Second copy_examples run: commit newly-added words
-    pr.green(f"Applying copy_examples for {source}...")
-    update_column_for_some_criteria(source, "vib", "vib", dry_run=False)
-    pr.yes("DB changes applied.")
+        # Step 6 — Second copy_examples run: commit newly-added words
+        pr.green(f"Applying copy_examples for {source}...")
+        update_column_for_some_criteria(source, "vib", "vib", dry_run=False)
+        pr.yes("DB changes applied.")
 
     # Step 7 — Save progress
     save_progress(source, pat_file)
