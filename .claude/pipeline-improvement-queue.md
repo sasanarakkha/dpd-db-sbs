@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 25
+Pointer: 29
 
 ## Scripts (76 total, local unique_paths)
 
@@ -35,13 +35,13 @@ Pointer: 25
 - [x] 22. scripts/change_in_db/update_ru_db_from_csv.py
 - [x] 23. scripts/change_in_db/update_sbs_chants_in_db.py
 - [x] 24. scripts/change_in_db/update_yojana_km.py
-- [ ] 25. scripts/change_in_db/vib_rule_workflow.py
+- [x] 25. scripts/change_in_db/vib_rule_workflow.py
 
 ### scripts/export
 
-- [ ] 26. scripts/export/sbs_anki_updater.py
-- [ ] 27. scripts/export/sbs_anki_apkg.py
-- [ ] 28. scripts/export/sbs_anki_deck_config.py
+- [x] 26. scripts/export/sbs_anki_updater.py
+- [x] 27. scripts/export/sbs_anki_apkg.py
+- [x] 28. scripts/export/sbs_anki_deck_config.py
 - [ ] 29. scripts/export/sbs_anki_collection_verifier.py
 - [ ] 30. scripts/export/sbs_anki_revert.py
 
@@ -131,3 +131,7 @@ Pointer: 25
 2026-06-14 | #22 scripts/change_in_db/update_ru_db_from_csv.py | changed | not in use — moved to scripts/dps_archive/ via git mv
 2026-06-14 | #23 scripts/change_in_db/update_sbs_chants_in_db.py | changed | query SBS directly (drop DpdHeadword+joinedload), remove dead guard, rename result→found, extract attr vars, remove or "" redundancy, explicit None checks, type annotations
 2026-06-14 | #24 scripts/change_in_db/update_yojana_km.py | changed | collapse dead if/else in Phase 2 printing, add re.Match[str]/->str type hints to 4 closure callbacks; golden-master tests added (5 tests, 28+50+54+32 fixture cases); word2number approach rejected — returns wrong value for "one million one hundred and seventy-six thousand" (1176001 vs 1176000)
+2026-06-14 | #25 scripts/change_in_db/vib_rule_workflow.py | changed | dict[str, Any] return type, Session annotation on db_session, Path.stem+re.match in suggest_next_pat_file, encoding='utf-8' on 5 read/write_text calls, short-circuit GUI pause when words list is empty; 20 tests added
+2026-06-14 | #26 scripts/export/sbs_anki_updater.py | changed | os→pathlib (4 places, drop os import), datetime to module level, Note/DpdHeadword type hints on update_note_values, dict[str,Any] on row param, type params on all bare dict/list signatures, deck_selector dedup→dict.fromkeys; 22 tests added
+2026-06-15 | #27 scripts/export/sbs_anki_apkg.py | changed | os→pathlib: makedirs→mkdir, path.join→/, exportInto(str(path))
+2026-06-15 | #28 scripts/export/sbs_anki_deck_config.py | changed | _to_br() helper, _SBS_TOOLS singleton, _base_db_fields() factory (1233→885 lines), str(root_group) type fix, meaning_1 or meaning_2, type annotations; 36 golden-master tests added

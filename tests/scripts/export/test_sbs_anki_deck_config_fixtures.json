@@ -1,0 +1,252 @@
+{
+  "get_root_key": {
+    "8": {
+      "lemma_1": "akaṅkha 1.1",
+      "has_rt": true,
+      "root_key": "√kaṅkh 2",
+      "output": "√kaṅkh"
+    },
+    "9": {
+      "lemma_1": "akaṅkha 2.1",
+      "has_rt": true,
+      "root_key": "√kaṅkh 1",
+      "output": "√kaṅkh"
+    },
+    "10": {
+      "lemma_1": "akaṅkhī",
+      "has_rt": true,
+      "root_key": "√kaṅkh 2",
+      "output": "√kaṅkh"
+    },
+    "12": {
+      "lemma_1": "akaccha",
+      "has_rt": true,
+      "root_key": "√kath",
+      "output": "√kath"
+    },
+    "13": {
+      "lemma_1": "akaṭa 1",
+      "has_rt": true,
+      "root_key": "√kar",
+      "output": "√kar"
+    },
+    "1": {
+      "lemma_1": "a 1.1",
+      "has_rt": false,
+      "root_key": null,
+      "output": ""
+    },
+    "2": {
+      "lemma_1": "a 2.1",
+      "has_rt": false,
+      "root_key": null,
+      "output": ""
+    },
+    "3": {
+      "lemma_1": "a 2.2",
+      "has_rt": false,
+      "root_key": null,
+      "output": ""
+    }
+  },
+  "get_construction": {
+    "2": {
+      "lemma_1": "a 2.1",
+      "input": "ā > a",
+      "output": "ā > a"
+    },
+    "4": {
+      "lemma_1": "a 2.3",
+      "input": "(n)a",
+      "output": "(n)a"
+    },
+    "7": {
+      "lemma_1": "akakkasa",
+      "input": "na > a + kakkasa",
+      "output": "na > a + kakkasa"
+    },
+    "1": {
+      "lemma_1": "a 1.1",
+      "input": "",
+      "output": ""
+    },
+    "3": {
+      "lemma_1": "a 2.2",
+      "input": "",
+      "output": ""
+    }
+  },
+  "get_phonetic": {
+    "2": {
+      "lemma_1": "a 2.1",
+      "input": "ā > a",
+      "output": "ā > a"
+    },
+    "12": {
+      "lemma_1": "akaccha",
+      "input": "thy > cch",
+      "output": "thy > cch"
+    },
+    "13": {
+      "lemma_1": "akaṭa 1",
+      "input": "rt > ṭ (sk ṛt)",
+      "output": "rt > ṭ (sk ṛt)"
+    },
+    "1": {
+      "lemma_1": "a 1.1",
+      "input": "",
+      "output": ""
+    },
+    "3": {
+      "lemma_1": "a 2.2",
+      "input": "",
+      "output": ""
+    }
+  },
+  "get_paritta_source": {
+    "882": {
+      "lemma_1": "acintayi",
+      "has_sbs": true,
+      "chant_pali_1": "Maṅgala-sutta",
+      "chant_pali_2": "",
+      "output": [
+        "SNP16",
+        "maṅgalasuttaṃ<br>cūḷavaggo 4",
+        "bahū devā manussā ca,<br>maṅgalāni <b>acintayuṃ</b>,<br>ākaṅkhamānā sotthānaṃ,<br>brūhi maṅgalam'uttamaṃ."
+      ]
+    },
+    "1258": {
+      "lemma_1": "ajjhagā",
+      "has_sbs": true,
+      "chant_pali_1": "Ratana-sutta",
+      "chant_pali_2": "",
+      "output": [
+        "SNP13",
+        "ratanasuttaṃ<br>cūḷavaggo 1",
+        "khayaṃ virāgaṃ amataṃ paṇītaṃ,<br>yad<b>ajjhagā</b> sakyamunī samāhito.<br>na tena dhammena sam'atthi kiñci"
+      ]
+    },
+    "1313": {
+      "lemma_1": "ajjhabhāsi",
+      "has_sbs": true,
+      "chant_pali_1": "Maṅgala-sutta",
+      "chant_pali_2": "",
+      "output": [
+        "SNP16",
+        "maṅgalasuttaṃ<br>cūḷavaggo 4",
+        "upasaṅkamitvā bhagavantaṃ abhivādetvā ekam'antaṃ aṭṭhāsi. ekam'antaṃ ṭhitā kho sā devatā bhagavantaṃ gāthāya <b>ajjhabhāsi</b>"
+      ]
+    },
+    "3": {
+      "lemma_1": "a 2.2",
+      "has_sbs": false,
+      "chant_pali_1": null,
+      "chant_pali_2": null,
+      "output": [
+        "",
+        "",
+        ""
+      ]
+    },
+    "4": {
+      "lemma_1": "a 2.3",
+      "has_sbs": false,
+      "chant_pali_1": null,
+      "chant_pali_2": null,
+      "output": [
+        "",
+        "",
+        ""
+      ]
+    }
+  },
+  "get_example_for_class": {
+    "32": {
+      "lemma_1": "akata 1",
+      "has_sbs": true,
+      "has_source_1": true,
+      "output": [
+        "AN5.140",
+        "sotasuttaṃ",
+        "idha, bhikkhave, rañño nāgo yam'enaṃ hatthidammasārathi kāraṇaṃ kāreti, yadi vā katapubbaṃ yadi vā <b>akata</b>pubbaṃ, taṃ aṭṭhiṃ katvā manasi katvā sabbaṃ cetasā samannāharitvā ohitasoto suṇāti."
+      ]
+    },
+    "33": {
+      "lemma_1": "akata 2",
+      "has_sbs": true,
+      "has_source_1": true,
+      "output": [
+        "UD73",
+        "tatiya nibbāna paṭisaṃyuttasuttaṃ",
+        "atthi bhikkhave ajātaṃ abhūtaṃ <b>akataṃ</b> asaṅkhataṃ"
+      ]
+    },
+    "54": {
+      "lemma_1": "akatapubba",
+      "has_sbs": true,
+      "has_source_1": true,
+      "output": [
+        "AN5.140",
+        "sotasuttaṃ",
+        "idha, bhikkhave, rañño nāgo yam'enaṃ hatthidammasārathi kāraṇaṃ kāreti, yadi vā katapubbaṃ yadi vā <b>akatapubbaṃ</b>, taṃ aṭṭhiṃ katvā manasi katvā sabbaṃ cetasā samannāharitvā ohitasoto suṇāti."
+      ]
+    },
+    "64": {
+      "lemma_1": "akatuposatha",
+      "has_sbs": true,
+      "has_source_1": true,
+      "output": [
+        "PAT PK",
+        "dhammayuttikapubbakiccaṃ",
+        "pānīyaparibhojanīya-upaṭṭhapanañ'ca, chand'ārahānaṃ bhikkhūnaṃ chand'āharaṇañ'ca, tesaññ'eva <b>akat'uposathānaṃ</b> pārisuddhiyā'pi āharaṇañ'ca"
+      ]
+    },
+    "74": {
+      "lemma_1": "akathaṃkathī",
+      "has_sbs": true,
+      "has_source_1": true,
+      "output": [
+        "MN107",
+        "gaṇakamoggallānasuttaṃ",
+        "vicikicchaṃ pahāya tiṇṇavicikiccho viharati <b>akathaṃkathī</b> kusalesu dhammesu, vicikicchāya cittaṃ parisodhesiṃ."
+      ]
+    },
+    "82": {
+      "lemma_1": "akanta",
+      "has_sbs": true,
+      "has_source_1": true,
+      "output": [
+        "Trad",
+        "",
+        "yan'dunnimittaṃ avamaṅgalañ'ca, yo c'āmanāpo sakuṇassa saddo, pāpaggaho dussupinaṃ <b>akantaṃ</b>, buddh'ānubhāvena vināsam'entu"
+      ]
+    },
+    "1": {
+      "lemma_1": "a 1.1",
+      "has_sbs": true,
+      "has_source_1": true,
+      "output": [
+        "bālāvatāra",
+        "sandhi kaṇḍa",
+        "<b>a</b> kavagga hā kaṇṭhajā, i cavagga yā tālujā, u pavaggā oṭṭhajā, ṭavagga ra ḷā muddhajā, tavagga la sā dantajā, e kaṇṭhatālujo, o kaṇṭh'oṭṭhajo, vo dant'oṭṭhajo."
+      ]
+    },
+    "2": {
+      "lemma_1": "a 2.1",
+      "has_sbs": true,
+      "has_source_1": true,
+      "output": [
+        "VIN1.2.1",
+        "sukkavissaṭṭhisikkhāpadaṃ",
+        "saṅgh'ādiseso'ti saṅgho'va tassā āpattiyā parivāsaṃ deti, mūlāya paṭikassati, mānattaṃ deti, <b>a</b>bbheti, na sambahulā, na ekapuggalo. tena vuccati, saṅgh'ādiseso'ti."
+      ]
+    }
+  },
+  "get_feedback": {
+    "structure": {
+      "contains_lemma": true,
+      "contains_deck_upper": true,
+      "starts_with_link_prefix": true
+    }
+  }
+}

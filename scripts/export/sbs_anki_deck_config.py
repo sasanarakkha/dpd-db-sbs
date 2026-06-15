@@ -3,12 +3,13 @@
 import datetime
 import re
 from dataclasses import dataclass
-from typing import Callable, Any, Literal
+from typing import Any, Callable, Literal
 
 from db.models import DpdHeadword
 from tools.sbs_table_functions import SBS_table_tools
 
-current_date = datetime.date.today().strftime("%m-%d")
+current_date: str = datetime.date.today().strftime("%m-%d")
+_SBS_TOOLS: SBS_table_tools = SBS_table_tools()
 
 
 @dataclass
@@ -23,9 +24,13 @@ class DeckSpec:
     creates_new_notes: bool = True
 
 
+def _to_br(text: str | None) -> str:
+    return text.replace("\n", "<br>") if text else ""
+
+
 # --- Producers for field_map ---
 
-sbs_ped_link = 'Spot a mistake? <a class="link" href="https://docs.google.com/forms/d/e/1FAIpQLScNC5v2gQbBCM3giXfYIib9zrp-WMzwJuf_iVXEMX2re4BFFw/viewform?usp=pp_url&entry.438735500'
+sbs_ped_link: str = 'Spot a mistake? <a class="link" href="https://docs.google.com/forms/d/e/1FAIpQLScNC5v2gQbBCM3giXfYIib9zrp-WMzwJuf_iVXEMX2re4BFFw/viewform?usp=pp_url&entry.438735500'
 
 
 def get_feedback(i: DpdHeadword, deck_name: str) -> str:
@@ -39,11 +44,11 @@ def get_root_key(i: DpdHeadword) -> str:
 
 
 def get_construction(i: DpdHeadword) -> str:
-    return i.construction.replace("\n", "<br>") if i.construction else ""
+    return _to_br(i.construction)
 
 
 def get_phonetic(i: DpdHeadword) -> str:
-    return i.phonetic.replace("\n", "<br>") if i.phonetic else ""
+    return _to_br(i.phonetic)
 
 
 def get_paritta_source(i: DpdHeadword) -> tuple[str, str, str]:
@@ -59,11 +64,7 @@ def get_paritta_source(i: DpdHeadword) -> tuple[str, str, str]:
         sbs_sources, sbs_suttas, sbs_examples, sbs_palichants
     ):
         if any(chant_name in palichant for chant_name in chant_names):
-            return (
-                source.replace("\n", "<br>") if source else "",
-                sutta.replace("\n", "<br>") if sutta else "",
-                example.replace("\n", "<br>") if example else "",
-            )
+            return (_to_br(source), _to_br(sutta), _to_br(example))
     return "", "", ""
 
 
@@ -85,18 +86,50 @@ def get_example_for_class(i: DpdHeadword) -> tuple[str, str, str]:
         if example_val:
             source_val = getattr(sbs, src_attr, None)
             sutta_val = getattr(sbs, sut_attr, None)
-            return (
-                source_val.replace("\n", "<br>") if source_val else "",
-                sutta_val.replace("\n", "<br>") if sutta_val else "",
-                example_val.replace("\n", "<br>") if example_val else "",
-            )
+            return (_to_br(source_val), _to_br(sutta_val), _to_br(example_val))
     if i.source_1:
-        return (
-            i.source_1.replace("\n", "<br>"),
-            i.sutta_1.replace("\n", "<br>"),
-            i.example_1.replace("\n", "<br>"),
-        )
+        return (_to_br(i.source_1), _to_br(i.sutta_1), _to_br(i.example_1))
     return "", "", ""
+
+
+def _base_db_fields() -> dict[str, Callable[[DpdHeadword], str]]:
+    """Field lambdas shared across all DB-sourced decks; unique fields override or extend."""
+    return {
+        "id": lambda i: str(i.id),
+        "pali": lambda i: i.lemma_1,
+        "grammar": lambda i: i.grammar,
+        "neg": lambda i: i.neg,
+        "verb": lambda i: i.verb,
+        "trans": lambda i: i.trans,
+        "plus_case": lambda i: i.plus_case,
+        "meaning": lambda i: i.meaning_1 or i.meaning_2,
+        "meaning_lit": lambda i: i.meaning_lit,
+        "native": lambda i: "",
+        "sanskrit": lambda i: i.sanskrit,
+        "sanskrit_root": lambda i: i.rt.sanskrit_root if i.rt else "",
+        "sanskrit_root_meaning": lambda i: i.rt.sanskrit_root_meaning if i.rt else "",
+        "sanskrit_root_class": lambda i: i.rt.sanskrit_root_class if i.rt else "",
+        "root": get_root_key,
+        "root_has_verb": lambda i: i.rt.root_has_verb if i.rt else "",
+        "root_group": lambda i: str(i.rt.root_group) if i.rt else "",
+        "root_sign": lambda i: i.root_sign if i.rt else "",
+        "root_meaning": lambda i: i.rt.root_meaning if i.rt else "",
+        "root_base": lambda i: i.root_base if i.rt else "",
+        "construction": get_construction,
+        "derivative": lambda i: i.derivative,
+        "suffix": lambda i: i.suffix,
+        "phonetic": get_phonetic,
+        "compound_type": lambda i: i.compound_type,
+        "compound_construction": lambda i: i.compound_construction,
+        "antonym": lambda i: i.antonym,
+        "synonym": lambda i: i.synonym,
+        "variant": lambda i: i.variant,
+        "commentary": lambda i: _to_br(i.commentary),
+        "notes": lambda i: _to_br(i.notes),
+        "link": lambda i: _to_br(i.link),
+        "audio": lambda i: _SBS_TOOLS.generate_sbs_audio(i.lemma_clean),
+        "test": lambda i: current_date,
+    }
 
 
 # SUTTAS_PREFIX_MAP maps discourses_source prefix -> full subdeck name
@@ -114,7 +147,7 @@ SUTTAS_PREFIX_MAP: dict[str, str] = {
 
 VOCAB_CLASS_RANGE = range(1, 30)
 
-EXPECTED_COLLECTION = {
+EXPECTED_COLLECTION: dict[str, dict[str, Any]] = {
     "Common Roots": {
         "model_name": "common roots",
         "fields": [
@@ -643,59 +676,10 @@ DECKS: list[DeckSpec] = [
         slug="pali_bhikkhu_vibhanga",
         source="db",
         field_map={
-            "id": lambda i: str(i.id),
-            "pali": lambda i: i.lemma_1,
-            "grammar": lambda i: i.grammar,
-            "neg": lambda i: i.neg,
-            "verb": lambda i: i.verb,
-            "trans": lambda i: i.trans,
-            "plus_case": lambda i: i.plus_case,
-            "meaning": lambda i: i.meaning_1 if i.meaning_1 else i.meaning_2,
-            "meaning_lit": lambda i: i.meaning_lit,
-            "native": lambda i: "",
-            "sanskrit": lambda i: i.sanskrit,
-            "sanskrit_root": lambda i: i.rt.sanskrit_root if i.rt else "",
-            "sanskrit_root_meaning": lambda i: (
-                i.rt.sanskrit_root_meaning if i.rt else ""
-            ),
-            "sanskrit_root_class": lambda i: i.rt.sanskrit_root_class if i.rt else "",
-            "root": lambda i: get_root_key(i),
-            "root_has_verb": lambda i: i.rt.root_has_verb if i.rt else "",
-            "root_group": lambda i: i.rt.root_group if i.rt else "",
-            "root_sign": lambda i: i.root_sign if i.rt else "",
-            "root_meaning": lambda i: i.rt.root_meaning if i.rt else "",
-            "root_base": lambda i: i.root_base if i.rt else "",
-            "construction": lambda i: get_construction(i),
-            "derivative": lambda i: i.derivative,
-            "suffix": lambda i: i.suffix,
-            "phonetic": lambda i: get_phonetic(i),
-            "compound_type": lambda i: i.compound_type,
-            "compound_construction": lambda i: i.compound_construction,
-            "source": lambda i: (
-                i.sbs.vib_source.replace("\n", "<br>")
-                if i.sbs and i.sbs.vib_source
-                else ""
-            ),
-            "sutta": lambda i: (
-                i.sbs.vib_sutta.replace("\n", "<br>")
-                if i.sbs and i.sbs.vib_sutta
-                else ""
-            ),
-            "example": lambda i: (
-                i.sbs.vib_example.replace("\n", "<br>")
-                if i.sbs and i.sbs.vib_example
-                else ""
-            ),
-            "antonym": lambda i: i.antonym,
-            "synonym": lambda i: i.synonym,
-            "variant": lambda i: i.variant,
-            "commentary": lambda i: (
-                i.commentary.replace("\n", "<br>") if i.commentary else ""
-            ),
-            "notes": lambda i: i.notes.replace("\n", "<br>") if i.notes else "",
-            "link": lambda i: i.link.replace("\n", "<br>") if i.link else "",
-            "audio": lambda i: SBS_table_tools().generate_sbs_audio(i.lemma_clean),
-            "test": lambda i: current_date,
+            **_base_db_fields(),
+            "source": lambda i: _to_br(i.sbs.vib_source) if i.sbs else "",
+            "sutta": lambda i: _to_br(i.sbs.vib_sutta) if i.sbs else "",
+            "example": lambda i: _to_br(i.sbs.vib_example) if i.sbs else "",
             "feedback": lambda i: get_feedback(i, "vibhanga"),
         },
     ),
@@ -706,52 +690,10 @@ DECKS: list[DeckSpec] = [
         slug="pali_dhp_vocab",
         source="db",
         field_map={
-            "id": lambda i: str(i.id),
-            "pali": lambda i: i.lemma_1,
-            "grammar": lambda i: i.grammar,
-            "neg": lambda i: i.neg,
-            "verb": lambda i: i.verb,
-            "trans": lambda i: i.trans,
-            "plus_case": lambda i: i.plus_case,
-            "meaning": lambda i: i.meaning_1 if i.meaning_1 else i.meaning_2,
-            "meaning_lit": lambda i: i.meaning_lit,
-            "native": lambda i: "",
-            "sanskrit": lambda i: i.sanskrit,
-            "sanskrit_root": lambda i: i.rt.sanskrit_root if i.rt else "",
-            "sanskrit_root_meaning": lambda i: (
-                i.rt.sanskrit_root_meaning if i.rt else ""
-            ),
-            "sanskrit_root_class": lambda i: i.rt.sanskrit_root_class if i.rt else "",
-            "root": lambda i: get_root_key(i),
-            "root_has_verb": lambda i: i.rt.root_has_verb if i.rt else "",
-            "root_group": lambda i: i.rt.root_group if i.rt else "",
-            "root_sign": lambda i: i.root_sign if i.rt else "",
-            "root_meaning": lambda i: i.rt.root_meaning if i.rt else "",
-            "root_base": lambda i: i.root_base if i.rt else "",
-            "construction": lambda i: get_construction(i),
-            "derivative": lambda i: i.derivative,
-            "suffix": lambda i: i.suffix,
-            "phonetic": lambda i: get_phonetic(i),
-            "compound_type": lambda i: i.compound_type,
-            "compound_construction": lambda i: i.compound_construction,
-            "source": lambda i: (
-                i.sbs.dhp_source.replace("\n", "<br>")
-                if i.sbs and i.sbs.dhp_source
-                else ""
-            ),
-            "sutta": lambda i: (
-                i.sbs.dhp_sutta.replace("\n", "<br>")
-                if i.sbs and i.sbs.dhp_sutta
-                else ""
-            ),
-            "example": lambda i: (
-                i.sbs.dhp_example.replace("\n", "<br>")
-                if i.sbs and i.sbs.dhp_example
-                else ""
-            ),
-            "link": lambda i: i.link.replace("\n", "<br>") if i.link else "",
-            "audio": lambda i: SBS_table_tools().generate_sbs_audio(i.lemma_clean),
-            "test": lambda i: current_date,
+            **_base_db_fields(),
+            "source": lambda i: _to_br(i.sbs.dhp_source) if i.sbs else "",
+            "sutta": lambda i: _to_br(i.sbs.dhp_sutta) if i.sbs else "",
+            "example": lambda i: _to_br(i.sbs.dhp_example) if i.sbs else "",
             "feedback": lambda i: get_feedback(i, "dhp"),
         },
     ),
@@ -765,18 +707,18 @@ DECKS: list[DeckSpec] = [
             "id": lambda i: str(i.id),
             "pali": lambda i: i.lemma_1,
             "grammar": lambda i: i.grammar,
-            "meaning": lambda i: i.meaning_1 if i.meaning_1 else i.meaning_2,
+            "meaning": lambda i: i.meaning_1 or i.meaning_2,
             "meaning_lit": lambda i: i.meaning_lit,
-            "root": lambda i: get_root_key(i),
-            "root_group": lambda i: i.rt.root_group if i.rt else "",
+            "root": get_root_key,
+            "root_group": lambda i: str(i.rt.root_group) if i.rt else "",
             "root_sign": lambda i: i.root_sign if i.rt else "",
             "root_meaning": lambda i: i.rt.root_meaning if i.rt else "",
             "root_base": lambda i: i.root_base if i.rt else "",
-            "construction": lambda i: get_construction(i),
+            "construction": get_construction,
             "source": lambda i: get_paritta_source(i)[0],
             "sutta": lambda i: get_paritta_source(i)[1],
             "example": lambda i: get_paritta_source(i)[2],
-            "audio": lambda i: SBS_table_tools().generate_sbs_audio(i.lemma_clean),
+            "audio": lambda i: _SBS_TOOLS.generate_sbs_audio(i.lemma_clean),
             "test": lambda i: current_date,
             "feedback": lambda i: get_feedback(i, "paritta"),
         },
@@ -821,56 +763,15 @@ DECKS: list[DeckSpec] = [
         slug="phonetic_changes_pali_class",
         source="db",
         field_map={
-            "id": lambda i: str(i.id),
-            "pali": lambda i: i.lemma_1,
+            **_base_db_fields(),
             "sbs_class_anki": lambda i: str(i.sbs.class_anki) if i.sbs else "",
-            "grammar": lambda i: i.grammar,
-            "neg": lambda i: i.neg,
-            "verb": lambda i: i.verb,
-            "trans": lambda i: i.trans,
-            "plus_case": lambda i: i.plus_case,
-            "meaning": lambda i: i.meaning_1 if i.meaning_1 else i.meaning_2,
-            "meaning_lit": lambda i: i.meaning_lit,
-            "native": lambda i: "",
-            "sanskrit": lambda i: i.sanskrit,
-            "sanskrit_root": lambda i: i.rt.sanskrit_root if i.rt else "",
-            "sanskrit_root_meaning": lambda i: (
-                i.rt.sanskrit_root_meaning if i.rt else ""
-            ),
-            "sanskrit_root_class": lambda i: i.rt.sanskrit_root_class if i.rt else "",
-            "root": lambda i: get_root_key(i),
-            "root_has_verb": lambda i: i.rt.root_has_verb if i.rt else "",
-            "root_group": lambda i: i.rt.root_group if i.rt else "",
-            "root_sign": lambda i: i.root_sign if i.rt else "",
-            "root_meaning": lambda i: i.rt.root_meaning if i.rt else "",
-            "root_base": lambda i: i.root_base if i.rt else "",
-            "construction": lambda i: get_construction(i),
-            "derivative": lambda i: i.derivative,
-            "suffix": lambda i: i.suffix,
-            "phonetic": lambda i: get_phonetic(i),
-            "compound_type": lambda i: i.compound_type,
-            "compound_construction": lambda i: i.compound_construction,
             "source_1": lambda i: get_example_for_class(i)[0],
             "sutta_1": lambda i: get_example_for_class(i)[1],
             "example_1": lambda i: get_example_for_class(i)[2],
-            "source_2": lambda i: "",  # Logic for example 2 can be added
+            "source_2": lambda i: "",
             "sutta_2": lambda i: "",
             "example_2": lambda i: "",
-            "antonym": lambda i: i.antonym,
-            "synonym": lambda i: i.synonym,
-            "variant": lambda i: i.variant,
-            "commentary": lambda i: (
-                i.commentary.replace("\n", "<br>") if i.commentary else ""
-            ),
-            "notes": lambda i: i.notes.replace("\n", "<br>") if i.notes else "",
-            "sbs_notes": lambda i: (
-                i.sbs.sbs_notes.replace("\n", "<br>")
-                if i.sbs and i.sbs.sbs_notes
-                else ""
-            ),
-            "link": lambda i: i.link.replace("\n", "<br>") if i.link else "",
-            "audio": lambda i: SBS_table_tools().generate_sbs_audio(i.lemma_clean),
-            "test": lambda i: current_date,
+            "sbs_notes": lambda i: _to_br(i.sbs.sbs_notes) if i.sbs else "",
             "feedback": lambda i: get_feedback(i, "root-phonetic"),
         },
     ),
@@ -881,56 +782,15 @@ DECKS: list[DeckSpec] = [
         slug="roots_pali_class",
         source="db",
         field_map={
-            "id": lambda i: str(i.id),
-            "pali": lambda i: i.lemma_1,
+            **_base_db_fields(),
             "sbs_class_anki": lambda i: str(i.sbs.class_anki) if i.sbs else "",
-            "grammar": lambda i: i.grammar,
-            "neg": lambda i: i.neg,
-            "verb": lambda i: i.verb,
-            "trans": lambda i: i.trans,
-            "plus_case": lambda i: i.plus_case,
-            "meaning": lambda i: i.meaning_1 if i.meaning_1 else i.meaning_2,
-            "meaning_lit": lambda i: i.meaning_lit,
-            "native": lambda i: "",
-            "sanskrit": lambda i: i.sanskrit,
-            "sanskrit_root": lambda i: i.rt.sanskrit_root if i.rt else "",
-            "sanskrit_root_meaning": lambda i: (
-                i.rt.sanskrit_root_meaning if i.rt else ""
-            ),
-            "sanskrit_root_class": lambda i: i.rt.sanskrit_root_class if i.rt else "",
-            "root": lambda i: get_root_key(i),
-            "root_has_verb": lambda i: i.rt.root_has_verb if i.rt else "",
-            "root_group": lambda i: i.rt.root_group if i.rt else "",
-            "root_sign": lambda i: i.root_sign if i.rt else "",
-            "root_meaning": lambda i: i.rt.root_meaning if i.rt else "",
-            "root_base": lambda i: i.root_base if i.rt else "",
-            "construction": lambda i: get_construction(i),
-            "derivative": lambda i: i.derivative,
-            "suffix": lambda i: i.suffix,
-            "phonetic": lambda i: get_phonetic(i),
-            "compound_type": lambda i: i.compound_type,
-            "compound_construction": lambda i: i.compound_construction,
             "source_1": lambda i: get_example_for_class(i)[0],
             "sutta_1": lambda i: get_example_for_class(i)[1],
             "example_1": lambda i: get_example_for_class(i)[2],
             "source_2": lambda i: "",
             "sutta_2": lambda i: "",
             "example_2": lambda i: "",
-            "antonym": lambda i: i.antonym,
-            "synonym": lambda i: i.synonym,
-            "variant": lambda i: i.variant,
-            "commentary": lambda i: (
-                i.commentary.replace("\n", "<br>") if i.commentary else ""
-            ),
-            "notes": lambda i: i.notes.replace("\n", "<br>") if i.notes else "",
-            "sbs_notes": lambda i: (
-                i.sbs.sbs_notes.replace("\n", "<br>")
-                if i.sbs and i.sbs.sbs_notes
-                else ""
-            ),
-            "link": lambda i: i.link.replace("\n", "<br>") if i.link else "",
-            "audio": lambda i: SBS_table_tools().generate_sbs_audio(i.lemma_clean),
-            "test": lambda i: current_date,
+            "sbs_notes": lambda i: _to_br(i.sbs.sbs_notes) if i.sbs else "",
             "feedback": lambda i: get_feedback(i, "root-phonetic"),
         },
     ),
@@ -942,87 +802,22 @@ DECKS: list[DeckSpec] = [
         source="db",
         updates_tags=True,
         field_map={
-            "id": lambda i: str(i.id),
-            "pali": lambda i: i.lemma_1,
-            "grammar": lambda i: i.grammar,
-            "neg": lambda i: i.neg,
-            "verb": lambda i: i.verb,
-            "trans": lambda i: i.trans,
-            "plus_case": lambda i: i.plus_case,
-            "meaning": lambda i: i.meaning_1 if i.meaning_1 else i.meaning_2,
-            "meaning_lit": lambda i: i.meaning_lit,
-            "native": lambda i: "",
+            **_base_db_fields(),
             "sbs_meaning": lambda i: i.sbs.sbs_meaning if i.sbs else "",
-            "sanskrit": lambda i: i.sanskrit,
-            "sanskrit_root": lambda i: i.rt.sanskrit_root if i.rt else "",
-            "sanskrit_root_meaning": lambda i: (
-                i.rt.sanskrit_root_meaning if i.rt else ""
-            ),
-            "sanskrit_root_class": lambda i: i.rt.sanskrit_root_class if i.rt else "",
-            "root": lambda i: get_root_key(i),
-            "root_has_verb": lambda i: i.rt.root_has_verb if i.rt else "",
-            "root_group": lambda i: i.rt.root_group if i.rt else "",
-            "root_sign": lambda i: i.root_sign if i.rt else "",
-            "root_meaning": lambda i: i.rt.root_meaning if i.rt else "",
-            "root_base": lambda i: i.root_base if i.rt else "",
-            "construction": lambda i: get_construction(i),
-            "derivative": lambda i: i.derivative,
-            "suffix": lambda i: i.suffix,
-            "phonetic": lambda i: get_phonetic(i),
-            "compound_type": lambda i: i.compound_type,
-            "compound_construction": lambda i: i.compound_construction,
-            "sbs_source_1": lambda i: (
-                i.sbs.sbs_source_1.replace("\n", "<br>")
-                if i.sbs and i.sbs.sbs_source_1
-                else ""
-            ),
-            "sbs_sutta_1": lambda i: (
-                i.sbs.sbs_sutta_1.replace("\n", "<br>")
-                if i.sbs and i.sbs.sbs_sutta_1
-                else ""
-            ),
-            "sbs_example_1": lambda i: (
-                i.sbs.sbs_example_1.replace("\n", "<br>")
-                if i.sbs and i.sbs.sbs_example_1
-                else ""
-            ),
+            "sbs_source_1": lambda i: _to_br(i.sbs.sbs_source_1) if i.sbs else "",
+            "sbs_sutta_1": lambda i: _to_br(i.sbs.sbs_sutta_1) if i.sbs else "",
+            "sbs_example_1": lambda i: _to_br(i.sbs.sbs_example_1) if i.sbs else "",
             "sbs_chant_pali_1": lambda i: i.sbs.sbs_chant_pali_1 if i.sbs else "",
             "sbs_chant_eng_1": lambda i: i.sbs.sbs_chant_eng_1 if i.sbs else "",
             "sbs_chapter_1": lambda i: str(i.sbs.sbs_chapter_1) if i.sbs else "",
-            "sbs_source_2": lambda i: (
-                i.sbs.sbs_source_2.replace("\n", "<br>")
-                if i.sbs and i.sbs.sbs_source_2
-                else ""
-            ),
-            "sbs_sutta_2": lambda i: (
-                i.sbs.sbs_sutta_2.replace("\n", "<br>")
-                if i.sbs and i.sbs.sbs_sutta_2
-                else ""
-            ),
-            "sbs_example_2": lambda i: (
-                i.sbs.sbs_example_2.replace("\n", "<br>")
-                if i.sbs and i.sbs.sbs_example_2
-                else ""
-            ),
+            "sbs_source_2": lambda i: _to_br(i.sbs.sbs_source_2) if i.sbs else "",
+            "sbs_sutta_2": lambda i: _to_br(i.sbs.sbs_sutta_2) if i.sbs else "",
+            "sbs_example_2": lambda i: _to_br(i.sbs.sbs_example_2) if i.sbs else "",
             "sbs_chant_pali_2": lambda i: i.sbs.sbs_chant_pali_2 if i.sbs else "",
             "sbs_chant_eng_2": lambda i: i.sbs.sbs_chant_eng_2 if i.sbs else "",
             "sbs_chapter_2": lambda i: str(i.sbs.sbs_chapter_2) if i.sbs else "",
-            "antonym": lambda i: i.antonym,
-            "synonym": lambda i: i.synonym,
-            "variant": lambda i: i.variant,
-            "commentary": lambda i: (
-                i.commentary.replace("\n", "<br>") if i.commentary else ""
-            ),
-            "notes": lambda i: i.notes.replace("\n", "<br>") if i.notes else "",
-            "sbs_notes": lambda i: (
-                i.sbs.sbs_notes.replace("\n", "<br>")
-                if i.sbs and i.sbs.sbs_notes
-                else ""
-            ),
-            "link": lambda i: i.link.replace("\n", "<br>") if i.link else "",
+            "sbs_notes": lambda i: _to_br(i.sbs.sbs_notes) if i.sbs else "",
             "sbs_index": lambda i: str(i.sbs.sbs_index) if i.sbs else "",
-            "audio": lambda i: SBS_table_tools().generate_sbs_audio(i.lemma_clean),
-            "test": lambda i: current_date,
             "feedback": lambda i: get_feedback(i, "sbs"),
         },
     ),
@@ -1033,64 +828,11 @@ DECKS: list[DeckSpec] = [
         slug="suttas_advanced_pali_class",
         source="db",
         field_map={
-            "id": lambda i: str(i.id),
-            "pali": lambda i: i.lemma_1,
-            "grammar": lambda i: i.grammar,
-            "neg": lambda i: i.neg,
-            "verb": lambda i: i.verb,
-            "trans": lambda i: i.trans,
-            "plus_case": lambda i: i.plus_case,
-            "meaning": lambda i: i.meaning_1 if i.meaning_1 else i.meaning_2,
-            "meaning_lit": lambda i: i.meaning_lit,
-            "native": lambda i: "",
-            "sanskrit": lambda i: i.sanskrit,
-            "sanskrit_root": lambda i: i.rt.sanskrit_root if i.rt else "",
-            "sanskrit_root_meaning": lambda i: (
-                i.rt.sanskrit_root_meaning if i.rt else ""
-            ),
-            "sanskrit_root_class": lambda i: i.rt.sanskrit_root_class if i.rt else "",
-            "root": lambda i: get_root_key(i),
-            "root_has_verb": lambda i: i.rt.root_has_verb if i.rt else "",
-            "root_group": lambda i: i.rt.root_group if i.rt else "",
-            "root_sign": lambda i: i.root_sign if i.rt else "",
-            "root_meaning": lambda i: i.rt.root_meaning if i.rt else "",
-            "root_base": lambda i: i.root_base if i.rt else "",
-            "construction": lambda i: get_construction(i),
-            "derivative": lambda i: i.derivative,
-            "suffix": lambda i: i.suffix,
-            "phonetic": lambda i: get_phonetic(i),
-            "compound_type": lambda i: i.compound_type,
-            "compound_construction": lambda i: i.compound_construction,
-            "source": lambda i: (
-                i.sbs.discourses_source.replace("\n", "<br>")
-                if i.sbs and i.sbs.discourses_source
-                else ""
-            ),
-            "sutta": lambda i: (
-                i.sbs.discourses_sutta.replace("\n", "<br>")
-                if i.sbs and i.sbs.discourses_sutta
-                else ""
-            ),
-            "example": lambda i: (
-                i.sbs.discourses_example.replace("\n", "<br>")
-                if i.sbs and i.sbs.discourses_example
-                else ""
-            ),
-            "antonym": lambda i: i.antonym,
-            "synonym": lambda i: i.synonym,
-            "variant": lambda i: i.variant,
-            "commentary": lambda i: (
-                i.commentary.replace("\n", "<br>") if i.commentary else ""
-            ),
-            "notes": lambda i: i.notes.replace("\n", "<br>") if i.notes else "",
-            "sbs_notes": lambda i: (
-                i.sbs.sbs_notes.replace("\n", "<br>")
-                if i.sbs and i.sbs.sbs_notes
-                else ""
-            ),
-            "link": lambda i: i.link.replace("\n", "<br>") if i.link else "",
-            "audio": lambda i: SBS_table_tools().generate_sbs_audio(i.lemma_clean),
-            "test": lambda i: current_date,
+            **_base_db_fields(),
+            "source": lambda i: _to_br(i.sbs.discourses_source) if i.sbs else "",
+            "sutta": lambda i: _to_br(i.sbs.discourses_sutta) if i.sbs else "",
+            "example": lambda i: _to_br(i.sbs.discourses_example) if i.sbs else "",
+            "sbs_notes": lambda i: _to_br(i.sbs.sbs_notes) if i.sbs else "",
             "feedback": lambda i: get_feedback(i, "suttas"),
         },
     ),
@@ -1101,35 +843,8 @@ DECKS: list[DeckSpec] = [
         slug="vocab_pali_class",
         source="db",
         field_map={
-            "id": lambda i: str(i.id),
-            "pali": lambda i: i.lemma_1,
+            **_base_db_fields(),
             "sbs_class_anki": lambda i: str(i.sbs.class_anki) if i.sbs else "",
-            "grammar": lambda i: i.grammar,
-            "neg": lambda i: i.neg,
-            "verb": lambda i: i.verb,
-            "trans": lambda i: i.trans,
-            "plus_case": lambda i: i.plus_case,
-            "meaning": lambda i: i.meaning_1 if i.meaning_1 else i.meaning_2,
-            "meaning_lit": lambda i: i.meaning_lit,
-            "native": lambda i: "",
-            "sanskrit": lambda i: i.sanskrit,
-            "sanskrit_root": lambda i: i.rt.sanskrit_root if i.rt else "",
-            "sanskrit_root_meaning": lambda i: (
-                i.rt.sanskrit_root_meaning if i.rt else ""
-            ),
-            "sanskrit_root_class": lambda i: i.rt.sanskrit_root_class if i.rt else "",
-            "root": lambda i: get_root_key(i),
-            "root_has_verb": lambda i: i.rt.root_has_verb if i.rt else "",
-            "root_group": lambda i: i.rt.root_group if i.rt else "",
-            "root_sign": lambda i: i.root_sign if i.rt else "",
-            "root_meaning": lambda i: i.rt.root_meaning if i.rt else "",
-            "root_base": lambda i: i.root_base if i.rt else "",
-            "construction": lambda i: get_construction(i),
-            "derivative": lambda i: i.derivative,
-            "suffix": lambda i: i.suffix,
-            "phonetic": lambda i: get_phonetic(i),
-            "compound_type": lambda i: i.compound_type,
-            "compound_construction": lambda i: i.compound_construction,
             "source": lambda i: get_example_for_class(i)[0],
             "sutta": lambda i: get_example_for_class(i)[1],
             "example": lambda i: get_example_for_class(i)[2],
@@ -1137,21 +852,7 @@ DECKS: list[DeckSpec] = [
                 i.sbs.class_example_translation if i.sbs else ""
             ),
             "extra": lambda i: i.sbs.class_extra if i.sbs else "",
-            "antonym": lambda i: i.antonym,
-            "synonym": lambda i: i.synonym,
-            "variant": lambda i: i.variant,
-            "commentary": lambda i: (
-                i.commentary.replace("\n", "<br>") if i.commentary else ""
-            ),
-            "notes": lambda i: i.notes.replace("\n", "<br>") if i.notes else "",
-            "sbs_notes": lambda i: (
-                i.sbs.sbs_notes.replace("\n", "<br>")
-                if i.sbs and i.sbs.sbs_notes
-                else ""
-            ),
-            "link": lambda i: i.link.replace("\n", "<br>") if i.link else "",
-            "audio": lambda i: SBS_table_tools().generate_sbs_audio(i.lemma_clean),
-            "test": lambda i: current_date,
+            "sbs_notes": lambda i: _to_br(i.sbs.sbs_notes) if i.sbs else "",
             "feedback": lambda i: get_feedback(i, "class"),
         },
     ),
@@ -1162,70 +863,22 @@ DECKS: list[DeckSpec] = [
         slug="pali_slovar",
         source="db",
         field_map={
-            "id": lambda i: str(i.id),
-            "pali": lambda i: i.lemma_1,
-            "grammar": lambda i: i.grammar,
-            "neg": lambda i: i.neg,
-            "verb": lambda i: i.verb,
-            "trans": lambda i: i.trans,
-            "plus_case": lambda i: i.plus_case,
-            "meaning": lambda i: i.meaning_1 if i.meaning_1 else i.meaning_2,
-            "meaning_lit": lambda i: i.meaning_lit,
+            **_base_db_fields(),
             "ru_meaning": lambda i: i.ru.ru_meaning if i.ru else "",
             "ru_meaning_lit": lambda i: i.ru.ru_meaning_lit if i.ru else "",
             "sbs_meaning": lambda i: i.sbs.sbs_meaning if i.sbs else "",
-            "sanskrit": lambda i: i.sanskrit,
-            "sanskrit_root": lambda i: i.rt.sanskrit_root if i.rt else "",
-            "sanskrit_root_meaning": lambda i: (
-                i.rt.sanskrit_root_meaning if i.rt else ""
-            ),
             "sanskrit_root_ru_meaning": lambda i: (
                 i.rt.sanskrit_root_ru_meaning if i.rt else ""
             ),
-            "sanskrit_root_class": lambda i: i.rt.sanskrit_root_class if i.rt else "",
-            "root": lambda i: get_root_key(i),
-            "root_has_verb": lambda i: i.rt.root_has_verb if i.rt else "",
-            "root_group": lambda i: i.rt.root_group if i.rt else "",
-            "root_sign": lambda i: i.root_sign if i.rt else "",
-            "root_meaning": lambda i: i.rt.root_meaning if i.rt else "",
             "root_ru_meaning": lambda i: i.rt.root_ru_meaning if i.rt else "",
-            "root_base": lambda i: i.root_base if i.rt else "",
-            "construction": lambda i: get_construction(i),
-            "derivative": lambda i: i.derivative,
-            "suffix": lambda i: i.suffix,
-            "phonetic": lambda i: get_phonetic(i),
-            "compound_type": lambda i: i.compound_type,
-            "compound_construction": lambda i: i.compound_construction,
-            "source_1": lambda i: (
-                i.source_1.replace("\n", "<br>") if i.source_1 else ""
-            ),
-            "sutta_1": lambda i: i.sutta_1.replace("\n", "<br>") if i.sutta_1 else "",
-            "example_1": lambda i: (
-                i.example_1.replace("\n", "<br>") if i.example_1 else ""
-            ),
-            "source_2": lambda i: (
-                i.source_2.replace("\n", "<br>") if i.source_2 else ""
-            ),
-            "sutta_2": lambda i: i.sutta_2.replace("\n", "<br>") if i.sutta_2 else "",
-            "example_2": lambda i: (
-                i.example_2.replace("\n", "<br>") if i.example_2 else ""
-            ),
-            "antonym": lambda i: i.antonym,
-            "synonym": lambda i: i.synonym,
-            "variant": lambda i: i.variant,
-            "commentary": lambda i: (
-                i.commentary.replace("\n", "<br>") if i.commentary else ""
-            ),
-            "notes": lambda i: i.notes.replace("\n", "<br>") if i.notes else "",
-            "sbs_notes": lambda i: (
-                i.sbs.sbs_notes.replace("\n", "<br>")
-                if i.sbs and i.sbs.sbs_notes
-                else ""
-            ),
-            "ru_notes": lambda i: i.ru.ru_notes.replace("\n", "<br>") if i.ru else "",
-            "link": lambda i: i.link.replace("\n", "<br>") if i.link else "",
-            "audio": lambda i: SBS_table_tools().generate_sbs_audio(i.lemma_clean),
-            "test": lambda i: current_date,
+            "source_1": lambda i: _to_br(i.source_1),
+            "sutta_1": lambda i: _to_br(i.sutta_1),
+            "example_1": lambda i: _to_br(i.example_1),
+            "source_2": lambda i: _to_br(i.source_2),
+            "sutta_2": lambda i: _to_br(i.sutta_2),
+            "example_2": lambda i: _to_br(i.example_2),
+            "sbs_notes": lambda i: _to_br(i.sbs.sbs_notes) if i.sbs else "",
+            "ru_notes": lambda i: _to_br(i.ru.ru_notes) if i.ru else "",
             "feedback": lambda i: get_feedback(i, "dps"),
         },
     ),
