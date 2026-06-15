@@ -7,7 +7,7 @@ from typing import Any, cast
 
 from db.models import DpdHeadword, DpdRoot
 from scripts.export import anki_csv
-from scripts.export.sbs_anki_deck_config import DECKS, EXPECTED_COLLECTION
+from scripts.export.sbs_anki_deck_config import DECKS
 from scripts.export.sbs_anki_updater import update_note_values_csv
 
 
@@ -154,7 +154,7 @@ def test_common_roots_updater_maps_test_date_from_csv() -> None:
 
     assert changed is True
     assert note.fields["test"] == "02-02"
-    assert EXPECTED_COLLECTION["Common Roots"]["fields"] == [
+    assert list(common_roots_deck.field_map.keys()) == [
         "root",
         "root_clean",
         "sanskrit_root",
@@ -166,5 +166,4 @@ def test_common_roots_updater_maps_test_date_from_csv() -> None:
         "native",
         "test",
         "feedback",
-        "marks",
     ]

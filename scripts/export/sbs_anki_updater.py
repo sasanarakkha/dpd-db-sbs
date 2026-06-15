@@ -27,7 +27,6 @@ from tools.sbs_table_functions import recalculate_all_sbs_indices
 
 from scripts.export.sbs_anki_deck_config import (
     DECKS,
-    EXPECTED_COLLECTION,
     DeckSpec,
     SUTTAS_PREFIX_MAP,
     VOCAB_CLASS_RANGE,
@@ -707,7 +706,7 @@ def run_pipeline(skip_collection: bool = False):
         pr.red("Aborting before collection update because backup failed.")
         return
 
-    deck_names = list(EXPECTED_COLLECTION.keys())
+    deck_names = [d.deck_name for d in DECKS]
     col, data_dict, all_data, deck_dict, model_dict = setup_anki_updater(deck_names)
     if (
         not col

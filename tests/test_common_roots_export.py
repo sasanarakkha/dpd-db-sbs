@@ -5,7 +5,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from scripts.export import anki_csv
-from scripts.export.sbs_anki_deck_config import DECKS, EXPECTED_COLLECTION
+from scripts.export.sbs_anki_deck_config import DECKS
 
 
 class FakeColumn:
@@ -142,10 +142,9 @@ def test_common_roots_csv_uses_root_key_and_keeps_duplicate_clean_roots(tmp_path
 
 def test_common_roots_deck_config_includes_root_clean():
     """Common Roots note type and field map must include root_clean."""
-    common_roots_fields = EXPECTED_COLLECTION["Common Roots"]["fields"]
+    common_roots_deck = next(deck for deck in DECKS if deck.deck_name == "Common Roots")
+    common_roots_fields = list(common_roots_deck.field_map.keys())
     root_index = common_roots_fields.index("root")
 
     assert common_roots_fields[root_index + 1] == "root_clean"
-
-    common_roots_deck = next(deck for deck in DECKS if deck.deck_name == "Common Roots")
     assert common_roots_deck.field_map["root_clean"]({"root_clean": "√kar"}) == "√kar"
