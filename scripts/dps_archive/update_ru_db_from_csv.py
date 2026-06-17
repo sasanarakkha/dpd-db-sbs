@@ -1,17 +1,18 @@
+#!/usr/bin/env python3
+
 import csv
 import sys
-import tty
 import termios
+import tty
+
 from rich.console import Console
+from sqlalchemy.orm import joinedload
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword
 from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
 from tools.tsv_read_write import dotdict
-
-from sqlalchemy.orm import joinedload
-
 
 console = Console()
 pth = ProjectPaths()
@@ -51,7 +52,7 @@ with open(csv_path, "r", encoding="utf-8") as f:
     for row in reader:
         csv_data.append(dotdict(row))
 
-console.print(f"[blue]Delimiter detected: {repr(delimiter)}")
+console.print(f"[blue]Delimiter detected: {delimiter!r}")
 if csv_data:
     console.print(f"[blue]First entry after headings in the csv: {csv_data[0]}")
 console.print(f"[blue]Total number of rows in the file: {len(csv_data)}")
