@@ -35,5 +35,13 @@
       "model": "gemini-2.5-flash",
       "delay": 0
     }
+  ],
+  "gemini_cli_work_models": [
+    {
+      "provider": "gemini_cli",
+      "model": "gemini-3-flash-preview",
+      "delay": 0,
+      "timeout": 150
+    }
   ]
 }
