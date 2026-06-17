@@ -2,40 +2,36 @@
 
 """Generate AI translations for Pāḷi headwords in multiple languages (Russian, Tamil, etc.) and persist to database or export as JSONL batch prompts."""
 
-import os
-import json
+import argparse
 import glob
+import json
+import os
 import re
 from collections.abc import Callable
 from pathlib import Path
-
 from typing import Any, TypedDict
+
+from sqlalchemy import and_, null, or_
+from sqlalchemy.orm import joinedload
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword, Russian, Tamil
-
-from tools.paths import ProjectPaths
-from tools.meaning_construction import make_meaning_combo
-from tools.date_and_time import year_month_day_hour_minute_dash
-
+from tools.ai_manager import AIManager
 from tools.ai_related import (
-    load_translation_examples,
-    replace_abbreviations,
     generate_messages_for_meaning,
-    generate_messages_for_notes,
     generate_messages_for_meaning_lit,
     generate_messages_for_meaning_ta,
+    generate_messages_for_notes,
     load_ai_config,
+    load_translation_examples,
+    replace_abbreviations,
 )
-from tools.ai_manager import AIManager
+from tools.date_and_time import year_month_day_hour_minute_dash
+from tools.meaning_construction import make_meaning_combo
 from tools.meaning_snapshot_ru import remove_ids_from_snapshot
-from tools.printer import printer as pr
-
+from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
-
-from sqlalchemy import and_, or_, null
-from sqlalchemy.orm import joinedload
-
+from tools.printer import printer as pr
 
 pth = ProjectPaths()
 dpspth = DPSPaths()
@@ -79,7 +75,9 @@ SNAPSHOTS_BY_MODE: dict[str, list[Path]] = {
 }
 
 
-def remove_irrelevant(limit: int, lang: str = "ru") -> None:
+def remove_irrelevant(
+    limit: int | None, lang: str = "ru", dry_run: bool = False
+) -> None:
     # Query the database to fetch words based on language
     if lang == "ru":
         db = (
@@ -118,6 +116,12 @@ def remove_irrelevant(limit: int, lang: str = "ru") -> None:
 
     print(f"Rows filtered for the process ({lang}): {len(db)} / {total_row_count}")
 
+    if dry_run:
+        print(f"[DRY-RUN] Would remove {len(db)} rows from {lang} database:")
+        for idx, word in enumerate(db, 1):
+            print(f"  {idx}/{len(db)} {word.id}, {word.lemma_1}")
+        return
+
     # Remove the filtered rows from the respective table
     for word in db:
         if lang == "ru":
@@ -130,7 +134,7 @@ def remove_irrelevant(limit: int, lang: str = "ru") -> None:
 
 
 def filter_words_for_translation(
-    mode: str, limit: int, lang: str = "ru"
+    mode: str, limit: int | None, lang: str = "ru"
 ) -> list[DpdHeadword]:
     """Filter words that need translation for specified language."""
 
@@ -142,7 +146,7 @@ def filter_words_for_translation(
     orm_model = lang_cfg["orm_model"]
 
     if mode == "meaning":
-        #! for filling those which does not have language table and fill the conditions
+        # for filling those which does not have language table and fill the conditions
 
         db = (
             db_session.query(DpdHeadword)
@@ -161,7 +165,7 @@ def filter_words_for_translation(
             .all()
         )
 
-        #! for filling empty rows in Russian table
+        # for filling empty rows in Russian table
 
         # db = db_session.query(DpdHeadword).outerjoin(
         #     Russian, DpdHeadword.id == Russian.id
@@ -171,7 +175,7 @@ def filter_words_for_translation(
         #                 Russian.ru_meaning_raw == '',
         #                 ).order_by(DpdHeadword.ebt_count.desc()).all()
 
-        #! for filling those which have lower model of gpt:
+        # for filling those which have lower model of gpt:
 
         # # Call the functions to read IDs from the TSV and json files to exclude
         # exclude_ids_tsv: set[str] = read_exclude_ids_from_tsv(f"{dpspth.ai_translated_dir}/{hight_model}.tsv")
@@ -194,7 +198,7 @@ def filter_words_for_translation(
         #     ).order_by(DpdHeadword.ebt_count.desc()).all()
 
     elif mode == "lit":
-        #! filter for lit meaning
+        # filter for lit meaning
         db = (
             db_session.query(DpdHeadword)
             .outerjoin(Russian, DpdHeadword.id == Russian.id)
@@ -210,7 +214,7 @@ def filter_words_for_translation(
         )
 
     elif mode == "note":
-        #! for filling notes those which has Russian table and does not have ru_notes
+        # for filling notes those which has Russian table and does not have ru_notes
         db = (
             db_session.query(DpdHeadword)
             .outerjoin(Russian, DpdHeadword.id == Russian.id)
@@ -242,7 +246,7 @@ def filter_words_for_translation(
 
 
 def create_translation_prompt(
-    word: DpdHeadword, mode: str, lang: str = "ru"
+    word: DpdHeadword, mode: str, lang: str = "ru", model: str | None = None
 ) -> dict[str, Any]:
     """Create a translation prompt for a given word."""
     pos_example_map = load_translation_examples(dpspth, lang=lang)
@@ -270,11 +274,12 @@ def create_translation_prompt(
     else:
         raise ValueError(f"Invalid mode: {mode}")
 
+    body_model = model if model is not None else globals()["model"]
     return {
         "custom_id": f"request-{word.id}",
         "method": "POST",
         "url": "/v1/chat/completions",
-        "body": {"model": model, "messages": messages},
+        "body": {"model": body_model, "messages": messages},
     }
 
 
@@ -287,6 +292,8 @@ def translate(
     notes: str,
     mode: str,
     lang: str = "ru",
+    provider: str | None = None,
+    model: str | None = None,
 ) -> str | None:
     pos_example_map = load_translation_examples(dpspth, lang=lang)
     translation_example = pos_example_map.get(pos, "")
@@ -313,13 +320,16 @@ def translate(
 
     sys_content = messages[0]["content"]
     user_content = messages[1]["content"]
-    response = ai_manager.request(prompt=user_content, prompt_sys=sys_content)
+    response = ai_manager.request(
+        prompt=user_content,
+        prompt_sys=sys_content,
+        provider_preference=provider,
+        model=model,
+    )
     if response.content is None:
         pr.red(response.status_message)
         return None
-    if mode == "meaning":
-        return response.content
-    elif mode == "lit":
+    if mode == "meaning" or mode == "lit":
         return response.content
     elif mode == "note":
         return f"[пер. ИИ] {response.content}"
@@ -336,18 +346,44 @@ def save_prompts_to_json(prompts: list[dict[str, Any]], filename: str | Path) ->
     print(f"prompts saved to {filename}")
 
 
-def make_json(mode: str, limit: int, lang: str = "ru") -> None:
+def make_json(
+    mode: str,
+    limit: int | None,
+    lang: str = "ru",
+    dry_run: bool = False,
+    model: str | None = None,
+) -> None:
     words = filter_words_for_translation(mode, limit, lang=lang)
-    prompts = [create_translation_prompt(word, mode, lang=lang) for word in words]
+    if dry_run:
+        print(f"[DRY-RUN] Would generate prompts for {len(words)} words:")
+        for idx, word in enumerate(words, 1):
+            print(f"  {idx}/{len(words)} {word.id}, {word.lemma_1}")
+        return
+    prompts = [
+        create_translation_prompt(word, mode, lang=lang, model=model) for word in words
+    ]
 
     file_name = os.path.join(dpspth.ai_for_batch_api_dir, f"{mode}-{lang}-{date}.jsonl")
     save_prompts_to_json(prompts, file_name)
 
 
-def translation_generate(mode: str, limit: int, lang: str = "ru") -> None:
+def translation_generate(
+    mode: str,
+    limit: int | None,
+    lang: str = "ru",
+    dry_run: bool = False,
+    provider: str | None = None,
+    model: str | None = None,
+) -> None:
     words = filter_words_for_translation(mode, limit, lang=lang)
+    if dry_run:
+        print(f"[DRY-RUN] Would process translation for {len(words)} words:")
+        for idx, word in enumerate(words, 1):
+            print(f"  {idx}/{len(words)} {word.id}, {word.lemma_1}")
+        return
     regenerated_ids: set[int] = set()
-    for word in words:
+    total = len(words)
+    for idx, word in enumerate(words, 1):
         meaning_result = translate(
             word.lemma_1,
             word.grammar,
@@ -357,6 +393,8 @@ def translation_generate(mode: str, limit: int, lang: str = "ru") -> None:
             word.notes or "",
             mode,
             lang=lang,
+            provider=provider,
+            model=model,
         )
         if meaning_result:
             regenerated_ids.add(word.id)
@@ -380,9 +418,12 @@ def translation_generate(mode: str, limit: int, lang: str = "ru") -> None:
 
                 db_session.commit()
 
-                print(f"{word.id}, {word.ebt_count} {word.lemma_1} {meaning_result}")
+                print(
+                    f"{idx}/{total} {word.id}, {word.ebt_count} {word.lemma_1} {meaning_result}"
+                )
 
-                tsv_path = dpspth.ai_translated_dir / f"{model}-{lang}.tsv"
+                tsv_model = model if model is not None else globals()["model"]
+                tsv_path = dpspth.ai_translated_dir / f"{tsv_model}-{lang}.tsv"
                 tsv_path.parent.mkdir(parents=True, exist_ok=True)
                 with open(tsv_path, "a", encoding="utf-8") as file:
                     file.write(f"{word.id}\t{word.lemma_1}\t{meaning_result}\n")
@@ -395,7 +436,7 @@ def translation_generate(mode: str, limit: int, lang: str = "ru") -> None:
                     existing_russian.ru_meaning_lit = meaning_result
                     db_session.commit()
                     print(
-                        f"{word.id}, {word.ebt_count} {word.lemma_1} {meaning_result}"
+                        f"{idx}/{total} {word.id}, {word.ebt_count} {word.lemma_1} {meaning_result}"
                     )
 
             if mode == "note":
@@ -403,7 +444,9 @@ def translation_generate(mode: str, limit: int, lang: str = "ru") -> None:
 
                 db_session.commit()
 
-                print(f"{word.id}, {word.ebt_count} {word.lemma_1} {meaning_result}")
+                print(
+                    f"{idx}/{total} {word.id}, {word.ebt_count} {word.lemma_1} {meaning_result}"
+                )
 
     if lang == "ru" and regenerated_ids:
         for snapshot_path in SNAPSHOTS_BY_MODE.get(mode, []):
@@ -455,22 +498,111 @@ def read_exclude_ids_from_json(
     return exclude_ids
 
 
+def get_provider_for_model(model_name: str) -> str | None:
+    for model_tuple in ai_manager.DEFAULT_MODELS + ai_manager.GROUNDED_MODELS:
+        if model_tuple[1] == model_name:
+            return model_tuple[0]
+    return None
+
+
+def get_default_model_for_provider(provider_name: str) -> str | None:
+    for model_tuple in ai_manager.DEFAULT_MODELS + ai_manager.GROUNDED_MODELS:
+        if model_tuple[0] == provider_name:
+            return model_tuple[1]
+    return None
+
+
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Generate AI translations for Pāḷi headwords.",
+        add_help=False,
+    )
+    parser.add_argument(
+        "-help",
+        "-h",
+        "--help",
+        action="help",
+        help="List all flags and exit.",
+    )
+    parser.add_argument(
+        "-lang",
+        "--lang",
+        default="ru",
+        choices=["ru", "ta"],
+        help="Language to translate to (default: ru)",
+    )
+    parser.add_argument(
+        "-mode",
+        "--mode",
+        default="meaning",
+        choices=["meaning", "note", "lit"],
+        help="Generation mode (default: meaning)",
+    )
+    parser.add_argument(
+        "-remove",
+        "--remove",
+        action="store_true",
+        help="Run remove_irrelevant instead of translation_generate/make_json",
+    )
+    parser.add_argument(
+        "-json",
+        "--json",
+        action="store_true",
+        help="Run make_json instead of translation_generate",
+    )
+    parser.add_argument(
+        "-limit",
+        "--limit",
+        type=int,
+        default=None,
+        help="Limit of rows to process (default: no limit)",
+    )
+    parser.add_argument(
+        "-dry-run",
+        "--dry-run",
+        action="store_true",
+        dest="dry_run",
+        help="Simulate operations without making database modifications or AI requests.",
+    )
+    parser.add_argument(
+        "-provider",
+        "--provider",
+        help="Specify the AI provider to use.",
+    )
+    parser.add_argument(
+        "-model",
+        "--model",
+        help="Specify the AI model to use.",
+    )
+
+    args = parser.parse_args()
+
+    provider_val = args.provider
+    model_val = args.model
+
+    if model_val and not provider_val:
+        provider_val = get_provider_for_model(model_val)
+    elif provider_val and not model_val:
+        model_val = get_default_model_for_provider(provider_val)
+
     print("Translating with the help of AI")
 
-    limit: int = 1
-
-    # lang: str = "ta"
-    lang: str = "ru"
-
-    # remove_irrelevant(limit, lang=lang)
-
-    translation_generate("meaning", limit, lang=lang)
-
-    # translation_generate("note", limit, lang=lang)
-
-    # make_json("meaning", limit, lang=lang)
-
-    # make_json("note", limit, lang=lang)
-
-    # make_json("lit", limit, lang=lang)
+    if args.remove:
+        remove_irrelevant(args.limit, lang=args.lang, dry_run=args.dry_run)
+    elif args.json:
+        make_json(
+            args.mode,
+            args.limit,
+            lang=args.lang,
+            dry_run=args.dry_run,
+            model=model_val,
+        )
+    else:
+        translation_generate(
+            args.mode,
+            args.limit,
+            lang=args.lang,
+            dry_run=args.dry_run,
+            provider=provider_val,
+            model=model_val,
+        )
