@@ -174,6 +174,7 @@ This repo enforces quality via `.pre-commit-config.yaml` (ruff lint, ruff format
 
 Before committing, especially after refactors or dependency changes:
 
+- **Never try to ignore pre-commit hooks (e.g. via `--no-verify`).** All linting, formatting, and type-checking errors MUST be fixed locally before committing.
 - **Run the app end-to-end at least once.** A clean `ruff`/`pyright` pass does not mean the code runs — import errors and runtime crashes won't show up in static checks.
 - **Never name a module after a stdlib module** (e.g. `types.py`, `re.py`, `json.py`). If it's importable from the project root, it shadows the real one and breaks unrelated imports in confusing, cascading ways.
 - **Double-check dependency names**, especially for SDKs with similarly-named packages (e.g. `google-generativeai` vs `google-genai` — these are different packages with different APIs).
