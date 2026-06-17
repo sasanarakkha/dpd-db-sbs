@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 
-"""Add all additions from gui2/data/additions.json to the database with new IDs."""
+"""Add all additions from gui2/data/additions_{username}.json to the database with new IDs."""
 
 import json
 from pathlib import Path
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword
-from tools.configger import config_read
-from tools.paths import ProjectPaths
-from tools.printer import printer as pr
-from tools.paths_dps import DPSPaths
 from gui2.database_manager import DatabaseManager
 from gui2.paths import Gui2Paths
-
+from tools.configger import config_read
+from tools.paths import ProjectPaths
+from tools.paths_dps import DPSPaths
+from tools.printer import printer as pr
 
 app_pth = ProjectPaths()
 db_session = get_db_session(app_pth.dpd_db_path)
@@ -75,7 +74,7 @@ def add_all_additions_with_new_ids() -> None:
     additions_json_path = Gui2Paths.for_user(username).additions_path
 
     try:
-        with open(additions_json_path) as f:
+        with open(additions_json_path, "r", encoding="utf-8") as f:
             all_additions_to_process = json.load(f)
     except FileNotFoundError:
         pr.red(f"File not found: {additions_json_path}")
@@ -121,7 +120,7 @@ def add_all_additions_with_new_ids() -> None:
 
         new_id = db_manager.get_next_id()
         new_headword = DpdHeadword()
-        setattr(new_headword, "id", new_id)
+        new_headword.id = new_id
 
         for field_name, value in addition_data.items():
             if field_name in ("id", "comment"):
@@ -135,7 +134,7 @@ def add_all_additions_with_new_ids() -> None:
                     ):
                         value = int(value)
                     setattr(new_headword, field_name, value)
-                except Exception as e:
+                except Exception as e:  # noqa: BLE001
                     pr.red(f"  Could not set field '{field_name}' to '{value}': {e}")
             else:
                 pr.red(
@@ -147,7 +146,7 @@ def add_all_additions_with_new_ids() -> None:
             db_session.commit()
             processed_count += 1
             successful_id_map[old_id_str] = new_id
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             db_session.rollback()
             pr.red(
                 f"  Database commit failed for '{new_headword.lemma_1}' (Old ID: {old_id_str}, New ID: {new_id}): {e}"

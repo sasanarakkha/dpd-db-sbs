@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 
-"""Apply all corrections from gui2/data/corrections.json to the database."""
+"""Apply all corrections from gui2/data/corrections_{username}.json to the database."""
 
 import json
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword
+from gui2.paths import Gui2Paths
 from tools.configger import config_read
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
-from gui2.paths import Gui2Paths
-
 
 app_pth = ProjectPaths()
 db_session = get_db_session(app_pth.dpd_db_path)
@@ -83,7 +82,7 @@ def apply_all_corrections_from_json() -> None:
             try:
                 db_session.commit()
                 processed_count += 1
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001
                 db_session.rollback()
                 pr.red(f"  Failed to commit changes for headword ID {word_id}: {e}")
                 failed_count += 1
