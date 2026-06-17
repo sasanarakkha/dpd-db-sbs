@@ -3,6 +3,7 @@
 import argparse
 import json
 from pathlib import Path
+import re
 from typing import Any
 
 from sqlalchemy.orm import Session
@@ -20,6 +21,29 @@ from tools.printer import printer as pr
 from tools.speech_marks import SpeechMarkManager
 
 
+def natural_sort_key(source: str) -> list[str]:
+    """Return a natural-sort key for DHP source labels."""
+    return [
+        text.zfill(12) if text.isdigit() else text.lower()
+        for text in re.split(r"(\d+)", source)
+    ]
+
+
+def should_overwrite_existing(
+    current_source: str | None,
+    new_source: str,
+    *,
+    force: bool,
+    prefer_earlier: bool,
+) -> bool:
+    """Decide whether an existing DHP example should be overwritten."""
+    if force:
+        return True
+    if not prefer_earlier or not current_source:
+        return False
+    return natural_sort_key(new_source) < natural_sort_key(current_source)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Fill SBS.dhp_example from AI analysis."
@@ -30,6 +54,16 @@ def main() -> None:
         "--dry-run",
         action="store_true",
         help="Show proposed changes without committing",
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Process even if dhp_example already exists",
+    )
+    parser.add_argument(
+        "--prefer-earlier",
+        action="store_true",
+        help="Overwrite if current verse is earlier than existing one (e.g. DHP1 > DHP10)",
     )
     parser.add_argument("--limit", type=int, help="Limit number of verses to process")
     args = parser.parse_args()
@@ -49,10 +83,14 @@ def main() -> None:
         if not analysis_results:
             pr.no(f"Verse '{args.verse}' not found in {analysis_path}")
             return
-    elif args.limit:
-        analysis_results = all_analysis[: args.limit]
     else:
         analysis_results = all_analysis
+
+    # Sort results to ensure natural ordering (e.g., DHP1, DHP2... DHP10)
+    analysis_results.sort(key=lambda x: natural_sort_key(x["num"]))
+
+    if args.limit:
+        analysis_results = analysis_results[: args.limit]
 
     paths = ProjectPaths()
     db_session: Session = get_db_session(paths.dpd_db_path)
@@ -84,7 +122,7 @@ def main() -> None:
                 if not options:
                     continue
 
-                best_option = max(options, key=lambda x: x.get("ai_score", 0))
+                best_option = max(options, key=lambda x: int(x.get("ai_score") or 0))
                 all_entries = collect_all_ids(best_option, word)
 
                 # Locate this token's apostrophe form in the verse text
@@ -102,7 +140,13 @@ def main() -> None:
                         continue
 
                     sbs = sbs_map.get(headword_id)
-                    if sbs and sbs.dhp_example and sbs.dhp_example.strip():
+                    exists = sbs and sbs.dhp_example and sbs.dhp_example.strip()
+                    if exists and not should_overwrite_existing(
+                        sbs.dhp_source if sbs else None,
+                        dhp_source,
+                        force=args.force,
+                        prefer_earlier=args.prefer_earlier,
+                    ):
                         skipped_count += 1
                         updated_in_verse.add(headword_id)
                         continue
@@ -118,11 +162,15 @@ def main() -> None:
                     )
 
                     if args.dry_run:
-                        pr.yes(
-                            f"  [DRY-RUN] ID {headword_id} '{component_pali}': {dhp_source}"
-                        )
+                        label = "[DRY-RUN]"
+                        if exists:
+                            label = "[DRY-RUN OVERWRITING]"
+                        pr.yes(f"  {label} ID {headword_id} '{component_pali}':")
+                        pr.yes(f"    Source: {dhp_source}")
+                        pr.yes(f"    Sutta:  {dhp_sutta}")
+                        pr.yes("    Example:")
                         for line in example.splitlines():
-                            pr.yes(f"    {line}")
+                            pr.yes(f"      {line}")
                     else:
                         if not sbs:
                             sbs = SBS(id=headword_id)

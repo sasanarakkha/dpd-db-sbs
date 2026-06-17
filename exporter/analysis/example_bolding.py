@@ -281,7 +281,7 @@ def collect_all_ids(
         for i, comp_list in enumerate(components_list):
             if not comp_list:
                 continue
-            best_comp = max(comp_list, key=lambda x: x.get("ai_score", 0))
+            best_comp = max(comp_list, key=lambda x: int(x.get("ai_score") or 0))
             results.extend(
                 collect_all_ids(
                     best_comp, word_in_verse, component_index=i, depth=depth + 1
