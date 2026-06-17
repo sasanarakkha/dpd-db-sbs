@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 29
+Pointer: 30
 
 ## Scripts (76 total, local unique_paths)
 
@@ -42,7 +42,7 @@ Pointer: 29
 - [x] 26. scripts/export/sbs_anki_updater.py
 - [x] 27. scripts/export/sbs_anki_apkg.py
 - [x] 28. scripts/export/sbs_anki_deck_config.py
-- [ ] 29. scripts/export/sbs_anki_collection_verifier.py
+- [x] 29. scripts/export/sbs_anki_collection_verifier.py
 - [ ] 30. scripts/export/sbs_anki_revert.py
 
 ### scripts/moving
@@ -135,3 +135,4 @@ Pointer: 29
 2026-06-14 | #26 scripts/export/sbs_anki_updater.py | changed | os→pathlib (4 places, drop os import), datetime to module level, Note/DpdHeadword type hints on update_note_values, dict[str,Any] on row param, type params on all bare dict/list signatures, deck_selector dedup→dict.fromkeys; 22 tests added
 2026-06-15 | #27 scripts/export/sbs_anki_apkg.py | changed | os→pathlib: makedirs→mkdir, path.join→/, exportInto(str(path))
 2026-06-15 | #28 scripts/export/sbs_anki_deck_config.py | changed | _to_br() helper, _SBS_TOOLS singleton, _base_db_fields() factory (1233→885 lines), str(root_group) type fix, meaning_1 or meaning_2, type annotations; 36 golden-master tests added
+2026-06-16 | #29 scripts/export/sbs_anki_collection_verifier.py | changed | JSON snapshot (sbs_anki_schema_snapshot.json) replaces Python-dict EXPECTED_COLLECTION (~470 lines removed from deck_config), extract _find_mismatches() helper, fix silent field-reorder bug, remove os/rich.print, pathlib+pr.*, generate_report() dumps JSON; 7 tests added
