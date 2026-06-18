@@ -3,112 +3,118 @@
 """Add combined view into db which have DpdHeadword, Russian, SBS tables and ebt_count together."""
 
 from sqlalchemy import create_engine, text
-from tools.paths import ProjectPaths
 
-from rich.console import Console
+from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 
-pth = ProjectPaths()
-engine = create_engine("sqlite:///" + str(pth.dpd_db_path))
+_VIEW_COLUMNS: list[tuple[str, str, str]] = [
+    ("dpd_headwords", "id", "id"),
+    ("dpd_headwords", "ebt_count", "count"),
+    ("sbs", "class_anki", "anki"),
+    ("sbs", "sbs_index", "PER"),
+    ("dpd_headwords", "lemma_1", "lemma_1"),
+    ("dpd_headwords", "lemma_2", "lemma_2"),
+    ("dpd_headwords", "pos", "pos"),
+    ("dpd_headwords", "grammar", "grammar"),
+    ("dpd_headwords", "derived_from", "derived"),
+    ("dpd_headwords", "neg", "neg"),
+    ("dpd_headwords", "verb", "verb"),
+    ("dpd_headwords", "trans", "trans"),
+    ("dpd_headwords", "plus_case", "plus_case"),
+    ("dpd_headwords", "meaning_1", "meaning_1"),
+    ("dpd_headwords", "meaning_lit", "meaning_lit"),
+    ("dpd_headwords", "meaning_2", "meaning_2"),
+    ("sbs", "sbs_meaning", "sbs_meaning"),
+    ("russian", "ru_meaning", "ru_meaning"),
+    ("russian", "ru_meaning_lit", "ru_meaning_lit"),
+    ("russian", "ru_meaning_raw", "ru_meaning_raw"),
+    ("dpd_headwords", "sanskrit", "sanskrit"),
+    ("dpd_headwords", "root_key", "root"),
+    ("dpd_headwords", "root_sign", "sign"),
+    ("dpd_headwords", "root_base", "root_base"),
+    ("dpd_headwords", "family_root", "family_root"),
+    ("dpd_headwords", "family_word", "family_word"),
+    ("dpd_headwords", "family_compound", "family_compound"),
+    ("dpd_headwords", "family_set", "family_set"),
+    ("dpd_headwords", "construction", "construction"),
+    ("dpd_headwords", "derivative", "derivative"),
+    ("dpd_headwords", "suffix", "suffix"),
+    ("dpd_headwords", "phonetic", "phonetic"),
+    ("dpd_headwords", "compound_type", "compound_type"),
+    ("dpd_headwords", "compound_construction", "compound_construction"),
+    ("dpd_headwords", "source_1", "source_1"),
+    ("dpd_headwords", "sutta_1", "sutta_1"),
+    ("dpd_headwords", "example_1", "example_1"),
+    ("dpd_headwords", "source_2", "source_2"),
+    ("dpd_headwords", "sutta_2", "sutta_2"),
+    ("dpd_headwords", "example_2", "example_2"),
+    ("sbs", "sbs_source_1", "sbs_source_1"),
+    ("sbs", "sbs_sutta_1", "sbs_sutta_1"),
+    ("sbs", "sbs_example_1", "sbs_example_1"),
+    ("sbs", "sbs_chant_pali_1", "sbs_chant_pali_1"),
+    ("sbs", "sbs_chant_eng_1", "sbs_chant_eng_1"),
+    ("sbs", "sbs_chapter_1", "sbs_chapter_1"),
+    ("sbs", "sbs_source_2", "sbs_source_2"),
+    ("sbs", "sbs_sutta_2", "sbs_sutta_2"),
+    ("sbs", "sbs_example_2", "sbs_example_2"),
+    ("sbs", "sbs_chant_pali_2", "sbs_chant_pali_2"),
+    ("sbs", "sbs_chant_eng_2", "sbs_chant_eng_2"),
+    ("sbs", "sbs_chapter_2", "sbs_chapter_2"),
+    ("sbs", "dhp_source", "dhp_source"),
+    ("sbs", "dhp_sutta", "dhp_sutta"),
+    ("sbs", "dhp_example", "dhp_example"),
+    ("sbs", "pat_source", "pat_source"),
+    ("sbs", "pat_sutta", "pat_sutta"),
+    ("sbs", "pat_example", "pat_example"),
+    ("sbs", "vib_source", "vib_source"),
+    ("sbs", "vib_sutta", "vib_sutta"),
+    ("sbs", "vib_example", "vib_example"),
+    ("sbs", "class_source", "class_source"),
+    ("sbs", "class_sutta", "class_sutta"),
+    ("sbs", "class_example", "class_example"),
+    ("sbs", "class_example_translation", "translation"),
+    ("sbs", "class_extra", "extra"),
+    ("sbs", "discourses_source", "discourses_source"),
+    ("sbs", "discourses_sutta", "discourses_sutta"),
+    ("sbs", "discourses_example", "discourses_example"),
+    ("dpd_headwords", "antonym", "antonym"),
+    ("dpd_headwords", "synonym", "synonym"),
+    ("dpd_headwords", "variant", "variant"),
+    ("dpd_headwords", "commentary", "commentary"),
+    ("dpd_headwords", "notes", "notes"),
+    ("sbs", "sbs_notes", "sbs_notes"),
+    ("russian", "ru_notes", "ru_notes"),
+    ("dpd_headwords", "cognate", "cognate"),
+    ("dpd_headwords", "stem", "stem"),
+    ("dpd_headwords", "pattern", "pattern"),
+    ("sbs", "sbs_class", "class"),
+]
 
-console = Console()
+
+def _build_select_clause(columns: list[tuple[str, str, str]]) -> str:
+    """Build the COALESCE(...) AS alias select clause from (table, column, alias) triples."""
+    lines = [
+        f"COALESCE({table}.{column}, '') AS {alias}" for table, column, alias in columns
+    ]
+    return ",\n                ".join(lines)
 
 
-def main():
+def main() -> None:
     pr.tic()
-    console.print("[bold bright_yellow]making combined view")
+    pr.yellow_title("making combined view")
+
+    pth = ProjectPaths()
+    engine = create_engine("sqlite:///" + str(pth.dpd_db_path))
 
     with engine.connect() as connection:
-        connection.execute(
-            text("""
-            DROP VIEW IF EXISTS _dps;
-        """)
-        )
+        connection.execute(text("DROP VIEW IF EXISTS _dps;"))
 
+        select_clause = _build_select_clause(_VIEW_COLUMNS)
         connection.execute(
-            text("""
+            text(f"""
             CREATE VIEW _dps AS
-            SELECT 
-                COALESCE(dpd_headwords.id, '') AS id,
-                COALESCE(dpd_headwords.ebt_count, '') AS count,
-                COALESCE(sbs.class_anki, '') AS anki,
-                COALESCE(sbs.sbs_index, '') AS PER,
-                COALESCE(dpd_headwords.lemma_1, '') AS lemma_1, 
-                COALESCE(dpd_headwords.lemma_2, '') AS lemma_2,  
-                COALESCE(dpd_headwords.pos, '') AS pos, 
-                COALESCE(dpd_headwords.grammar, '') AS grammar, 
-                COALESCE(dpd_headwords.derived_from, '') AS derived, 
-                COALESCE(dpd_headwords.neg, '') AS neg, 
-                COALESCE(dpd_headwords.verb, '') AS verb, 
-                COALESCE(dpd_headwords.trans, '') AS trans, 
-                COALESCE(dpd_headwords.plus_case, '') AS plus_case, 
-                COALESCE(dpd_headwords.meaning_1, '') AS meaning_1, 
-                COALESCE(dpd_headwords.meaning_lit, '') AS meaning_lit, 
-                COALESCE(dpd_headwords.meaning_2, '') AS meaning_2,
-                COALESCE(sbs.sbs_meaning, '') AS sbs_meaning, 
-                COALESCE(russian.ru_meaning, '') AS ru_meaning, 
-                COALESCE(russian.ru_meaning_lit, '') AS ru_meaning_lit,
-                COALESCE(russian.ru_meaning_raw, '') AS ru_meaning_raw, 
-                COALESCE(dpd_headwords.sanskrit, '') AS sanskrit, 
-                COALESCE(dpd_headwords.root_key, '') AS root, 
-                COALESCE(dpd_headwords.root_sign, '') AS sign, 
-                COALESCE(dpd_headwords.root_base, '') AS root_base, 
-                COALESCE(dpd_headwords.family_root, '') AS family_root, 
-                COALESCE(dpd_headwords.family_word, '') AS family_word, 
-                COALESCE(dpd_headwords.family_compound, '') AS family_compound, 
-                COALESCE(dpd_headwords.family_set, '') AS family_set, 
-                COALESCE(dpd_headwords.construction, '') AS construction, 
-                COALESCE(dpd_headwords.derivative, '') AS derivative, 
-                COALESCE(dpd_headwords.suffix, '') AS suffix, 
-                COALESCE(dpd_headwords.phonetic, '') AS phonetic, 
-                COALESCE(dpd_headwords.compound_type, '') AS compound_type, 
-                COALESCE(dpd_headwords.compound_construction, '') AS compound_construction, 
-                COALESCE(dpd_headwords.source_1, '') AS source_1, 
-                COALESCE(dpd_headwords.sutta_1, '') AS sutta_1, 
-                COALESCE(dpd_headwords.example_1, '') AS example_1, 
-                COALESCE(dpd_headwords.source_2, '') AS source_2, 
-                COALESCE(dpd_headwords.sutta_2, '') AS sutta_2, 
-                COALESCE(dpd_headwords.example_2, '') AS example_2,
-                COALESCE(sbs.sbs_source_1, '') AS sbs_source_1, 
-                COALESCE(sbs.sbs_sutta_1, '') AS sbs_sutta_1, 
-                COALESCE(sbs.sbs_example_1, '') AS sbs_example_1, 
-                COALESCE(sbs.sbs_chant_pali_1, '') AS sbs_chant_pali_1, 
-                COALESCE(sbs.sbs_chant_eng_1, '') AS sbs_chant_eng_1, 
-                COALESCE(sbs.sbs_chapter_1, '') AS sbs_chapter_1, 
-                COALESCE(sbs.sbs_source_2, '') AS sbs_source_2, 
-                COALESCE(sbs.sbs_sutta_2, '') AS sbs_sutta_2, 
-                COALESCE(sbs.sbs_example_2, '') AS sbs_example_2, 
-                COALESCE(sbs.sbs_chant_pali_2, '') AS sbs_chant_pali_2, 
-                COALESCE(sbs.sbs_chant_eng_2, '') AS sbs_chant_eng_2, 
-                COALESCE(sbs.sbs_chapter_2, '') AS sbs_chapter_2, 
-                COALESCE(sbs.dhp_source, '') AS dhp_source, 
-                COALESCE(sbs.dhp_sutta, '') AS dhp_sutta, 
-                COALESCE(sbs.dhp_example, '') AS dhp_example,
-                COALESCE(sbs.pat_source, '') AS pat_source, 
-                COALESCE(sbs.pat_sutta, '') AS pat_sutta, 
-                COALESCE(sbs.pat_example, '') AS pat_example,
-                COALESCE(sbs.vib_source, '') AS vib_source, 
-                COALESCE(sbs.vib_sutta, '') AS vib_sutta, 
-                COALESCE(sbs.vib_example, '') AS vib_example,
-                COALESCE(sbs.class_source, '') AS class_source, 
-                COALESCE(sbs.class_sutta, '') AS class_sutta, 
-                COALESCE(sbs.class_example, '') AS class_example,
-                COALESCE(sbs.class_example_translation, '') AS translation,
-                COALESCE(sbs.class_extra, '') AS extra,
-                COALESCE(sbs.discourses_source, '') AS discourses_source, 
-                COALESCE(sbs.discourses_sutta, '') AS discourses_sutta, 
-                COALESCE(sbs.discourses_example, '') AS discourses_example,
-                COALESCE(dpd_headwords.antonym, '') AS antonym, 
-                COALESCE(dpd_headwords.synonym, '') AS synonym, 
-                COALESCE(dpd_headwords.variant, '') AS variant, 
-                COALESCE(dpd_headwords.commentary, '') AS commentary, 
-                COALESCE(dpd_headwords.notes, '') AS notes, 
-                COALESCE(sbs.sbs_notes, '') AS sbs_notes, 
-                COALESCE(russian.ru_notes, '') AS ru_notes,
-                COALESCE(dpd_headwords.cognate, '') AS cognate, 
-                COALESCE(dpd_headwords.stem, '') AS stem, 
-                COALESCE(dpd_headwords.pattern, '') AS pattern,
-                COALESCE(sbs.sbs_class, '') AS class 
+            SELECT
+                {select_clause}
             FROM dpd_headwords
             LEFT JOIN sbs ON dpd_headwords.id = sbs.id
             LEFT JOIN russian ON dpd_headwords.id = russian.id
