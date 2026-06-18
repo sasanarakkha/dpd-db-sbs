@@ -49,11 +49,11 @@ uv run python exporter/tpr/tpr_exporter_ru.py
 
 uv run python scripts/build/zip_goldendict_mdict.py
 
-uv run python scripts/moving/move_mdict.py
+uv run python scripts/moving/distribute.py move_mdict
 
 # If option 1 was selected, copy DPD-SBS
 if [ "$CHOSEN_OPTION" == "1" ]; then
-    uv run python scripts/moving/copy_dpdsbs_from_share2sbs.py
+    uv run python scripts/moving/distribute.py copy_dpdsbs_from_share2sbs
 fi
 
 # If option 1 was not selected, return settings back to default

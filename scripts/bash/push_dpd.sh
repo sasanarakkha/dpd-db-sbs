@@ -37,7 +37,7 @@ while true; do
     case $yn in
         [Yy]* )
             echo -e "\033[1;33m Unzipping and copying ru-dpd.\033[0m"
-            scripts/moving/unzip_rudpd_to_filesrv.py
+            scripts/moving/distribute.py unzip_rudpd_to_filesrv
             break;;
         * )
             break;;
@@ -51,7 +51,7 @@ while true; do
     case $yn in
         [Yy]* )
             echo -e "\033[1;33m Unzipping and copying DPD...\033[0m"
-            scripts/moving/unzip_dpd_to_filesrv.py
+            scripts/moving/distribute.py unzip_dpd_to_filesrv
             break;;
         * )
             break;;
@@ -69,7 +69,7 @@ while true; do
     case $yn in
         [Yy]* )
             echo -e "\033[1;33m Unzipping and copying DPD-SBS...\033[0m"
-            scripts/moving/unzip_dpd_sbs_to_filesrv.py
+            scripts/moving/distribute.py unzip_dpd_sbs_to_filesrv
             break;;
         * )
             break;;
@@ -87,7 +87,7 @@ while true; do
     case $yn in
         [Yy]* )
             echo -e "\033[1;33m Unzipping to local goldendict...\033[0m"
-            scripts/moving/unzip_dpd_to_gd.py
+            scripts/moving/distribute.py unzip_dpd_to_gd
             scripts/bash/manual_update_mac_dict.sh
             break;;
         * )
@@ -106,7 +106,7 @@ while true; do
     case $yn in
         [Yy]* )
             echo -e "\033[1;33m Unzipping to local share...\033[0m"
-            scripts/moving/unzip_dpd_to_share.py
+            scripts/moving/distribute.py unzip_dpd_to_share
             break;;
         * )
             break;;

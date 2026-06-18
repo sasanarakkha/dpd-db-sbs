@@ -78,7 +78,7 @@ fi
 response=$(uv run python "$PROJECT_DIR/tools/ask.py" "need to update offline materials for classes?") || exit 1
 if [[ $response == "y" ]]; then
     uv run bash scripts/bash/download_pali_classes.sh
-    uv run python scripts/moving/unzip_classes_to_filesrv.py
+    uv run python scripts/moving/distribute.py unzip_classes_to_filesrv
 fi
 response=$(uv run python "$PROJECT_DIR/tools/ask.py" "need to move all other decks?") || exit 1
 if [[ $response == "y" ]]; then

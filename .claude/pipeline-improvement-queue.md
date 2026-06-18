@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 30
+Pointer: 43
 
 ## Scripts (76 total, local unique_paths)
 
@@ -43,22 +43,22 @@ Pointer: 30
 - [x] 27. scripts/export/sbs_anki_apkg.py
 - [x] 28. scripts/export/sbs_anki_deck_config.py
 - [x] 29. scripts/export/sbs_anki_collection_verifier.py
-- [ ] 30. scripts/export/sbs_anki_revert.py
+- [x] 30. scripts/export/sbs_anki_revert.py
 
 ### scripts/moving
 
-- [ ] 31. scripts/moving/copy_dpd_for_classes.py
-- [ ] 32. scripts/moving/copy_dpdsbs_from_sbs2filesrv.py
-- [ ] 33. scripts/moving/copy_dpdsbs_from_share2sbs.py
-- [ ] 34. scripts/moving/copy_rudpd_from_share2filesrv.py
-- [ ] 35. scripts/moving/move_mdict.py
-- [ ] 36. scripts/moving/move_mdict_ru.py
-- [ ] 37. scripts/moving/unzip_classes_to_filesrv.py
-- [ ] 38. scripts/moving/unzip_dpd_sbs_to_filesrv.py
-- [ ] 39. scripts/moving/unzip_dpd_to_filesrv.py
-- [ ] 40. scripts/moving/unzip_dpd_to_gd.py
-- [ ] 41. scripts/moving/unzip_dpd_to_share.py
-- [ ] 42. scripts/moving/unzip_rudpd_to_filesrv.py
+- [x] 31. scripts/moving/copy_dpd_for_classes.py
+- [x] 32. scripts/moving/copy_dpdsbs_from_sbs2filesrv.py — unified into distribute.py
+- [x] 33. scripts/moving/copy_dpdsbs_from_share2sbs.py — unified into distribute.py
+- [x] 34. scripts/moving/copy_rudpd_from_share2filesrv.py — unified into distribute.py
+- [x] 35. scripts/moving/move_mdict.py — unified into distribute.py
+- [x] 36. scripts/moving/move_mdict_ru.py — unified into distribute.py
+- [x] 37. scripts/moving/unzip_classes_to_filesrv.py — unified into distribute.py
+- [x] 38. scripts/moving/unzip_dpd_sbs_to_filesrv.py — unified into distribute.py
+- [x] 39. scripts/moving/unzip_dpd_to_filesrv.py — unified into distribute.py
+- [x] 40. scripts/moving/unzip_dpd_to_gd.py — unified into distribute.py
+- [x] 41. scripts/moving/unzip_dpd_to_share.py — unified into distribute.py
+- [x] 42. scripts/moving/unzip_rudpd_to_filesrv.py — unified into distribute.py
 
 ### scripts/other
 
@@ -136,3 +136,6 @@ Pointer: 30
 2026-06-15 | #27 scripts/export/sbs_anki_apkg.py | changed | os→pathlib: makedirs→mkdir, path.join→/, exportInto(str(path))
 2026-06-15 | #28 scripts/export/sbs_anki_deck_config.py | changed | _to_br() helper, _SBS_TOOLS singleton, _base_db_fields() factory (1233→885 lines), str(root_group) type fix, meaning_1 or meaning_2, type annotations; 36 golden-master tests added
 2026-06-16 | #29 scripts/export/sbs_anki_collection_verifier.py | changed | JSON snapshot (sbs_anki_schema_snapshot.json) replaces Python-dict EXPECTED_COLLECTION (~470 lines removed from deck_config), extract _find_mismatches() helper, fix silent field-reorder bug, remove os/rich.print, pathlib+pr.*, generate_report() dumps JSON; 7 tests added
+2026-06-18 | #30 scripts/export/sbs_anki_revert.py | changed | reviewer cross-check skipped (gemini-3.1-pro-preview and gemini-2.5-pro both QUOTA_EXHAUSTED, ~19h reset) — proceeded on explicit user approval; main()->None; pre-commit gate forced fixing 2 pre-existing findings: chmod +x (EXE001 shebang-not-executable), except Exception->except OSError (BLE001); same EXE001/BLE001 pattern confirmed present in already-passed #29, out of scope to retrofit there
+2026-06-18 | #31 scripts/moving/copy_dpd_for_classes.py | changed | Path.cwd()->Path(__file__).resolve() anchoring fix, print()->pr.yellow_title/green/red, extracted safe_copy() helper (user-requested: catch OSError per-copy and print red on failure instead of crashing), main()+__main__ guard, module docstring; 5 tests added (tests/scripts/moving/test_copy_dpd_for_classes.py); live smoke test hit expected sys.exit(1) early-exit path (dest network share not mounted on this machine) — confirms path anchoring correct, matches old behavior
+2026-06-18 | #32-42 scripts/moving/{unzip,copy,move}_*.py | changed | user-requested unification — all 11 highly-duplicated unzip/copy/move scripts merged into single scripts/moving/distribute.py with shared primitives (_unzip/_copy_file/_copy_tree/_move_file/_copy_pair/_require_dirs) and one task function per old script, dispatched via argparse `task` positional; Path.cwd()->Path(__file__).resolve() anchoring fix applied to all; raw ANSI prints->pr.*; 4 bash callers updated (push_dpd.sh x5, make_dpd.sh x2, make_ru_dpd.sh, update_decks.sh); 10 old files git rm'd, copy_dpd_for_classes.py (#31) intentionally excluded (DB+bash-script copy, not zip/dict distribution); 24 tests added (tests/scripts/moving/test_distribute.py), all real-filesystem/tmp_path, no mocks; live smoke test of unzip_dpd_to_filesrv actually ran against the real mounted fileserver share (network share was mounted, unlike #31) — extracted real dpd-goldendict.zip/dpd-mdict.zip into production Golden Dictionary/MDict folders; user confirmed this was the intended current build and caused no problem; registry.json/SMD required no update since scripts/moving/ is tracked as a directory wildcard
