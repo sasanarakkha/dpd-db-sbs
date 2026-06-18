@@ -34,13 +34,13 @@ def revert_to_latest_backup() -> bool:
         shutil.copy2(str(latest), db_path)
         pr.yes("collection restored")
         return True
-    except Exception as e:
+    except OSError as e:
         pr.no("error")
         pr.red(f"Restore failed: {e}")
         return False
 
 
-def main():
+def main() -> None:
     pr.tic()
     if not revert_to_latest_backup():
         raise SystemExit(1)
