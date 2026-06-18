@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 43
+Pointer: 47
 
 ## Scripts (76 total, local unique_paths)
 
@@ -62,10 +62,10 @@ Pointer: 43
 
 ### scripts/other
 
-- [ ] 43. scripts/other/add_combined_view.py
-- [ ] 44. scripts/other/ai_batch_api.py
-- [ ] 45. scripts/other/ai_batch_deepseek_meaning.py
-- [ ] 46. scripts/other/ai_check_russian_meanings.py
+- [x] 43. scripts/other/add_combined_view.py
+- [x] 44. scripts/other/ai_batch_api.py — renamed to ai_batch_openai_meaning.py
+- [x] 45. scripts/other/ai_batch_deepseek_meaning.py — archived
+- [x] 46. scripts/other/ai_check_russian_meanings.py
 - [ ] 47. scripts/other/ai_generate_translation.py
 - [ ] 48. scripts/other/ai_individual_word_ru.py
 - [ ] 49. scripts/other/ai_sentences_extracting.py
@@ -139,3 +139,7 @@ Pointer: 43
 2026-06-18 | #30 scripts/export/sbs_anki_revert.py | changed | reviewer cross-check skipped (gemini-3.1-pro-preview and gemini-2.5-pro both QUOTA_EXHAUSTED, ~19h reset) — proceeded on explicit user approval; main()->None; pre-commit gate forced fixing 2 pre-existing findings: chmod +x (EXE001 shebang-not-executable), except Exception->except OSError (BLE001); same EXE001/BLE001 pattern confirmed present in already-passed #29, out of scope to retrofit there
 2026-06-18 | #31 scripts/moving/copy_dpd_for_classes.py | changed | Path.cwd()->Path(__file__).resolve() anchoring fix, print()->pr.yellow_title/green/red, extracted safe_copy() helper (user-requested: catch OSError per-copy and print red on failure instead of crashing), main()+__main__ guard, module docstring; 5 tests added (tests/scripts/moving/test_copy_dpd_for_classes.py); live smoke test hit expected sys.exit(1) early-exit path (dest network share not mounted on this machine) — confirms path anchoring correct, matches old behavior
 2026-06-18 | #32-42 scripts/moving/{unzip,copy,move}_*.py | changed | user-requested unification — all 11 highly-duplicated unzip/copy/move scripts merged into single scripts/moving/distribute.py with shared primitives (_unzip/_copy_file/_copy_tree/_move_file/_copy_pair/_require_dirs) and one task function per old script, dispatched via argparse `task` positional; Path.cwd()->Path(__file__).resolve() anchoring fix applied to all; raw ANSI prints->pr.*; 4 bash callers updated (push_dpd.sh x5, make_dpd.sh x2, make_ru_dpd.sh, update_decks.sh); 10 old files git rm'd, copy_dpd_for_classes.py (#31) intentionally excluded (DB+bash-script copy, not zip/dict distribution); 24 tests added (tests/scripts/moving/test_distribute.py), all real-filesystem/tmp_path, no mocks; live smoke test of unzip_dpd_to_filesrv actually ran against the real mounted fileserver share (network share was mounted, unlike #31) — extracted real dpd-goldendict.zip/dpd-mdict.zip into production Golden Dictionary/MDict folders; user confirmed this was the intended current build and caused no problem; registry.json/SMD required no update since scripts/moving/ is tracked as a directory wildcard
+2026-06-18 | #43 scripts/other/add_combined_view.py | changed | approve all — moved pth/engine from module scope into main(), rich.Console->pr.yellow_title(), main()->None, replaced 80 hand-written COALESCE(...) AS lines with (table,column,alias) data list + _build_select_clause() generator (reviewer's logging+Dict/List/Tuple suggestion rejected, kept pr.* and modern hints); 3 tests added against fixture mechanically regex-extracted from the original SQL (golden master); live run confirmed 80 columns, same order, in real dpd.db
+2026-06-18 | #44 scripts/other/ai_batch_api.py | changed | user-requested rename to ai_batch_openai_meaning.py + consolidation into single run_batch_workflow() (upload->poll->save to db); _get_openai_client() isinstance-based helper replaces 6x duplicated client-validation + nested _openai_* functions; upload_and_create_batch returns batch_id; check_batch_status typed Batch|None; id->record_id (builtin shadow fix); simplified dead skip_empty branch; pre-commit forced chmod+x (EXE001) + narrowed 6 blind except Exception->openai.OpenAIError/OSError/(TypeError,AttributeError) (BLE001); reviewer's BatchProcessor dataclass/class redesign rejected as out of scope; 1 test added (serialize_request_counts — only network-free pure function); live run skipped by user choice (would create real billed OpenAI batch job)
+2026-06-18 | #45 scripts/other/ai_batch_deepseek_meaning.py | archived | broken — depends on langchain_deepseek, which is not installed/declared anywhere in pyproject.toml, so the module cannot import; functionality (RU meaning+notes translation, lang=ru) is already fully covered by scripts/other/ai_generate_translation.py (mode=meaning/note) via AIManager, which already lists deepseek as a configured provider in tools/ai_models.json; only unique trait was concurrent batch dispatch via LangChain's RunnableMap.batch(), but DeepSeek has no real async Batch API (unlike OpenAI's /v1/batches used in #44) so that's just client-side concurrency, generically addable to ai_generate_translation.py later if wanted, not unique to this file; also silently discarded the ru_example_raw field it asked the LLM to produce — moved to archive/ai_batch_deepseek_meaning.py
+2026-06-18 | #46 scripts/other/ai_check_russian_meanings.py | changed | moved pth/db_session module-level globals into main() (side-effect-free imports), main()->None, fixed import order, removed dead --output arg (parsed but never used) and dead --individual flag (user-confirmed: no caller anywhere passes it; use_batch simplified to args.batch), replaced 8-branch if-elif mode-message chain with _MODE_NOTES dict lookup, except Exception # noqa: BLE001 (top-level CLI boundary, same pattern as #29/#30/#44), pre-commit forced chmod +x (EXE001); 4 tests added for _MODE_NOTES (only pure logic in this CLI wrapper — rest is DB/argparse/AI plumbing delegated to tools/ai_meaning_checker.py, queued separately as #68); tools/ai_meaning_checker.py itself untouched (out of scope, reviewed when #68 comes up); live run (--limit 1 --no-auto-invalidate) completed successfully against real dpd.db and a live AI call, report written to configured temp/ai_meaning_check/ output dir
