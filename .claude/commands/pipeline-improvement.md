@@ -14,6 +14,17 @@ Review everything; change only what genuinely needs it. Coverage over churn.
 **Scope**: local unique Python scripts — files listed in the `unique_paths` section of
 `kamma/upstream_sync/registry.json`. The queue is in `.claude/pipeline-improvement-queue.md`.
 
+## Delegation
+
+For any self-contained sub-task in this skill that does not need live conversation
+context — reading imported local modules to check for dead/unused symbols, running
+the fixture-capture probe script (step 4b), bulk `grep`/call-graph searches, mechanical
+multi-file checks — delegate it to a subagent on the fast model (Haiku) via the Agent
+tool instead of doing it inline. Reserve this session for the review judgment, the
+decision (clean / needs a change), and the final synthesis. Do not delegate anything
+that requires weighing project conventions or deciding what counts as a genuine
+improvement — that judgment stays here.
+
 ## Procedure
 
 ### 1. Read state
@@ -65,7 +76,7 @@ For each script:
 
 **FIRST — the moment you know the Python file path, launch the second-opinion
 reviewer in the BACKGROUND, before you read or analyse anything.** Run the
-opencode command from step 4 with `run_in_background: true` so it reviews the
+`uv run python3 -c ...` command from step 4 with `run_in_background: true` so it reviews the
 file in parallel while you do your own analysis. The point is that you and the
 reviewer reach conclusions at the same time — do NOT wait until you have finished
 your own review to start it, or you pay the full reviewer latency in series. You
@@ -125,14 +136,16 @@ step 3 should be finished. Collect its output. If you have not launched it yet
 parallel the whole time, so this is the fallback path, not the norm.
 
 **If the background task notification shows exit code 124 or any non-zero exit code,
-treat it exactly the same as an inline timeout — immediately run the fallback model.
+treat it exactly the same as an inline failure — there is no further fallback to run,
+since `AIManager.request()` already tried every configured model internally.
 Never proceed to present findings without a completed review from at least one model.**
 
-**Models — update these lines when models change:**
-```
-PRIMARY:  gemini-3.1-pro-preview
-FALLBACK: gemini-2.5-pro
-```
+The review now goes through `tools/ai_manager.py`'s `AIManager`, not a direct `gemini` CLI
+call. `AIManager.request()` walks the model list in `tools/ai_models.json` (gemini_cli,
+antigravity_cli, openrouter, deepseek, etc., in the order listed there) and automatically
+falls through to the next model on failure — no model names need to be hardcoded or
+updated in this skill file. To change the fallback order or add/remove models, edit
+`tools/ai_models.json` directly.
 
 Note: `timeout` is not available on macOS without GNU coreutils. Use `run_in_background: true`
 on the Bash tool with `timeout` parameter set to 150000 (ms) instead of shell `timeout`.
@@ -141,23 +154,27 @@ The command to launch (in the background during step 2, or run here as fallback;
 substitute actual file path for `<file>`):
 
 ```bash
-cat <file> | gemini -m gemini-3.1-pro-preview -p "Give a thorough review of this file. Cover: (1) refactor improvements — type hints, dead code, complexity, conventions; (2) whether a significantly simpler or more elegant approach could achieve the same result with substantially less code." 2>&1
+uv run python3 -c "
+from pathlib import Path
+from tools.ai_manager import AIManager
+
+content = Path('<file>').read_text(encoding='utf-8')
+prompt = (
+    'Give a thorough review of this file. Cover: (1) refactor improvements — '
+    'type hints, dead code, complexity, conventions; (2) whether a significantly '
+    'simpler or more elegant approach could achieve the same result with '
+    'substantially less code.\n\n' + content
+)
+response = AIManager().request(prompt=prompt)
+print(response.content if response.content else response.status_message)
+"
 ```
 
 Run it via the Bash tool with `timeout: 150000` and `run_in_background: true` for the background launch.
 
-If it errors (non-zero exit, whether run inline or notified via background task):
-1. **Print a loud warning:** `⚠️  PRIMARY REVIEW FAILED (gemini-3.1-pro-preview) — trying fallback`
-2. Run the fallback:
-
-```bash
-cat <file> | gemini -m gemini-2.5-pro -p "Give a thorough review of this file. Cover: (1) refactor improvements — type hints, dead code, complexity, conventions; (2) whether a significantly simpler or more elegant approach could achieve the same result with substantially less code." 2>&1
-```
-
-If the fallback also fails:
+If `response.content` is `None` (every model in `tools/ai_models.json` failed):
 - **Stop and report loudly to the user:**
-  `🚨 AUTOMATED REVIEW UNAVAILABLE — both gemini-3.1-pro-preview and gemini-2.5-pro failed.`
-  `Check model names. Update the model lines in step 3 if needed.`
+  `🚨 AUTOMATED REVIEW UNAVAILABLE — all models in tools/ai_models.json failed: <status_message>`
 - **DO NOT proceed without a review.** Wait for the user to fix the model/network issue or explicitly
   instruct you to skip the review for this file. Never silently omit the reviewer cross-check.
 
