@@ -11,8 +11,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any, TypedDict
 
-from sqlalchemy import and_, null, or_
-from sqlalchemy.orm import joinedload
+from sqlalchemy import and_, case, null, or_
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword, Russian, Tamil
@@ -38,8 +37,51 @@ dpspth = DPSPaths()
 db_session = get_db_session(pth.dpd_db_path)
 date = year_month_day_hour_minute_dash()
 
-ai_manager = AIManager()
-api_key, provider, model = load_ai_config()
+ai_manager: AIManager | None = None
+api_key: str | None = None
+provider: str | None = None
+model: str | None = None
+
+
+def get_ai_manager() -> AIManager:
+    """Lazily initialize and return AIManager."""
+    global ai_manager
+    if ai_manager is None:
+        ai_manager = AIManager()
+    return ai_manager
+
+
+def init_ai_config() -> None:
+    """Lazily load the AI config globals."""
+    global api_key, provider, model
+    if api_key is None and provider is None and model is None:
+        api_key, provider, model = load_ai_config()
+
+
+def load_models_from_json() -> list[tuple[str, str, int, float]]:
+    """Load model lists directly from tools/ai_models.json without initializing AIManager."""
+    try:
+        path = Path("tools/ai_models.json")
+        data = json.loads(path.read_text(encoding="utf-8"))
+
+        def _entry(m: dict[str, Any]) -> tuple[str, str, int, float]:
+            return (
+                m["provider"],
+                m["model"],
+                m["delay"],
+                float(m.get("timeout", 150.0)),
+            )
+
+        gemini_cli_work = [_entry(m) for m in data.get("gemini_cli_work_models", [])]
+        antigravity_cli_work = [
+            _entry(m) for m in data.get("antigravity_cli_work_models", [])
+        ]
+        default_models = [_entry(m) for m in data.get("default_models", [])]
+        grounded_models = [_entry(m) for m in data.get("grounded_models", [])]
+
+        return gemini_cli_work + antigravity_cli_work + default_models + grounded_models
+    except (FileNotFoundError, json.JSONDecodeError, KeyError):
+        return []
 
 
 # Language routing configuration for meaning mode
@@ -142,96 +184,181 @@ def filter_words_for_translation(
     if lang not in LANG_CONFIG:
         raise ValueError(f"Unsupported language: {lang}")
 
-    lang_cfg = LANG_CONFIG[lang]
-    orm_model = lang_cfg["orm_model"]
+    filter_desc = ""
 
     if mode == "meaning":
-        # for filling those which does not have language table and fill the conditions
+        if lang == "ta":
+            filter_desc = (
+                f"mode: {mode} | lang: {lang} | "
+                "filter: (meaning_1 != '' OR meaning_2 != '') AND (Tamil entry is missing OR ta_meaning is empty/null)"
+            )
+            db = (
+                db_session.query(DpdHeadword)
+                .outerjoin(Tamil, DpdHeadword.id == Tamil.id)
+                .filter(
+                    and_(
+                        or_(DpdHeadword.meaning_1 != "", DpdHeadword.meaning_2 != ""),
+                        or_(
+                            Tamil.id.is_(null()),
+                            Tamil.ta_meaning.is_(None),
+                            Tamil.ta_meaning == "",
+                        ),
+                    )
+                )
+                .order_by(
+                    case(
+                        (
+                            and_(
+                                DpdHeadword.meaning_1 != "",
+                                DpdHeadword.meaning_1.isnot(None),
+                            ),
+                            0,
+                        ),
+                        (
+                            and_(
+                                DpdHeadword.meaning_2 != "",
+                                DpdHeadword.meaning_2.isnot(None),
+                            ),
+                            1,
+                        ),
+                        else_=2,
+                    ),
+                    DpdHeadword.ebt_count.desc(),
+                )
+                .all()
+            )
+        elif lang == "ru":
+            filter_desc = (
+                f"mode: {mode} | lang: {lang} | "
+                "filter: (meaning_1 != '' OR meaning_2 != '') AND (Russian entry is missing OR both ru_meaning_raw and ru_meaning are empty/null)"
+            )
+            db = (
+                db_session.query(DpdHeadword)
+                .outerjoin(Russian, DpdHeadword.id == Russian.id)
+                .filter(
+                    and_(
+                        or_(DpdHeadword.meaning_1 != "", DpdHeadword.meaning_2 != ""),
+                        or_(
+                            Russian.id.is_(null()),
+                            and_(
+                                or_(
+                                    Russian.ru_meaning_raw.is_(None),
+                                    Russian.ru_meaning_raw == "",
+                                ),
+                                or_(
+                                    Russian.ru_meaning.is_(None),
+                                    Russian.ru_meaning == "",
+                                ),
+                            ),
+                        ),
+                    )
+                )
+                .order_by(
+                    case(
+                        (
+                            and_(
+                                DpdHeadword.meaning_1 != "",
+                                DpdHeadword.meaning_1.isnot(None),
+                            ),
+                            0,
+                        ),
+                        (
+                            and_(
+                                DpdHeadword.meaning_2 != "",
+                                DpdHeadword.meaning_2.isnot(None),
+                            ),
+                            1,
+                        ),
+                        else_=2,
+                    ),
+                    DpdHeadword.ebt_count.desc(),
+                )
+                .all()
+            )
+        else:
+            raise ValueError(f"Unsupported language: {lang}")
 
+    elif mode == "lit":
+        filter_desc = (
+            f"mode: {mode} | lang: {lang} | "
+            "filter: (meaning_1 != '' OR meaning_2 != '') AND meaning_lit != '' AND Russian entry exists AND ru_meaning != '' AND ru_meaning_lit is empty/null"
+        )
         db = (
             db_session.query(DpdHeadword)
-            .outerjoin(orm_model, DpdHeadword.id == orm_model.id)
+            .join(Russian, DpdHeadword.id == Russian.id)
             .filter(
                 and_(
-                    # DpdHeadword.meaning_1 != "",
                     or_(DpdHeadword.meaning_1 != "", DpdHeadword.meaning_2 != ""),
+                    DpdHeadword.meaning_lit != "",
+                    Russian.ru_meaning != "",
                     or_(
-                        orm_model.id.is_(null()),
-                        getattr(orm_model, lang_cfg["field_name"]).is_(None),
+                        Russian.ru_meaning_lit.is_(None),
+                        Russian.ru_meaning_lit == "",
                     ),
                 )
             )
-            .order_by(DpdHeadword.ebt_count.desc())
-            .all()
-        )
-
-        # for filling empty rows in Russian table
-
-        # db = db_session.query(DpdHeadword).outerjoin(
-        #     Russian, DpdHeadword.id == Russian.id
-        #         ).filter(
-        #                 Russian.id != '',
-        #                 Russian.ru_meaning == '',
-        #                 Russian.ru_meaning_raw == '',
-        #                 ).order_by(DpdHeadword.ebt_count.desc()).all()
-
-        # for filling those which have lower model of gpt:
-
-        # # Call the functions to read IDs from the TSV and json files to exclude
-        # exclude_ids_tsv: set[str] = read_exclude_ids_from_tsv(f"{dpspth.ai_translated_dir}/{hight_model}.tsv")
-        # exclude_ids_json: set[str] = read_exclude_ids_from_json(dpspth.ai_from_batch_api_dir)
-        # exclude_ids = exclude_ids_tsv | exclude_ids_json
-        # print(f"excluded words {len(exclude_ids)}")
-
-        # # Add the conditions to the query
-        # db = db_session.query(DpdHeadword).outerjoin(
-        #     Russian, DpdHeadword.id == Russian.id
-        #     ).filter(
-        #         and_(
-        #             DpdHeadword.meaning_1 != '',
-        #             # DpdHeadword.example_1 != '',
-        #             Russian.ru_meaning_raw != '',
-        #             # func.length(Russian.ru_meaning_raw) > 20,
-        #             Russian.ru_meaning == '',
-        #             ~DpdHeadword.id.in_(exclude_ids)
-        #         )
-        #     ).order_by(DpdHeadword.ebt_count.desc()).all()
-
-    elif mode == "lit":
-        # filter for lit meaning
-        db = (
-            db_session.query(DpdHeadword)
-            .outerjoin(Russian, DpdHeadword.id == Russian.id)
-            .filter(
-                and_(
-                    DpdHeadword.meaning_lit != "",
-                    Russian.ru_meaning != "",
-                    Russian.ru_meaning_lit == "",
-                )
+            .order_by(
+                case(
+                    (
+                        and_(
+                            DpdHeadword.meaning_1 != "",
+                            DpdHeadword.meaning_1.isnot(None),
+                        ),
+                        0,
+                    ),
+                    (
+                        and_(
+                            DpdHeadword.meaning_2 != "",
+                            DpdHeadword.meaning_2.isnot(None),
+                        ),
+                        1,
+                    ),
+                    else_=2,
+                ),
+                DpdHeadword.ebt_count.desc(),
             )
-            .order_by(DpdHeadword.ebt_count.desc())
             .all()
         )
 
     elif mode == "note":
-        # for filling notes those which has Russian table and does not have ru_notes
+        filter_desc = (
+            f"mode: {mode} | lang: {lang} | "
+            "filter: (meaning_1 != '' OR meaning_2 != '') AND notes != '' AND (Russian entry is missing OR ru_notes is empty/null)"
+        )
         db = (
             db_session.query(DpdHeadword)
             .outerjoin(Russian, DpdHeadword.id == Russian.id)
-            .options(joinedload(DpdHeadword.ru))
             .filter(
                 and_(
-                    # DpdHeadword.meaning_1 != '',
-                    # DpdHeadword.example_1 != '',
+                    or_(DpdHeadword.meaning_1 != "", DpdHeadword.meaning_2 != ""),
                     DpdHeadword.notes != "",
-                    Russian.ru_notes == "",
-                ),
-                or_(
-                    Russian.ru_meaning != "",
-                    Russian.ru_meaning_raw != "",
-                ),
+                    or_(
+                        Russian.id.is_(null()),
+                        Russian.ru_notes.is_(None),
+                        Russian.ru_notes == "",
+                    ),
+                )
             )
-            .order_by(DpdHeadword.ebt_count.desc())
+            .order_by(
+                case(
+                    (
+                        and_(
+                            DpdHeadword.meaning_1 != "",
+                            DpdHeadword.meaning_1.isnot(None),
+                        ),
+                        0,
+                    ),
+                    (
+                        and_(
+                            DpdHeadword.meaning_2 != "",
+                            DpdHeadword.meaning_2.isnot(None),
+                        ),
+                        1,
+                    ),
+                    else_=2,
+                ),
+                DpdHeadword.ebt_count.desc(),
+            )
             .all()
         )
     else:
@@ -240,6 +367,7 @@ def filter_words_for_translation(
     total_row_count = len(db)
     db = db[:limit]
 
+    print(f"Current filter: {filter_desc}")
     print(f"Rows filtered for the process: {len(db)} / {total_row_count}")
 
     return db
@@ -274,6 +402,7 @@ def create_translation_prompt(
     else:
         raise ValueError(f"Invalid mode: {mode}")
 
+    init_ai_config()
     body_model = model if model is not None else globals()["model"]
     return {
         "custom_id": f"request-{word.id}",
@@ -320,7 +449,7 @@ def translate(
 
     sys_content = messages[0]["content"]
     user_content = messages[1]["content"]
-    response = ai_manager.request(
+    response = get_ai_manager().request(
         prompt=user_content,
         prompt_sys=sys_content,
         provider_preference=provider,
@@ -457,6 +586,17 @@ def translation_generate(
                     f"{snapshot_path.name} (will be re-checked)"
                 )
 
+    if regenerated_ids:
+        project_root = Path(__file__).resolve().parents[2]
+        temp_dir = project_root / "temp"
+        temp_dir.mkdir(exist_ok=True)
+        last_translated_path = temp_dir / "last_translated.json"
+        try:
+            with open(last_translated_path, "w", encoding="utf-8") as f:
+                json.dump({"lang": lang, "ids": sorted(regenerated_ids)}, f)
+        except (OSError, TypeError, ValueError) as e:
+            print(f"Warning: could not save last translated IDs: {e}")
+
 
 def read_exclude_ids_from_tsv(file_path: str | Path) -> set[str]:
     exclude_ids = set()
@@ -499,14 +639,14 @@ def read_exclude_ids_from_json(
 
 
 def get_provider_for_model(model_name: str) -> str | None:
-    for model_tuple in ai_manager.DEFAULT_MODELS + ai_manager.GROUNDED_MODELS:
+    for model_tuple in load_models_from_json():
         if model_tuple[1] == model_name:
             return model_tuple[0]
     return None
 
 
 def get_default_model_for_provider(provider_name: str) -> str | None:
-    for model_tuple in ai_manager.DEFAULT_MODELS + ai_manager.GROUNDED_MODELS:
+    for model_tuple in load_models_from_json():
         if model_tuple[0] == provider_name:
             return model_tuple[1]
     return None
@@ -516,6 +656,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Generate AI translations for Pāḷi headwords.",
         add_help=False,
+        formatter_class=argparse.RawTextHelpFormatter,
     )
     parser.add_argument(
         "-help",
@@ -564,21 +705,47 @@ if __name__ == "__main__":
         dest="dry_run",
         help="Simulate operations without making database modifications or AI requests.",
     )
+    all_models: list[tuple[str, str, int, float]] = load_models_from_json()
+    configured_providers: list[str] = sorted({m[0] for m in all_models})
+    configured_models: list[str] = sorted({m[1] for m in all_models})
+
+    provider_list: str = ", ".join(configured_providers)
+    provider_help: str = (
+        f"Specify the AI provider to use. Available: {provider_list}.\n"
+        "Default is the sequence from ai_models.json."
+    )
+
+    provider_to_models: dict[str, list[str]] = {}
+    for m in all_models:
+        provider_to_models.setdefault(m[0], []).append(m[1])
+
+    model_help_blocks: list[str] = ["Specify the AI model to use. Available models:"]
+    for prov in sorted(provider_to_models.keys()):
+        prov_models: list[str] = sorted(set(provider_to_models[prov]))
+        prov_lines: list[str] = [f"  {prov} / {mdl}" for mdl in prov_models]
+        model_help_blocks.append("\n".join(prov_lines))
+    model_help: str = "\n\n".join(model_help_blocks)
+
     parser.add_argument(
         "-provider",
         "--provider",
-        help="Specify the AI provider to use.",
+        help=provider_help,
     )
     parser.add_argument(
         "-model",
         "--model",
-        help="Specify the AI model to use.",
+        help=model_help,
     )
 
     args = parser.parse_args()
 
     provider_val = args.provider
     model_val = args.model
+
+    if provider_val and provider_val not in configured_providers:
+        parser.error(f"provider must be one of: {', '.join(configured_providers)}")
+    if model_val and model_val not in configured_models:
+        parser.error(f"model must be one of: {', '.join(configured_models)}")
 
     if model_val and not provider_val:
         provider_val = get_provider_for_model(model_val)
@@ -606,3 +773,10 @@ if __name__ == "__main__":
             provider=provider_val,
             model=model_val,
         )
+        if not args.dry_run:
+            check_cmd = f"uv run python3 tests/scripts/others/ai_translation_check.py -lang {args.lang}"
+            print("\n" + "=" * 60)
+            print("Translation run complete!")
+            print("To verify the generated translations, run:")
+            print(f"  {check_cmd}")
+            print("=" * 60)
