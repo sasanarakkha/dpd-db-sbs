@@ -3,9 +3,7 @@
 """Generate AI translations for Pāḷi headwords in multiple languages (Russian, Tamil, etc.) and persist to database or export as JSONL batch prompts."""
 
 import argparse
-import glob
 import json
-import os
 import re
 from collections.abc import Callable
 from pathlib import Path
@@ -39,8 +37,8 @@ date = year_month_day_hour_minute_dash()
 
 ai_manager: AIManager | None = None
 api_key: str | None = None
-provider: str | None = None
-model: str | None = None
+default_provider: str | None = None
+default_model: str | None = None
 
 
 def get_ai_manager() -> AIManager:
@@ -53,9 +51,9 @@ def get_ai_manager() -> AIManager:
 
 def init_ai_config() -> None:
     """Lazily load the AI config globals."""
-    global api_key, provider, model
-    if api_key is None and provider is None and model is None:
-        api_key, provider, model = load_ai_config()
+    global api_key, default_provider, default_model
+    if api_key is None and default_provider is None and default_model is None:
+        api_key, default_provider, default_model = load_ai_config()
 
 
 def load_models_from_json() -> list[tuple[str, str, int, float]]:
@@ -156,12 +154,12 @@ def remove_irrelevant(
     total_row_count = len(db)
     db = db[:limit]
 
-    print(f"Rows filtered for the process ({lang}): {len(db)} / {total_row_count}")
+    pr.white(f"Rows filtered for the process ({lang}): {len(db)} / {total_row_count}")
 
     if dry_run:
-        print(f"[DRY-RUN] Would remove {len(db)} rows from {lang} database:")
+        pr.amber(f"[DRY-RUN] Would remove {len(db)} rows from {lang} database:")
         for idx, word in enumerate(db, 1):
-            print(f"  {idx}/{len(db)} {word.id}, {word.lemma_1}")
+            pr.white(f"  {idx}/{len(db)} {word.id}, {word.lemma_1}")
         return
 
     # Remove the filtered rows from the respective table
@@ -367,8 +365,8 @@ def filter_words_for_translation(
     total_row_count = len(db)
     db = db[:limit]
 
-    print(f"Current filter: {filter_desc}")
-    print(f"Rows filtered for the process: {len(db)} / {total_row_count}")
+    pr.white(f"Current filter: {filter_desc}")
+    pr.white(f"Rows filtered for the process: {len(db)} / {total_row_count}")
 
     return db
 
@@ -403,7 +401,7 @@ def create_translation_prompt(
         raise ValueError(f"Invalid mode: {mode}")
 
     init_ai_config()
-    body_model = model if model is not None else globals()["model"]
+    body_model = model if model is not None else default_model
     return {
         "custom_id": f"request-{word.id}",
         "method": "POST",
@@ -468,11 +466,11 @@ def translate(
 
 def save_prompts_to_json(prompts: list[dict[str, Any]], filename: str | Path) -> None:
     """Save prompts to a JSON file for Batch API use."""
-    with open(filename, "w", encoding="utf-8") as f:
+    with Path(filename).open("w", encoding="utf-8") as f:
         for prompt in prompts:
             json.dump(prompt, f, ensure_ascii=False)
-            f.write("\n")  # Add newline between JSON objects
-    print(f"prompts saved to {filename}")
+            f.write("\n")
+    pr.green(f"prompts saved to {filename}")
 
 
 def make_json(
@@ -484,15 +482,15 @@ def make_json(
 ) -> None:
     words = filter_words_for_translation(mode, limit, lang=lang)
     if dry_run:
-        print(f"[DRY-RUN] Would generate prompts for {len(words)} words:")
+        pr.amber(f"[DRY-RUN] Would generate prompts for {len(words)} words:")
         for idx, word in enumerate(words, 1):
-            print(f"  {idx}/{len(words)} {word.id}, {word.lemma_1}")
+            pr.white(f"  {idx}/{len(words)} {word.id}, {word.lemma_1}")
         return
     prompts = [
         create_translation_prompt(word, mode, lang=lang, model=model) for word in words
     ]
 
-    file_name = os.path.join(dpspth.ai_for_batch_api_dir, f"{mode}-{lang}-{date}.jsonl")
+    file_name = dpspth.ai_for_batch_api_dir / f"{mode}-{lang}-{date}.jsonl"
     save_prompts_to_json(prompts, file_name)
 
 
@@ -506,9 +504,9 @@ def translation_generate(
 ) -> None:
     words = filter_words_for_translation(mode, limit, lang=lang)
     if dry_run:
-        print(f"[DRY-RUN] Would process translation for {len(words)} words:")
+        pr.amber(f"[DRY-RUN] Would process translation for {len(words)} words:")
         for idx, word in enumerate(words, 1):
-            print(f"  {idx}/{len(words)} {word.id}, {word.lemma_1}")
+            pr.white(f"  {idx}/{len(words)} {word.id}, {word.lemma_1}")
         return
     regenerated_ids: set[int] = set()
     total = len(words)
@@ -547,11 +545,11 @@ def translation_generate(
 
                 db_session.commit()
 
-                print(
+                pr.green(
                     f"{idx}/{total} {word.id}, {word.ebt_count} {word.lemma_1} {meaning_result}"
                 )
 
-                tsv_model = model if model is not None else globals()["model"]
+                tsv_model = model if model is not None else default_model
                 tsv_path = dpspth.ai_translated_dir / f"{tsv_model}-{lang}.tsv"
                 tsv_path.parent.mkdir(parents=True, exist_ok=True)
                 with open(tsv_path, "a", encoding="utf-8") as file:
@@ -564,16 +562,22 @@ def translation_generate(
                 if existing_russian:
                     existing_russian.ru_meaning_lit = meaning_result
                     db_session.commit()
-                    print(
+                    pr.green(
                         f"{idx}/{total} {word.id}, {word.ebt_count} {word.lemma_1} {meaning_result}"
                     )
 
-            if mode == "note":
-                word.ru.ru_notes = meaning_result
+            elif mode == "note":
+                existing_russian = (
+                    db_session.query(Russian).filter(Russian.id == word.id).first()
+                )
+                if not existing_russian:
+                    existing_russian = Russian(id=word.id)
+                    db_session.add(existing_russian)
+                existing_russian.ru_notes = meaning_result
 
                 db_session.commit()
 
-                print(
+                pr.green(
                     f"{idx}/{total} {word.id}, {word.ebt_count} {word.lemma_1} {meaning_result}"
                 )
 
@@ -595,15 +599,15 @@ def translation_generate(
             with open(last_translated_path, "w", encoding="utf-8") as f:
                 json.dump({"lang": lang, "ids": sorted(regenerated_ids)}, f)
         except (OSError, TypeError, ValueError) as e:
-            print(f"Warning: could not save last translated IDs: {e}")
+            pr.red(f"Warning: could not save last translated IDs: {e}")
 
 
 def read_exclude_ids_from_tsv(file_path: str | Path) -> set[str]:
     exclude_ids = set()
-    with open(file_path, "r", encoding="utf-8") as file:
+    with Path(file_path).open("r", encoding="utf-8") as file:
         for line in file:
-            id = line.split("\t")[0]
-            exclude_ids.add(id)
+            word_id = line.split("\t")[0]
+            exclude_ids.add(word_id)
     return exclude_ids
 
 
@@ -612,12 +616,10 @@ def read_exclude_ids_from_json(
 ) -> set[int]:
     """Read queued IDs from JSONL batch files. Extracts numeric ID from custom_id field like 'request-12345'."""
     exclude_ids: set[int] = set()
-    # Find all JSONL files in the directory (match pattern with language for filtering if needed)
-    json_files = glob.glob(f"{dir_path}/*.jsonl")
+    json_files = Path(dir_path).glob("*.jsonl")
 
-    # Read each JSONL file and extract the IDs from custom_id field
     for file_path in json_files:
-        with open(file_path, "r", encoding="utf-8") as file:
+        with file_path.open("r", encoding="utf-8") as file:
             for line in file:
                 try:
                     # Decode each JSON object
@@ -752,7 +754,7 @@ if __name__ == "__main__":
     elif provider_val and not model_val:
         model_val = get_default_model_for_provider(provider_val)
 
-    print("Translating with the help of AI")
+    pr.white("Translating with the help of AI")
 
     if args.remove:
         remove_irrelevant(args.limit, lang=args.lang, dry_run=args.dry_run)
@@ -775,8 +777,8 @@ if __name__ == "__main__":
         )
         if not args.dry_run:
             check_cmd = f"uv run python3 tests/scripts/others/ai_translation_check.py -lang {args.lang}"
-            print("\n" + "=" * 60)
-            print("Translation run complete!")
-            print("To verify the generated translations, run:")
-            print(f"  {check_cmd}")
-            print("=" * 60)
+            pr.green("\n" + "=" * 60)
+            pr.green("Translation run complete!")
+            pr.white("To verify the generated translations, run:")
+            pr.white(f"  {check_cmd}")
+            pr.green("=" * 60)
