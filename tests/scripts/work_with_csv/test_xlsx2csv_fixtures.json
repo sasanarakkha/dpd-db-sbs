@@ -1,0 +1,49 @@
+{
+  "format_cell_value": {
+    "cells": [
+      {
+        "coordinate": "A1",
+        "result": "plain"
+      },
+      {
+        "coordinate": "B1",
+        "result": "<b>bold_cell</b>"
+      },
+      {
+        "coordinate": "C1",
+        "result": "5"
+      },
+      {
+        "coordinate": "D1",
+        "result": "5.5"
+      },
+      {
+        "coordinate": "E1",
+        "result": "7"
+      },
+      {
+        "coordinate": "A2",
+        "result": "<b>bold part</b> plain part"
+      },
+      {
+        "coordinate": "B2",
+        "result": ""
+      },
+      {
+        "coordinate": "C2",
+        "result": ""
+      },
+      {
+        "coordinate": "D2",
+        "result": ""
+      },
+      {
+        "coordinate": "E2",
+        "result": ""
+      }
+    ]
+  },
+  "convert_xlsx_to_csv": {
+    "output_content": "plain\t<b>bold_cell</b>\t5\t5.5\t7\n<b>bold part</b> plain part\t\t\t\t\n"
+  }
+}
