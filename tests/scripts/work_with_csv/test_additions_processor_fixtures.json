@@ -1,0 +1,41 @@
+{
+  "normal_match_and_collision_bait_OLD_BEHAVIOR": {
+    "input_tsv": "\"id\"\t\"sbs_class\"\t\"sbs_meaning\"\t\"sbs_sutta_1\"\n\"1\"\t\"\"\t\"\"\t\"\"\n\"7\"\t\"\"\t\"\"\t\"\"\n\"9\"\t\"\"\t\"\"\t\"DHP408\"\n",
+    "id_mapping": {
+      "7": 99990,
+      "408": 12345
+    },
+    "replacements": 2,
+    "output_tsv": "\"id\"\t\"sbs_class\"\t\"sbs_meaning\"\t\"sbs_sutta_1\"\n\"1\"\t\"\"\t\"\"\t\"\"\n\"99990\"\t\"\"\t\"\"\t\"\"\n\"9\"\t\"\"\t\"\"\t\"DHP12345\"\n"
+  },
+  "missing_file": {
+    "id_mapping": {
+      "7": 99990,
+      "408": 12345
+    },
+    "replacements": 0
+  },
+  "load_additions_data": {
+    "output": {
+      "82904": 82990,
+      "100": 200
+    }
+  },
+  "load_processed_ids_existing": {
+    "output": [
+      "1",
+      "2"
+    ]
+  },
+  "load_processed_ids_missing": {
+    "output": []
+  },
+  "save_processed_ids_merged": {
+    "output": [
+      "1",
+      "2",
+      "3",
+      "4"
+    ]
+  }
+}

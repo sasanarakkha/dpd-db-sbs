@@ -7,12 +7,13 @@ Filters out already processed IDs to avoid duplicates and tracks processed addit
 
 import json
 from pathlib import Path
-from typing import Dict, Set
+
 from gui2.paths import Gui2Paths
 from tools.paths_dps import DPSPaths
+from tools.printer import printer as pr
 
 
-def load_additions_data(json_path: Path) -> Dict[str, int]:
+def load_additions_data(json_path: Path) -> dict[str, int]:
     """
     Load additions data from JSON file and create id_add -> id mapping.
 
@@ -22,10 +23,8 @@ def load_additions_data(json_path: Path) -> Dict[str, int]:
     Returns:
         Dictionary mapping id_add (string) to id (integer)
     """
-    with open(json_path, "r", encoding="utf-8") as f:
-        additions_data = json.load(f)
+    additions_data = json.loads(json_path.read_text(encoding="utf-8"))
 
-    # Create mapping from id_add to id
     id_mapping = {}
     for entry in additions_data:
         id_add = str(entry["id_add"])
@@ -35,7 +34,7 @@ def load_additions_data(json_path: Path) -> Dict[str, int]:
     return id_mapping
 
 
-def load_processed_ids(processed_path: Path) -> Set[str]:
+def load_processed_ids(processed_path: Path) -> set[str]:
     """
     Load already processed id_add values from the processed file.
 
@@ -49,14 +48,13 @@ def load_processed_ids(processed_path: Path) -> Set[str]:
         return set()
 
     try:
-        with open(processed_path, "r", encoding="utf-8") as f:
-            processed_data = json.load(f)
+        processed_data = json.loads(processed_path.read_text(encoding="utf-8"))
         return set(processed_data)
     except (json.JSONDecodeError, FileNotFoundError):
         return set()
 
 
-def save_processed_ids(processed_path: Path, processed_ids: Set[str]) -> None:
+def save_processed_ids(processed_path: Path, processed_ids: set[str]) -> None:
     """
     Save processed id_add values to the processed file.
 
@@ -64,20 +62,16 @@ def save_processed_ids(processed_path: Path, processed_ids: Set[str]) -> None:
         processed_path: Path to the addition_replaced.json file
         processed_ids: Set of processed id_add values to save
     """
-    # Load existing processed IDs
     existing_ids = load_processed_ids(processed_path)
-
-    # Merge with new processed IDs
     all_processed_ids = existing_ids.union(processed_ids)
+    processed_path.write_text(
+        json.dumps(list(all_processed_ids), indent=2), encoding="utf-8"
+    )
 
-    # Save back to file
-    with open(processed_path, "w", encoding="utf-8") as f:
-        json.dump(list(all_processed_ids), f, indent=2)
 
-
-def replace_ids_in_tsv(tsv_path: Path, id_mapping: Dict[str, int]) -> int:
+def replace_ids_in_tsv(tsv_path: Path, id_mapping: dict[str, int]) -> int:
     """
-    Replace id_add with id in a TSV file.
+    Replace id_add with id in the first (id) column of a TSV file.
 
     Args:
         tsv_path: Path to the TSV file to update
@@ -87,34 +81,25 @@ def replace_ids_in_tsv(tsv_path: Path, id_mapping: Dict[str, int]) -> int:
         Number of replacements made
     """
     if not tsv_path.exists():
-        print(f"Warning: TSV file {tsv_path} does not exist")
+        pr.amber(f"Warning: TSV file {tsv_path} does not exist")
         return 0
 
+    lines = tsv_path.read_text(encoding="utf-8").splitlines(keepends=True)
+
     replacements = 0
-
-    # Read the TSV file
-    with open(tsv_path, "r", encoding="utf-8") as f:
-        lines = f.readlines()
-
-    # Process each line
     updated_lines = []
-    for line_num, line in enumerate(lines, 1):
-        updated_line = line
-        for id_add, id_val in id_mapping.items():
-            # Replace id_add with id in the line
-            if id_add in line:
-                updated_line = updated_line.replace(id_add, str(id_val))
-                if updated_line != line:
-                    replacements += 1
-                    print(
-                        f"Replaced '{id_add}' with '{id_val}' in {tsv_path.name} line {line_num}"
-                    )
+    for line in lines:
+        columns = line.split("\t", 1)
+        current_id = columns[0].strip().strip('"')
+        if current_id in id_mapping:
+            new_id = id_mapping[current_id]
+            columns[0] = f'"{new_id}"'
+            line = "\t".join(columns)
+            replacements += 1
+            pr.cyan(f"Replaced '{current_id}' with '{new_id}' in {tsv_path.name}")
+        updated_lines.append(line)
 
-        updated_lines.append(updated_line)
-
-    # Write the updated content back to the file
-    with open(tsv_path, "w", encoding="utf-8") as f:
-        f.writelines(updated_lines)
+    tsv_path.write_text("".join(updated_lines), encoding="utf-8")
 
     return replacements
 
@@ -123,21 +108,17 @@ def process_additions() -> None:
     """
     Main function to process additions and update TSV files.
     """
-    # Initialize path objects
     pthgui = Gui2Paths()
     pthdps = DPSPaths()
 
-    # Load additions data
-    print("Loading additions data...")
+    pr.cyan("Loading additions data...")
     id_mapping = load_additions_data(pthgui.additions_added_path)
-    print(f"Found {len(id_mapping)} additions to process")
+    pr.green(f"Found {len(id_mapping)} additions to process")
 
-    # Load already processed IDs
-    print("Loading already processed IDs...")
+    pr.cyan("Loading already processed IDs...")
     processed_ids = load_processed_ids(pthdps.addition_replaced_json_path)
-    print(f"Already processed {len(processed_ids)} additions")
+    pr.green(f"Already processed {len(processed_ids)} additions")
 
-    # Filter out already processed IDs
     new_id_mapping = {
         id_add: id_val
         for id_add, id_val in id_mapping.items()
@@ -145,26 +126,24 @@ def process_additions() -> None:
     }
 
     if not new_id_mapping:
-        print("No new additions to process")
+        pr.green("No new additions to process")
         return
 
-    print(f"Processing {len(new_id_mapping)} new additions")
+    pr.green(f"Processing {len(new_id_mapping)} new additions")
 
-    # Replace IDs in TSV files
-    print(f"Updating SBS TSV file: {pthdps.sbs_path}")
+    pr.cyan(f"Updating SBS TSV file: {pthdps.sbs_path}")
     sbs_replacements = replace_ids_in_tsv(pthdps.sbs_path, new_id_mapping)
 
-    print(f"Updating Russian TSV file: {pthdps.russian_path}")
+    pr.cyan(f"Updating Russian TSV file: {pthdps.russian_path}")
     russian_replacements = replace_ids_in_tsv(pthdps.russian_path, new_id_mapping)
 
-    # Update processed IDs file
-    print("Updating processed IDs file...")
-    save_processed_ids(pthdps.addition_replaced_json_path, set(new_id_mapping.keys()))
+    pr.cyan("Updating processed IDs file...")
+    save_processed_ids(pthdps.addition_replaced_json_path, set(new_id_mapping))
 
-    print("Processing complete!")
-    print(f"- SBS replacements: {sbs_replacements}")
-    print(f"- Russian replacements: {russian_replacements}")
-    print(f"- Total new additions processed: {len(new_id_mapping)}")
+    pr.green("Processing complete!")
+    pr.green(f"- SBS replacements: {sbs_replacements}")
+    pr.green(f"- Russian replacements: {russian_replacements}")
+    pr.green(f"- Total new additions processed: {len(new_id_mapping)}")
 
 
 if __name__ == "__main__":

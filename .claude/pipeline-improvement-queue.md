@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 57
+Pointer: 58
 
 ## Scripts (76 total, local unique_paths)
 
@@ -79,7 +79,7 @@ Pointer: 57
 
 ### scripts/work_with_csv
 
-- [ ] 57. scripts/work_with_csv/additions_processor.py
+- [x] 57. scripts/work_with_csv/additions_processor.py
 - [ ] 58. scripts/work_with_csv/anki_class_grammar.py
 - [ ] 59. scripts/work_with_csv/check_class_data.py
 - [ ] 60. scripts/work_with_csv/compare_changed_id.py
@@ -153,3 +153,4 @@ Pointer: 57
 2026-06-18 | #54 scripts/other/replace_sandhi_txt.py | archived | already in scripts/dps_archive/ — queue was stale
 2026-06-18 | #55 scripts/other/tpr_db_tester.py | archived | standalone TPR HTML validation utility — not referenced by any workflow or caller; ad-hoc manual QA tool only
 2026-06-18 | #56 scripts/other/uppickle_and_edit.py | archived | broken (references non-existent DPSPaths.dps_save_state_path), functionally inert (edit/save code commented out), no callers
+2026-06-19 | #57 scripts/work_with_csv/additions_processor.py | changed | fixed real bug — replace_ids_in_tsv was substring-matching id_add against the WHOLE line instead of the first (id) column, so an id_add digit-string could silently corrupt unrelated numeric content in other columns (e.g. id_add "408" colliding with sutta ref "DHP408"); fixed to match only column 0, same pattern as apply_all_additions.py's replace_old_ids_in_tsv_files (#9); Dict/Set->dict/set, open()->Path.read_text/write_text, print()->pr.*, set(.keys())->set(); duplication with #9's TSV-replace logic noted but not extracted (would require editing #9, out of scope); 6 tests added (tests/scripts/work_with_csv/test_additions_processor.py), one of which fails against the pre-fix code on purpose to document the bug, then passes after the fix; live run against real db/backup_tsv/{sbs,russian}.tsv confirmed no-op (all current additions already marked processed) with zero file diffs
