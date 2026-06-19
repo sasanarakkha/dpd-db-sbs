@@ -22,3 +22,6 @@
 - 2026-06-13 [POSITIVE] Switching agy transport to stdin (--print -) bypasses OS-level argv limits (MAX_ARG_STRLEN), enabling the analysis of large verses that previously failed.
 - 2026-06-13 [POSITIVE] JSON-size-driven chunking with grounded-translation fallback provides a robust safety net for lone oversize sentences without requiring model-specific tokenizers.
 - 2026-06-13 [POSITIVE] Anchoring internal module paths to `__file__` and deferring side-effect-heavy initialization (like directory creation) to runtime ensures cross-platform robustness and clean test isolation.
+- 2026-06-19 [WORKFLOW] Mixed-hunk file staging via `git add -p` in bash scripts is error-prone; consider documenting/flagging mixed-hunk files during review and either selecting a dedicated tool or accepting simpler constraints (e.g., "exclude this file from commit").
+- 2026-06-19 [BEHAVIOR] Pre-existing lint errors in unmodified lines block commits even when only a small help-text change is staged; run a full lint check on the working tree before finalization, not just on staged hunks.
+- 2026-06-19 [POSITIVE] Thorough review.md (listing all files, findings, test evidence, and procedural notes) enables efficient finalization even when files have mixed hunks or procedural constraints.
