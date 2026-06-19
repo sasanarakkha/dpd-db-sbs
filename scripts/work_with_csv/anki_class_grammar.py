@@ -3,21 +3,17 @@
 # Generate csvs for grammar anki deck for all classes from the database.
 # https://sasanarakkha.github.io/study-tools/pali-class/pali-class.html
 
-import pandas as pd
 from datetime import datetime
-from tools.paths_dps import DPSPaths
-from tools.paths import ProjectPaths
+from pathlib import Path
 
+import pandas as pd
+
+from tools.paths import ProjectPaths
+from tools.paths_dps import DPSPaths
 from tools.printer import printer as pr
 
-dpspth = DPSPaths()
-pth = ProjectPaths()
 
-current_date = datetime.now().strftime("%m-%d")
-current_date_year = datetime.now().strftime("%y-%m-%d")
-
-
-def make_feedback_link(question_text: object, update_date: str) -> str:
+def make_feedback_link(question_text: str, update_date: str) -> str:
     """Build the prefilled grammar feedback form link."""
     return (
         f"""Spot a mistake? <a class="link" href="https://docs.google.com/forms/d/1Z8Jjt0-E0HNX7ygABIzAcrChG23M3IOyoZGQ-EDRzXY/viewform?usp=pp_url&entry.438735500"""
@@ -27,104 +23,96 @@ def make_feedback_link(question_text: object, update_date: str) -> str:
     )
 
 
-def main():
+def main() -> None:
     pr.tic()
     pr.green_title("Extracting grammar csvs...")
+    dpspth = DPSPaths()
+    pth = ProjectPaths()
     excel_file_dir = pth.temp_dir / "grammar.xlsx"
-    # moving_grammar(excel_file_dir)
-    make_grammar_csvs(excel_file_dir)
+    make_grammar_csvs(excel_file_dir, dpspth, pth)
     check_duplicate_ids(excel_file_dir)
     pr.toc()
 
 
-def check_duplicate_ids(excel_file_dir):
-    # Load the Excel file into a pandas ExcelFile object
-    with pd.ExcelFile(excel_file_dir) as excel_file:
-        # Dictionary to store [id] values from each sheet
-        id_dict = {}
+def _warn_invalid_sheet(sheet_name: str | int, df: pd.DataFrame) -> None:
+    if df.columns[0] == "id":
+        return
+    pr.amber(f"Sheet {sheet_name} does not have an 'id' column as the first column.")
 
-        # Loop through each sheet in the Excel file
+
+def check_duplicate_ids(excel_file_dir: Path) -> None:
+    with pd.ExcelFile(excel_file_dir) as excel_file:
+        seen_ids: set[object] = set()
+
         for sheet_name in excel_file.sheet_names:
-            # Read the current sheet into a DataFrame
             df = excel_file.parse(sheet_name)
 
-            # Check if df is a DataFrame
-            if isinstance(df, pd.DataFrame):
-                # Check if the first column exists and is named 'id'
-                if df.columns[0] == "id":
-                    # Iterate through each [id] value in the first column
-                    for id_value in df[df.columns[0]]:
-                        # Check if the [id] value is already in the dictionary
-                        if id_value in id_dict:
-                            # If it is, print the [id] value in red
-                            pr.red(f"{id_value}")
-                        else:
-                            # If not, add the [id] value to the dictionary
-                            id_dict[id_value] = True
-                else:
-                    print(
-                        f"Sheet {sheet_name} does not have an 'id' column as the first column."
-                    )
-            else:
-                print(
+            if not isinstance(df, pd.DataFrame):
+                pr.amber(
                     f"Sheet {sheet_name} did not load as a DataFrame. It is a {type(df)}."
                 )
+                continue
+
+            if df.columns[0] != "id":
+                _warn_invalid_sheet(sheet_name, df)
+                continue
+
+            for id_value in df[df.columns[0]]:
+                if id_value in seen_ids:
+                    pr.red(f"{id_value}")
+                else:
+                    seen_ids.add(id_value)
 
 
-def make_grammar_csvs(excel_file_dir):
-    # Load the Excel file into a pandas ExcelFile object
+def make_grammar_csvs(
+    excel_file_dir: Path, dpspth: DPSPaths, pth: ProjectPaths
+) -> None:
+    now = datetime.now().astimezone()
+    current_date = now.strftime("%m-%d")
+    current_date_year = now.strftime("%y-%m-%d")
+
     # Create a dictionary to store the DataFrames
-    dfs = {}
+    dfs: dict[str | int, pd.DataFrame] = {}
 
     with pd.ExcelFile(excel_file_dir) as excel_file:
         sheet_names = excel_file.sheet_names
 
-        # Loop through each sheet in the Excel file
         for sheet_name in sheet_names:
-            # Read the current sheet into a DataFrame
             df = excel_file.parse(sheet_name)
 
-            # Check if df is a DataFrame
-            if isinstance(df, pd.DataFrame):
-                # Convert the 'id' column to integers
-                if "id" in df.columns:
-                    df["id"] = df["id"].fillna(0).astype(int)
-                    # remove rows where id is 0 or empty
-                    df = df[df["id"] != 0]
-
-                # Convert the values in the '2nd column' to strings
-                df.iloc[:, 1] = df.iloc[:, 1].astype(str)
-
-                second_column_name = df.columns[1]
-                df["feedback"] = df.apply(
-                    lambda row: make_feedback_link(
-                        row[second_column_name], current_date_year
-                    ),
-                    axis=1,
-                )
-
-                # Reset the index and drop the old index
-                df.reset_index(drop=True, inplace=True)
-
-                # Add the current date to the DataFrame as test
-                df["test"] = current_date
-
-                # Store the DataFrame in the dictionary with the sheet name as the key
-                dfs[sheet_name] = df
-            else:
-                print(
+            if not isinstance(df, pd.DataFrame):
+                pr.amber(
                     f"Sheet {sheet_name} did not load as a DataFrame. It is a {type(df)}."
                 )
+                continue
 
-    # Now you can access each DataFrame using its sheet name as a key
-    # For example, dfs['Sheet1'] will give you the DataFrame for 'Sheet1', and so on.
+            # Convert the 'id' column to integers
+            if "id" in df.columns:
+                df["id"] = df["id"].fillna(0).astype(int)
+                # remove rows where id is 0 or empty
+                df = df[df["id"] != 0]
+
+            # Convert the values in the '2nd column' to strings
+            df.iloc[:, 1] = df.iloc[:, 1].astype(str)
+
+            second_column_name = df.columns[1]
+            df["feedback"] = df.apply(
+                lambda row, scn=second_column_name: make_feedback_link(
+                    row[scn], current_date_year
+                ),
+                axis=1,
+            )
+
+            df.reset_index(drop=True, inplace=True)
+            df["test"] = current_date
+
+            assert isinstance(df, pd.DataFrame)
+            dfs[sheet_name] = df
 
     pr.green("extracting df_sum_abbr for class.")
 
     # Load abbreviations from TSV, filter out those with capital letters, and add id/pattern columns
     abr_dir = pth.abbreviations_tsv_path
-
-    # Load abbreviations from TSV, filter out capital letters, and add id/pattern columns
     df_abbr = pd.read_csv(abr_dir, sep="\t")
     assert isinstance(df_abbr, pd.DataFrame)
     df_abbr = df_abbr[
@@ -168,8 +156,7 @@ def make_grammar_csvs(excel_file_dir):
     sum_abbr_path = dpspth.anki_csvs_dir / "pali_class" / "grammar" / "cl_sum_abbr.csv"
     df_sum_abbr.to_csv(sum_abbr_path, sep="\t", index=False)
 
-    row_count = len(df_sum_abbr)
-    print("Number of rows:", row_count)
+    pr.white(f"Number of rows: {len(df_sum_abbr)}")
 
     pr.green("extracting df_sum_sandhi for class.")
 
@@ -199,8 +186,7 @@ def make_grammar_csvs(excel_file_dir):
     )
     df_sum_sandhi.to_csv(sum_sandhi_path, sep="\t", index=False)
 
-    row_count = len(df_sum_sandhi)
-    print("Number of rows:", row_count)
+    pr.white(f"Number of rows: {len(df_sum_sandhi)}")
 
     pr.green("extracting cl_sum_gramm for class.")
 
@@ -229,10 +215,11 @@ def make_grammar_csvs(excel_file_dir):
     ]
 
     # --- Create and save ru_cl_sum_gramm.csv with 'id' and 'native' ---
-    native_dfs = []
-    for sheet_name in sheets_for_gramm:
-        if "id" in dfs[sheet_name].columns and "native" in dfs[sheet_name].columns:
-            native_dfs.append(dfs[sheet_name][["id", "native"]])
+    native_dfs = [
+        dfs[sheet_name][["id", "native"]]
+        for sheet_name in sheets_for_gramm
+        if "id" in dfs[sheet_name].columns and "native" in dfs[sheet_name].columns
+    ]
 
     if native_dfs:
         df_sum_native = pd.concat(native_dfs, ignore_index=True)
@@ -256,38 +243,36 @@ def make_grammar_csvs(excel_file_dir):
     )
     df_sum_gramm.to_csv(sum_gramm_path, sep="\t", index=False)
 
-    row_count = len(df_sum_gramm)
-    print("Number of rows:", row_count)
+    pr.white(f"Number of rows: {len(df_sum_gramm)}")
 
     if dpspth.sbs_anki_style_dir.exists():
         pr.green("Saving field list to sbs directory.")
-
-        # Save the column list of df_sum_abbr to a text file
-        grammar_abbr_path = dpspth.sbs_anki_style_dir / "field-list-grammar-abbr.md"
-        with open(grammar_abbr_path, "w") as file:
-            columns_with_marks = list(df_sum_abbr.columns) + ["marks"]
-            file.write("# Field List: Grammar Abbr\n\n```\n")
-            file.write("\n".join(columns_with_marks))
-            file.write("\n```\n")
-
-        # Save the column list of df_sum_sandhi to a text file
-        grammar_sandhi_path = dpspth.sbs_anki_style_dir / "field-list-grammar-sandhi.md"
-        with open(grammar_sandhi_path, "w") as file:
-            columns_with_marks = list(df_sum_sandhi.columns) + ["marks"]
-            file.write("# Field List: Grammar Sandhi\n\n```\n")
-            file.write("\n".join(columns_with_marks))
-            file.write("\n```\n")
-
-        # Save the column list of df_sum_gramm to a text file
-        grammar_grammar_path = dpspth.sbs_anki_style_dir / "field-list-grammar-gramm.md"
-        with open(grammar_grammar_path, "w") as file:
-            columns_with_marks = list(df_sum_gramm.columns) + ["marks"]
-            file.write("# Field List: Grammar Gramm\n\n```\n")
-            file.write("\n".join(columns_with_marks))
-            file.write("\n```\n")
-
+        _write_field_list(
+            dpspth.sbs_anki_style_dir / "field-list-grammar-abbr.md",
+            "Grammar Abbr",
+            df_sum_abbr.columns,
+        )
+        _write_field_list(
+            dpspth.sbs_anki_style_dir / "field-list-grammar-sandhi.md",
+            "Grammar Sandhi",
+            df_sum_sandhi.columns,
+        )
+        _write_field_list(
+            dpspth.sbs_anki_style_dir / "field-list-grammar-gramm.md",
+            "Grammar Gramm",
+            df_sum_gramm.columns,
+        )
     else:
         pr.red("Study-tools/anki-style directory does not exist.")
+
+
+def _write_field_list(path: Path, title: str, columns: pd.Index) -> None:
+    """Write a field-list markdown file listing column names plus 'marks'."""
+    columns_with_marks = [*list(columns), "marks"]
+    content = (
+        f"# Field List: {title}\n\n```\n" + "\n".join(columns_with_marks) + "\n```\n"
+    )
+    path.write_text(content, encoding="utf-8")
 
 
 if __name__ == "__main__":
