@@ -1,8 +1,9 @@
 import os
 import re
-import pandas as pd
-from tools.paths_dps import DPSPaths
 
+import pandas as pd
+
+from tools.paths_dps import DPSPaths
 
 
 def get_pali_sentences_from_txt(filepath: str) -> set[str]:
@@ -29,7 +30,9 @@ def get_pali_sentences_from_txt(filepath: str) -> set[str]:
                 while i < len(lines):
                     next_line = lines[i].strip()
                     # Stop if we hit a blank line or a new section
-                    if not next_line or next_line.startswith("English Translation:") or next_line.startswith("Sutta Number:") or next_line.startswith("Pali:"):
+                    if not next_line or next_line.startswith(
+                        ("English Translation:", "Sutta Number:", "Pali:")
+                    ):
                         break
                     sentence += " " + next_line
                     i += 1
@@ -66,14 +69,13 @@ def find_mismatched_examples(mode: str, source: str, dpspth: DPSPaths):
         base_path = dpspth.pali_class_output_dir
         csv_path = os.path.join(base_path, "done", f"class_{source}_output done.csv")
         txt_path = os.path.join(base_path, "exercises", f"exercises_class_{source}.txt")
-    elif mode == "discourses": 
+    elif mode == "discourses":
         base_path = dpspth.discourses_output_dir
         csv_path = os.path.join(base_path, "done", f"{source} done.csv")
         txt_path = os.path.join(base_path, "suttas", "combined.txt")
     else:
         print(f"Unknown mode: {mode}")
         return
-
 
     print(f"Checking CSV: {csv_path}")
     print(f"Against TXT: {txt_path}\n")
@@ -98,13 +100,17 @@ def find_mismatched_examples(mode: str, source: str, dpspth: DPSPaths):
     mismatched_ids = []
     for _, row in df.iterrows():
         # Skip rows where 'class_source' column contains "Class Doc"
-        if "class_source" in df.columns and pd.notna(row["class_source"]) and "Class Doc" in str(row["class_source"]):
+        if (
+            "class_source" in df.columns
+            and pd.notna(row["class_source"])  # pyright: ignore
+            and "Class Doc" in str(row["class_source"])
+        ):
             continue
 
         example = row["class_example"]
 
         # Print ID if class_example is empty or NaN
-        if pd.isna(example) or str(example).strip() == "":
+        if pd.isna(example) or str(example).strip() == "":  # pyright: ignore
             print(f"Empty class_example for ID: {row['id']}")
             continue
 
@@ -124,7 +130,7 @@ def find_mismatched_examples(mode: str, source: str, dpspth: DPSPaths):
             if not found:
                 mismatched_ids.append(row["id"])
 
-        elif mode == "discourses": 
+        elif mode == "discourses":
             if not txt_contains_sentence(txt_path, cleaned_example):
                 mismatched_ids.append(row["id"])
 
@@ -133,7 +139,9 @@ def find_mismatched_examples(mode: str, source: str, dpspth: DPSPaths):
         for an_id in mismatched_ids:
             print(an_id)
     else:
-        print("All examples in the CSV were found in the exercises text file. No mismatches detected.")
+        print(
+            "All examples in the CSV were found in the exercises text file. No mismatches detected."
+        )
 
 
 def main():
