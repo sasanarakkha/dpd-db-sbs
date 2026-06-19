@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 58
+Pointer: 63
 
 ## Scripts (76 total, local unique_paths)
 
@@ -80,11 +80,11 @@ Pointer: 58
 ### scripts/work_with_csv
 
 - [x] 57. scripts/work_with_csv/additions_processor.py
-- [ ] 58. scripts/work_with_csv/anki_class_grammar.py
-- [ ] 59. scripts/work_with_csv/check_class_data.py
-- [ ] 60. scripts/work_with_csv/compare_changed_id.py
-- [ ] 61. scripts/work_with_csv/filter_one_list_from_another.py
-- [ ] 62. scripts/work_with_csv/pat_for_anki.py
+- [x] 58. scripts/work_with_csv/anki_class_grammar.py
+- [x] 59. scripts/work_with_csv/check_class_data.py — already archived (commit ec21b027e), queue was stale
+- [x] 60. scripts/work_with_csv/compare_changed_id.py — already archived (commit ec21b027e), queue was stale
+- [x] 61. scripts/work_with_csv/filter_one_list_from_another.py — already archived (commit ec21b027e), queue was stale
+- [x] 62. scripts/work_with_csv/pat_for_anki.py
 - [ ] 63. scripts/work_with_csv/replace_new_id.py
 - [ ] 64. scripts/work_with_csv/xlsx2csv.py
 
@@ -154,3 +154,8 @@ Pointer: 58
 2026-06-18 | #55 scripts/other/tpr_db_tester.py | archived | standalone TPR HTML validation utility — not referenced by any workflow or caller; ad-hoc manual QA tool only
 2026-06-18 | #56 scripts/other/uppickle_and_edit.py | archived | broken (references non-existent DPSPaths.dps_save_state_path), functionally inert (edit/save code commented out), no callers
 2026-06-19 | #57 scripts/work_with_csv/additions_processor.py | changed | fixed real bug — replace_ids_in_tsv was substring-matching id_add against the WHOLE line instead of the first (id) column, so an id_add digit-string could silently corrupt unrelated numeric content in other columns (e.g. id_add "408" colliding with sutta ref "DHP408"); fixed to match only column 0, same pattern as apply_all_additions.py's replace_old_ids_in_tsv_files (#9); Dict/Set->dict/set, open()->Path.read_text/write_text, print()->pr.*, set(.keys())->set(); duplication with #9's TSV-replace logic noted but not extracted (would require editing #9, out of scope); 6 tests added (tests/scripts/work_with_csv/test_additions_processor.py), one of which fails against the pre-fix code on purpose to document the bug, then passes after the fix; live run against real db/backup_tsv/{sbs,russian}.tsv confirmed no-op (all current additions already marked processed) with zero file diffs
+2026-06-19 | #58 scripts/work_with_csv/anki_class_grammar.py | changed | fixed real bug: current_date/current_date_year computed at module-import time not run time; moved DPSPaths/ProjectPaths instantiation (which create dirs on init) out of module scope into main(); removed dead commented-out moving_grammar() call; print()->pr.amber/pr.white, extracted _warn_invalid_sheet/_write_field_list helpers (deduplicated 3 near-identical open()-write blocks); check_duplicate_ids dict-as-set->set; fixed B023 lambda-closure bug (second_column_name captured by reference, bound via default-arg); type hints throughout; reviewer's SHEET_CATEGORIES data-driven redesign and full make_grammar_csvs decomposition rejected as too invasive (strict parity); 2 tests added (tests/scripts/work_with_csv/test_anki_class_grammar.py, synthetic xlsx fixture, no mocks); live run against real downloaded grammar.xlsx (via scripts/bash/download_grammar.sh) succeeded - 286/713/1321 rows across the three output CSVs, exit 0
+2026-06-19 | #59 scripts/work_with_csv/check_class_data.py | archived | file already moved to scripts/dps_archive/ in commit ec21b027e, not in registry.json — queue entry was stale, no review needed
+2026-06-19 | #60 scripts/work_with_csv/compare_changed_id.py | archived | same as #59, already archived in commit ec21b027e — queue was stale
+2026-06-19 | #61 scripts/work_with_csv/filter_one_list_from_another.py | archived | same as #59, already archived in commit ec21b027e — queue was stale
+2026-06-19 | #62 scripts/work_with_csv/pat_for_anki.py | changed | approve all — found and fixed 2 real pandas-3.0 incompatibilities discovered while building golden-master fixtures: (1) df.iloc[:,0]=...astype(str) in-place mutation raised LossySetitemError/TypeError whenever the flag column was numeric-inferred; (2) df_processed.loc[:,"test"]=scalar raised ValueError on a zero-row DataFrame; root-caused both to pd.read_csv inferring int64/float64 on the numeric-looking first column, fixed at the source via dtype=str+keep_default_na=False rather than patching downstream (also fixes a third, silent bug this exposed: "1.0" != "1" meant the filter matched zero rows whenever the column was numeric, even before the crash); restructure: extracted _filter_input_rows/_build_feedback_column/_build_web_link_column/_write_field_list helpers, df.reindex(columns=COLUMNS_TO_KEEP, fill_value="") replaces manual per-column copy loop, single datetime.now().astimezone() replaces 3x datetime.today() calls (DTZ002, race-condition risk); BLE001 narrowed to (ParserError,OSError,UnicodeDecodeError/KeyError) per call site; removed one redundant cast(dict[str,str], dict(zip(...))) (verified via pyright), kept cast(Any, source_to_link) for pandas-stubs .map() and 2x cast(pd.Series, ...) for pandas-stubs .apply() ambiguity (pyright requires these, pyrefly calls them "redundant" — user approved keeping per project's "approve pyrefly warnings" exception); chmod +x (EXE001), import sort, encoding="utf-8" on open(); 8 tests added (tests/scripts/work_with_csv/test_pat_for_anki.py + fixtures.json), 5 golden-master against unedited code + 3 literal new-behavior cases documenting where old code crashed; live run against realistic numeric-flag-column input + real shared_data/sbs_csvs/pat_links.tsv succeeded, field-list-pat.md regenerated byte-identical in sibling study-tools repo
