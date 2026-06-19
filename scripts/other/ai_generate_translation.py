@@ -70,14 +70,13 @@ def load_models_from_json() -> list[tuple[str, str, int, float]]:
                 float(m.get("timeout", 150.0)),
             )
 
-        gemini_cli_work = [_entry(m) for m in data.get("gemini_cli_work_models", [])]
         antigravity_cli_work = [
             _entry(m) for m in data.get("antigravity_cli_work_models", [])
         ]
         default_models = [_entry(m) for m in data.get("default_models", [])]
         grounded_models = [_entry(m) for m in data.get("grounded_models", [])]
 
-        return gemini_cli_work + antigravity_cli_work + default_models + grounded_models
+        return antigravity_cli_work + default_models + grounded_models
     except (FileNotFoundError, json.JSONDecodeError, KeyError):
         return []
 

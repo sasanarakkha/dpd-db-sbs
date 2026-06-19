@@ -31,23 +31,20 @@
   ],
   "grounded_models": [
     {
-      "provider": "gemini",
-      "model": "gemini-2.5-flash",
-      "delay": 0
-    }
-  ],
-  "gemini_cli_work_models": [
-    {
-      "provider": "gemini_cli",
-      "model": "gemini-3-flash-preview",
+      "provider": "antigravity_cli",
+      "model": "Gemini 3.1 Pro (Low)",
       "delay": 0,
       "timeout": 150
     },
     {
-      "provider": "gemini_cli",
-      "model": "gemini-3.1-flash-lite",
-      "delay": 0,
-      "timeout": 150
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "delay": 0
+    },
+    {
+      "provider": "openrouter",
+      "model": "deepseek/deepseek-v4-pro",
+      "delay": 0
     }
   ]
 }

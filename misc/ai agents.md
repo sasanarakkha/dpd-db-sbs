@@ -73,5 +73,4 @@
 - Claude Code: The industry leader with the best models. Also the most expensive.
 - OpenCode: The best open-source CLI, provides the most model flexibility.
 - Kilo CLI: A good fork of OpenCode. Good free models.
-- Gemini CLI: Slow, heavily rate-limited, but free. Also has a massive context window. Good for long-running background tasks.
 - Qwen: Very outdated, but also has a million token context window. Good for simple, long-running background tasks and data-crunching.

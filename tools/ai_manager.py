@@ -10,7 +10,6 @@ from tools.printer import printer as pr
 
 AI_MODELS_PATH = Path("tools/ai_models.json")
 ANTIGRAVITY_PROVIDER = "antigravity_cli"
-GEMINI_CLI_PROVIDER = "gemini_cli"
 
 
 def _load_models_from_json() -> dict[str, list[tuple[str, str, int, float]]]:
@@ -21,13 +20,11 @@ def _load_models_from_json() -> dict[str, list[tuple[str, str, int, float]]]:
 
     try:
         data = json.loads(AI_MODELS_PATH.read_text(encoding="utf-8"))
-        gemini_cli_work = [_entry(m) for m in data.get("gemini_cli_work_models", [])]
         antigravity_cli_work = [
             _entry(m) for m in data.get("antigravity_cli_work_models", [])
         ]
         return {
-            "default": gemini_cli_work
-            + antigravity_cli_work
+            "default": antigravity_cli_work
             + [_entry(m) for m in data.get("default_models", [])],
             "grounded": [_entry(m) for m in data.get("grounded_models", [])],
         }
@@ -96,14 +93,6 @@ class AIManager:
             pr.green("nvidia initialized")
         else:
             pr.amber("NVIDIA API key not found, manager not initialized.")
-
-        if shutil.which("gemini"):
-            from tools.ai_gemini_cli import GeminiCliManager
-
-            self.providers["gemini_cli"] = GeminiCliManager()
-            pr.green("gemini_cli initialized")
-        else:
-            pr.amber("gemini executable not found on PATH, gemini_cli not initialized.")
 
         if shutil.which("agy"):
             self._antigravity_probe_thread = threading.Thread(

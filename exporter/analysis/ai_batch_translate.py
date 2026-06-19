@@ -38,7 +38,7 @@ def main():
     )
     parser.add_argument(
         "--provider",
-        help="Force one AI provider (requires --model), e.g. gemini_cli",
+        help="Force one AI provider (requires --model), e.g. antigravity_cli",
     )
     parser.add_argument(
         "--model",
@@ -116,8 +116,8 @@ def main():
                     provider=args.provider,
                     verse_source=verse["num"],
                     speech_mark_options=verse.get("speech_mark_options"),
-                    progress=lambda event: _print_translation_progress(
-                        verse["num"], event
+                    progress=lambda event, v_num=verse["num"]: (
+                        _print_translation_progress(v_num, event)
                     ),
                     debug=ai_debug,
                     verbose=args.debug,

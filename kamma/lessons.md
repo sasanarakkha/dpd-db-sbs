@@ -22,4 +22,3 @@
 - 2026-06-13 [POSITIVE] Switching agy transport to stdin (--print -) bypasses OS-level argv limits (MAX_ARG_STRLEN), enabling the analysis of large verses that previously failed.
 - 2026-06-13 [POSITIVE] JSON-size-driven chunking with grounded-translation fallback provides a robust safety net for lone oversize sentences without requiring model-specific tokenizers.
 - 2026-06-13 [POSITIVE] Anchoring internal module paths to `__file__` and deferring side-effect-heavy initialization (like directory creation) to runtime ensures cross-platform robustness and clean test isolation.
-- 2026-06-17 [POSITIVE] Passing prompts via stdin (-p -) in ai_gemini_cli.py bypasses system command-line argument limits, preventing failures on large dictionary contexts.

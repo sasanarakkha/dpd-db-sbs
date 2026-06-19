@@ -339,7 +339,7 @@ uv run python exporter/analysis/ai_batch_translate.py --book kn2
 You can optionally specify a custom provider and model, and enable verbose debug logging:
 
 ```bash
-uv run python exporter/analysis/ai_batch_translate.py --book kn2 --provider gemini_cli --model gemini-3-flash-preview --debug
+uv run python exporter/analysis/ai_batch_translate.py --book kn2 --provider antigravity_cli --model "Gemini 3.5 Flash (Low)" --debug
 ```
 
 Use `--limit N` for a small batch and `--dry-run` to inspect work without AI calls.
