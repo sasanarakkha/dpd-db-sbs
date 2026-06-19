@@ -32,7 +32,7 @@
   "grounded_models": [
     {
       "provider": "antigravity_cli",
-      "model": "Gemini 3.1 Pro (Low)",
+      "model": "Gemini 3.5 Flash (High)",
       "delay": 0,
       "timeout": 150
     },

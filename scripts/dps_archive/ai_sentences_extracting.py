@@ -2,17 +2,17 @@
 
 import json
 from pathlib import Path
+
 import pandas as pd
 
-from tools.file_utils import (
-    search_pali_in_csv,
-    load_exercise_data_from_file,
-    load_discourse_sutta_data,
-)
 from tools.ai_llm_factory import LLMFactory
 from tools.configger import config_read
+from tools.file_utils import (
+    load_discourse_sutta_data,
+    load_exercise_data_from_file,
+    search_pali_in_csv,
+)
 from tools.printer import printer as pr
-
 
 # --- DeepSeek Caching Configuration ---
 # Define the directory for DeepSeek API context caching
@@ -338,7 +338,7 @@ def run_batch_discourse_inference(
     except FileNotFoundError:
         pr.red(f"Error: Vocab file not found at {vocab_csv_path}")
         return
-    except Exception as e:
+    except (ValueError, TypeError) as e:
         pr.red(f"Error reading vocab CSV '{vocab_csv_path}': {e}")
         return
 

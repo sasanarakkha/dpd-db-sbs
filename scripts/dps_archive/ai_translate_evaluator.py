@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """
 Reusable evaluation workflow for AI-assisted dictionary translation.
 
@@ -30,8 +28,8 @@ Outputs:
 import datetime
 import json
 import time
-from typing import Any, Dict, List, Optional
 from pathlib import Path
+from typing import Any
 
 import requests
 
@@ -51,7 +49,7 @@ from tools.paths_dps import DPSPaths
 from tools.printer import printer as pr
 
 
-def get_available_models(provider: str, api_key: str | None) -> List[str]:
+def get_available_models(provider: str, api_key: str | None) -> list[str]:
     """Fetch available models for the given provider."""
     models = []
     if not api_key:
@@ -66,7 +64,7 @@ def get_available_models(provider: str, api_key: str | None) -> List[str]:
             response = client.models.list()
             models = [m.id for m in response.data]
             models.sort()
-        except Exception as e:
+        except (RuntimeError, ValueError) as e:
             pr.red(f"Failed to fetch OpenAI models: {e}")
     elif provider == "openrouter":
         try:
@@ -78,7 +76,7 @@ def get_available_models(provider: str, api_key: str | None) -> List[str]:
             data = response.json()
             models = [m["id"] for m in data["data"]]
             models.sort()
-        except Exception as e:
+        except (requests.RequestException, ValueError) as e:
             pr.red(f"Failed to fetch OpenRouter models: {e}")
     else:
         pr.amber(f"Model discovery not implemented for provider: {provider}")
@@ -108,8 +106,8 @@ TARGET_POS = [
 def select_evaluation_sample(
     db_session,
     lang: str = "ru",
-    limit: Optional[int] = None,
-) -> List[DpdHeadword]:
+    limit: int | None = None,
+) -> list[DpdHeadword]:
     """Select three representative words per POS at ranks 20, 40, 60.
 
     Args:
@@ -161,7 +159,7 @@ def select_evaluation_sample(
 
 def build_translation_prompt(
     word: DpdHeadword, dpspth: DPSPaths, lang: str = "ru"
-) -> List[Dict[str, str]]:
+) -> list[dict[str, str]]:
     """Wrap the production prompt logic for meaning translation.
 
     Args:
@@ -192,10 +190,10 @@ def build_translation_prompt(
 
 
 def create_batch_jsonl(
-    model_name: str, sample: List[DpdHeadword], dpspth: DPSPaths, lang: str = "ru"
+    model_name: str, sample: list[DpdHeadword], dpspth: DPSPaths, lang: str = "ru"
 ) -> Path:
     """Create a JSONL file for OpenAI Batch API."""
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.datetime.now(tz=datetime.UTC).strftime("%Y%m%d_%H%M%S")
     file_name = f"eval_{model_name.replace('/', '_')}_{timestamp}.jsonl"
     file_path = dpspth.ai_for_batch_api_dir / file_name
 
@@ -218,10 +216,10 @@ def create_batch_jsonl(
 
 def process_sequential_batch(
     client,
-    shortlist: List[str],
-    sample: List[DpdHeadword],
+    shortlist: list[str],
+    sample: list[DpdHeadword],
     dpspth: DPSPaths,
-    results_map: Dict,
+    results_map: dict,
     lang: str = "ru",
 ):
     """Submit, poll, and download results for each model one by one."""
@@ -290,10 +288,10 @@ def process_sequential_batch(
 
 
 def generate_markdown_report(
-    results: List[Dict], provider: str, shortlist: List[str], lang: str
+    results: list[dict], provider: str, shortlist: list[str], lang: str
 ) -> str:
     """Generate a side-by-side Markdown comparison report."""
-    ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    ts = datetime.datetime.now(tz=datetime.UTC).strftime("%Y-%m-%d %H:%M:%S")
 
     md = "# AI Translation Evaluation Report\n\n"
     md += f"- **Date**: {ts}\n"
@@ -334,7 +332,7 @@ def main():
     dpspth = DPSPaths()
     db_session = get_db_session(pth.dpd_db_path)
 
-    api_key, provider, current_model = load_ai_config()
+    api_key, provider, _current_model = load_ai_config()
     pr.green(f"Active provider: {provider}")
 
     # Mode selection
@@ -524,7 +522,7 @@ Please provide a brief justification for each recommendation.
         output_dir = dpspth.temp_dir / "ai_eval"
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        ts = datetime.datetime.now(tz=datetime.UTC).strftime("%Y%m%d_%H%M%S")
 
         # Save raw JSON
         raw_file = output_dir / f"eval_raw_{provider}_{ts}.json"

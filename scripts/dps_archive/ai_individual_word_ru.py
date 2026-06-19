@@ -3,28 +3,23 @@
 
 import csv
 from pathlib import Path
-from typing import Optional
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword
-
-from tools.paths import ProjectPaths
-from tools.date_and_time import year_month_day_hour_minute_dash
-from tools.printer import printer as pr
-
 from tools.ai_related import (
-    load_translation_examples,
-    replace_abbreviations,
-    handle_ai_response,
-    get_ai_client,
-    print_ai_config,
+    generate_messages_for_english_meaning,
     generate_messages_for_meaning,
     generate_messages_for_notes,
-    generate_messages_for_english_meaning,
+    get_ai_client,
+    handle_ai_response,
+    load_translation_examples,
+    print_ai_config,
+    replace_abbreviations,
 )
-
+from tools.date_and_time import year_month_day_hour_minute_dash
+from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
-
+from tools.printer import printer as pr
 
 pth = ProjectPaths()
 dpspth = DPSPaths()
@@ -32,7 +27,7 @@ db_session = get_db_session(pth.dpd_db_path)
 date = year_month_day_hour_minute_dash()
 
 
-def fetch_id(db_session, id_to_check: int) -> Optional[DpdHeadword]:
+def fetch_id(db_session, id_to_check: int) -> DpdHeadword | None:
     """Get id from db."""
 
     if not id_to_check:  # Check if id_or_lemma_1 is empty
@@ -141,16 +136,16 @@ if __name__ == "__main__":
     if id_input:
         id_to_check = int(id_input)
 
-        #! for russian meaning
+        # for russian meaning
         translate_with_ai(dpspth, id_to_check, "meaning")
 
-        #! for russian synonyms
+        # for russian synonyms
         # translate_with_ai(dpspth, id_to_check, "meaning", True)
 
-        #! for russian notes
+        # for russian notes
         # translate_with_ai(dpspth, id_to_check, "note")
 
-        #! for english meaning
+        # for english meaning
         # translate_with_ai(dpspth, id_to_check, "english")
 
     pr.toc()

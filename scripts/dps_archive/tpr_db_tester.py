@@ -1,18 +1,18 @@
-#!/usr/bin/env python3
 """Verify the HTML structure of records in the Tipitaka Pali Reader (TPR) database."""
 
-import sqlite3
 import csv
-from lxml import etree  # type: ignore
-from tools.configger import config_read
+import sqlite3
 from pathlib import Path
-from typing import Optional, List, Tuple
+
+from lxml import etree  # type: ignore
+
+from tools.configger import config_read
 from tools.printer import printer as pr
 
 
 def main():
     pr.tic()
-    tpr_db_path_str: Optional[str] = config_read("tpr", "db_path")
+    tpr_db_path_str: str | None = config_read("tpr", "db_path")
 
     if not tpr_db_path_str:
         pr.red("Error: tpr db_path not found in configuration.")
@@ -42,7 +42,7 @@ def main():
         conn: sqlite3.Connection = sqlite3.connect(tpr_db_path)
         cursor: sqlite3.Cursor = conn.cursor()
         pr.yes("ok")
-    except Exception as e:
+    except sqlite3.DatabaseError as e:
         pr.no("failed")
         pr.red(f"Error connecting to database: {e}")
         return
@@ -50,11 +50,11 @@ def main():
     # Fetch all rows
     pr.green_tmr("fetching pages")
     cursor.execute("SELECT rowid, content FROM pages")
-    rows: List[Tuple[int, Optional[str]]] = cursor.fetchall()
+    rows: list[tuple[int, str | None]] = cursor.fetchall()
     pr.yes(len(rows))
 
     # Store rows with parsing issues
-    invalid_html_rows: List[Tuple[int, str]] = []
+    invalid_html_rows: list[tuple[int, str]] = []
 
     # Explicitly create a parser
     html_parser = etree.HTMLParser(recover=False)

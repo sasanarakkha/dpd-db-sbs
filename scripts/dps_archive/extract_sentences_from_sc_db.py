@@ -4,6 +4,7 @@
 import csv
 import re
 from pathlib import Path
+
 from tools.printer import printer as pr
 
 
@@ -96,11 +97,11 @@ def process_csv(
             if not row:
                 continue
             word = row[0].strip()
-            file, pali_line = search_word_in_folder(word, primary_pali_folder)
+            _, pali_line = search_word_in_folder(word, primary_pali_folder)
 
             if not pali_line:
                 # If not found in primary, check in variant
-                file, pali_line = search_word_in_folder(word, variant_folder)
+                _, pali_line = search_word_in_folder(word, variant_folder)
                 if pali_line:
                     # Try to find corresponding primary sentence
                     id = extract_id(pali_line)

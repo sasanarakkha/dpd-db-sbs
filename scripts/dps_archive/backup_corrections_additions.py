@@ -2,10 +2,12 @@
 
 """pull corrections and additions to git"""
 
+from datetime import UTC, datetime
+
 from git import Repo
 from rich import print
+
 from tools.printer import printer as pr
-from datetime import datetime
 
 
 def backup_paliword_paliroot():
@@ -71,14 +73,14 @@ def git_commit():
             f"Committer: {commit_details.committer.name} <{commit_details.committer.email}>"
         )
         print(
-            f"Authored Date: {datetime.utcfromtimestamp(commit_details.authored_date)}"
+            f"Authored Date: {datetime.fromtimestamp(commit_details.authored_date, tz=UTC)}"
         )
         print(
-            f"Committed Date: {datetime.utcfromtimestamp(commit_details.committed_date)}"
+            f"Committed Date: {datetime.fromtimestamp(commit_details.committed_date, tz=UTC)}"
         )
 
         return True
-    except Exception as e:
+    except RuntimeError as e:
         print(f"[bold red]Error occurred during commit: {e}")
         return False
 

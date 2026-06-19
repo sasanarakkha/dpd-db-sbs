@@ -1,7 +1,9 @@
+#!/usr/bin/env python3
 """A Pickle file reader and editor."""
 
 import pickle
 from pathlib import Path
+
 from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
 from tools.printer import printer as pr
@@ -47,7 +49,7 @@ def save_modified_data(data, filepath: Path):
 
 def main():
     pr.tic()
-    filepath = dpspth.dps_save_state_path
+    filepath = pth.additions_pickle_path
 
     # pth.additions_pickle_path
     # pth.daily_record_path
@@ -67,7 +69,7 @@ def main():
     except FileNotFoundError:
         pr.no("failed")
         pr.red(f"Error: {filepath} not found")
-    except Exception as e:
+    except (OSError, pickle.UnpicklingError) as e:
         pr.no("failed")
         pr.red(f"Error: {e}")
 
