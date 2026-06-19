@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 47
+Pointer: 57
 
 ## Scripts (76 total, local unique_paths)
 
@@ -66,16 +66,16 @@ Pointer: 47
 - [x] 44. scripts/other/ai_batch_api.py — renamed to ai_batch_openai_meaning.py
 - [x] 45. scripts/other/ai_batch_deepseek_meaning.py — archived
 - [x] 46. scripts/other/ai_check_russian_meanings.py
-- [ ] 47. scripts/other/ai_generate_translation.py
-- [ ] 48. scripts/other/ai_individual_word_ru.py
-- [ ] 49. scripts/other/ai_sentences_extracting.py
-- [ ] 50. scripts/other/ai_translate_evaluator.py
-- [ ] 51. scripts/other/backup_corrections_additions.py
-- [ ] 52. scripts/other/extract_id_from_docs.py
-- [ ] 53. scripts/other/extract_sentences_from_sc_db.py
-- [ ] 54. scripts/other/replace_sandhi_txt.py
-- [ ] 55. scripts/other/tpr_db_tester.py
-- [ ] 56. scripts/other/uppickle_and_edit.py
+- [x] 47. scripts/other/ai_generate_translation.py
+- [x] 48. scripts/other/ai_individual_word_ru.py — archived
+- [x] 49. scripts/other/ai_sentences_extracting.py — archived
+- [x] 50. scripts/other/ai_translate_evaluator.py — archived
+- [x] 51. scripts/other/backup_corrections_additions.py — archived (already in scripts/dps_archive/, queue was stale)
+- [x] 52. scripts/other/extract_id_from_docs.py — archived
+- [x] 53. scripts/other/extract_sentences_from_sc_db.py — archived
+- [x] 54. scripts/other/replace_sandhi_txt.py
+- [x] 55. scripts/other/tpr_db_tester.py — archived
+- [x] 56. scripts/other/uppickle_and_edit.py | archived
 
 ### scripts/work_with_csv
 
@@ -143,3 +143,13 @@ Pointer: 47
 2026-06-18 | #44 scripts/other/ai_batch_api.py | changed | user-requested rename to ai_batch_openai_meaning.py + consolidation into single run_batch_workflow() (upload->poll->save to db); _get_openai_client() isinstance-based helper replaces 6x duplicated client-validation + nested _openai_* functions; upload_and_create_batch returns batch_id; check_batch_status typed Batch|None; id->record_id (builtin shadow fix); simplified dead skip_empty branch; pre-commit forced chmod+x (EXE001) + narrowed 6 blind except Exception->openai.OpenAIError/OSError/(TypeError,AttributeError) (BLE001); reviewer's BatchProcessor dataclass/class redesign rejected as out of scope; 1 test added (serialize_request_counts — only network-free pure function); live run skipped by user choice (would create real billed OpenAI batch job)
 2026-06-18 | #45 scripts/other/ai_batch_deepseek_meaning.py | archived | broken — depends on langchain_deepseek, which is not installed/declared anywhere in pyproject.toml, so the module cannot import; functionality (RU meaning+notes translation, lang=ru) is already fully covered by scripts/other/ai_generate_translation.py (mode=meaning/note) via AIManager, which already lists deepseek as a configured provider in tools/ai_models.json; only unique trait was concurrent batch dispatch via LangChain's RunnableMap.batch(), but DeepSeek has no real async Batch API (unlike OpenAI's /v1/batches used in #44) so that's just client-side concurrency, generically addable to ai_generate_translation.py later if wanted, not unique to this file; also silently discarded the ru_example_raw field it asked the LLM to produce — moved to archive/ai_batch_deepseek_meaning.py
 2026-06-18 | #46 scripts/other/ai_check_russian_meanings.py | changed | moved pth/db_session module-level globals into main() (side-effect-free imports), main()->None, fixed import order, removed dead --output arg (parsed but never used) and dead --individual flag (user-confirmed: no caller anywhere passes it; use_batch simplified to args.batch), replaced 8-branch if-elif mode-message chain with _MODE_NOTES dict lookup, except Exception # noqa: BLE001 (top-level CLI boundary, same pattern as #29/#30/#44), pre-commit forced chmod +x (EXE001); 4 tests added for _MODE_NOTES (only pure logic in this CLI wrapper — rest is DB/argparse/AI plumbing delegated to tools/ai_meaning_checker.py, queued separately as #68); tools/ai_meaning_checker.py itself untouched (out of scope, reviewed when #68 comes up); live run (--limit 1 --no-auto-invalidate) completed successfully against real dpd.db and a live AI call, report written to configured temp/ai_meaning_check/ output dir
+2026-06-18 | #47 scripts/other/ai_generate_translation.py | changed | print()->pr.* (19 sites), os.path.join/glob.glob->pathlib (drop os/glob imports), module globals provider/model renamed to default_provider/default_model removing globals()["model"] anti-pattern (collided with same-named function params), id->word_id builtin shadow in read_exclude_ids_from_tsv; note-mode in translation_generate now creates missing Russian row instead of crashing on word.ru.ru_notes (if->elif for consistency with meaning/lit) — caveat: every row in the live DB already has a Russian row so this guard is currently unreachable, defensive only; PIPELINE_CONFIG/strategy-pattern rewrite (reviewer suggestion) and module-level db_session/main() wrapping (pattern from #43/#44/#46) both rejected as too invasive given db_session is read at module scope by many functions, not just __main__; read_exclude_ids_from_json's unused mode/lang params left as-is — fixing the glob pattern would break existing tests/test_tamil_translation.py which uses arbitrary filenames, and the function isn't wired into the main flow anyway; existing tests/test_tamil_translation.py (10 tests, pre-existing from the Tamil thread) re-verified passing, no new test added (note-mode fix isn't testable without mocking the AI call, against project no-mocks rule); live smoke test of all mode/lang/--remove/--json --dry-run combos clean; live run (--mode note --limit 1, real AI call, user-approved) succeeded, wrote real Russian note to dpd.db
+2026-06-18 | #48 scripts/other/ai_individual_word_ru.py | archived | single-word interactive CLI superseded by ai_generate_translation.py
+2026-06-18 | #49 scripts/other/ai_sentences_extracting.py | archived | standalone AI sentence extraction script; user chose archive over review (batch + same modes); not unique enough to keep in active path
+2026-06-18 | #50 scripts/other/ai_translate_evaluator.py | archived | evaluation harness for manual model comparison — not a recurring workflow, can re-run ad-hoc via ai_generate_translation.py if needed
+2026-06-18 | #51 scripts/other/backup_corrections_additions.py | archived | already in scripts/dps_archive/, queue was stale — fixed
+2026-06-18 | #52 scripts/other/extract_id_from_docs.py | archived | buggy (writes ids instead of unique_ids) — user chose archive over fix
+2026-06-18 | #53 scripts/other/extract_sentences_from_sc_db.py | archived | user chose archive over improvement
+2026-06-18 | #54 scripts/other/replace_sandhi_txt.py | archived | already in scripts/dps_archive/ — queue was stale
+2026-06-18 | #55 scripts/other/tpr_db_tester.py | archived | standalone TPR HTML validation utility — not referenced by any workflow or caller; ad-hoc manual QA tool only
+2026-06-18 | #56 scripts/other/uppickle_and_edit.py | archived | broken (references non-existent DPSPaths.dps_save_state_path), functionally inert (edit/save code commented out), no callers

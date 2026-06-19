@@ -52,6 +52,12 @@ Then present the summary to the user and use the `AskUserQuestion` tool to ask:
 > - **Improve** — continue with the full review below.
 > - **Archive** — move the file, update the queue, end session.
 
+> **🚫 HARD GATE — do not cross until the user has answered the question above.**
+> The background API review command (step 3) MUST NOT be launched until the user
+> explicitly chooses **Improve**. Do NOT start it speculatively during step 2, even
+> though the file path is already known. The user may choose Archive, in which case
+> the API call is wasted and the session must end immediately.
+
 **If the user chooses Archive:**
 
 1. Determine the target:
@@ -71,16 +77,22 @@ Then present the summary to the user and use the `AskUserQuestion` tool to ask:
 
 ### 3. Review forward
 
+> **⛔ PREREQUISITE:** The user has already answered **Improve** in step 2.
+> If that answer is not yet received, stop and wait. Never begin step 3 before it.
+
 Starting from the Pointer, review each pending `[ ]` script in order.
 For each script:
 
-**FIRST — the moment you know the Python file path, launch the second-opinion
-reviewer in the BACKGROUND, before you read or analyse anything.** Run the
+**FIRST — now that the user has chosen Improve, immediately launch the second-opinion
+reviewer in the BACKGROUND, before you read or analyse anything further.** Run the
 `uv run python3 -c ...` command from step 4 with `run_in_background: true` so it reviews the
 file in parallel while you do your own analysis. The point is that you and the
 reviewer reach conclusions at the same time — do NOT wait until you have finished
 your own review to start it, or you pay the full reviewer latency in series. You
 collect its output in step 4 (it will already be done, or nearly so).
+
+**DO NOT launch this background command during step 2, before the user has chosen
+Improve. The gate in step 2 is unconditional: Archive answer → no API call, ever.**
 
 **a. Read the file** (and any files it imports from this repo). The script
 itself is already in context from step 2 — do not re-read it, only read
@@ -140,9 +152,9 @@ treat it exactly the same as an inline failure — there is no further fallback 
 since `AIManager.request()` already tried every configured model internally.
 Never proceed to present findings without a completed review from at least one model.**
 
-The review now goes through `tools/ai_manager.py`'s `AIManager`, not a direct `gemini` CLI
-call. `AIManager.request()` walks the model list in `tools/ai_models.json` (gemini_cli,
-antigravity_cli, openrouter, deepseek, etc., in the order listed there) and automatically
+The review now goes through `tools/ai_manager.py`'s `AIManager`, not a direct `agy` CLI
+call. `AIManager.request()` walks the model list in `tools/ai_models.json` (antigravity_cli,
+openrouter, deepseek, etc., in the order listed there) and automatically
 falls through to the next model on failure — no model names need to be hardcoded or
 updated in this skill file. To change the fallback order or add/remove models, edit
 `tools/ai_models.json` directly.
@@ -165,7 +177,7 @@ prompt = (
     'simpler or more elegant approach could achieve the same result with '
     'substantially less code.\n\n' + content
 )
-response = AIManager().request(prompt=prompt)
+response = AIManager().request(prompt=prompt, grounding=True)
 print(response.content if response.content else response.status_message)
 "
 ```
