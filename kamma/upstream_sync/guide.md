@@ -208,6 +208,9 @@ Stage 4 is split into two model-bound substages: ADVANCED analysis and FAST tran
    - Identify all modified, added, and deleted upstream files relative to the registry.
    - If `prep_manifest.json.discuss_paths` is non-empty, STOP before `execute_sync.py`.
    - If `prep_manifest.json.needs_classification_paths` is non-empty, those upstream additions have no local collision; register them in `registry.json`/SMD during Stage 2. They do NOT block `execute_sync.py`.
+   - `prep_analyzer.py` also performs a full local-tree audit (independent of the commit-range diff) by comparing every git-tracked local file against the upstream tree and full upstream history at the target SHA:
+     - If `prep_manifest.json.unregistered_local_paths` is non-empty, those local files have no upstream counterpart (current or historical) and are not covered by any registry category; register them in `registry.json`/SMD during Stage 2 (typically `unique_paths`, or a shadow/inspired category). They do NOT block `execute_sync.py`.
+     - If `prep_manifest.json.upstream_deleted_orphans` is non-empty, those local files match a path upstream once had but has since deleted; decide during Stage 2 whether to keep them as an intentional fork divergence (register the decision) or delete them locally to match upstream. They do NOT block `execute_sync.py`.
    - If `prep_manifest.json.blocker_paths` is non-empty, STOP before `execute_sync.py`. Deletion blockers may be acknowledged by creating `<thread_dir>/run_acknowledged_blockers.txt` (one path per line; `#` comments allowed); `verify_manifest` warns but does not block on acknowledged paths. Collision blockers require registry/SMD changes before `execute_sync.py`.
 3. **Automated Pull**:
    - Perform the automated sync by running `uv run python3 kamma/upstream_sync/scripts/execute_sync.py <thread_dir>`.
@@ -224,7 +227,7 @@ Stage 4 is split into two model-bound substages: ADVANCED analysis and FAST tran
 **ADVANCED must stop and request FAST if** files need to be copied, generated, formatted, tested, translated in bulk, or mechanically edited.
 
 **Stage 2 sub-stage splitting (context safety):** Stage 2 routinely exceeds one session's context. Split it into restartable sub-stages, updating `handoff.md` and writing a restart prompt at each boundary so a fresh session can resume from files alone:
-- **2a — Impact assessment:** read `prep_report.md` + `prep_manifest.json`; classify every changed path (port / mirror / preserve / discuss / inspired / skip / docs) in `dynamic_plan.md`, then hard stop.
+- **2a — Impact assessment:** read `prep_report.md` + `prep_manifest.json`; classify every changed path (port / mirror / preserve / discuss / inspired / skip / docs) in `dynamic_plan.md`, then hard stop. Also classify every path in `unregistered_local_paths` (register in the appropriate registry category) and `upstream_deleted_orphans` (keep-as-divergence or delete-to-match-upstream).
 - **2b — Discuss resolution:** resolve each `discuss: true` item with the user one at a time; record each as RESOLVED in `dynamic_plan.md`, then hard stop.
 - **2c — Literal plan authoring:** write self-contained per-file instructions (anchors, literal edits, verify commands); split again after each major domain if context grows, then hard stop.
 - **2d — Approval gate:** present `dynamic_plan.md` for approval.

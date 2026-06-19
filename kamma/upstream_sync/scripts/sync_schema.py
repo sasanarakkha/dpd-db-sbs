@@ -3,7 +3,7 @@
 """Define typed schema objects for upstream sync metadata JSON files."""
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import PurePosixPath
 
 BOOTSTRAP_SHA_SENTINEL = "BOOTSTRAP_REQUIRED"
@@ -53,7 +53,7 @@ def validate_repo_relative_path(path: str, label: str) -> str:
 
 def _as_object(raw: object, label: str) -> dict[str, object]:
     if not isinstance(raw, dict):
-        raise ValueError(f"{label} must be a JSON object")
+        raise TypeError(f"{label} must be a JSON object")
     return raw
 
 
@@ -62,7 +62,7 @@ def _required_string(data: dict[str, object], field: str) -> str:
         raise ValueError(f"missing required field '{field}'")
     value = data[field]
     if not isinstance(value, str):
-        raise ValueError(f"field '{field}' must be a string")
+        raise TypeError(f"field '{field}' must be a string")
     if not value.strip():
         raise ValueError(f"field '{field}' must be a non-empty string")
     return value
@@ -86,7 +86,7 @@ def _optional_string(data: dict[str, object], field: str) -> str | None:
     if value is None:
         return None
     if not isinstance(value, str):
-        raise ValueError(f"field '{field}' must be a string")
+        raise TypeError(f"field '{field}' must be a string")
     return value
 
 
@@ -95,12 +95,12 @@ def _string_list(data: dict[str, object], field: str) -> list[str]:
         raise ValueError(f"missing required field '{field}'")
     value = data[field]
     if not isinstance(value, list):
-        raise ValueError(f"field '{field}' must be a list")
+        raise TypeError(f"field '{field}' must be a list")
     items: list[str] = []
     for index, item in enumerate(value):
         item_label = f"{field}[{index}]"
         if not isinstance(item, str):
-            raise ValueError(f"field '{item_label}' must be a string")
+            raise TypeError(f"field '{item_label}' must be a string")
         if not item.strip():
             raise ValueError(f"field '{item_label}' must be a non-empty string")
         items.append(item)
@@ -118,13 +118,13 @@ def _string_mapping(data: dict[str, object], field: str) -> dict[str, str]:
         raise ValueError(f"missing required field '{field}'")
     value = data[field]
     if not isinstance(value, dict):
-        raise ValueError(f"field '{field}' must be an object")
+        raise TypeError(f"field '{field}' must be an object")
     mapping: dict[str, str] = {}
     for key, item in value.items():
         if not isinstance(key, str) or not key.strip():
             raise ValueError(f"field '{field}' key must be a non-empty string")
         if not isinstance(item, str):
-            raise ValueError(f"field '{field}['{key}']' must be a string")
+            raise TypeError(f"field '{field}['{key}']' must be a string")
         if not item.strip():
             raise ValueError(f"field '{field}['{key}']' must be a non-empty string")
         mapping[key] = item
@@ -225,6 +225,8 @@ class PrepManifest:
     discuss_paths: list[str]
     mapped_actions: dict[str, list[MappedAction]]
     needs_classification_paths: list[str]
+    unregistered_local_paths: list[str] = field(default_factory=list)
+    upstream_deleted_orphans: list[str] = field(default_factory=list)
 
     @classmethod
     def from_raw(cls, raw: object) -> "PrepManifest":
@@ -241,12 +243,24 @@ class PrepManifest:
         needs_classification_paths = _optional_string_list(
             data, "needs_classification_paths"
         )
+        unregistered_local_paths = _optional_string_list(
+            data, "unregistered_local_paths"
+        )
+        upstream_deleted_orphans = _optional_string_list(
+            data, "upstream_deleted_orphans"
+        )
         validate_repo_relative_paths(changed_upstream_paths, "changed_upstream_paths")
         validate_repo_relative_paths(deleted_upstream_paths, "deleted_upstream_paths")
         validate_repo_relative_paths(blocker_paths, "blocker_paths")
         validate_repo_relative_paths(discuss_paths, "discuss_paths")
         validate_repo_relative_paths(
             needs_classification_paths, "needs_classification_paths"
+        )
+        validate_repo_relative_paths(
+            unregistered_local_paths, "unregistered_local_paths", allow_globs=True
+        )
+        validate_repo_relative_paths(
+            upstream_deleted_orphans, "upstream_deleted_orphans", allow_globs=True
         )
         return cls(
             from_upstream_sha=from_upstream_sha,
@@ -259,6 +273,8 @@ class PrepManifest:
             discuss_paths=discuss_paths,
             mapped_actions=cls._mapped_actions(data),
             needs_classification_paths=needs_classification_paths,
+            unregistered_local_paths=unregistered_local_paths,
+            upstream_deleted_orphans=upstream_deleted_orphans,
         )
 
     @staticmethod
@@ -267,7 +283,7 @@ class PrepManifest:
             raise ValueError("missing required field 'mapped_actions'")
         value = data["mapped_actions"]
         if not isinstance(value, dict):
-            raise ValueError("field 'mapped_actions' must be an object")
+            raise TypeError("field 'mapped_actions' must be an object")
         mapped_actions: dict[str, list[MappedAction]] = {}
         for path, actions in value.items():
             if not isinstance(path, str) or not path.strip():
@@ -277,7 +293,7 @@ class PrepManifest:
             validate_repo_relative_path(path, f"mapped_actions key '{path}'")
             action_label = f"mapped_actions['{path}']"
             if not isinstance(actions, list):
-                raise ValueError(f"field '{action_label}' must be a list")
+                raise TypeError(f"field '{action_label}' must be a list")
             mapped_actions[path] = [
                 MappedAction.from_raw(action, f"field '{action_label}[{index}]'")
                 for index, action in enumerate(actions)
@@ -300,6 +316,8 @@ class PrepManifest:
                 for path, actions in self.mapped_actions.items()
             },
             "discuss_paths": self.discuss_paths,
+            "unregistered_local_paths": self.unregistered_local_paths,
+            "upstream_deleted_orphans": self.upstream_deleted_orphans,
         }
 
 
@@ -323,7 +341,7 @@ class ModifiedUpstreamEntry:
             raise ValueError(f"{label}: missing required field 'discuss'")
         discuss = data["discuss"]
         if not isinstance(discuss, bool):
-            raise ValueError(f"{label}: field 'discuss' must be a bool")
+            raise TypeError(f"{label}: field 'discuss' must be a bool")
         discuss_reason = _optional_string(data, "discuss_reason")
         return cls(path=path, discuss=discuss, discuss_reason=discuss_reason)
 
@@ -385,7 +403,7 @@ class RegistryData:
             raise ValueError("missing required field 'modified_upstream_files'")
         entries = data["modified_upstream_files"]
         if not isinstance(entries, list):
-            raise ValueError("field 'modified_upstream_files' must be a list")
+            raise TypeError("field 'modified_upstream_files' must be a list")
         return [
             ModifiedUpstreamEntry.from_raw(
                 entry, f"field 'modified_upstream_files[{index}]'"
@@ -401,7 +419,7 @@ class RegistryData:
             raise ValueError("missing required field 'inspired_by_upstream'")
         entries = data["inspired_by_upstream"]
         if not isinstance(entries, dict):
-            raise ValueError("field 'inspired_by_upstream' must be an object")
+            raise TypeError("field 'inspired_by_upstream' must be an object")
         parsed: dict[str, InspiredByUpstreamEntry] = {}
         for path, entry in entries.items():
             if not isinstance(path, str) or not path.strip():

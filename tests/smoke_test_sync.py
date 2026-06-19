@@ -11,8 +11,19 @@ from contextlib import contextmanager
 from pathlib import Path
 from types import ModuleType
 
+# Running this file as a script (`python tests/smoke_test_sync.py`) puts its own
+# directory first on sys.path. tests/exporter/ is a real package (test fixtures
+# mirroring exporter/'s layout) and would shadow the real top-level exporter/
+# package, breaking every `exporter.*` runtime import below. Force the project
+# root ahead of it.
+_project_root = str(Path(__file__).resolve().parent.parent)
+if _project_root in sys.path:
+    sys.path.remove(_project_root)
+sys.path.insert(0, _project_root)
+
 from db.db_helpers import create_db_if_not_exists, create_tables, get_db_session
 from db.models import (
+    SBS,
     DpdHeadword,
     DpdRoot,
     FamilyCompound,
@@ -22,12 +33,15 @@ from db.models import (
     FamilyWord,
     Lookup,
     Russian,
-    SBS,
 )
 from scripts.build.db_rebuild_from_tsv import get_tsv_files, read_tsv_files
 from scripts.build.db_rebuild_from_tsv_dps import (
     get_tsv_files as dps_get_tsv_files,
+)
+from scripts.build.db_rebuild_from_tsv_dps import (
     make_root_table_data_ru,
+)
+from scripts.build.db_rebuild_from_tsv_dps import (
     read_tsv_files as dps_read_tsv_files,
 )
 from tools import configger
@@ -74,7 +88,7 @@ def _clone_config(source: configparser.ConfigParser) -> configparser.ConfigParse
 
 
 @contextmanager
-def isolated_config() -> Generator[None, None, None]:
+def isolated_config() -> Generator[None]:
     """Patch configger so smoke-test config updates never write config.ini."""
     original_config = configger.config
     original_config_write = configger.config_write
@@ -113,7 +127,7 @@ def set_smoke_config() -> None:
 
 
 @contextmanager
-def patched_project_paths() -> Generator[None, None, None]:
+def patched_project_paths() -> Generator[None]:
     """Override ProjectPaths.dpd_db_path → MINI_DB_PATH for any new instance."""
     original_init = ProjectPaths.__init__
 
@@ -214,7 +228,7 @@ def _build_mini_db() -> bool:
         db_session.commit()
         db_session.close()
         return True
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         pr.no(f"mini DB build error: {exc}")
         return False
 
@@ -258,7 +272,7 @@ def _verify_mini_db() -> bool:
             )
             ok = False
         return ok
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         pr.no(f"verification error: {exc}")
         return False
 
@@ -283,7 +297,7 @@ def _run_component(module_path: str) -> bool:
             return True
     except SystemExit:
         return True  # some scripts call sys.exit(0)
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         pr.red(f"{dotted}: {exc}")
         return False
 
@@ -300,7 +314,7 @@ def _load_module_from_path(module_name: str, module_file: Path) -> ModuleType:
 
 
 @contextmanager
-def _preloaded_component_helpers(module_file: Path) -> Generator[None, None, None]:
+def _preloaded_component_helpers(module_file: Path) -> Generator[None]:
     """Preload sibling helper modules needed by legacy component scripts."""
     previous_modules: dict[str, ModuleType | None] = {}
     helper_names: tuple[str, ...] = ()
@@ -406,7 +420,7 @@ def _generate_components() -> bool:
             )
             any_fail = True
         return not any_fail and ru_ok
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         pr.no(f"    component verification error: {exc}")
         return False
 
@@ -446,7 +460,7 @@ def _run_exporter(label: str, module_path: str) -> bool:
         return True
     except SystemExit:
         return True
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         pr.red(f"{label}: {exc}")
         return False
 
@@ -492,7 +506,7 @@ def _verify_goldendict_output(
             ok = False
         else:
             pr.yes(f"    {label}: no Mako syntax leaks")
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         pr.no(f"    {label}: failed to read .dict.dz: {exc}")
         ok = False
 
@@ -608,6 +622,7 @@ def _check_no_mako_in_templates() -> bool:
             ["grep", "-rl", "${", dirpath],
             capture_output=True,
             text=True,
+            check=False,
         )
         if result.stdout.strip():
             for f in result.stdout.strip().splitlines():
@@ -627,7 +642,7 @@ def _check_anki_import() -> bool:
         importlib.import_module("exporter.anki.anki_updater")
         pr.yes("    anki_updater: import ok")
         return True
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         pr.no(f"    anki_updater import error: {exc}")
         return False
 
@@ -845,7 +860,7 @@ def phase3_webapp() -> bool:
                     pr.yes("  /sbs/search_json?q=a → results present")
 
         return all_ok
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         pr.no(f"webapp error: {exc}")
         return False
 
@@ -881,7 +896,7 @@ def phase3_anki() -> bool | None:
                 mod.main()
 
         return True
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         # Mini DB has 0 matching Anki notes → updater cannot find expected deck
         # structure. Treat as skip: import works, limitation is data, not code.
         pr.cyan(f"  Anki skipped (mini DB has no matching notes): {exc}")
@@ -900,6 +915,7 @@ def phase3_gui() -> bool:
     pr.yellow_title("=== Phase 3.3: GUI launch check (MagicMock) ===")
     try:
         from unittest.mock import MagicMock
+
         from gui2.main import App
 
         with patched_project_paths():
@@ -909,7 +925,7 @@ def phase3_gui() -> bool:
 
         pr.yes("GUI App initialized without exceptions")
         return True
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         pr.no(f"GUI launch error: {exc}")
         return False
 

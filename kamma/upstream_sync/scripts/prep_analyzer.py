@@ -59,6 +59,58 @@ def resolve_target_upstream_sha(ref: str = "upstream/main") -> str:
     return result.stdout.strip()
 
 
+def get_local_tracked_files() -> list[str]:
+    """Return all git-tracked local file paths, respecting .gitignore."""
+    result = subprocess.run(
+        ["git", "-c", "core.quotePath=false", "ls-files", "-z"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return [path for path in result.stdout.split("\0") if path]
+
+
+def get_upstream_tree_paths(ref: str) -> set[str]:
+    """Return every file path present in the upstream tree at *ref*."""
+    result = subprocess.run(
+        [
+            "git",
+            "-c",
+            "core.quotePath=false",
+            "ls-tree",
+            "-r",
+            "-z",
+            "--name-only",
+            ref,
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return {path for path in result.stdout.split("\0") if path}
+
+
+def get_upstream_ever_added_paths(ref: str) -> set[str]:
+    """Return every file path ever added in upstream's full history up to *ref*."""
+    result = subprocess.run(
+        [
+            "git",
+            "-c",
+            "core.quotePath=false",
+            "log",
+            ref,
+            "--diff-filter=A",
+            "--name-only",
+            "-z",
+            "--pretty=format:",
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return {path for path in result.stdout.split("\0") if path}
+
+
 def get_upstream_changes(from_sha: str, to_sha: str) -> list[GitChange]:
     """Return list of changed upstream paths for the explicit sync range."""
     try:
@@ -151,6 +203,47 @@ class PrepAnalyzer:
             elif path == local_path:
                 return True, f"collides with registered local path '{local_path}'"
         return False, ""
+
+    def _is_registered_local(self, path: str) -> bool:
+        """Return True if path is covered by any registered local path entry."""
+        for local_path in self._all_registered_local_paths():
+            if local_path.endswith("/"):
+                if path.startswith(local_path):
+                    return True
+            elif path == local_path:
+                return True
+        return False
+
+    def compute_unregistered_audit(self, to_sha: str) -> tuple[list[str], list[str]]:
+        """Scan the full local tree for unregistered or upstream-deleted-orphan paths.
+
+        Returns (unregistered_local_paths, upstream_deleted_orphans):
+        - unregistered_local_paths: local files absent from the upstream tree at
+          *to_sha*, never present anywhere in upstream history, and not covered
+          by any registry category.
+        - upstream_deleted_orphans: local files absent from the upstream tree at
+          *to_sha* but found somewhere in upstream's full history (i.e. upstream
+          deleted them at some point) — needs a human keep/delete decision.
+        """
+        current_upstream_paths = get_upstream_tree_paths(to_sha)
+        ever_upstream_paths = get_upstream_ever_added_paths(to_sha)
+
+        unregistered: list[str] = []
+        orphans: list[str] = []
+
+        for path in get_local_tracked_files():
+            if self.is_skipped(path):
+                continue
+            if path in current_upstream_paths:
+                continue
+            if self._is_registered_local(path):
+                continue
+            if path in ever_upstream_paths:
+                orphans.append(path)
+            else:
+                unregistered.append(path)
+
+        return sorted(unregistered), sorted(orphans)
 
     def is_skipped(self, path: str) -> bool:
         """Return True when the path is outside sync scanning scope."""
@@ -300,6 +393,10 @@ class PrepAnalyzer:
                 else:
                     untracked.append(path)
 
+        unregistered_local_paths, upstream_deleted_orphans = (
+            self.compute_unregistered_audit(to_sha)
+        )
+
         report = self.generate_report(
             tracked=tracked_modified,
             shadows=shadow_sources_modified,
@@ -311,6 +408,8 @@ class PrepAnalyzer:
             collision_reasons=collision_reasons,
             from_sha=from_sha,
             to_sha=to_sha,
+            unregistered_local_paths=unregistered_local_paths,
+            upstream_deleted_orphans=upstream_deleted_orphans,
         )
         manifest = self.generate_manifest(
             from_sha=from_sha,
@@ -321,6 +420,8 @@ class PrepAnalyzer:
             needs_classification_paths=sorted(needs_classification_paths),
             mapped_actions=mapped_actions,
             discuss_paths=sorted(set(discuss_paths)),
+            unregistered_local_paths=unregistered_local_paths,
+            upstream_deleted_orphans=upstream_deleted_orphans,
         )
 
         self.thread_dir.mkdir(parents=True, exist_ok=True)
@@ -345,6 +446,8 @@ class PrepAnalyzer:
         collision_reasons: dict[str, str],
         from_sha: str,
         to_sha: str,
+        unregistered_local_paths: list[str],
+        upstream_deleted_orphans: list[str],
     ) -> str:
         """Render the human-readable Stage 1 report."""
         lines = ["# Upstream Sync Preparation Report\n"]
@@ -391,7 +494,7 @@ class PrepAnalyzer:
                     for failure in rubric_fails:
                         lines.append(f"- {failure}")
                 lines.append("")
-        except Exception as exc:
+        except (OSError, ValueError) as exc:
             lines.append(f"FAIL: Error checking SMD coverage: {exc}\n")
 
         lines.append("## Modified - Tracked Files")
@@ -443,6 +546,32 @@ class PrepAnalyzer:
             lines.append("_No paths need classification._")
         lines.append("")
 
+        lines.append("## Unregistered Local Paths (Stage 2)")
+        if unregistered_local_paths:
+            lines.append(
+                "These local files have no upstream counterpart (current or historical) and are not "
+                "covered by any registry category. Classify them in `registry.json`/SMD during Stage 2 "
+                "(typically `unique_paths`, or a shadow/inspired category if a counterpart exists)."
+            )
+            for path in unregistered_local_paths:
+                lines.append(f"- {path}")
+        else:
+            lines.append("_No unregistered local paths._")
+        lines.append("")
+
+        lines.append("## Upstream-Deleted Orphans (Stage 2)")
+        if upstream_deleted_orphans:
+            lines.append(
+                "These local files match a path upstream once had but has since deleted. Decide during "
+                "Stage 2 whether to keep them as an intentional fork divergence (register the decision) or "
+                "delete them locally to match upstream."
+            )
+            for path in upstream_deleted_orphans:
+                lines.append(f"- {path}")
+        else:
+            lines.append("_No upstream-deleted orphans._")
+        lines.append("")
+
         lines.append("## Stage 1 Blocker Paths")
         if blockers:
             lines.append(
@@ -468,6 +597,8 @@ class PrepAnalyzer:
         needs_classification_paths: list[str],
         mapped_actions: dict[str, list[MappedAction]],
         discuss_paths: list[str],
+        unregistered_local_paths: list[str],
+        upstream_deleted_orphans: list[str],
     ) -> dict[str, object]:
         """Return the machine-readable Stage 1 manifest."""
         return {
@@ -481,6 +612,8 @@ class PrepAnalyzer:
             "needs_classification_paths": needs_classification_paths,
             "mapped_actions": mapped_actions,
             "discuss_paths": discuss_paths,
+            "unregistered_local_paths": unregistered_local_paths,
+            "upstream_deleted_orphans": upstream_deleted_orphans,
         }
 
 
