@@ -1,0 +1,63 @@
+{
+  "yes_tty_like_pipe": {
+    "args": [
+      "question?"
+    ],
+    "stdin": "y\n",
+    "stdout": "y",
+    "stderr": "\u001b[36mquestion?\u001b[0m\n",
+    "returncode": 0
+  },
+  "no_pipe": {
+    "args": [
+      "question?"
+    ],
+    "stdin": "n\n",
+    "stdout": "n",
+    "stderr": "\u001b[36mquestion?\u001b[0m\n",
+    "returncode": 0
+  },
+  "quit_pipe": {
+    "args": [
+      "question?"
+    ],
+    "stdin": "q\n",
+    "stdout": "",
+    "stderr": "\u001b[36mquestion?\u001b[0m\n\u001b[31mAborted by user.\u001b[0m\n",
+    "returncode": 1
+  },
+  "empty_stdin": {
+    "args": [
+      "question?"
+    ],
+    "stdin": "",
+    "stdout": "",
+    "stderr": "\u001b[36mquestion?\u001b[0m\n",
+    "returncode": 0
+  },
+  "uppercase_input": {
+    "args": [
+      "question?"
+    ],
+    "stdin": "Y\n",
+    "stdout": "y",
+    "stderr": "\u001b[36mquestion?\u001b[0m\n",
+    "returncode": 0
+  },
+  "multichar_line": {
+    "args": [
+      "question?"
+    ],
+    "stdin": "yes\n",
+    "stdout": "y",
+    "stderr": "\u001b[36mquestion?\u001b[0m\n",
+    "returncode": 0
+  },
+  "no_args": {
+    "args": [],
+    "stdin": "y\n",
+    "stdout": "",
+    "stderr": "\u001b[31mUsage: ask.py '<question>'\u001b[0m\n",
+    "returncode": 1
+  }
+}
