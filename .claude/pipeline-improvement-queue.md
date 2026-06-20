@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 67
+Pointer: 68
 
 ## Scripts (76 total, local unique_paths)
 
@@ -92,7 +92,7 @@ Pointer: 67
 
 - [x] 65. tools/ai_batch_processor.py
 - [x] 66. tools/ai_json_parser.py
-- [ ] 67. tools/ai_llm_factory.py
+- [x] 67. tools/ai_llm_factory.py — archived
 - [ ] 68. tools/ai_meaning_checker.py
 - [ ] 69. tools/ai_openai_manager.py
 - [ ] 70. tools/ai_related.py
@@ -163,3 +163,4 @@ Pointer: 67
 2026-06-19 | #64 scripts/work_with_csv/xlsx2csv.py | changed | console (rich)->pr.red/green/amber; Union[Font,None]->Font|None with cast() for openpyxl StyleProxy/MergedCell stub mismatches; narrowed 3 blanket except Exception to specific exceptions per call site (OSError/KeyError/ValueError on load, ValueError/AttributeError per-row, OSError on write); removed stale WHAT-comments; open()->Path.open(); reviewer's "dead elif isinstance(part,str)" claim disproven by fixture (mixed bold/plain rich text needs it) and its raise-SystemExit restructuring rejected as a behavior change; 4 golden-master tests added (tests/scripts/work_with_csv/test_xlsx2csv.py); live run via temp synthetic xlsx succeeded, exit 0, byte-correct output
 2026-06-20 | #65 tools/ai_batch_processor.py | changed | List/Optional->list/X|None, print()->pr.*, removed stray debug print(prompt); deleted mark_as_checked_safe (try/except around set.add() that can't raise, callers ignored its return value) -> checked_ids.add() inline; deduped ComparisonResult construction across process_batch_results/parse_ai_response into new _comparison_result_from_dict() helper reusing extract_headword_id; removed unused batch_size param from process_batch_results; extracted _log_parse_failure() helper (was duplicated twice verbatim); fixed latent UnboundLocalError on `i`/`batch_num` in compare_meanings_batch's finally block when comparisons is empty (init i=0/batch_num=0 before loop); moved signal/re imports to module top; reviewer's Strategy-pattern/Enum/TypedDict rewrite of create_comparison_prompt rejected as too invasive (matches prior #43/#47/#58 precedent against redesigns); no entry point - live run not applicable; 16 tests added (tests/tools/test_ai_batch_processor.py) covering extract_headword_id, _comparison_result_from_dict, process_batch_results, create_comparison_prompt (3 modes), parse_ai_response (JSON + manual fallback); confirmed no external callers of removed/changed signatures (tools/ai_meaning_checker.py only calls compare_meanings_batch/compare_meanings_individual, unaffected)
 2026-06-20 | #66 tools/ai_json_parser.py | changed | Optional[str]->str|None, print()->pr.green() (5 sites), narrowed 3 overly-broad except clauses (1x tuple incl. redundant Exception, 2x bare Exception) to except json.JSONDecodeError (only raise source in each block, traced); user explicitly asked about genericizing beyond the "comparisons" schema, recommended against it (single caller, no second use case to design against) and user agreed; reviewer's from-scratch ~50-line rewrite rejected (risks silently dropping recovery paths for real AI-output malformations this code was built to handle, no way to verify against original failure cases); no entry point - live run not applicable; 13 tests added (tests/tools/test_ai_json_parser.py), no fixture file (pure string logic, no DB dependency), captured green against unedited source first per protocol
+2026-06-20 | #67 tools/ai_llm_factory.py | archived | broken (unimportable) — depends on langchain_deepseek, not installed/declared anywhere in pyproject.toml (no langchain deps at all); only caller was scripts/dps_archive/ai_sentences_extracting.py, itself already archived in #49; functionality (LangChain-based OpenAI/DeepSeek chat wrapper + batch_processing via RunnableMap) fully superseded by tools/ai_manager.py's AIManager; same pattern as #45 (ai_batch_deepseek_meaning.py); moved to archive/ai_llm_factory.py via git mv; removed tools/ai_llm_factory.py line from registry.json unique_paths (no SMD entry existed for it); validate_registry.py and verify_smd_coverage.py both pass
