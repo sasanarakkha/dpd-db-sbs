@@ -1,0 +1,295 @@
+{
+  "meaning": [
+    {
+      "headword_id": 2,
+      "lemma_1": "a 2.1",
+      "english_meaning": "ā prefix shortened before double consonant",
+      "russian_meaning": "приставка \"аа\" сокращена перед двойной согласной",
+      "russian_meaning_alt": null,
+      "grammar": "prefix"
+    },
+    {
+      "headword_id": 3,
+      "lemma_1": "a 2.2",
+      "english_meaning": "augment added to some aorist, imperfect and conditional verbs",
+      "russian_meaning": "увеличивающий элемент, добавляемый к некоторым глаголам прошедшего времени, имперфектам и условному наклонению",
+      "russian_meaning_alt": null,
+      "grammar": "prefix"
+    },
+    {
+      "headword_id": 4,
+      "lemma_1": "a 2.3",
+      "english_meaning": "not; un-; im-; negative prefix",
+      "russian_meaning": "нет; не-",
+      "russian_meaning_alt": null,
+      "grammar": "prefix"
+    },
+    {
+      "headword_id": 5,
+      "lemma_1": "a 3.1",
+      "english_meaning": "(gram) conjugational sign of group 1 bhū group verbs",
+      "russian_meaning": "(грам) знак спряжения для глаголов 1 ой группы bhū",
+      "russian_meaning_alt": null,
+      "grammar": "conjugational sign , masculine noun"
+    },
+    {
+      "headword_id": 7,
+      "lemma_1": "akakkasa",
+      "english_meaning": "smooth; tender; not harsh; not rough",
+      "russian_meaning": "деликатный; тактичный; вежливый; не резкий; не грубый",
+      "russian_meaning_alt": null,
+      "grammar": "adjective"
+    }
+  ],
+  "meaning_raw": [
+    {
+      "headword_id": 16,
+      "lemma_1": "akaṭayūsa",
+      "english_meaning": "plain bean soup; bean broth",
+      "russian_meaning": "",
+      "russian_meaning_alt": null,
+      "grammar": "masculine noun , compound"
+    },
+    {
+      "headword_id": 19,
+      "lemma_1": "akaṭṭhapāka",
+      "english_meaning": "ripening in uncultivated ground; growing wild",
+      "russian_meaning": "",
+      "russian_meaning_alt": null,
+      "grammar": "adjective , compound"
+    },
+    {
+      "headword_id": 20,
+      "lemma_1": "akaṭṭhapākasālipātubhāva",
+      "english_meaning": "appearance of uncultivated ready to eat fine rice",
+      "russian_meaning": "",
+      "russian_meaning_alt": null,
+      "grammar": "masculine noun , abstract noun , compound"
+    },
+    {
+      "headword_id": 22,
+      "lemma_1": "akaṇa",
+      "english_meaning": "without bran; with the husk removed",
+      "russian_meaning": "",
+      "russian_meaning_alt": null,
+      "grammar": "adjective"
+    },
+    {
+      "headword_id": 28,
+      "lemma_1": "akaṇhaasukka",
+      "english_meaning": "neither black nor white; neither good nor bad",
+      "russian_meaning": "",
+      "russian_meaning_alt": null,
+      "grammar": "adjective , compound"
+    }
+  ],
+  "meaning_ru_raw": [
+    {
+      "headword_id": 16,
+      "lemma_1": "akaṭayūsa",
+      "english_meaning": "plain bean soup; bean broth",
+      "russian_meaning": "",
+      "russian_meaning_alt": null,
+      "grammar": "masculine noun , compound"
+    },
+    {
+      "headword_id": 19,
+      "lemma_1": "akaṭṭhapāka",
+      "english_meaning": "ripening in uncultivated ground; growing wild",
+      "russian_meaning": "",
+      "russian_meaning_alt": null,
+      "grammar": "adjective , compound"
+    },
+    {
+      "headword_id": 20,
+      "lemma_1": "akaṭṭhapākasālipātubhāva",
+      "english_meaning": "appearance of uncultivated ready to eat fine rice",
+      "russian_meaning": "",
+      "russian_meaning_alt": null,
+      "grammar": "masculine noun , abstract noun , compound"
+    },
+    {
+      "headword_id": 22,
+      "lemma_1": "akaṇa",
+      "english_meaning": "without bran; with the husk removed",
+      "russian_meaning": "",
+      "russian_meaning_alt": null,
+      "grammar": "adjective"
+    },
+    {
+      "headword_id": 28,
+      "lemma_1": "akaṇhaasukka",
+      "english_meaning": "neither black nor white; neither good nor bad",
+      "russian_meaning": "",
+      "russian_meaning_alt": null,
+      "grammar": "adjective , compound"
+    }
+  ],
+  "meaning_lit": [
+    {
+      "headword_id": 11,
+      "lemma_1": "akaci 1",
+      "english_meaning": "not something",
+      "russian_meaning": "не что-то",
+      "russian_meaning_alt": "ничто",
+      "grammar": "pronoun , pronominal base"
+    },
+    {
+      "headword_id": 25,
+      "lemma_1": "akaṇṭaka",
+      "english_meaning": "without thorns",
+      "russian_meaning": "без шипов",
+      "russian_meaning_alt": "без препятствий; без помех",
+      "grammar": "adjective"
+    },
+    {
+      "headword_id": 26,
+      "lemma_1": "akaṇṭakanikkaṇṭaka",
+      "english_meaning": "without thorns and thornless",
+      "russian_meaning": "нет шипов и без шипов",
+      "russian_meaning_alt": "без беспокойства и проблем",
+      "grammar": "adjective , compound"
+    },
+    {
+      "headword_id": 37,
+      "lemma_1": "akatakamma 1",
+      "english_meaning": "not done the deed",
+      "russian_meaning": "не совершивший деяние",
+      "russian_meaning_alt": "кто не совершал кражу; кто не совершал преступление",
+      "grammar": "adjective , compound"
+    },
+    {
+      "headword_id": 42,
+      "lemma_1": "akataññutā",
+      "english_meaning": "not knowing what is done state",
+      "russian_meaning": "не знание сделанного",
+      "russian_meaning_alt": "неблагодарность; отсутствие признательности",
+      "grammar": "feminine noun , abstract noun , compound"
+    }
+  ],
+  "notes": [
+    {
+      "headword_id": 7,
+      "lemma_1": "akakkasa",
+      "english_meaning": "PED suggests ku + √kar + ta.",
+      "russian_meaning": "PED предлагает ku + √kar + ta",
+      "russian_meaning_alt": null,
+      "grammar": "adjective"
+    },
+    {
+      "headword_id": 8,
+      "lemma_1": "akaṅkha 1.1",
+      "english_meaning": "See akaṅkha 2.",
+      "russian_meaning": "см. akaṅkha 2",
+      "russian_meaning_alt": null,
+      "grammar": "adjective"
+    },
+    {
+      "headword_id": 9,
+      "lemma_1": "akaṅkha 2.1",
+      "english_meaning": "See akaṅkha 1.",
+      "russian_meaning": "см. akaṅkha 1",
+      "russian_meaning_alt": null,
+      "grammar": "adjective"
+    },
+    {
+      "headword_id": 46,
+      "lemma_1": "akataññū 1.1",
+      "english_meaning": "See akataññu 2.",
+      "russian_meaning": "см. akataññu 2",
+      "russian_meaning_alt": null,
+      "grammar": "adjective , compound"
+    },
+    {
+      "headword_id": 47,
+      "lemma_1": "akataññū 2.1",
+      "english_meaning": "See akataññu 1.",
+      "russian_meaning": "см. akataññu 1",
+      "russian_meaning_alt": null,
+      "grammar": "adjective , compound"
+    }
+  ],
+  "notes_raw": [
+    {
+      "headword_id": 1120,
+      "lemma_1": "achidda",
+      "english_meaning": "The preferred reading is <i>acchidda</i>.",
+      "russian_meaning": "[пер. ИИ] <i>acchidda</i> является предпочтительным чтением",
+      "russian_meaning_alt": null,
+      "grammar": "past participle"
+    },
+    {
+      "headword_id": 2148,
+      "lemma_1": "atithiyo",
+      "english_meaning": "The suggested form is <i>atithayo</i>, either derivered from <i>√aṭ</i> (wander) or from <i>na-thiti</i>, one who has no fixed day. The feminine <i>-iyo</i> ending suggests the latter.",
+      "russian_meaning": "[пер. ИИ] предложенная форма atithayo из √aṭ (блуждать) или от na-thiti, тот, у кого нет определенного дня.",
+      "russian_meaning_alt": null,
+      "grammar": "masculine noun nominative case plural number , irregular conjugation or declension form"
+    },
+    {
+      "headword_id": 2335,
+      "lemma_1": "atisāra 2",
+      "english_meaning": "atisāra is the equivalent noun of the verb atidhāvati",
+      "russian_meaning": "[пер. ИИ] атисара - это существительное, эквивалентное глаголу атидхавати",
+      "russian_meaning_alt": null,
+      "grammar": "masculine noun"
+    },
+    {
+      "headword_id": 2740,
+      "lemma_1": "atthika 1.2",
+      "english_meaning": "atthita",
+      "russian_meaning": "[пер. ИИ] аттита",
+      "russian_meaning_alt": null,
+      "grammar": "adjective , in compounds"
+    },
+    {
+      "headword_id": 3301,
+      "lemma_1": "adhimuccanta",
+      "english_meaning": "alternatively (MW) √muc: gladden, delight, yield enjoyment",
+      "russian_meaning": "[пер. ИИ] Возможно радоваться, радовать, приносить удовольствие.",
+      "russian_meaning_alt": null,
+      "grammar": "present participle"
+    }
+  ],
+  "meaning_lit_list": [
+    {
+      "headword_id": 11,
+      "lemma_1": "akaci 1",
+      "english_meaning": "not something",
+      "russian_meaning": "не что-то",
+      "russian_meaning_alt": "ничто",
+      "grammar": "pronoun , pronominal base"
+    },
+    {
+      "headword_id": 25,
+      "lemma_1": "akaṇṭaka",
+      "english_meaning": "without thorns",
+      "russian_meaning": "без шипов",
+      "russian_meaning_alt": "без препятствий; без помех",
+      "grammar": "adjective"
+    }
+  ],
+  "meaning_raw_list": [
+    {
+      "headword_id": 16,
+      "lemma_1": "akaṭayūsa",
+      "english_meaning": "plain bean soup; bean broth",
+      "russian_meaning": "",
+      "russian_meaning_alt": null,
+      "grammar": "masculine noun , compound"
+    },
+    {
+      "headword_id": 19,
+      "lemma_1": "akaṭṭhapāka",
+      "english_meaning": "ripening in uncultivated ground; growing wild",
+      "russian_meaning": "",
+      "russian_meaning_alt": null,
+      "grammar": "adjective , compound"
+    }
+  ],
+  "load_list_ids_none": [],
+  "load_list_ids_with_file": [
+    16,
+    19
+  ]
+}

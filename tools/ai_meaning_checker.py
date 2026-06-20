@@ -11,17 +11,15 @@ Russian translations in the DPD database. It supports multiple checking modes:
 The checker uses AI models to identify mismatches and generates detailed reports.
 """
 
+import datetime
 import json
-import os
-from sqlalchemy import and_
-from typing import List, Optional
+from pathlib import Path
 
-from tools.paths import ProjectPaths
-from tools.paths_dps import DPSPaths
+from sqlalchemy import and_
+from sqlalchemy.orm import Session
 
 from db.db_helpers import get_db_session
-
-from tools.ai_batch_processor import BatchProcessor, WordComparison, ComparisonResult
+from tools.ai_batch_processor import BatchProcessor, ComparisonResult, WordComparison
 from tools.ai_related import replace_abbreviations
 from tools.meaning_snapshot_ru import (
     compose_english_content,
@@ -30,11 +28,9 @@ from tools.meaning_snapshot_ru import (
     load_snapshot,
     save_snapshot,
 )
+from tools.paths import ProjectPaths
+from tools.paths_dps import DPSPaths
 from tools.printer import printer as pr
-
-pth = ProjectPaths()
-dpspth = DPSPaths()
-db_session = get_db_session(pth.dpd_db_path)
 
 
 # Extension of WordComparison with additional functionality
@@ -73,6 +69,8 @@ class RussianMeaningChecker:
         self.db_path = db_path
         self.mode = mode
         self.batch_processor = BatchProcessor()
+        dpspth = DPSPaths()
+        self.list_ids_file: Path | None = None
 
         # Use different checked IDs files for different modes
         if mode == "meaning_raw":
@@ -122,10 +120,10 @@ class RussianMeaningChecker:
                         compute_field_hash(english) if english else ""
                     )
             save_snapshot(self.checked_ids_file, self.snapshot)
-        except Exception as e:
+        except OSError as e:
             pr.amber(f"Could not save checked IDs: {e}")
 
-    def apply_invalidation(self, db_session) -> tuple[int, int]:
+    def apply_invalidation(self, db_session: Session) -> tuple[int, int]:
         """Drop snapshot entries whose English content changed in the DB.
 
         Returns (n_invalidated, n_seeded). Persists immediately so an
@@ -140,24 +138,17 @@ class RussianMeaningChecker:
 
     def load_list_ids(self) -> set[int]:
         """Load IDs from the ai_processed_ids_json file for meaning_raw_list mode"""
+        if self.list_ids_file is None or not self.list_ids_file.exists():
+            return set()
         try:
-            if hasattr(self, "list_ids_file") and os.path.exists(self.list_ids_file):
-                with open(self.list_ids_file, "r", encoding="utf-8") as f:
-                    return set(json.load(f))
-            else:
-                return set()
-        except (json.JSONDecodeError, FileNotFoundError, AttributeError):
+            return set(json.loads(self.list_ids_file.read_text(encoding="utf-8")))
+        except json.JSONDecodeError:
             return set()
 
-    def mark_as_checked(self, headword_id: int):
-        """Mark a word as checked"""
-        self.checked_ids.add(headword_id)
-
-    def get_words_for_comparison_with_session(self, db_session) -> List[WordComparison]:
+    def get_words_for_comparison_with_session(
+        self, db_session: Session
+    ) -> list[WordComparison]:
         """Get all words that have both English and Russian meanings using provided session"""
-        if db_session is None:
-            raise Exception("No db_session")
-
         from db.models import DpdHeadword, Russian
 
         if self.mode == "meaning":
@@ -205,7 +196,7 @@ class RussianMeaningChecker:
             # List mode: check ru_meaning_raw for IDs in the list file only
             list_ids = self.load_list_ids()
             if not list_ids:
-                print("Warning: No IDs found in ai_processed_ids_json file. Exiting.")
+                pr.amber("No IDs found in ai_processed_ids_json file. Exiting.")
                 return []
 
             results = (
@@ -302,7 +293,7 @@ class RussianMeaningChecker:
             # List mode: check ru_meaning_lit for IDs in the list file only
             list_ids = self.load_list_ids()
             if not list_ids:
-                print("Warning: No IDs found in ai_processed_ids_json file. Exiting.")
+                pr.amber("No IDs found in ai_processed_ids_json file. Exiting.")
                 return []
 
             results = (
@@ -358,163 +349,118 @@ class RussianMeaningChecker:
 
         return comparisons
 
-    def get_total_count_with_session(self, db_session) -> int:
+    def get_total_count_with_session(self, db_session: Session) -> int:
         """Get total count of words that need comparison using provided session"""
         # Use the same query logic as get_words_for_comparison_with_session
         comparisons = self.get_words_for_comparison_with_session(db_session)
         return len(comparisons)
 
     def compare_meanings_batch(
-        self, comparisons: List[WordComparison], batch_size: int = 50
-    ) -> List[ComparisonResult]:
+        self, comparisons: list[WordComparison], batch_size: int = 50
+    ) -> list[ComparisonResult]:
         """Compare meanings in batches using AI - delegates to BatchProcessor"""
         return self.batch_processor.compare_meanings_batch(
             comparisons, self.checked_ids, batch_size, self.mode
         )
 
     def compare_meanings_individual(
-        self, comparisons: List[WordComparison]
-    ) -> List[ComparisonResult]:
+        self, comparisons: list[WordComparison]
+    ) -> list[ComparisonResult]:
         """Compare meanings individually using AI - delegates to BatchProcessor"""
         return self.batch_processor.compare_meanings_individual(
             comparisons, self.checked_ids, self.mode
         )
 
-    def clean_ru_meaning_raw_for_mismatches(self, results: List[ComparisonResult]):
-        """Clean ru_meaning_raw for mismatched entries"""
+    def _clean_field_for_mismatches(
+        self, results: list[ComparisonResult], field_name: str
+    ) -> None:
+        """Clear the given Russian field for mismatched entries"""
         from db.models import Russian
 
         mismatches = [r for r in results if r.match_status == "MISMATCH"]
         if not mismatches:
             return
 
-        print(f"Cleaning ru_meaning_raw for {len(mismatches)} mismatched entries...")
+        pr.white(f"Cleaning {field_name} for {len(mismatches)} mismatched entries...")
 
+        pth = ProjectPaths()
+        clean_session = get_db_session(pth.dpd_db_path)
         try:
-            from db.db_helpers import get_db_session
-            from tools.paths import ProjectPaths
-
-            pth = ProjectPaths()
-            clean_session = get_db_session(pth.dpd_db_path)
-
             for result in mismatches:
                 try:
-                    # Find the Russian record and clear ru_meaning_raw
                     russian_record = (
                         clean_session.query(Russian)
                         .filter(Russian.id == result.headword_id)
                         .first()
                     )
                     if russian_record:
-                        russian_record.ru_meaning_raw = ""
+                        setattr(russian_record, field_name, "")
                         clean_session.commit()
-                        print(f"✓ Cleared ru_meaning_raw for ID {result.headword_id}")
-                except Exception as e:
-                    print(
-                        f"⚠ Failed to clear ru_meaning_raw for ID {result.headword_id}: {e}"
+                        pr.green(f"Cleared {field_name} for ID {result.headword_id}")
+                except OSError as e:
+                    pr.amber(
+                        f"Failed to clear {field_name} for ID {result.headword_id}: {e}"
                     )
                     clean_session.rollback()
 
+            pr.green(f"Completed cleaning {field_name} for mismatched entries")
+        finally:
             clean_session.close()
-            print("✓ Completed cleaning ru_meaning_raw for mismatched entries")
-
-        except Exception as e:
-            print(f"⚠ Failed to clean ru_meaning_raw: {e}")
-
-    def clean_ru_notes_for_mismatches(self, results: List[ComparisonResult]):
-        """Clean ru_notes for mismatched entries"""
-        from db.models import Russian
-
-        mismatches = [r for r in results if r.match_status == "MISMATCH"]
-        if not mismatches:
-            return
-
-        print(f"Cleaning ru_notes for {len(mismatches)} mismatched entries...")
-
-        try:
-            from db.db_helpers import get_db_session
-            from tools.paths import ProjectPaths
-
-            pth = ProjectPaths()
-            clean_session = get_db_session(pth.dpd_db_path)
-
-            for result in mismatches:
-                try:
-                    # Find the Russian record and clear ru_notes
-                    russian_record = (
-                        clean_session.query(Russian)
-                        .filter(Russian.id == result.headword_id)
-                        .first()
-                    )
-                    if russian_record:
-                        russian_record.ru_notes = ""
-                        clean_session.commit()
-                        print(f"✓ Cleared ru_notes for ID {result.headword_id}")
-                except Exception as e:
-                    print(
-                        f"⚠ Failed to clear ru_notes for ID {result.headword_id}: {e}"
-                    )
-                    clean_session.rollback()
-
-            clean_session.close()
-            print("✓ Completed cleaning ru_notes for mismatched entries")
-
-        except Exception as e:
-            print(f"⚠ Failed to clean ru_notes: {e}")
 
     def generate_report(
-        self, results: List[ComparisonResult], output_txt_folder: str | None = None
-    ):
+        self,
+        results: list[ComparisonResult],
+        output_txt_folder: Path | None = None,
+    ) -> None:
         """Generate a human-readable report of mismatches"""
-        import datetime
-
         # Use instance output folder if not provided
         output_folder = output_txt_folder or self.output_txt_folder
-
-        # Create directory if it doesn't exist
-        os.makedirs(output_folder, exist_ok=True)
+        output_folder.mkdir(parents=True, exist_ok=True)
 
         # Generate timestamp-based filename
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        output_file = os.path.join(output_folder, f"{timestamp}_mismatches.txt")
+        timestamp = datetime.datetime.now().astimezone().strftime("%Y-%m-%d_%H-%M-%S")
+        output_file = output_folder / f"{timestamp}_mismatches.txt"
 
-        with open(output_file, "w", encoding="utf-8") as f:
-            f.write(f"RUSSIAN {self.mode.upper()} MISMATCH ANALYSIS REPORT\n")
-            f.write("=" * 50 + "\n\n")
+        lines = [
+            f"RUSSIAN {self.mode.upper()} MISMATCH ANALYSIS REPORT\n",
+            "=" * 50 + "\n\n",
+        ]
 
-            # Filter for problematic entries - ONLY COMPLETE MISMATCHES (no partial matches)
-            mismatches = [r for r in results if r.match_status == "MISMATCH"]
-            matches = [r for r in results if r.match_status == "MATCH"]
+        # Filter for problematic entries - ONLY COMPLETE MISMATCHES (no partial matches)
+        mismatches = [r for r in results if r.match_status == "MISMATCH"]
+        matches = [r for r in results if r.match_status == "MATCH"]
 
-            f.write(f"Total entries analyzed: {len(results)}\n")
-            f.write(f"Complete mismatches: {len(mismatches)}\n")
-            f.write(f"Correct matches: {len(matches)}\n\n")
+        lines.append(f"Total entries analyzed: {len(results)}\n")
+        lines.append(f"Complete mismatches: {len(mismatches)}\n")
+        lines.append(f"Correct matches: {len(matches)}\n\n")
 
-            if mismatches:
-                f.write("COMPLETE MISMATCHES (Require Russian Translation Review):\n")
-                f.write("-" * 50 + "\n\n")
-                for result in mismatches:
-                    f.write(f"ID: {result.headword_id}\n")
-                    f.write(f"Lemma: {result.lemma_1}\n")
-                    f.write(f"Confidence: {result.confidence:.2f}\n")
-                    f.write(f"Reasoning: {result.reasoning}\n")
-                    if result.suggested_fix:
-                        f.write(f"Suggested fix: {result.suggested_fix}\n")
-                    f.write("\n" + "-" * 40 + "\n\n")
-            else:
-                f.write(
-                    "No complete mismatches found! All translations appear accurate.\n"
-                )
+        if mismatches:
+            lines.append("COMPLETE MISMATCHES (Require Russian Translation Review):\n")
+            lines.append("-" * 50 + "\n\n")
+            for result in mismatches:
+                lines.append(f"ID: {result.headword_id}\n")
+                lines.append(f"Lemma: {result.lemma_1}\n")
+                lines.append(f"Confidence: {result.confidence:.2f}\n")
+                lines.append(f"Reasoning: {result.reasoning}\n")
+                if result.suggested_fix:
+                    lines.append(f"Suggested fix: {result.suggested_fix}\n")
+                lines.append("\n" + "-" * 40 + "\n\n")
+        else:
+            lines.append(
+                "No complete mismatches found! All translations appear accurate.\n"
+            )
 
-        print(f"Report saved to {output_file}")
-        print(f"Total entries analyzed: {len(results)}")
-        print(f"Total problematic entries requiring review: {len(mismatches)}")
+        output_file.write_text("".join(lines), encoding="utf-8")
+
+        pr.white(f"Report saved to {output_file}")
+        pr.white(f"Total entries analyzed: {len(results)}")
+        pr.white(f"Total problematic entries requiring review: {len(mismatches)}")
 
         # Special handling for raw mode - only clean database fields for raw modes
         if self.mode in ["meaning_raw", "meaning_raw_list"] and mismatches:
-            self.clean_ru_meaning_raw_for_mismatches(results)
+            self._clean_field_for_mismatches(results, "ru_meaning_raw")
         elif self.mode == "notes_raw" and mismatches:
-            self.clean_ru_notes_for_mismatches(results)
+            self._clean_field_for_mismatches(results, "ru_notes")
         # Note: meaning_lit and meaning_lit_list modes don't clean database fields, only report
         # Note: meaning_ru_raw mode also doesn't clean database fields - keeps Russian meanings for review
 
@@ -523,78 +469,70 @@ class RussianMeaningChecker:
 
     def run_analysis(
         self,
-        db_session=None,
+        db_session: Session,
         use_batch: bool = True,
-        limit: Optional[int] = None,
+        limit: int | None = None,
         auto_invalidate: bool = True,
-    ):
+    ) -> None:
         """Run the complete analysis"""
-        print("Starting Russian meaning mismatch analysis...")
+        pr.white("Starting Russian meaning mismatch analysis...")
 
-        # Use provided session or the global one
-        session = db_session or globals()["db_session"]
-
-        try:
-            if auto_invalidate:
-                n_invalidated, n_seeded = self.apply_invalidation(session)
-                pr.white(
-                    f"Invalidated {n_invalidated} IDs (English changed), "
-                    f"seeded {n_seeded} baseline hashes"
-                )
-
-            # Get words for comparison
-            comparisons = self.get_words_for_comparison_with_session(session)
-            self.english_by_id = {c.headword_id: c.english_meaning for c in comparisons}
-
-            if limit:
-                comparisons = comparisons[:limit]
-
-            print(f"Found {len(comparisons)} words to analyze")
-
-            if not comparisons:
-                print("No words found with both English and Russian meanings")
-                return
-
-            # Run comparison
-            if use_batch:
-                print("Using batch processing...")
-                results = self.compare_meanings_batch(comparisons, batch_size=50)
-                # IDs are now marked as checked within the batch method only on success
-            else:
-                print("Using individual processing...")
-                results = self.compare_meanings_individual(comparisons)
-
-            # Generate report
-            self.generate_report(results)
-
-            print(
-                f"Analysis complete. Found {len([r for r in results if r.match_status == 'MISMATCH'])} problematic entries."
+        if auto_invalidate:
+            n_invalidated, n_seeded = self.apply_invalidation(db_session)
+            pr.white(
+                f"Invalidated {n_invalidated} IDs (English changed), "
+                f"seeded {n_seeded} baseline hashes"
             )
 
-        finally:
-            # Only close if we created our own session
-            if db_session is None:
-                session.close()
+        # Get words for comparison
+        comparisons = self.get_words_for_comparison_with_session(db_session)
+        self.english_by_id = {c.headword_id: c.english_meaning for c in comparisons}
+
+        if limit:
+            comparisons = comparisons[:limit]
+
+        pr.white(f"Found {len(comparisons)} words to analyze")
+
+        if not comparisons:
+            pr.white("No words found with both English and Russian meanings")
+            return
+
+        # Run comparison
+        if use_batch:
+            pr.white("Using batch processing...")
+            results = self.compare_meanings_batch(comparisons, batch_size=50)
+            # IDs are now marked as checked within the batch method only on success
+        else:
+            pr.white("Using individual processing...")
+            results = self.compare_meanings_individual(comparisons)
+
+        # Generate report
+        self.generate_report(results)
+
+        n_mismatches = len([r for r in results if r.match_status == "MISMATCH"])
+        pr.white(f"Analysis complete. Found {n_mismatches} problematic entries.")
 
 
 if __name__ == "__main__":
     # Test the functionality
+    pth = ProjectPaths()
+    db_session = get_db_session(pth.dpd_db_path)
     checker = RussianMeaningChecker()
 
-    print("Testing RussianMeaningChecker...")
+    pr.white("Testing RussianMeaningChecker...")
 
     try:
         total_count = checker.get_total_count_with_session(db_session)
-        print(f"Total words with both meanings: {total_count}")
+        pr.white(f"Total words with both meanings: {total_count}")
 
         # Test with small sample
         comparisons = checker.get_words_for_comparison_with_session(db_session)
         sample = comparisons[:3]  # Get first 3 for testing
 
-        print("\n--- Sample Data ---")
+        pr.white("--- Sample Data ---")
         for comp in sample:
-            print(word_comparison_to_ai_prompt_text(comp))
-            print("-" * 50)
+            pr.white(word_comparison_to_ai_prompt_text(comp))
+            pr.white("-" * 50)
 
     finally:
         db_session.close()
