@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 72
+Pointer: 73
 
 ## Scripts (76 total, local unique_paths)
 
@@ -97,7 +97,7 @@ Pointer: 72
 - [x] 69. tools/ai_openai_manager.py — archived
 - [x] 70. tools/ai_related.py
 - [x] 71. tools/ask.py
-- [ ] 72. tools/deepseek.py
+- [x] 72. tools/deepseek.py
 - [ ] 73. tools/duplicates.py
 - [ ] 74. tools/file_utils.py
 - [ ] 75. tools/sbs_table_functions.py
@@ -168,3 +168,4 @@ Pointer: 72
 2026-06-20 | #69 tools/ai_openai_manager.py | archived | direct-OpenAI-SDK wrapper class, zero callers anywhere in repo (grep across .py/.json/.md); AIManager routes all OpenAI-model requests through tools/ai_open_router.py's OpenRouterManager instead, confirmed no import of this module from ai_manager.py; superseded, same pattern as #45/#48/#49/#50/#67; moved to archive/ai_openai_manager.py via git mv; removed tools/ai_openai_manager.py line from registry.json unique_paths (no SMD entry existed for it, same as #67); validate_registry.py and verify_smd_coverage.py both pass
 2026-06-20 | #71 tools/ask.py | changed | extracted _read_line_fallback() helper, removes duplicated readline/strip/lower/EOFError logic between the non-TTY branch and the termios-exception branch in read_single_char(); reviewer's other claims (missing type hints, "three consecutive flushes," .lower() duplication "in same path", abort-check misplacement) checked against actual code and rejected as inaccurate; chmod +x (EXE001) forced by pre-commit, same pattern as #29/#30/#44/#46; 7 tests added (tests/tools/test_ask.py, subprocess golden-master against real CLI invocations, no mocks); live run (`echo y | uv run python3 tools/ask.py "question?"`) succeeded, exit 0, output unchanged
 2026-06-20 | #70 tools/ai_related.py | changed | consolidated AI client/config machinery onto AIManager: removed get_ai_client/print_ai_config/load_ai_config (legacy single-model config.ini duplicating AIManager's role); now prompt-builders only (generate_messages_for_*, replace_abbreviations, load_translation_examples); type hints throughout, print()->pr.*, open()->Path.open(); removed dead handle_ai_response/generate_messages_for_english_meaning + unused module-level dpspth; tools/ai_manager.py exposed load_models_from_json() as public (was _load_models_from_json) for model-list deduping in scripts/other/ai_generate_translation.py; scripts/other/ai_batch_openai_meaning.py inlined minimal _get_openai_client() (reads apis.openai directly, cannot route through AIManager lacking Batch API support); scripts/other/ai_generate_translation.py removed duplicate JSON parsing + legacy default_model globals, now sources via AIManager.load_models_from_json() (cheap, no provider init); tests/tools/test_ai_related.py + fixtures.json 10 golden-master tests captured against unedited code, all pass; live smoke tests: (1) ai_generate_translation.py --mode note --limit 1 via deepseek-v4-flash (1.32s, persisted to dpd.db), (2) ai_batch_openai_meaning.py check_batch_list() listed real OpenAI batch history via live API
+2026-06-20 | #72 tools/deepseek.py | archived | direct-API wrapper superseded by tools/ai_deepseek_manager.py, which is integrated into AIManager provider system; zero callers anywhere; same pattern as #69 (ai_openai_manager.py); moved to archive/deepseek.py via git mv, removed from registry.json unique_paths

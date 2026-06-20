@@ -225,7 +225,6 @@
     "tools/ai_related.py",
     "tools/meaning_snapshot_ru.py",
     "tools/ask.py",
-    "tools/deepseek.py",
     "tools/duplicates.py",
     "tools/file_utils.py",
     "tools/sbs_table_functions.py",
