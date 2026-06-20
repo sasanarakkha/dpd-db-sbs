@@ -7,7 +7,6 @@ from pathlib import Path
 from kamma.upstream_sync.scripts.registry_helper import load_accepted_sync_state
 from tools.printer import printer as pr
 
-
 TEMPLATES_DIR = Path("kamma/upstream_sync/templates")
 THREADS_DIR = Path("kamma/threads")
 ACCEPTED_SYNC_PATH = Path("kamma/upstream_sync/accepted_sync.json")
@@ -78,8 +77,7 @@ def render_handoff(date_human: str) -> str:
         "3. <thread_dir>/plan.md\n\n"
         "Task: run Stage 1 FAST Prep exactly as defined in the plan.\n"
         "Do not perform analysis or strategic planning.\n"
-        "Stop before Stage 2 and update handoff.md.\n\n"
-        "Manual fallback: Switch to FAST. Start a fresh session with the same prompt.\n"
+        "Stop before Stage 2 and update handoff.md.\n"
         "```\n\n"
         "Do not continue in this session.\n"
     )
@@ -89,7 +87,7 @@ def main() -> None:
     pr.tic()
     pr.green_title("init_sync_thread.py")
 
-    today = datetime.date.today()
+    today = datetime.datetime.now(datetime.UTC).date()
     date_str = today.strftime("%Y%m%d")
     date_human = today.strftime("%Y-%m-%d")
 
@@ -142,7 +140,6 @@ def main() -> None:
     pr.green("     Task: run Stage 1 FAST Prep exactly as defined in the plan.")
     pr.green("     Do not perform analysis or strategic planning.")
     pr.green("     Stop before Stage 2 and update handoff.md.")
-    pr.green("     (Manual fallback: Switch to FAST. Start a fresh session.)")
     pr.green("After the sync completes:")
     pr.green(
         "  6. Write kamma/upstream_sync/new_improvements.md with lessons from this run."

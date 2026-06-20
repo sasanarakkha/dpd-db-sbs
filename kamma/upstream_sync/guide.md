@@ -82,10 +82,10 @@ Hard stop procedure: save artifacts -> update `handoff.md` -> state the exact re
 
 **Commit-closeout checklist (mandatory after each commit lands):** Before writing the restart prompt, update `handoff.md` Status + Next Action to reflect the commit that just landed, and mark resolved ledger/approval items DONE. A restart prompt written before the handoff is updated causes the next session to re-do already-finished work.
 
-**Fresh restart prompt template:**
+**Context-handoff prompt template** (used when a thread spans sessions for context-size reasons):
 
 ```text
-Switch to <FAST|ADVANCED>. Start a fresh session.
+Start a fresh session.
 
 Continue upstream sync thread: <thread_dir>.
 First read:
@@ -144,38 +144,19 @@ The orchestrating session (Opus / ADVANCED) dispatches mechanical work to the `s
 
 All user-facing gates remain in the orchestrating session: Stage 2 approval, Stage 4.A discussion, commit gates, and Stage 5 acceptance. Subagent work is verified from files — read `handoff.md` and stage outputs after each dispatch; subagent self-reports are not trusted.
 
-**Manual fallback** (when running without subagent support — e.g., CI, non-Claude-Code environments):
-
-Use fresh-session model restarts following this prompt template:
-
-```text
-Switch to <FAST|ADVANCED>. Start a fresh session.
-
-Continue upstream sync thread: <thread_dir>.
-First read:
-1. <thread_dir>/handoff.md
-2. kamma/upstream_sync/guide.md
-3. <stage-specific file>
-
-Your task:
-<exact next task>
-
-Do not perform <forbidden model responsibility>.
-Stop if <specific stop condition>.
-```
-
-- **Stage 1 (Prep)** — FAST model; factual collection only.
-- **Stage 2 (Analysis)** — ADVANCED model; strategic planning, resolve `discuss` flags, draft `dynamic_plan.md`.
-- **Stage 3 (Execution)** — FAST model; mechanical implementation item-by-item per the plan.
-- **Stage 4.A (Docs Analysis)** — ADVANCED model; read FAST outputs, decide terminology and translation strategy, draft `docs_translation_plan.md`.
-- **Stage 4.B (Docs Translation)** — FAST model; execute `docs_translation_plan.md` file-by-file — translate or update each file, then prepare the commit message.
-- **Stage 5 (Verification + After-sync)** — ADVANCED model for acceptance decisions; hand off to FAST for any mechanical finalization.
+**Stage ownership:**
+- **Stage 1 (Prep)** — FAST; factual collection only.
+- **Stage 2 (Analysis)** — ADVANCED; strategic planning, resolve `discuss` flags, draft `dynamic_plan.md`.
+- **Stage 3 (Execution)** — FAST; mechanical implementation item-by-item per the plan.
+- **Stage 4.A (Docs Analysis)** — ADVANCED; read FAST outputs, decide terminology and translation strategy, draft `docs_translation_plan.md`.
+- **Stage 4.B (Docs Translation)** — FAST; execute `docs_translation_plan.md` file-by-file — translate or update each file, then prepare the commit message.
+- **Stage 5 (Verification + After-sync)** — ADVANCED for acceptance decisions; hand off to FAST for any mechanical finalization.
 
 **Handoff quality gate (ADVANCED -> FAST, Stage 2 -> 3):** Before switching to FAST for Stage 3, ADVANCED must verify that `dynamic_plan.md` passes this test: *"Could a mechanical executor complete every item without reading any file not explicitly referenced in the plan?"* If the answer is no, expand the plan before handing off. FAST must never be asked to analyze, judge, or discover — only execute.
 
 **Handoff quality gate (ADVANCED -> FAST, Stage 4.A -> 4.B):** Before switching to FAST for Stage 4.B, ADVANCED must verify that `docs_translation_plan.md` includes: (1) a terminology glossary, (2) per-file instructions specifying source path, target path, and whether it is a full translation or a targeted update, (3) explicit rules for what to keep untranslated (Pali terms, product names, image paths, code blocks, URLs). FAST must never decide what to translate — only execute the plan.
 
-**The agent MUST stop at the end of each Stage and explicitly state the model switch instruction before ending the session. Never begin the next stage in the same session that completed the previous stage.**
+**The agent MUST stop at the end of each Stage and explicitly write the handoff note before ending the session. Never begin the next stage in the same session that completed the previous stage.**
 
 ---
 
@@ -220,6 +201,11 @@ Stage 4 is split into two model-bound substages: ADVANCED analysis and FAST tran
    - `execute_sync.py <thread_dir>` leaves changes unstaged by default. Review `git diff` before manual staging; use `--stage` only when you intentionally want the script to run `git add .`.
    - **Upstream deletions propagate.** After the exclusion-restore step, `execute_sync.py` runs `propagate_upstream_deletions` which computes `git diff --no-renames --diff-filter=D <last_accepted_sha>..<target_sha>` and removes any resulting candidate that is not in the protected set (shadows, `no_sync_files`, `modified_upstream_files`, `unique_paths`, and run-specific exclusions). Each removal is worktree-only (`Path.unlink`), never staged — it surfaces as an unstaged deletion in `git diff` for human review before Commit 1. Renamed-away files are covered because `--no-renames` decomposes renames into add+delete.
    - **Staging rule:** NEVER use `git add -A -- <file list>` — gitignore'd paths will trigger errors. If you stage all sync changes manually, use `git add .` which respects `.gitignore` automatically. If you must stage selectively, pre-filter with `git add <file>` one path at a time or check first with `git check-ignore -v <path>`.
+4. **Fast-path triage (advisory):**
+   - After `prep_manifest.json` exists, run `uv run python3 kamma/upstream_sync/scripts/sync_triage.py <thread_dir>`.
+   - It prints the fast-path verdict: pass means no entry in `mapped_actions` has a `category` in `modified_upstream_files`, `russian_copies`, `sbs_copies`, `dps_copies`, `tamil_copies`, or `inspired_by_upstream`; `discuss_paths`, `needs_classification_paths`, `blocker_paths`, `unregistered_local_paths`, and `upstream_deleted_orphans` are all empty; and no `changed_upstream_paths` is under `docs/`.
+   - If the verdict passes, this sync touches nothing localized: skip Stages 2-4 and go straight to Stage 5 (retrospective + `finalize_accepted_sync.py`) after Commit 1.
+   - The triage verdict is advisory only — it never runs Stage 5 or any destructive step automatically. ADVANCED still makes the acceptance decision.
 
 ### Stage 2: Analysis (ADVANCED Strategic Planning)
 **Goal**: Determine how to integrate upstream changes into localized files.
@@ -333,7 +319,7 @@ The script reads `<thread_dir>/prep_manifest.json` and reports docs changes from
    - Promote any `promote` items to `archive_improvements.md` before running finalize.
    - `finalize_accepted_sync.py` will refuse to run if `retrospective.md` is absent (hard code gate).
 3. **After sync**
-   - Write exact FAST handoff instructions to run `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>`.
+   - If accepted, write exact FAST handoff instructions to run `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>`.
    - Review the temporary `new_improvements.md`, promote accepted items to `archive_improvements.md`, and delete the file.
 
 ---

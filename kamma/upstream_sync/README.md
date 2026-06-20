@@ -5,6 +5,9 @@ Canonical sync process and tooling for the DPD SBS-RU fork.
 All local sync-process documentation lives in `kamma/upstream_sync/`. Do not add sync-process
 docs under upstream-owned `docs/`.
 
+Lost track of where a sync thread is? Run `uv run python3 kamma/upstream_sync/scripts/sync_status.py <thread_dir>`
+to print the current stage and the exact next command.
+
 ## Quick Start: The 5-Stage Model-Split Workflow
 
 Before Stage 1, run `scripts/cl_dps/dpd-kamma-sync`. This is the only sync-related
@@ -81,10 +84,4 @@ For the full protocol, see **[guide.md](./guide.md)**.
 
 ## Registry Categories
 
-- `modified_upstream_files`: Direct divergences (Manual porting).
-- `russian_copies` / `sbs_copies`: Strict shadows (Parity enforced).
-- `dps_copies`: Strict DPS fork shadows (Parity enforced). `dps_copies` is the single category for mixed/shared fork shadows, including local upstream shadows that combine Russian, SBS, Tamil, or general DPS behavior.
-- `tamil_copies`: Strict Tamil shadows (Parity enforced).
-- `inspired_by_upstream`: Structural divergences (Selective backporting).
-- `unique_paths`: Fork-only cleanup inventory, not sync targets; no SMD entry required.
-- `skip_sync_patterns`: Upstream-owned or irrelevant paths excluded from Stage 1 analysis only; still synced unless also listed in `no_sync_files`.
+See **[guide.md § Registry Categories](./guide.md#registry-categories)** for the canonical table.

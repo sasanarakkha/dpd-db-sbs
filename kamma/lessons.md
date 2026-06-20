@@ -25,3 +25,5 @@
 - 2026-06-19 [WORKFLOW] Mixed-hunk file staging via `git add -p` in bash scripts is error-prone; consider documenting/flagging mixed-hunk files during review and either selecting a dedicated tool or accepting simpler constraints (e.g., "exclude this file from commit").
 - 2026-06-19 [BEHAVIOR] Pre-existing lint errors in unmodified lines block commits even when only a small help-text change is staged; run a full lint check on the working tree before finalization, not just on staged hunks.
 - 2026-06-19 [POSITIVE] Thorough review.md (listing all files, findings, test evidence, and procedural notes) enables efficient finalization even when files have mixed hunks or procedural constraints.
+- 2026-06-20 [POSITIVE] Using ask_question to confirm doc updates during finalization ensures smooth, explicit alignment on technical notes.
+

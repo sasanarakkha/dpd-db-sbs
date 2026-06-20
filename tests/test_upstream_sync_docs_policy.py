@@ -103,8 +103,9 @@ def test_unique_paths_are_documented_as_cleanup_inventory_not_sync_targets() -> 
     guide = Path("kamma/upstream_sync/guide.md").read_text(encoding="utf-8")
 
     expected = "cleanup inventory, not sync targets"
-    assert expected in readme
     assert expected in guide
+    assert expected not in readme
+    assert "guide.md#registry-categories" in readme
 
 
 def test_reviewed_shadow_noop_ledger_is_documented() -> None:
@@ -167,7 +168,8 @@ def test_docs_define_single_category_dps_shadow_policy() -> None:
 
     required = "`dps_copies` is the single category for mixed/shared fork shadows"
     assert required in guide
-    assert required in readme
+    assert required not in readme
+    assert "guide.md#registry-categories" in readme
 
 
 def test_agents_requires_shadow_documentation_gate() -> None:
