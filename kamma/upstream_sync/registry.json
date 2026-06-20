@@ -222,7 +222,6 @@
     "tools/ai_batch_processor.py",
     "tools/ai_json_parser.py",
     "tools/ai_meaning_checker.py",
-    "tools/ai_openai_manager.py",
     "tools/ai_related.py",
     "tools/meaning_snapshot_ru.py",
     "tools/ask.py",

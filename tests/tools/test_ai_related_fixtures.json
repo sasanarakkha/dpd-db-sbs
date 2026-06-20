@@ -1,0 +1,120 @@
+{
+  "load_translation_examples_ru": {
+    "abs": "спросив, поднявшись, сделав, преодолев, покинув, подойдя, прибыв, возвратившись",
+    "adj": "знающий, свободный, плохой, мягкий, верхний, полый, незрячий, тугой, личный",
+    "aor": "сделал, сказал, пришел, вырезал, увидел, исчез, поджег, появился, замер, колебался",
+    "card": "тридцать (30), девять (9), четыре (4), сорок (40)",
+    "fem": "неприязнь, жалость, работа, сила, бойня, самка, женщина",
+    "fut": "будет, объясит, сделает, возьмет, разрушит, поймет",
+    "ger": "понимая, проникая, видя, избегая, беря, досл. приблизившись, досл. привязавшись",
+    "ind": "скоро, сейчас, внутри, дольше, слишком, между, точно, открыто, так, раньше",
+    "inf": "добиваться, продолжать, защищать, объяснять, делать, смотреть, винить",
+    "masc": "костер, помощник, проступок, скелет, водоем, вопрос, период, владыка, вред",
+    "nt": "делание, состояние, слово, одеяние, наставление, отсутствие, путешествие",
+    "opt": "следует сделать; должен совершить; может выполнить; мог бы исполнить",
+    "ordin": "восьмой (8ой), шестой (6ой), тринадцатый (13ый)",
+    "pp": "созданный, раненный, понятый, потраченный, удаленный, достигнутый, запятнанный",
+    "pr": "живет, одевает, смотрит, выходит, хвалит, ложится, является, рождается, вводится, пачкается",
+    "prp": "обучаемый, волнующийся, подвергаемый, принимая, зная, вращая, давая",
+    "ptp": "следует оспорить, досл. к опровержению; должен быть уважаем, досл. к почитанию; подлежит совершению, досл. к исполнению",
+    "imperf": "утвердился; установился"
+  },
+  "load_translation_examples_ta": {
+    "abs": "சென்ற பிறகு, பூத்த பிறகு, சிந்தித்த பிறகு, உணர்ந்த பிறகு, தூங்கிய பிறகு",
+    "adj": "வேகமான, சுறுசுறுப்பான, பசுமையான, குளிர்ந்த, இதமான",
+    "aor": "சென்றான், ஓடினான், தப்பித்தான், கோபப்பட்டான், அழுதான்",
+    "fem": "கிழவி, அக்கா, அம்மா, அண்ணி, தங்கை",
+    "ger": "நடப்பது, ஓடுவது, வளர்வது, செழிப்பது, நினைப்பது",
+    "ind": "விரைவாக, திடீரென்று, எதிர்பாராமல், எங்கும், வெளியே",
+    "inf": "செல்வதற்கு, ஓடுவதற்கு, மலர்வதற்கு, வளர்வதற்கு, அறிவதற்கு",
+    "masc": "கிழவன், அண்ணன், அப்பா, மாமா, தம்பி",
+    "nt": "வாகனம், தேர், சக்கரம், காடு, நீர்",
+    "pp": "கடக்கப்பட்ட, பயணிக்கப்பட்ட, வளர்க்கப்பட்ட, வெட்டப்பட்ட, உண்ணப்பட்ட",
+    "pr": "செல்கிறான், ஓடுகிறான், பயணிக்கிறான், ஒளிர்கிறது, பாய்கிறது",
+    "pron": "எவன், எவள், எவர்கள், இது, அது",
+    "prp": "செல்கின்ற, ஓடுகின்ற, பாய்கின்ற, வீசுகின்ற, படிக்கின்ற",
+    "ptp": "கடக்கப்பட வேண்டும், செல்லப்படலாம், பயிரிடப்பட வேண்டும், அறியப்பட வேண்டும், மூடப்பட வேண்டும்"
+  },
+  "replace_abbreviations": {
+    "masc, nom sg": "masculine noun , nominative case singular number",
+    "aor 3rd pl": "aorist verb third person plural number",
+    "pp of karoti": "past participle",
+    "(of weather)": "",
+    "noun, pp of vac": "noun",
+    "prp of gacchati": "present participle",
+    "ptp of karoti": "potential participle",
+    "fem, loc abs": "feminine noun",
+    "neut, gen abs": "neuter noun",
+    "1st sg pres": "first person singular number pres"
+  },
+  "generate_messages_for_meaning": [
+    {
+      "role": "system",
+      "content": "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules."
+    },
+    {
+      "role": "user",
+      "content": "\n        Translate the English definition of the Pali term into Russian, following these rules:\n\n        - Translate all bracketed text (e.g., \"(gram)\" → \"(грам)\", \"(comm)\" → \"(комм)\", \"(vinaya)\" → \"(виная)\", \"(of weather)\" → \"(о погоде)\").\n        - Separate synonyms with `;`.\n        - Match the grammatical structure of the Pali term (noun, verb, etc.).\n        - Use lowercase unless it's a proper noun.\n        - Translate \"lit.\" as \"досл.\".\n        - Retain clarifications if any (e.g., \"(of trap) laid down\" → \"(о капкане) установленный\").\n        - Translate idioms to Russian equivalents.\n        - Ensure no English remains untranslated, including within brackets.\n        - Output only the translation of the Definition, without labels like \"Перевод\" etc, without any comments, without translation of the Grammar and in one line.\n\n        **Pali Term**: dhamma\n        **Grammar**: masc, nom sg\n        **Definition**: phenomenon; nature; teaching\n    \n- Consider Pali context: Dhammā anattā."
+    }
+  ],
+  "generate_messages_for_meaning_synonyms": [
+    {
+      "role": "system",
+      "content": "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules."
+    },
+    {
+      "role": "user",
+      "content": "\n        Provide at least nine (9) distinct Russian synonyms for the English definition of Pali term, following these rules:\n\n        - Translate all bracketed text (e.g., \"(gram)\" → \"(грам)\", \"(comm)\" → \"(комм)\", \"(vinaya)\" → \"(виная)\", \"(of weather)\" → \"(о погоде)\").\n        - Separate synonyms with `;`.\n        - Match the grammatical structure of the Pali term (noun, verb, etc.).\n        - Use lowercase unless it's a proper noun.\n        - Translate \"lit.\" as \"досл.\".\n        - Retain clarifications if any (e.g., \"(of trap) laid down\" → \"(о капкане) установленный\").\n        - Translate idioms to Russian equivalents.\n        - Ensure no English remains untranslated, including within brackets.\n        - Output only the translation of the Definition, without labels like \"Перевод\" etc, without any comments, without translation of the Grammar and in one line.\n\n        **Pali Term**: dhamma\n        **Grammar**: masc, nom sg\n        **Definition**: phenomenon; nature; teaching\n    "
+    }
+  ],
+  "generate_messages_for_meaning_with_example": [
+    {
+      "role": "system",
+      "content": "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules."
+    },
+    {
+      "role": "user",
+      "content": "\n        Translate the English definition of the Pali term into Russian, following these rules:\n\n        - Translate all bracketed text (e.g., \"(gram)\" → \"(грам)\", \"(comm)\" → \"(комм)\", \"(vinaya)\" → \"(виная)\", \"(of weather)\" → \"(о погоде)\").\n        - Separate synonyms with `;`.\n        - Match the grammatical structure of the Pali term (noun, verb, etc.).\n        - Use lowercase unless it's a proper noun.\n        - Translate \"lit.\" as \"досл.\".\n        - Retain clarifications if any (e.g., \"(of trap) laid down\" → \"(о капкане) установленный\").\n        - Translate idioms to Russian equivalents.\n        - Ensure no English remains untranslated, including within brackets.\n        - Output only the translation of the Definition, without labels like \"Перевод\" etc, without any comments, without translation of the Grammar and in one line.\n\n        **Pali Term**: dhamma\n        **Grammar**: masc, nom sg\n        **Definition**: phenomenon\n    \n- Consider Pali context: context here\n- Match this example format: example here"
+    }
+  ],
+  "generate_messages_for_notes": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant that translates English text to Russian considering the context."
+    },
+    {
+      "role": "user",
+      "content": "\n    Translate the English notes into Russian, following these rules:\n    - Keep Pali or Sanskrit terms in roman script.\n    - Output only the translation of the Notes, without labels like \"Перевод\" etc, without any comments, without translation of the Grammar and in one line.\n\n                **Pali Term**: dhamma\n                **Grammar**: masc, nom sg\n                **Notes**: see also adhamma\n    "
+    }
+  ],
+  "generate_messages_for_meaning_ta": [
+    {
+      "role": "system",
+      "content": "You are a skilled assistant that translates English text to Tamil with grammatical accuracy, contextual relevance, and strict adherence to rules."
+    },
+    {
+      "role": "user",
+      "content": "\n        Translate the English definition of the Pali term into Tamil, following these rules:\n\n        - Translate all bracketed text (e.g., \"(gram)\" → \"(இலக்கணம்)\", \"(of weather)\" → \"(வெயிலைப் பற்றி)\").\n        - Separate synonyms with `;`.\n        - Match the grammatical structure of the Pali term (noun, verb, etc.).\n        - Use lowercase unless it's a proper noun.\n        - Retain clarifications if any.\n        - Translate idioms to Tamil equivalents.\n        - Ensure no English remains untranslated, including within brackets.\n        - Output only the translation of the Definition, without labels, without any comments, without translation of the Grammar and in one line.\n\n        **Pali Term**: dhamma\n        **Grammar**: masc, nom sg\n        **Definition**: phenomenon; nature; teaching\n    \n- Consider Pali context: Dhammā anattā."
+    }
+  ],
+  "generate_messages_for_meaning_lit": [
+    {
+      "role": "system",
+      "content": "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules."
+    },
+    {
+      "role": "user",
+      "content": "\n        Translate the English literal definition of the Pali term into Russian, following these rules:\n\n        - Translate all bracketed text (e.g., \"(of weather)\" → \"(о погоде)\").\n        - Match the grammatical structure of the Pali term (noun, verb, etc.).\n        - Use lowercase unless it's a proper noun.\n        - Retain clarifications if any (e.g., \"(of trap) laid down\" → \"(о капкане) установленный\").\n        - Translate idioms to Russian equivalents.\n        - Ensure no English remains untranslated, including within brackets.\n        - Output only the translation of the literal Definition, without labels like \"Перевод\" etc, without any comments, without translation of the Grammar and in one line.\n\n        **IMPORTANT**: If the literal translation is already contained in the existing Russian meaning, return only an empty string \"\" without any translation or comments.\n\n        **Pali Term**: dhamma\n        **Grammar**: masc, nom sg\n        **Literal Definition**: that which is held\n        **Existing Russian Meaning**: феномен\n    "
+    }
+  ],
+  "generate_messages_for_meaning_lit_no_ru": [
+    {
+      "role": "system",
+      "content": "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules."
+    },
+    {
+      "role": "user",
+      "content": "\n        Translate the English literal definition of the Pali term into Russian, following these rules:\n\n        - Translate all bracketed text (e.g., \"(of weather)\" → \"(о погоде)\").\n        - Match the grammatical structure of the Pali term (noun, verb, etc.).\n        - Use lowercase unless it's a proper noun.\n        - Retain clarifications if any (e.g., \"(of trap) laid down\" → \"(о капкане) установленный\").\n        - Translate idioms to Russian equivalents.\n        - Ensure no English remains untranslated, including within brackets.\n        - Output only the translation of the literal Definition, without labels like \"Перевод\" etc, without any comments, without translation of the Grammar and in one line.\n\n        **IMPORTANT**: If the literal translation is already contained in the existing Russian meaning, return only an empty string \"\" without any translation or comments.\n\n        **Pali Term**: dhamma\n        **Grammar**: masc, nom sg\n        **Literal Definition**: that which is held\n        **Existing Russian Meaning**: \n    "
+    }
+  ]
+}

@@ -5,7 +5,7 @@ from typing import Any, NamedTuple
 import pytest
 
 from tools import ai_manager as ai_manager_module
-from tools.ai_manager import AIManager, _load_models_from_json
+from tools.ai_manager import AIManager, load_models_from_json
 
 
 class _StubResponse(NamedTuple):
@@ -331,7 +331,7 @@ def test_rate_limit_sleep_applies_to_tried_model(
 
 def test_antigravity_has_per_model_timeout() -> None:
     """antigravity_cli work models must carry 150s timeouts before DeepSeek."""
-    models = _load_models_from_json()
+    models = load_models_from_json()
     agy_entries = [m for m in models["default"] if m[0] == "antigravity_cli"]
     assert [m[1] for m in agy_entries] == ["Gemini 3.5 Flash (Low)"]
     assert all(len(m) == 4 for m in agy_entries), (

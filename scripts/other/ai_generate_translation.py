@@ -14,12 +14,12 @@ from sqlalchemy import and_, case, null, or_
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword, Russian, Tamil
 from tools.ai_manager import AIManager
+from tools.ai_manager import load_models_from_json as load_ai_models_by_kind
 from tools.ai_related import (
     generate_messages_for_meaning,
     generate_messages_for_meaning_lit,
     generate_messages_for_meaning_ta,
     generate_messages_for_notes,
-    load_ai_config,
     load_translation_examples,
     replace_abbreviations,
 )
@@ -36,9 +36,6 @@ db_session = get_db_session(pth.dpd_db_path)
 date = year_month_day_hour_minute_dash()
 
 ai_manager: AIManager | None = None
-api_key: str | None = None
-default_provider: str | None = None
-default_model: str | None = None
 
 
 def get_ai_manager() -> AIManager:
@@ -49,36 +46,16 @@ def get_ai_manager() -> AIManager:
     return ai_manager
 
 
-def init_ai_config() -> None:
-    """Lazily load the AI config globals."""
-    global api_key, default_provider, default_model
-    if api_key is None and default_provider is None and default_model is None:
-        api_key, default_provider, default_model = load_ai_config()
-
-
 def load_models_from_json() -> list[tuple[str, str, int, float]]:
-    """Load model lists directly from tools/ai_models.json without initializing AIManager."""
-    try:
-        path = Path("tools/ai_models.json")
-        data = json.loads(path.read_text(encoding="utf-8"))
+    """Flat provider/model list from tools/ai_models.json, sourced from AIManager."""
+    models = load_ai_models_by_kind()
+    return models["default"] + models["grounded"]
 
-        def _entry(m: dict[str, Any]) -> tuple[str, str, int, float]:
-            return (
-                m["provider"],
-                m["model"],
-                m["delay"],
-                float(m.get("timeout", 150.0)),
-            )
 
-        antigravity_cli_work = [
-            _entry(m) for m in data.get("antigravity_cli_work_models", [])
-        ]
-        default_models = [_entry(m) for m in data.get("default_models", [])]
-        grounded_models = [_entry(m) for m in data.get("grounded_models", [])]
-
-        return antigravity_cli_work + default_models + grounded_models
-    except (FileNotFoundError, json.JSONDecodeError, KeyError):
-        return []
+def default_model_name() -> str:
+    """First model in the AIManager fallback list, used as a default model id."""
+    all_models = load_models_from_json()
+    return all_models[0][1] if all_models else "unknown-model"
 
 
 # Language routing configuration for meaning mode
@@ -399,8 +376,7 @@ def create_translation_prompt(
     else:
         raise ValueError(f"Invalid mode: {mode}")
 
-    init_ai_config()
-    body_model = model if model is not None else default_model
+    body_model = model if model is not None else default_model_name()
     return {
         "custom_id": f"request-{word.id}",
         "method": "POST",
@@ -548,7 +524,7 @@ def translation_generate(
                     f"{idx}/{total} {word.id}, {word.ebt_count} {word.lemma_1} {meaning_result}"
                 )
 
-                tsv_model = model if model is not None else default_model
+                tsv_model = model if model is not None else default_model_name()
                 tsv_path = dpspth.ai_translated_dir / f"{tsv_model}-{lang}.tsv"
                 tsv_path.parent.mkdir(parents=True, exist_ok=True)
                 with open(tsv_path, "a", encoding="utf-8") as file:

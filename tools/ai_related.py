@@ -1,117 +1,33 @@
-"""Functions for openai"""
+"""Builds AI translation prompts (messages) and grammar-abbreviation helpers."""
 
 import csv
 import re
 
-from tools.deepseek import Deepseek
-from openai import OpenAI
-
-from rich.prompt import Prompt
-from timeout_decorator import timeout, TimeoutError as TimeoutDecoratorError
-
-from tools.configger import config_test_option, config_read, config_update
-from tools.paths_dps import DPSPaths
 from tools.paths import ProjectPaths
-from tools.printer import printer as pr
+from tools.paths_dps import DPSPaths
 
-
-dpspth = DPSPaths()
 pth = ProjectPaths()
 
 
-def get_ai_client():
-    """Initialize and return an AI client for specified provider."""
-    try:
-        api_key, provider, model = load_ai_config()
-        if provider == "deepseek":
-            return Deepseek(api_key=api_key)
-        elif provider == "openai":
-            return OpenAI(api_key=api_key)
-        raise ValueError(f"Unsupported provider: {provider}")
-    except ValueError as e:
-        print(f"{provider.title()} client initialization failed: {e}")
-        return None
-
-
-def print_ai_config():
-    """Load model and provider from config and print them."""
-    provider = str(config_read("models", "provider"))
-    model = config_read("models", f"{provider}")
-    pr.green(f"DPS uses {provider} model {model}")
-
-
-def load_ai_config():
-    """Load API key for specified provider from config or prompt user."""
-
-    provider = str(config_read("models", "provider"))
-
-    if not config_test_option("apis", provider):
-        api_key = Prompt.ask(
-            f"[yellow]Enter your {provider} API key (or ENTER for None)"
-        )
-        if api_key:
-            config_update("apis", provider, api_key)
-        else:
-            raise ValueError(f"{provider} API key is required")
-    else:
-        api_key = config_read("apis", provider)
-
-    model = config_read("models", f"{provider}")
-
-    return api_key, provider, model
-
-
-def load_translation_examples(dpspth, lang="ru"):
+def load_translation_examples(dpspth: DPSPaths, lang: str = "ru") -> dict[str, str]:
     """Load the pos-examples mapping from a TSV file into a dictionary."""
-    pos_examples_map = {}
+    pos_examples_map: dict[str, str] = {}
     if lang == "ru":
         path = dpspth.ru_translation_example_path
     elif lang == "ta":
         path = dpspth.ta_translation_example_path
     else:
         raise ValueError(f"Unsupported language: {lang}")
-    if path:
-        with open(path, "r", encoding="utf-8") as csvfile:
-            reader = csv.reader(csvfile, delimiter="\t")
-            next(reader)  # Skip header row
-            for row in reader:
-                pos, examples = row[0], row[1]
-                pos_examples_map[pos] = examples
+    with path.open("r", encoding="utf-8") as csvfile:
+        reader = csv.reader(csvfile, delimiter="\t")
+        next(reader)  # Skip header row
+        for row in reader:
+            pos, examples = row[0], row[1]
+            pos_examples_map[pos] = examples
     return pos_examples_map
 
 
-@timeout(10, timeout_exception=TimeoutDecoratorError)  # Setting a 10-second timeout
-def handle_ai_response(client, messages):
-    if client is None:
-        return None, "client is not initialized."
-
-    api_key, provider, model = load_ai_config()
-
-    error_string = ""
-    try:
-        if provider == "openai":
-            response = client.chat.completions.create(model=model, messages=messages)
-            content = response.choices[0].message.content
-        elif provider == "deepseek":
-            prompt = [{"content": m["content"], "role": m["role"]} for m in messages]
-            response = client.request(
-                prompt=prompt, model=model, stream=False, max_tokens=4096
-            )
-            content = response
-        else:
-            raise ValueError(f"Unsupported provider: {provider}")
-
-        return {"content": content}, error_string
-    except TimeoutDecoratorError:
-        error_string = "Timed out"
-    except Exception as e:
-        error_string = f"{provider.title()} Error: {e}"
-
-    print(error_string)
-    return None, error_string
-
-
-def replace_abbreviations(grammar_string):
+def replace_abbreviations(grammar_string: str) -> str:
     # Clean the grammar string
     cleaned_grammar_string = re.sub(
         r" of [\w\s]+|, pp of [\w\s]+|, prp of [\w\s]+|, ptp of [\w\s]+|, from [\w\s]+|, loc abs|, gen abs|\(.*?\)",
@@ -121,11 +37,11 @@ def replace_abbreviations(grammar_string):
 
     # TODO consider noun, pp of ... remove pp or make it from pp
 
-    replacements = {}
-    multi_word_replacements = {}
+    replacements: dict[str, str] = {}
+    multi_word_replacements: dict[str, str] = {}
 
     # Read abbreviations and their full forms into a dictionary
-    with open(pth.abbreviations_tsv_path, "r", encoding="utf-8") as file:
+    with pth.abbreviations_tsv_path.open("r", encoding="utf-8") as file:
         reader = csv.reader(file, delimiter="\t")
         next(reader)  # skip header
         for row in reader:
@@ -151,17 +67,17 @@ def replace_abbreviations(grammar_string):
             words[idx] = replacements[word]
 
     # Join the words back into a string
-    replaced_string = " ".join(words)
-
-    # debug
-    # print(f"{grammar_string} || replaced with || {replaced_string}")
-
-    return replaced_string
+    return " ".join(words)
 
 
 def generate_messages_for_meaning(
-    lemma_1, grammar, meaning, sentence, translation_example="", synonyms=False
-):
+    lemma_1: str,
+    grammar: str,
+    meaning: str,
+    sentence: str,
+    translation_example: str = "",
+    synonyms: bool = False,
+) -> list[dict[str, str]]:
     """Generate messages for translation."""
 
     system_content = "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules."
@@ -196,14 +112,15 @@ def generate_messages_for_meaning(
             "Provide at least nine (9) distinct Russian synonyms for the English definition of Pali term",
         )
 
-    # print(user_content)
     return [
         {"role": "system", "content": system_content},
         {"role": "user", "content": user_content},
     ]
 
 
-def generate_messages_for_notes(lemma_1, grammar, notes):
+def generate_messages_for_notes(
+    lemma_1: str, grammar: str, notes: str
+) -> list[dict[str, str]]:
     """Generate messages for translation."""
 
     system_content = "You are a helpful assistant that translates English text to Russian considering the context."
@@ -218,28 +135,6 @@ def generate_messages_for_notes(lemma_1, grammar, notes):
                 **Notes**: {notes}
     """
 
-    # print(user_content)
-    return [
-        {"role": "system", "content": system_content},
-        {"role": "user", "content": user_content},
-    ]
-
-
-def generate_messages_for_english_meaning(lemma_1, grammar, sentence):
-    """Generate messages for translation."""
-
-    system_content = "You are a helpful assistant that translates Pali to English considering the context."
-
-    user_content = f"""
-
-    Given the grammatical and contextual details provided, list at least 8 distinct English synonyms for the specified Pali term. Avoid repeating the same word. In the answer provide only a list of synonyms separated by ';' without any introduction or comments.
-
-                **Pali Term**: {lemma_1}
-                **Grammar**: {grammar}
-                **Context**: {sentence}
-    """
-
-    # print(user_content)
     return [
         {"role": "system", "content": system_content},
         {"role": "user", "content": user_content},
@@ -247,8 +142,12 @@ def generate_messages_for_english_meaning(lemma_1, grammar, sentence):
 
 
 def generate_messages_for_meaning_ta(
-    lemma_1, grammar, meaning, sentence, translation_example=""
-):
+    lemma_1: str,
+    grammar: str,
+    meaning: str,
+    sentence: str,
+    translation_example: str = "",
+) -> list[dict[str, str]]:
     """Generate messages for Tamil translation of meaning."""
 
     system_content = "You are a skilled assistant that translates English text to Tamil with grammatical accuracy, contextual relevance, and strict adherence to rules."
@@ -282,7 +181,9 @@ def generate_messages_for_meaning_ta(
     ]
 
 
-def generate_messages_for_meaning_lit(lemma_1, grammar, meaning_lit, ru_meaning=""):
+def generate_messages_for_meaning_lit(
+    lemma_1: str, grammar: str, meaning_lit: str, ru_meaning: str = ""
+) -> list[dict[str, str]]:
     """Generate messages for literal meaning translation with duplication check."""
 
     system_content = "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules."
@@ -306,7 +207,6 @@ def generate_messages_for_meaning_lit(lemma_1, grammar, meaning_lit, ru_meaning=
         **Existing Russian Meaning**: {ru_meaning}
     """
 
-    # print(user_content)
     return [
         {"role": "system", "content": system_content},
         {"role": "user", "content": user_content},

@@ -12,7 +12,7 @@ AI_MODELS_PATH = Path("tools/ai_models.json")
 ANTIGRAVITY_PROVIDER = "antigravity_cli"
 
 
-def _load_models_from_json() -> dict[str, list[tuple[str, str, int, float]]]:
+def load_models_from_json() -> dict[str, list[tuple[str, str, int, float]]]:
     """Load model lists from tools/ai_models.json."""
 
     def _entry(m: dict[str, Any]) -> tuple[str, str, int, float]:
@@ -51,7 +51,7 @@ class AIManager:
     _antigravity_probe_thread: threading.Thread | None = None
 
     def __init__(self):
-        models = _load_models_from_json()
+        models = load_models_from_json()
         self.DEFAULT_MODELS: list[tuple[str, str, int, float]] = models["default"]
         self.GROUNDED_MODELS: list[tuple[str, str, int, float]] = models["grounded"]
 
@@ -144,7 +144,7 @@ class AIManager:
 
     def reload_models(self) -> None:
         """Reload model lists from tools/ai_models.json."""
-        models = _load_models_from_json()
+        models = load_models_from_json()
         self.DEFAULT_MODELS = models["default"]
         self.GROUNDED_MODELS = models["grounded"]
         pr.green(

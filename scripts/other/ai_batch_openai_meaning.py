@@ -10,7 +10,7 @@ from openai.types import Batch
 
 from db.db_helpers import get_db_session
 from db.models import Russian, Tamil
-from tools.ai_related import get_ai_client, print_ai_config
+from tools.configger import config_read
 from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
 from tools.printer import printer as pr
@@ -23,12 +23,12 @@ _TERMINAL_STATUSES = {"completed", "failed", "expired", "cancelled"}
 
 
 def _get_openai_client() -> OpenAI | None:
-    """Return the configured AI client, or None if it isn't an OpenAI client."""
-    client = get_ai_client()
-    if not isinstance(client, OpenAI):
-        pr.red("Batch API is only supported for OpenAI client.")
+    """Return an OpenAI client for the Batch API, which AIManager does not support."""
+    api_key = config_read("apis", "openai")
+    if not api_key:
+        pr.red("OpenAI API key is not configured (apis.openai).")
         return None
-    return client
+    return OpenAI(api_key=api_key)
 
 
 def upload_and_create_batch(file_name: str) -> str | None:
@@ -38,7 +38,6 @@ def upload_and_create_batch(file_name: str) -> str | None:
     if client is None:
         pr.toc()
         return None
-    print_ai_config()
 
     file_path = dpspth.ai_for_batch_api_dir / f"{file_name}.jsonl"
     batch_id: str | None = None
