@@ -4,20 +4,19 @@
 
 from rich.console import Console
 
-from db.db_helpers import get_db_session
-from tools.printer import printer as pr
-from tools.paths import ProjectPaths
-from tools.paths_dps import DPSPaths
-
-from scripts.backup.backup_dpd_headwords_and_roots import (
+from db.backup_tsv.backup_dpd_headwords_and_roots import (
     backup_dpd_headwords,
     backup_dpd_roots,
 )
-from scripts.backup.backup_dps import (
+from db.backup_tsv.backup_dps import (
     backup_roots_ru,
     backup_ru,
     backup_sbs,
 )
+from db.db_helpers import get_db_session
+from tools.paths import ProjectPaths
+from tools.paths_dps import DPSPaths
+from tools.printer import printer as pr
 
 console = Console()
 

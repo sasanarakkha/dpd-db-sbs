@@ -2,16 +2,16 @@
 
 """Save latest Russian, Tamil, SBS, and roots tables to backup_tsv folder."""
 
-from git import Repo
 import csv
 
+from git import Repo
 from sqlalchemy.orm.session import Session
 
 from db.db_helpers import get_db_session
-from db.models import Russian, SBS, DpdRoot, Tamil
-from tools.printer import printer as pr
+from db.models import SBS, DpdRoot, Russian, Tamil
 from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
+from tools.printer import printer as pr
 
 
 def backup_dps():

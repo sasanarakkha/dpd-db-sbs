@@ -11,7 +11,7 @@
   {
     "sync_commit": "cc60ac42a91339f3e5c7c515aaa7c17610410b06",
     "source": "db/backup_tsv/backup_dpd_headwords_and_roots.py",
-    "shadow": "scripts/backup/backup_dps.py",
+    "shadow": "db/backup_tsv/backup_dps.py",
     "changed_paths": [
       "db/backup_tsv/backup_dpd_headwords_and_roots.py"
     ],

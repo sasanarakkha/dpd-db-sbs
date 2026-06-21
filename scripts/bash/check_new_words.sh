@@ -25,7 +25,7 @@ while true; do
     read yn
     case $yn in
         [Yy]* )
-            scripts/backup/backup_all.py
+            db/backup_tsv/backup_all.py
             break;;
         * )
             break;;
@@ -58,5 +58,5 @@ else
 fi
 
 echo "${bold}${red}Please check out latest newly added words vib/sutta${reset}"
-scripts/backup/backup_dps.py
+db/backup_tsv/backup_dps.py
 # scripts/work_with_csv/replace_new_id.py

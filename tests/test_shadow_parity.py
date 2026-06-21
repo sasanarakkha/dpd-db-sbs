@@ -277,7 +277,7 @@ WHITELIST: dict[str, WhitelistEntry] = {
             "exporter.webapp.data_classes.VariantData",
         ],
     },
-    "scripts/backup/backup_dps.py": {
+    "db/backup_tsv/backup_dps.py": {
         "functions": [
             "backup_dpd_headwords_and_roots",
             "backup_dpd_roots",

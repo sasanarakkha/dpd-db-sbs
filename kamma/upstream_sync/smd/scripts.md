@@ -64,7 +64,7 @@
 ---
 
 
-**File**: `scripts/backup/backup_dps.py`
+**File**: `db/backup_tsv/backup_dps.py`
 - **Category**: dps_copies
 - **Sync Rule**: PORT
 - **Local Changes**:
