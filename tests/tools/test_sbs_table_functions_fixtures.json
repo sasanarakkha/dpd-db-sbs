@@ -1,0 +1,717 @@
+{
+  "chant_index_map": {
+    "Buddh'ādi-āmisa-pūjā": 1,
+    "Pubbabhāga-namakāra": 2,
+    "Buddh'ābhitthuti": 3,
+    "Dhamm'ābhitthuti": 4,
+    "Saṅgh'ābhitthuti": 5,
+    "Ratanattaya-paṇāma": 6,
+    "Buddha-paṭhama-bhāsita": 7,
+    "Dhamma-gārava": 8,
+    "Khem'ākhema-saraṇa-gamana": 9,
+    "Ovāda-pāṭimokkha-gāthā": 10,
+    "Ti-lakkhaṇā": 11,
+    "Bhārā": 12,
+    "Raṭṭhapāla-thera-gāthā": 13,
+    "Pārāpariya-thera-gāthā": 14,
+    "Tāyana-gāthā": 15,
+    "Pakiṇṇaka-gāthā": 16,
+    "Bhadd'eka-ratta": 17,
+    "Dhamma-cakkappavattana": 18,
+    "Anupubba-sikkhā": 19,
+    "Bodhipakkhiya-dhammā": 20,
+    "Satta-sambojjhaṅgā": 21,
+    "Ariy'aṭṭhaṅgika-magga": 22,
+    "Ānāpānassati": 23,
+    "Paṭicca-samuppāda": 24,
+    "Saṅkhitta-dhamma": 25,
+    "Cattāro-mahāpadesā": 26,
+    "Cha-sāraṇīya-dhammā": 27,
+    "Aparihāniya-dhammā": 28,
+    "Dhamma-pahaṃsāna": 29,
+    "Buddha-pacchima-ovāda": 30,
+    "Cattāro-parikkhārā": 31,
+    "Āhāra-paṭikūla-paccavekkhaṇa-pāṭho": 32,
+    "Mettā-pharaṇa": 33,
+    "Brahmavihārā": 34,
+    "Pañca-abhiṇha-paccavekkhaṇā": 35,
+    "Dasadhammā-pabbajita-abhiṇha-paccavekkhaṇā": 36,
+    "Dvattiṃs'ākāra-paccavekkhaṇa": 37,
+    "Anicc'ānussati": 38,
+    "Dhammacakkappavattana-sutta": 39,
+    "Anatta-lakkhaṇa-sutta": 40,
+    "Āditta-pariyāya-sutta": 41,
+    "Yathā-vāri-vahā-pūrā": 42,
+    "Ratanattayānubhāv'ādi-gāthā": 43,
+    "Bhojana-dānānumodanā": 44,
+    "Culla-maṅgala-cakka-vāḷa": 45,
+    "Aggappasāda-sutta-gāthā": 46,
+    "Kāla-dāna-sutta-gāthā": 47,
+    "So-attha-laddho": 48,
+    "Devā-ārādhanā": 49,
+    "Saraṇa-gamana-pāṭho": 50,
+    "Nama-kāra-siddhi-gāthā": 51,
+    "Namo-kāra-aṭṭhaka": 52,
+    "Maṅgala-sutta": 53,
+    "Ratana-sutta": 54,
+    "Karaṇīya-metta-sutta": 55,
+    "Khandha-parittaṃ": 56,
+    "Buddha-dhamma-saṅgha-guṇā": 57,
+    "Yaṅ'kiñci-ratanaṃ-loke": 58,
+    "Bojjh'aṅga-parittaṃ": 59,
+    "Abhaya-parittaṃ": 60,
+    "Devatā-uyyojana-gāthā": 61,
+    "Jaya-maṅgala-aṭṭha-gāthā": 62,
+    "Jaya-parittaṃ": 63,
+    "Bhavatu-sabba-maṅgalaṃ": 64,
+    "Dhamma-saṅgaṇī-mātikā": 65,
+    "Vipassanā-bhūmi-pāṭho": 66,
+    "Paṭṭhāna-mātikā-pāṭho": 67,
+    "Adāsi-me-ādi-gāthā": 68,
+    "Maraṇa-paccavekkhaṇā": 69,
+    "Uddissan'ādhiṭṭhānā": 70,
+    "Sabba-patti-dāna": 71,
+    "Peta-patti-dāna": 72,
+    "Devata-patti-dāna": 73,
+    "Paramāya-pūjāyañ'ca-paṇidhiñ'ca": 74,
+    "Pubbakicca": 75,
+    "Pubba-bhāga": 76,
+    "Sīl'uddesa-pāṭha": 77
+  },
+  "chant_link_map": {
+    "Buddh'ādi-āmisa-pūjā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-01-dedication-of-offerings/",
+    "Pubbabhāga-namakāra": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-02-preliminary-homage/",
+    "Buddh'ābhitthuti": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-03-homage-to-the-buddha/",
+    "Dhamm'ābhitthuti": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-04-homage-to-the-dhamma/",
+    "Saṅgh'ābhitthuti": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-05-homage-to-the-sangha/",
+    "Ratanattaya-paṇāma": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-06-salutation-to-the-triple-gem/",
+    "Buddha-paṭhama-bhāsita": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-07-the-buddhas-first-exclamation/",
+    "Dhamma-gārava": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-08-respect-for-the-dhamma/",
+    "Khem'ākhema-saraṇa-gamana": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-09-going-to-true-and-false-refuges/",
+    "Ovāda-pāṭimokkha-gāthā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-10-the-patimokkha-exhortation/",
+    "Ti-lakkhaṇā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-11-the-three-characteristics/",
+    "Bhārā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-12-the-burdens/",
+    "Raṭṭhapāla-thera-gāthā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-13-from-the-elder-ratthapala/",
+    "Pārāpariya-thera-gāthā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-14-from-the-elder-parapariya/",
+    "Tāyana-gāthā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-15-on-protection/",
+    "Pakiṇṇaka-gāthā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-16-miscellaneous-verses/",
+    "Bhadd'eka-ratta": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-17-a-single-excellent-night/",
+    "Dhamma-cakkappavattana": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-18-setting-in-motion-the-wheel-of-dhamma/",
+    "Anupubba-sikkhā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-19-anupubba-sikkha/",
+    "Bodhipakkhiya-dhammā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-20-requisites-for-awakening/",
+    "Satta-sambojjhaṅgā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-21-the-seven-factors-of-awakening/",
+    "Ariy'aṭṭhaṅgika-magga": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-22-the-noble-eightfold-path/",
+    "Ānāpānassati": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-23-mindfulness-of-breathing/",
+    "Paṭicca-samuppāda": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-24-dependent-origination/",
+    "Saṅkhitta-dhamma": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-25-the-dhamma-in-brief/",
+    "Cattāro-mahāpadesā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-26-the-four-great-references/",
+    "Cha-sāraṇīya-dhammā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-27-principles-of-cordiality/",
+    "Aparihāniya-dhammā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-28-principles-of-non-decline/",
+    "Dhamma-pahaṃsāna": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-29-striving-according-to-the-dhamma/",
+    "Buddha-pacchima-ovāda": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-30-the-buddhas-final-instruction/",
+    "Cattāro-parikkhārā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-31-the-four-requisites/",
+    "Āhāra-paṭikūla-paccavekkhaṇa-pāṭho": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-32-the-repulsiveness-of-food/",
+    "Mettā-pharaṇa": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-33-universal-well-being/",
+    "Brahmavihārā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-34-the-divine-abidings/",
+    "Pañca-abhiṇha-paccavekkhaṇā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-35-five-subjects-for-frequent-recollection/",
+    "Dasadhammā-pabbajita-abhiṇha-paccavekkhaṇā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-36-ten-subjects-for-frequent-recollection-by-one-who-has-gone-forth/",
+    "Dvattiṃs'ākāra-paccavekkhaṇa": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-37-the-thirty-two-parts/",
+    "Anicc'ānussati": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-38-recollection-of-impermanence/",
+    "Dhammacakkappavattana-sutta": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-39-dhammacakkappavattana-sutta/",
+    "Anatta-lakkhaṇa-sutta": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-40-anatta-lakkhana-sutta/",
+    "Āditta-pariyāya-sutta": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-41-aditta-pariyaya-sutta/",
+    "Yathā-vāri-vahā-pūrā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-42-yatha-vari-vaha/",
+    "Ratanattayānubhāv'ādi-gāthā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-43-ratanattayanubhavadi-gatha/",
+    "Bhojana-dānānumodanā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-44-bhojana-dananumodana/",
+    "Culla-maṅgala-cakka-vāḷa": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-45-culla-mangala-cakka-vala/",
+    "Aggappasāda-sutta-gāthā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-46-aggappasada-sutta-gatha/",
+    "Kāla-dāna-sutta-gāthā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-47-kala-dana-sutta-gatha/",
+    "So-attha-laddho": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-48-so-attha-laddho/",
+    "Devā-ārādhanā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-49-deva-aradhanai/",
+    "Saraṇa-gamana-pāṭho": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-50-sarana-gamana-patho/",
+    "Nama-kāra-siddhi-gāthā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-51-nama-kara-siddhi-gatha/",
+    "Namo-kāra-aṭṭhaka": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-52-namo-kara-atthaka/",
+    "Maṅgala-sutta": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-53-mangala-sutta/",
+    "Ratana-sutta": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-54-ratana-sutta/",
+    "Karaṇīya-metta-sutta": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-55-karaniya-metta-sutta/",
+    "Khandha-parittaṃ": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-56-khandha-parittam/",
+    "Buddha-dhamma-saṅgha-guṇā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-57-buddha-dhamma-sangha-guna/",
+    "Yaṅ'kiñci-ratanaṃ-loke": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-58-yan-kinci-ratanam-loke/",
+    "Bojjh'aṅga-parittaṃ": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-59-bojjhanga-parittam/",
+    "Abhaya-parittaṃ": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-60-abhaya-parittam/",
+    "Devatā-uyyojana-gāthā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-61-devata-uyyojana-gatha/",
+    "Jaya-maṅgala-aṭṭha-gāthā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-62-jaya-mangala-attha-gatha/",
+    "Jaya-parittaṃ": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-63-jaya-parittam/",
+    "Bhavatu-sabba-maṅgalaṃ": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-64-bhavatu-sabba-mangalam/",
+    "Dhamma-saṅgaṇī-mātikā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-65-dhamma-sangani-matika/",
+    "Vipassanā-bhūmi-pāṭho": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-66-vipassana-bhumi-patho/",
+    "Paṭṭhāna-mātikā-pāṭho": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-67-patthana-matika-patho/",
+    "Adāsi-me-ādi-gāthā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-68-adasi-me-adi-gatha/",
+    "Maraṇa-paccavekkhaṇā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-69-pamsu-kula/",
+    "Uddissan'ādhiṭṭhānā": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-70-sharing-and-aspirations/",
+    "Sabba-patti-dāna": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-71-sharing-of-all-merits/",
+    "Peta-patti-dāna": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-72-sharing-of-merits-with-the-departed/",
+    "Devata-patti-dāna": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-73-sharing-of-merits-with-the-devas/",
+    "Paramāya-pūjāyañ'ca-paṇidhiñ'ca": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/per-74-the-highest-honour-and-aspirations/",
+    "Pubbakicca": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/pubbakicca-analysis/",
+    "Pubba-bhāga": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/post-patimokkha/#preliminary-homage",
+    "Sīl'uddesa-pāṭha": "https://sasanarakkha.github.io/study-tools/6-pali-class/sbs-per-analysis/post-patimokkha/#recitation-of-virtue"
+  },
+  "valid_chants": [
+    "Buddh'ādi-āmisa-pūjā",
+    "Pubbabhāga-namakāra",
+    "Buddh'ābhitthuti",
+    "Dhamm'ābhitthuti",
+    "Saṅgh'ābhitthuti",
+    "Ratanattaya-paṇāma",
+    "Buddha-paṭhama-bhāsita",
+    "Dhamma-gārava",
+    "Khem'ākhema-saraṇa-gamana",
+    "Ovāda-pāṭimokkha-gāthā",
+    "Ti-lakkhaṇā",
+    "Bhārā",
+    "Raṭṭhapāla-thera-gāthā",
+    "Pārāpariya-thera-gāthā",
+    "Tāyana-gāthā",
+    "Pakiṇṇaka-gāthā",
+    "Bhadd'eka-ratta",
+    "Dhamma-cakkappavattana",
+    "Anupubba-sikkhā",
+    "Bodhipakkhiya-dhammā",
+    "Satta-sambojjhaṅgā",
+    "Ariy'aṭṭhaṅgika-magga",
+    "Ānāpānassati",
+    "Paṭicca-samuppāda",
+    "Saṅkhitta-dhamma",
+    "Cattāro-mahāpadesā",
+    "Cha-sāraṇīya-dhammā",
+    "Aparihāniya-dhammā",
+    "Dhamma-pahaṃsāna",
+    "Buddha-pacchima-ovāda",
+    "Cattāro-parikkhārā",
+    "Āhāra-paṭikūla-paccavekkhaṇa-pāṭho",
+    "Mettā-pharaṇa",
+    "Brahmavihārā",
+    "Pañca-abhiṇha-paccavekkhaṇā",
+    "Dasadhammā-pabbajita-abhiṇha-paccavekkhaṇā",
+    "Dvattiṃs'ākāra-paccavekkhaṇa",
+    "Anicc'ānussati",
+    "Dhammacakkappavattana-sutta",
+    "Anatta-lakkhaṇa-sutta",
+    "Āditta-pariyāya-sutta",
+    "Yathā-vāri-vahā-pūrā",
+    "Ratanattayānubhāv'ādi-gāthā",
+    "Bhojana-dānānumodanā",
+    "Culla-maṅgala-cakka-vāḷa",
+    "Aggappasāda-sutta-gāthā",
+    "Kāla-dāna-sutta-gāthā",
+    "So-attha-laddho",
+    "Devā-ārādhanā",
+    "Saraṇa-gamana-pāṭho",
+    "Nama-kāra-siddhi-gāthā",
+    "Namo-kāra-aṭṭhaka",
+    "Maṅgala-sutta",
+    "Ratana-sutta",
+    "Karaṇīya-metta-sutta",
+    "Khandha-parittaṃ",
+    "Buddha-dhamma-saṅgha-guṇā",
+    "Yaṅ'kiñci-ratanaṃ-loke",
+    "Bojjh'aṅga-parittaṃ",
+    "Abhaya-parittaṃ",
+    "Devatā-uyyojana-gāthā",
+    "Jaya-maṅgala-aṭṭha-gāthā",
+    "Jaya-parittaṃ",
+    "Bhavatu-sabba-maṅgalaṃ",
+    "Dhamma-saṅgaṇī-mātikā",
+    "Vipassanā-bhūmi-pāṭho",
+    "Paṭṭhāna-mātikā-pāṭho",
+    "Adāsi-me-ādi-gāthā",
+    "Maraṇa-paccavekkhaṇā",
+    "Uddissan'ādhiṭṭhānā",
+    "Sabba-patti-dāna",
+    "Peta-patti-dāna",
+    "Devata-patti-dāna",
+    "Paramāya-pūjāyañ'ca-paṇidhiñ'ca",
+    "Pubbakicca",
+    "Pubba-bhāga",
+    "Sīl'uddesa-pāṭha"
+  ],
+  "valid_mappings": [
+    [
+      "Abhaya-parittaṃ",
+      "Protection for Safety",
+      "Protective Recitations"
+    ],
+    [
+      "Adāsi-me-ādi-gāthā",
+      "Verses Starting with \"He Gave to Me\"",
+      "Funeral Chants"
+    ],
+    [
+      "Aggappasāda-sutta-gāthā",
+      "Verses from the Discourse on Confidence in the Supreme",
+      "Thanksgiving Recitations"
+    ],
+    [
+      "Anatta-lakkhaṇa-sutta",
+      "The Discourse on the Characteristic of Not-Self",
+      "Cardinal Suttas"
+    ],
+    [
+      "Anicc'ānussati",
+      "Recollection of Impermanence",
+      "Reflections"
+    ],
+    [
+      "Anupubba-sikkhā",
+      "The Gradual Training",
+      "Teachings"
+    ],
+    [
+      "Aparihāniya-dhammā",
+      "Principles of Non-Decline",
+      "Teachings"
+    ],
+    [
+      "Ariy'aṭṭhaṅgika-magga",
+      "The Noble Eightfold Path",
+      "Teachings"
+    ],
+    [
+      "Bhadd'eka-ratta",
+      "A single Excellent Night",
+      "Verses"
+    ],
+    [
+      "Bhavatu-sabba-maṅgalaṃ",
+      "May Every Blessing Come to Be",
+      "Protective Recitations"
+    ],
+    [
+      "Bhojana-dānānumodanā",
+      "Rejoicing in the Giving of Food",
+      "Thanksgiving Recitations"
+    ],
+    [
+      "Bhārā",
+      "The Burdens",
+      "Verses"
+    ],
+    [
+      "Bodhipakkhiya-dhammā",
+      "Requisites for Awakening",
+      "Teachings"
+    ],
+    [
+      "Bojjh'aṅga-parittaṃ",
+      "Protection of the Factors of Awakening",
+      "Protective Recitations"
+    ],
+    [
+      "Brahmavihārā",
+      "The Divine Abidings",
+      "Reflections"
+    ],
+    [
+      "Buddh'ābhitthuti",
+      "Homage to the Buddha",
+      "Homage to the Triple Gem"
+    ],
+    [
+      "Buddh'ādi-āmisa-pūjā",
+      "Dedication of Offerings",
+      "Homage to the Triple Gem"
+    ],
+    [
+      "Buddha-dhamma-saṅgha-guṇā",
+      "Qualities of the Buddha, Dhamma, and Saṅgha",
+      "Protective Recitations"
+    ],
+    [
+      "Buddha-pacchima-ovāda",
+      "The Buddha's Final Instruction",
+      "Teachings"
+    ],
+    [
+      "Buddha-paṭhama-bhāsita",
+      "The Buddha's First Exclamation",
+      "Verses"
+    ],
+    [
+      "Cattāro-mahāpadesā",
+      "The Four Great References",
+      "Teachings"
+    ],
+    [
+      "Cattāro-parikkhārā",
+      "The Four Requisites",
+      "Reflections"
+    ],
+    [
+      "Cha-sāraṇīya-dhammā",
+      "Principles of Cordiality",
+      "Teachings"
+    ],
+    [
+      "Culla-maṅgala-cakka-vāḷa",
+      "Short Blessings of the Entire World",
+      "Thanksgiving Recitations"
+    ],
+    [
+      "Dasadhammā-pabbajita-abhiṇha-paccavekkhaṇā",
+      "Ten Subjects for Frequent Reflection by One Who Has Gone Forth",
+      "Reflections"
+    ],
+    [
+      "Devata-patti-dāna",
+      "Sharing of Merits with the Devas",
+      "Sharing of Merits"
+    ],
+    [
+      "Devatā-uyyojana-gāthā",
+      "Verses on Dismissing Evil Spirits",
+      "Protective Recitations"
+    ],
+    [
+      "Devā-ārādhanā",
+      "Invitation to the Devas",
+      "Protective Recitations"
+    ],
+    [
+      "Dhamm'ābhitthuti",
+      "Homage to the Dhamma",
+      "Homage to the Triple Gem"
+    ],
+    [
+      "Dhamma-cakkappavattana",
+      "Setting in Motion The Wheel of Dhamma",
+      "Teachings"
+    ],
+    [
+      "Dhamma-gārava",
+      "Respect for the Dhamma",
+      "Verses"
+    ],
+    [
+      "Dhamma-pahaṃsāna",
+      "Striving According to the Dhamma",
+      "Teachings"
+    ],
+    [
+      "Dhamma-saṅgaṇī-mātikā",
+      "Outlines from the Enumeration of Phenomena",
+      "Funeral Chants"
+    ],
+    [
+      "Dhammacakkappavattana-sutta",
+      "The Discourse on Setting in Motion The Wheel of Dhamma",
+      "Cardinal Suttas"
+    ],
+    [
+      "Dvattiṃs'ākāra-paccavekkhaṇa",
+      "The Thirty-Two Parts",
+      "Reflections"
+    ],
+    [
+      "Jaya-maṅgala-aṭṭha-gāthā",
+      "Verses on the Eight Victory Blessings",
+      "Protective Recitations"
+    ],
+    [
+      "Jaya-parittaṃ",
+      "Protection for Victory",
+      "Protective Recitations"
+    ],
+    [
+      "Karaṇīya-metta-sutta",
+      "The Discourse on the Loving-Kindness to be Done",
+      "Protective Recitations"
+    ],
+    [
+      "Khandha-parittaṃ",
+      "Protection of the Aggregates",
+      "Protective Recitations"
+    ],
+    [
+      "Khem'ākhema-saraṇa-gamana",
+      "Going to True and False Refuges",
+      "Verses"
+    ],
+    [
+      "Kāla-dāna-sutta-gāthā",
+      "Verses from the Discourse on Giving at the Proper Time",
+      "Thanksgiving Recitations"
+    ],
+    [
+      "Maraṇa-paccavekkhaṇā",
+      "Reflections on Death",
+      "Funeral Chants"
+    ],
+    [
+      "Maṅgala-sutta",
+      "The Discourse on Blessings",
+      "Protective Recitations"
+    ],
+    [
+      "Mettā-pharaṇa",
+      "Universal Well-Being",
+      "Reflections"
+    ],
+    [
+      "Nama-kāra-siddhi-gāthā",
+      "Verses on Triumph by Paying Homage",
+      "Protective Recitations"
+    ],
+    [
+      "Namo-kāra-aṭṭhaka",
+      "Paying Homage to the Octad",
+      "Protective Recitations"
+    ],
+    [
+      "Ovāda-pāṭimokkha-gāthā",
+      "The Pāṭimokkha Exhortation",
+      "Verses"
+    ],
+    [
+      "Pakiṇṇaka-gāthā",
+      "Miscellaneous Verses",
+      "Verses"
+    ],
+    [
+      "Paramāya-pūjāyañ'ca-paṇidhiñ'ca",
+      "The Highest Honour and Aspirations",
+      "Sharing of Merits"
+    ],
+    [
+      "Pañca-abhiṇha-paccavekkhaṇā",
+      "Five Subjects for Frequent Reflection",
+      "Reflections"
+    ],
+    [
+      "Paṭicca-samuppāda",
+      "Dependent Origination",
+      "Teachings"
+    ],
+    [
+      "Paṭṭhāna-mātikā-pāṭho",
+      "Passage on the Outlines from the Foundation of Conditional Relations",
+      "Funeral Chants"
+    ],
+    [
+      "Peta-patti-dāna",
+      "Sharing of Merits with the Departed",
+      "Sharing of Merits"
+    ],
+    [
+      "Pubba-bhāga",
+      "Preliminary Homage",
+      "Post Pātimokkha"
+    ],
+    [
+      "Pubbabhāga-namakāra",
+      "Preliminary Homage",
+      "Homage to the Triple Gem"
+    ],
+    [
+      "Pubbakicca",
+      "Preliminary duty",
+      "International Pātimokkha"
+    ],
+    [
+      "Pārāpariya-thera-gāthā",
+      "From the Elder Pārāpariya",
+      "Verses"
+    ],
+    [
+      "Ratana-sutta",
+      "The Discourse on Jewels",
+      "Protective Recitations"
+    ],
+    [
+      "Ratanattaya-paṇāma",
+      "Salutation to the Triple Gem",
+      "Homage to the Triple Gem"
+    ],
+    [
+      "Ratanattayānubhāv'ādi-gāthā",
+      "Verses Starting with the Power of the Triple Gem",
+      "Thanksgiving Recitations"
+    ],
+    [
+      "Raṭṭhapāla-thera-gāthā",
+      "From the Elder Raṭṭhapāla",
+      "Verses"
+    ],
+    [
+      "Sabba-patti-dāna",
+      "Sharing of All Merits",
+      "Sharing of Merits"
+    ],
+    [
+      "Saraṇa-gamana-pāṭho",
+      "Passage on Going for Refuge",
+      "Protective Recitations"
+    ],
+    [
+      "Satta-sambojjhaṅgā",
+      "The Seven Factors of Awakening",
+      "Teachings"
+    ],
+    [
+      "Saṅgh'ābhitthuti",
+      "Homage to the Saṅgha",
+      "Homage to the Triple Gem"
+    ],
+    [
+      "Saṅkhitta-dhamma",
+      "The Dhamma in Brief",
+      "Teachings"
+    ],
+    [
+      "So-attha-laddho",
+      "He Who Gains Benefits",
+      "Thanksgiving Recitations"
+    ],
+    [
+      "Sīl'uddesa-pāṭha",
+      "Recitation of virtue",
+      "Post Pātimokkha"
+    ],
+    [
+      "Ti-lakkhaṇā",
+      "The Three Characteristics",
+      "Verses"
+    ],
+    [
+      "Tāyana-gāthā",
+      "On Protection",
+      "Verses"
+    ],
+    [
+      "Uddissan'ādhiṭṭhānā",
+      "Sharing and Aspirations",
+      "Sharing of Merits"
+    ],
+    [
+      "Vipassanā-bhūmi-pāṭho",
+      "Passage on the Ground for Distinct Seeing",
+      "Funeral Chants"
+    ],
+    [
+      "Yathā-vāri-vahā-pūrā",
+      "Just as Rivers Full of Water",
+      "Thanksgiving Recitations"
+    ],
+    [
+      "Yaṅ'kiñci-ratanaṃ-loke",
+      "Whatever Kind of Jewel in the World",
+      "Protective Recitations"
+    ],
+    [
+      "Āditta-pariyāya-sutta",
+      "The Fire Sermon",
+      "Cardinal Suttas"
+    ],
+    [
+      "Āhāra-paṭikūla-paccavekkhaṇa-pāṭho",
+      "The Repulsiveness of Food",
+      "Reflections"
+    ],
+    [
+      "Ānāpānassati",
+      "Mindfulness of Breathing",
+      "Teachings"
+    ]
+  ],
+  "class_link_map": {
+    "1": "https://digitalpalidictionary.github.io/dpd-pali-courses/bpc_key/1_class/   ",
+    "2": "https://digitalpalidictionary.github.io/dpd-pali-courses/bpc_key/2_class/",
+    "3": "https://digitalpalidictionary.github.io/dpd-pali-courses/bpc_key/3_class/",
+    "4": "https://digitalpalidictionary.github.io/dpd-pali-courses/bpc_key/4_class/",
+    "5": "https://digitalpalidictionary.github.io/dpd-pali-courses/bpc_key/5_class/",
+    "6": "https://digitalpalidictionary.github.io/dpd-pali-courses/bpc_key/6_class/",
+    "7": "https://digitalpalidictionary.github.io/dpd-pali-courses/bpc_key/7_class/",
+    "8": "https://digitalpalidictionary.github.io/dpd-pali-courses/bpc_key/8_class/",
+    "9": "https://digitalpalidictionary.github.io/dpd-pali-courses/bpc_key/9_class/",
+    "10": "https://digitalpalidictionary.github.io/dpd-pali-courses/bpc_key/10_class/",
+    "11": "https://digitalpalidictionary.github.io/dpd-pali-courses/bpc_key/11_class/",
+    "12": "https://digitalpalidictionary.github.io/dpd-pali-courses/bpc_key/12_class/",
+    "13": "https://digitalpalidictionary.github.io/dpd-pali-courses/bpc_key/13_class/",
+    "14": "https://digitalpalidictionary.github.io/dpd-pali-courses/bpc_key/14_class/",
+    "15": "https://digitalpalidictionary.github.io/dpd-pali-courses/bpc_key/15_class/",
+    "16": "https://digitalpalidictionary.github.io/dpd-pali-courses/ipc_key/16_class/",
+    "17": "https://digitalpalidictionary.github.io/dpd-pali-courses/ipc_key/17_class/",
+    "18": "https://digitalpalidictionary.github.io/dpd-pali-courses/ipc_key/18_class/",
+    "19": "https://digitalpalidictionary.github.io/dpd-pali-courses/ipc_key/19_class/",
+    "20": "https://digitalpalidictionary.github.io/dpd-pali-courses/ipc_key/20_class/",
+    "21": "https://digitalpalidictionary.github.io/dpd-pali-courses/ipc_key/21_class/",
+    "22": "https://digitalpalidictionary.github.io/dpd-pali-courses/ipc_key/22_class/",
+    "23": "https://digitalpalidictionary.github.io/dpd-pali-courses/ipc_key/23_class/",
+    "24": "https://digitalpalidictionary.github.io/dpd-pali-courses/ipc_key/24_class/",
+    "25": "https://digitalpalidictionary.github.io/dpd-pali-courses/ipc_key/25_class/",
+    "26": "https://digitalpalidictionary.github.io/dpd-pali-courses/ipc_key/26_class/",
+    "27": "https://digitalpalidictionary.github.io/dpd-pali-courses/ipc_key/27_class/",
+    "28": "https://digitalpalidictionary.github.io/dpd-pali-courses/ipc_key/28_class/",
+    "29": "https://digitalpalidictionary.github.io/dpd-pali-courses/ipc_key/29_class/",
+    "30": "https://docs.google.com/document/d/1VoFPr2jqJbQEQgT_UbuhxpzHM_H_mqX3BCy3vMdqiUc/#heading=h.xt3055kj3u3f",
+    "31": "https://docs.google.com/document/d/1VoFPr2jqJbQEQgT_UbuhxpzHM_H_mqX3BCy3vMdqiUc/#heading=h.h6g3ex3hsr1l",
+    "32": "https://docs.google.com/document/d/1VoFPr2jqJbQEQgT_UbuhxpzHM_H_mqX3BCy3vMdqiUc/#heading=h.csnptkyfuic9",
+    "33": "https://docs.google.com/document/d/1VoFPr2jqJbQEQgT_UbuhxpzHM_H_mqX3BCy3vMdqiUc/#heading=h.8g5c1nk4l7k7",
+    "34": "https://docs.google.com/document/d/1VoFPr2jqJbQEQgT_UbuhxpzHM_H_mqX3BCy3vMdqiUc/#heading=h.fnrtqj1w1e1v",
+    "35": "https://docs.google.com/document/d/1VoFPr2jqJbQEQgT_UbuhxpzHM_H_mqX3BCy3vMdqiUc/#heading=h.tx9p3q8r2630",
+    "36": "https://docs.google.com/document/d/1VoFPr2jqJbQEQgT_UbuhxpzHM_H_mqX3BCy3vMdqiUc/#heading=h.63qja4jqyjfb",
+    "37": "https://docs.google.com/document/d/1VoFPr2jqJbQEQgT_UbuhxpzHM_H_mqX3BCy3vMdqiUc/#heading=h.a9wtbtacc74q",
+    "38": "https://docs.google.com/document/d/1VoFPr2jqJbQEQgT_UbuhxpzHM_H_mqX3BCy3vMdqiUc/#heading=h.vtt0mrk0y3s1",
+    "39": "https://docs.google.com/document/d/1VoFPr2jqJbQEQgT_UbuhxpzHM_H_mqX3BCy3vMdqiUc/#heading=h.hirmha5w5o87",
+    "40": "https://docs.google.com/document/d/1c5E1-xA5OEKOC_myMBqVzdcEkoyiqfurAphMLz7JmnQ/#heading=h.c2qpipluj75s",
+    "41": "https://docs.google.com/document/d/1c5E1-xA5OEKOC_myMBqVzdcEkoyiqfurAphMLz7JmnQ/#heading=h.hujdmgrxn0er",
+    "42": "https://docs.google.com/document/d/1c5E1-xA5OEKOC_myMBqVzdcEkoyiqfurAphMLz7JmnQ/#heading=h.pa33bqqt56b1",
+    "43": "https://docs.google.com/document/d/1c5E1-xA5OEKOC_myMBqVzdcEkoyiqfurAphMLz7JmnQ/#heading=h.uxjn2bl2s8kh",
+    "44": "https://docs.google.com/document/d/1c5E1-xA5OEKOC_myMBqVzdcEkoyiqfurAphMLz7JmnQ/#heading=h.ahildl7e7fp",
+    "45": "https://docs.google.com/document/d/1c5E1-xA5OEKOC_myMBqVzdcEkoyiqfurAphMLz7JmnQ/#heading=h.diwn2pkxgt7x",
+    "46": "https://docs.google.com/document/d/1c5E1-xA5OEKOC_myMBqVzdcEkoyiqfurAphMLz7JmnQ/#heading=h.iel7ix6ma3zg",
+    "47": "https://docs.google.com/document/d/1c5E1-xA5OEKOC_myMBqVzdcEkoyiqfurAphMLz7JmnQ/#heading=h.5kkkj08vtyug",
+    "48": "https://docs.google.com/document/d/1c5E1-xA5OEKOC_myMBqVzdcEkoyiqfurAphMLz7JmnQ/#heading=h.mnn081bx2g7z",
+    "49": "https://docs.google.com/document/d/1c5E1-xA5OEKOC_myMBqVzdcEkoyiqfurAphMLz7JmnQ/#heading=h.2jx9e6dfncu1",
+    "50": "https://docs.google.com/document/d/1c5E1-xA5OEKOC_myMBqVzdcEkoyiqfurAphMLz7JmnQ/#heading=h.nq9j3nwb1hxs",
+    "51": "https://docs.google.com/document/d/18IBPFP0zs3ngEV-Ps5MmiGwaFtuz_2r3AqsZBlksPIQ/#heading=h.i94dpq8dwyfj",
+    "52": "https://docs.google.com/document/d/18IBPFP0zs3ngEV-Ps5MmiGwaFtuz_2r3AqsZBlksPIQ/#heading=h.is551l2lu9xv",
+    "53": "https://docs.google.com/document/d/18IBPFP0zs3ngEV-Ps5MmiGwaFtuz_2r3AqsZBlksPIQ/#heading=h.xbpo5wpofxwt",
+    "54": "https://docs.google.com/document/d/18IBPFP0zs3ngEV-Ps5MmiGwaFtuz_2r3AqsZBlksPIQ/#heading=h.fjh1agol5h9o"
+  },
+  "fetch_results": {
+    "Buddh'ādi-āmisa-pūjā": [
+      "Dedication of Offerings",
+      "Homage to the Triple Gem"
+    ],
+    "Pubbabhāga-namakāra": [
+      "Preliminary Homage",
+      "Homage to the Triple Gem"
+    ],
+    "Buddh'ābhitthuti": [
+      "Homage to the Buddha",
+      "Homage to the Triple Gem"
+    ],
+    "Nonexistent-chant": null
+  },
+  "closest_results": {
+    "exact": [
+      "Buddh'ādi-āmisa-pūjā",
+      1.0
+    ],
+    "near": [
+      "Buddh'ādi-āmisa-pūjā",
+      0.9743589743589743
+    ],
+    "no_match": null
+  },
+  "audio_results": {
+    "some_lemma": "",
+    "another_lemma": ""
+  },
+  "paragraph_results": {
+    "identical": true,
+    "different": false,
+    "close": true
+  }
+}

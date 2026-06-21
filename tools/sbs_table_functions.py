@@ -1,73 +1,68 @@
 """Functions for properties in SBS table"""
 
-import csv
-import os
-from difflib import SequenceMatcher
+from __future__ import annotations
 
-from rich.console import Console
+import csv
+from difflib import SequenceMatcher
+from pathlib import Path
+from typing import TYPE_CHECKING
 
 from tools.configger import config_read
 from tools.paths_dps import DPSPaths
+from tools.printer import printer as pr
 
-console = Console()
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
 
-dpspth = DPSPaths()
+    from db.models import DpdHeadword
+
+_dpspth: DPSPaths | None = None
+
+
+def _paths() -> DPSPaths:
+    """Lazily construct DPSPaths so importing this module has no side effects."""
+    global _dpspth
+    if _dpspth is None:
+        _dpspth = DPSPaths()
+    return _dpspth
+
+
+def _load_sbs_index_rows() -> tuple[dict[str, str], ...]:
+    """Parse sbs_index.csv into rows shared by all sbs_index.csv-based lookups."""
+    pth = _paths()
+    if not pth.sbs_index_path:
+        return ()
+    with open(pth.sbs_index_path, encoding="utf-8") as f:
+        reader = csv.DictReader(f, delimiter="\t")
+        return tuple(dict(row) for row in reader)
 
 
 class SBS_table_tools:
-    def load_chant_index_map(self):
+    def load_chant_index_map(self) -> dict[str, int]:
         """Load the chant-index mapping from a TSV file into a dictionary."""
-        chant_index_map = {}
-        if dpspth.sbs_index_path:
-            with open(dpspth.sbs_index_path, "r", encoding="utf-8") as csvfile:
-                reader = csv.reader(csvfile, delimiter="\t")
-                next(reader)  # Skip header row
-                for row in reader:
-                    index, chant = row[0], row[1]
-                    chant_index_map[chant] = int(index)
-        return chant_index_map
+        return {row["pali_chant"]: int(row["index"]) for row in _load_sbs_index_rows()}
 
-    def load_chant_link_map(self):
+    def load_chant_link_map(self) -> dict[str, str]:
         """Load the chant-link mapping from a TSV file into a dictionary."""
-        chant_link_map = {}
-        if dpspth.sbs_index_path:
-            with open(dpspth.sbs_index_path, "r", encoding="utf-8") as csvfile:
-                reader = csv.reader(csvfile, delimiter="\t")
-                next(reader)  # Skip header row
-                for row in reader:
-                    chant, link = row[1], row[4]
-                    chant_link_map[chant] = link
-        return chant_link_map
+        return {row["pali_chant"]: row["link"] for row in _load_sbs_index_rows()}
 
     def fetch_sbs_index(self, pali_chant: str) -> tuple[str, str] | None:
         """Return (english_chant, chapter) for exact pali_chant match, or None."""
-        if not dpspth.sbs_index_path:
-            return None
-        with open(dpspth.sbs_index_path, encoding="utf-8") as f:
-            reader = csv.DictReader(f, delimiter="\t")
-            for row in reader:
-                if row["pali_chant"] == pali_chant:
-                    return row["english_chant"], row["chapter"]
+        for row in _load_sbs_index_rows():
+            if row["pali_chant"] == pali_chant:
+                return row["english_chant"], row["chapter"]
         return None
 
     def load_valid_chants(self) -> list[str]:
         """Return all pali_chant values from sbs_index.csv."""
-        if not dpspth.sbs_index_path:
-            return []
-        with open(dpspth.sbs_index_path, encoding="utf-8") as f:
-            reader = csv.DictReader(f, delimiter="\t")
-            return [row["pali_chant"] for row in reader]
+        return [row["pali_chant"] for row in _load_sbs_index_rows()]
 
     def load_valid_mappings(self) -> set[tuple[str, str, str]]:
         """Return set of (pali_chant, english_chant, chapter) from sbs_index.csv."""
-        if not dpspth.sbs_index_path:
-            return set()
-        mappings: set[tuple[str, str, str]] = set()
-        with open(dpspth.sbs_index_path, encoding="utf-8") as f:
-            reader = csv.DictReader(f, delimiter="\t")
-            for row in reader:
-                mappings.add((row["pali_chant"], row["english_chant"], row["chapter"]))
-        return mappings
+        return {
+            (row["pali_chant"], row["english_chant"], row["chapter"])
+            for row in _load_sbs_index_rows()
+        }
 
     def find_closest_chant(
         self, pali_chant: str, threshold: float = 0.8
@@ -76,49 +71,36 @@ class SBS_table_tools:
         best: tuple[str, float] | None = None
         for candidate in self.load_valid_chants():
             ratio = SequenceMatcher(None, pali_chant, candidate).ratio()
-            if ratio >= threshold:
-                if best is None or ratio > best[1]:
-                    best = (candidate, ratio)
+            if ratio >= threshold and (best is None or ratio > best[1]):
+                best = (candidate, ratio)
         return best
 
-    def load_class_link_map(self):
+    def load_class_link_map(self) -> dict[int, str]:
         """Load the class-link mapping from a TSV file into a dictionary."""
-        class_link_map = {}
-        if dpspth.class_index_path:
-            with open(dpspth.class_index_path, "r", encoding="utf-8") as csvfile:
+        class_link_map: dict[int, str] = {}
+        pth = _paths()
+        if pth.class_index_path:
+            with open(pth.class_index_path, "r", encoding="utf-8") as csvfile:
                 reader = csv.reader(csvfile, delimiter="\t")
                 next(reader)  # Skip header row
                 for row in reader:
-                    class_num, link = (
-                        int(row[0]),
-                        row[2],
-                    )  # Convert class_num to integer
+                    class_num, link = int(row[0]), row[2]
                     class_link_map[class_num] = link
         return class_link_map
 
-    def load_sutta_link_map(self):
-        """Load the sutta-link mapping from a TSV file into a dictionary."""
-        sutta_link_map = {}
-        if dpspth.sutta_index_path:
-            with open(dpspth.sutta_index_path, "r", encoding="utf-8") as csvfile:
-                reader = csv.reader(csvfile, delimiter="\t")
-                next(reader)  # Skip header row
-                for row in reader:
-                    sutta_num, link = row[0], row[2]
-                    sutta_link_map[sutta_num] = link
-        return sutta_link_map
-
-    def generate_sbs_audio(self, lemma_clean):
+    def generate_sbs_audio(self, lemma_clean: str) -> str:
         """Generate the sbs_audio string based on the presence of an audio file."""
         anki_media_dir_path = config_read("anki", "media_dir")
         if anki_media_dir_path:
-            audio_path = os.path.join(anki_media_dir_path, f"{lemma_clean}.mp3")
-            if os.path.exists(audio_path):
+            audio_path = Path(anki_media_dir_path) / f"{lemma_clean}.mp3"
+            if audio_path.exists():
                 return f"[sound:{lemma_clean}.mp3]"
         return ""
 
 
-def paragraphs_are_similar_sbs(paragraph1, paragraph2, threshold):
+def paragraphs_are_similar_sbs(
+    paragraph1: str, paragraph2: str, threshold: float
+) -> bool:
     matcher = SequenceMatcher(None, paragraph1, paragraph2)
     similarity_ratio = matcher.ratio()
     return similarity_ratio >= threshold
@@ -269,9 +251,9 @@ sbs_category_list = [
 ]
 
 
-def recalculate_all_sbs_indices(db_session, db):
+def recalculate_all_sbs_indices(db_session: Session, db: list[DpdHeadword]) -> None:
     """Recalculate sbs_index for all entries in the db and commit changes."""
-    console.print("[green]Calculating sbs_index")
+    pr.green("Calculating sbs_index")
     try:
         for i in db:
             if i.sbs:
@@ -279,11 +261,11 @@ def recalculate_all_sbs_indices(db_session, db):
                 sbs_index_value = i.sbs.calculate_index()
                 if sbs_index_old != sbs_index_value:
                     i.sbs.sbs_index = sbs_index_value
-                    console.print(
-                        f"[cyan]{i.lemma_1}[/cyan] old index {sbs_index_old} changed to {sbs_index_value}"
+                    pr.cyan(
+                        f"{i.lemma_1} old index {sbs_index_old} changed to {sbs_index_value}"
                     )
 
         db_session.commit()
 
-    except Exception as e:
-        console.print(f"[bold red]{str(e)}")
+    except Exception as e:  # noqa: BLE001
+        pr.red(str(e))

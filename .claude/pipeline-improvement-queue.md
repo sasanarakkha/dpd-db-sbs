@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 73
+Pointer: 76
 
 ## Scripts (76 total, local unique_paths)
 
@@ -98,9 +98,9 @@ Pointer: 73
 - [x] 70. tools/ai_related.py
 - [x] 71. tools/ask.py
 - [x] 72. tools/deepseek.py
-- [ ] 73. tools/duplicates.py
-- [ ] 74. tools/file_utils.py
-- [ ] 75. tools/sbs_table_functions.py
+- [x] 73. tools/duplicates.py
+- [x] 74. tools/file_utils.py — archived
+- [x] 75. tools/sbs_table_functions.py
 - [ ] 76. tools/tools_for_ru_exporter.py
 
 ---
@@ -169,3 +169,6 @@ Pointer: 73
 2026-06-20 | #71 tools/ask.py | changed | extracted _read_line_fallback() helper, removes duplicated readline/strip/lower/EOFError logic between the non-TTY branch and the termios-exception branch in read_single_char(); reviewer's other claims (missing type hints, "three consecutive flushes," .lower() duplication "in same path", abort-check misplacement) checked against actual code and rejected as inaccurate; chmod +x (EXE001) forced by pre-commit, same pattern as #29/#30/#44/#46; 7 tests added (tests/tools/test_ask.py, subprocess golden-master against real CLI invocations, no mocks); live run (`echo y | uv run python3 tools/ask.py "question?"`) succeeded, exit 0, output unchanged
 2026-06-20 | #70 tools/ai_related.py | changed | consolidated AI client/config machinery onto AIManager: removed get_ai_client/print_ai_config/load_ai_config (legacy single-model config.ini duplicating AIManager's role); now prompt-builders only (generate_messages_for_*, replace_abbreviations, load_translation_examples); type hints throughout, print()->pr.*, open()->Path.open(); removed dead handle_ai_response/generate_messages_for_english_meaning + unused module-level dpspth; tools/ai_manager.py exposed load_models_from_json() as public (was _load_models_from_json) for model-list deduping in scripts/other/ai_generate_translation.py; scripts/other/ai_batch_openai_meaning.py inlined minimal _get_openai_client() (reads apis.openai directly, cannot route through AIManager lacking Batch API support); scripts/other/ai_generate_translation.py removed duplicate JSON parsing + legacy default_model globals, now sources via AIManager.load_models_from_json() (cheap, no provider init); tests/tools/test_ai_related.py + fixtures.json 10 golden-master tests captured against unedited code, all pass; live smoke tests: (1) ai_generate_translation.py --mode note --limit 1 via deepseek-v4-flash (1.32s, persisted to dpd.db), (2) ai_batch_openai_meaning.py check_batch_list() listed real OpenAI batch history via live API
 2026-06-20 | #72 tools/deepseek.py | archived | direct-API wrapper superseded by tools/ai_deepseek_manager.py, which is integrated into AIManager provider system; zero callers anywhere; same pattern as #69 (ai_openai_manager.py); moved to archive/deepseek.py via git mv, removed from registry.json unique_paths
+2026-06-21 | #73 tools/duplicates.py | changed | Optional/Tuple/List/Dict->modern hints, Counter[str], open()->tsv_path.open(), defaultdict(list) replaces manual dict-init-then-append, removed dead trailing else after early return; reviewer's empty-string/whitespace/case-sensitivity edge-case changes and pandas/memory-optimized rewrites rejected (no evidence needed, scale doesn't warrant it); 7 golden-master tests added (tests/tools/test_duplicates.py), captured against unedited code first per protocol, all match byte-identical; no entry point in this file - live run not applicable (only caller is scripts/build/db_rebuild_from_tsv_dps.py, out of scope to run)
+2026-06-21 | #74 tools/file_utils.py | archived | zero active callers in current codebase; only importer is scripts/dps_archive/ai_sentences_extracting.py, itself already archived; utilities for loading vocabulary/exercise data (CSV search, text file parsing) have no active workflow using them
+2026-06-21 | #75 tools/sbs_table_functions.py | changed | lazy `_paths()` replaces module-level `dpspth = DPSPaths()` (fixed real import-time side effect: DPSPaths(create_dirs=True) created directories on disk merely by importing db/models.py, which imports this module); removed dead load_sutta_link_map (zero callers anywhere, confirmed via grep); console/rich->pr.green/pr.cyan/pr.red; os.path->pathlib in generate_sbs_audio; added missing type hints throughout with TYPE_CHECKING guard for Session/DpdHeadword (avoids circular import with db/models.py, same pattern as #2); reviewer's (deepseek) module-level eager _SBS_DATA cache and SBS_table_tools->SbsTableTools rename rejected (eager load reintroduces the same import-side-effect problem, rename touches ~8 external import sites for no behavior gain); my own first attempt at deduping repeated file I/O via module-level lru_cache was caught and reverted before commit — it broke tests/test_sbs_chants_fix.py's builtins.open mocking when run in the same pytest session (cache populated by one test leaked into another, 9/24 tests failed depending on collection order); kept the shared-rows extraction (_load_sbs_index_rows) for load_class_link_map but without caching, so behavior (one file read per call) is unchanged; 17 golden-master tests added (tests/tools/test_sbs_table_functions.py + fixtures.json) against real shared_data/sbs_csvs files, no mocks; confirmed order-independent with tests/test_sbs_chants_fix.py both directions; verified clean imports for db/models.py, scripts/change_in_db/update_sbs_chants_in_db.py, scripts/export/sbs_anki_deck_config.py; no entry point in this file - live run not applicable
