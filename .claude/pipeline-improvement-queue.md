@@ -1,40 +1,40 @@
 # Pipeline Improvement Queue
 
-Pointer: 76
+Pointer: 1
 
-## Scripts (76 total, local unique_paths)
+## Scripts (143 total, local unique_paths)
 
 ### db/families
 
-- [x] 1. db/families/family_set_ru_update.py
+- [ ] 1. db/families/family_set_ru_update.py
 
 ### gui2
 
-- [x] 2. gui2/dps_ai_service.py
-- [x] 3. gui2/dps_db_helpers.py
-- [>] 4. gui2/dps_field_mapping.py
-- [x] 5. gui2/dps_process_additions.py
-- [x] 6. gui2/dps_process_corrections.py
+- [ ] 2. gui2/dps_ai_service.py
+- [ ] 3. gui2/dps_db_helpers.py
+- [ ] 4. gui2/dps_field_mapping.py
+- [ ] 5. gui2/dps_process_additions.py
+- [ ] 6. gui2/dps_process_corrections.py
 
 ### scripts/change_in_db
 
-- [x] 8. scripts/change_in_db/add_row_to_table.py
-- [x] 9. scripts/change_in_db/apply_all_additions.py
-- [x] 10. scripts/change_in_db/apply_all_corrections.py
-- [x] 11. scripts/change_in_db/change_in_db.py
-- [x] 12. scripts/change_in_db/class_relation.py
-- [x] 13. scripts/change_in_db/copy_examples.py
-- [x] 14. scripts/change_in_db/copy_ru_meaning_raw_to_ru_meaning.py
-- [x] 15. scripts/change_in_db/fill_dhp_examples.py
-- [x] 16. scripts/change_in_db/preview_dhp_changes.py
-- [x] 17. scripts/change_in_db/replace_in_db.py
-- [x] 18. scripts/change_in_db/sbs_class_sutta_linker.py
-- [x] 19. scripts/change_in_db/dhp_examples_copy.py
-- [x] 20. scripts/change_in_db/source_cleanup.py
-- [x] 21. scripts/change_in_db/update_examples_from_csv.py
-- [x] 22. scripts/change_in_db/update_ru_db_from_csv.py
-- [x] 23. scripts/change_in_db/update_sbs_chants_in_db.py
-- [x] 24. scripts/change_in_db/update_yojana_km.py
+- [ ] 8. scripts/change_in_db/add_row_to_table.py
+- [ ] 9. scripts/change_in_db/apply_all_additions.py
+- [ ] 10. scripts/change_in_db/apply_all_corrections.py
+- [ ] 11. scripts/change_in_db/change_in_db.py
+- [ ] 12. scripts/change_in_db/class_relation.py
+- [ ] 13. scripts/change_in_db/copy_examples.py
+- [ ] 14. scripts/change_in_db/copy_ru_meaning_raw_to_ru_meaning.py
+- [ ] 15. scripts/change_in_db/fill_dhp_examples.py
+- [ ] 16. scripts/change_in_db/preview_dhp_changes.py
+- [ ] 17. scripts/change_in_db/replace_in_db.py
+- [ ] 18. scripts/change_in_db/sbs_class_sutta_linker.py
+- [ ] 19. scripts/change_in_db/dhp_examples_copy.py
+- [ ] 20. scripts/change_in_db/source_cleanup.py
+- [ ] 21. scripts/change_in_db/update_examples_from_csv.py
+- [ ] 22. scripts/change_in_db/update_ru_db_from_csv.py
+- [ ] 23. scripts/change_in_db/update_sbs_chants_in_db.py
+- [ ] 24. scripts/change_in_db/update_yojana_km.py
 - [x] 25. scripts/change_in_db/vib_rule_workflow.py
 
 ### scripts/export
@@ -102,6 +102,97 @@ Pointer: 76
 - [x] 74. tools/file_utils.py — archived
 - [x] 75. tools/sbs_table_functions.py
 - [ ] 76. tools/tools_for_ru_exporter.py
+
+### scripts/rus_exporter
+
+- [ ] 77. scripts/rus_exporter/anki_config_github_release.py
+- [ ] 78. scripts/rus_exporter/check_tpr_download_index.py
+- [ ] 79. scripts/rus_exporter/config_github_local_dpd_rus.py
+- [ ] 80. scripts/rus_exporter/config_github_local_dpd_sbs.py
+- [ ] 81. scripts/rus_exporter/config_github_release_dpd_rus.py
+- [ ] 82. scripts/rus_exporter/config_github_release_dpd_sbs.py
+- [ ] 83. scripts/rus_exporter/config_github_release_dpd_ta.py
+- [ ] 84. scripts/rus_exporter/config_github_server_dpd_sbs.py
+- [ ] 85. scripts/rus_exporter/docs_add_indexes.py
+- [ ] 86. scripts/rus_exporter/docs_check_ru.py
+- [ ] 87. scripts/rus_exporter/ru_config_github_release.py
+- [ ] 88. scripts/rus_exporter/ru_zip_goldendict_mdict.py
+- [ ] 89. scripts/rus_exporter/zip_dpd_rus.py
+- [ ] 90. scripts/rus_exporter/zip_dpd_sbs.py
+- [ ] 91. scripts/rus_exporter/zip_dpd_ta.py
+
+### scripts/change_in_db (new additions)
+
+- [ ] 92. scripts/change_in_db/rearrange_sbs_gatha_lines.py
+- [ ] 93. scripts/change_in_db/sbs_dpd_example_transfers.py
+
+### db/backup_tsv
+
+- [ ] 94. db/backup_tsv/backup_all.py
+
+### scripts/bash
+
+- [ ] 95. scripts/bash/check_new_words.sh
+- [ ] 96. scripts/bash/copy_dpd_to_server
+- [ ] 97. scripts/bash/copy_tpr_db.sh
+- [ ] 98. scripts/bash/download_dpd.sh
+- [ ] 99. scripts/bash/download_pali_classes.sh
+- [ ] 100. scripts/bash/for_release.py
+- [ ] 101. scripts/bash/manual_update_mac_dict.sh
+- [ ] 102. scripts/bash/move_class.sh
+- [ ] 103. scripts/bash/move_decks.sh
+- [ ] 104. scripts/bash/pali_vocab_push.sh
+- [ ] 105. scripts/bash/push_from_temp.sh
+- [ ] 106. scripts/bash/rebuild_db.sh
+- [ ] 107. scripts/bash/sbs-update-db.sh
+- [ ] 108. scripts/bash/stage_study_tools.sh
+- [ ] 109. scripts/bash/upload_study_tools.sh
+
+### scripts/cl
+
+- [ ] 110. scripts/cl/dpd-gui2
+
+### scripts/cl_dps
+
+- [ ] 111. scripts/cl_dps/decks
+- [ ] 112. scripts/cl_dps/dpd-anki
+- [ ] 113. scripts/cl_dps/dpd-build-db
+- [ ] 114. scripts/cl_dps/dpd-gui2
+- [ ] 115. scripts/cl_dps/dpd-kamma-sync
+- [ ] 116. scripts/cl_dps/dpd-makedict
+- [ ] 117. scripts/cl_dps/dpd-push
+- [ ] 118. scripts/cl_dps/dpd-review-comments
+- [ ] 119. scripts/cl_dps/dpd-upstream-push
+- [ ] 120. scripts/cl_dps/dpd-upstream-push-corrections
+- [ ] 121. scripts/cl_dps/dpd-upstream-push-latest
+- [ ] 122. scripts/cl_dps/dpd-vib-rule
+- [ ] 123. scripts/cl_dps/dpd-webapp
+
+### scripts/export (additional)
+
+- [ ] 124. scripts/export/anki_csv.py
+- [ ] 125. scripts/export/dps_anki_updater.py
+- [ ] 126. scripts/export/extract_ebt_text.py
+- [ ] 127. scripts/export/filter_from_db.py
+- [ ] 128. scripts/export/filtering_and_backup.py
+- [ ] 129. scripts/export/list_of_words_from_txt.py
+- [ ] 130. scripts/export/list_of_words_from_txt_old.py
+- [ ] 131. scripts/export/save_all_sutta_names.py
+- [ ] 132. scripts/export/save_all_words_alphabetically.py
+- [ ] 133. scripts/export/save_all_words_sorted_by_family.py
+- [ ] 134. scripts/export/save_csv_for_audio.py
+- [ ] 135. scripts/export/save_filtered_words.py
+- [ ] 136. scripts/export/save_russian_for_collaborator.py
+- [ ] 137. scripts/export/sbs_anki_fields_check.py
+- [ ] 138. scripts/export/sbs_anki_templates.py
+- [ ] 139. scripts/export/sbs_anki_update_seed.py
+- [ ] 140. scripts/export/sbs_example_dupes.py
+- [ ] 141. scripts/export/sourse_atth_sbs_mula.py
+- [ ] 142. scripts/export/vocab_abbrev_pali_course.py
+
+### tools (additional)
+
+- [ ] 143. tools/meaning_snapshot_ru.py
 
 ---
 

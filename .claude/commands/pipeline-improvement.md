@@ -66,10 +66,20 @@ Then present the summary to the user and use the `AskUserQuestion` tool to ask:
 2. Run `git mv <source> <target>` to move it.
 3. Mark the script `[x] archived` in the queue and advance the Pointer.
 4. Append a decision log entry: `archived — <one-line reason>`.
-5. Output exactly:
+5. Stage the move and the queue update: `git add <target> .claude/pipeline-improvement-queue.md`
+   (use `git mv`'s staged result for the source/target rename — no separate `git rm` needed).
+6. Show the proposed commit message:
+   ```
+   pipeline: archive <file> (#N)
+
+   - <one-line reason>
+   ```
+   Then use the AskUserQuestion tool to ask **"commit?"** (yes / no).
+7. If **yes**: run `git commit -m` with that message (no heredoc — user runs Fish shell).
+8. Output exactly:
    > **Archived.** `<source>` → `<target>`. Queue pointer advanced to #N.
    > Start a fresh session and run `/pipeline-improvement` to continue.
-6. **Stop. Do not proceed to the review steps.**
+9. **Stop. Do not proceed to the review steps.**
 
 **If the user chooses Improve:** continue to step 3.
 
