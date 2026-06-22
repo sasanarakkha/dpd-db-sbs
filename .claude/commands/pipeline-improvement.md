@@ -17,34 +17,48 @@ Review everything; change only what genuinely needs it. Coverage over churn.
 ## Delegation
 
 For any self-contained sub-task in this skill that does not need live conversation
-context — reading imported local modules to check for dead/unused symbols, running
-the fixture-capture probe script (step 4b), bulk `grep`/call-graph searches, mechanical
-multi-file checks — delegate it to a subagent on the fast model (Haiku) via the Agent
-tool instead of doing it inline. Reserve this session for the review judgment, the
-decision (clean / needs a change), and the final synthesis. Do not delegate anything
-that requires weighing project conventions or deciding what counts as a genuine
-improvement — that judgment stays here.
+context, delegate it to a subagent on the fast model (Haiku) via the Agent tool
+(pin `model: "haiku"`) instead of doing it inline. Delegate:
+
+- the step-2 archive-check summary (read the file + grep its callers, return the
+  2–4 paragraph summary) — keeps the full file out of this session's context on the
+  Archive path;
+- running the pre-commit gate (`ruff check --fix` / `ruff format` / `pyright` /
+  `pyrefly` / `pytest`) and returning only `PASS` or the specific errors — keeps
+  verbose tool output out of this session;
+- reading imported local modules to check for dead/unused symbols;
+- running the fixture-capture probe script (step 4b);
+- bulk `grep`/call-graph searches and mechanical multi-file checks.
+
+Reserve this session for the review judgment, the decision (clean / needs a change),
+and the final synthesis. Do not delegate anything that requires weighing project
+conventions or deciding what counts as a genuine improvement — that judgment stays here.
 
 ## Procedure
 
 ### 1. Read state
 
-Read `.claude/pipeline-improvement-queue.md`.
-Find the current **Pointer** value. That is the next script to review.
+Read `.claude/pipeline-improvement-queue.md` (lean — Pointer + checklist only).
+Find the current **Pointer** value. That is the next script to review. The verbose
+decision history lives in `.claude/pipeline-improvement-log.md`; read it only on
+demand (e.g. to check a prior precedent), never by default.
 
 ### 2. Archive check
 
-Before any review work, read the next pending `[ ]` script and write a short
-summary (2–4 paragraphs) covering:
+Before any review work, delegate to a Haiku subagent (`model: "haiku"`) the task of
+reading the next pending `[ ]` script and its callers, and returning a short summary
+(2–4 paragraphs) covering:
 
 - **What it does** — its purpose and the problem it solves.
 - **Where it fits** — what calls it, what it calls, who uses it.
 - **Current status** — does it still appear active and needed, or does it look
   stale/superseded/unused?
 
-This summary is **reused verbatim** as the "What it does" block in the step 4
-output template — do not re-derive it. The file is already in context; step 3
-does not need to re-read it.
+Delegating this keeps the full file out of this session's context — important because
+the user may choose Archive, in which case the file is never needed here. This summary
+is **reused verbatim** as the "What it does" block in the step 4 output template — do
+not re-derive it. The file is NOT in this session's context; step 3a reads it only if
+the user chooses Improve.
 
 Then present the summary to the user and use the `AskUserQuestion` tool to ask:
 
@@ -65,8 +79,10 @@ Then present the summary to the user and use the `AskUserQuestion` tool to ask:
    - File is under any other folder → move to `archive/`
 2. Run `git mv <source> <target>` to move it.
 3. Mark the script `[x] archived` in the queue and advance the Pointer.
-4. Append a decision log entry: `archived — <one-line reason>`.
-5. Stage the move and the queue update: `git add <target> .claude/pipeline-improvement-queue.md`
+4. Append a terse decision line to `.claude/pipeline-improvement-log.md`:
+   `YYYY-MM-DD | #N path | archived | <one-line reason>`.
+5. Stage the move, the queue update, and the log update:
+   `git add <target> .claude/pipeline-improvement-queue.md .claude/pipeline-improvement-log.md`
    (use `git mv`'s staged result for the source/target rename — no separate `git rm` needed).
 6. Show the proposed commit message:
    ```
@@ -104,9 +120,9 @@ collect its output in step 4 (it will already be done, or nearly so).
 **DO NOT launch this background command during step 2, before the user has chosen
 Improve. The gate in step 2 is unconditional: Archive answer → no API call, ever.**
 
-**a. Read the file** (and any files it imports from this repo). The script
-itself is already in context from step 2 — do not re-read it, only read
-imported local modules that were not yet loaded.
+**a. Read the file** (and any files it imports from this repo). The script was
+summarised by the step-2 subagent but is NOT in this session's context, so read it
+now. Imported local modules can be read by a Haiku subagent (dead/unused-symbol check).
 
 **b. Review across all five angles:**
 
@@ -326,14 +342,16 @@ Rules:
 - Cover every branch: each code path needs at least one real-data case.
 - Test directory mirrors source: `scripts/export/foo.py` → `tests/scripts/export/test_foo.py`
 - One test file + one fixture file per script reviewed.
-- After writing, run the FULL pre-commit gate against the test file — the same three
-  tools the `.pre-commit-config.yaml` hook runs, in this order, plus pytest:
-  `uv run ruff check --fix <test file>`, `uv run ruff format <test file>`,
-  `uv run pyright <test file>`, `uv run --with pyrefly pyrefly check --min-severity warn <test file>`,
-  `uv run pytest <test file>`. **Do not skip
-  `ruff format`** — a file can pass `ruff check` and still be rewritten by the
-  formatter, which costs a commit round-trip. Confirm all pass **against the
-  unedited source**.
+- After writing, run the FULL pre-commit gate against the test file. **The gate** is
+  the same three tools the `.pre-commit-config.yaml` hook runs, in this order, plus
+  pytest:
+  `uv run ruff check --fix <files>`, `uv run ruff format <files>`,
+  `uv run pyright <files>`, `uv run --with pyrefly pyrefly check --min-severity warn <files>`,
+  `uv run pytest <test file>`. **Do not skip `ruff format`** — a file can pass
+  `ruff check` and still be rewritten by the formatter, which costs a commit
+  round-trip. Delegate the gate run to a Haiku subagent (`model: "haiku"`) that
+  returns only `PASS` or the specific errors, to keep verbose tool output out of this
+  session. Confirm all pass **against the unedited source**.
 - Include both the test file and the fixture file in the commit.
 
 #### Step 3 — Apply the approved source edits (only now)
@@ -342,14 +360,12 @@ The test is green against the current code. Now apply the changes from step 4.
 
 #### Step 4 — Re-run the full gate
 
-Run the same pre-commit gate again, on BOTH the edited source and the test file:
-`uv run ruff check --fix <files>`, `uv run ruff format <files>`,
-`uv run pyright <files>`, `uv run --with pyrefly pyrefly check --min-severity warn <files>`,
-`uv run pytest <test file>`. These mirror the
-`.pre-commit-config.yaml` hooks — if they pass here, the commit hook will not bounce.
-For a behaviour-preserving refactor the test must still pass unchanged. For a deliberate
-behaviour change, only the cases you explicitly updated to the new behaviour may differ
-— everything else stays byte-identical.
+Run **the gate** (defined in Step 2) again, on BOTH the edited source and the test
+file — again delegating the run to a Haiku subagent that returns only `PASS` or the
+errors. These mirror the `.pre-commit-config.yaml` hooks — if they pass here, the
+commit hook will not bounce. For a behaviour-preserving refactor the test must still
+pass unchanged. For a deliberate behaviour change, only the cases you explicitly
+updated to the new behaviour may differ — everything else stays byte-identical.
 
 #### Step 5 — Run the script live (smoke test)
 
@@ -395,14 +411,22 @@ After a successful live run (or a confirmed skip):
    Output exactly:
    > **Done.** Queue updated — pointer is at #N (`path/to/next/script.py`). Start a fresh session and run `/pipeline-improvement` to continue.
 
-### 5. Update queue.md
+### 5. Update the queue and log
 
-After every run (whether a change was made or not), write back to `.claude/pipeline-improvement-queue.md`:
+After every run (whether a change was made or not):
+
+In `.claude/pipeline-improvement-queue.md` (kept lean — Pointer + checklist only, read
+in full at step 1):
 - Update the Pointer to the next pending script.
 - Mark reviewed-clean scripts `[x] passed`.
 - Mark changed scripts `[x] changed`.
 - Mark deferred scripts `[>]`.
-- Append all decisions to the decisions log.
+
+In `.claude/pipeline-improvement-log.md` (append-only history, NOT read at step 1):
+- Append ONE terse decision line: `YYYY-MM-DD | #N path | passed / changed / skipped /
+  deferred / archived | one concise clause`. The full rationale already lives in the
+  commit message — do not duplicate it here. Keep the log a thin index, not a second
+  changelog.
 
 ### 6. End-of-queue
 
