@@ -26,4 +26,4 @@
 - 2026-06-19 [BEHAVIOR] Pre-existing lint errors in unmodified lines block commits even when only a small help-text change is staged; run a full lint check on the working tree before finalization, not just on staged hunks.
 - 2026-06-19 [POSITIVE] Thorough review.md (listing all files, findings, test evidence, and procedural notes) enables efficient finalization even when files have mixed hunks or procedural constraints.
 - 2026-06-20 [POSITIVE] Using ask_question to confirm doc updates during finalization ensures smooth, explicit alignment on technical notes.
-
+- 2026-06-22 [POSITIVE] Moving pipeline logic from model instructions to zero-LLM local Python scripts drastically reduces start-up overhead and ensures stable validation.
