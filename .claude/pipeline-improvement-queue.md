@@ -10,7 +10,7 @@
 > re-litigate the refactor work already logged (type hints, pr.* conversion, dead code,
 > etc.), that part is done and should not be redone.
 
-Pointer: 5
+Pointer: 9
 
 ## Scripts (143 total, local unique_paths)
 
@@ -23,12 +23,12 @@ Pointer: 5
 - [x] 2. gui2/dps_ai_service.py
 - [x] 3. gui2/dps_db_helpers.py
 - [x] 4. gui2/dps_field_mapping.py
-- [ ] 5. gui2/dps_process_additions.py
-- [ ] 6. gui2/dps_process_corrections.py
+- [x] 5. gui2/dps_process_additions.py
+- [x] 6. gui2/dps_process_corrections.py
 
 ### scripts/change_in_db
 
-- [ ] 8. scripts/change_in_db/add_row_to_table.py
+- [x] 8. scripts/change_in_db/add_row_to_table.py
 - [ ] 9. scripts/change_in_db/apply_all_additions.py
 - [ ] 10. scripts/change_in_db/apply_all_corrections.py
 - [ ] 11. scripts/change_in_db/change_in_db.py
