@@ -1,5 +1,65 @@
 [
     {
+        "id": 61972,
+        "lemma_1": "saṃvega 1"
+    },
+    {
+        "id": 37660,
+        "lemma_1": "nibbidā"
+    },
+    {
+        "id": 63146,
+        "lemma_1": "sīla 1"
+    },
+    {
+        "id": 53199,
+        "lemma_1": "metta 2"
+    },
+    {
+        "id": 53198,
+        "lemma_1": "metta 1"
+    },
+    {
+        "id": 53212,
+        "lemma_1": "mettā"
+    },
+    {
+        "id": 46342,
+        "lemma_1": "pīṭha"
+    },
+    {
+        "id": 67414,
+        "lemma_1": "vicaya"
+    },
+    {
+        "id": 66883,
+        "lemma_1": "vāyāma"
+    },
+    {
+        "id": 69911,
+        "lemma_1": "vīriya 1"
+    },
+    {
+        "id": 68921,
+        "lemma_1": "viriya"
+    },
+    {
+        "id": 44749,
+        "lemma_1": "passaddhi"
+    },
+    {
+        "id": 70026,
+        "lemma_1": "vuḍḍha 2"
+    },
+    {
+        "id": 29909,
+        "lemma_1": "tapati 1"
+    },
+    {
+        "id": 50331,
+        "lemma_1": "bho"
+    },
+    {
         "id": 59526,
         "lemma_1": "samaṃ 3"
     },
@@ -38,65 +98,5 @@
     {
         "id": 74170,
         "lemma_1": "kammakiliṭṭha"
-    },
-    {
-        "id": 42491,
-        "lemma_1": "pabbajjā 1"
-    },
-    {
-        "id": 73961,
-        "lemma_1": "durakkha"
-    },
-    {
-        "id": 73963,
-        "lemma_1": "ekacāra"
-    },
-    {
-        "id": 73966,
-        "lemma_1": "anavassutacitta"
-    },
-    {
-        "id": 73964,
-        "lemma_1": "anavaṭṭhitacitta"
-    },
-    {
-        "id": 79743,
-        "lemma_1": "ahari"
-    },
-    {
-        "id": 88671,
-        "lemma_1": "amagga 2"
-    },
-    {
-        "id": 88622,
-        "lemma_1": "upadhāvati 3"
-    },
-    {
-        "id": 5115,
-        "lemma_1": "anurakkhaṇāppadhāna"
-    },
-    {
-        "id": 49326,
-        "lemma_1": "bhattiyaghara"
-    },
-    {
-        "id": 43595,
-        "lemma_1": "parinibbāyati 2"
-    },
-    {
-        "id": 43594,
-        "lemma_1": "parinibbāyati 1"
-    },
-    {
-        "id": 73996,
-        "lemma_1": "vitiṇṇaparaloka"
-    },
-    {
-        "id": 12707,
-        "lemma_1": "ālokasaññā"
-    },
-    {
-        "id": 45799,
-        "lemma_1": "pāripūri 1"
     }
 ]
