@@ -3,7 +3,6 @@
 """Add all additions from gui2/data/additions_{username}.json to the database with new IDs."""
 
 import json
-from pathlib import Path
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword
@@ -20,44 +19,35 @@ dpspth = DPSPaths()
 
 
 def replace_old_ids_in_tsv_files(id_map: dict[str, int]) -> None:
-    """
-    Replaces old IDs with new IDs in specified TSV files.
-    id_map: A dictionary mapping old_id_str to new_id (int).
-    """
+    """Replaces old IDs with new IDs in specified TSV files."""
     pr.green_title("Replacing old IDs in TSV files (russian.tsv, sbs.tsv)...")
 
     if not id_map:
         pr.red("ID map is empty. No TSV files to update.")
         return
 
-    def process_file(file_path: Path, current_id_map: dict[str, int]) -> None:
+    for file_path in [dpspth.russian_path, dpspth.sbs_path]:
         try:
             with open(file_path, "r", newline="", encoding="utf-8") as file:
                 lines = file.readlines()
         except FileNotFoundError:
             pr.red(f"File not found: {file_path}")
-            return
+            continue
 
         replacements_done = 0
         with open(file_path, "w", newline="", encoding="utf-8") as file:
-            for line_number, line in enumerate(lines):
+            for line in lines:
                 columns = line.strip().split("\t")
                 if columns:
-                    # Clean the first column ID for matching (remove existing quotes)
                     id_to_check = columns[0].strip().strip('"')
-                    if id_to_check in current_id_map:
-                        new_id = current_id_map[id_to_check]
-                        columns[0] = f'"{new_id}"'  # Add quotes to the new ID
+                    if id_to_check in id_map:
+                        columns[0] = f'"{id_map[id_to_check]}"'
                         replacements_done += 1
                 file.write("\t".join(columns) + "\n")
         pr.green(
             f"Finished processing {file_path}. Replacements made: {replacements_done}"
         )
         pr.yes("ok")
-
-    process_file(dpspth.russian_path, id_map)
-    process_file(dpspth.sbs_path, id_map)
-    pr.yes("ok")
 
 
 def add_all_additions_with_new_ids() -> None:
