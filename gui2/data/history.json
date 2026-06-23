@@ -1,5 +1,45 @@
 [
     {
+        "id": 73959,
+        "lemma_1": "abalassa"
+    },
+    {
+        "id": 73957,
+        "lemma_1": "suchanna"
+    },
+    {
+        "id": 73954,
+        "lemma_1": "sukhamanveti"
+    },
+    {
+        "id": 73956,
+        "lemma_1": "sammāsaṅkappagocara"
+    },
+    {
+        "id": 73955,
+        "lemma_1": "micchāsaṅkappagocara"
+    },
+    {
+        "id": 74170,
+        "lemma_1": "kammakiliṭṭha"
+    },
+    {
+        "id": 73961,
+        "lemma_1": "durakkha"
+    },
+    {
+        "id": 73963,
+        "lemma_1": "ekacāra"
+    },
+    {
+        "id": 73966,
+        "lemma_1": "anavassutacitta"
+    },
+    {
+        "id": 73964,
+        "lemma_1": "anavaṭṭhitacitta"
+    },
+    {
         "id": 62730,
         "lemma_1": "sikkhākaraṇīyā"
     },
@@ -38,45 +78,5 @@
     {
         "id": 89526,
         "lemma_1": "hāyati 2"
-    },
-    {
-        "id": 70634,
-        "lemma_1": "vosāsati"
-    },
-    {
-        "id": 89616,
-        "lemma_1": "samakaṃ"
-    },
-    {
-        "id": 38421,
-        "lemma_1": "nivāreti"
-    },
-    {
-        "id": 48512,
-        "lemma_1": "buddha 2"
-    },
-    {
-        "id": 20592,
-        "lemma_1": "kalahajāta"
-    },
-    {
-        "id": 49255,
-        "lemma_1": "bhaṇḍanajāta"
-    },
-    {
-        "id": 89417,
-        "lemma_1": "vilekhana 2"
-    },
-    {
-        "id": 72591,
-        "lemma_1": "akusalacitta 2"
-    },
-    {
-        "id": 57102,
-        "lemma_1": "sacittaka"
-    },
-    {
-        "id": 16054,
-        "lemma_1": "upalāpeti 1"
     }
 ]
