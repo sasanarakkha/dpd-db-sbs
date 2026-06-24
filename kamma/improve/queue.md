@@ -10,7 +10,7 @@
 > re-litigate the refactor work already logged (type hints, pr.* conversion, dead code,
 > etc.), that part is done and should not be redone.
 
-Pointer: 11
+Pointer: 12
 
 ## Scripts (143 total, local unique_paths)
 
@@ -31,7 +31,7 @@ Pointer: 11
 - [x] 8. scripts/change_in_db/add_row_to_table.py
 - [x] 9. scripts/change_in_db/apply_all_additions.py
 - [x] 10. scripts/change_in_db/apply_all_corrections.py
-- [ ] 11. scripts/change_in_db/change_in_db.py
+- [x] 11. scripts/change_in_db/change_in_db.py | archived
 - [ ] 12. scripts/change_in_db/class_relation.py
 - [ ] 13. scripts/change_in_db/copy_examples.py
 - [ ] 14. scripts/change_in_db/copy_ru_meaning_raw_to_ru_meaning.py

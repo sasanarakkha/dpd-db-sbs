@@ -78,3 +78,4 @@
 2026-06-22 | #8 scripts/change_in_db/add_row_to_table.py | archived | zero callers in entire repo, unused CLI utility
 2026-06-24 | #9 scripts/change_in_db/apply_all_additions.py | changed | approach: flattened nested process_file into direct loop, removed unused Path import
 2026-06-24 | #10 scripts/change_in_db/apply_all_corrections.py | changed | extracted _apply_correction helper with ALLOWED_FIELDS filtering, added type hints, fixed hardcoded filename in error message
+2026-06-24 | #11 scripts/change_in_db/change_in_db.py | archived | not in registry (unique_paths), generic CLI DB field updater with no active callers
