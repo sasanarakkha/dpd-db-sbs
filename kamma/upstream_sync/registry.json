@@ -275,7 +275,6 @@
     "audio/error_check/deleted_silent_files.txt",
     "audio/error_check/silent_files.txt",
     "go_modules/frequency/ebt_freq/main.go",
-    "gui/functions_dps.py",
     "gui2/data/additions.json",
     "gui2/data/daily_log.json",
     "gui2/data/example_stash.json",
@@ -292,10 +291,6 @@
     "scripts/cl/dpd-gui2",
     "shared_data/all_tipitaka_words",
     "shared_data/changed_templates",
-    "gui/functions_db_dps.py",
-    "gui/functions_tests_dps.py",
-    "gui/tab_dps_tests.py",
-    "gui/tab_edit_dps.py",
     ".metadata_never_index",
     "dpd-db.code-workspace"
   ],

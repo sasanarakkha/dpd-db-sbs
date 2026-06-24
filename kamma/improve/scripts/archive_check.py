@@ -2,6 +2,7 @@
 
 import ast
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -31,25 +32,36 @@ def _count_lines(file_path: Path) -> int:
 
 
 def _find_callers(file_path: Path) -> list[str]:
-    """Search for importers/callers of the given module within the repo."""
+    """Search for importers/callers of the given module within the repo.
+
+    Covers both Python imports (from X import / import X) and bare-path
+    invocations (shell scripts, subprocess calls, CI configs, Makefiles, etc.).
+    """
+    rel = str(_relative_path(file_path))
     stem = file_path.stem
-    pattern = rf"from\s+{stem}\s|import\s+{stem}\b"
+    import_pattern = rf"(?:from\s+[\w.]*{re.escape(stem)}\s+import|import\s+[\w.]*{re.escape(stem)}\b)"
+    path_pattern = rf"\b{re.escape(file_path.name)}\b|{re.escape(rel)}"
+    callers: set[str] = set()
     try:
-        result = subprocess.run(
-            ["rg", "--no-heading", "-l", pattern],
-            capture_output=True,
-            text=True,
-            cwd=REPO_ROOT,
-            timeout=15,
-            check=False,
-        )
-        if result.returncode not in (0, 1):
-            return []
-        return [
-            p for p in result.stdout.strip().split("\n") if p and p != str(file_path)
-        ]
+        for pattern in (import_pattern, path_pattern):
+            result = subprocess.run(
+                ["rg", "--no-heading", "-l", pattern, "-g", "!*.db"],
+                capture_output=True,
+                text=True,
+                cwd=REPO_ROOT,
+                timeout=15,
+                check=False,
+            )
+            if result.returncode in (0, 1) and result.stdout.strip():
+                callers.update(result.stdout.strip().split("\n"))
     except (FileNotFoundError, subprocess.TimeoutExpired):
         return []
+    callers.discard(str(_relative_path(file_path)))
+    callers.discard(str(file_path))
+    callers = {
+        c for c in callers if not c.startswith("tests/") and not c.startswith("kamma/")
+    }
+    return sorted(callers)
 
 
 def _imports_from_repo(file_path: Path) -> list[str]:

@@ -33,6 +33,12 @@ This outputs compact JSON covering:
 This summary is **reused verbatim** as the "What it does" block in the step 4 output
 template — do not re-derive it.
 
+**⚠️ MANDATORY CROSS-CHECK:** The archive check's caller detection may miss non-Python
+invocations (shell scripts, subprocess calls, CI configs, Makefiles). Before presenting
+the summary, you MUST run a separate `grep` for the script's **basename** across the
+entire repo to catch any callers the archive check missed. If you find callers the
+archive check did not report, include them in the summary and flag the discrepancy.
+
 Then present the summary to the user and use the `AskUserQuestion` tool to ask:
 
 > **Proceed with improvement, or move to archive?**

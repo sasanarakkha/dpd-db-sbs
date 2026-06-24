@@ -12,7 +12,7 @@
 
 Pointer: 12
 
-## Scripts (143 total, local unique_paths)
+## Scripts (146 total, local unique_paths)
 
 ### db/families
 
@@ -157,50 +157,53 @@ Pointer: 12
 - [ ] 107. scripts/bash/sbs-update-db.sh
 - [ ] 108. scripts/bash/stage_study_tools.sh
 - [ ] 109. scripts/bash/upload_study_tools.sh
+- [ ] 110. scripts/bash/download_grammar.sh
+- [ ] 111. scripts/bash/push_dpd.sh
+- [ ] 112. scripts/bash/update_decks.sh
 
 ### scripts/cl
 
-- [ ] 110. scripts/cl/dpd-gui2
+- [ ] 113. scripts/cl/dpd-gui2
 
 ### scripts/cl_dps
 
-- [ ] 111. scripts/cl_dps/decks
-- [ ] 112. scripts/cl_dps/dpd-anki
-- [ ] 113. scripts/cl_dps/dpd-build-db
-- [ ] 114. scripts/cl_dps/dpd-gui2
-- [ ] 115. scripts/cl_dps/dpd-kamma-sync
-- [ ] 116. scripts/cl_dps/dpd-makedict
-- [ ] 117. scripts/cl_dps/dpd-push
-- [ ] 118. scripts/cl_dps/dpd-review-comments
-- [ ] 119. scripts/cl_dps/dpd-upstream-push
-- [ ] 120. scripts/cl_dps/dpd-upstream-push-corrections
-- [ ] 121. scripts/cl_dps/dpd-upstream-push-latest
-- [ ] 122. scripts/cl_dps/dpd-vib-rule
-- [ ] 123. scripts/cl_dps/dpd-webapp
+- [ ] 114. scripts/cl_dps/decks
+- [ ] 115. scripts/cl_dps/dpd-anki
+- [ ] 116. scripts/cl_dps/dpd-build-db
+- [ ] 117. scripts/cl_dps/dpd-gui2
+- [ ] 118. scripts/cl_dps/dpd-kamma-sync
+- [ ] 119. scripts/cl_dps/dpd-makedict
+- [ ] 120. scripts/cl_dps/dpd-push
+- [ ] 121. scripts/cl_dps/dpd-review-comments
+- [ ] 122. scripts/cl_dps/dpd-upstream-push
+- [ ] 123. scripts/cl_dps/dpd-upstream-push-corrections
+- [ ] 124. scripts/cl_dps/dpd-upstream-push-latest
+- [ ] 125. scripts/cl_dps/dpd-vib-rule
+- [ ] 126. scripts/cl_dps/dpd-webapp
 
 ### scripts/export (additional)
 
-- [ ] 124. scripts/export/anki_csv.py
-- [ ] 125. scripts/export/dps_anki_updater.py
-- [ ] 126. scripts/export/extract_ebt_text.py
-- [ ] 127. scripts/export/filter_from_db.py
-- [ ] 128. scripts/export/filtering_and_backup.py
-- [ ] 129. scripts/export/list_of_words_from_txt.py
-- [ ] 130. scripts/export/list_of_words_from_txt_old.py
-- [ ] 131. scripts/export/save_all_sutta_names.py
-- [ ] 132. scripts/export/save_all_words_alphabetically.py
-- [ ] 133. scripts/export/save_all_words_sorted_by_family.py
-- [ ] 134. scripts/export/save_csv_for_audio.py
-- [ ] 135. scripts/export/save_filtered_words.py
-- [ ] 136. scripts/export/save_russian_for_collaborator.py
-- [ ] 137. scripts/export/sbs_anki_fields_check.py
-- [ ] 138. scripts/export/sbs_anki_templates.py
-- [ ] 139. scripts/export/sbs_anki_update_seed.py
-- [ ] 140. scripts/export/sbs_example_dupes.py
-- [ ] 141. scripts/export/sourse_atth_sbs_mula.py
-- [ ] 142. scripts/export/vocab_abbrev_pali_course.py
+- [ ] 127. scripts/export/anki_csv.py
+- [ ] 128. scripts/export/dps_anki_updater.py
+- [ ] 129. scripts/export/extract_ebt_text.py
+- [ ] 130. scripts/export/filter_from_db.py
+- [ ] 131. scripts/export/filtering_and_backup.py
+- [ ] 132. scripts/export/list_of_words_from_txt.py
+- [ ] 133. scripts/export/list_of_words_from_txt_old.py
+- [ ] 134. scripts/export/save_all_sutta_names.py
+- [ ] 135. scripts/export/save_all_words_alphabetically.py
+- [ ] 136. scripts/export/save_all_words_sorted_by_family.py
+- [ ] 137. scripts/export/save_csv_for_audio.py
+- [ ] 138. scripts/export/save_filtered_words.py
+- [ ] 139. scripts/export/save_russian_for_collaborator.py
+- [ ] 140. scripts/export/sbs_anki_fields_check.py
+- [ ] 141. scripts/export/sbs_anki_templates.py
+- [ ] 142. scripts/export/sbs_anki_update_seed.py
+- [ ] 143. scripts/export/sbs_example_dupes.py
+- [ ] 144. scripts/export/sourse_atth_sbs_mula.py
+- [ ] 145. scripts/export/vocab_abbrev_pali_course.py
 
 ### tools (additional)
 
-- [ ] 143. tools/meaning_snapshot_ru.py
+- [ ] 146. tools/meaning_snapshot_ru.py
 
