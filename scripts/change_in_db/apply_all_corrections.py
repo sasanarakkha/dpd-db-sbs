@@ -3,6 +3,9 @@
 """Apply all corrections from gui2/data/corrections_{username}.json to the database."""
 
 import json
+from typing import Any
+
+from sqlalchemy.orm import Session
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword
@@ -11,8 +14,27 @@ from tools.configger import config_read
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 
-app_pth = ProjectPaths()
-db_session = get_db_session(app_pth.dpd_db_path)
+app_pth: ProjectPaths = ProjectPaths()
+db_session: Session = get_db_session(app_pth.dpd_db_path)
+
+ALLOWED_FIELDS: set[str] = set(DpdHeadword.__table__.columns.keys()) - {"id", "comment"}  # type: ignore[attr-defined]
+
+
+def _apply_correction(db_entry: DpdHeadword, correction_data: dict[str, Any]) -> bool:
+    """Apply corrections to a single DB entry. Returns True if any changes were made."""
+    any_changed = False
+    for field_name, new_value in correction_data.items():
+        if field_name not in ALLOWED_FIELDS:
+            pr.red(
+                f"  Field '{field_name}' (value: '{new_value}') does not "
+                f"exist in DpdHeadword model or is protected. Skipping."
+            )
+            continue
+        current_value = getattr(db_entry, field_name)
+        if current_value != new_value:
+            setattr(db_entry, field_name, new_value)
+            any_changed = True
+    return any_changed
 
 
 def apply_all_corrections_from_json() -> None:
@@ -36,7 +58,7 @@ def apply_all_corrections_from_json() -> None:
         return
 
     if not all_corrections_to_process:
-        pr.red("No corrections found in corrections.json.")
+        pr.red(f"No corrections found in {corrections_json_path}.")
         return
 
     pr.green(f"Found {len(all_corrections_to_process)} corrections to process.")
@@ -64,21 +86,7 @@ def apply_all_corrections_from_json() -> None:
             failed_count += 1
             continue
 
-        any_changed: bool = False
-        for field_name, new_value in correction_data.items():
-            if field_name == "comment":
-                continue
-            if hasattr(db_entry, field_name):
-                current_value = getattr(db_entry, field_name)
-                if current_value != new_value:
-                    setattr(db_entry, field_name, new_value)
-                    any_changed = True
-            else:
-                pr.red(
-                    f"  Field '{field_name}' (value: '{new_value}') from correction data does not exist in DpdHeadword model. Skipping this field."
-                )
-
-        if any_changed:
+        if _apply_correction(db_entry, correction_data):
             try:
                 db_session.commit()
                 processed_count += 1

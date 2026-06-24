@@ -77,3 +77,4 @@
 2026-06-22 | #6 gui2/dps_process_corrections.py | passed | approach-suggestion angle only (per queue note, angles 1-4 already done 2026-06-08) — linear CLI pipeline (load→filter→interact→save) already the natural approach; decomposing into helpers or using a class would redistribute code without reducing it, no fundamental simplification found
 2026-06-22 | #8 scripts/change_in_db/add_row_to_table.py | archived | zero callers in entire repo, unused CLI utility
 2026-06-24 | #9 scripts/change_in_db/apply_all_additions.py | changed | approach: flattened nested process_file into direct loop, removed unused Path import
+2026-06-24 | #10 scripts/change_in_db/apply_all_corrections.py | changed | extracted _apply_correction helper with ALLOWED_FIELDS filtering, added type hints, fixed hardcoded filename in error message
