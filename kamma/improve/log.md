@@ -5,6 +5,7 @@
 > prior precedent). One terse line per decision; full rationale lives in commit messages.
 
 <!-- Format: YYYY-MM-DD | #N script | passed / changed / skipped / deferred | note -->
+2026-06-24 | #12 scripts/change_in_db/class_relation.py | passed (approach-only) | no substantial simplification possible — inherent decision tree
 2026-06-07 | #1 db/families/family_set_ru_update.py | changed | compiled regex to module constants, extracted _clean_translated_lines helper, atomic TSV write, -> None annotation, removed stale comments
 2026-06-07 | #2 gui2/dps_ai_service.py | changed | type hints (TYPE_CHECKING guard for DpsFields, DpdHeadword), lemma_1 or "" guard, textwrap.dedent on both prompt f-strings, synonyms via instruction var not .replace(), str(e)->e, removed WHAT comments
 2026-06-07 | #3 gui2/dps_db_helpers.py | changed | Optional[X] → X | None, removed typing.Optional import, removed coding header, inlined multi-line filter() calls
@@ -79,3 +80,4 @@
 2026-06-24 | #9 scripts/change_in_db/apply_all_additions.py | changed | approach: flattened nested process_file into direct loop, removed unused Path import
 2026-06-24 | #10 scripts/change_in_db/apply_all_corrections.py | changed | extracted _apply_correction helper with ALLOWED_FIELDS filtering, added type hints, fixed hardcoded filename in error message
 2026-06-24 | #11 scripts/change_in_db/change_in_db.py | archived | not in registry (unique_paths), generic CLI DB field updater with no active callers
+2026-06-24 | #13 scripts/change_in_db/copy_examples.py | changed (approach-only) | merged 3 queries+exclusion tracking→1 query+priority loop, reduced 170→119 lines

@@ -59,5 +59,203 @@
     "example_2": "",
     "expected_match": false,
     "expected_idx": null
+  },
+  "source_value": "VIN2.5.7.5",
+  "target": "vib",
+  "ids_already_have": [
+    6914,
+    11289,
+    17323,
+    17326,
+    20358,
+    20359,
+    43690,
+    43691,
+    60754,
+    63140,
+    69948
+  ],
+  "ids_update_sbs": [],
+  "ids_update_dpd": [],
+  "ids_merged": [
+    6914,
+    11289,
+    17323,
+    17326,
+    20358,
+    20359,
+    43690,
+    43691,
+    60754,
+    63140,
+    69948
+  ],
+  "total_original": 11,
+  "total_merged": 11,
+  "synthetic_cases": {
+    "already_have": {
+      "description": "SBS vib_source already equals source_value — skipped",
+      "word": {
+        "source_1": "VIN2.5.7.5",
+        "source_2": "",
+        "sutta_1": "s1",
+        "sutta_2": "",
+        "example_1": "e1",
+        "example_2": ""
+      },
+      "sbs": {
+        "vib_source": "VIN2.5.7.5",
+        "sbs_source_1": "",
+        "sbs_source_2": "",
+        "sbs_sutta_1": "x",
+        "sbs_example_1": "x",
+        "sbs_sutta_2": "",
+        "sbs_example_2": ""
+      },
+      "expected_action": "already"
+    },
+    "from_sbs_source1": {
+      "description": "sbs_source_1 matches — copies sbs fields from idx=1",
+      "word": {
+        "source_1": "",
+        "source_2": "",
+        "sutta_1": "",
+        "sutta_2": "",
+        "example_1": "",
+        "example_2": ""
+      },
+      "sbs": {
+        "vib_source": "",
+        "sbs_source_1": "VIN2.5.7.5",
+        "sbs_source_2": "",
+        "sbs_sutta_1": "MN12",
+        "sbs_example_1": "text here",
+        "sbs_sutta_2": "",
+        "sbs_example_2": ""
+      },
+      "expected_action": "from_sbs",
+      "expected_changes": {
+        "vib_source": "VIN2.5.7.5",
+        "vib_sutta": "MN12",
+        "vib_example": "text here"
+      }
+    },
+    "from_sbs_source2": {
+      "description": "sbs_source_2 matches (re.search) — copies sbs fields from idx=2",
+      "word": {
+        "source_1": "",
+        "source_2": "",
+        "sutta_1": "",
+        "sutta_2": "",
+        "example_1": "",
+        "example_2": ""
+      },
+      "sbs": {
+        "vib_source": "",
+        "sbs_source_1": "OTHER",
+        "sbs_source_2": "VIN2.5.7.5",
+        "sbs_sutta_1": "",
+        "sbs_example_1": "",
+        "sbs_sutta_2": "AN3",
+        "sbs_example_2": "text2"
+      },
+      "expected_action": "from_sbs",
+      "expected_changes": {
+        "vib_source": "VIN2.5.7.5",
+        "vib_sutta": "AN3",
+        "vib_example": "text2"
+      }
+    },
+    "from_dpd_existing_sbs": {
+      "description": "No SBS match; SBS row exists; DPD source_1 matches",
+      "word": {
+        "source_1": "VIN2.5.7.5",
+        "source_2": "",
+        "sutta_1": "DN22",
+        "sutta_2": "",
+        "example_1": "dpd text",
+        "example_2": ""
+      },
+      "sbs": {
+        "vib_source": "",
+        "sbs_source_1": "OTHER",
+        "sbs_source_2": "OTHER2",
+        "sbs_sutta_1": "",
+        "sbs_example_1": "",
+        "sbs_sutta_2": "",
+        "sbs_example_2": ""
+      },
+      "expected_action": "from_dpd",
+      "expected_changes": {
+        "vib_source": "VIN2.5.7.5",
+        "vib_sutta": "DN22",
+        "vib_example": "dpd text"
+      }
+    },
+    "from_dpd_source2": {
+      "description": "No SBS match; SBS row exists; DPD source_2 matches (source_1 empty)",
+      "word": {
+        "source_1": "",
+        "source_2": "VIN2.5.7.5",
+        "sutta_1": "",
+        "sutta_2": "MN10",
+        "example_1": "",
+        "example_2": "dpd text2"
+      },
+      "sbs": {
+        "vib_source": "",
+        "sbs_source_1": "OTHER",
+        "sbs_source_2": "OTHER2",
+        "sbs_sutta_1": "",
+        "sbs_example_1": "",
+        "sbs_sutta_2": "",
+        "sbs_example_2": ""
+      },
+      "expected_action": "from_dpd",
+      "expected_changes": {
+        "vib_source": "VIN2.5.7.5",
+        "vib_sutta": "MN10",
+        "vib_example": "dpd text2"
+      }
+    },
+    "from_dpd_new_sbs": {
+      "description": "No SBS row at all; DPD source matches — creates new SBS",
+      "word": {
+        "source_1": "VIN2.5.7.5",
+        "source_2": "",
+        "sutta_1": "SN56",
+        "sutta_2": "",
+        "example_1": "new text",
+        "example_2": ""
+      },
+      "sbs": null,
+      "expected_action": "new_row",
+      "expected_changes": {
+        "vib_source": "VIN2.5.7.5",
+        "vib_sutta": "SN56",
+        "vib_example": "new text"
+      }
+    },
+    "no_match": {
+      "description": "Nothing matches — no changes",
+      "word": {
+        "source_1": "OTHER",
+        "source_2": "OTHER2",
+        "sutta_1": "",
+        "sutta_2": "",
+        "example_1": "",
+        "example_2": ""
+      },
+      "sbs": {
+        "vib_source": "",
+        "sbs_source_1": "OTHER3",
+        "sbs_source_2": "OTHER4",
+        "sbs_sutta_1": "",
+        "sbs_example_1": "",
+        "sbs_sutta_2": "",
+        "sbs_example_2": ""
+      },
+      "expected_action": "none"
+    }
   }
 }
