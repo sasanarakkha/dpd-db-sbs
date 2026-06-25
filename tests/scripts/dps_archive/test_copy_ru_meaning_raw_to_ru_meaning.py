@@ -1,4 +1,4 @@
-"""Tests for scripts/change_in_db/copy_ru_meaning_raw_to_ru_meaning.py."""
+"""Tests for scripts/dps_archive/copy_ru_meaning_raw_to_ru_meaning.py."""
 
 import json
 import tempfile
@@ -7,7 +7,7 @@ from types import SimpleNamespace
 from typing import Any, cast
 
 from db.models import DpdHeadword, Russian
-from scripts.change_in_db.copy_ru_meaning_raw_to_ru_meaning import read_ids_from_tsv
+from scripts.dps_archive.copy_ru_meaning_raw_to_ru_meaning import read_ids_from_tsv
 
 FIXTURE_PATH = (
     Path(__file__).parent / "test_copy_ru_meaning_raw_to_ru_meaning_fixtures.json"

@@ -81,3 +81,4 @@
 2026-06-24 | #10 scripts/change_in_db/apply_all_corrections.py | changed | extracted _apply_correction helper with ALLOWED_FIELDS filtering, added type hints, fixed hardcoded filename in error message
 2026-06-24 | #11 scripts/change_in_db/change_in_db.py | archived | not in registry (unique_paths), generic CLI DB field updater with no active callers
 2026-06-24 | #13 scripts/change_in_db/copy_examples.py | changed (approach-only) | merged 3 queries+exclusion tracking→1 query+priority loop, reduced 170→119 lines
+2026-06-25 | #14 scripts/change_in_db/copy_ru_meaning_raw_to_ru_meaning.py | archived | zero callers in entire repo, unused CLI utility
