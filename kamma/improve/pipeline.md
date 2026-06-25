@@ -27,29 +27,25 @@ uv run python3 kamma/improve/scripts/archive_check.py <file_path>
 
 This outputs compact JSON covering:
 - **What it does** — docstring / purpose.
-- **Where it fits** — what calls it, what it imports.
+- **Where it fits** — what calls it, what it imports. `_find_callers()` already greps
+  both the basename and the rel-path repo-wide with `rg` (no language filter), so this
+  already covers shell scripts, CI configs, and Makefiles — no separate manual
+  cross-check grep is needed.
 - **Current status** — size, registry membership, test presence, entrypoint.
 
 This summary is **reused verbatim** as the "What it does" block in the step 4 output
 template — do not re-derive it.
 
-**⚠️ MANDATORY CROSS-CHECK:** The archive check's caller detection may miss non-Python
-invocations (shell scripts, subprocess calls, CI configs, Makefiles). Before presenting
-the summary, you MUST run a separate `grep` for the script's **basename** across the
-entire repo to catch any callers the archive check missed. If you find callers the
-archive check did not report, include them in the summary and flag the discrepancy.
-
-Then present the summary to the user and use the `AskUserQuestion` tool to ask:
+Then present the summary to the user with a recommendation (Improve or Archive, derived
+from the callers/registry/breakage findings above) and ask the user to reply `improve`
+or `archive`:
 
 > **Proceed with improvement, or move to archive?**
 > - **Improve** — continue with the full review below.
 > - **Archive** — move the file, update the queue, end session.
 
-> **🚫 HARD GATE — do not cross until the user has answered the question above.**
-> The background API review command (step 3) MUST NOT be launched until the user
-> explicitly chooses **Improve**. Do NOT start it speculatively during step 2, even
-> though the file path is already known. The user may choose Archive, in which case
-> the API call is wasted and the session must end immediately.
+Do not run the second-opinion review until the user has chosen Improve — on Archive,
+no API call is made.
 
 **If the user chooses Archive:**
 
@@ -69,7 +65,7 @@ Then present the summary to the user and use the `AskUserQuestion` tool to ask:
 
    - <one-line reason>
    ```
-   Then use the AskUserQuestion tool to ask **"commit?"** (yes / no).
+   State the recommendation to commit and ask the user to reply `yes` or `no`.
 7. If **yes**: run `git commit -m` with that message (no heredoc — user runs Fish shell).
 8. Output exactly:
    > **Archived.** `<source>` → `<target>`. Queue pointer advanced to #N.
@@ -82,23 +78,8 @@ Then present the summary to the user and use the `AskUserQuestion` tool to ask:
 
 ### 3. Review forward
 
-> **⛔ PREREQUISITE:** The user has already answered **Improve** in step 2.
-> If that answer is not yet received, stop and wait. Never begin step 3 before it.
-
 Starting from the Pointer, review each pending `[ ]` script in order.
 For each script:
-
-**FIRST — now that the user has chosen Improve, immediately launch the second-opinion
-reviewer in the BACKGROUND, before you read or analyse anything further.** Run the
-`uv run python3 kamma/improve/scripts/second_opinion.py <file>` command with
-`run_in_background: true` so it reviews the file in parallel while you do your own
-analysis. The point is that you and the reviewer reach conclusions at the same time —
-do NOT wait until you have finished your own review to start it, or you pay the full
-reviewer latency in series. You collect its output in step 4 (it will already be done,
-or nearly so).
-
-**DO NOT launch this background command during step 2, before the user has chosen
-Improve. The gate in step 2 is unconditional: Archive answer → no API call, ever.**
 
 **a. Read the file** (and any files it imports from this repo).
 
@@ -145,16 +126,22 @@ Improve. The gate in step 2 is unconditional: Archive answer → no API call, ev
 
 ### 4. Present all changes for this file
 
-By now the second-opinion reviewer you launched in the background at the start of
-step 3 should be finished. Collect its output. If you have not launched it yet
-(e.g. you only realised the file needed changes late), run it now on the
-**current, unedited file** — but the intent is that it has been running in
-parallel the whole time, so this is the fallback path, not the norm.
+Now that a change is needed, run the second-opinion review (substitute the actual
+file path for `<file>`):
 
-**If the background task notification shows exit code 124 or any non-zero exit code,
-treat it exactly the same as an inline failure — there is no further fallback to run,
-since `AIManager.request()` already tried every configured model internally.
-Never proceed to present findings without a completed review from at least one model.**
+```bash
+uv run python3 kamma/improve/scripts/second_opinion.py --approach-only <file>
+```
+
+`--approach-only` is the default — it only flags a significantly simpler approach and
+skips style/type-hint/naming commentary, matching what actually gets accepted (see
+`log.md`). If this file's own Step 3 review judged its logic unusually complex (not
+just a style/convention issue), the agent may instead run the full review as an
+explicit opt-in:
+
+```bash
+uv run python3 kamma/improve/scripts/second_opinion.py <file>
+```
 
 The review goes through `tools/ai_manager.py`'s `AIManager`, not a direct `agy` CLI
 call. `AIManager.request()` walks the model list in `tools/ai_models.json` (antigravity_cli,
@@ -162,22 +149,6 @@ openrouter, deepseek, etc., in the order listed there) and automatically
 falls through to the next model on failure — no model names need to be hardcoded or
 updated in this skill file. To change the fallback order or add/remove models, edit
 `tools/ai_models.json` directly.
-
-The command to launch (in the background during step 3, or run here as fallback;
-substitute actual file path for `<file>`):
-
-```bash
-uv run python3 kamma/improve/scripts/second_opinion.py <file>
-```
-
-For approach-only review:
-
-```bash
-uv run python3 kamma/improve/scripts/second_opinion.py --approach-only <file>
-```
-
-Run it via the Bash tool with `timeout: 150000` and `run_in_background: true` for the
-background launch.
 
 If `response.content` is `None` (every model in `tools/ai_models.json` failed):
 - **Stop and report loudly to the user:**
@@ -215,31 +186,19 @@ For each: one line — WHAT changes and WHY. No reviewer back-and-forth here.
 Compact. One line each. Out-of-scope items and anything below the change bar.
 - <thing> — <one-line reason>
 
-### ⚠️ Decisions for you
-ONLY genuine either/or choices that change what gets written. If there are none,
-omit this whole section. See "Highlighting decisions" below for how to surface
-these — prefer the AskUserQuestion tool.
+### Approach suggestion *(omit entirely if none)*
+- **What:** <one sentence on the simpler/more elegant approach and the gain>
+- **Drawbacks:** <risk of behaviour change, migration cost, readability tradeoffs, anything that could go wrong>
+
+### ⚠️ Decisions for you *(omit entirely if none)*
+ONLY genuine either/or choices that change what gets written.
+See "Highlighting decisions" below for how to surface these.
 
 ---
 *Reviewer cross-check (<model>): agreed on <n> (<short list>); raised <m> I did
 not apply — <one compressed clause each>.*
 
 ---
-
-**File:** `<path>`
-
-**Changes (`approve` applies these)**
-- <one bullet per distinct code edit — specific enough to understand without scrolling up>
-- <e.g. "replace raw print() calls with pr.green / pr.warning — printer convention">
-- <e.g. "add return type annotations to process() and validate() — missing type hints">
-
-**Non-obvious / risky details** *(omit entirely if none)*
-- <hidden constraint, edge case, or irreversible step>
-- <any assumption that could be wrong>
-
-**Approach suggestion** *(omit entirely if none)*
-- **What:** <one sentence on the simpler/more elegant approach and the gain>
-- **Drawbacks:** <risk of behaviour change, migration cost, readability tradeoffs, anything that could go wrong>
 
 **`1` / `approve`** — apply the changes listed above. Tests first, then edits, then commit.
 **`2` / `approve all`** — apply the changes listed above AND the approach suggestion. Tests first, then edits, then commit.
@@ -252,8 +211,9 @@ not apply — <one compressed clause each>.*
 A wall of terminal text buries the one thing the user must act on. So:
 
 - If there is a real either/or decision (e.g. "make the cache deterministic but
-  change stored output?  yes / no"), **use the `AskUserQuestion` tool** — give the
-  context in the question and offer the concrete options. Do not bury it in prose.
+  change stored output?  yes / no"), present an inline recommendation with the
+  concrete options spelled out — give the context and offer the choices. Do not
+  bury it in prose.
 - If a decision is better left inline, mark it with a leading **`⚠️ DECISION:`**
   so it stands out in the scroll. Never phrase a decision as a buried sentence.
 - The final approve / skip / defer prompt is itself a decision: put it last, on its
@@ -373,7 +333,7 @@ After a successful live run (or a confirmed skip):
    - <bullet per distinct change>
    - add test: tests/<mirror-path>/test_<name>.py
    ```
-   Then use the AskUserQuestion tool to ask **"commit?"** (yes / no).
+   State the recommendation to commit and ask the user to reply `yes` or `no`.
 
 3. If **yes**: run `git commit -m` with that message (no heredoc — user runs Fish shell).
 

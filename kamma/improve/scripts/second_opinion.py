@@ -45,7 +45,7 @@ def main() -> None:
 
     from tools.ai_manager import AIManager
 
-    response = AIManager().request(prompt=prompt, grounding=True)
+    response = AIManager().request(prompt=prompt, grounding=False)
     print(response.content if response.content else response.status_message)
 
 
