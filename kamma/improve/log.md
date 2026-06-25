@@ -84,3 +84,4 @@
 2026-06-25 | #14 scripts/change_in_db/copy_ru_meaning_raw_to_ru_meaning.py | archived | zero callers in entire repo, unused CLI utility
 2026-06-25 | #15 scripts/change_in_db/fill_dhp_examples.py | passed | clean: modern hints, pathlib, pr.* printer, tested, no approach issue
 2026-06-25 | #16 scripts/change_in_db/preview_dhp_changes.py | archived | already moved to scripts/dps_archive/ in commit 482becb05 ("cleaning"), queue was stale
+2026-06-25 | #17 scripts/change_in_db/replace_in_db.py | archived | one-off idiom sbs_example_1 cleanup script, commit() already commented out (already run once), no callers, not in registry

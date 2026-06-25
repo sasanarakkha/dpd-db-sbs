@@ -10,7 +10,7 @@
 > re-litigate the refactor work already logged (type hints, pr.* conversion, dead code,
 > etc.), that part is done and should not be redone.
 
-Pointer: 17
+Pointer: 18
 
 ## Scripts (146 total, local unique_paths)
 
@@ -37,7 +37,7 @@ Pointer: 17
 - [x] 14. scripts/change_in_db/copy_ru_meaning_raw_to_ru_meaning.py | archived
 - [x] 15. scripts/change_in_db/fill_dhp_examples.py | passed
 - [x] 16. scripts/change_in_db/preview_dhp_changes.py — already archived to scripts/dps_archive/ (commit 482becb05), queue was stale
-- [ ] 17. scripts/change_in_db/replace_in_db.py
+- [x] 17. scripts/change_in_db/replace_in_db.py | archived
 - [ ] 18. scripts/change_in_db/sbs_class_sutta_linker.py
 - [ ] 19. scripts/change_in_db/dhp_examples_copy.py
 - [ ] 20. scripts/change_in_db/source_cleanup.py
