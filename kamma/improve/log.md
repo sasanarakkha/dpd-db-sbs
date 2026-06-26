@@ -85,3 +85,9 @@
 2026-06-25 | #15 scripts/change_in_db/fill_dhp_examples.py | passed | clean: modern hints, pathlib, pr.* printer, tested, no approach issue
 2026-06-25 | #16 scripts/change_in_db/preview_dhp_changes.py | archived | already moved to scripts/dps_archive/ in commit 482becb05 ("cleaning"), queue was stale
 2026-06-25 | #17 scripts/change_in_db/replace_in_db.py | archived | one-off idiom sbs_example_1 cleanup script, commit() already commented out (already run once), no callers, not in registry
+2026-06-26 | #19 scripts/change_in_db/dhp_examples_copy.py | passed (approach-only) | no substantial simplification — natural procedural approach for a one-off copy script
+2026-06-26 | #20 scripts/change_in_db/source_cleanup.py | passed (approach-only) | no substantial simplification — field-loop + exempt-check already the natural approach
+2026-06-26 | #21 scripts/change_in_db/update_examples_from_csv.py | archived | already archived per log — queue was stale
+2026-06-26 | #22 scripts/change_in_db/update_ru_db_from_csv.py | archived | already archived per log — queue was stale
+2026-06-26 | #23 scripts/change_in_db/update_sbs_chants_in_db.py | passed (approach-only) | exact-then-fuzzy pattern is correct; interactive prompt is inherent complexity
+2026-06-26 | #24 scripts/change_in_db/update_yojana_km.py | passed (approach-only) | collect→print→confirm→apply is the natural pattern; words_to_num alternatives already explored and rejected per log

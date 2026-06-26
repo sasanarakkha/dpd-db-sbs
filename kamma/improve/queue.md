@@ -1,16 +1,6 @@
 # Pipeline Improvement Queue
 
-> **Note:** Items #1-24 are intentionally left unchecked `[ ]` even though they already
-> have full review entries in the Decisions log below. Do NOT treat this as a stale
-> checkbox bug and do NOT check them off without re-reviewing. Between reviewing #25 and
-> #26 the skill itself was updated to add the "Approach suggestion" angle (a 5th review
-> angle: is there a significantly simpler/more elegant way to achieve the same result).
-> #1-24 were reviewed under the old skill version and never got that angle applied. When
-> the Pointer reaches them again, apply ONLY the approach-suggestion angle — do not
-> re-litigate the refactor work already logged (type hints, pr.* conversion, dead code,
-> etc.), that part is done and should not be redone.
-
-Pointer: 18
+Pointer: 76
 
 ## Scripts (146 total, local unique_paths)
 
@@ -38,13 +28,13 @@ Pointer: 18
 - [x] 15. scripts/change_in_db/fill_dhp_examples.py | passed
 - [x] 16. scripts/change_in_db/preview_dhp_changes.py — already archived to scripts/dps_archive/ (commit 482becb05), queue was stale
 - [x] 17. scripts/change_in_db/replace_in_db.py | archived
-- [ ] 18. scripts/change_in_db/sbs_class_sutta_linker.py
-- [ ] 19. scripts/change_in_db/dhp_examples_copy.py
-- [ ] 20. scripts/change_in_db/source_cleanup.py
-- [ ] 21. scripts/change_in_db/update_examples_from_csv.py
-- [ ] 22. scripts/change_in_db/update_ru_db_from_csv.py
-- [ ] 23. scripts/change_in_db/update_sbs_chants_in_db.py
-- [ ] 24. scripts/change_in_db/update_yojana_km.py
+- [x] 18. scripts/change_in_db/sbs_class_sutta_linker.py — already archived (commit 3f8ac54a0), queue was stale
+- [x] 19. scripts/change_in_db/dhp_examples_copy.py
+- [x] 20. scripts/change_in_db/source_cleanup.py
+- [x] 21. scripts/change_in_db/update_examples_from_csv.py | archived
+- [x] 22. scripts/change_in_db/update_ru_db_from_csv.py | archived
+- [x] 23. scripts/change_in_db/update_sbs_chants_in_db.py
+- [x] 24. scripts/change_in_db/update_yojana_km.py
 - [x] 25. scripts/change_in_db/vib_rule_workflow.py
 
 ### scripts/export
