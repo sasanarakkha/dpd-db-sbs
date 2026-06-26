@@ -165,6 +165,10 @@ sticks, this one doesn't" before they even know what the findings are.
 
 #### Output template — use this EXACT structure, in this order, every time
 
+> **Mandatory:** Write the complete summary below — all sections, including Approach
+> suggestion and Decisions — before presenting the approval block. Do not show the
+> approval options until every applicable section is written.
+
 Lead with conclusions the user can act on. The reviewer cross-check is an audit
 footnote at the very bottom, never the opening.
 
@@ -190,8 +194,10 @@ Compact. One line each. Out-of-scope items and anything below the change bar.
 - **What:** <one sentence on the simpler/more elegant approach and the gain>
 - **Drawbacks:** <risk of behaviour change, migration cost, readability tradeoffs, anything that could go wrong>
 
-### ⚠️ Decisions for you *(omit entirely if none)*
-ONLY genuine either/or choices that change what gets written.
+### ⚠️ Special attention — required decisions *(omit entirely if none)*
+Items the user MUST decide before work begins. List every genuine either/or choice
+that changes what gets written. If this section exists, the user must respond to
+each item before `approve` is accepted.
 See "Highlighting decisions" below for how to surface these.
 
 ---
@@ -200,8 +206,10 @@ not apply — <one compressed clause each>.*
 
 ---
 
-**`1` / `approve`** — apply the changes listed above. Tests first, then edits, then commit.
-**`2` / `approve all`** — apply the changes listed above AND the approach suggestion. Tests first, then edits, then commit.
+**STOP. Only show these options after ALL sections above are written.**
+
+**`1` / `approve`** — apply the proposed changes only (no approach rewrite). Tests first, then edits, then commit.
+**`2` / `approve all`** — apply proposed changes AND the approach suggestion (if one was listed above). Tests first, then edits, then commit.
 **`3` / `skip`** — log `skipped`, advance Pointer.
 **`4` / `defer`** — mark `[>]`, log `deferred`, move Pointer past it.
 ```
