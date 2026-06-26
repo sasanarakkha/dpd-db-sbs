@@ -5,6 +5,7 @@ Frozen current output — prove refactored code reproduces it.
 
 import json
 from pathlib import Path
+from unittest.mock import patch
 
 from tools.tools_for_ru_exporter import (
     get_first_synonym,
@@ -217,7 +218,10 @@ def test_make_ru_meaning_no_ru():
         meaning_2=f["meaning_2"],
         ru=None,
     )
-    assert make_ru_meaning(i) == f["make_ru_meaning"]
+    with patch(
+        "tools.tools_for_ru_exporter.year_month_day_dash", return_value="2026-06-26"
+    ):
+        assert make_ru_meaning(i) == f["make_ru_meaning"]
 
 
 def test_make_ru_meaning_simpl_no_ru():
