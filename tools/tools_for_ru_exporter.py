@@ -6,19 +6,17 @@
 5. assume corresponding ru names for sets from the tsv
 """
 
-import re
 import csv
-from rich import print
+import re
+from pathlib import Path
 
 from db.models import DpdHeadword, Russian
-from tools.paths import ProjectPaths
-from tools.paths_ru import RuPaths
-from tools.meaning_construction import make_meaning_combo
 from tools.date_and_time import year_month_day_dash
+from tools.meaning_construction import make_meaning_combo
+from tools.paths_ru import RuPaths
+from tools.printer import printer as pr
 
-pth = ProjectPaths()
 rupth = RuPaths()
-date = year_month_day_dash()
 
 abbreviations_dict = None
 compiled_patterns = None
@@ -28,6 +26,7 @@ def make_ru_meaning(i: DpdHeadword) -> str:
     """Uses only DpdHeadword input. Compile html of ru_meaning and literal meaning, or return ru_meaning_raw.
     ru_meaning in <b>bold</b>, or return english meaning
     with links for feedback"""
+    date = year_month_day_dash()
 
     if i.ru is None:
         ru_meaning: str = f"<a class='link' href='https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500={i.lemma_link}&entry.326955045=Перевод&entry.1433863141=dpdict.net+{date}' target='_blank'>[перевести]</a> {make_meaning_combo(i)}"
@@ -60,26 +59,6 @@ def make_ru_meaning_simpl(i: DpdHeadword) -> str:
         return ru_meaning
     elif i.ru.ru_meaning_raw:
         ru_meaning: str = f"<i>[пер. ИИ]</i> {i.ru.ru_meaning_raw}"
-        return ru_meaning
-    else:
-        return ""
-
-
-def make_ru_meaning_no_bold(i: DpdHeadword) -> str:
-    """Uses only DpdHeadword input. Compile html of ru_meaning and literal meaning, or return ru_meaning_raw.
-    ru_meaning in regular text, or return english meaning"""
-
-    if i.ru is None:
-        ru_meaning: str = f"{make_meaning_combo(i)}"
-        return ru_meaning
-
-    elif i.ru.ru_meaning:
-        ru_meaning: str = i.ru.ru_meaning
-        if i.ru.ru_meaning_lit:
-            ru_meaning += f"; досл. {i.ru.ru_meaning_lit}"
-        return ru_meaning
-    elif i.ru.ru_meaning_raw:
-        ru_meaning: str = i.ru.ru_meaning_raw
         return ru_meaning
     else:
         return ""
@@ -140,7 +119,7 @@ def make_ru_meaning_for_ebook(i: DpdHeadword, ru: Russian) -> str:
         return ""
 
 
-def ru_replace_abbreviations(value, kind="meaning"):
+def ru_replace_abbreviations(value: str, kind: str = "meaning") -> str:
     """
     Replace abbreviations in the given value based on the specified kind.
     """
@@ -234,16 +213,7 @@ def ru_replace_abbreviations(value, kind="meaning"):
     return value
 
 
-def ru_replace_abbreviations_list(grammar):
-    ru_grammar = []
-    for value in grammar:
-        ru_value = ru_replace_abbreviations(value, "no")
-        ru_grammar.append(ru_value)
-
-    return ru_grammar
-
-
-def load_abbreviations_dict(tsv_file_path):
+def load_abbreviations_dict(tsv_file_path: str | Path) -> dict[str, str]:
     """Load abbreviations from a TSV file and precompile regex patterns."""
     global abbreviations_dict, compiled_patterns
     if abbreviations_dict is None:
@@ -268,20 +238,6 @@ def load_abbreviations_dict(tsv_file_path):
         }
 
     return abbreviations_dict
-
-
-def replace_english(value, kind="freq"):
-    # Perform basic replacements
-    if kind == "freq":
-        value = (
-            value.replace("There are no matches of", "Нет совпадений со словом")
-            .replace("in any corpus.", "ни в одной из версий текста")
-            .replace("Frequency of", "График частоты совпадений слова")
-            .replace("and its", "и его форм")
-            .replace("declensions", "склонений")
-            .replace("conjugations", "спряжений")
-        )
-    return value
 
 
 def ru_make_grammar_line(i: DpdHeadword) -> str:
@@ -319,9 +275,9 @@ def make_short_meaning(i: DpdHeadword) -> str:
         return ""
 
 
-def read_set_ru_from_tsv():
+def read_set_ru_from_tsv() -> dict[str, str]:
     set_ru_dict = {}
-    with open(rupth.sets_ru_path, "r", newline="") as file:
+    with open(rupth.sets_ru_path, "r", newline="", encoding="utf-8") as file:
         reader = csv.reader(file, delimiter="\t")
         for row in reader:
             set_name, set_ru = row
@@ -329,41 +285,19 @@ def read_set_ru_from_tsv():
     return set_ru_dict
 
 
-def write_set_to_tsv(fs):
-    # Write unique sets to a TSV file
-    with open("unique_sets.tsv", "w", newline="") as file:
-        writer = csv.writer(file, delimiter="\t")
-        for set_name in fs:
-            writer.writerow([set_name])
-
-
-def populate_set_ru_and_check_errors(sets_dict):
+def populate_set_ru_and_check_errors(sets_dict: dict) -> list[str]:
     set_ru_dict = read_set_ru_from_tsv()
     errors_list = []
-    for sf in sets_dict:
+    for sf, entry in sets_dict.items():
         if sf in set_ru_dict:
-            sets_dict[sf]["set_ru"] = set_ru_dict[sf]
+            entry["set_ru"] = set_ru_dict[sf]
         else:
             errors_list.append(sf)
-            print(f"[bright_red]ERROR: No corresponding set_ru found for set: {sf}")
+            pr.red(f"ERROR: No corresponding set_ru found for set: {sf}")
     if errors_list == []:
-        print("[green]All sets have russian equivalents")
+        pr.green("All sets have russian equivalents")
     return errors_list
 
-
-# mdict_ru_description = """
-
-#     <p>Электронный Словарь Пали Дост. Бодхираса</p>
-#     <p>Переведен на русский Бхиккху Дэвамитта</p>
-#     <p>Для более детальной информации можено посетить
-#     <a href=\"https://devamitta.github.io/pali/pali_dict.html\">
-#     сайт Пали Словаря</a></p>
-#     и оригинальный сайт <a href=\"https://digitalpalidictionary.github.io\">
-#     Digital Pāḷi Dictionary</a></p>
-
-# """
-
-# mdict_ru_title = "Электронный Словарь Пали"
 
 gdict_ru_info = {
     "bookname": "Пали Словарь",
@@ -371,21 +305,3 @@ gdict_ru_info = {
     "description": "",
     "website": "https://digitalpalidictionary.github.io/rus",
 }
-
-
-# def sbs_related_sign(i: DpdHeadword):
-#     """Return html styled letter of which category of examples related to SBS."""
-#     html = """<span color: #ab7b38>"""
-#     if i.sbs:
-#         if i.sbs.discourses_example:
-#             html += "A "
-#         if i.sbs.class_anki:
-#             html += "C "
-#         if i.sbs.pat_example:
-#             html += "P "
-#         if i.sbs.vib_example:
-#             html += "V "
-#         if i.sbs.sbs_index:
-#             html += "S"
-#     html += """</span>"""
-#     return html

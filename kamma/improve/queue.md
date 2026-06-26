@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 76
+Pointer: 77
 
 ## Scripts (146 total, local unique_paths)
 
@@ -101,7 +101,7 @@ Pointer: 76
 - [x] 73. tools/duplicates.py
 - [x] 74. tools/file_utils.py — archived
 - [x] 75. tools/sbs_table_functions.py
-- [ ] 76. tools/tools_for_ru_exporter.py
+- [x] 76. tools/tools_for_ru_exporter.py | changed
 
 ### scripts/rus_exporter
 

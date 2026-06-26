@@ -1,0 +1,109 @@
+{
+  "get_first_synonym_single": "слово",
+  "get_first_synonym_multi": "слово",
+  "get_first_synonym_empty": "",
+  "ru_replace_abbreviations_meaning": "корень буква форма",
+  "ru_replace_abbreviations_inflect": "возвратный неправильный класс спряжения",
+  "ru_replace_abbreviations_root": "Корень Пали and Корень Санскр.",
+  "ru_replace_abbreviations_gram": "несклоняемое слово",
+  "ru_replace_abbreviations_base": "страд, понудит неправ усил",
+  "ru_replace_abbreviations_phonetic": "метатеза перед гласным",
+  "hq_with_meaning_and_lit": {
+    "id": 11,
+    "lemma_1": "akaci 1",
+    "meaning_1": "nothing",
+    "grammar": "pron, base, from na ka",
+    "neg": "neg",
+    "verb": "",
+    "trans": "",
+    "plus_case": "",
+    "ru_id": 11,
+    "ru_meaning": "ничто",
+    "ru_meaning_lit": "не что-то",
+    "ru_meaning_raw": "",
+    "make_ru_meaning": "<b>ничто</b>; досл. не что-то",
+    "make_ru_meaning_simpl": "<b>ничто</b>; досл. не что-то",
+    "make_ru_meaning_html": "<b>ничто</b>; досл. не что-то",
+    "make_ru_meaning_for_ebook": "<b>ничто</b>; досл. не что-то",
+    "make_short_ru_meaning": "ничто",
+    "ru_make_grammar_line": "местоим, основа, от na ka, отриц"
+  },
+  "hq_with_meaning_only": {
+    "id": 1,
+    "lemma_1": "a 1.1",
+    "meaning_1": "(gram) letter a; 1st letter of the alphabet; guttural vowel",
+    "ru_meaning": "(грам) буква а; первая буква алфавита; гортанная гласная",
+    "ru_meaning_lit": "",
+    "ru_meaning_raw": "(грам) буква а; первая буква алфавита; гортанная гласная",
+    "make_ru_meaning": "<b>(грам) буква а; первая буква алфавита; гортанная гласная</b>",
+    "make_ru_meaning_simpl": "<b>(грам) буква а; первая буква алфавита; гортанная гласная</b>",
+    "make_ru_meaning_html": "<b>(грам) буква а; первая буква алфавита; гортанная гласная</b>",
+    "make_ru_meaning_for_ebook": "<b>(грам) буква а; первая буква алфавита; гортанная гласная</b>",
+    "make_short_ru_meaning": "(грам) буква а"
+  },
+  "hq_with_raw_only": {
+    "id": 15,
+    "lemma_1": "akaṭa 3",
+    "ru_meaning": "",
+    "ru_meaning_lit": "",
+    "ru_meaning_raw": "естественный, неприготовленный",
+    "make_ru_meaning": "<a class='link' href='https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500=akaṭa%203&entry.326955045=Перевод&entry.1433863141=dpdict.net+2026-06-26' target='_blank'>[пер. ИИ]</a> естественный, неприготовленный",
+    "make_ru_meaning_simpl": "<i>[пер. ИИ]</i> естественный, неприготовленный",
+    "make_ru_meaning_html": "естественный, неприготовленный",
+    "make_ru_meaning_for_ebook": "[пер. ИИ] естественный, неприготовленный",
+    "make_short_ru_meaning": "естественный, неприготовленный"
+  },
+  "hq_no_ru": {
+    "id": 89646,
+    "lemma_1": "vissāsaṃ",
+    "meaning_1": "on trust; out of familiarity; in good faith",
+    "meaning_2": "confidence, trust",
+    "make_ru_meaning": "<a class='link' href='https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500=vissāsaṃ&entry.326955045=Перевод&entry.1433863141=dpdict.net+2026-06-26' target='_blank'>[перевести]</a> on trust; out of familiarity; in good faith",
+    "make_ru_meaning_simpl": "on trust; out of familiarity; in good faith",
+    "make_ru_meaning_html": "on trust; out of familiarity; in good faith",
+    "make_ru_meaning_for_ebook": "on trust; out of familiarity; in good faith",
+    "make_short_ru_meaning": "on trust",
+    "make_short_meaning": "on trust"
+  },
+  "hq_with_meaning2_only": {
+    "id": 15,
+    "meaning_1": "",
+    "meaning_2": "not artificial; not prepared",
+    "make_short_meaning": "not artificial"
+  },
+  "hq_full_grammar": {
+    "id": 119,
+    "lemma_1": "akariyamāna 1",
+    "grammar": "prp of na kariyati",
+    "neg": "neg",
+    "verb": "pass",
+    "trans": "trans",
+    "plus_case": "+acc",
+    "ru_make_grammar_line": "прич.наст от na kariyati, отриц, страд, переход (+вин)"
+  },
+  "read_set_ru_from_tsv_sample": {
+    "32 marks of a great man": "32 отметки великого человека",
+    "Sanskritisms": "Санскритизмы",
+    "Sri Lanka": "Шри-Ланка"
+  },
+  "read_set_ru_from_tsv_count": 346,
+  "populate_set_ru_all_found": {
+    "errors": [],
+    "populated": {
+      "32 marks of a great man": {
+        "set_ru": "32 отметки великого человека"
+      },
+      "Sanskritisms": {
+        "set_ru": "Санскритизмы"
+      },
+      "Sri Lanka": {
+        "set_ru": "Шри-Ланка"
+      }
+    }
+  },
+  "populate_set_ru_with_missing": {
+    "errors": [
+      "NONEXISTENT_SET_XYZ"
+    ]
+  }
+}
