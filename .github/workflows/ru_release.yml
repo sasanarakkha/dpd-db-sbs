@@ -85,7 +85,7 @@ jobs:
     # ----------------------------------------
 
     - name: Config for GitHub release
-      run: uv run python scripts/rus_exporter/ru_config_github_release.py
+      run: uv run python scripts/rus_exporter/set_config.py --profile release_full_ru
 
     - name: Create dpd.db
       run: touch dpd.db
@@ -328,7 +328,7 @@ jobs:
     # ----------------------------------------
 
     - name: Config for DPD + RUS
-      run: uv run python scripts/rus_exporter/config_github_release_dpd_rus.py
+      run: uv run python scripts/rus_exporter/set_config.py --profile release_rus
 
     - name: Run TPR Exporter
       run: uv run python exporter/tpr/tpr_exporter_ru.py
@@ -403,7 +403,7 @@ jobs:
         rm -f exporter/share/*.mdd
 
     - name: Config for DPD + SBS
-      run: uv run python scripts/rus_exporter/config_github_release_dpd_sbs.py
+      run: uv run python scripts/rus_exporter/set_config.py --profile release_sbs
 
     - name: Export GoldenDict & MDict for DPD + SBS
       run: |
@@ -421,7 +421,7 @@ jobs:
         rm -f exporter/share/*.mdd
 
     - name: Config for DPD + TA
-      run: uv run python scripts/rus_exporter/config_github_release_dpd_ta.py
+      run: uv run python scripts/rus_exporter/set_config.py --profile release_ta
 
     - name: Export GoldenDict & MDict for DPD + TA
       run: |

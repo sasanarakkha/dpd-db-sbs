@@ -11,10 +11,10 @@ while true; do
     read option
     case $option in
         [1]* )
-            uv run python scripts/rus_exporter/config_github_release_dpd_rus.py
+            uv run python scripts/rus_exporter/set_config.py --profile release_rus
             break;;
         [2]* )
-            uv run python scripts/rus_exporter/config_github_local_dpd_rus.py
+            uv run python scripts/rus_exporter/set_config.py --profile local_rus
             break;;
         * )
             break;;
@@ -61,4 +61,4 @@ uv run python exporter/tpr/tpr_exporter_ru.py
 
 uv run python scripts/rus_exporter/check_tpr_download_index.py --skip-reset
 
-uv run python scripts/rus_exporter/config_github_local_dpd_sbs.py
+uv run python scripts/rus_exporter/set_config.py --profile local_sbs

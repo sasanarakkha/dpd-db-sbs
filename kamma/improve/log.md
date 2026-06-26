@@ -92,3 +92,5 @@
 2026-06-26 | #23 scripts/change_in_db/update_sbs_chants_in_db.py | passed (approach-only) | exact-then-fuzzy pattern is correct; interactive prompt is inherent complexity
 2026-06-26 | #24 scripts/change_in_db/update_yojana_km.py | passed (approach-only) | collect→print→confirm→apply is the natural pattern; words_to_num alternatives already explored and rejected per log
 2026-06-26 | #76 tools/tools_for_ru_exporter.py | changed | removed dead code (4 uncalled functions, 2 commented-out blocks), unused import ProjectPaths+pth, switched rich.print→printer, added type hints, fixed open(encoding) and ruff PLC0206, moved date var local to only caller, added 30 characterization tests
+
+2026-06-26 | #77-84,87 scripts/rus_exporter/[8 config scripts] | changed | unified 8 identical-structure config scripts into set_config.py --profile <name>; updated 11 CI lines + 5 shell script lines; fixes rich.print→printer in all

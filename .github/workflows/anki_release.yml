@@ -74,7 +74,7 @@ jobs:
     # ----------------------------------------
 
     - name: Config for GitHub release
-      run: uv run python scripts/rus_exporter/ru_config_github_release.py
+      run: uv run python scripts/rus_exporter/set_config.py --profile release_full_ru
 
     - name: Create dpd.db
       run: touch dpd.db
@@ -255,7 +255,7 @@ jobs:
         tar -xzf resources/anki/collection_media.tar.gz -C temp/anki_collection/collection.media/
 
     - name: Configure Anki paths for CI
-      run: uv run python scripts/rus_exporter/anki_config_github_release.py
+      run: uv run python scripts/rus_exporter/set_config.py --profile anki_ci
 
     - name: Update Anki Collection (headless)
       run: uv run python scripts/export/sbs_anki_updater.py

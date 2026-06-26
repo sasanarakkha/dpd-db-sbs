@@ -13,11 +13,11 @@ while true; do
     read option
     case $option in
         [1]* )
-            uv run python scripts/rus_exporter/config_github_server_dpd_sbs.py
+            uv run python scripts/rus_exporter/set_config.py --profile server_sbs
             CHOSEN_OPTION="1"
             break;;
         [2]* )
-            uv run python scripts/rus_exporter/config_github_local_dpd_sbs.py
+            uv run python scripts/rus_exporter/set_config.py --profile local_sbs
             break;;
         * )
             break;;
@@ -58,5 +58,5 @@ fi
 
 # If option 1 was not selected, return settings back to default
 if [ "$CHOSEN_OPTION" != "1" ]; then
-    uv run python scripts/rus_exporter/config_github_local_dpd_sbs.py
+    uv run python scripts/rus_exporter/set_config.py --profile local_sbs
 fi

@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 77
+Pointer: 78
 
 ## Scripts (146 total, local unique_paths)
 
@@ -105,17 +105,17 @@ Pointer: 77
 
 ### scripts/rus_exporter
 
-- [ ] 77. scripts/rus_exporter/anki_config_github_release.py
+- [x] 77. scripts/rus_exporter/anki_config_github_release.py | changed (unified into set_config.py)
 - [ ] 78. scripts/rus_exporter/check_tpr_download_index.py
-- [ ] 79. scripts/rus_exporter/config_github_local_dpd_rus.py
-- [ ] 80. scripts/rus_exporter/config_github_local_dpd_sbs.py
-- [ ] 81. scripts/rus_exporter/config_github_release_dpd_rus.py
-- [ ] 82. scripts/rus_exporter/config_github_release_dpd_sbs.py
-- [ ] 83. scripts/rus_exporter/config_github_release_dpd_ta.py
-- [ ] 84. scripts/rus_exporter/config_github_server_dpd_sbs.py
+- [x] 79. scripts/rus_exporter/config_github_local_dpd_rus.py | changed (unified into set_config.py)
+- [x] 80. scripts/rus_exporter/config_github_local_dpd_sbs.py | changed (unified into set_config.py)
+- [x] 81. scripts/rus_exporter/config_github_release_dpd_rus.py | changed (unified into set_config.py)
+- [x] 82. scripts/rus_exporter/config_github_release_dpd_sbs.py | changed (unified into set_config.py)
+- [x] 83. scripts/rus_exporter/config_github_release_dpd_ta.py | changed (unified into set_config.py)
+- [x] 84. scripts/rus_exporter/config_github_server_dpd_sbs.py | changed (unified into set_config.py)
 - [ ] 85. scripts/rus_exporter/docs_add_indexes.py
 - [ ] 86. scripts/rus_exporter/docs_check_ru.py
-- [ ] 87. scripts/rus_exporter/ru_config_github_release.py
+- [x] 87. scripts/rus_exporter/ru_config_github_release.py | changed (unified into set_config.py)
 - [ ] 88. scripts/rus_exporter/ru_zip_goldendict_mdict.py
 - [ ] 89. scripts/rus_exporter/zip_dpd_rus.py
 - [ ] 90. scripts/rus_exporter/zip_dpd_sbs.py

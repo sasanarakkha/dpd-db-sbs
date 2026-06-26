@@ -79,7 +79,7 @@ jobs:
     # ----------------------------------------
 
     - name: Config for GitHub release
-      run: uv run python scripts/rus_exporter/ru_config_github_release.py
+      run: uv run python scripts/rus_exporter/set_config.py --profile release_full_ru
 
     - name: Create dpd.db
       run: touch dpd.db
