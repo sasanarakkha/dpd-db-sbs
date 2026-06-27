@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 78
+Pointer: 79
 
 ## Scripts (146 total, local unique_paths)
 
@@ -106,7 +106,7 @@ Pointer: 78
 ### scripts/rus_exporter
 
 - [x] 77. scripts/rus_exporter/anki_config_github_release.py | changed (unified into set_config.py)
-- [ ] 78. scripts/rus_exporter/check_tpr_download_index.py
+- [x] 78. scripts/rus_exporter/check_tpr_download_index.py | changed
 - [x] 79. scripts/rus_exporter/config_github_local_dpd_rus.py | changed (unified into set_config.py)
 - [x] 80. scripts/rus_exporter/config_github_local_dpd_sbs.py | changed (unified into set_config.py)
 - [x] 81. scripts/rus_exporter/config_github_release_dpd_rus.py | changed (unified into set_config.py)

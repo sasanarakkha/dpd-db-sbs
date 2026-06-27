@@ -1,15 +1,16 @@
 """Check and report the current state of the TPR download list index for the DPD with Russian entry."""
 
+import argparse
 import json
 import subprocess
 import sys
-import argparse
 from pathlib import Path
-from tools.printer import printer as pr
+
 from tools.configger import config_test
+from tools.printer import printer as pr
 
 
-def main():
+def main() -> None:
     if not config_test("exporter", "make_tpr", "yes"):
         pr.green_title("disabled in config.ini")
         return
@@ -61,11 +62,11 @@ def main():
         pr.red(f"JSON file missing: {json_path}")
         sys.exit(1)
 
-    with open(json_path, "r") as f:
+    with open(json_path, "r", encoding="utf-8") as f:
         download_list = json.load(f)
 
     for i, entry in enumerate(download_list):
-        print(f"{i}: {entry.get('name')}")
+        pr.cyan(f"{i}: {entry.get('name')}")
 
     ru_idx = None
     for i, entry in enumerate(download_list):

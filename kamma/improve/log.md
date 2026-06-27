@@ -94,3 +94,5 @@
 2026-06-26 | #76 tools/tools_for_ru_exporter.py | changed | removed dead code (4 uncalled functions, 2 commented-out blocks), unused import ProjectPaths+pth, switched rich.print→printer, added type hints, fixed open(encoding) and ruff PLC0206, moved date var local to only caller, added 30 characterization tests
 
 2026-06-26 | #77-84,87 scripts/rus_exporter/[8 config scripts] | changed | unified 8 identical-structure config scripts into set_config.py --profile <name>; updated 11 CI lines + 5 shell script lines; fixes rich.print→printer in all
+
+2026-06-27 | #78 scripts/rus_exporter/check_tpr_download_index.py | changed | print()→pr.cyan(), main()->None, encoding on open()
