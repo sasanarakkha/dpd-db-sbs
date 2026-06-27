@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 89
+Pointer: 92
 
 ## Scripts (144 total, local unique_paths)
 
@@ -117,9 +117,9 @@ Pointer: 89
 - [x] 86. scripts/rus_exporter/docs_check_ru.py | changed
 - [x] 87. scripts/rus_exporter/ru_config_github_release.py | changed (unified into set_config.py)
 - [x] 88. scripts/rus_exporter/ru_zip_goldendict_mdict.py | removed from queue — shadow copy
-- [ ] 89. scripts/rus_exporter/zip_dpd_rus.py
-- [ ] 90. scripts/rus_exporter/zip_dpd_sbs.py
-- [ ] 91. scripts/rus_exporter/zip_dpd_ta.py
+- [x] 89. scripts/rus_exporter/zip_dpd_rus.py — unified into zip_dpd.py --locale rus
+- [x] 90. scripts/rus_exporter/zip_dpd_sbs.py — unified into zip_dpd.py --locale sbs
+- [x] 91. scripts/rus_exporter/zip_dpd_ta.py — unified into zip_dpd.py --locale ta
 
 ### scripts/change_in_db (new additions)
 

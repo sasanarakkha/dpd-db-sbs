@@ -394,7 +394,7 @@ jobs:
         $HOME/check_disk.sh
 
     - name: Zip GoldenDict & Mdict for DPD + RUS
-      run: uv run python scripts/rus_exporter/zip_dpd_rus.py
+      run: uv run python scripts/rus_exporter/zip_dpd.py --locale rus
 
     - name: Cleanup DPD + RUS Intermediate Files
       run: |
@@ -412,7 +412,7 @@ jobs:
         $HOME/check_disk.sh
 
     - name: Zip GoldenDict & Mdict for DPD + SBS
-      run: uv run python scripts/rus_exporter/zip_dpd_sbs.py
+      run: uv run python scripts/rus_exporter/zip_dpd.py --locale sbs
 
     - name: Cleanup DPD + SBS Intermediate Files
       run: |
@@ -430,7 +430,7 @@ jobs:
         $HOME/check_disk.sh
 
     - name: Zip GoldenDict & Mdict for DPD + TA
-      run: uv run python scripts/rus_exporter/zip_dpd_ta.py
+      run: uv run python scripts/rus_exporter/zip_dpd.py --locale ta
 
     # ----------------------------------------
     # Create Draft Release
