@@ -96,3 +96,5 @@
 2026-06-26 | #77-84,87 scripts/rus_exporter/[8 config scripts] | changed | unified 8 identical-structure config scripts into set_config.py --profile <name>; updated 11 CI lines + 5 shell script lines; fixes rich.print→printer in all
 
 2026-06-27 | #78 scripts/rus_exporter/check_tpr_download_index.py | changed | print()→pr.cyan(), main()->None, encoding on open()
+2026-06-27 | #85 scripts/rus_exporter/docs_add_indexes.py | removed from queue | shadow copy of scripts/build/docs_add_indexes.py — sync will pick up upstream refactors
+2026-06-27 | #88 scripts/rus_exporter/ru_zip_goldendict_mdict.py | removed from queue | shadow copy of scripts/build/zip_goldendict_mdict.py — sync will pick up upstream refactors
