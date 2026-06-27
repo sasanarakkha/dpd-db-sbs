@@ -4,6 +4,7 @@ import re
 import sys
 from pathlib import Path
 from urllib.parse import unquote
+
 from tools.printer import printer as pr
 
 DOCS_DIR = Path("docs_rus")
@@ -22,7 +23,7 @@ def check_file(file_path: Path) -> list[str]:
     if not file_path.exists():
         return []
 
-    lines = file_path.read_text().splitlines()
+    lines = file_path.read_text(encoding="utf-8").splitlines()
     new_lines = []
     broken_images = []
     changed = False
@@ -58,12 +59,12 @@ def check_file(file_path: Path) -> list[str]:
         new_lines.append(line)
 
     if changed:
-        file_path.write_text("\n".join(new_lines) + "\n")
+        file_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
 
     return broken_images
 
 
-def main():
+def main() -> None:
     pr.green("check docs_rus links and assets")
 
     if not DOCS_DIR.exists():

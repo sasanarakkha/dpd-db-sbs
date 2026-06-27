@@ -98,3 +98,4 @@
 2026-06-27 | #78 scripts/rus_exporter/check_tpr_download_index.py | changed | print()→pr.cyan(), main()->None, encoding on open()
 2026-06-27 | #85 scripts/rus_exporter/docs_add_indexes.py | removed from queue | shadow copy of scripts/build/docs_add_indexes.py — sync will pick up upstream refactors
 2026-06-27 | #88 scripts/rus_exporter/ru_zip_goldendict_mdict.py | removed from queue | shadow copy of scripts/build/zip_goldendict_mdict.py — sync will pick up upstream refactors
+2026-06-27 | #86 scripts/rus_exporter/docs_check_ru.py | changed | main()->None, encoding="utf-8" on read_text/write_text, add golden-master test + fixture
