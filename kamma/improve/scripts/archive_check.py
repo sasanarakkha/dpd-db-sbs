@@ -45,7 +45,7 @@ def _find_callers(file_path: Path) -> list[str]:
     try:
         for pattern in (import_pattern, path_pattern):
             result = subprocess.run(
-                ["rg", "--no-heading", "-l", pattern, "-g", "!*.db"],
+                ["rg", "--no-heading", "--hidden", "-l", pattern, "-g", "!*.db"],
                 capture_output=True,
                 text=True,
                 cwd=REPO_ROOT,
@@ -58,9 +58,7 @@ def _find_callers(file_path: Path) -> list[str]:
         return []
     callers.discard(str(_relative_path(file_path)))
     callers.discard(str(file_path))
-    callers = {
-        c for c in callers if not c.startswith("tests/") and not c.startswith("kamma/")
-    }
+    callers = {c for c in callers if not c.startswith("kamma/")}
     return sorted(callers)
 
 
