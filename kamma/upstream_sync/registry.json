@@ -257,7 +257,6 @@
     "scripts/export/sbs_example_dupes.py",
     "scripts/export/sourse_atth_sbs_mula.py",
     "scripts/export/vocab_abbrev_pali_course.py",
-    "db/backup_tsv/backup_all.py",
     "temp/anki_decks/",
     "scripts/bash/rebuild_db.sh",
     "scripts/bash/push_from_temp.sh",

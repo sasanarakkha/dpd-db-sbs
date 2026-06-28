@@ -5,6 +5,8 @@
 > prior precedent). One terse line per decision; full rationale lives in commit messages.
 
 <!-- Format: YYYY-MM-DD | #N script | passed / changed / skipped / deferred | note -->
+2026-06-28 | #94 db/backup_tsv/backup_all.py | archived | only caller (check_new_words.sh) is already archived; no active usage
+
 2026-06-24 | #12 scripts/change_in_db/class_relation.py | passed (approach-only) | no substantial simplification possible — inherent decision tree
 2026-06-07 | #1 db/families/family_set_ru_update.py | changed | compiled regex to module constants, extracted _clean_translated_lines helper, atomic TSV write, -> None annotation, removed stale comments
 2026-06-07 | #2 gui2/dps_ai_service.py | changed | type hints (TYPE_CHECKING guard for DpsFields, DpdHeadword), lemma_1 or "" guard, textwrap.dedent on both prompt f-strings, synonyms via instruction var not .replace(), str(e)->e, removed WHAT comments

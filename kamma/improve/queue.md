@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 94
+Pointer: 95
 
 ## Scripts (144 total, local unique_paths)
 
@@ -123,7 +123,7 @@ Pointer: 94
 
 ### db/backup_tsv
 
-- [ ] 94. db/backup_tsv/backup_all.py
+- [x] 94. db/backup_tsv/backup_all.py | archived
 
 ### scripts/bash
 
