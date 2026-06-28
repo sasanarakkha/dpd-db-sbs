@@ -20,6 +20,7 @@ dependencies = [
     "requests>=2.32.3",
     "typst>=0.14.9",
     "num2words>=0.5.14",
+    "pyrefly>=1.1.1",
 ]
 
 [dependency-groups]
