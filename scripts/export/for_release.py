@@ -1,6 +1,10 @@
-"""Print space-separated list of study-tools release asset filenames."""
+"""Explicit manifest of study-tools release asset filenames for the upload pipeline.
 
-ASSETS: list[str] = [
+Called by upload_study_tools.sh to enumerate every asset that should be attached
+to a sasanarakkha/study-tools GitHub release.
+"""
+
+RELEASE_ASSETS: list[str] = [
     "common-roots.apkg",
     "common-roots.csv",
     "dhp-vocab.apkg",
@@ -33,4 +37,4 @@ ASSETS: list[str] = [
 ]
 
 if __name__ == "__main__":
-    print(" ".join(ASSETS))
+    print(" ".join(RELEASE_ASSETS))

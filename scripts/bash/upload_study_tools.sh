@@ -12,7 +12,7 @@ LATEST_TAG=$(gh release list --repo "$REPO" --limit 1 --json tagName --jq '.[0].
 
 CREATE_NEW=true
 if [ -n "$LATEST_TAG" ]; then
-    FIRST_ASSET=$(uv run python scripts/bash/for_release.py | awk '{print $1}')
+    FIRST_ASSET=$(uv run python scripts/export/for_release.py | awk '{print $1}')
     EXISTING=$(gh release view "$LATEST_TAG" --repo "$REPO" --json assets \
                --jq '.assets[].name' 2>/dev/null || echo "")
     if ! echo "$EXISTING" | grep -qx "$FIRST_ASSET"; then
@@ -30,7 +30,7 @@ else
     echo "Appending to existing release: $TAG"
 fi
 
-for asset in $(uv run python scripts/bash/for_release.py); do
+for asset in $(uv run python scripts/export/for_release.py); do
     full_path="$ASSET_DIR/$asset"
     if [ ! -f "$full_path" ]; then
         echo "Warning: $full_path not found, skipping."

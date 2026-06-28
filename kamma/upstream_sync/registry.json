@@ -275,7 +275,7 @@
     "scripts/bash/move_decks.sh",
     "scripts/bash/pali_vocab_push.sh",
     "scripts/bash/copy_dpd_to_server.sh",
-    "scripts/bash/for_release.py",
+    "scripts/export/for_release.py",
     "audio/error_check/deleted_silent_files.txt",
     "audio/error_check/silent_files.txt",
     "go_modules/frequency/ebt_freq/main.go",

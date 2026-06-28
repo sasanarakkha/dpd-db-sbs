@@ -132,7 +132,7 @@ Pointer: 100
 - [x] 97. scripts/bash/copy_tpr_db.sh | changed
 - [x] 98. scripts/bash/download_dpd.sh | changed
 - [x] 99. scripts/bash/download_pali_classes.sh | changed
-- [ ] 100. scripts/bash/for_release.py
+- [ ] 100. scripts/export/for_release.py
 - [ ] 101. scripts/bash/manual_update_mac_dict.sh
 - [ ] 102. scripts/bash/move_class.sh
 - [ ] 103. scripts/bash/move_decks.sh
