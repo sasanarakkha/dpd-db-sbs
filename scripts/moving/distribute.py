@@ -10,7 +10,7 @@ from collections.abc import Callable
 from pathlib import Path
 from zipfile import ZipFile
 
-from tools.configger import config_test
+from tools.configger import config_read, config_test
 from tools.printer import printer as pr
 
 _SHARE_MDICT_MEMBERS = {
@@ -290,6 +290,55 @@ def _task_copy_rudpd_from_share2filesrv() -> None:
     )
 
 
+def safe_copy(src: Path, dest: Path) -> None:
+    """Copy a file or directory to dest, overwriting any existing dest."""
+    try:
+        if dest.exists():
+            if dest.is_dir():
+                shutil.rmtree(dest)
+            else:
+                dest.unlink()
+        if src.is_dir():
+            shutil.copytree(src, dest)
+        else:
+            shutil.copy2(src, dest)
+        pr.green(f"{src.name} copied successfully")
+    except OSError as e:
+        pr.red(f"Failed to copy {src.name}: {e}")
+
+
+def _task_copy_dpd_for_classes() -> None:
+    pr.yellow_title("copying tipitaka_pali.db and dpd_goldendict_src")
+    project_dir, deva_dir = _project_paths()
+
+    tpr_db_path = config_read("tpr", "db_path")
+    share_dir = project_dir / "exporter" / "share"
+    dpd_goldendict_src = share_dir / "dpd"
+    bash_script = project_dir / "scripts" / "bash" / "copy_tpr_db.sh"
+
+    dest_dir = (
+        deva_dir
+        / "filesrv1"
+        / "share1"
+        / "Sharing between users"
+        / "For A. Deva"
+        / "for_classes"
+    )
+    _require_dirs(dest_dir)
+
+    sources: list[tuple[Path | None, Path]] = [
+        (Path(tpr_db_path) if tpr_db_path else None, dest_dir / "tipitaka_pali.db"),
+        (dpd_goldendict_src, dest_dir / "dpd"),
+        (bash_script, dest_dir / bash_script.name),
+    ]
+
+    for src, dest in sources:
+        if src is None or not src.exists():
+            pr.red(f"Missing source: {src}")
+            continue
+        safe_copy(src, dest)
+
+
 TASKS: dict[str, Callable[[], None]] = {
     "unzip_dpd_to_filesrv": _task_unzip_dpd_to_filesrv,
     "unzip_dpd_to_gd": _task_unzip_dpd_to_gd,
@@ -302,6 +351,7 @@ TASKS: dict[str, Callable[[], None]] = {
     "copy_dpdsbs_from_sbs2filesrv": _task_copy_dpdsbs_from_sbs2filesrv,
     "copy_dpdsbs_from_share2sbs": _task_copy_dpdsbs_from_share2sbs,
     "copy_rudpd_from_share2filesrv": _task_copy_rudpd_from_share2filesrv,
+    "copy_dpd_for_classes": _task_copy_dpd_for_classes,
 }
 
 

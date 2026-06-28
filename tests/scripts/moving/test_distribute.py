@@ -453,3 +453,141 @@ def test_task_copy_rudpd_from_share2filesrv_uses_expected_paths(
     assert (gd_dir / "ru-dpd" / "entry.txt").read_text() == "entry"
     assert (md_dir / "ru-dpd-mdict.mdx").read_text() == "mdx"
     assert (md_dir / "ru-dpd-mdict.mdd").read_text() == "mdd"
+
+
+# safe_copy tests
+
+
+def test_safe_copy_file_to_new_dest(tmp_path: Path) -> None:
+    src = tmp_path / "src.db"
+    src.write_text("db contents")
+    dest = tmp_path / "dest.db"
+
+    dist.safe_copy(src, dest)
+
+    assert dest.read_text() == "db contents"
+
+
+def test_safe_copy_file_overwrites_existing_dest(tmp_path: Path) -> None:
+    src = tmp_path / "src.db"
+    src.write_text("new contents")
+    dest = tmp_path / "dest.db"
+    dest.write_text("old contents")
+
+    dist.safe_copy(src, dest)
+
+    assert dest.read_text() == "new contents"
+
+
+def test_safe_copy_dir_to_new_dest(tmp_path: Path) -> None:
+    src = tmp_path / "src_dir"
+    src.mkdir()
+    (src / "file.txt").write_text("hello")
+    dest = tmp_path / "dest_dir"
+
+    dist.safe_copy(src, dest)
+
+    assert (dest / "file.txt").read_text() == "hello"
+
+
+def test_safe_copy_dir_overwrites_existing_dest_dir(tmp_path: Path) -> None:
+    src = tmp_path / "src_dir"
+    src.mkdir()
+    (src / "new.txt").write_text("new")
+    dest = tmp_path / "dest_dir"
+    dest.mkdir()
+    (dest / "stale.txt").write_text("stale")
+
+    dist.safe_copy(src, dest)
+
+    assert (dest / "new.txt").read_text() == "new"
+    assert not (dest / "stale.txt").exists()
+
+
+def test_safe_copy_logs_red_on_failure(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    src = tmp_path / "src.db"
+    src.write_text("db contents")
+    dest = tmp_path / "missing_parent" / "dest.db"
+
+    dist.safe_copy(src, dest)
+
+    assert "Failed to copy" in capsys.readouterr().out
+    assert not dest.exists()
+
+
+# copy_dpd_for_classes task tests
+
+
+def test_task_copy_dpd_for_classes_copies_sources(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    project_dir = tmp_path / "dpd-db"
+    deva_dir = tmp_path
+    monkeypatch.setattr(dist, "_project_paths", lambda: (project_dir, deva_dir))
+
+    tpr_db = tmp_path / "tipitaka.db"
+    tpr_db.write_text("tpr")
+    monkeypatch.setattr(dist, "config_read", lambda *a: str(tpr_db))
+
+    share_dir = project_dir / "exporter" / "share"
+    dpd_src = share_dir / "dpd"
+    dpd_src.mkdir(parents=True)
+    (dpd_src / "entry.txt").write_text("entry")
+
+    bash_script = project_dir / "scripts" / "bash" / "copy_tpr_db.sh"
+    bash_script.parent.mkdir(parents=True)
+    bash_script.write_text("#!/bin/bash")
+
+    dest_dir = (
+        deva_dir
+        / "filesrv1"
+        / "share1"
+        / "Sharing between users"
+        / "For A. Deva"
+        / "for_classes"
+    )
+    dest_dir.mkdir(parents=True)
+
+    dist._task_copy_dpd_for_classes()
+
+    assert (dest_dir / "tipitaka_pali.db").read_text() == "tpr"
+    assert (dest_dir / "dpd" / "entry.txt").read_text() == "entry"
+    assert (dest_dir / "copy_tpr_db.sh").exists()
+
+
+def test_task_copy_dpd_for_classes_exits_when_dest_missing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(dist, "_project_paths", lambda: (tmp_path / "dpd-db", tmp_path))
+    monkeypatch.setattr(dist, "config_read", lambda *a: None)
+
+    with pytest.raises(SystemExit):
+        dist._task_copy_dpd_for_classes()
+
+
+def test_task_copy_dpd_for_classes_skips_missing_source(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    project_dir = tmp_path / "dpd-db"
+    deva_dir = tmp_path
+    monkeypatch.setattr(dist, "_project_paths", lambda: (project_dir, deva_dir))
+    monkeypatch.setattr(dist, "config_read", lambda *a: None)
+
+    dest_dir = (
+        deva_dir
+        / "filesrv1"
+        / "share1"
+        / "Sharing between users"
+        / "For A. Deva"
+        / "for_classes"
+    )
+    dest_dir.mkdir(parents=True)
+
+    dist._task_copy_dpd_for_classes()
+
+    out = capsys.readouterr().out
+    assert "Missing source" in out

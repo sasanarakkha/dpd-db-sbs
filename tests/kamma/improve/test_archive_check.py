@@ -64,7 +64,7 @@ def test_registry_status_uses_repo_relative_paths():
 
 def test_test_detection_uses_repo_relative_paths():
     """Mirrored tests under tests/ must be detected."""
-    data, _ = _run_archive_check("scripts/moving/copy_dpd_for_classes.py")
+    data, _ = _run_archive_check("scripts/moving/distribute.py")
     assert data["has_test"] is True
 
 

@@ -47,7 +47,7 @@ Pointer: 97
 
 ### scripts/moving
 
-- [x] 31. scripts/moving/copy_dpd_for_classes.py
+- [x] 31. scripts/moving/copy_dpd_for_classes.py — merged into distribute.py
 - [x] 32. scripts/moving/copy_dpdsbs_from_sbs2filesrv.py — unified into distribute.py
 - [x] 33. scripts/moving/copy_dpdsbs_from_share2sbs.py — unified into distribute.py
 - [x] 34. scripts/moving/copy_rudpd_from_share2filesrv.py — unified into distribute.py
@@ -126,6 +126,10 @@ Pointer: 97
 - [x] 94. db/backup_tsv/backup_all.py | archived
 
 ### scripts/bash
+
+> **Convention:** All scripts in this folder must use `tools/ask.py` for user prompts (not
+> raw `echo`/`read`/ANSI codes). See #96 (`copy_dpd_to_server.sh`) for the clean
+> pattern. Other scripts in this folder still need conversion when reviewed.
 
 - [x] 95. scripts/bash/check_new_words.sh — already archived (commit 3679d5439), queue was stale
 - [x] 96. scripts/bash/copy_dpd_to_server → copy_dpd_to_server.sh | changed

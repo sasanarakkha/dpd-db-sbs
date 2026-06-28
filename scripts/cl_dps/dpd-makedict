@@ -12,13 +12,13 @@ LOG_BASE_NAME="make_dpd"
 TARGET_SCRIPT_PATH="${PROJECT_ROOT}/scripts/bash/make_dpd.sh"
 TARGET_SCRIPT_PATH_RU="${PROJECT_ROOT}/scripts/bash/make_ru_dpd.sh"
 TARGET_SCRIPT_PATH_COPY="${PROJECT_ROOT}/scripts/bash/copy_dpd_to_server.sh"
-TARGET_SCRIPT_PATH_COPY_TPR="${PROJECT_ROOT}/scripts/moving/copy_dpd_for_classes.py"
+TARGET_SCRIPT_PATH_COPY_TPR="${PROJECT_ROOT}/scripts/moving/distribute.py"
 
 # The command to run, including 'uv run bash'
 COMMAND_TO_EXECUTE=(bash -c "cd '${PROJECT_ROOT}' && uv run bash '${TARGET_SCRIPT_PATH}'")
 COMMAND_TO_EXECUTE_RU=(bash -c "cd '${PROJECT_ROOT}' && uv run bash '${TARGET_SCRIPT_PATH_RU}'")
 COMMAND_TO_EXECUTE_COPY=(bash -c "cd '${PROJECT_ROOT}' && uv run bash '${TARGET_SCRIPT_PATH_COPY}'")
-COMMAND_TO_EXECUTE_COPY_TPR=(bash -c "cd '${PROJECT_ROOT}' && uv run python '${TARGET_SCRIPT_PATH_COPY_TPR}'")
+COMMAND_TO_EXECUTE_COPY_TPR=(bash -c "cd '${PROJECT_ROOT}' && uv run python '${TARGET_SCRIPT_PATH_COPY_TPR}' copy_dpd_for_classes")
 
 # Execute the master script
 
