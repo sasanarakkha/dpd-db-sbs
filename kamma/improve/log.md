@@ -112,5 +112,4 @@
 2026-06-28 | #101 scripts/bash/manual_update_mac_dict.sh | changed | echo→ask.py --print, add set -e, drop emojis
 2026-06-28 | #102 scripts/bash/move_class.sh | changed | echo→ask.py, remove dead cp_options, silent-on-success + FAILURES tracking + final summary
 2026-06-28 | #103 scripts/bash/move_decks.sh | changed | echo→ask.py, remove dead cp_options, silent-on-success + FAILURES tracking + final summary
-
-
+2026-06-28 | #104 scripts/bash/pali_vocab_push.sh | changed | echo→ask.py convention + simplified git logic (removed redundant status porcelain + cached-diff guards); added mirror test at tests/scripts/bash/test_pali_vocab_push.py; removed duplicate tests from test_deck_update_scripts.py

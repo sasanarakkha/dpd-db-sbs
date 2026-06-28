@@ -12,18 +12,10 @@ GENERATED_PATHS=(
 
 cd "$COURSES_DIR"
 
-if [[ -z "$(git status --porcelain -- "${GENERATED_PATHS[@]}")" ]]; then
-    echo "No generated vocab changes to push."
-    exit 0
-fi
-
 git status --short -- "${GENERATED_PATHS[@]}"
-git add -- "${GENERATED_PATHS[@]}"
 
-if git diff --cached --quiet -- "${GENERATED_PATHS[@]}"; then
-    echo "No generated vocab changes to commit."
-    exit 0
+if ! git diff --quiet -- "${GENERATED_PATHS[@]}"; then
+    git add -- "${GENERATED_PATHS[@]}"
+    git commit -m "update pali course vocab" -- "${GENERATED_PATHS[@]}"
+    git push
 fi
-
-git commit -m "update pali course vocab" -- "${GENERATED_PATHS[@]}"
-git push
