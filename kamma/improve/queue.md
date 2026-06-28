@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 103
+Pointer: 104
 
 ## Scripts (144 total, local unique_paths)
 
@@ -135,7 +135,7 @@ Pointer: 103
 - [x] 100. scripts/export/for_release.py | changed
 - [x] 101. scripts/bash/manual_update_mac_dict.sh | changed
 - [x] 102. scripts/bash/move_class.sh | changed
-- [ ] 103. scripts/bash/move_decks.sh
+- [x] 103. scripts/bash/move_decks.sh | changed
 - [ ] 104. scripts/bash/pali_vocab_push.sh
 - [ ] 105. scripts/bash/push_from_temp.sh
 - [ ] 106. scripts/bash/rebuild_db.sh

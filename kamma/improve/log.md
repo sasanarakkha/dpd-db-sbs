@@ -111,5 +111,6 @@
 2026-06-28 | #99 scripts/bash/download_pali_classes.sh | changed | replace echo + ANSI codes with tools/ask.py (convention)
 2026-06-28 | #101 scripts/bash/manual_update_mac_dict.sh | changed | echo→ask.py --print, add set -e, drop emojis
 2026-06-28 | #102 scripts/bash/move_class.sh | changed | echo→ask.py, remove dead cp_options, silent-on-success + FAILURES tracking + final summary
+2026-06-28 | #103 scripts/bash/move_decks.sh | changed | echo→ask.py, remove dead cp_options, silent-on-success + FAILURES tracking + final summary
 
 
