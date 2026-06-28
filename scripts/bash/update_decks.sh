@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# all for update of sbs-study-tools (https://sasanarakkha.github.io/study-tools/)
+# Orchestrate the full SBS Anki deck update workflow.
 
 PROJECT_DIR="$HOME/Documents/dpd-db"
 
@@ -15,7 +15,7 @@ if [[ $response == "y" ]]; then
     uv run python scripts/change_in_db/example_cleanup.py
     uv run python scripts/change_in_db/update_sbs_chants_in_db.py
     if ! uv run python db_tests/sbs_consistency_tests.py; then
-        echo -e "\033[1;31m SBS consistency tests FAILED. Aborting before anki_csv.py. \033[0m"
+        uv run "$PROJECT_DIR/tools/ask.py" --print -c red "SBS consistency tests FAILED. Aborting before anki_csv.py."
         exit 1
     fi
     uv run python scripts/export/anki_csv.py
@@ -91,15 +91,14 @@ STUDY_TOOLS_DIR="$HOME/Documents/sasanarakkha/study-tools"
 response=$(uv run python "$PROJECT_DIR/tools/ask.py" "need to push individually on GitHub?") || exit 1
 if [[ $response == "y" ]]; then
     while true; do
-        echo -n "Available assets: "
+        uv run "$PROJECT_DIR/tools/ask.py" --print "Available assets:"
         bash "$STUDY_TOOLS_DIR/scripts/upload_asset.sh"
-        echo -n "Enter filename to upload (or press Enter to finish): "
+        uv run "$PROJECT_DIR/tools/ask.py" --print "Enter filename to upload (or press Enter to finish):"
         read asset_name
         if [[ -z "$asset_name" ]]; then
             break
         fi
         bash "$STUDY_TOOLS_DIR/scripts/upload_asset.sh" "$asset_name"
-        echo
     done
 fi
 
@@ -108,5 +107,5 @@ if [[ $response == "y" ]]; then
     bash "$STUDY_TOOLS_DIR/scripts/upload.sh"
 fi
 
-echo "what have to be done has been done!"
-echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+uv run "$PROJECT_DIR/tools/ask.py" --print -c green "what have to be done has been done!"
+uv run "$PROJECT_DIR/tools/ask.py" --print -c green "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
