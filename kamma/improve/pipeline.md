@@ -97,6 +97,11 @@ For each script:
    TSV line to the build log, which raw prints bypass. Keep any rich-markup escaping intact,
    since `pr.*` still feeds rich underneath.
 
+   **Bash scripts:** never use `echo` for terminal output. All output must go through
+   `tools/ask.py`. Colors: `red`, `green`, `yellow`, `blue`, `magenta`, `cyan` (default), `white`.
+   - Statements (no pause): `uv run tools/ask.py --print [-c <color>] "message"`
+   - Interactive prompts (single keypress, `q` aborts): `answer=$(uv run tools/ask.py [-c <color>] "question?")`
+
 3. **Dependencies** — what does it import? Are all imports used? What does it call, and
    what calls it? Are any dependencies stale, redundant, or pointing at the wrong
    abstraction? Check for dead code revealed by tracing the call graph.

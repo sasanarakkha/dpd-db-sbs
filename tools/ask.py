@@ -1,13 +1,20 @@
 #!/usr/bin/env python3
-# Colored interactive prompts using the printer module.
+# Colored interactive prompts and print statements for bash scripts.
 
+import argparse
 import sys
 import termios
 import tty
 
-# ANSI color codes
-CYAN = "\033[36m"
-RED = "\033[31m"
+COLORS: dict[str, str] = {
+    "red": "\033[31m",
+    "green": "\033[32m",
+    "yellow": "\033[33m",
+    "blue": "\033[34m",
+    "magenta": "\033[35m",
+    "cyan": "\033[36m",
+    "white": "\033[37m",
+}
 RESET = "\033[0m"
 
 
@@ -24,11 +31,8 @@ def read_single_char() -> str:
     """Read a single character without requiring Enter (if TTY). Falls back to line input for pipes."""
     try:
         fd = sys.stdin.fileno()
-        # Check if stdin is a TTY
         if not sys.stdin.isatty():
             return _read_line_fallback()
-
-        # Is a TTY, use raw mode for single character
         old_settings = termios.tcgetattr(fd)
         try:
             tty.setraw(fd)
@@ -39,10 +43,10 @@ def read_single_char() -> str:
         return _read_line_fallback()
 
 
-def ask_question(question: str) -> str:
+def ask_question(question: str, color: str = "cyan") -> str:
     """Ask a question with color. Return the first char of the response."""
-    # Print to stderr so it displays even when stdout is captured
-    sys.stderr.write(f"{CYAN}{question}{RESET}")
+    ansi = COLORS.get(color, COLORS["cyan"])
+    sys.stderr.write(f"{ansi}{question}{RESET}")
     sys.stderr.flush()
 
     response = read_single_char()
@@ -50,19 +54,43 @@ def ask_question(question: str) -> str:
     sys.stderr.flush()
 
     if response == "q":
-        sys.stderr.write(f"{RED}Aborted by user.{RESET}\n")
+        sys.stderr.write(f"{COLORS['red']}Aborted by user.{RESET}\n")
         sys.stderr.flush()
         sys.exit(1)
 
-    # Return the character
     return response
 
 
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        sys.stderr.write(f"{RED}Usage: ask.py '<question>'{RESET}\n")
-        sys.exit(1)
+def print_message(message: str, color: str = "cyan") -> None:
+    """Print a colored message to stderr without waiting for input."""
+    ansi = COLORS.get(color, COLORS["cyan"])
+    sys.stderr.write(f"{ansi}{message}{RESET}\n")
+    sys.stderr.flush()
 
-    answer = ask_question(sys.argv[1])
-    # Output the answer so bash can check it
-    print(answer, end="")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Colored interactive prompts and print statements for bash scripts."
+    )
+    parser.add_argument("message", help="The question or message to display.")
+    parser.add_argument(
+        "--print",
+        "-p",
+        action="store_true",
+        dest="print_only",
+        help="Print message without waiting for input.",
+    )
+    parser.add_argument(
+        "--color",
+        "-c",
+        default="cyan",
+        choices=list(COLORS.keys()),
+        help="Color name (default: cyan).",
+    )
+    args = parser.parse_args()
+
+    if args.print_only:
+        print_message(args.message, args.color)
+    else:
+        answer = ask_question(args.message, args.color)
+        print(answer, end="")

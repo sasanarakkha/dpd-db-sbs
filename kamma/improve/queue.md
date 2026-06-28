@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 99
+Pointer: 96
 
 ## Scripts (144 total, local unique_paths)
 
@@ -127,14 +127,10 @@ Pointer: 99
 
 ### scripts/bash
 
-> **Convention:** All scripts in this folder must use `tools/ask.py` for user prompts (not
-> raw `echo`/`read`/ANSI codes). See #96 (`copy_dpd_to_server.sh`) for the clean
-> pattern. Other scripts in this folder still need conversion when reviewed.
-
-- [x] 95. scripts/bash/check_new_words.sh — already archived (commit 3679d5439), queue was stale
-- [x] 96. scripts/bash/copy_dpd_to_server → copy_dpd_to_server.sh | changed
-- [x] 97. scripts/bash/copy_tpr_db.sh | passed
-- [x] 98. scripts/bash/download_dpd.sh | changed
+- [x] 95. scripts/bash/check_new_words.sh | archived
+- [ ] 96. scripts/bash/copy_dpd_to_server → copy_dpd_to_server.sh
+- [ ] 97. scripts/bash/copy_tpr_db.sh
+- [ ] 98. scripts/bash/download_dpd.sh
 - [ ] 99. scripts/bash/download_pali_classes.sh
 - [ ] 100. scripts/bash/for_release.py
 - [ ] 101. scripts/bash/manual_update_mac_dict.sh

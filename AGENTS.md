@@ -44,6 +44,22 @@ For full table & column documentation, you MUST read `docs/technical/dpd_headwor
 Use `from tools.printer import printer as pr` for colored terminal output and timing. See `tools/printer.py` for the full API. If initialized with a log file path, operations log to TSV.
 - Use `icecream` (`from icecream import ic`) for debug output, not `print()`.
 
+## Bash Scripts
+- **Never use `echo` for terminal output in bash scripts.** All terminal output must go through `tools/ask.py`.
+  Available colors: `red`, `green`, `yellow`, `blue`, `magenta`, `cyan` (default), `white`.
+  - **Statements / info messages** — print with color, no pause:
+    ```bash
+    uv run tools/ask.py --print "Starting backup..."
+    uv run tools/ask.py --print --color green "Done."
+    uv run tools/ask.py -p -c red "Error: file not found."
+    ```
+  - **Interactive prompts** — print with color, wait for single keypress, `q` aborts:
+    ```bash
+    answer=$(uv run tools/ask.py "Proceed? [y/n] ")
+    answer=$(uv run tools/ask.py --color yellow "Overwrite existing file? [y/n] ")
+    if [ "$answer" = "y" ]; then ...
+    ```
+
 # Localized Rules (local fork)
 
 ## Project Overview

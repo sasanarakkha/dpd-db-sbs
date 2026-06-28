@@ -7,6 +7,7 @@
 <!-- Format: YYYY-MM-DD | #N script | passed / changed / skipped / deferred | note -->
 2026-06-28 | #31 scripts/moving/copy_dpd_for_classes.py | merged into distribute.py | safe_copy() promoted to public helper, _task_copy_dpd_for_classes() added to TASKS, dpd-makedict caller updated, 5 safe_copy tests + 3 task tests merged into test_distribute.py (32 total), test_copy_dpd_for_classes.py deleted
 2026-06-28 | #94 db/backup_tsv/backup_all.py | archived | only caller (check_new_words.sh) is already archived; no active usage
+2026-06-28 | #95 scripts/bash/check_new_words.sh | archived | already moved to scripts/dps_archive/ in commit 3679d5439; queue was stale
 
 2026-06-24 | #12 scripts/change_in_db/class_relation.py | passed (approach-only) | no substantial simplification possible — inherent decision tree
 2026-06-07 | #1 db/families/family_set_ru_update.py | changed | compiled regex to module constants, extracted _clean_translated_lines helper, atomic TSV write, -> None annotation, removed stale comments
@@ -103,7 +104,5 @@
 2026-06-27 | #88 scripts/rus_exporter/ru_zip_goldendict_mdict.py | removed from queue | shadow copy of scripts/build/zip_goldendict_mdict.py — sync will pick up upstream refactors
 2026-06-27 | #86 scripts/rus_exporter/docs_check_ru.py | changed | main()->None, encoding="utf-8" on read_text/write_text, add golden-master test + fixture
 2026-06-27 | #89–91 scripts/rus_exporter/zip_dpd_{rus,sbs,ta}.py | changed | unified into zip_dpd.py --locale; pathlib; archived originals
-2026-06-28 | #95 scripts/bash/check_new_words.sh | archived | already in scripts/dps_archive/ (commit 3679d5439), queue was stale
-2026-06-28 | #96 scripts/bash/copy_dpd_to_server | changed | renamed to .sh, converted raw echo/read to tools/ask.py, extracted duplicate loop into function, updated caller ref in dpd-makedict
-2026-06-28 | #97 scripts/bash/copy_tpr_db.sh | passed | personal macOS utility, no interactive prompts, no improvement needed
-2026-06-28 | #98 scripts/bash/download_dpd.sh | changed | ask_and_run() helper via tools/ask.py, removed ANSI echo codes, reordered flow so CWD is repo root before prompt
+
+
