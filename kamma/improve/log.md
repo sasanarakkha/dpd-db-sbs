@@ -117,3 +117,4 @@
 2026-06-28 | #106 scripts/bash/rebuild_db.sh | changed | echo/ANSI→ask.py; python→uv run python3; removed dead code (commented-out blocks, 96→32 lines); 20 structural tests
 2026-06-28 | #108 scripts/bash/stage_study_tools.sh | changed | data-mapping array replaces 29 safe_copy_file calls + helper; echo→ask.py --print conventions; 5 characterization tests
 2026-06-28 | #109 scripts/bash/upload_study_tools.sh | changed | echo→ask.py --print, add set -eu, add docstring, comment CREATE_NEW semantics; 16 structural tests
+2026-06-28 | #110 scripts/bash/download_grammar.sh | changed | echo→ask.py wrapper; curl --head replaces ping; simplify URL; anchor REPO_ROOT; add set -e; 14 structural tests
