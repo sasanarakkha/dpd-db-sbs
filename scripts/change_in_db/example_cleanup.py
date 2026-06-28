@@ -1,35 +1,29 @@
 #!/usr/bin/env python3
 
-"""
-Script to automatically clean up extra spaces in SBS source fields.
-Fixes issues like 'SN35.28 ' -> 'SN35.28' and 'VIN 1.4.1.2' -> 'VIN1.4.1.2'.
-Exceptions: Fields containing 'PAT', 'Sri Lanka', '(modif)', or '(simpl)' are exempt
-from internal space removal, but trailing/leading spaces will still be stripped.
-"""
+"""Script to auto-fix 5 categories of errors in SBS example fields."""
 
 import argparse
+import re
 
 from db.db_helpers import get_db_session
 from db.models import SBS
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 
-SOURCE_FIELDS: tuple[str, ...] = (
-    "sbs_source_1",
-    "sbs_source_2",
-    "dhp_source",
-    "pat_source",
-    "vib_source",
-    "class_source",
-    "discourses_source",
+EXAMPLE_FIELDS: tuple[str, ...] = (
+    "sbs_example_1",
+    "sbs_example_2",
+    "dhp_example",
+    "pat_example",
+    "vib_example",
+    "class_example",
+    "discourses_example",
 )
-
-EXEMPTS: tuple[str, ...] = ("PAT", "Sri Lanka", "(modif)", "(simpl)")
 
 
 def main(dry_run: bool = False) -> None:
     pr.tic()
-    pr.yellow_title("running sbs source cleanup")
+    pr.yellow_title("running sbs example cleanup")
     pth = ProjectPaths()
     db_session = get_db_session(pth.dpd_db_path)
 
@@ -38,15 +32,16 @@ def main(dry_run: bool = False) -> None:
 
     for sbs in sbs_data:
         row_changed = False
-        for field in SOURCE_FIELDS:
+        for field in EXAMPLE_FIELDS:
             val = getattr(sbs, field)
             if not val:
                 continue
 
             new_val = val.strip()
-            # If the value does not contain any of the exempt substrings, remove all spaces
-            if not any(exempt in new_val for exempt in EXEMPTS):
-                new_val = new_val.replace(" ", "")
+            new_val = re.sub(r"  +", " ", new_val)
+            new_val = re.sub(r" ,", ",", new_val)
+            new_val = re.sub(r" \.", ".", new_val)
+            new_val = re.sub(r"[A-Z]", lambda m: m.group().lower(), new_val)
 
             if val != new_val:
                 if not dry_run:
@@ -62,13 +57,13 @@ def main(dry_run: bool = False) -> None:
             db_session.commit()
         pr.yes(f"cleaned up {changed_count} rows")
     else:
-        pr.yes("no source cleanup needed")
+        pr.yes("no example cleanup needed")
     db_session.close()
     pr.toc()
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Clean up SBS source fields.")
+    parser = argparse.ArgumentParser(description="Clean up SBS example fields.")
     parser.add_argument(
         "--dry-run", action="store_true", help="Log changes without committing"
     )

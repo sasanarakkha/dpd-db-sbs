@@ -12,6 +12,7 @@ uv run python "$PROJECT_DIR/tools/ask.py" "!IMPORTANT! did you apply all suggest
 response=$(uv run python "$PROJECT_DIR/tools/ask.py" "need to make latest csv for anki?") || exit 1
 if [[ $response == "y" ]]; then
     uv run python scripts/change_in_db/source_cleanup.py
+    uv run python scripts/change_in_db/example_cleanup.py
     uv run python scripts/change_in_db/update_sbs_chants_in_db.py
     if ! uv run python db_tests/sbs_consistency_tests.py; then
         echo -e "\033[1;31m SBS consistency tests FAILED. Aborting before anki_csv.py. \033[0m"

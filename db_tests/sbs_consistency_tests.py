@@ -4,6 +4,7 @@
 
 import re
 import sys
+from collections.abc import Callable
 
 from sqlalchemy.orm import Session
 
@@ -57,32 +58,50 @@ def run_sbs_consistency_tests() -> int:
     for field in SOURCE_FIELDS:
         run_one(
             f"source_has_space_{field}",
-            lambda db: check_source_has_space_field(db, field),
+            lambda db, field=field: check_source_has_space_field(db, field),
         )
 
     # Formatting
     for field in EXAMPLE_FIELDS:
-        run_one(f"bold_tags_{field}", lambda db: check_bold_tags_field(db, field))
+        run_one(
+            f"bold_tags_{field}",
+            lambda db, field=field: check_bold_tags_field(db, field),
+        )
 
     for field in EXAMPLE_FIELDS:
         run_one(
             f"capital_letter_{field}",
-            lambda db: check_example_capital_letters_field(db, field),
+            lambda db, field=field: check_example_capital_letters_field(db, field),
         )
 
     for field in EXAMPLE_FIELDS:
         run_one(
             f"space_comma_{field}",
-            lambda db: check_example_spacing_comma_field(db, field),
+            lambda db, field=field: check_example_spacing_comma_field(db, field),
         )
         run_one(
             f"space_comma_edge_{field}",
-            lambda db: check_example_spacing_comma_edge_field(db, field),
+            lambda db, field=field: check_example_spacing_comma_edge_field(db, field),
         )
         run_one(
             f"space_fullstop_edge_{field}",
-            lambda db: check_example_spacing_fullstop_edge_field(db, field),
+            lambda db, field=field: check_example_spacing_fullstop_edge_field(
+                db, field
+            ),
         )
+
+    # Example content
+    run_one("example_space_before_comma", check_example_space_before_comma)
+    run_one("example_space_before_fullstop", check_example_space_before_fullstop)
+    run_one(
+        "example_leading_trailing_whitespace",
+        check_example_leading_trailing_whitespace,
+    )
+    run_one("example_capital_letter", check_example_capital_letter)
+    run_one("example_missing_bold_open", check_example_missing_bold_open)
+    run_one("example_missing_bold_close", check_example_missing_bold_close)
+    run_one("example_missing_source", check_example_missing_source)
+    run_one("example_missing_sutta", check_example_missing_sutta)
 
     # Cross-reference
     run_one("sbs_index_mapping", check_sbs_index_mapping)
@@ -359,13 +378,17 @@ def check_pat_consistency(db_session: Session) -> tuple[str, str | None, int, st
         if sbs.pat_source == "PAT":
             exceptions_count += 1
             continue
-        if sbs.pat_example and "VIN PAT" not in sbs.pat_source:
+        if (
+            (
+                sbs.pat_example
+                and "VIN PAT" not in sbs.pat_source
+                or "VIN PAT" in sbs.pat_source
+                and not sbs.pat_example
+            )
+            or any([sbs.pat_example, sbs.pat_source, sbs.pat_sutta])
+            and not all([sbs.pat_example, sbs.pat_source, sbs.pat_sutta])
+        ):
             results.append(str(sbs.id))
-        elif "VIN PAT" in sbs.pat_source and not sbs.pat_example:
-            results.append(str(sbs.id))
-        elif any([sbs.pat_example, sbs.pat_source, sbs.pat_sutta]):
-            if not all([sbs.pat_example, sbs.pat_source, sbs.pat_sutta]):
-                results.append(str(sbs.id))
 
     if exceptions_count > 0:
         pr.amber(
@@ -449,6 +472,165 @@ def check_example_spacing_fullstop_edge_field(
         field=field,
         pattern=r" \.$| \. ",
         solution="remove trailing or floating ' .'",
+    )
+
+
+# ==== EXAMPLE CONTENT CHECKS ====
+
+
+def _check_example_all_fields(
+    db_session: Session,
+    *,
+    name: str,
+    solution: str,
+    condition: Callable[[str, SBS], bool],
+) -> tuple[str, str | None, int, str]:
+    """Run a condition across all 7 example fields. Condition is a callable(val, sbs) -> bool."""
+    results: list[str] = []
+    for sbs in db_session.query(SBS).all():
+        for field in EXAMPLE_FIELDS:
+            val = getattr(sbs, field) or ""
+            if condition(val, sbs):
+                results.append(f"{sbs.id}/{field}")
+                break
+    return (name, regex_results(results), len(results), solution)
+
+
+def check_example_space_before_comma(
+    db_session: Session,
+) -> tuple[str, str | None, int, str]:
+    """Detect space before comma across all example fields."""
+    return _check_example_all_fields(
+        db_session,
+        name="example_space_before_comma",
+        condition=lambda v, s: " ," in v,
+        solution="remove space before comma across all example fields",
+    )
+
+
+def check_example_space_before_fullstop(
+    db_session: Session,
+) -> tuple[str, str | None, int, str]:
+    """Detect space before fullstop across all example fields."""
+    return _check_example_all_fields(
+        db_session,
+        name="example_space_before_fullstop",
+        condition=lambda v, s: " ." in v,
+        solution="remove space before fullstop across all example fields",
+    )
+
+
+def check_example_leading_trailing_whitespace(
+    db_session: Session,
+) -> tuple[str, str | None, int, str]:
+    """Detect leading or trailing whitespace across all example fields."""
+    return _check_example_all_fields(
+        db_session,
+        name="example_leading_trailing_whitespace",
+        condition=lambda v, s: v != v.strip(),
+        solution="strip leading/trailing whitespace across all example fields",
+    )
+
+
+def check_example_capital_letter(
+    db_session: Session,
+) -> tuple[str, str | None, int, str]:
+    """Detect ASCII capital letters across all example fields."""
+    return _check_example_all_fields(
+        db_session,
+        name="example_capital_letter",
+        condition=lambda v, s: bool(re.search(r"[A-Z]", v)),
+        solution="lowercase ASCII capital letters across all example fields",
+    )
+
+
+def check_example_missing_bold_open(
+    db_session: Session,
+) -> tuple[str, str | None, int, str]:
+    """Detect non-empty fields missing <b>."""
+    return _check_example_all_fields(
+        db_session,
+        name="example_missing_bold_open",
+        condition=lambda v, s: bool(v) and "<b>" not in v,
+        solution="add <b> tag to example fields missing bold open",
+    )
+
+
+def check_example_missing_bold_close(
+    db_session: Session,
+) -> tuple[str, str | None, int, str]:
+    """Detect non-empty fields missing </b>."""
+    return _check_example_all_fields(
+        db_session,
+        name="example_missing_bold_close",
+        condition=lambda v, s: bool(v) and "</b>" not in v,
+        solution="add </b> tag to example fields missing bold close",
+    )
+
+
+SOURCE_TO_EXAMPLE: dict[str, str] = {
+    "sbs_example_1": "sbs_source_1",
+    "sbs_example_2": "sbs_source_2",
+    "dhp_example": "dhp_source",
+    "pat_example": "pat_source",
+    "vib_example": "vib_source",
+    "class_example": "class_source",
+    "discourses_example": "discourses_source",
+}
+
+SUTTA_FIELD_MAP: dict[str, str] = {
+    "sbs_example_1": "sbs_sutta_1",
+    "sbs_example_2": "sbs_sutta_2",
+    "dhp_example": "dhp_sutta",
+    "pat_example": "pat_sutta",
+    "vib_example": "vib_sutta",
+    "class_example": "class_sutta",
+    "discourses_example": "discourses_sutta",
+}
+
+
+def check_example_missing_source(
+    db_session: Session,
+) -> tuple[str, str | None, int, str]:
+    """Detect example non-empty but source empty."""
+    results: list[str] = []
+    for sbs in db_session.query(SBS).all():
+        for example_field, source_field in SOURCE_TO_EXAMPLE.items():
+            example = getattr(sbs, example_field) or ""
+            source = getattr(sbs, source_field) or ""
+            if example and not source:
+                results.append(f"{sbs.id}/{example_field}")
+    return (
+        "example_missing_source",
+        regex_results(results),
+        len(results),
+        "ensure source is present when example is non-empty",
+    )
+
+
+def check_example_missing_sutta(
+    db_session: Session,
+) -> tuple[str, str | None, int, str]:
+    """Detect example non-empty, source not exempt, but sutta empty."""
+    results: list[str] = []
+    for sbs in db_session.query(SBS).all():
+        for example_field in EXAMPLE_FIELDS:
+            example = getattr(sbs, example_field) or ""
+            if not example:
+                continue
+            source_field = SOURCE_TO_EXAMPLE[example_field]
+            source = getattr(sbs, source_field) or ""
+            if source in SUTTA_EXCEPTION_SOURCES:
+                continue
+            sutta_field = SUTTA_FIELD_MAP[example_field]
+            sutta = getattr(sbs, sutta_field) or ""
+            if not sutta:
+                results.append(f"{sbs.id}/{example_field}")
+    return (
+        "example_missing_sutta",
+        regex_results(results),
+        len(results),
+        "ensure sutta is present when example is non-empty and source is not exempt",
     )
 
 
@@ -539,9 +721,8 @@ def check_dhp_source_consistency(
         has_dhp_source = re.search(r"DHP\d+", headword.source_1) or re.search(
             r"DHP\d+", headword.source_2
         )
-        if has_dhp_source:
-            if not headword.sbs or not headword.sbs.dhp_source:
-                results.append(str(headword.id))
+        if has_dhp_source and (not headword.sbs or not headword.sbs.dhp_source):
+            results.append(str(headword.id))
 
     if results:
         pr.amber(
@@ -562,25 +743,31 @@ def check_sbs_index_mapping(db_session: Session) -> tuple[str, str | None, int, 
     sbs_tools = SBS_table_tools()
     try:
         valid_mappings = sbs_tools.load_valid_mappings()
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         return "sbs_index_mapping", None, 0, f"Error: {e}"
 
     results: list[str] = []
     for sbs in db_session.query(SBS).all():
-        if sbs.sbs_chant_pali_1:
-            if (
+        if (
+            sbs.sbs_chant_pali_1
+            and (
                 sbs.sbs_chant_pali_1,
                 sbs.sbs_chant_eng_1,
                 sbs.sbs_chapter_1,
-            ) not in valid_mappings:
-                results.append(str(sbs.id))
-        if sbs.sbs_chant_pali_2:
-            if (
+            )
+            not in valid_mappings
+        ):
+            results.append(str(sbs.id))
+        if (
+            sbs.sbs_chant_pali_2
+            and (
                 sbs.sbs_chant_pali_2,
                 sbs.sbs_chant_eng_2,
                 sbs.sbs_chapter_2,
-            ) not in valid_mappings:
-                results.append(str(sbs.id))
+            )
+            not in valid_mappings
+        ):
+            results.append(str(sbs.id))
     return (
         "sbs_index_mapping",
         regex_results(results),
@@ -600,9 +787,12 @@ def check_class_anki_consistency(
         ):
             if not (not sbs.class_example and str(sbs.class_anki) == "1"):
                 results.append(str(sbs.id))
-        elif sbs.class_anki and str(sbs.class_anki) != "1":
-            if not sbs.class_example or not sbs.class_example_translation:
-                results.append(str(sbs.id))
+        elif (
+            sbs.class_anki
+            and str(sbs.class_anki) != "1"
+            and (not sbs.class_example or not sbs.class_example_translation)
+        ):
+            results.append(str(sbs.id))
     return (
         "class_anki_consistency",
         regex_results(results),

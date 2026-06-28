@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 92
+Pointer: 94
 
 ## Scripts (144 total, local unique_paths)
 
@@ -121,11 +121,6 @@ Pointer: 92
 - [x] 90. scripts/rus_exporter/zip_dpd_sbs.py — unified into zip_dpd.py --locale sbs
 - [x] 91. scripts/rus_exporter/zip_dpd_ta.py — unified into zip_dpd.py --locale ta
 
-### scripts/change_in_db (new additions)
-
-- [ ] 92. scripts/change_in_db/rearrange_sbs_gatha_lines.py
-- [ ] 93. scripts/change_in_db/sbs_dpd_example_transfers.py
-
 ### db/backup_tsv
 
 - [ ] 94. db/backup_tsv/backup_all.py
@@ -196,4 +191,3 @@ Pointer: 92
 ### tools (additional)
 
 - [ ] 146. tools/meaning_snapshot_ru.py
-
