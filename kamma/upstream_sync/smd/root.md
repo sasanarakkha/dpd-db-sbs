@@ -117,12 +117,25 @@
 ---
 
 
+**File**: `.pre-commit-config.yaml`
+- **Category**: modified_upstream_files
+- **Sync Rule**: DISCUSS
+- **Why DISCUSS**: Carries a local-only `pyrefly` hook appended after the upstream `pyright` hook. Blind porting would drop this addition.
+- **Local Changes**:
+  1. `pyrefly` hook added: `uv run --with pyrefly pyrefly check --min-severity warn`, runs on all Python files with `pass_filenames: true`.
+- **Watch For**:
+  - After each upstream pull, re-append the `pyrefly` hook block after `pyright` if the file was overwritten.
+  - If upstream adds new hooks, integrate them alongside the local `pyrefly` entry — do not replace wholesale.
+
+---
+
+
 **File**: `pyproject.toml`
 - **Category**: modified_upstream_files
 - **Sync Rule**: DISCUSS
 - **Why DISCUSS**: Carries local-only dependencies not present upstream (currently `num2words>=0.5.14`, added for `scripts/change_in_db/update_yojana_km.py`). The Stage 1 `execute_sync` checkout overwrites `pyproject.toml` with the upstream version; without an exclusion entry the local-only deps are silently dropped.
 - **Local Changes**:
-  1. Local-only runtime dependencies appended to `[project].dependencies` that upstream does not declare. Current set: `num2words>=0.5.14`.
+  1. Local-only runtime dependencies appended to `[project].dependencies` that upstream does not declare. Current set: `num2words>=0.5.14`, `pyrefly>=1.1.1`.
   2. Any future fork-only dependency added to `dependencies` or `[dependency-groups]` must be re-applied after every upstream pull.
 - **Watch For**:
   - After each upstream pull, diff local `pyproject.toml` against `upstream/main:pyproject.toml`, re-apply every local-only dependency, then run `uv lock` + `uv sync --all-groups`.

@@ -43,7 +43,12 @@
     {
       "path": "pyproject.toml",
       "discuss": true,
-      "discuss_reason": "Carries local-only dependencies not present upstream (currently num2words>=0.5.14). The Stage 1 execute_sync checkout overwrites pyproject.toml with the upstream version; without a modified_upstream_files exclusion the local-only deps are silently dropped (regressed in the 2026-06-01 sync). Must be restored and merged manually so local-only deps survive every sync."
+      "discuss_reason": "Carries local-only dependencies not present upstream (currently num2words>=0.5.14, pyrefly>=1.1.1). The Stage 1 execute_sync checkout overwrites pyproject.toml with the upstream version; without a modified_upstream_files exclusion the local-only deps are silently dropped (regressed in the 2026-06-01 sync). Must be restored and merged manually so local-only deps survive every sync."
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "discuss": true,
+      "discuss_reason": "Carries a local-only pyrefly hook appended after the upstream pyright hook. Must be re-appended after every upstream pull that overwrites this file."
     }
   ],
   "inspired_by_upstream": {
