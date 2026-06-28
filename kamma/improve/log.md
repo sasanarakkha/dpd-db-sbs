@@ -103,3 +103,4 @@
 2026-06-27 | #86 scripts/rus_exporter/docs_check_ru.py | changed | main()->None, encoding="utf-8" on read_text/write_text, add golden-master test + fixture
 2026-06-27 | #89–91 scripts/rus_exporter/zip_dpd_{rus,sbs,ta}.py | changed | unified into zip_dpd.py --locale; pathlib; archived originals
 2026-06-28 | #95 scripts/bash/check_new_words.sh | archived | already in scripts/dps_archive/ (commit 3679d5439), queue was stale
+2026-06-28 | #96 scripts/bash/copy_dpd_to_server | changed | renamed to .sh, converted raw echo/read to tools/ask.py, extracted duplicate loop into function, updated caller ref in dpd-makedict

@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 96
+Pointer: 97
 
 ## Scripts (144 total, local unique_paths)
 
@@ -128,7 +128,7 @@ Pointer: 96
 ### scripts/bash
 
 - [x] 95. scripts/bash/check_new_words.sh — already archived (commit 3679d5439), queue was stale
-- [ ] 96. scripts/bash/copy_dpd_to_server
+- [x] 96. scripts/bash/copy_dpd_to_server → copy_dpd_to_server.sh | changed
 - [ ] 97. scripts/bash/copy_tpr_db.sh
 - [ ] 98. scripts/bash/download_dpd.sh
 - [ ] 99. scripts/bash/download_pali_classes.sh

@@ -274,7 +274,7 @@
     "scripts/bash/upload_study_tools.sh",
     "scripts/bash/move_decks.sh",
     "scripts/bash/pali_vocab_push.sh",
-    "scripts/bash/copy_dpd_to_server",
+    "scripts/bash/copy_dpd_to_server.sh",
     "scripts/bash/for_release.py",
     "audio/error_check/deleted_silent_files.txt",
     "audio/error_check/silent_files.txt",

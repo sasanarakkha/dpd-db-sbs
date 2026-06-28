@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This script is a wrapper for run_and_log.sh
-# It executes scripts/bash/make_dpd.sh or make_ru_dpd.sh or copy_dpd_to_server with logging and rotation.
+# It executes scripts/bash/make_dpd.sh or make_ru_dpd.sh or copy_dpd_to_server.sh with logging and rotation.
 
 # Determine the directory of this script
 PROJECT_ROOT="$HOME/Documents/dpd-db"
@@ -11,7 +11,7 @@ MASTER_SCRIPT="$HOME/.local/bin/run_and_log.sh"
 LOG_BASE_NAME="make_dpd"
 TARGET_SCRIPT_PATH="${PROJECT_ROOT}/scripts/bash/make_dpd.sh"
 TARGET_SCRIPT_PATH_RU="${PROJECT_ROOT}/scripts/bash/make_ru_dpd.sh"
-TARGET_SCRIPT_PATH_COPY="${PROJECT_ROOT}/scripts/bash/copy_dpd_to_server"
+TARGET_SCRIPT_PATH_COPY="${PROJECT_ROOT}/scripts/bash/copy_dpd_to_server.sh"
 TARGET_SCRIPT_PATH_COPY_TPR="${PROJECT_ROOT}/scripts/moving/copy_dpd_for_classes.py"
 
 # The command to run, including 'uv run bash'
