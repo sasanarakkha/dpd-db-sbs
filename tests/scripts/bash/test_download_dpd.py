@@ -58,3 +58,27 @@ def test_ask_and_run_function_defined() -> None:
 def test_no_raw_ansi_codes() -> None:
     content = SCRIPT.read_text(encoding="utf-8")
     assert "\\033[" not in content
+
+
+def test_curl_download_command() -> None:
+    content = SCRIPT.read_text(encoding="utf-8")
+    assert "curl -q -# -L -O" in content
+
+
+def test_ask_print_for_status() -> None:
+    content = SCRIPT.read_text(encoding="utf-8")
+    assert "ask.py --print" in content
+
+
+def test_ask_print_red_for_error() -> None:
+    content = SCRIPT.read_text(encoding="utf-8")
+    assert "ask.py --print -c red" in content
+    assert "Error: No internet connection" in content
+
+
+def test_no_raw_echo_for_output() -> None:
+    content = SCRIPT.read_text(encoding="utf-8")
+    for line in content.splitlines():
+        stripped = line.strip()
+        if stripped.startswith(("echo '", 'echo "')):
+            assert False, f"raw echo for output on line: {stripped}"

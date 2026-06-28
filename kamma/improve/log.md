@@ -106,5 +106,6 @@
 2026-06-27 | #88 scripts/rus_exporter/ru_zip_goldendict_mdict.py | removed from queue | shadow copy of scripts/build/zip_goldendict_mdict.py — sync will pick up upstream refactors
 2026-06-27 | #86 scripts/rus_exporter/docs_check_ru.py | changed | main()->None, encoding="utf-8" on read_text/write_text, add golden-master test + fixture
 2026-06-27 | #89–91 scripts/rus_exporter/zip_dpd_{rus,sbs,ta}.py | changed | unified into zip_dpd.py --locale; pathlib; archived originals
+2026-06-28 | #98 scripts/bash/download_dpd.sh | changed | echo→ask.py --print for status messages (convention), added 3 structural tests
 
 

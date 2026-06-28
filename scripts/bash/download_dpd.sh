@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# This script downloads the latest DPD files from GitHub and saves them to a specified directory.
-# It also checks for an internet connection before proceeding with the download.
+# Downloads DPD/SBS/RU release artifacts from GitHub to ~/Downloads/DPDs/.
+# SBS and RU groups are defined but commented out -- available for future activation.
 
 ask_and_run() {
     local prompt="$1"
@@ -10,7 +10,7 @@ ask_and_run() {
     response=$(uv run python tools/ask.py "$prompt") || exit 1
     if [[ $response == "y" ]]; then
         for link in "${links[@]}"; do
-            echo "Downloading $(basename "$link")..."
+            uv run tools/ask.py --print "Downloading $(basename "$link")..."
             curl -q -# -L -O "$link"
         done
     fi
@@ -18,7 +18,7 @@ ask_and_run() {
 
 # Check for internet connection
 if ! ping -c 1 google.com &> /dev/null; then
-    echo "Error: No internet connection."
+    uv run tools/ask.py --print -c red "Error: No internet connection."
     exit 1
 fi
 
