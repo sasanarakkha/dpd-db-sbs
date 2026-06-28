@@ -105,3 +105,5 @@
 2026-06-27 | #89–91 scripts/rus_exporter/zip_dpd_{rus,sbs,ta}.py | changed | unified into zip_dpd.py --locale; pathlib; archived originals
 2026-06-28 | #95 scripts/bash/check_new_words.sh | archived | already in scripts/dps_archive/ (commit 3679d5439), queue was stale
 2026-06-28 | #96 scripts/bash/copy_dpd_to_server | changed | renamed to .sh, converted raw echo/read to tools/ask.py, extracted duplicate loop into function, updated caller ref in dpd-makedict
+2026-06-28 | #97 scripts/bash/copy_tpr_db.sh | passed | personal macOS utility, no interactive prompts, no improvement needed
+2026-06-28 | #98 scripts/bash/download_dpd.sh | changed | ask_and_run() helper via tools/ask.py, removed ANSI echo codes, reordered flow so CWD is repo root before prompt
