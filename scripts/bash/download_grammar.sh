@@ -1,54 +1,50 @@
 #!/bin/bash
+set -e
 
-# This script downloads the grammar spreadsheet from Google Sheets 
-# It also checks for internet connection and logs the output.
+REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 
-# Check for internet connection
-if ! ping -c 1 google.com &> /dev/null; then
-    echo "\033[0;31mError: No internet connection. Please check your network settings."
+# Script: download_grammar.sh
+# Downloads the grammar spreadsheet from Google Sheets as .xlsx
+
+ask() { uv run "$REPO_ROOT/tools/ask.py" --print "$@"; }
+
+# Check for internet connection using HTTP (more reliable than ICMP ping)
+if ! curl -sS --head https://google.com > /dev/null 2>&1; then
+    ask -c red "Error: No internet connection. Please check your network settings."
     exit 1
 fi
 
-# exec > >(tee "$HOME/logs/download_grammar.log") 2>&1
+ask -c cyan "--- download_grammar Script Started at $(date) ---"
 
-echo "--- download_grammar Script Started at $(date) ---"
+# Ensure temp directory exists
+mkdir -p "$REPO_ROOT/temp"
 
-cd temp/
+grammar_url="https://docs.google.com/spreadsheets/d/1-iNYm9R86162zFzLd9kraEqNP7DpAFczFMPTVttJSrs"
+title="grammar"
+output="$REPO_ROOT/temp/$title.xlsx"
 
-grammar=("[grammar](https://docs.google.com/spreadsheets/d/1-iNYm9R86162zFzLd9kraEqNP7DpAFczFMPTVttJSrs/edit?usp=sharing)")
+# Download xlsx export using a browser User-Agent
+curl -L -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
+    "$grammar_url/export?format=xlsx" -o "$output"
 
-# Loop through the list of grammar and extract the title and URL
-for link in "${grammar[@]}"; do
-    # Extract title from within square brackets
-    title=$(echo "$link" | sed -n 's/\[\([^]]*\)\].*/\1/p')
-    # Extract URL from within parentheses
-    url=$(echo "$link" | sed -n 's/.*(\(https:[^)]*\)).*/\1/p' | sed 's/\/edit.*//')
+# Check if the downloaded file exists
+if [ ! -f "$output" ]; then
+    ask -c red "Error: $title.xlsx not available at $grammar_url"
+    exit 1
+fi
 
-    # Generate and execute the curl command with the formatted title, using a browser User-Agent
-    curl -L -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" "$url/export?format=xlsx" -o "$title.xlsx"
+# Validate that the downloaded file is a Zip archive (Excel files are Zips)
+# This prevents processing HTML login pages as Excel files
+file_info=$(file "$output")
+if [[ "$file_info" != *"Zip archive data"* ]] && [[ "$file_info" != *"Microsoft Excel 2007+"* ]]; then
+    ask -c red "Error: Downloaded file is not a valid Excel file."
+    ask -c red "It appears to be: $file_info"
+    ask -c red "This usually means the Google Sheet is invalid or not public."
+    ask -c red "Please ensure the Sheet is shared as 'Anyone with the link can view'."
+    ask -c red "URL: $grammar_url"
+    exit 1
+fi
 
-    # Check if the downloaded file exists
-    if [ ! -f "$title.xlsx" ]; then
-        echo "\033[0;31mError: $title.xlsx not available at $url\033[0m"
-        exit 1
-    fi
-
-    # Validate that the downloaded file is a Zip archive (Excel files are Zips)
-    # This prevents processing HTML login pages as Excel files
-    file_info=$(file "$title.xlsx")
-    if [[ "$file_info" != *"Zip archive data"* ]] && [[ "$file_info" != *"Microsoft Excel 2007+"* ]]; then
-        echo "\033[0;31mError: Downloaded file is not a valid Excel file.\033[0m"
-        echo "It appears to be: $file_info"
-        echo "This usually means the Google Sheet is invalid or not public."
-        echo "Please ensure the Sheet is shared as 'Anyone with the link can view'."
-        echo "URL: $url"
-        # Print first few lines if it's text to show the error
-        # head -n 5 "$title.xlsx"
-        exit 1
-    fi
-done
-
-# print what is downloaded and where
-echo "Downloaded: $title.xlsx"
-echo "Folder: $(pwd)"
+ask -c green "Downloaded: $title.xlsx"
+ask -c green "Folder: $REPO_ROOT/temp"
 
