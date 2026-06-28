@@ -5,11 +5,11 @@
 
 # Check for internet connection
 if ! ping -c 1 google.com &> /dev/null; then
-    echo "\033[0;31mError: No internet connection. Please check your network settings."
+    uv run tools/ask.py -p -c red "Error: No internet connection. Please check your network settings."
     exit 1
 fi
 
-echo "--- download_pali_classes Script Started at $(date) ---"
+uv run tools/ask.py --print "--- download_pali_classes Script Started at $(date) ---"
 
 mkdir -p "$HOME/Downloads/Pali_classes"
 cd "$HOME/Downloads/Pali_classes"
@@ -24,9 +24,9 @@ Class_links=(
 
 # Loop through the list of links and download them
 for link in "${Class_links[@]}"; do
-    echo "Downloading $link..."
+    uv run tools/ask.py --print "Downloading $link..."
     curl -q -# -L -O "$link"
 done
 
 # print success message
-echo -e "\033[0;32mAll files downloaded successfully.\033[0m"
+uv run tools/ask.py -p -c green "All files downloaded successfully."

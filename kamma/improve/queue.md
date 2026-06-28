@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 99
+Pointer: 100
 
 ## Scripts (144 total, local unique_paths)
 
@@ -131,7 +131,7 @@ Pointer: 99
 - [x] 96. scripts/bash/copy_dpd_to_server → copy_dpd_to_server.sh | passed
 - [x] 97. scripts/bash/copy_tpr_db.sh | changed
 - [x] 98. scripts/bash/download_dpd.sh | changed
-- [ ] 99. scripts/bash/download_pali_classes.sh
+- [x] 99. scripts/bash/download_pali_classes.sh | changed
 - [ ] 100. scripts/bash/for_release.py
 - [ ] 101. scripts/bash/manual_update_mac_dict.sh
 - [ ] 102. scripts/bash/move_class.sh
