@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 111
+Pointer: 112
 
 ## Scripts (144 total, local unique_paths)
 
@@ -143,7 +143,7 @@ Pointer: 111
 - [x] 108. scripts/bash/stage_study_tools.sh | changed
 - [x] 109. scripts/bash/upload_study_tools.sh | changed
 - [x] 110. scripts/bash/download_grammar.sh | changed
-- [ ] 111. scripts/bash/push_dpd.sh
+- [x] 111. scripts/bash/push_dpd.sh | changed
 - [ ] 112. scripts/bash/update_decks.sh
 
 ### scripts/cl
