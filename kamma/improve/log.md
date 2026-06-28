@@ -8,6 +8,8 @@
 2026-06-28 | #31 scripts/moving/copy_dpd_for_classes.py | merged into distribute.py | safe_copy() promoted to public helper, _task_copy_dpd_for_classes() added to TASKS, dpd-makedict caller updated, 5 safe_copy tests + 3 task tests merged into test_distribute.py (32 total), test_copy_dpd_for_classes.py deleted
 2026-06-28 | #94 db/backup_tsv/backup_all.py | archived | only caller (check_new_words.sh) is already archived; no active usage
 2026-06-28 | #95 scripts/bash/check_new_words.sh | archived | already moved to scripts/dps_archive/ in commit 3679d5439; queue was stale
+2026-06-28 | #96 scripts/bash/copy_dpd_to_server.sh | passed | clean — 16 lines, ask.py for prompts, active caller
+2026-06-28 | #97 scripts/bash/copy_tpr_db.sh | changed | echo→ask.py --print -c (red/green) for all 6 output lines; 10 structural tests added
 
 2026-06-24 | #12 scripts/change_in_db/class_relation.py | passed (approach-only) | no substantial simplification possible — inherent decision tree
 2026-06-07 | #1 db/families/family_set_ru_update.py | changed | compiled regex to module constants, extracted _clean_translated_lines helper, atomic TSV write, -> None annotation, removed stale comments

@@ -13,12 +13,12 @@ DEST_DPD_DIR="$HOME/Documents/GoldenDict/dpd"
 
 # ---------- Checks ----------
 if [ ! -f "$SRC_DB" ]; then
-    echo "❌ Missing source file: $SRC_DB"
+    uv run tools/ask.py --print -c red "Missing source file: $SRC_DB"
     exit 1
 fi
 
 if [ ! -d "$SRC_DPD_DIR" ]; then
-    echo "❌ Missing source folder: $SRC_DPD_DIR"
+    uv run tools/ask.py --print -c red "Missing source folder: $SRC_DPD_DIR"
     exit 1
 fi
 
@@ -28,9 +28,9 @@ mkdir -p "$(dirname "$DEST_DPD_DIR")"
 
 # ---------- Copy DB ----------
 if cp -f "$SRC_DB" "$DEST_DB"; then
-    echo "✅ tipitaka_pali.db copied successfully to $DEST_DB"
+    uv run tools/ask.py --print -c green "tipitaka_pali.db copied successfully to $DEST_DB"
 else
-    echo "❌ Failed to copy tipitaka_pali.db"
+    uv run tools/ask.py --print -c red "Failed to copy tipitaka_pali.db"
 fi
 
 # ---------- Replace dpd folder ----------
@@ -39,7 +39,7 @@ if [ -d "$DEST_DPD_DIR" ]; then
 fi
 
 if cp -R "$SRC_DPD_DIR" "$DEST_DPD_DIR"; then
-    echo "✅ dpd folder replaced successfully in $DEST_DPD_DIR"
+    uv run tools/ask.py --print -c green "dpd folder replaced successfully in $DEST_DPD_DIR"
 else
-    echo "❌ Failed to copy dpd folder"
+    uv run tools/ask.py --print -c red "Failed to copy dpd folder"
 fi
