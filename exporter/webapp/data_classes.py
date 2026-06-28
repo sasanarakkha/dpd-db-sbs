@@ -50,6 +50,13 @@ class HeadwordData:
             "sbs_notes",
             "sbs_example_1",
             "sbs_example_2",
+            "dhp_example",
+            "pat_example",
+            "vib_example",
+            "class_example",
+            "class_example_translation",
+            "discourses_example",
+            "extra_example",
         ]
         # We'll return a proxy object or just the modified SQLAlchemy object
         # but with only specific fields changed.

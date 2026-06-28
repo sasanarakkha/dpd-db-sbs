@@ -5,7 +5,8 @@
 - **Sync Rule**: PORT
 - **Local Changes**:
   1. `HeadwordData.__init__` includes `self.sbs` (line ~18) and `self.show_ru_data` flag (line ~26) plus `ru_meaning`, `ru_meaning_lit`, `ru_notes`, `sbs_meaning`, `sbs_notes` fields (lines ~46-50).
-  2. SBS search URL `/sbs/search_json` referenced in rendered HTML (line ~164).
+  2. `convert_newlines` `string_columns` extended with SBS/local example fields: `sbs_example_1`, `sbs_example_2`, `dhp_example`, `pat_example`, `vib_example`, `class_example`, `class_example_translation`, `discourses_example`, `extra_example`.
+  3. SBS search URL `/sbs/search_json` referenced in rendered HTML (line ~164).
 - **Watch For**:
   - New upstream data class fields must be ported to this file AND to `exporter/webapp/data_classes_ru.py` (its shadow).
   - If upstream changes `HeadwordData` constructor signature, update both files.
@@ -179,8 +180,8 @@
   2. Russian fields populated: `ru_pos`, `ru_plus_case`, `ru_meaning`, `ru_summary`, `ru_complete`, `ru_grammar`, `ru_base`, `ru_phonetic`, `ru_inflections_html`.
   3. SBS fields populated: `sbs_meaning`, `sbs_notes`, `sbs_index`, `sbs_class`, and many `needs_*_example` flags.
   4. Tamil: `self.ta` holds the `Tamil` ORM object; `show_ta_data` flag controls rendering.
-  5. `_convert_newlines_ru` replaces `\n, ` with `<br>` in Russian notes.
-  6. `_convert_newlines_sbs` handles newline conversion for ~10 SBS string fields.
+  5. `_convert_newlines_ru` replaces `\n` with `<br>` in `ru_notes` (plain newline, not `\n, `).
+  6. `_convert_newlines_sbs` handles newline conversion for 11 SBS string fields including `class_example_translation`.
   7. `RpdData` subclass for Russian EPD entries; `TpdData` subclass for Tamil EPD entries (reserved for future `export_tpd.py`).
 - **Watch For**:
   - Upstream changes to `HeadwordData` constructor or methods must be meticulously merged to preserve ALL three data layers (RU, SBS, Tamil).

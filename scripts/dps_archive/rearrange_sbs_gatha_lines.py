@@ -15,25 +15,132 @@ from db.models import SBS
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 
-
 EXAMPLE_SOURCE_FIELDS: tuple[tuple[str, str], ...] = (
     ("sbs_example_1", "sbs_source_1"),
     ("sbs_example_2", "sbs_source_2"),
     ("dhp_example", "dhp_source"),
-    ("pat_example", "pat_source"),
-    ("vib_example", "vib_source"),
     ("class_example", "class_source"),
     ("discourses_example", "discourses_source"),
     ("extra_example", "extra_source"),
 )
 REVIEW_PATH = Path("temp/sbs_gatha_review.tsv")
 CONCERN_PATH = Path("temp/sbs_gatha_concerns.tsv")
-EXPECTED_LINE_COUNTS = {4, 6}
-SHORT_PHRASE_MAX_CHARS = 10
+EXPECTED_LINE_COUNTS = {1, 2, 3, 4, 6}
+# (id, field) → None: skip (prose stored under a verse-only source prefix).
+# (id, field) → str: use this exact output (manual fix where the algorithm
+# cannot produce the correct result from the stored text alone).
+MANUAL_OVERRIDES: dict[tuple[int, str], str | None] = {
+    (9885, "extra_example"): None,  # UD78 — prose in a mixed source
+    (18083, "extra_example"): None,  # SNP38 — prose passage, not a gāthā
+    (
+        34414,
+        "extra_example",
+    ): None,  # SNP38 — prose discourse (evaṃ sammā dvayat'ānupassino kho, bhikkhave)
+    (
+        60602,
+        "extra_example",
+    ): None,  # SNP38 — prose discourse (ye te, bhikkhave, kusalā dhammā)
+    (
+        63882,
+        "extra_example",
+    ): None,  # SNP38 — prose discourse (yaṃ, bhikkhave, sadevakassa lokassa)
+    (20728, "extra_example"): None,  # SNP4 — prose dialogue
+    (45710, "extra_example"): None,  # SNP4 — prose narrative (brāhmaṇo upanāmesi)
+    (49136, "extra_example"): None,  # SNP4 — prose narrative (brāhmaṇo upanāmesi)
+    (
+        10858,
+        "extra_example",
+    ): None,  # SNP4 — prose dialogue (aham'pi kho, brāhmaṇa, kasāmi ca vapāmi ca)
+    (
+        27328,
+        "extra_example",
+    ): None,  # SNP4 — prose dialogue (tena hi tvaṃ, brāhmaṇa, taṃ pāyasaṃ)
+    (
+        31979,
+        "extra_example",
+    ): None,  # SNP4 — prose dialogue (atha kassa c'āhaṃ, bho gotama)
+    (
+        57967,
+        "extra_example",
+    ): None,  # SNP4 — prose narrative (na khv'āhaṃ taṃ, brāhmaṇa, passāmi)
+    (
+        59772,
+        "extra_example",
+    ): None,  # SNP4 — prose narrative (na khv'āhaṃ taṃ, brāhmaṇa, passāmi)
+    (60737, "extra_example"): None,  # SNP4 — prose conclusion (acir'ūpasampanno kho)
+    (
+        60787,
+        "extra_example",
+    ): None,  # SNP4 — prose narrative (na khv'āhaṃ taṃ, brāhmaṇa, passāmi)
+    (
+        61293,
+        "extra_example",
+    ): None,  # SNP4 — prose narrative (na khv'āhaṃ taṃ, brāhmaṇa, passāmi)
+    # SNP16 prose narrative introductions stored in verse-only source fields
+    (1313, "sbs_example_1"): None,
+    (1849, "sbs_example_1"): None,
+    (7555, "sbs_example_1"): None,
+    (7559, "sbs_example_1"): None,
+    (7559, "extra_example"): None,
+    (7561, "sbs_example_1"): None,
+    (7561, "extra_example"): None,
+    (8335, "sbs_example_1"): None,
+    (16096, "sbs_example_1"): None,
+    (17613, "sbs_example_1"): None,
+    (29087, "sbs_example_1"): None,
+    # SNP16 prose nidāna formula stored in verse-only source fields
+    # "evaṃ me sutaṃ, ekaṃ samayaṃ bhagavā..." split at first comma → prose
+    (12462, "sbs_example_1"): None,
+    (17376, "sbs_example_1"): None,
+    (28686, "sbs_example_1"): None,
+    (53164, "sbs_example_1"): None,
+    (59451, "sbs_example_1"): None,
+    (62659, "sbs_example_1"): None,
+    # SNP32 prose narrative passages
+    (
+        16143,
+        "extra_example",
+    ): None,  # SNP32 — prose ordination formula (catunnaṃ māsānaṃ)
+    (24122, "extra_example"): None,
+    (26467, "extra_example"): None,
+    (53824, "extra_example"): None,
+    # SNP8 Metta Sutta — erroneous comma in DB ("suvaco c'assa mudu, anatimānī.")
+    # produces a standalone "anatimānī." line; override with correct 3-line form
+    # and standard spelling sūjū (DB has suhujū, a variant/error).
+    (14392, "sbs_example_1"): (
+        "karaṇīyam'atthakusalena yaṃ taṃ santaṃ padaṃ abhisamecca,\n"
+        "sakko <b>ujū</b> ca sūjū ca,\n"
+        "suvaco c'assa mudu anatimānī."
+    ),
+    (20466, "sbs_example_2"): (
+        "<b>karaṇīyam</b>'atthakusalena yaṃ taṃ santaṃ padaṃ abhisamecca,\n"
+        "sakko ujū ca sūjū ca,\n"
+        "suvaco c'assa mudu anatimānī."
+    ),
+    (53873, "sbs_example_1"): (
+        "karaṇīyam'atthakusalena <b>yaṃ</b> taṃ santaṃ padaṃ abhisamecca,\n"
+        "sakko ujū ca sūjū ca,\n"
+        "suvaco c'assa mudu anatimānī."
+    ),
+    (55634, "sbs_example_1"): (  # AN3.156 — 6-pāda verse; middle pāda lacks
+        "padakkhiṇaṃ kāyakammaṃ,\n"  # an internal comma so algorithm gives 5 lines;
+        "vācākammaṃ padakkhiṇaṃ,\n"  # comma inserted manually between the two halves.
+        "padakkhiṇaṃ manokammaṃ,\n"
+        "paṇīdhi te padakkhiṇe,\n"
+        "padakkhiṇāni katvāna,\n"
+        "<b>labhant'atthe</b> padakkhiṇe."
+    ),
+}
+SHORT_PHRASE_MAX_CHARS = 12
 SHORT_PHRASE_MAX_TOKENS = 2
 PERIOD_BOUNDARY_RE = re.compile(r"\. +(?=\S)")
 TAG_RE = re.compile(r"<[^>]+>")
 WORD_EDGE_RE = re.compile(r"^[^\w]+|[^\w]+$")
+# Pāḷi speaker attribution formula: {line}, (iti {name}), {continuation}
+ITI_RE = re.compile(r"^\((?:iti|icc')")
+# A split segment consisting entirely of a parenthetical (e.g. "(māgaṇḍiyā'ti bhagavā)")
+# is a bare speaker attribution that must be re-attached to the preceding pāda.
+STANDALONE_PAREN_RE = re.compile(r"^\(.*\)$", re.DOTALL)
 # Compiled from distinct SBS source values: TH/THI are this DB's
 # Theragāthā/Therīgāthā abbreviations. Commentaries and local chants are excluded.
 VERSE_SOURCE_PREFIXES: tuple[str, ...] = (
@@ -96,17 +203,38 @@ def split_gatha_lines(text: str) -> str:
     lines: list[str] = []
     for existing_line in text.split("\n"):
         existing_line = existing_line.rstrip()
+        sub_lines: list[str] = []
         for period_part in PERIOD_BOUNDARY_RE.sub(".\n", existing_line).split("\n"):
-            lines.extend(split_comma_boundaries(period_part))
+            sub_lines.extend(split_comma_boundaries(period_part))
+        sub_lines = merge_iti_phrases(sub_lines)
+        # If every comma-split segment of this existing line is a short phrase,
+        # they form one pāda and must not be split.
+        if sub_lines and all(is_short_phrase(s) for s in sub_lines):
+            lines.append(" ".join(sub_lines))
+        else:
+            lines.extend(sub_lines)
     return "\n".join(merge_short_one_word_lines(lines))
 
 
 def split_comma_boundaries(text: str) -> list[str]:
-    """Split comma-space boundaries."""
+    """Split comma-space boundaries, stripping accidental leading spaces from each part."""
     parts = text.split(", ")
     if len(parts) == 1:
         return [text]
-    return [f"{part}," for part in parts[:-1]] + [parts[-1]]
+    return [f"{part.lstrip()}," for part in parts[:-1]] + [parts[-1].lstrip()]
+
+
+def merge_iti_phrases(parts: list[str]) -> list[str]:
+    """Re-attach (iti X)/(icc' X) speaker tags and standalone parentheticals onto the preceding segment."""
+    result: list[str] = []
+    for part in parts:
+        # Strip markup before matching so (<b>icc'āyasmā</b> X) is caught too.
+        plain = TAG_RE.sub("", part).strip()
+        if result and (ITI_RE.match(plain) or STANDALONE_PAREN_RE.match(plain)):
+            result[-1] = f"{result[-1]} {part.lstrip()}"
+        else:
+            result.append(part)
+    return result
 
 
 def merge_short_one_word_lines(lines: list[str]) -> list[str]:
@@ -275,12 +403,22 @@ def migrate_sbs_gatha_lines(
             source = str(getattr(sbs, source_field) or "")
             if not before:
                 continue
+            if "(simpl)" in source:
+                continue  # simplified texts are kept as-is
             if "\n" not in before and not is_verse_source(source):
                 continue
 
             summary.targeted_by_field[example_field] += 1
-            after = split_gatha_lines(before)
-            if line_count(after) not in EXPECTED_LINE_COUNTS:
+            override_key = (sbs.id, example_field)
+            if override_key in MANUAL_OVERRIDES:
+                override_value = MANUAL_OVERRIDES[override_key]
+                if override_value is None:
+                    continue  # prose entry — leave untouched
+                after = override_value
+            else:
+                after = split_gatha_lines(before)
+            changed = after != before
+            if changed and line_count(after) not in EXPECTED_LINE_COUNTS:
                 summary.review_rows.append(
                     ReviewRow(
                         entry_id=sbs.id,
@@ -290,7 +428,7 @@ def migrate_sbs_gatha_lines(
                         after=after,
                     )
                 )
-            if after == before:
+            if not changed:
                 continue
 
             summary.changed_by_field[example_field] += 1

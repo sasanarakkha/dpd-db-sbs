@@ -3,6 +3,7 @@
 from jinja2 import Environment
 
 from db.models import (
+    SBS,
     DpdHeadword,
     DpdRoot,
     FamilyCompound,
@@ -10,28 +11,30 @@ from db.models import (
     FamilyRoot,
     FamilySet,
     FamilyWord,
-    SuttaInfo,
     Lookup,
     Russian,
-    SBS,
+    SuttaInfo,
     Tamil,
 )
+from exporter.goldendict.helpers import TODAY
+from tools.css_manager import CSSManager
+from tools.date_and_time import year_month_day_dash
+from tools.degree_of_completion_ru import degree_of_completion_ru
+from tools.meaning_construction import (
+    make_grammar_line,
+    make_meaning_combo_html,
+    summarize_construction,
+)
+from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
 from tools.paths_ru import RuPaths
-from tools.meaning_construction import make_grammar_line, make_meaning_combo_html
 from tools.pos import CONJUGATIONS, DECLENSIONS
-from exporter.goldendict.helpers import TODAY
-from tools.date_and_time import year_month_day_dash
-from tools.css_manager import CSSManager
-from tools.pali_sort_key import pali_sort_key
 from tools.tools_for_ru_exporter import (
-    ru_replace_abbreviations,
     make_ru_meaning_html,
     ru_make_grammar_line,
+    ru_replace_abbreviations,
 )
-from tools.degree_of_completion_ru import degree_of_completion_ru
-from tools.meaning_construction import summarize_construction
 
 
 def _render_header(
@@ -171,7 +174,7 @@ class HeadwordData:
     @staticmethod
     def _convert_newlines_ru(obj):
         if obj and hasattr(obj, "ru_notes") and obj.ru_notes:
-            obj.ru_notes = obj.ru_notes.replace("\n, ", "<br>")
+            obj.ru_notes = obj.ru_notes.replace("\n", "<br>")
         return obj
 
     @staticmethod
@@ -187,6 +190,7 @@ class HeadwordData:
             "class_example",
             "discourses_example",
             "extra_example",
+            "class_example_translation",
         ]
         for attr_name in attrs:
             attr_value = getattr(obj, attr_name, None)
