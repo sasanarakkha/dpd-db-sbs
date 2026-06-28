@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 106
+Pointer: 107
 
 ## Scripts (144 total, local unique_paths)
 
@@ -138,7 +138,7 @@ Pointer: 106
 - [x] 103. scripts/bash/move_decks.sh | changed
 - [x] 104. scripts/bash/pali_vocab_push.sh | changed
 - [x] 105. scripts/bash/push_from_temp.sh | archived
-- [ ] 106. scripts/bash/rebuild_db.sh
+- [x] 106. scripts/bash/rebuild_db.sh | changed
 - [ ] 107. scripts/bash/sbs-update-db.sh
 - [ ] 108. scripts/bash/stage_study_tools.sh
 - [ ] 109. scripts/bash/upload_study_tools.sh
