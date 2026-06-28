@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 101
+Pointer: 102
 
 ## Scripts (144 total, local unique_paths)
 
@@ -133,7 +133,7 @@ Pointer: 101
 - [x] 98. scripts/bash/download_dpd.sh | changed
 - [x] 99. scripts/bash/download_pali_classes.sh | changed
 - [x] 100. scripts/export/for_release.py | changed
-- [ ] 101. scripts/bash/manual_update_mac_dict.sh
+- [x] 101. scripts/bash/manual_update_mac_dict.sh | changed
 - [ ] 102. scripts/bash/move_class.sh
 - [ ] 103. scripts/bash/move_decks.sh
 - [ ] 104. scripts/bash/pali_vocab_push.sh

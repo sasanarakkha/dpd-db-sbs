@@ -109,5 +109,6 @@
 2026-06-27 | #89–91 scripts/rus_exporter/zip_dpd_{rus,sbs,ta}.py | changed | unified into zip_dpd.py --locale; pathlib; archived originals
 2026-06-28 | #98 scripts/bash/download_dpd.sh | changed | echo→ask.py --print for status messages (convention), added 3 structural tests
 2026-06-28 | #99 scripts/bash/download_pali_classes.sh | changed | replace echo + ANSI codes with tools/ask.py (convention)
+2026-06-28 | #101 scripts/bash/manual_update_mac_dict.sh | changed | echo→ask.py --print, add set -e, drop emojis
 
 
