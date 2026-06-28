@@ -115,3 +115,4 @@
 2026-06-28 | #103 scripts/bash/move_decks.sh | changed | echo→ask.py, remove dead cp_options, silent-on-success + FAILURES tracking + final summary
 2026-06-28 | #104 scripts/bash/pali_vocab_push.sh | changed | echo→ask.py convention + simplified git logic (removed redundant status porcelain + cached-diff guards); added mirror test at tests/scripts/bash/test_pali_vocab_push.py; removed duplicate tests from test_deck_update_scripts.py
 2026-06-28 | #106 scripts/bash/rebuild_db.sh | changed | echo/ANSI→ask.py; python→uv run python3; removed dead code (commented-out blocks, 96→32 lines); 20 structural tests
+2026-06-28 | #108 scripts/bash/stage_study_tools.sh | changed | data-mapping array replaces 29 safe_copy_file calls + helper; echo→ask.py --print conventions; 5 characterization tests
