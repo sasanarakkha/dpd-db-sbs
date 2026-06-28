@@ -162,6 +162,14 @@ files.
 3. `uv run pyright <file>`
 4. `uv run --with pyrefly pyrefly check --min-severity warn <file>`
 5. `uv run pytest tests/test_<feature>.py -v` (for affected tests)
+6. **If you created, renamed, moved, deleted, or reclassified ANY fork-local file** — this includes:
+   - Shadow files (`*_ru.py`, `*_sbs.py`, `*_dps.py`, `*_ta.py`) → add/update in the correct `registry.json` copies category (`russian_copies`, `sbs_copies`, `tamil_copies`, or `dps_copies`) and update the matching `kamma/upstream_sync/smd/*.md` entry (`Category` line must match registry key exactly)
+   - New fork-specific files with no upstream counterpart → add the path to `unique_paths` in `registry.json`
+   - Removed or moved files → remove or update their entry in `registry.json`
+
+   Then run:
+   - `uv run python3 kamma/upstream_sync/scripts/validate_registry.py`
+   - `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py`
 
 **Do NOT report completion until all checks pass.** This is non-negotiable. Do not skip or defer these. Pyrefly warnings count as failures unless explicitly approved by the user. Type safety is mandatory, not optional.
 - **Verification:** Write tests for accurate data output (not UI components). Readme MUST be updated.
