@@ -2,13 +2,11 @@
 
 # Copy DPD-SBS and RU-DPD to the server via distribute.py subcommands.
 
-cd "$HOME/Documents/dpd-db"
-
 ask_and_run() {
     local prompt="$1" action="$2"
-    response=$(uv run python tools/ask.py "$prompt") || exit 1
+    response=$(uv run tools/ask.py "$prompt") || exit 1
     if [[ $response == "y" ]]; then
-        uv run python scripts/moving/distribute.py "$action"
+        uv run python3 scripts/moving/distribute.py "$action"
     fi
 }
 

@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 112
+Pointer: 114
 
 ## Scripts (144 total, local unique_paths)
 
@@ -128,7 +128,7 @@ Pointer: 112
 ### scripts/bash
 
 - [x] 95. scripts/bash/check_new_words.sh | archived
-- [x] 96. scripts/bash/copy_dpd_to_server → copy_dpd_to_server.sh | passed
+- [x] 96. scripts/bash/copy_dpd_to_server → copy_dpd_to_server.sh | changed
 - [x] 97. scripts/bash/copy_tpr_db.sh | changed
 - [x] 98. scripts/bash/download_dpd.sh | changed
 - [x] 99. scripts/bash/download_pali_classes.sh | changed
@@ -144,11 +144,7 @@ Pointer: 112
 - [x] 109. scripts/bash/upload_study_tools.sh | changed
 - [x] 110. scripts/bash/download_grammar.sh | changed
 - [x] 111. scripts/bash/push_dpd.sh | changed
-- [ ] 112. scripts/bash/update_decks.sh
-
-### scripts/cl
-
-- [ ] 113. scripts/cl/dpd-gui2
+- [x] 112. scripts/bash/update_decks.sh | changed
 
 ### scripts/cl_dps
 

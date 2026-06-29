@@ -10,6 +10,7 @@
 2026-06-28 | #95 scripts/bash/check_new_words.sh | archived | already moved to scripts/dps_archive/ in commit 3679d5439; queue was stale
 2026-06-28 | #100 scripts/export/for_release.py | changed | relocated from scripts/bash/ (category violation); expanded docstring; renamed ASSETS→RELEASE_ASSETS; updated caller upload_study_tools.sh; added test
 2026-06-28 | #96 scripts/bash/copy_dpd_to_server.sh | passed | clean — 16 lines, ask.py for prompts, active caller
+2026-06-29 | #96 scripts/bash/copy_dpd_to_server.sh | changed | re-reviewed: dropped hardcoded cd "$HOME/..."; uv run python→uv run tools/ask.py; uv run python→uv run python3 for distribute.py; 6 structural tests added
 2026-06-28 | #97 scripts/bash/copy_tpr_db.sh | changed | echo→ask.py --print -c (red/green) for all 6 output lines; 10 structural tests added
 
 2026-06-24 | #12 scripts/change_in_db/class_relation.py | passed (approach-only) | no substantial simplification possible — inherent decision tree
@@ -119,3 +120,4 @@
 2026-06-28 | #109 scripts/bash/upload_study_tools.sh | changed | echo→ask.py --print, add set -eu, add docstring, comment CREATE_NEW semantics; 16 structural tests
 2026-06-28 | #110 scripts/bash/download_grammar.sh | changed | echo→ask.py wrapper; curl --head replaces ping; simplify URL; anchor REPO_ROOT; add set -e; 14 structural tests
 2026-06-28 | #111 scripts/bash/push_dpd.sh | changed | echo/ANSI→ask.py; extract 6 while/read/case blocks into ask_run() helper; 114→23 lines
+2026-06-28 | #112 scripts/bash/update_decks.sh | changed | echo→ask.py --print -c, add docstring
