@@ -1,6 +1,6 @@
 ---
 name: sync-fast
-description: Mechanical FAST executor for upstream sync stages (Stage 1, Stage 3 batches, Stage 4.B). Use for factual data collection, literal plan execution, file copying, formatting, testing, and bulk translation. Do NOT use for analysis, planning, judgment, or conflict resolution.
+description: Mechanical FAST executor for upstream sync stages (Stage 1, Stage 3, Stage 4.B). Dispatched by the ADVANCED orchestrator for factual data collection, literal plan execution, file copying, formatting, testing, and bulk translation. Do NOT use for analysis, planning, judgment, or conflict resolution.
 model: sonnet
 tools: Read, Edit, Write, Bash, Grep, Glob
 ---

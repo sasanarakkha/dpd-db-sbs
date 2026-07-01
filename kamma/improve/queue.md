@@ -2,7 +2,7 @@
 
 Pointer: 147
 
-## Scripts (144 total, local unique_paths)
+## Scripts (146 total, local unique_paths)
 
 ### db/families
 
@@ -190,3 +190,11 @@ Pointer: 147
 ### tools (additional)
 
 - [x] 146. tools/meaning_snapshot_ru.py | passed
+
+### scripts/cl_dps (additional)
+
+- [ ] 147. scripts/cl_dps/dpd-kill-webapp
+
+### scripts/change_in_db (additional)
+
+- [ ] 148. scripts/change_in_db/example_cleanup.py

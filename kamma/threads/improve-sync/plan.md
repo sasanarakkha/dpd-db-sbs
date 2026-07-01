@@ -113,8 +113,8 @@ Literal keep/remove list (no judgment required):
   excluded from commit scope.
 
 ### ── HARD STOP after Tier 1 ──
-- [ ] Update `handoff.md`: Tier 1 done, files touched, verify output, commit msg.
-- [ ] STOP for user commit + Tier 2 approval. Do not begin Tier 2 in this
+- [x] Update `handoff.md`: Tier 1 done, files touched, verify output, commit msg.
+- [x] STOP for user commit + Tier 2 approval. Do not begin Tier 2 in this
   session. Restart prompt (if approved):
   `Switch to ADVANCED (Opus). Start a fresh session. Continue thread kamma/threads/improve-sync. Read handoff.md, spec.md, plan.md Tier 2. Execute Tier 2.A only (design + guide.md rewrite), then hard stop.`
 
@@ -127,14 +127,14 @@ Literal keep/remove list (no judgment required):
 > Split into 2.A (Opus analysis) → hard stop → 2.B (Sonnet mechanical).
 
 ### Tier 2.A — OWNER: ADVANCED (Opus) — analysis + authoring (minimal pass)
-- [ ] **2.A.1 Target-state note:** write `target_state.md` in this thread: the
+- [x] **2.A.1 Target-state note:** write `target_state.md` in this thread: the
   slimmed orchestration — orchestrator (Opus) holds all user gates (Stage 2
   approval, Commit 1/2/3, Stage 5 acceptance); mechanical work fans to the
   `sync-fast` subagent (Sonnet); session boundaries fall on dispatch + gate
   points, NOT on arbitrary "every 5 items". Confirm the FAST/ADVANCED
   *responsibility* split is preserved; only the human "switch models now" ritual
   and the arbitrary hard-stop counters are removed.
-- [ ] **2.A.2 Author the `guide.md` rewrite** (this IS the analysis — deciding
+- [x] **2.A.2 Author the `guide.md` rewrite** (this IS the analysis — deciding
   what is load-bearing vs. ceremony; do it directly, do not defer to FAST):
   - Remove the manual model-switch instructions superseded by subagent dispatch.
   - Remove the "hard stop after every 5 implementation items / 5 translation
@@ -145,32 +145,32 @@ Literal keep/remove list (no judgment required):
   - **Keep untouched:** Iron Rule, all commit gates, Stage 2 approval gate,
     Stage 5 acceptance gate, the plan-quality handoff gates (self-contained
     plan test), and `handoff.md` contract.
-- [ ] **2.A.3 Emit a literal edit list** for 2.B (exact deletions/replacements
+- [x] **2.A.3 Emit a literal edit list** for 2.B (exact deletions/replacements
   in `templates/sync_thread_plan.md` and `.claude/agents/sync-fast.md` that must
   mirror the guide decisions).
-- [ ] **2.A.4 Present** `target_state.md` + rewritten `guide.md` for approval.
+- [x] **2.A.4 Present** `target_state.md` + rewritten `guide.md` for approval.
 
 ### ── HARD STOP: Opus → Sonnet ──
-- [ ] Update `handoff.md`: guide.md rewritten, decisions recorded, literal edit
+- [x] Update `handoff.md`: guide.md rewritten, decisions recorded, literal edit
   list for 2.B attached. Restart prompt:
   `Switch to FAST (Sonnet). Start a fresh session. Continue thread kamma/threads/improve-sync. Read handoff.md and the 2.A edit list. Apply Tier 2.B mechanically, verify, prepare commit. Do not redesign guide.md.`
-- [ ] STOP. Do not do 2.B in the Opus session.
+- [x] STOP. Do not do 2.B in the Opus session.
 
 ### Tier 2.B — OWNER: FAST (Sonnet) — mechanical reconciliation
-- [ ] **2.B.1** Apply the 2.A edit list to `templates/sync_thread_plan.md`
+- [x] **2.B.1** Apply the 2.A edit list to `templates/sync_thread_plan.md`
   (remove the obsolete "Switch to FAST/ADVANCED. Start a fresh session…"
   restart-prompt boilerplate; keep checklist, stop-conditions, commit gates).
-- [ ] **2.B.2** Apply the 2.A edit list to `.claude/agents/sync-fast.md` (adjust
+- [x] **2.B.2** Apply the 2.A edit list to `.claude/agents/sync-fast.md` (adjust
   only wording referencing the removed manual model-switch ritual).
-- [ ] **2.B.3** Dry-read walkthrough: trace a hypothetical sync through the
+- [x] **2.B.3** Dry-read walkthrough: trace a hypothetical sync through the
   slimmed guide; confirm every gate (2 approval, 3 commits, 5 acceptance) still
   fires and commit structure is unchanged.
-- [ ] **2.B.4** `validate_registry.py` + `verify_smd_coverage.py` still pass.
-- [ ] Prepare commit message only:
+- [x] **2.B.4** `validate_registry.py` + `verify_smd_coverage.py` still pass.
+- [x] Prepare commit message only:
   `docs(sync): drive FAST/ADVANCED split via sync-fast dispatch, drop manual model-switch ceremony`.
 
 ### ── HARD STOP after Tier 2 ──
-- [ ] Update `handoff.md`. STOP for user commit + Tier 3 decision.
+- [x] Update `handoff.md`. STOP for user commit + Tier 3 decision.
 
 ---
 
@@ -180,15 +180,15 @@ Literal keep/remove list (no judgment required):
 > Requires its own thread + approval to implement.
 
 ### Tier 3.1 — proposal note (Opus)
-- [ ] Write `state_machine_proposal.md` in this thread: extend `sync_status.py`
+- [x] Write `state_machine_proposal.md` in this thread: extend `sync_status.py`
   from "print current stage + next command" into a small state machine owning
   workflow transitions, so the model runs "the next emitted command" instead of
   re-deriving 423 lines of prose each session.
-- [ ] Identify state read (`prep_manifest.json`, `handoff.md`, commit markers,
+- [x] Identify state read (`prep_manifest.json`, `handoff.md`, commit markers,
   `stage_state.json`) and emitted output.
-- [ ] Estimate token savings vs. implementation cost; flag the drift risk (a
+- [x] Estimate token savings vs. implementation cost; flag the drift risk (a
   state machine out of sync with reality is worse than prose).
-- [ ] Leave the decision open for the user. Hard stop.
+- [x] Leave the decision open for the user. Hard stop.
 
 ---
 

@@ -58,47 +58,28 @@ continue from files only.
 - `<thread_dir>/stage_state.json` only when a script or later session needs machine-readable state.
 
 **`handoff.md` must include:**
-- Current stage and owner model (`FAST` or `ADVANCED`).
+- Current stage and owner (`FAST` subagent or `ADVANCED` orchestrator).
 - Completed work.
 - Exact commands already run.
 - Exact outputs or failures summarized.
 - Files changed.
 - Open decisions.
 - Errors, issues, and repeated mistakes.
-- Next model to use.
-- Exact restart prompt for a fresh session.
+- Exact next action.
 - Explicit instruction: "Do not continue in this session."
 
-**Hard Stop Triggers (mandatory fresh-session split):**
+**Hard Stop Triggers (mandatory session boundary):**
 - After completing any full Stage (1, 2, 3, 4.A, 4.B, or 5).
-- After preparing ANY commit message (Commit 1, 2, 3, or docs). Preparing a Commit is always a session boundary: update `handoff.md` and write a restart prompt naming the exact model and `/kamma:2-do` command before ending.
-- When FAST needs analysis, planning, judgment, or conflict resolution.
-- When ADVANCED needs mechanical editing, command execution, file copying, formatting, testing, or bulk research.
-- After every 5 implementation items in Stage 3.
-- After every 5 translation files in Stage 4.B.
+- After preparing ANY commit message (Commit 1, 2, 3, or docs). Preparing a Commit is always a session boundary: update `handoff.md` before ending.
+- When the `sync-fast` subagent encounters work requiring analysis, planning, judgment, or conflict resolution — it returns to the orchestrator.
+- When the orchestrator identifies mechanical work — it dispatches to `sync-fast`.
 - If output is too large, context feels stale, failures repeat, state becomes unclear, or the agent is relying on memory instead of files.
 
-Hard stop procedure: save artifacts -> update `handoff.md` -> state the exact restart prompt and required model -> STOP. Do not continue in the same session.
+Hard stop procedure: save artifacts -> update `handoff.md` -> STOP. Do not continue in the same session.
 
-**Commit-closeout checklist (mandatory after each commit lands):** Before writing the restart prompt, update `handoff.md` Status + Next Action to reflect the commit that just landed, and mark resolved ledger/approval items DONE. A restart prompt written before the handoff is updated causes the next session to re-do already-finished work.
+**Commit-closeout checklist (mandatory after each commit lands):** Before proceeding, update `handoff.md` Status + Next Action to reflect the commit that just landed, and mark resolved ledger/approval items DONE. A handoff written before this update causes the next dispatch to re-do already-finished work.
 
-**Context-handoff prompt template** (used when a thread spans sessions for context-size reasons):
-
-```text
-Start a fresh session.
-
-Continue upstream sync thread: <thread_dir>.
-First read:
-1. <thread_dir>/handoff.md
-2. kamma/upstream_sync/guide.md
-3. <stage-specific file>
-
-Your task:
-<exact next task>
-
-Do not perform <forbidden model responsibility>.
-Stop if <specific stop condition>.
-```
+**Orchestrator context-overflow handoff:** When the orchestrator itself must span sessions for context size, write `handoff.md` with the contract above and suggest the user restart with `/kamma:2-do <thread>`. The `sync-fast` subagent's dispatch prompt is its agent definition (`.claude/agents/sync-fast.md`); no restart-prompt template is needed for dispatched work.
 
 **Pre-Authorized Commands:**
 All commands listed in this guide (`uv run`, `rg`, `git diff`, `git log`, `ruff`, `pytest`, `python temp/`) are pre-authorized for the entire sync session. Use `rg` for repo searches. Write all ad-hoc logic to `temp/<name>.py` and run via `uv run python temp/<name>.py`. Never use inline `python -c "..."`. Delete temp files when done.
@@ -135,14 +116,14 @@ ADVANCED must stop when mechanical work is needed: broad file reading, command e
 - ADVANCED decides a shadow must be updated -> write exact instructions, then stop and hand off to FAST.
 - ADVANCED sees docs need translation -> write `docs_translation_plan.md`, then stop and hand off to FAST.
 
-**Subagent Dispatch (Primary Path):**
+**Subagent Dispatch (Primary Execution Path):**
 
-The orchestrating session (Opus / ADVANCED) dispatches mechanical work to the `sync-fast` subagent (`.claude/agents/sync-fast.md`):
+The orchestrator (ADVANCED) dispatches mechanical work to the `sync-fast` subagent (`.claude/agents/sync-fast.md`):
 - **Stage 1** (entire stage): dispatch to `sync-fast` after thread init.
-- **Stage 3** (batches of ≤5 plan items): dispatch sequential batches to `sync-fast`.
+- **Stage 3** (batches): dispatch sequential batches to `sync-fast`. Batch size is at the orchestrator's discretion based on complexity and item count — there is no fixed cap.
 - **Stage 4.B** (entire docs translation stage): dispatch to `sync-fast`.
 
-All user-facing gates remain in the orchestrating session: Stage 2 approval, Stage 4.A discussion, commit gates, and Stage 5 acceptance. Subagent work is verified from files — read `handoff.md` and stage outputs after each dispatch; subagent self-reports are not trusted.
+All user-facing gates remain in the orchestrator: Stage 2 approval, Stage 4.A discussion, commit gates, and Stage 5 acceptance. Subagent work is verified from files — read `handoff.md` and stage outputs after each dispatch; subagent self-reports are not trusted.
 
 **Stage ownership:**
 - **Stage 1 (Prep)** — FAST; factual collection only.
@@ -156,7 +137,7 @@ All user-facing gates remain in the orchestrating session: Stage 2 approval, Sta
 
 **Handoff quality gate (ADVANCED -> FAST, Stage 4.A -> 4.B):** Before switching to FAST for Stage 4.B, ADVANCED must verify that `docs_translation_plan.md` includes: (1) a terminology glossary, (2) per-file instructions specifying source path, target path, and whether it is a full translation or a targeted update, (3) explicit rules for what to keep untranslated (Pali terms, product names, image paths, code blocks, URLs). FAST must never decide what to translate — only execute the plan.
 
-**The agent MUST stop at the end of each Stage and explicitly write the handoff note before ending the session. Never begin the next stage in the same session that completed the previous stage.**
+**The orchestrator manages stage boundaries.** Each stage ends with a handoff note before proceeding. The orchestrator never begins the next stage in the same dispatch that completed the previous one — it reads the subagent's `handoff.md` output first, then decides whether to dispatch the next stage or surface a gate to the user.
 
 ---
 
@@ -212,7 +193,7 @@ Stage 4 is split into two model-bound substages: ADVANCED analysis and FAST tran
 **Owner**: ADVANCED only.
 **ADVANCED must stop and request FAST if** files need to be copied, generated, formatted, tested, translated in bulk, or mechanically edited.
 
-**Stage 2 sub-stage splitting (context safety):** Stage 2 routinely exceeds one session's context. Split it into restartable sub-stages, updating `handoff.md` and writing a restart prompt at each boundary so a fresh session can resume from files alone:
+**Stage 2 sub-stage splitting (context safety):** Stage 2 routinely exceeds one session's context. Split it into restartable sub-stages, updating `handoff.md` at each boundary so a fresh session can resume from files alone:
 - **2a — Impact assessment:** read `prep_report.md` + `prep_manifest.json`; classify every changed path (port / mirror / preserve / discuss / inspired / skip / docs) in `dynamic_plan.md`, then hard stop. For every changed path with a registered shadow/`inspired_by_upstream` mapping, read the actual upstream diff at this stage (not later) and note whether it contains structural refactoring — see the "Structural refactor check" field required in 2c. Also classify every path in `unregistered_local_paths` (register in the appropriate registry category) and `upstream_deleted_orphans` (keep-as-divergence or delete-to-match-upstream).
 - **2b — Discuss resolution:** resolve each `discuss: true` item with the user one at a time; record each as RESOLVED in `dynamic_plan.md`, then hard stop.
 - **2c — Literal plan authoring:** write self-contained per-file instructions (anchors, literal edits, verify commands); split again after each major domain if context grows, then hard stop.

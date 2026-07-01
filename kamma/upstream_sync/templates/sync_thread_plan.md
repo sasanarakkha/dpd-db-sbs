@@ -36,8 +36,7 @@
 **FAST must stop and request ADVANCED if** registry errors require policy interpretation, a `discuss: true` path changed, a new upstream file needs classification, or command output is ambiguous.
 
 **Hard stop handoff**:
-- [ ] Update `<thread_dir>/handoff.md` with commands run, outputs/failures, files changed, open issues, and repeated mistakes.
-- [ ] Restart prompt: `Switch to ADVANCED. Start a fresh session. Continue upstream sync thread: <thread_dir>. First read <thread_dir>/handoff.md, kamma/upstream_sync/guide.md, prep_report.md, and prep_manifest.json. Analyze Stage 1 results and write dynamic_plan.md. Do not perform mechanical edits.`
+- [ ] Update `<thread_dir>/handoff.md` with commands run, outputs/failures, files changed, open issues, and next action.
 - [ ] Stop. Do not continue in this session.
 
 ---
@@ -65,7 +64,6 @@
 
 **Hard stop handoff**:
 - [ ] Update `<thread_dir>/handoff.md` with decisions, open questions, and exact next steps.
-- [ ] Restart prompt: `Switch to FAST. Start a fresh session. Continue upstream sync thread: <thread_dir>. First read <thread_dir>/handoff.md, kamma/upstream_sync/guide.md, and <thread_dir>/dynamic_plan.md. Execute dynamic_plan.md literally item by item. Do not analyze or redesign. Stop if any plan item is incomplete or fails unexpectedly.`
 - [ ] Stop. Do not continue in this session.
 
 ---
@@ -77,7 +75,6 @@
 - [ ] **3.1 Implementation**:
   - [ ] Execute `<thread_dir>/dynamic_plan.md` item by item.
   - [ ] Mark progress in `dynamic_plan.md`.
-  - [ ] Split after every 5 implementation items.
 - [ ] **3.2 Verification**:
   - [ ] Run every verification command specified by `dynamic_plan.md`.
   - [ ] `uv run pytest tests/test_shadow_parity.py tests/test_shadow_cleanup.py tests/test_namespace_isolation.py tests/test_template_syntax.py -v`.
@@ -92,8 +89,7 @@
 **FAST must stop and request ADVANCED if** an expected anchor is missing, a test failure is not covered by the plan, a merge conflict requires judgment, or a different implementation seems necessary.
 
 **Hard stop handoff**:
-- [ ] Update `<thread_dir>/handoff.md` with completed items, failed items, files changed, commands run, test evidence, and repeated mistakes.
-- [ ] Restart prompt: `Switch to ADVANCED. Start a fresh session. Continue upstream sync thread: <thread_dir>. First read <thread_dir>/handoff.md, kamma/upstream_sync/guide.md, and <thread_dir>/dynamic_plan.md. Analyze Stage 3 evidence and decide whether to proceed to docs parity or write a corrective plan. Do not perform mechanical edits.`
+- [ ] Update `<thread_dir>/handoff.md` with completed items, failed items, files changed, commands run, test evidence, and next action.
 - [ ] Stop. Do not continue in this session.
 
 ---
@@ -116,8 +112,7 @@
 **ADVANCED must stop and request FAST if** the parity script must be run, files must be translated, or `mkdocs_ru.yaml` must be edited.
 
 **Hard stop handoff**:
-- [ ] Update `<thread_dir>/handoff.md`.
-- [ ] Restart prompt: `Switch to FAST. Start a fresh session. Continue upstream sync thread: <thread_dir>. First read <thread_dir>/handoff.md, kamma/upstream_sync/guide.md, and <thread_dir>/docs_translation_plan.md. Execute the docs translation plan literally. Stop if terminology or scope is unclear.`
+- [ ] Update `<thread_dir>/handoff.md` with translation plan decisions and next action.
 - [ ] Stop. Do not continue in this session.
 
 ---
@@ -127,7 +122,6 @@
 **Owner**: FAST only. Execute the approved docs translation plan literally.
 
 - [ ] Translate or update files exactly as listed in `docs_translation_plan.md`.
-- [ ] Split after every 5 translation files.
 - [ ] Update `mkdocs_ru.yaml` only if explicitly instructed.
 - [ ] Run `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir> --strict`.
 - [ ] Prepare commit message only: `#docs: translate/update docs_rus/ for sync <from>..<to>`.
@@ -135,8 +129,7 @@
 **FAST must stop and request ADVANCED if** terminology, source diff interpretation, or translation scope is unclear.
 
 **Hard stop handoff**:
-- [ ] Update `<thread_dir>/handoff.md` with files changed, remaining files, and issues.
-- [ ] Restart prompt: `Switch to ADVANCED. Start a fresh session. Continue upstream sync thread: <thread_dir>. First read <thread_dir>/handoff.md, kamma/upstream_sync/guide.md, and docs translation evidence. Decide whether Stage 5 verification can begin. Do not perform mechanical edits.`
+- [ ] Update `<thread_dir>/handoff.md` with files changed, remaining files, issues, and next action.
 - [ ] Stop. Do not continue in this session.
 
 ---
