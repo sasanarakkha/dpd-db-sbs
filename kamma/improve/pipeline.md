@@ -53,24 +53,29 @@ no API call is made.
    - File is under `scripts/` → move to `scripts/dps_archive/`
    - File is under any other folder → move to `archive/`
 2. Run `git mv <source> <target>` to move it.
-3. Mark the script `[x] archived` in the queue and advance the Pointer.
-4. Append a terse decision line to `kamma/improve/log.md`:
+3. Remove the file's old path from `unique_paths` in `kamma/upstream_sync/registry.json`.
+   `scripts/dps_archive/` and `archive/` are already covered by their own wildcard
+   entries — do not add the new path, just delete the stale old-path entry. Skipping
+   this step leaves a dead entry that `validate_registry.py` will not catch (it
+   checks structure, not path existence).
+4. Mark the script `[x] archived` in the queue and advance the Pointer.
+5. Append a terse decision line to `kamma/improve/log.md`:
    `YYYY-MM-DD | #N path | archived | <one-line reason>`.
-5. Stage the move, the queue update, and the log update:
-   `git add <target> kamma/improve/queue.md kamma/improve/log.md`
+6. Stage the move, the registry update, the queue update, and the log update:
+   `git add <target> kamma/upstream_sync/registry.json kamma/improve/queue.md kamma/improve/log.md`
    (use `git mv`'s staged result for the source/target rename — no separate `git rm` needed).
-6. Show the proposed commit message:
+7. Show the proposed commit message:
    ```
    pipeline: archive <file> (#N)
 
    - <one-line reason>
    ```
    State the recommendation to commit and ask the user to reply `yes` or `no`.
-7. If **yes**: run `git commit -m` with that message (no heredoc — user runs Fish shell).
-8. Output exactly:
+8. If **yes**: run `git commit -m` with that message (no heredoc — user runs Fish shell).
+9. Output exactly:
    > **Archived.** `<source>` → `<target>`. Queue pointer advanced to #N.
    > Start a fresh session and run `/pipeline-improvement` to continue.
-9. **Stop. Do not proceed to the review steps.**
+10. **Stop. Do not proceed to the review steps.**
 
 **If the user chooses Improve:** continue to step 3.
 
