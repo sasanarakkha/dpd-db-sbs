@@ -132,3 +132,4 @@
 2026-07-01 | #119 scripts/cl_dps/dpd-makedict | passed | clean — 35-line bash, ask.py prompts, no issues
 2026-07-01 | #120 scripts/cl_dps/dpd-push | changed | echo/ANSI → ask.py prompts; 39→19 lines; bash syntax test added
 2026-07-01 | #121 scripts/cl_dps/dpd-review-comments | changed | echo→ask.py, anchor path, uv run python→python3, set -e; 10 structural tests added
+2026-07-01 | #125 scripts/cl_dps/dpd-vib-rule | changed | shebang → #!/usr/bin/env bash, add set -euo pipefail
