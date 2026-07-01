@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 131
+Pointer: 132
 
 ## Scripts (144 total, local unique_paths)
 
@@ -171,7 +171,7 @@ Pointer: 131
 - [x] 128. scripts/export/dps_anki_updater.py | improved (module-level → main(), dead code removed, simplify make_data_dict, print→pr, pathlib, modern types, 12 tests)
 - [x] 129. scripts/export/extract_ebt_text.py | archived
 - [x] 130. scripts/export/filter_from_db.py | archived
-- [ ] 131. scripts/export/filtering_and_backup.py
+- [x] 131. scripts/export/filtering_and_backup.py | archived
 - [ ] 132. scripts/export/list_of_words_from_txt.py
 - [ ] 133. scripts/export/list_of_words_from_txt_old.py
 - [ ] 134. scripts/export/save_all_sutta_names.py
