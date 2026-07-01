@@ -4,18 +4,19 @@
 Save list of words from text.txt which are not in sbs db
 """
 
-from tools.paths import ProjectPaths
-from tools.paths_dps import DPSPaths
-from db.db_helpers import get_db_session
+from typing import Any
 
-from tools.cst_sc_text_sets import make_cst_text_list_from_file
-from tools.printer import printer as pr
-
-from db.models import Lookup, SBS, DpdHeadword
 from sqlalchemy import and_, func, or_
 
+from db.db_helpers import get_db_session
+from db.models import SBS, DpdHeadword, Lookup
+from tools.cst_sc_text_sets import make_cst_text_list_from_file
+from tools.paths import ProjectPaths
+from tools.paths_dps import DPSPaths
+from tools.printer import printer as pr
 
-def make_field_conditions(fields: str | list[str]) -> list:
+
+def make_field_conditions(fields: str | list[str]) -> list[Any]:
     if isinstance(fields, str):
         fields = [fields]
 
@@ -31,10 +32,11 @@ def make_decon_word_list(deconstruction: list[str]) -> list[str]:
 
     word_list: list[str] = []
     for deconstruction_item in deconstruction:
-        words = deconstruction_item.split(" + ")
-        for word in words:
-            word_list.append(word.strip())
-    return sorted(set(word_list), key=lambda x: word_list.index(x))
+        for word in deconstruction_item.split(" + "):
+            word = word.strip()
+            if word not in word_list:
+                word_list.append(word)
+    return word_list
 
 
 def get_headwords_ids(db_session, word_in_text: str) -> list[int]:
@@ -142,25 +144,19 @@ def dps_make_words_to_add_list_from_text_no_field(
     dpspth,
     db_session,
     fields,
-) -> list:
+) -> list[str]:
     """
-    Generalized function to create words to add lists with various configurations.
+    Read words from text.txt, exclude those already covered by SBS fields,
+    and write the remainder to temp/text_{fields}.tsv.
 
     Parameters:
-    - db_session: The database session for retrieving inflections.
-    - pth: Path for resources.
-    - make_cst_func: Function to create the CST text list.
-    - make_sc_func: Optional function to create the SC text list.
-    - inflection_func: Function to generate the inflection set.
-    - book: The book name (optional).
-    - sutta_name: The sutta name (optional).
-    - dpspth: Path for DPS files.
-    - source: Source identifier (optional).
-    - field: Field name for inflections (optional).
-    - output_filename_template: Template for the output file name.
+    - pth: ProjectPaths instance.
+    - dpspth: DPSPaths instance (provides text_to_add_path).
+    - db_session: SQLAlchemy database session.
+    - fields: SBS field(s) to check for existing coverage.
 
     Returns:
-    - A sorted list of words to add.
+    - Sorted list of words to add.
     """
     # Generate CST and SC text lists
     cst_text_list = make_cst_text_list_from_file(dpspth)
@@ -189,12 +185,10 @@ def dps_make_words_to_add_list_from_text_no_field(
         output_filename = f"temp/text_{fields}.tsv"
 
     # Save to a file
-    with open(output_filename, "w") as f:
-        for word in text_list:
-            f.write(f"{word}\n")
+    with open(output_filename, "w", encoding="utf-8") as f:
+        f.writelines(f"{word}\n" for word in text_list)
 
     pr.green(f"Saved to {output_filename}")
-    # print list of those words
     for word in text_list:
         pr.amber(word)
 

@@ -3,7 +3,10 @@
 from pathlib import Path
 
 from scripts.export import list_of_words_from_txt as module
-from scripts.export.list_of_words_from_txt import make_field_conditions
+from scripts.export.list_of_words_from_txt import (
+    make_decon_word_list,
+    make_field_conditions,
+)
 
 
 class _FakeQuery:
@@ -68,6 +71,42 @@ class _FakeLookupSession:
 class _FakePaths:
     def __init__(self, base_dir: Path) -> None:
         pass
+
+
+def test_make_decon_word_list_splits_and_deduplicates():
+    """Split compound deconstructor items, deduplicate, preserve first-appearance order."""
+    result = make_decon_word_list(["tathā + rūpappaccayā", "rūpa + kāya"])
+    assert result == ["tathā", "rūpappaccayā", "rūpa", "kāya"]
+
+
+def test_make_decon_word_list_handles_single_word():
+    """Single word with no split marker."""
+    assert make_decon_word_list(["rūpa"]) == ["rūpa"]
+
+
+def test_make_decon_word_list_deduplicates_across_items():
+    """Same part appearing in multiple deconstruction items -> only first occurrence."""
+    result = make_decon_word_list(["kāma + rāga", "kāma + chanda"])
+    assert result == ["kāma", "rāga", "chanda"]
+    assert len(result) == 3
+
+
+def test_make_decon_word_list_removes_duplicates_within_same_item():
+    """Same word appearing twice from different splits within one item."""
+    result = make_decon_word_list(["idha + eva + idha"])
+    assert result == ["idha", "eva"]
+    assert len(result) == 2
+
+
+def test_make_decon_word_list_empty_input():
+    """Empty list input -> empty list."""
+    assert make_decon_word_list([]) == []
+
+
+def test_make_decon_word_list_strips_whitespace():
+    """Each part is stripped of surrounding whitespace."""
+    result = make_decon_word_list(["  abhi  +   dhamma  "])
+    assert result == ["abhi", "dhamma"]
 
 
 def test_get_lookup_headword_ids_prefers_direct_headwords_over_deconstructor():
