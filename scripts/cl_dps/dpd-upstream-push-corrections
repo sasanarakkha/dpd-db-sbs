@@ -10,25 +10,33 @@ FILES=(
 
 cd "$PROJECT_DIR"
 
-# Checkout as_upstream branch and update from upstream
+uv run tools/ask.py --print -c green "Switching to as_upstream..."
 git checkout as_upstream
+uv run tools/ask.py --print -c cyan "Pulling latest from upstream..."
 git pull upstream main
 
-# Copy the two files from sbs-ru branch
+uv run tools/ask.py --print -c green "Copying additions + corrections from sbs-ru..."
 for FILE in "${FILES[@]}"; do
     git checkout sbs-ru -- "$FILE"
 done
 
-# Add and commit the files
 git add "${FILES[@]}"
 git commit -m "additions and corrections"
 
-# Push to upstream (replace 'upstream' with your remote name if needed)
+uv run tools/ask.py --print -c yellow "About to push: ${FILES[*]}"
+confirm=$(uv run tools/ask.py -c yellow "Push to upstream remote? [y/n] ")
+if [ "$confirm" != "y" ]; then
+    git checkout sbs-ru
+    uv run tools/ask.py --print -c red "Cancelled. Returned to sbs-ru."
+    exit 0
+fi
+
 git push upstream as_upstream:main
 
-# Return to your previous branch
 git checkout sbs-ru
 
-# Empty files
+uv run tools/ask.py --print -c green "Clearing local JSON files..."
 echo '{}' > gui2/data/additions_deva.json
 echo '{}' > gui2/data/corrections_deva.json
+
+uv run tools/ask.py --print -c green "Done."

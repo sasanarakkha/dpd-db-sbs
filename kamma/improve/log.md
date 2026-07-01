@@ -19,6 +19,8 @@
 2026-06-07 | #2 gui2/dps_ai_service.py | changed | type hints (TYPE_CHECKING guard for DpsFields, DpdHeadword), lemma_1 or "" guard, textwrap.dedent on both prompt f-strings, synonyms via instruction var not .replace(), str(e)->e, removed WHAT comments
 2026-06-07 | #3 gui2/dps_db_helpers.py | changed | Optional[X] → X | None, removed typing.Optional import, removed coding header, inlined multi-line filter() calls
 2026-07-01 | #122 scripts/cl_dps/dpd-upstream-push | archived | outdated — replaced by dpd-upstream-push-corrections
+2026-07-01 | #123 scripts/cl_dps/dpd-upstream-push-corrections | changed | echo→ask.py --print -c with status messages; added confirmation before push
+2026-07-01 | #124 scripts/cl_dps/dpd-upstream-push-latest | changed | echo→ask.py --print -c for all terminal output; `read`→ask.py for pause; added tests
 2026-06-08 | #4 gui2/dps_field_mapping.py | deferred | GUI work in progress on this file; revisit when done
 2026-06-08 | #5 gui2/dps_process_additions.py | changed | print()->pr.*, main()->None, encoding='utf-8' on open(), sorted(list())->sorted(), save guard try/except OSError, remove WHAT-comments
 2026-06-08 | #6 gui2/dps_process_corrections.py | changed | print()->pr.*, encoding='utf-8' on open(), try/except OSError on write, sorted(processed_ids) redundant cast, set[int]/list[int] type hints, remove WHAT-comments

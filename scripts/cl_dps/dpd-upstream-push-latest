@@ -8,63 +8,52 @@ cd "$PROJECT_DIR"
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 if [ "$CURRENT_BRANCH" == "as_upstream" ]; then
-    echo "You are already on as_upstream branch. This script should be run from your feature branch."
+    uv run tools/ask.py -c red "You are already on as_upstream branch. This script should be run from your feature branch."
     exit 1
 fi
 
-# Get files changed in the latest commit
-# Using mapfile to handle potential spaces in filenames correctly, though unlikely in this repo
 FILES=()
 while IFS= read -r line; do
     FILES+=("$line")
 done < <(git diff-tree --no-commit-id --name-only -r HEAD)
 
 if [ ${#FILES[@]} -eq 0 ]; then
-    echo "No files found in the latest commit."
+    uv run tools/ask.py -c yellow "No files found in the latest commit."
     exit 0
 fi
 
-echo "Found ${#FILES[@]} changed files in latest commit of $CURRENT_BRANCH:"
-printf '%s\n' "${FILES[@]}"
+uv run tools/ask.py --print -c cyan "Found ${#FILES[@]} changed files in latest commit of $CURRENT_BRANCH:"
+for f in "${FILES[@]}"; do uv run tools/ask.py --print "  $f"; done
 
 COMMIT_MSG=$(git log -1 --pretty=%B)
 
-# Checkout as_upstream branch and update from upstream
-echo "Switching to as_upstream..."
+uv run tools/ask.py --print -c green "Switching to as_upstream..."
 git checkout as_upstream
 git pull upstream main
 
-# Copy files from original branch
-echo "Checking out files from $CURRENT_BRANCH..."
+uv run tools/ask.py --print -c green "Checking out files from $CURRENT_BRANCH..."
 for FILE in "${FILES[@]}"; do
-    # check if file exists in the source branch (it might be a deletion)
     if git cat-file -e "$CURRENT_BRANCH:$FILE" 2>/dev/null; then
         git checkout "$CURRENT_BRANCH" -- "$FILE"
     else
-        echo "File $FILE was deleted in source, deleting in destination..."
+        uv run tools/ask.py --print -c yellow "  $FILE deleted in source, deleting in destination..."
         rm -f "$FILE"
     fi
     git add "$FILE"
 done
 
-# Add and commit
-echo "Committing..."
+uv run tools/ask.py --print -c green "Committing..."
 git commit -m "$COMMIT_MSG"
 
-# Print files which are commited
-echo "Files commited:"
+uv run tools/ask.py --print -c cyan "Files committed:"
 git diff --name-only HEAD^ HEAD
 
-#add a pause here
-echo "Press enter to push to upstream..."
-read
+confirm=$(uv run tools/ask.py -c yellow "Push to upstream remote? [Press enter to push, q to abort] ")
 
-# Push to upstream
-echo "Pushing to upstream..."
+uv run tools/ask.py --print -c green "Pushing to upstream..."
 git push upstream as_upstream:main
 
-# Return to previous branch
-echo "Returning to $CURRENT_BRANCH..."
+uv run tools/ask.py --print -c green "Returning to $CURRENT_BRANCH..."
 git checkout "$CURRENT_BRANCH"
 
-echo "Done."
+uv run tools/ask.py --print -c green "Done."

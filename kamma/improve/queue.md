@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 123
+Pointer: 125
 
 ## Scripts (144 total, local unique_paths)
 
@@ -160,8 +160,8 @@ Pointer: 123
 - [x] 120. scripts/cl_dps/dpd-push | changed
 - [x] 121. scripts/cl_dps/dpd-review-comments | changed
 - [x] 122. scripts/cl_dps/dpd-upstream-push | archived
-- [ ] 123. scripts/cl_dps/dpd-upstream-push-corrections
-- [ ] 124. scripts/cl_dps/dpd-upstream-push-latest
+- [x] 123. scripts/cl_dps/dpd-upstream-push-corrections | changed
+- [x] 124. scripts/cl_dps/dpd-upstream-push-latest | changed
 - [ ] 125. scripts/cl_dps/dpd-vib-rule
 - [ ] 126. scripts/cl_dps/dpd-webapp
 
