@@ -3,10 +3,11 @@
 import argparse
 import csv
 from pathlib import Path
+
 from sqlalchemy.orm import joinedload
 
-from db.models import DpdHeadword, SBS
 from db.db_helpers import get_db_session
+from db.models import SBS, DpdHeadword
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 
@@ -142,7 +143,7 @@ def generate_abbreviations(pth: ProjectPaths, output_dir: Path) -> None:
                 )
 
         pr.yes("ok")
-    except Exception as e:
+    except (OSError, csv.Error) as e:
         pr.no(f"Error processing abbreviations: {e}")
 
 
@@ -151,7 +152,7 @@ def main() -> None:
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=Path("/Users/deva/Documents/dpd-pali-courses/docs/generated"),
+        default=Path.home() / "Documents" / "dpd-pali-courses" / "docs" / "generated",
     )
     args = parser.parse_args()
     output_dir: Path = args.output_dir

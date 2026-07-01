@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 145
+Pointer: 146
 
 ## Scripts (144 total, local unique_paths)
 
@@ -185,7 +185,7 @@ Pointer: 145
 - [x] 142. scripts/export/sbs_anki_update_seed.py
 - [x] 143. scripts/export/sbs_example_dupes.py | archived
 - [x] 144. scripts/export/sourse_atth_sbs_mula.py | archived
-- [ ] 145. scripts/export/vocab_abbrev_pali_course.py
+- [x] 145. scripts/export/vocab_abbrev_pali_course.py | changed
 
 ### tools (additional)
 
