@@ -135,3 +135,4 @@
 2026-07-01 | #121 scripts/cl_dps/dpd-review-comments | changed | echo→ask.py, anchor path, uv run python→python3, set -e; 10 structural tests added
 2026-07-01 | #125 scripts/cl_dps/dpd-vib-rule | changed | shebang → #!/usr/bin/env bash, add set -euo pipefail
 2026-07-01 | #126 scripts/cl_dps/dpd-webapp | skipped | simple uvicorn wrapper, same pattern as #125, user chose to skip
+2026-07-01 | #129 scripts/export/extract_ebt_text.py | archived | zero callers, standalone manual-run script, not referenced by any workflow
