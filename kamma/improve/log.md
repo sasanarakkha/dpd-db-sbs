@@ -16,6 +16,7 @@
 
 2026-06-24 | #12 scripts/change_in_db/class_relation.py | passed (approach-only) | no substantial simplification possible — inherent decision tree
 2026-06-28 | #105 scripts/bash/push_from_temp.sh | archived | no callers, personal utility with hardcoded paths — echo vs ask.py violation
+2026-07-01 | #134 scripts/export/save_all_sutta_names.py | archived | no callers, no entrypoint guard, raw print — orphan utility
 2026-06-07 | #1 db/families/family_set_ru_update.py | changed | compiled regex to module constants, extracted _clean_translated_lines helper, atomic TSV write, -> None annotation, removed stale comments
 2026-06-07 | #2 gui2/dps_ai_service.py | changed | type hints (TYPE_CHECKING guard for DpsFields, DpdHeadword), lemma_1 or "" guard, textwrap.dedent on both prompt f-strings, synonyms via instruction var not .replace(), str(e)->e, removed WHAT comments
 2026-06-07 | #3 gui2/dps_db_helpers.py | changed | Optional[X] → X | None, removed typing.Optional import, removed coding header, inlined multi-line filter() calls
