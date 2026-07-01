@@ -136,3 +136,4 @@
 2026-07-01 | #125 scripts/cl_dps/dpd-vib-rule | changed | shebang → #!/usr/bin/env bash, add set -euo pipefail
 2026-07-01 | #126 scripts/cl_dps/dpd-webapp | skipped | simple uvicorn wrapper, same pattern as #125, user chose to skip
 2026-07-01 | #129 scripts/export/extract_ebt_text.py | archived | zero callers, standalone manual-run script, not referenced by any workflow
+2026-07-01 | #130 scripts/export/filter_from_db.py | archived | no callers, standalone manual-run script
