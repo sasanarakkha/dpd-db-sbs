@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 137
+Pointer: 139
 
 ## Scripts (144 total, local unique_paths)
 
@@ -177,8 +177,8 @@ Pointer: 137
 - [x] 134. scripts/export/save_all_sutta_names.py | archived
 - [x] 135. scripts/export/save_all_words_alphabetically.py | archived
 - [x] 136. scripts/export/save_all_words_sorted_by_family.py | archived
-- [ ] 137. scripts/export/save_csv_for_audio.py
-- [ ] 138. scripts/export/save_filtered_words.py
+- [x] 137. scripts/export/save_csv_for_audio.py | archived
+- [x] 138. scripts/export/save_filtered_words.py | archived
 - [ ] 139. scripts/export/save_russian_for_collaborator.py
 - [ ] 140. scripts/export/sbs_anki_fields_check.py
 - [ ] 141. scripts/export/sbs_anki_templates.py

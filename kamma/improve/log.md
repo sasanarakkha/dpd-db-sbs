@@ -143,3 +143,5 @@
 2026-07-01 | #132 scripts/export/list_of_words_from_txt.py | changed | simplify make_decon_word_list, fix docstring/encoding/types, 6 regression tests
 2026-07-01 | #133 scripts/export/list_of_words_from_txt_old.py | archived | zero callers, self-declared temporary script ("REMOVE after few rounds of checking")
 2026-07-01 | #136 scripts/export/save_all_words_sorted_by_family.py | archived | zero callers, no entrypoint guard, no tests, module-level side effects on import
+2026-07-01 | #137 scripts/export/save_csv_for_audio.py | archived | zero callers, standalone manual-run script
+2026-07-01 | #138 scripts/export/save_filtered_words.py | archived | zero callers, hardcoded attribute, no entrypoint guard, one-off manual utility
