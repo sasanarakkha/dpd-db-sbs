@@ -32,10 +32,7 @@ handoff, and an explicit model switch when needed. Stage 4 has two model-bound s
     -   **Stage 4.B: FAST Docs Translation** — execute the approved docs translation plan.
 5.  **Stage 5: ADVANCED Verification & After-sync** — decide acceptance after user verification.
 
-FAST performs mechanical work only. ADVANCED performs analysis and planning only. If either model
-needs the other responsibility, it must update `handoff.md`, write an exact restart prompt, and stop.
-
-For the full protocol, see **[guide.md](./guide.md)**.
+For the full protocol, model responsibilities, and Iron Rule, see [guide.md](./guide.md).
 
 ## Core Tooling
 
@@ -58,7 +55,7 @@ For the full protocol, see **[guide.md](./guide.md)**.
 - **[reviewed_shadow_noops.json](./reviewed_shadow_noops.json)**: Exact reviewed no-op ledger for changed upstream sources that intentionally need no shadow edit.
 - **[smd/index.md](./smd/index.md)**: Per-file merge guidance (Sync Metadata).
 - **[registry.json](./registry.json)**: Source of truth for file mappings and categories.
-- **[archive_improvements.md](./archive_improvements.md)**: Accumulated lessons from past runs. (Note: `new_improvements.md` is a strictly temporary file used during syncs and must not be committed).
+- **[archive_improvements.md](./archive_improvements.md)**: Accumulated lessons from past runs.
 
 ## File Inventory
 
@@ -70,7 +67,6 @@ For the full protocol, see **[guide.md](./guide.md)**.
 | `smd/` | Shadow Module Descriptions (Directory) — per-file merge guidance |
 | `guide.md` | Canonical process reference: Iron Rule, 5-stage workflow, model responsibilities, naming policy |
 | `archive_improvements.md` | Accumulated lessons from all past sync runs |
-| `new_improvements.md` | Strictly temporary intake file during an active sync; must be deleted after promotion to `archive_improvements.md`; ignored by git |
 | `templates/` | `plan.md` / `spec.md` starters for new sync kamma threads |
 | `scripts/init_sync_thread.py` | Creates the Kamma sync thread after `scripts/cl_dps/dpd-kamma-sync` backs up DPS data |
 | `scripts/registry_helper.py` | Shared Python helper to load the registry and extract paths |

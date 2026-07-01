@@ -134,7 +134,6 @@ typescript
 # machine-local overrides stay out of git.
 .claude/settings.local.json
 .gemini/
-kamma/upstream_sync/new_improvements.md
 archive
 .roo/
 .agents/

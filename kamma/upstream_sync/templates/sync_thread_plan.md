@@ -151,7 +151,7 @@
 - [ ] Decide whether `accepted_sync.json` may be advanced.
 - [ ] If accepted, write exact FAST handoff instructions to run `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>`.
 - [ ] If final mechanical edits are needed, write exact FAST instructions and stop.
-- [ ] Review `kamma/upstream_sync/new_improvements.md` if it exists; promote accepted items to `archive_improvements.md` by FAST handoff if edits are needed.
+- [ ] Write `retrospective.md` (required before finalize); promote accepted items to `archive_improvements.md` by FAST handoff if edits are needed.
 - [ ] Prepare final commit message only after acceptance.
 
 **Final hard stop**:

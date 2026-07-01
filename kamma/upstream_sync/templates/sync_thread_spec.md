@@ -25,7 +25,7 @@ SBS, DPS, and Tamil localized additions.
 - All docs parity changes are handled through `docs_translation_plan.md`.
 - All automated sync tests pass.
 - User manually verified GoldenDict/webapp output and confirmed correct.
-- `new_improvements.md` was reviewed, valuable items were promoted, and the temporary file was deleted if present.
+- `retrospective.md` was written and any `promote` items were promoted to `archive_improvements.md`.
 - Commit messages were prepared and presented for manual execution; no autonomous commit, pull, or push was performed.
 
 For the Iron Rule, model responsibilities, handoff requirements, and subagent dispatch protocol,

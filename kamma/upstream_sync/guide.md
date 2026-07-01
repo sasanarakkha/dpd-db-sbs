@@ -321,7 +321,6 @@ The script reads `<thread_dir>/prep_manifest.json` and reports docs changes from
    - `finalize_accepted_sync.py` will refuse to run if `retrospective.md` is absent (hard code gate).
 3. **After sync**
    - If accepted, write exact FAST handoff instructions to run `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>`.
-   - Review the temporary `new_improvements.md`, promote accepted items to `archive_improvements.md`, and delete the file.
 
 ---
 

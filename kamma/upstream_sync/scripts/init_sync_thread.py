@@ -142,7 +142,8 @@ def main() -> None:
     pr.green("     Stop before Stage 2 and update handoff.md.")
     pr.green("After the sync completes:")
     pr.green(
-        "  6. Write kamma/upstream_sync/new_improvements.md with lessons from this run."
+        "  6. Write <thread_dir>/retrospective.md (copy from "
+        "kamma/upstream_sync/templates/retrospective.md) before finalize."
     )
     pr.green(
         "  7. Run `/kamma:3-review`, then `/kamma:4-finalize` to close the thread."
