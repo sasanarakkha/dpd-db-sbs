@@ -18,6 +18,7 @@
 2026-06-07 | #1 db/families/family_set_ru_update.py | changed | compiled regex to module constants, extracted _clean_translated_lines helper, atomic TSV write, -> None annotation, removed stale comments
 2026-06-07 | #2 gui2/dps_ai_service.py | changed | type hints (TYPE_CHECKING guard for DpsFields, DpdHeadword), lemma_1 or "" guard, textwrap.dedent on both prompt f-strings, synonyms via instruction var not .replace(), str(e)->e, removed WHAT comments
 2026-06-07 | #3 gui2/dps_db_helpers.py | changed | Optional[X] → X | None, removed typing.Optional import, removed coding header, inlined multi-line filter() calls
+2026-07-01 | #122 scripts/cl_dps/dpd-upstream-push | archived | outdated — replaced by dpd-upstream-push-corrections
 2026-06-08 | #4 gui2/dps_field_mapping.py | deferred | GUI work in progress on this file; revisit when done
 2026-06-08 | #5 gui2/dps_process_additions.py | changed | print()->pr.*, main()->None, encoding='utf-8' on open(), sorted(list())->sorted(), save guard try/except OSError, remove WHAT-comments
 2026-06-08 | #6 gui2/dps_process_corrections.py | changed | print()->pr.*, encoding='utf-8' on open(), try/except OSError on write, sorted(processed_ids) redundant cast, set[int]/list[int] type hints, remove WHAT-comments
@@ -128,3 +129,4 @@
 2026-07-01 | #118 scripts/cl_dps/dpd-kamma-sync | changed | echo→ask.py; fix broken BACKUP_SCRIPT path; update 3 test files' stale path; add test
 2026-07-01 | #119 scripts/cl_dps/dpd-makedict | passed | clean — 35-line bash, ask.py prompts, no issues
 2026-07-01 | #120 scripts/cl_dps/dpd-push | changed | echo/ANSI → ask.py prompts; 39→19 lines; bash syntax test added
+2026-07-01 | #121 scripts/cl_dps/dpd-review-comments | changed | echo→ask.py, anchor path, uv run python→python3, set -e; 10 structural tests added
