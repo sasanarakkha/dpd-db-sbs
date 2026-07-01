@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 135
+Pointer: 136
 
 ## Scripts (144 total, local unique_paths)
 
@@ -175,7 +175,7 @@ Pointer: 135
 - [x] 132. scripts/export/list_of_words_from_txt.py | changed (simplify make_decon_word_list, fix docstring/encoding/types, 6 regression tests)
 - [x] 133. scripts/export/list_of_words_from_txt_old.py | archived
 - [x] 134. scripts/export/save_all_sutta_names.py | archived
-- [ ] 135. scripts/export/save_all_words_alphabetically.py
+- [x] 135. scripts/export/save_all_words_alphabetically.py | archived
 - [ ] 136. scripts/export/save_all_words_sorted_by_family.py
 - [ ] 137. scripts/export/save_csv_for_audio.py
 - [ ] 138. scripts/export/save_filtered_words.py
