@@ -379,9 +379,11 @@ In `kamma/improve/log.md` (append-only history, NOT read at step 1):
 ### 6. End-of-queue
 
 If the Pointer reaches the end with no change needed (and no deferred items remain),
-report: **"Pipeline review complete — all 80 scripts passed. Queue will reset."**
-Then reset all `[x]` items back to `[ ]` and set Pointer to 1 to begin the next cycle.
-Deferred items `[>]` are reviewed before the full reset.
+report: **"Pipeline review complete — all scripts passed."**
+
+Do NOT reset the queue. The pipeline is finished. A fresh cycle is only started
+by explicit user request (e.g., a new feature or convention sweep lands and the
+user decides to re-review from the top).
 
 ---
 
