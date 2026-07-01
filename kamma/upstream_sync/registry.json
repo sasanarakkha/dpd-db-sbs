@@ -240,8 +240,6 @@
     "scripts/export/sbs_anki_revert.py",
     "scripts/export/anki_csv.py",
     "scripts/export/dps_anki_updater.py",
-    "scripts/export/extract_ebt_text.py",
-    "scripts/export/filter_from_db.py",
     "scripts/export/filtering_and_backup.py",
     "scripts/export/list_of_words_from_txt.py",
     "scripts/export/list_of_words_from_txt_old.py",
