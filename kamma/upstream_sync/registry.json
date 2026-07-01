@@ -244,7 +244,6 @@
     "scripts/export/sbs_anki_fields_check.py",
     "scripts/export/sbs_anki_templates.py",
     "scripts/export/sbs_anki_update_seed.py",
-    "scripts/export/sourse_atth_sbs_mula.py",
     "scripts/export/vocab_abbrev_pali_course.py",
     "temp/anki_decks/",
     "scripts/bash/rebuild_db.sh",
