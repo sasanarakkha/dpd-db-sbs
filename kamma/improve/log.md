@@ -146,3 +146,7 @@
 2026-07-01 | #137 scripts/export/save_csv_for_audio.py | archived | zero callers, standalone manual-run script
 2026-07-01 | #138 scripts/export/save_filtered_words.py | archived | zero callers, hardcoded attribute, no entrypoint guard, one-off manual utility
 2026-07-01 | #139 scripts/export/save_russian_for_collaborator.py | archived | zero callers, no tests, no entrypoint guard, incomplete TODO items, runs on import
+2026-07-01 | #140 scripts/export/sbs_anki_fields_check.py | passed | well-structured, has tests, follows conventions
+2026-07-01 | #141 scripts/export/sbs_anki_templates.py | passed | clean extraction script, follows conventions
+2026-07-01 | #142 scripts/export/sbs_anki_update_seed.py | passed | maintenance utility for CI seed archives, clean
+2026-07-01 | #143 scripts/export/sbs_example_dupes.py | archived | zero callers, no tests, replaces older archive copy
