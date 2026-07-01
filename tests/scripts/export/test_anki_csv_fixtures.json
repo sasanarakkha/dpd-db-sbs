@@ -1,0 +1,245 @@
+{
+  "get_common_root_examples": {
+    "empty": "",
+    "no_main_verb": "kara, gaccha",
+    "with_main_verb": "kara, passa",
+    "single": "kara"
+  },
+  "join": {
+    "empty": "",
+    "single": "hello",
+    "multiple": "foo bar baz",
+    "with_spaces": "foo-bar baz",
+    "with_none": "foo baz",
+    "all_none": ""
+  },
+  "none_to_empty": {
+    "all_strings": [
+      "a",
+      "b",
+      "c"
+    ],
+    "all_none": [
+      "",
+      ""
+    ],
+    "mixed": [
+      "a",
+      "",
+      "b",
+      ""
+    ],
+    "empty_list": []
+  },
+  "get_feedback": {
+    "dps_deck": "Нашли ошибку? <a class=\"link\" href=\"https://docs.google.com/forms/d/1iMD9sCSWFfJAFCFYuG9HRIyrr9KFRy0nAOVApM998wM/viewform?usp=pp_url&entry.438735500=kamma&entry.1433863141=DPS-26-07-01\">Пожалуйста сообщите.</a>",
+    "sbs_deck": "Spot a mistake? <a class=\"link\" href=\"https://docs.google.com/forms/d/e/1FAIpQLScNC5v2gQbBCM3giXfYIib9zrp-WMzwJuf_iVXEMX2re4BFFw/viewform?usp=pp_url&entry.438735500=kamma&entry.1433863141=SBS-26-07-01\">Fix it here.</a>",
+    "dhp_deck": "Spot a mistake? <a class=\"link\" href=\"https://docs.google.com/forms/d/e/1FAIpQLScNC5v2gQbBCM3giXfYIib9zrp-WMzwJuf_iVXEMX2re4BFFw/viewform?usp=pp_url&entry.438735500=kamma&entry.1433863141=DHP-26-07-01\">Fix it here.</a>"
+  },
+  "get_root_info": {
+    "with_rt": [
+      "√gam",
+      "to go",
+      "1",
+      "√gam",
+      "･",
+      "gaccha",
+      "a",
+      "to go",
+      "gam"
+    ],
+    "without_rt": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "get_grammar_and_meaning": {
+    "with_meaning_1": [
+      "pr",
+      "neg",
+      "kar",
+      "act",
+      "acc",
+      "to do",
+      "lit. to carry"
+    ],
+    "with_meaning_2": [
+      "pr",
+      "neg",
+      "kar",
+      "act",
+      "acc",
+      "alternative meaning",
+      null
+    ]
+  },
+  "get_construction": {
+    "with_construction": [
+      "kar + a",
+      "√",
+      "a",
+      "kar + a → kara",
+      "tappurisa",
+      "kamma + dha"
+    ],
+    "without_construction": [
+      null,
+      "",
+      "",
+      null,
+      "",
+      ""
+    ]
+  },
+  "get_sbs_info": {
+    "with_sbs_chapter": [
+      "AN 1.1<br>line2",
+      "AN 1.1<br>continuation",
+      "Example text<br>more",
+      "Karaṇīya-metta-sutta",
+      "The Karaniya Sutta",
+      "1",
+      null,
+      null,
+      null,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      null,
+      "Some note<br>with newline"
+    ],
+    "empty_sbs_fields": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Some note<br>with newline"
+    ],
+    "no_sbs": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "opposite",
+      "same",
+      "var",
+      "com",
+      null
+    ]
+  },
+  "get_paritta_source": {
+    "chant_in_first": [
+      "Khp 1",
+      "Khp 1",
+      "Karaṇīya-metta-sutta example text"
+    ],
+    "chant_in_second": [
+      "Khp 5",
+      "Khp 5",
+      "Ratana-sutta example"
+    ],
+    "no_chant_match": [
+      null,
+      null,
+      null
+    ],
+    "sbs_is_none": [
+      null,
+      null,
+      null
+    ]
+  },
+  "get_example_for_class": {
+    "class_example_priority": [
+      "Class Src",
+      "Class Sut",
+      "class example text"
+    ],
+    "sbs1_example": [
+      "SBS1 Src",
+      "SBS1 Sut",
+      "sbs1 example"
+    ],
+    "fallback_source_1": [
+      "Src1",
+      "Sutta1",
+      "Ex1"
+    ],
+    "fallback_source_2": [
+      "Src2",
+      "Sutta2",
+      "Ex2"
+    ],
+    "no_fallback": [
+      null,
+      null,
+      null
+    ],
+    "sbs_is_none": [
+      null,
+      null,
+      null
+    ]
+  },
+  "get_unique_example_2": {
+    "unique_found": [
+      "AN 2",
+      "AN 2.1",
+      "A very different sentence about something else."
+    ],
+    "similar_skipped": [
+      null,
+      null,
+      null
+    ],
+    "all_empty": [
+      null,
+      null,
+      null
+    ],
+    "sbs_is_none": [
+      null,
+      null,
+      null
+    ]
+  },
+  "get_grammar_and_meaning_all_none": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+  ]
+}

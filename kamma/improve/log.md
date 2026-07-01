@@ -5,6 +5,7 @@
 > prior precedent). One terse line per decision; full rationale lives in commit messages.
 
 <!-- Format: YYYY-MM-DD | #N script | passed / changed / skipped / deferred | note -->
+2026-07-01 | #127 scripts/export/anki_csv.py | changed | fixed root_key NameError in 3 functions, removed dead-code loop in classes(), simplified none_to_empty, modernised type hints; added 14 golden-master tests
 2026-06-28 | #31 scripts/moving/copy_dpd_for_classes.py | merged into distribute.py | safe_copy() promoted to public helper, _task_copy_dpd_for_classes() added to TASKS, dpd-makedict caller updated, 5 safe_copy tests + 3 task tests merged into test_distribute.py (32 total), test_copy_dpd_for_classes.py deleted
 2026-06-28 | #94 db/backup_tsv/backup_all.py | archived | only caller (check_new_words.sh) is already archived; no active usage
 2026-06-28 | #95 scripts/bash/check_new_words.sh | archived | already moved to scripts/dps_archive/ in commit 3679d5439; queue was stale

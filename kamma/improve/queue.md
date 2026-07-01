@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 127
+Pointer: 128
 
 ## Scripts (144 total, local unique_paths)
 
@@ -167,7 +167,7 @@ Pointer: 127
 
 ### scripts/export (additional)
 
-- [ ] 127. scripts/export/anki_csv.py
+- [x] 127. scripts/export/anki_csv.py | changed
 - [ ] 128. scripts/export/dps_anki_updater.py
 - [ ] 129. scripts/export/extract_ebt_text.py
 - [ ] 130. scripts/export/filter_from_db.py

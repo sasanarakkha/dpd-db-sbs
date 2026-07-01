@@ -14,29 +14,24 @@ Export db into csv for various anki decks
 """
 
 import csv
-import re
-import os
-
-from typing import List
-from sqlalchemy import func
-
-from db.models import DpdHeadword, SBS, DpdRoot
-from db.db_helpers import get_db_session
-
-from tools.pali_sort_key import pali_sort_key
-from tools.paths_dps import DPSPaths
-from tools.paths import ProjectPaths
-from tools.printer import printer as pr
 import datetime
+import os
+import re
 
+from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
-from tools.sbs_table_functions import SBS_table_tools, paragraphs_are_similar_sbs
+from db.db_helpers import get_db_session
+from db.models import SBS, DpdHeadword, DpdRoot
 from tools.clean_machine import clean_machine
+from tools.pali_sort_key import pali_sort_key
+from tools.paths import ProjectPaths
+from tools.paths_dps import DPSPaths
+from tools.printer import printer as pr
+from tools.sbs_table_functions import SBS_table_tools, paragraphs_are_similar_sbs
 
-
-current_date = datetime.date.today().strftime("%m-%d")
-current_date_year = datetime.date.today().strftime("%y-%m-%d")
+current_date = datetime.datetime.now(datetime.UTC).date().strftime("%m-%d")
+current_date_year = datetime.datetime.now(datetime.UTC).date().strftime("%y-%m-%d")
 
 sbs_ped_link = 'Spot a mistake? <a class="link" href="https://docs.google.com/forms/d/e/1FAIpQLScNC5v2gQbBCM3giXfYIib9zrp-WMzwJuf_iVXEMX2re4BFFw/viewform?usp=pp_url&entry.438735500'
 
@@ -161,7 +156,7 @@ def common_roots(db_session, dpspth):
     if dpspth.sbs_anki_style_dir.exists():
         pr.green("Saving field list to sbs directory.")
         field_list_path = dpspth.sbs_anki_style_dir / "field-list-common-roots.md"
-        with open(field_list_path, "w") as file:
+        with open(field_list_path, "w", encoding="utf-8") as file:
             columns_with_marks = columns_names + ["marks"]
             file.write("# Field List: Common Roots\n\n```\n")
             file.write("\n".join(columns_with_marks))
@@ -202,16 +197,9 @@ def join(*args):
     )
 
 
-def none_to_empty(values: List):
+def none_to_empty(values: list) -> list:
     """Replace None with empty string."""
-
-    def _to_empty(x):
-        if x is None:
-            return ""
-        else:
-            return x
-
-    return list(map(_to_empty, values))
+    return ["" if x is None else x for x in values]
 
 
 def get_feedback(i: DpdHeadword, deck_name):
@@ -224,19 +212,18 @@ def get_feedback(i: DpdHeadword, deck_name):
 
 def get_root_info(i: DpdHeadword):
     """Get all root data with keys from a DpdHeadword object."""
-    if i.rt is not None:
-        root_key = re.sub(r" \d*$", "", i.root_key)
+    root_key = re.sub(r" \d*$", "", i.root_key) if i.rt is not None else None
 
     return [
-        i.rt.sanskrit_root if i.rt else None,
-        i.rt.sanskrit_root_meaning if i.rt else None,
-        i.rt.sanskrit_root_class if i.rt else None,
-        root_key if i.rt else None,
-        i.rt.root_has_verb if i.rt else None,
-        i.rt.root_group if i.rt else None,
-        i.root_sign if i.rt else None,
-        i.rt.root_meaning if i.rt else None,
-        i.root_base if i.rt else None,
+        i.rt.sanskrit_root if i.rt is not None else None,
+        i.rt.sanskrit_root_meaning if i.rt is not None else None,
+        i.rt.sanskrit_root_class if i.rt is not None else None,
+        root_key,
+        i.rt.root_has_verb if i.rt is not None else None,
+        i.rt.root_group if i.rt is not None else None,
+        i.root_sign if i.rt is not None else None,
+        i.rt.root_meaning if i.rt is not None else None,
+        i.root_base if i.rt is not None else None,
     ]
 
 
@@ -294,7 +281,7 @@ def get_sbs_info(i: DpdHeadword):
     return sbs_info
 
 
-def get_paritta_source(i: DpdHeadword, chant_names: List[str]):
+def get_paritta_source(i: DpdHeadword, chant_names: list[str]):
     """Get Paritta source info from SBS info in a DpdHeadword object."""
     sbs_sources = [i.sbs.sbs_source_1, i.sbs.sbs_source_2]
     sbs_suttas = [i.sbs.sbs_sutta_1, i.sbs.sbs_sutta_2]
@@ -345,7 +332,7 @@ def get_example_for_class(sbs: SBS, i: DpdHeadword):
         return None, None, None
 
 
-def get_unique_example_2(sbs: SBS):
+def get_unique_example_2(sbs: SBS | None):
     """
     Checks i.sbs.class_example against other example fields for similarity (factor 0.7).
     Returns the source, sutta, and example of the first unique instance found
@@ -372,23 +359,23 @@ def get_unique_example_2(sbs: SBS):
         if current_example:
             current_example_cleaned = clean_machine(current_example)
 
-            if current_example_cleaned and class_example_cleaned:
-                if not paragraphs_are_similar_sbs(
+            if (
+                current_example_cleaned
+                and class_example_cleaned
+                and not paragraphs_are_similar_sbs(
                     class_example_cleaned, current_example_cleaned, 0.7
+                )
+            ):
+                if (
+                    class_example_cleaned in current_example_cleaned
+                    or current_example_cleaned in class_example_cleaned
                 ):
-                    if class_example_cleaned in current_example_cleaned:
-                        continue
-                    elif current_example_cleaned in class_example_cleaned:
-                        continue
-                    return (
-                        current_source.replace("\n", "<br>")
-                        if current_source
-                        else None,
-                        current_sutta.replace("\n", "<br>") if current_sutta else None,
-                        current_example.replace("\n", "<br>")
-                        if current_example
-                        else None,
-                    )
+                    continue
+                return (
+                    current_source.replace("\n", "<br>") if current_source else None,
+                    current_sutta.replace("\n", "<br>") if current_sutta else None,
+                    current_example.replace("\n", "<br>") if current_example else None,
+                )
 
     return None, None, None
 
@@ -437,7 +424,7 @@ def dhp(dpspth, dpd_db):
         "marks",
     ]
 
-    def dhp_row(i: DpdHeadword) -> List[str]:
+    def dhp_row(i: DpdHeadword) -> list[str]:
         fields = [
             i.id,
             i.lemma_1,
@@ -473,7 +460,7 @@ def dhp(dpspth, dpd_db):
     if dpspth.sbs_anki_style_dir.exists():
         pr.green("Saving field list to sbs directory.")
         field_list_path = dpspth.sbs_anki_style_dir / "field-list-dhp.md"
-        with open(field_list_path, "w") as file:
+        with open(field_list_path, "w", encoding="utf-8") as file:
             file.write("# Field List: Dhp\n\n```\n")
             file.write("\n".join(columns_names))
             file.write("\n```\n")
@@ -542,7 +529,7 @@ def sbs_per(dpspth, dpd_db):
         "marks",
     ]
 
-    def sbs_row(i: DpdHeadword) -> List[str]:
+    def sbs_row(i: DpdHeadword) -> list[str]:
         tags = join(
             i.sbs.sbs_chant_pali_1,
             i.sbs.sbs_chant_pali_2,
@@ -583,7 +570,7 @@ def sbs_per(dpspth, dpd_db):
     if dpspth.sbs_anki_style_dir.exists():
         pr.green("Saving field list to sbs directory.")
         field_list_path = dpspth.sbs_anki_style_dir / "field-list-sbs.md"
-        with open(field_list_path, "w") as file:
+        with open(field_list_path, "w", encoding="utf-8") as file:
             file.write("# Field List: SBS Vocab\n\n```\n")
             file.write("\n".join(columns_names))
             file.write("\n```\n")
@@ -628,20 +615,19 @@ def parittas(dpspth, dpd_db):
         "marks",
     ]
 
-    def parittas_row(i: DpdHeadword, chant_names) -> List[str]:
-        if i.rt is not None:
-            root_key = re.sub(r" \d*$", "", i.root_key)
+    def parittas_row(i: DpdHeadword, chant_names) -> list[str]:
+        root_key = re.sub(r" \d*$", "", i.root_key) if i.rt is not None else None
         fields = [
             i.id,
             i.lemma_1,
             i.grammar,
             i.meaning_1 if i.meaning_1 else i.meaning_2,
             i.meaning_lit,
-            root_key if i.rt else None,
-            i.rt.root_group if i.rt else None,
-            i.root_sign if i.rt else None,
-            i.rt.root_meaning if i.rt else None,
-            i.root_base if i.rt else None,
+            root_key,
+            i.rt.root_group if i.rt is not None else None,
+            i.root_sign if i.rt is not None else None,
+            i.rt.root_meaning if i.rt is not None else None,
+            i.root_base if i.rt is not None else None,
             i.construction.replace("\n", "<br>") if i.construction else None,
             *get_paritta_source(i, chant_names),
             SBS_table_tools().generate_sbs_audio(i.lemma_clean),
@@ -667,7 +653,7 @@ def parittas(dpspth, dpd_db):
     if dpspth.sbs_anki_style_dir.exists():
         pr.green("Saving field list to sbs directory.")
         field_list_path = dpspth.sbs_anki_style_dir / "field-list-parittas.md"
-        with open(field_list_path, "w") as file:
+        with open(field_list_path, "w", encoding="utf-8") as file:
             file.write("# Field List: Parittas\n\n```\n")
             file.write("\n".join(columns_names))
             file.write("\n```\n")
@@ -742,7 +728,7 @@ def dps(dpspth, dpd_db):
         "marks",
     ]
 
-    def dps_row(i: DpdHeadword) -> List[str]:
+    def dps_row(i: DpdHeadword) -> list[str]:
         source, sutta, example = get_example_for_class(i.sbs, i)
         if i.source_1:
             source = i.source_1.replace("\n", "<br>")
@@ -751,8 +737,7 @@ def dps(dpspth, dpd_db):
         if i.example_1:
             example = i.example_1.replace("\n", "<br>")
 
-        if i.rt is not None:
-            root_key = re.sub(r" \d*$", "", i.root_key)
+        root_key = re.sub(r" \d*$", "", i.root_key) if i.rt is not None else None
 
         fields = [
             i.id,
@@ -762,17 +747,17 @@ def dps(dpspth, dpd_db):
             i.ru.ru_meaning_lit if i.ru else None,
             i.sbs.sbs_meaning if i.sbs else None,
             i.sanskrit,
-            i.rt.sanskrit_root if i.rt else None,
-            i.rt.sanskrit_root_meaning if i.rt else None,
-            i.rt.sanskrit_root_ru_meaning if i.rt else None,
-            i.rt.sanskrit_root_class if i.rt else None,
-            root_key if i.rt else None,
-            i.rt.root_has_verb if i.rt else None,
-            i.rt.root_group if i.rt else None,
-            i.root_sign if i.rt else None,
-            i.rt.root_meaning if i.rt else None,
-            i.rt.root_ru_meaning if i.rt else None,
-            i.root_base if i.rt else None,
+            i.rt.sanskrit_root if i.rt is not None else None,
+            i.rt.sanskrit_root_meaning if i.rt is not None else None,
+            i.rt.sanskrit_root_ru_meaning if i.rt is not None else None,
+            i.rt.sanskrit_root_class if i.rt is not None else None,
+            root_key if i.rt is not None else None,
+            i.rt.root_has_verb if i.rt is not None else None,
+            i.rt.root_group if i.rt is not None else None,
+            i.root_sign if i.rt is not None else None,
+            i.rt.root_meaning if i.rt is not None else None,
+            i.rt.root_ru_meaning if i.rt is not None else None,
+            i.root_base if i.rt is not None else None,
             *get_construction(i),
             source,
             sutta,
@@ -809,7 +794,7 @@ def dps(dpspth, dpd_db):
     if dpspth.sbs_anki_style_dir.exists():
         pr.green("Saving field list to sbs directory.")
         field_list_path = dpspth.sbs_anki_style_dir / "field-list-dps.md"
-        with open(field_list_path, "w") as file:
+        with open(field_list_path, "w", encoding="utf-8") as file:
             file.write("# Field List: Dps\n\n```\n")
             file.write("\n".join(columns_names))
             file.write("\n```\n")
@@ -874,7 +859,7 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
         "marks",
     ]
 
-    def classes_row(i: DpdHeadword) -> List[str]:
+    def classes_row(i: DpdHeadword) -> list[str]:
         source, sutta, example = get_example_for_class(i.sbs, i)
 
         fields = [
@@ -918,17 +903,10 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
         with open(output_path, "w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f, delimiter="\t")
             writer.writerows(
-                (
-                    classes_row(i)
-                    for i in dpd_db
-                    if _is_needed(i) and i.sbs.class_anki == sbs_class_value
-                )
+                classes_row(i)
+                for i in dpd_db
+                if _is_needed(i) and i.sbs.class_anki == sbs_class_value
             )
-    # Corrected path for individual class files within the 'classes' subdirectory
-    for sbs_class_value in unique_sbs_class_values:
-        output_path = os.path.join(output_dir, f"class_{sbs_class_value}.csv")
-        # ... rest of the writing logic for individual class files
-
     # Save all basic classes to csv
     all_sbs_class_values = [
         value for value in unique_sbs_class_values if 1 <= value <= 29
@@ -949,7 +927,7 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
     pr.green(f"{len(all_classes_list)} rows has been saved to class_all.csv")
 
     # Save ru for all basic classes to csv
-    def ru_classes_row(i: DpdHeadword) -> List[str]:
+    def ru_classes_row(i: DpdHeadword) -> list[str]:
         fields = [
             i.id,
         ]
@@ -985,7 +963,7 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
         writer.writerows(rows_total_list)
 
     # Save class_upcoming to a CSV file
-    all_classes_set = set((tuple(row) for row in all_classes_list))
+    all_classes_set = {tuple(row) for row in all_classes_list}
     rows_upcoming = [
         row for row in rows_total_list if tuple(row) not in all_classes_set
     ]
@@ -998,7 +976,7 @@ def classes(dpspth, dpd_db, unique_sbs_class_values):
     if dpspth.sbs_anki_style_dir.exists():
         pr.green("Saving field list to sbs directory.")
         field_list_path = dpspth.sbs_anki_style_dir / "field-list-vocab-class.md"
-        with open(field_list_path, "w") as file:
+        with open(field_list_path, "w", encoding="utf-8") as file:
             file.write("# Field List: Vocab Class\n\n```\n")
             file.write("\n".join(columns_names))
             file.write("\n```\n")
@@ -1056,7 +1034,7 @@ def suttas(dpspth, dpd_db):
         "marks",
     ]
 
-    def suttas_row(i: DpdHeadword) -> List[str]:
+    def suttas_row(i: DpdHeadword) -> list[str]:
         fields = [
             i.id,
             i.lemma_1,
@@ -1097,7 +1075,7 @@ def suttas(dpspth, dpd_db):
     if dpspth.sbs_anki_style_dir.exists():
         pr.green("Saving field list to sbs directory.")
         field_list_path = dpspth.sbs_anki_style_dir / "field-list-suttas-class.md"
-        with open(field_list_path, "w") as file:
+        with open(field_list_path, "w", encoding="utf-8") as file:
             file.write("# Field List: Suttas Class\n\n```\n")
             file.write("\n".join(columns_names))
             file.write("\n```\n")
@@ -1162,7 +1140,7 @@ def root_phonetic_class(dpspth, dpd_db, unique_sbs_class_values):
         "marks",
     ]
 
-    def root_phonetic_row(i: DpdHeadword) -> List[str]:
+    def root_phonetic_row(i: DpdHeadword) -> list[str]:
         source, sutta, example = get_example_for_class(i.sbs, i)
         source_2, sutta_2, example_2 = get_unique_example_2(i.sbs)
         fields = [
@@ -1235,7 +1213,7 @@ def root_phonetic_class(dpspth, dpd_db, unique_sbs_class_values):
     if dpspth.sbs_anki_style_dir.exists():
         pr.green("Saving field list to sbs directory.")
         field_list_path = dpspth.sbs_anki_style_dir / "field-list-roots-class.md"
-        with open(field_list_path, "w") as file:
+        with open(field_list_path, "w", encoding="utf-8") as file:
             file.write("# Field List: Roots Class\n\n```\n")
             file.write("\n".join(columns_names))
             file.write("\n```\n")
@@ -1294,7 +1272,7 @@ def vibhanga(dpspth, dpd_db):
         "marks",
     ]
 
-    def vibhanga_row(i: DpdHeadword) -> List[str]:
+    def vibhanga_row(i: DpdHeadword) -> list[str]:
         fields = [
             i.id,
             i.lemma_1,
@@ -1360,7 +1338,7 @@ def vibhanga(dpspth, dpd_db):
     if dpspth.sbs_anki_style_dir.exists():
         pr.green("Saving field list to sbs directory.")
         field_list_path = dpspth.sbs_anki_style_dir / "field-list-vibhanga.md"
-        with open(field_list_path, "w") as file:
+        with open(field_list_path, "w", encoding="utf-8") as file:
             file.write("# Field List: Vibhanga\n\n```\n")
             file.write("\n".join(columns_names))
             file.write("\n```\n")
@@ -1384,7 +1362,7 @@ def native(dpspth, dpd_db):
         )
 
     # Save ru for all sbs decks
-    def ru_row(i: DpdHeadword) -> List[str]:
+    def ru_row(i: DpdHeadword) -> list[str]:
         if i.ru.ru_meaning_lit:
             ru_meaning = i.ru.ru_meaning + "; досл. " + i.ru.ru_meaning_lit
         else:
