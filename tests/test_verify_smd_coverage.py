@@ -3,14 +3,15 @@
 from pathlib import Path
 
 import pytest
+
 from kamma.upstream_sync.scripts.sync_schema import RegistryData
 from kamma.upstream_sync.scripts.verify_smd_coverage import (
     check_category_alignment,
+    check_rubric,
     check_unregistered_smd_entries,
     collect_registry_paths,
     extract_all_smd_entries,
     extract_smd_entries,
-    check_rubric,
 )
 
 
@@ -140,7 +141,7 @@ def test_collect_registry_paths_includes_tamil_copies() -> None:
 
 def test_check_category_alignment_rejects_smd_registry_mismatch() -> None:
     smd_entries: dict[str, dict[str, object]] = {
-        "scripts/backup/backup_dps.py": {
+        "db/backup_tsv/backup_dps.py": {
             "category": "sbs_copy",
             "sync_rule": "PORT",
             "local_changes_count": 2,
@@ -149,12 +150,12 @@ def test_check_category_alignment_rejects_smd_registry_mismatch() -> None:
     }
 
     violations = check_category_alignment(
-        [("scripts/backup/backup_dps.py", "dps_copies")],
+        [("db/backup_tsv/backup_dps.py", "dps_copies")],
         smd_entries,
     )
 
     assert violations == [
-        "  [dps_copies] scripts/backup/backup_dps.py: SMD category is 'sbs_copy'"
+        "  [dps_copies] db/backup_tsv/backup_dps.py: SMD category is 'sbs_copy'"
     ]
 
 

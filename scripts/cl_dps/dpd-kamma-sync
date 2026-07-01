@@ -5,7 +5,7 @@ set -euo pipefail
 PROJECT_DIR="$HOME/Documents/dpd-db"
 cd "$PROJECT_DIR"
 
-BACKUP_SCRIPT="scripts/backup/backup_dps.py"
+BACKUP_SCRIPT="db/backup_tsv/backup_dps.py"
 INIT_SCRIPT="kamma/upstream_sync/scripts/init_sync_thread.py"
 BACKUP_FILES=(
     db/backup_tsv/russian.tsv
@@ -17,33 +17,33 @@ BACKUP_COMMIT_MESSAGE="backup dps data"
 
 CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 if [ "$CURRENT_BRANCH" != "sbs-ru" ]; then
-    echo "❌ Error: Wrong branch '$CURRENT_BRANCH'. Switch to sbs-ru before running this script."
+    uv run tools/ask.py --print -c red "❌ Error: Wrong branch '$CURRENT_BRANCH'. Switch to sbs-ru before running this script."
     exit 1
 fi
 
 if [ -f "$BACKUP_SCRIPT" ]; then
     if ! git diff --cached --quiet; then
-        echo "❌ Error: staged changes already exist. Commit or unstage them before running this script."
+        uv run tools/ask.py --print -c red "❌ Error: staged changes already exist. Commit or unstage them before running this script."
         exit 1
     fi
 
     uv run python3 "$BACKUP_SCRIPT"
 
     if git diff --quiet -- "${BACKUP_FILES[@]}"; then
-        echo "DPS backup complete. No backup TSV changes to commit."
+        uv run tools/ask.py --print -c green "DPS backup complete. No backup TSV changes to commit."
     else
         git add "${BACKUP_FILES[@]}"
         git commit -m "$BACKUP_COMMIT_MESSAGE"
-        echo "DPS backup committed: $BACKUP_COMMIT_MESSAGE"
+        uv run tools/ask.py --print -c green "DPS backup committed: $BACKUP_COMMIT_MESSAGE"
     fi
 else
-    echo "❌ Error: $BACKUP_SCRIPT not found in $PROJECT_DIR"
+    uv run tools/ask.py --print -c red "❌ Error: $BACKUP_SCRIPT not found in $PROJECT_DIR"
     exit 1
 fi
 
 if [ -f "$INIT_SCRIPT" ]; then
     uv run python3 "$INIT_SCRIPT"
 else
-    echo "❌ Error: $INIT_SCRIPT not found in $PROJECT_DIR"
+    uv run tools/ask.py --print -c red "❌ Error: $INIT_SCRIPT not found in $PROJECT_DIR"
     exit 1
 fi

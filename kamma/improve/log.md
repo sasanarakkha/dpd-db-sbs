@@ -123,3 +123,5 @@
 2026-06-28 | #112 scripts/bash/update_decks.sh | changed | echo→ask.py --print -c, add docstring
 2026-07-01 | #114 scripts/cl_dps/decks | skipped | zero callers, not in registry, machine-specific deps; user chose skip
 2026-07-01 | #115 scripts/cl_dps/dpd-anki | changed | ask.py prompts, set -euo pipefail, run() helper, python→python3, case flatten; test added
+2026-07-01 | #116 scripts/cl_dps/dpd-build-db | passed | clean — 18-line wrapper, consistent with cl_dps pattern, no issues
+2026-07-01 | #117 scripts/cl_dps/dpd-gui2 | passed | clean — 15-line wrapper, consistent cl_dps pattern, no issues
