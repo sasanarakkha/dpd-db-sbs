@@ -1,21 +1,22 @@
 #!/bin/bash
+set -euo pipefail
 
 # This script is running update_decks.sh
 
 PROJECT_DIR="$HOME/Documents/dpd-db"
 
-response=$(uv run python "$PROJECT_DIR/tools/ask.py" "Do you want to attempt to mount the fileserver?") || exit 1
-if [[ $response == "y" ]]; then
+answer=$(uv run tools/ask.py "Do you want to attempt to mount the fileserver?") || exit 1
+if [[ $answer == "y" ]]; then
     mnt
 fi
 
-cd "$PROJECT_DIR"
+cd "$PROJECT_DIR" || exit 1
 
 uv run bash scripts/bash/update_decks.sh
 
 cd
 
-response=$(uv run python "$PROJECT_DIR/tools/ask.py" "Do you want to umount the fileserver?") || exit 1
-if [[ $response == "y" ]]; then
+answer=$(uv run tools/ask.py "Do you want to umount the fileserver?") || exit 1
+if [[ $answer == "y" ]]; then
     umnt
 fi

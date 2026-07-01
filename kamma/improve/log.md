@@ -121,7 +121,7 @@
 2026-06-28 | #110 scripts/bash/download_grammar.sh | changed | echo→ask.py wrapper; curl --head replaces ping; simplify URL; anchor REPO_ROOT; add set -e; 14 structural tests
 2026-06-28 | #111 scripts/bash/push_dpd.sh | changed | echo/ANSI→ask.py; extract 6 while/read/case blocks into ask_run() helper; 114→23 lines
 2026-06-28 | #112 scripts/bash/update_decks.sh | changed | echo→ask.py --print -c, add docstring
-2026-07-01 | #114 scripts/cl_dps/decks | skipped | zero callers, not in registry, machine-specific deps; user chose skip
+2026-07-01 | #114 scripts/cl_dps/decks | changed (reevaluated) | set -euo pipefail, uv run python→tools/ask.py, cd error check; 9 structural tests
 2026-07-01 | #115 scripts/cl_dps/dpd-anki | changed | ask.py prompts, set -euo pipefail, run() helper, python→python3, case flatten; test added
 2026-07-01 | #116 scripts/cl_dps/dpd-build-db | passed | clean — 18-line wrapper, consistent with cl_dps pattern, no issues
 2026-07-01 | #117 scripts/cl_dps/dpd-gui2 | passed | clean — 15-line wrapper, consistent cl_dps pattern, no issues

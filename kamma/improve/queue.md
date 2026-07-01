@@ -151,7 +151,7 @@ Pointer: 119
 > Personal CLI commands invoked from PATH. Zero grep callers is expected —
 > do not flag for archiving on that basis. Review for quality improvements instead.
 
-- [x] 114. scripts/cl_dps/decks | skipped
+- [x] 114. scripts/cl_dps/decks | changed
 - [x] 115. scripts/cl_dps/dpd-anki | changed
 - [x] 116. scripts/cl_dps/dpd-build-db | passed
 - [x] 117. scripts/cl_dps/dpd-gui2 | passed
