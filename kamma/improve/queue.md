@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 114
+Pointer: 116
 
 ## Scripts (144 total, local unique_paths)
 
@@ -148,8 +148,8 @@ Pointer: 114
 
 ### scripts/cl_dps
 
-- [ ] 114. scripts/cl_dps/decks
-- [ ] 115. scripts/cl_dps/dpd-anki
+- [x] 114. scripts/cl_dps/decks | skipped
+- [x] 115. scripts/cl_dps/dpd-anki | changed
 - [ ] 116. scripts/cl_dps/dpd-build-db
 - [ ] 117. scripts/cl_dps/dpd-gui2
 - [ ] 118. scripts/cl_dps/dpd-kamma-sync
