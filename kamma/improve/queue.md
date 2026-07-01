@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 146
+Pointer: 147
 
 ## Scripts (144 total, local unique_paths)
 
@@ -189,4 +189,4 @@ Pointer: 146
 
 ### tools (additional)
 
-- [ ] 146. tools/meaning_snapshot_ru.py
+- [x] 146. tools/meaning_snapshot_ru.py | passed

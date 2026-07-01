@@ -152,3 +152,4 @@
 2026-07-01 | #143 scripts/export/sbs_example_dupes.py | archived | zero callers, no tests, replaces older archive copy
 2026-07-01 | #144 scripts/export/sourse_atth_sbs_mula.py | archived | zero callers, unused orphan utility
 2026-07-01 | #145 scripts/export/vocab_abbrev_pali_course.py | changed | portable default output-dir using Path.home(), narrow blind exception catch
+2026-07-01 | #146 tools/meaning_snapshot_ru.py | passed | clean — 122 lines, modern types, pathlib, all imports used, has tests, no dead code
