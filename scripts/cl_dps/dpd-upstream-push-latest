@@ -48,7 +48,7 @@ git commit -m "$COMMIT_MSG"
 uv run tools/ask.py --print -c cyan "Files committed:"
 git diff --name-only HEAD^ HEAD
 
-confirm=$(uv run tools/ask.py -c yellow "Push to upstream remote? [Press enter to push, q to abort] ")
+uv run tools/ask.py -c yellow "Push to upstream remote? [Press enter to push, q to abort] "
 
 uv run tools/ask.py --print -c green "Pushing to upstream..."
 git push upstream as_upstream:main
