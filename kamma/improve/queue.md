@@ -148,6 +148,9 @@ Pointer: 116
 
 ### scripts/cl_dps
 
+> Personal CLI commands invoked from PATH. Zero grep callers is expected —
+> do not flag for archiving on that basis. Review for quality improvements instead.
+
 - [x] 114. scripts/cl_dps/decks | skipped
 - [x] 115. scripts/cl_dps/dpd-anki | changed
 - [ ] 116. scripts/cl_dps/dpd-build-db
