@@ -1,18 +1,19 @@
 #!/bin/bash
+# dpd-review-comments — run corrections review then additions review sequentially.
 
-# This script runs the corrections and additions review scripts one after another.
+set -e
 
-# Determine the directory of this script
-PROJECT_ROOT="$HOME/Documents/dpd-db"
+PROJECT_ROOT="$(dirname "$(realpath "$0")")/../.."
 
-echo "----------------------------------------"
-echo "Step 1: Reviewing Corrections"
-echo "----------------------------------------"
-cd "${PROJECT_ROOT}" && uv run python gui2/dps_process_corrections.py
+uv run tools/ask.py --print -c cyan "──────────────────────────────────────────"
+uv run tools/ask.py --print -c cyan "Step 1: Reviewing Corrections"
+uv run tools/ask.py --print -c cyan "──────────────────────────────────────────"
+cd "${PROJECT_ROOT}" && uv run python3 gui2/dps_process_corrections.py
 
-echo -e "\n----------------------------------------"
-echo "Step 2: Reviewing Additions"
-echo "----------------------------------------"
-cd "${PROJECT_ROOT}" && uv run python gui2/dps_process_additions.py
+uv run tools/ask.py --print -c cyan ""
+uv run tools/ask.py --print -c cyan "──────────────────────────────────────────"
+uv run tools/ask.py --print -c cyan "Step 2: Reviewing Additions"
+uv run tools/ask.py --print -c cyan "──────────────────────────────────────────"
+cd "${PROJECT_ROOT}" && uv run python3 gui2/dps_process_additions.py
 
-echo -e "\nAll reviews completed."
+uv run tools/ask.py --print -c green "All reviews completed."
