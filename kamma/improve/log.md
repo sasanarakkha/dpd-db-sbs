@@ -125,3 +125,4 @@
 2026-07-01 | #115 scripts/cl_dps/dpd-anki | changed | ask.py prompts, set -euo pipefail, run() helper, python→python3, case flatten; test added
 2026-07-01 | #116 scripts/cl_dps/dpd-build-db | passed | clean — 18-line wrapper, consistent with cl_dps pattern, no issues
 2026-07-01 | #117 scripts/cl_dps/dpd-gui2 | passed | clean — 15-line wrapper, consistent cl_dps pattern, no issues
+2026-07-01 | #118 scripts/cl_dps/dpd-kamma-sync | changed | echo→ask.py; fix broken BACKUP_SCRIPT path; update 3 test files' stale path; add test
