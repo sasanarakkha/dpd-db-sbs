@@ -15,6 +15,12 @@ This directory follows a "Wrapper Alias" pattern:
 
 ## Interface
 - **Start GUI:** `scripts/cl/dpd-gui`
+- **Start GUI (v2):** `scripts/cl/dpd-gui2`
 - **Build DB:** `scripts/cl/dpd-build-db`
 - **Start WebApp:** `scripts/cl/dpd-webapp`
-(etc.)
+- **Make dict:** `scripts/cl/dpd-makedict`
+- **Anki export:** `scripts/cl/dpd-anki`
+- **Bhashini export:** `scripts/cl/dpd-bhashini`
+- **Find examples:** `scripts/cl/dpd-example`
+- **Sandhi analysis:** `scripts/cl/dpd-sandhi`
+- **Kill webapp:** `scripts/cl/dpd-kill-webapp`

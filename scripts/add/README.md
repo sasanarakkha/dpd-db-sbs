@@ -17,4 +17,8 @@ Scripts in this folder follow a "Staging and Ingestion" pattern:
 
 ## Interface
 - **Process Additions:** `uv run python scripts/add/add_additions_to_db.py`
-- **Targeted Additions:** Use scripts like `add_words_ebts.py` when focusing on specific literary layers.
+- **From commentaries:** `uv run python scripts/add/add_words_commentaries.py`
+- **From EBTs:** `uv run python scripts/add/add_words_ebts.py`
+- **From example/commentary columns:** `uv run python scripts/add/add_words_from_egs_&_commentary_columns.py`
+- **Random additions:** `uv run python scripts/add/add_words_random.py`
+- **Vagga codes:** `scripts/add/vagga_codes/`

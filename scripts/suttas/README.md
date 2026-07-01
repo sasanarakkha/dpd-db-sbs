@@ -16,6 +16,11 @@ This subsystem follows a "Corpus Alignment" pattern, organized by source:
 - **Display:** This data powers the "Sutta" and "Source" buttons in the **Exporters** and **WebApp**.
 
 ## Interface
-Each source has its own management logic. For SuttaCentral metadata:
-- `uv run python scripts/suttas/sc/suttas.py`
-- `uv run python scripts/suttas/sc/blurbs.py`
+Each source has its own management logic:
+- **SuttaCentral:** `uv run python scripts/suttas/sc/suttas.py` / `sc/blurbs.py`
+- **BJT:** `scripts/suttas/bjt/`
+- **CST:** `scripts/suttas/cst/`
+- **DPR:** `scripts/suttas/dpr/`
+- **Vaggas:** `scripts/suttas/vaggas/`
+- **Internal:** `scripts/suttas/dpd/`
+- **Alias detection:** `uv run python scripts/suttas/find_sutta_alias_candidates.py`
