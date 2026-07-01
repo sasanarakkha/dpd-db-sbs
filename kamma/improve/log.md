@@ -145,3 +145,4 @@
 2026-07-01 | #136 scripts/export/save_all_words_sorted_by_family.py | archived | zero callers, no entrypoint guard, no tests, module-level side effects on import
 2026-07-01 | #137 scripts/export/save_csv_for_audio.py | archived | zero callers, standalone manual-run script
 2026-07-01 | #138 scripts/export/save_filtered_words.py | archived | zero callers, hardcoded attribute, no entrypoint guard, one-off manual utility
+2026-07-01 | #139 scripts/export/save_russian_for_collaborator.py | archived | zero callers, no tests, no entrypoint guard, incomplete TODO items, runs on import
