@@ -142,3 +142,4 @@
 2026-07-01 | #131 scripts/export/filtering_and_backup.py | archived | zero callers, ~75% dead code (3 of 4 saving functions commented out at call site)
 2026-07-01 | #132 scripts/export/list_of_words_from_txt.py | changed | simplify make_decon_word_list, fix docstring/encoding/types, 6 regression tests
 2026-07-01 | #133 scripts/export/list_of_words_from_txt_old.py | archived | zero callers, self-declared temporary script ("REMOVE after few rounds of checking")
+2026-07-01 | #136 scripts/export/save_all_words_sorted_by_family.py | archived | zero callers, no entrypoint guard, no tests, module-level side effects on import
