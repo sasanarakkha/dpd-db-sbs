@@ -1,9 +1,6 @@
 #!/bin/bash
+# Interactive CLI wrapper for building and distributing DPD dictionaries.
 
-# This script is a wrapper for run_and_log.sh
-# It executes scripts/bash/make_dpd.sh or make_ru_dpd.sh or copy_dpd_to_server.sh with logging and rotation.
-
-# Determine the directory of this script
 PROJECT_ROOT="$HOME/Documents/dpd-db"
 
 MASTER_SCRIPT="$HOME/.local/bin/run_and_log.sh"
@@ -20,102 +17,19 @@ COMMAND_TO_EXECUTE_RU=(bash -c "cd '${PROJECT_ROOT}' && uv run bash '${TARGET_SC
 COMMAND_TO_EXECUTE_COPY=(bash -c "cd '${PROJECT_ROOT}' && uv run bash '${TARGET_SCRIPT_PATH_COPY}'")
 COMMAND_TO_EXECUTE_COPY_TPR=(bash -c "cd '${PROJECT_ROOT}' && uv run python '${TARGET_SCRIPT_PATH_COPY_TPR}' copy_dpd_for_classes")
 
-# Execute the master script
-
-while true; do
-    echo -ne "\033[1;34m make DPD? \033[0m"
-    read -n 1 -s user_input
-    echo
-    if [[ $user_input == "q" ]]; then
-        echo -e "\n\033[1;31m Aborted by user.\033[0m"
-        exit 1
+prompt_and_run() {
+    local prompt="$1"
+    shift
+    local answer
+    answer=$(uv run tools/ask.py -c cyan "$prompt")
+    if [[ $answer == "y" ]]; then
+        "$@"
     fi
-    case $user_input in
-        [Yy]* )
-            bash "${MASTER_SCRIPT}" "${LOG_BASE_NAME}" "${COMMAND_TO_EXECUTE[@]}"
-            break;;
-        * )
-            break;;
-    esac
-done
+}
 
-while true; do
-    echo -ne "\033[1;34m make RU-DPD? \033[0m"
-    read -n 1 -s user_input
-    echo
-    if [[ $user_input == "q" ]]; then
-        echo -e "\n\033[1;31m Aborted by user.\033[0m"
-        exit 1
-    fi
-    case $user_input in
-        [Yy]* )
-            bash "${MASTER_SCRIPT}" "${LOG_BASE_NAME}" "${COMMAND_TO_EXECUTE_RU[@]}"
-            break;;
-        * )
-            break;;
-    esac
-done
-
-# Ask the user if they want to attempt to mount the fileserver
-while true; do
-    echo -ne "\033[1;34m Do you want to attempt to mount the fileserver? \033[0m"
-    read mount_confirm
-    case $mount_confirm in
-        [Yy]* )
-            mnt
-            break;;
-        * )
-            break;;
-    esac
-done
-
-while true; do
-    echo -ne "\033[1;34m copy DPD+SBS to the /Sharing between users/1 For Everyone/Software/Golden Dictionary/Default folder? \033[0m"
-    read -n 1 -s user_input
-    echo
-    if [[ $user_input == "q" ]]; then
-        echo -e "\n\033[1;31m Aborted by user.\033[0m"
-        exit 1
-    fi
-    case $user_input in
-        [Yy]* )
-            bash "${MASTER_SCRIPT}" "${LOG_BASE_NAME}" "${COMMAND_TO_EXECUTE_COPY[@]}"
-            break;;
-        * )
-            break;;
-    esac
-done
-
-while true; do
-    echo -ne "\033[1;34m copy DPD + TPR for class to the /Sharing between users/For A. Deva/for_classes/ folder? \033[0m"
-    read -n 1 -s user_input
-    echo
-    if [[ $user_input == "q" ]]; then
-        echo -e "\n\033[1;31m Aborted by user.\033[0m"
-        exit 1
-    fi
-    case $user_input in
-        [Yy]* )
-            bash "${MASTER_SCRIPT}" "${LOG_BASE_NAME}" "${COMMAND_TO_EXECUTE_COPY_TPR[@]}"
-            break;;
-        * )
-            break;;
-    esac
-done
-
-# Ask the user if they want to attempt to umount the fileserver
-while true; do
-    echo -ne "\033[1;34m Do you want to umount the fileserver? \033[0m"
-    read -n 1 -s mount_confirm
-    if [[ $mount_confirm == "q" ]]; then
-        echo -e "\n\033[1;31m Aborted by user.\033[0m"
-        exit 1
-    fi
-    case $mount_confirm in
-        [Yy]* )
-            umnt
-            break;;
-        * )
-            break;;
-    esac
-done
+prompt_and_run "make DPD?" bash "${MASTER_SCRIPT}" "${LOG_BASE_NAME}" "${COMMAND_TO_EXECUTE[@]}"
+prompt_and_run "make RU-DPD?" bash "${MASTER_SCRIPT}" "${LOG_BASE_NAME}" "${COMMAND_TO_EXECUTE_RU[@]}"
+prompt_and_run "Do you want to attempt to mount the fileserver?" mnt
+prompt_and_run "copy DPD+SBS?" bash "${MASTER_SCRIPT}" "${LOG_BASE_NAME}" "${COMMAND_TO_EXECUTE_COPY[@]}"
+prompt_and_run "copy DPD + TPR for class?" bash "${MASTER_SCRIPT}" "${LOG_BASE_NAME}" "${COMMAND_TO_EXECUTE_COPY_TPR[@]}"
+prompt_and_run "Do you want to umount the fileserver?" umnt
