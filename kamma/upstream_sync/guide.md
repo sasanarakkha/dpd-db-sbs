@@ -178,9 +178,9 @@ reference when a step fails or when running a step by hand outside the chain.
    - Rationale: accumulated shadow drift that slips through one sync becomes a multi-hour
      remediation in the next sync (see Stage 3.5 in the April 2026 sync thread).
 1. **Environmental Validation**:
-   - Run `git fetch upstream` — always fetch before any analysis. No need to search for new commits manually; the scripts derive the range from `accepted_sync.json`.
    - Run `uv run ruff check tools/ scripts/ db/ exporter/ --select F821,E999 --quiet` — catch undefined names and syntax/API breakage before sync work begins.
    - Run `uv run python3 kamma/upstream_sync/scripts/validate_registry.py`
+   - Run `git fetch upstream` — fetch before the factual diff. No need to search for new commits manually; the scripts derive the range from `accepted_sync.json`.
    - Ensure `kamma/upstream_sync/accepted_sync.json` points at the last accepted upstream sync.
 2. **Factual Diff**:
    - Run `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py <thread_dir>`.
@@ -191,22 +191,19 @@ reference when a step fails or when running a step by hand outside the chain.
    - `prep_analyzer.py` also performs a full local-tree audit (independent of the commit-range diff) by comparing every git-tracked local file against the upstream tree and full upstream history at the target SHA:
      - If `prep_manifest.json.unregistered_local_paths` is non-empty, those local files have no upstream counterpart (current or historical) and are not covered by any registry category; register them in `registry.json` during Stage 2 (typically `unique_paths`, or a shadow/inspired category). They do NOT block `execute_sync.py`.
      - If `prep_manifest.json.upstream_deleted_orphans` is non-empty, those local files match a path upstream once had but has since deleted; decide during Stage 2 whether to keep them as an intentional fork divergence (register the decision) or delete them locally to match upstream. They do NOT block `execute_sync.py`.
-   - If `prep_manifest.json.blocker_paths` is non-empty, STOP before `execute_sync.py`. A deleted upstream path lands in `blocker_paths` only when it intersects a registered local interest — a mapped shadow/`inspired_by_upstream` source, or a `modified_upstream_files` entry. Deletions with no registered interest are informational only: they appear in `deleted_upstream_paths` and the report's Deleted Files section, and are handled automatically by `execute_sync.py`'s `propagate_upstream_deletions` pass. Deletion blockers may be acknowledged by creating `<thread_dir>/run_acknowledged_blockers.txt` (one path per line; `#` comments allowed); `verify_manifest` warns but does not block on acknowledged paths, and `stage1.py`'s triage step likewise clears them from its chain verdict. Acknowledgment only clears these verdicts — it does NOT enable the fast-path triage in step 4 below, since any `blocker_paths` entry (acknowledged or not) still routes to Stage 2 for human handling. Collision blockers require registry changes before `execute_sync.py`.
+   - If `prep_manifest.json.blocker_paths` is non-empty, STOP before `execute_sync.py` (see `prep_analyzer.py` for how a deleted path becomes a blocker versus informational-only). Deletion blockers may be acknowledged by creating `<thread_dir>/run_acknowledged_blockers.txt` (one path per line; `#` comments allowed): `verify_manifest` and `stage1.py`'s triage step then clear them from their verdicts, but acknowledgment does NOT enable the fast-path — any `blocker_paths` entry still routes to Stage 2. Collision blockers require registry changes before `execute_sync.py`.
 3. **Automated Pull**:
    - Perform the automated sync by running `uv run python3 kamma/upstream_sync/scripts/execute_sync.py <thread_dir>`.
    - Review and add any run-specific exclusions to `<thread_dir>/run_exclusions.txt` before execution if needed.
    - `execute_sync.py` pins `as_upstream` directly to the verified manifest SHA without switching branches.
    - (Commit 1 gate). Message format: `#sync: upstream pull <from>..<to>, <N> files, YYYY-MM-DD`
    - `execute_sync.py <thread_dir>` leaves changes unstaged by default. Review `git diff` before manual staging; use `--stage` only when you intentionally want the script to run `git add .`.
-   - **Upstream deletions propagate.** After the exclusion-restore step, `execute_sync.py` runs `propagate_upstream_deletions` which computes `git diff --no-renames --diff-filter=D <last_accepted_sha>..<target_sha>` and removes any resulting candidate that is not in the protected set (shadows, `no_sync_files`, `modified_upstream_files`, `unique_paths`, and run-specific exclusions). Each removal is worktree-only (`Path.unlink`), never staged — it surfaces as an unstaged deletion in `git diff` for human review before Commit 1. Renamed-away files are covered because `--no-renames` decomposes renames into add+delete.
+   - **Upstream deletions propagate.** After the exclusion-restore step, `execute_sync.py`'s `propagate_upstream_deletions` pass removes files upstream deleted or renamed away since the last accepted sync (protected paths are never touched; see the function docstring for the exact diff command and protected set). Each removal is worktree-only and unstaged, surfacing in `git diff` for human review before Commit 1.
    - **Staging rule:** NEVER use `git add -A -- <file list>` — gitignore'd paths will trigger errors. If you stage all sync changes manually, use `git add .` which respects `.gitignore` automatically. If you must stage selectively, pre-filter with `git add <file>` one path at a time or check first with `git check-ignore -v <path>`.
 4. **Fast-path triage (advisory):**
-   - The `stage1.py` chain already runs this as its last step and prints the verdict; run
-     `uv run python3 kamma/upstream_sync/scripts/sync_triage.py <thread_dir>` by hand only outside the
-     chain (e.g. re-checking a manifest without re-running the whole chain).
-   - It prints the fast-path verdict: pass means no entry in `mapped_actions` has a `category` in `modified_upstream_files`, `russian_copies`, `sbs_copies`, `dps_copies`, `tamil_copies`, or `inspired_by_upstream`; `discuss_paths`, `needs_classification_paths`, `blocker_paths`, `unregistered_local_paths`, and `upstream_deleted_orphans` are all empty. `docs/` paths do not affect the verdict — they are queued to the Docs Translation Track independently and never block the fast-path.
-   - If the verdict passes, this sync touches nothing localized: skip Stages 2-3 and go straight to Stage 4 (retrospective + `finalize_accepted_sync.py`) after Commit 1.
-   - The triage verdict is advisory only — it never runs Stage 4 or any destructive step automatically. ADVANCED still makes the acceptance decision.
+   - The `stage1.py` chain runs this as its last step and prints the verdict; run `uv run python3 kamma/upstream_sync/scripts/sync_triage.py <thread_dir>` by hand only outside the chain (e.g. re-checking a manifest without re-running the whole chain). The verdict text lists the exact criteria it checked.
+   - Pass means this sync touches nothing localized (`docs/` paths are queued to the Docs Translation Track and never affect the verdict): skip Stages 2-3 and go straight to Stage 4 (retrospective + `finalize_accepted_sync.py`) after Commit 1.
+   - The verdict is advisory only — it never runs Stage 4 or any destructive step automatically. ADVANCED still makes the acceptance decision.
 
 ### Stage 2: Analysis (ADVANCED Strategic Planning)
 **Goal**: Determine how to integrate upstream changes into localized files.

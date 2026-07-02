@@ -289,3 +289,20 @@ def test_shadow_mapping_rejects_missing_upstream_source(base_data, tmp_path):
         in e
         for e in errors
     )
+
+
+def test_rubric_allows_single_local_change(base_data, capsys):
+    base_data["modified_upstream_files"] = [
+        {
+            "path": ".pre-commit-config.yaml",
+            "discuss": False,
+            "discuss_reason": "",
+            "sync_rule": "DISCUSS",
+            "local_changes": ["pyrefly hook added"],
+            "watch_for": ["upstream hook list changes"],
+        }
+    ]
+
+    validate_registry_core(base_data)
+
+    assert "local-change(s)" not in capsys.readouterr().out

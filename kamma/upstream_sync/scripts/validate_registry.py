@@ -65,9 +65,9 @@ def validate_entry_rubric(label: str, entry: dict[str, object]) -> list[str]:
         watch_for = []
 
     # Enforce minimums
-    if sync_rule not in ["MIRROR_EXACTLY", "inspired_only"] and len(local_changes) < 2:
+    if sync_rule not in ["MIRROR_EXACTLY", "inspired_only"] and len(local_changes) < 1:
         pr.amber(
-            f"Rubric Warning: {label}: only {len(local_changes)} local-change(s), need 2"
+            f"Rubric Warning: {label}: only {len(local_changes)} local-change(s), need 1"
         )
 
     if sync_rule != "MIRROR_EXACTLY" and len(watch_for) < 1:
@@ -122,26 +122,6 @@ def validate_no_duplicates_in_list(label: str, items: list[str]) -> list[str]:
         if item in seen:
             errors.append(f"{label}: duplicate entry '{item}'")
         seen.add(item)
-    return errors
-
-
-def validate_shadow_paths_exist(
-    label: str, mapping: dict[str, str], repo_root: Path
-) -> list[str]:
-    errors: list[str] = []
-    for shadow in mapping:
-        # Directory entries end with /; wildcard entries skip existence check
-        if "*" in shadow:
-            continue
-        shadow_path = repo_root / shadow
-        if shadow.endswith("/"):
-            if not shadow_path.is_dir():
-                errors.append(
-                    f"{label}: shadow directory '{shadow}' does not exist in repo"
-                )
-        else:
-            if not shadow_path.exists():
-                errors.append(f"{label}: shadow file '{shadow}' does not exist in repo")
     return errors
 
 

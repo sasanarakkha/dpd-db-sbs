@@ -266,23 +266,22 @@ def execute_sync(
         target_sha = run_git(["git", "rev-parse", target_ref]).stdout.strip()
         pr.yes(f"{target_ref} -> {target_sha}")
 
-        # 2. Verify manifest if thread_dir is provided
-        if thread_dir:
-            pr.green("verifying manifest")
-            if (
-                verify_manifest(
-                    thread_dir,
-                    accepted_sync_state=state,
-                    target_sha=target_sha,
-                    allow_discuss=False,
-                    allow_blockers=False,
-                )
-                != 0
-            ):
-                pr.red("Manifest verification failed. Stop before checkout.")
-                return 1
-            else:
-                pr.yes("ok")
+        # 2. Verify manifest
+        pr.green("verifying manifest")
+        if (
+            verify_manifest(
+                thread_dir,
+                accepted_sync_state=state,
+                target_sha=target_sha,
+                allow_discuss=False,
+                allow_blockers=False,
+            )
+            != 0
+        ):
+            pr.red("Manifest verification failed. Stop before checkout.")
+            return 1
+        else:
+            pr.yes("ok")
 
         # 3. Gather exclusions
         pr.green("gathering exclusions")
@@ -390,16 +389,13 @@ def execute_sync(
             return 1
 
         # 9. Record completion marker for sync_status.py's state machine
-        if thread_dir:
-            marker = {
-                "to_upstream_sha": target_sha,
-                "executed_at": datetime.now()
-                .astimezone()
-                .isoformat(timespec="seconds"),
-            }
-            (Path(thread_dir) / "execute_sync_done.json").write_text(
-                json.dumps(marker, indent=2), encoding="utf-8"
-            )
+        marker = {
+            "to_upstream_sha": target_sha,
+            "executed_at": datetime.now().astimezone().isoformat(timespec="seconds"),
+        }
+        (Path(thread_dir) / "execute_sync_done.json").write_text(
+            json.dumps(marker, indent=2), encoding="utf-8"
+        )
 
         pr.green("✅ Sync execution complete. Ready for Stage 2 (Analysis).")
         return 0

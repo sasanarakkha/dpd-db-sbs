@@ -129,7 +129,7 @@ def main() -> None:
     # --- Done ---
     pr.green(f"Thread ready: {thread_dir}")
     pr.green("Next steps:")
-    pr.green(f"  1. Fill in the upstream diff range in {thread_dir}/spec.md")
+    pr.green(f"  1. Review the auto-filled upstream diff range in {thread_dir}/spec.md")
     pr.green(
         "  2. Dispatch Stage 1 to the sync-fast subagent (.claude/agents/sync-fast.md)."
     )
@@ -148,11 +148,11 @@ def main() -> None:
     pr.green("     Stop before Stage 2 and update handoff.md.")
     pr.green("After the sync completes:")
     pr.green(
-        "  6. Write <thread_dir>/retrospective.md (copy from "
+        "  3. Write <thread_dir>/retrospective.md (copy from "
         "kamma/upstream_sync/templates/retrospective.md) before finalize."
     )
     pr.green(
-        "  7. Run `/kamma:3-review`, then `/kamma:4-finalize` to close the thread."
+        "  4. Run `/kamma:3-review`, then `/kamma:4-finalize` to close the thread."
     )
     pr.toc()
 

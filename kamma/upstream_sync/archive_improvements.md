@@ -120,18 +120,18 @@ This document provides a unified, exhaustive post-mortem of the Upstream Sync Re
 - Run `uv run ruff check tools/ scripts/ db/ exporter/ --select F821,E999 --quiet` in Stage 1 Environmental Validation to catch dead-code and API violations before sync begins.
 - Pre-existing failures are in scope — fix them in a separate commit before the sync commits.
 
+## 17. Scope Discipline and Out-of-Scope Directories
+**Issue:** In the 2026-05-02 sync, the agent repeatedly accessed the `gui/` folder despite it being explicitly excluded from sync scope. It even added `"gui/"` to `unique_paths` in the registry — which had to be manually reverted.
+**Recommendation:**
+- Superseded scope note: `gui/` remains out of sync scope; `docs/` is upstream-owned and accepted verbatim, while `docs_rus/` is handled by Stage 4 Docs Translation Parity.
+- The guide now has an explicit `## Sync Scope` note. Consult it at the start of every stage.
+
 ## 18. PRO → FAST Handoff Quality Gate
 **Issue:** The planning model (PRO) produced `dynamic_plan.md` entries that contained vague instructions like "check X", "verify Y", "determine the correct approach" — deferring analysis to the execution model (FAST). FAST is not equipped for strategic reasoning; this caused errors, invented solutions, and Iron Rule violations during Stage 3.
 **Recommendation:**
 - `dynamic_plan.md` must be written as if the executing agent has **zero context and zero judgment**. Every item must provide: exact file path, exact anchor string or line reference, exact code to insert/replace/delete, and a verification command.
 - Before handing off to FAST, PRO must self-check: *"Could a mechanical executor complete every item without opening any file not explicitly listed in the plan?"* If no — expand the plan first.
 - FAST must never be asked to analyze, judge, or discover. If FAST finds itself reasoning about "what the right approach is", the plan was insufficient — it must stop and flag the gap rather than guess.
-
-## 17. Scope Discipline and Out-of-Scope Directories
-**Issue:** In the 2026-05-02 sync, the agent repeatedly accessed the `gui/` folder despite it being explicitly excluded from sync scope. It even added `"gui/"` to `unique_paths` in the registry — which had to be manually reverted.
-**Recommendation:**
-- Superseded scope note: `gui/` remains out of sync scope; `docs/` is upstream-owned and accepted verbatim, while `docs_rus/` is handled by Stage 4 Docs Translation Parity.
-- The guide now has an explicit `## Sync Scope` note. Consult it at the start of every stage.
 
 ## 19. Execute_sync.py Untracked Exclusions Flaw (June 2026)
 **Issue:** `execute_sync.py` leaked new upstream files from excluded directories into the sync commit. `git restore --source as_upstream` added them as untracked files, and the subsequent `git restore` from the original SHA ignored them because they were not tracked.

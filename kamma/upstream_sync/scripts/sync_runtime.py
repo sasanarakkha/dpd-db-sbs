@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
-"""Provide command-line helpers for runtime sync metadata used by shell automation."""
+"""Provide manifest-verification helpers imported by the sync scripts."""
 
-import argparse
 from pathlib import Path
 
 from kamma.upstream_sync.scripts.registry_helper import (
@@ -86,24 +85,3 @@ def verify_manifest(
     except ValueError as exc:
         pr.red(f"Manifest invalid: {exc}")
         return 1
-
-
-def main() -> int:
-    """Parse CLI arguments and execute the requested runtime helper."""
-    parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers(dest="command", required=True)
-
-    verify_parser = subparsers.add_parser("verify-manifest")
-    verify_parser.add_argument("thread_dir", help="Path to the sync thread directory")
-
-    args = parser.parse_args()
-
-    if args.command == "verify-manifest":
-        return verify_manifest(args.thread_dir)
-
-    pr.red(f"Unknown command: {args.command}")
-    return 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
