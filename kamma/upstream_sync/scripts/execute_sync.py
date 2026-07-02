@@ -3,7 +3,10 @@
 """Robustly execute selective sync from upstream ref, applying run-specific exclusions."""
 
 import argparse
+import json
+import shutil
 import subprocess
+from datetime import datetime
 from pathlib import Path
 
 from kamma.upstream_sync.scripts.registry_helper import (
@@ -11,6 +14,7 @@ from kamma.upstream_sync.scripts.registry_helper import (
     get_strict_shadow_mappings,
     load_accepted_sync_state,
     load_registry,
+    read_line_list,
 )
 from kamma.upstream_sync.scripts.sync_runtime import verify_manifest
 from kamma.upstream_sync.scripts.sync_schema import validate_repo_relative_paths
@@ -180,16 +184,7 @@ def get_run_specific_exclusions(thread_dir: str | None) -> list[str]:
     if not thread_dir:
         return []
 
-    exclusions_path = Path(thread_dir) / "run_exclusions.txt"
-    if not exclusions_path.exists():
-        return []
-
-    exclusions = []
-    with exclusions_path.open("r", encoding="utf-8") as f:
-        for line in f:
-            line = line.rstrip("\n\r")
-            if line.strip() and not line.lstrip().startswith("#"):
-                exclusions.append(line)
+    exclusions = read_line_list(Path(thread_dir) / "run_exclusions.txt")
     return validate_repo_relative_paths(exclusions, "run-specific exclusions")
 
 
@@ -365,8 +360,6 @@ def execute_sync(
                     )
                     # If it's a directory, rm -rf
                     if Path(path).is_dir():
-                        import shutil
-
                         shutil.rmtree(path)
                     else:
                         Path(path).unlink(missing_ok=True)
@@ -395,6 +388,18 @@ def execute_sync(
         if run_sync_assertions(sbs_ru_original_sha) != 0:
             pr.red("Sync assertions failed. Check output above.")
             return 1
+
+        # 9. Record completion marker for sync_status.py's state machine
+        if thread_dir:
+            marker = {
+                "to_upstream_sha": target_sha,
+                "executed_at": datetime.now()
+                .astimezone()
+                .isoformat(timespec="seconds"),
+            }
+            (Path(thread_dir) / "execute_sync_done.json").write_text(
+                json.dumps(marker, indent=2), encoding="utf-8"
+            )
 
         pr.green("✅ Sync execution complete. Ready for Stage 2 (Analysis).")
         return 0

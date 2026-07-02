@@ -34,7 +34,14 @@ class StageDescriptor:
 
 
 def derive_stage(thread_dir: Path) -> StageDescriptor:
-    """Derive the current stage descriptor for a sync thread."""
+    """Derive the current stage descriptor for a sync thread.
+
+    Known limitation: on the non-fast-path, the Stage 3 -> Stage 4 verification
+    gate (all `dynamic_plan.md` items marked `[x]`) is not distinguished from
+    Stage 3 itself — that would require parsing `dynamic_plan.md` checkboxes,
+    which is out of scope. `derive_stage` only advances past Stage 3 once
+    `retrospective.md` exists.
+    """
     manifest_path = thread_dir / "prep_manifest.json"
     retrospective_path = thread_dir / "retrospective.md"
     dynamic_plan_path = thread_dir / "dynamic_plan.md"
@@ -84,6 +91,22 @@ def derive_stage(thread_dir: Path) -> StageDescriptor:
         )
 
     if is_localized_noop(manifest):
+        if (thread_dir / "execute_sync_done.json").exists():
+            return StageDescriptor(
+                stage="Fast-path (Stage 4: write retrospective + finalize)",
+                next_command=(
+                    "Write retrospective.md, then run "
+                    f"uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py {thread_dir}"
+                ),
+                owner="FAST",
+                dispatch="sync-fast",
+                gate_before="Stage 4 acceptance",
+                gate_after=None,
+                reads=["prep_manifest.json", "execute_sync_done.json"],
+                produces=["retrospective.md", "accepted_sync.json (updated)"],
+                stop_condition="finalize_accepted_sync.py completes",
+                guide_anchor="### Stage 4: Verification & After-sync (ADVANCED Acceptance)",
+            )
         return StageDescriptor(
             stage="Fast-path (Stage 1 -> Commit 1 -> Stage 4)",
             next_command=f"uv run python3 kamma/upstream_sync/scripts/execute_sync.py {thread_dir}",

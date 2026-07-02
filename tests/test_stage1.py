@@ -233,3 +233,80 @@ def test_run_triage_and_status_fails_when_discuss_paths_present(tmp_path: Path) 
 
     assert success is False
     assert "db/discuss_me.py" in output
+
+
+def test_run_triage_and_status_passes_when_all_blockers_acknowledged(
+    tmp_path: Path,
+) -> None:
+    (tmp_path / "prep_manifest.json").write_text(
+        json.dumps(
+            {
+                "mapped_actions": {},
+                "blocker_paths": ["x/y.py"],
+                "discuss_paths": [],
+                "needs_classification_paths": [],
+                "unregistered_local_paths": [],
+                "upstream_deleted_orphans": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (tmp_path / "run_acknowledged_blockers.txt").write_text(
+        "x/y.py\n", encoding="utf-8"
+    )
+
+    success, _output = run_triage_and_status(tmp_path)
+
+    assert success is True
+
+
+def test_run_triage_and_status_fails_when_ack_file_lists_different_path(
+    tmp_path: Path,
+) -> None:
+    (tmp_path / "prep_manifest.json").write_text(
+        json.dumps(
+            {
+                "mapped_actions": {},
+                "blocker_paths": ["x/y.py"],
+                "discuss_paths": [],
+                "needs_classification_paths": [],
+                "unregistered_local_paths": [],
+                "upstream_deleted_orphans": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (tmp_path / "run_acknowledged_blockers.txt").write_text(
+        "some/other.py\n", encoding="utf-8"
+    )
+
+    success, output = run_triage_and_status(tmp_path)
+
+    assert success is False
+    assert "x/y.py" in output
+
+
+def test_run_triage_and_status_fails_when_discuss_path_present_despite_ack(
+    tmp_path: Path,
+) -> None:
+    (tmp_path / "prep_manifest.json").write_text(
+        json.dumps(
+            {
+                "mapped_actions": {},
+                "blocker_paths": ["x/y.py"],
+                "discuss_paths": ["db/discuss_me.py"],
+                "needs_classification_paths": [],
+                "unregistered_local_paths": [],
+                "upstream_deleted_orphans": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (tmp_path / "run_acknowledged_blockers.txt").write_text(
+        "x/y.py\n", encoding="utf-8"
+    )
+
+    success, output = run_triage_and_status(tmp_path)
+
+    assert success is False
+    assert "db/discuss_me.py" in output

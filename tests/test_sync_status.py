@@ -71,6 +71,23 @@ def test_docs_only_manifest_is_fast_path(tmp_path: Path) -> None:
     assert "execute_sync.py" in descriptor.next_command
 
 
+def test_localized_noop_after_execute_sync_is_fast_path_stage_4(
+    tmp_path: Path,
+) -> None:
+    _write_manifest(tmp_path, localized=True)
+    (tmp_path / "execute_sync_done.json").write_text(
+        json.dumps(
+            {"to_upstream_sha": "1" * 40, "executed_at": "2026-07-02T00:00:00+00:00"}
+        ),
+        encoding="utf-8",
+    )
+    descriptor = derive_stage(tmp_path)
+    assert descriptor.stage.startswith("Fast-path")
+    assert "Stage 4" in descriptor.stage
+    assert "finalize_accepted_sync.py" in descriptor.next_command
+    assert "execute_sync.py" not in descriptor.next_command
+
+
 def test_shadow_touching_manifest_without_plan_is_stage_2(tmp_path: Path) -> None:
     _write_manifest(tmp_path, localized=False)
     descriptor = derive_stage(tmp_path)
@@ -118,6 +135,15 @@ def _all_descriptors(tmp_path: Path) -> list[StageDescriptor]:
 
     _write_manifest(tmp_path, localized=True)
     descriptors.append(derive_stage(tmp_path))  # Fast-path
+
+    (tmp_path / "execute_sync_done.json").write_text(
+        json.dumps(
+            {"to_upstream_sha": "1" * 40, "executed_at": "2026-07-02T00:00:00+00:00"}
+        ),
+        encoding="utf-8",
+    )
+    descriptors.append(derive_stage(tmp_path))  # Fast-path (Stage 4)
+    (tmp_path / "execute_sync_done.json").unlink()
 
     _write_manifest(tmp_path, localized=False)
     descriptors.append(derive_stage(tmp_path))  # Stage 2

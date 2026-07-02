@@ -57,9 +57,6 @@ def validate_entry_rubric(label: str, entry: dict[str, object]) -> list[str]:
     local_changes = entry.get("local_changes", [])
     watch_for = entry.get("watch_for", [])
 
-    # Allow local_changes/watch_for to be optional if they are completely missing,
-    # but if they are present, they must be lists. Wait, actually the schema requires
-    # them to be lists, but let's check:
     if not isinstance(local_changes, list):
         errors.append(f"{label}: 'local_changes' must be a list")
         local_changes = []

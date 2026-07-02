@@ -1,5 +1,6 @@
 """Verify automated upstream sync execution refuses unsafe repository states."""
 
+import json
 import shutil
 import subprocess
 import tempfile
@@ -304,6 +305,49 @@ class TestExecuteSync(unittest.TestCase):
             (["git", "add", "."],),
             [call.args for call in mock_run_git.call_args_list],
         )
+
+    @patch("kamma.upstream_sync.scripts.execute_sync.subprocess.run")
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_registry")
+    @patch(
+        "kamma.upstream_sync.scripts.execute_sync.run_sync_assertions", return_value=0
+    )
+    @patch("kamma.upstream_sync.scripts.execute_sync.verify_manifest", return_value=0)
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_accepted_sync_state")
+    @patch("kamma.upstream_sync.scripts.execute_sync.run_git")
+    @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
+    def test_execute_sync_writes_done_marker_on_success(
+        self,
+        mock_context_class,
+        mock_run_git,
+        mock_load_state,
+        mock_verify_manifest,
+        mock_run_assertions,
+        mock_load_registry,
+        mock_subprocess_run,
+    ):
+        context = MagicMock()
+        context.is_dirty = False
+        context.original_branch = "sbs-ru"
+        mock_context_class.return_value = context
+        mock_load_state.return_value = _ACCEPTED_STATE
+        mock_load_registry.return_value = _REGISTRY_EMPTY
+        mock_run_git.side_effect = [
+            MagicMock(stdout=""),  # git fetch upstream
+            MagicMock(stdout="newsha456\n"),  # rev-parse upstream/main
+            MagicMock(stdout="localsha789\n"),  # rev-parse HEAD
+            MagicMock(stdout=""),  # update-ref refs/heads/as_upstream newsha456
+            MagicMock(stdout=""),  # restore --source as_upstream --worktree -- .
+        ]
+        mock_subprocess_run.return_value = MagicMock(returncode=0)
+
+        result = execute_sync(str(self.thread_dir))
+
+        self.assertEqual(result, 0)
+        marker_path = self.thread_dir / "execute_sync_done.json"
+        self.assertTrue(marker_path.exists())
+        marker = json.loads(marker_path.read_text(encoding="utf-8"))
+        self.assertEqual(marker["to_upstream_sha"], "newsha456")
+        self.assertIn("executed_at", marker)
 
     @patch("kamma.upstream_sync.scripts.execute_sync.subprocess.run")
     @patch("kamma.upstream_sync.scripts.execute_sync.load_registry")

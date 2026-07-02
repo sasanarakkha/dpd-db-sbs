@@ -11,7 +11,10 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from kamma.upstream_sync.scripts.prep_analyzer import PrepAnalyzer
-from kamma.upstream_sync.scripts.registry_helper import get_registry_path
+from kamma.upstream_sync.scripts.registry_helper import (
+    get_registry_path,
+    read_line_list,
+)
 from kamma.upstream_sync.scripts.sync_status import derive_stage
 from kamma.upstream_sync.scripts.validate_registry import validate_registry_core
 from tools.printer import printer as pr
@@ -55,15 +58,30 @@ def run_prep_analyzer(thread_dir: Path) -> StepResult:
 
 
 def run_triage_and_status(thread_dir: Path) -> StepResult:
-    """Derive the stage verdict and fail if unresolved blocker/discuss paths remain."""
+    """Derive the stage verdict and fail if unresolved blocker/discuss paths remain.
+
+    Acknowledged blockers (`<thread_dir>/run_acknowledged_blockers.txt`) are
+    subtracted from `blocker_paths` before the verdict, mirroring
+    `sync_runtime.verify_manifest`. Acknowledgment clears this chain verdict
+    only — it does not enable the fast-path, since `is_localized_noop` still
+    treats any `blocker_paths` entry as non-fast-path.
+    """
     manifest_path = thread_dir / "prep_manifest.json"
     manifest: dict[str, object] = json.loads(manifest_path.read_text(encoding="utf-8"))
     descriptor = derive_stage(thread_dir)
-    blockers = manifest.get("blocker_paths") or []
+    blockers_raw = manifest.get("blocker_paths") or []
+    blockers = blockers_raw if isinstance(blockers_raw, list) else []
     discuss = manifest.get("discuss_paths") or []
+    acknowledged = read_line_list(thread_dir / "run_acknowledged_blockers.txt")
+    effective_blockers = [p for p in blockers if p not in set(acknowledged)]
     summary = f"stage: {descriptor.stage}; next: {descriptor.next_command}"
-    if blockers or discuss:
-        return False, f"{summary}; blocker_paths={blockers}; discuss_paths={discuss}"
+    if acknowledged and not effective_blockers:
+        pr.amber(f"Acknowledged blockers cleared: {acknowledged}")
+    if effective_blockers or discuss:
+        return (
+            False,
+            f"{summary}; blocker_paths={effective_blockers}; discuss_paths={discuss}",
+        )
     return True, summary
 
 

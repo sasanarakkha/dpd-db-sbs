@@ -1,14 +1,6 @@
 {
-  "repo": "digitalpalidictionary/dpd-db",
-  "project": "digitalpalidictionary/1",
-  "agents": [
-    "claude",
-    "gemini",
-    "antigravity",
-    "opencode",
-    "codex",
-    "kilo",
-    "qwen"
-  ],
+  "repo": "sasanarakkha/dpd-db-sbs",
+  "project": "sasanarakkha/1",
+  "agents": ["claude", "antigravity", "opencode", "codex", "kilo", "qwen"],
   "models": {}
 }

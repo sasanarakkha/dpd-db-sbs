@@ -13,6 +13,24 @@ from kamma.upstream_sync.scripts.sync_schema import (
 )
 
 
+def read_line_list(path: Path) -> list[str]:
+    """Read non-blank, non-`#`-comment lines from a thread-local list file.
+
+    Returns `[]` if the path does not exist. Lines are stripped of trailing
+    `\\n`/`\\r` only; other surrounding whitespace is preserved so callers'
+    own validation (e.g. `validate_repo_relative_paths`) can reject it.
+    """
+    if not path.exists():
+        return []
+    lines: list[str] = []
+    with path.open("r", encoding="utf-8") as f:
+        for line in f:
+            line = line.rstrip("\n\r")
+            if line.strip() and not line.lstrip().startswith("#"):
+                lines.append(line)
+    return lines
+
+
 def get_registry_path() -> Path:
     """Return the canonical path to registry.json."""
     return Path("kamma/upstream_sync/registry.json")

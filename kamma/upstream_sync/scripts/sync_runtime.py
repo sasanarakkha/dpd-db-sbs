@@ -8,6 +8,7 @@ from pathlib import Path
 from kamma.upstream_sync.scripts.registry_helper import (
     get_prep_manifest_path,
     load_prep_manifest,
+    read_line_list,
 )
 from kamma.upstream_sync.scripts.sync_schema import AcceptedSyncState
 from tools.printer import printer as pr
@@ -15,16 +16,7 @@ from tools.printer import printer as pr
 
 def _load_acknowledged_blockers(thread_dir: str) -> list[str]:
     """Load acknowledged blocker paths from thread_dir/run_acknowledged_blockers.txt."""
-    ack_path = Path(thread_dir) / "run_acknowledged_blockers.txt"
-    if not ack_path.exists():
-        return []
-    paths: list[str] = []
-    with ack_path.open("r", encoding="utf-8") as f:
-        for line in f:
-            line = line.rstrip("\n\r")
-            if line.strip() and not line.lstrip().startswith("#"):
-                paths.append(line)
-    return paths
+    return read_line_list(Path(thread_dir) / "run_acknowledged_blockers.txt")
 
 
 def verify_manifest(
