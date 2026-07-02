@@ -1,6 +1,6 @@
 # Pipeline Improvement Queue
 
-Pointer: 147
+Pointer: 149
 
 ## Scripts (146 total, local unique_paths)
 
@@ -193,8 +193,8 @@ Pointer: 147
 
 ### scripts/cl_dps (additional)
 
-- [ ] 147. scripts/cl_dps/dpd-kill-webapp
+- [x] 147. scripts/cl_dps/dpd-kill-webapp | passed
 
 ### scripts/change_in_db (additional)
 
-- [ ] 148. scripts/change_in_db/example_cleanup.py
+- [x] 148. scripts/change_in_db/example_cleanup.py | changed (extract clean_example, type hints, add tests)

@@ -4,13 +4,14 @@
 
 import argparse
 import re
+from typing import Final
 
 from db.db_helpers import get_db_session
 from db.models import SBS
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 
-EXAMPLE_FIELDS: tuple[str, ...] = (
+EXAMPLE_FIELDS: Final[tuple[str, ...]] = (
     "sbs_example_1",
     "sbs_example_2",
     "dhp_example",
@@ -21,27 +22,36 @@ EXAMPLE_FIELDS: tuple[str, ...] = (
 )
 
 
+def clean_example(text: str) -> str:
+    """Clean up a single example text by stripping whitespace, removing double spaces,
+    fixing punctuation spacing, and lowercasing English capital letters."""
+    if not text:
+        return ""
+    new_val = text.strip()
+    new_val = re.sub(r"  +", " ", new_val)
+    new_val = re.sub(r" ,", ",", new_val)
+    new_val = re.sub(r" \.", ".", new_val)
+    new_val = re.sub(r"[A-Z]", lambda m: m.group().lower(), new_val)
+    return new_val
+
+
 def main(dry_run: bool = False) -> None:
     pr.tic()
     pr.yellow_title("running sbs example cleanup")
     pth = ProjectPaths()
     db_session = get_db_session(pth.dpd_db_path)
 
-    changed_count = 0
-    sbs_data = db_session.query(SBS).all()
+    changed_count: int = 0
+    sbs_data: list[SBS] = db_session.query(SBS).all()
 
     for sbs in sbs_data:
-        row_changed = False
+        row_changed: bool = False
         for field in EXAMPLE_FIELDS:
-            val = getattr(sbs, field)
+            val: str | None = getattr(sbs, field)
             if not val:
                 continue
 
-            new_val = val.strip()
-            new_val = re.sub(r"  +", " ", new_val)
-            new_val = re.sub(r" ,", ",", new_val)
-            new_val = re.sub(r" \.", ".", new_val)
-            new_val = re.sub(r"[A-Z]", lambda m: m.group().lower(), new_val)
+            new_val = clean_example(val)
 
             if val != new_val:
                 if not dry_run:

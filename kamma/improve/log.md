@@ -153,3 +153,5 @@
 2026-07-01 | #144 scripts/export/sourse_atth_sbs_mula.py | archived | zero callers, unused orphan utility
 2026-07-01 | #145 scripts/export/vocab_abbrev_pali_course.py | changed | portable default output-dir using Path.home(), narrow blind exception catch
 2026-07-01 | #146 tools/meaning_snapshot_ru.py | passed | clean — 122 lines, modern types, pathlib, all imports used, has tests, no dead code
+2026-07-02 | #147 scripts/cl_dps/dpd-kill-webapp | passed | 1-line pkill command, not in registry.json, nothing to improve
+2026-07-02 | #148 scripts/change_in_db/example_cleanup.py | changed | extract clean_example helper, type hints, add golden master tests

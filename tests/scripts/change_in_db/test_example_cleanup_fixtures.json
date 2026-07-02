@@ -1,0 +1,147 @@
+[
+  {
+    "id": "synthetic_0",
+    "input": "  leading and trailing whitespace  ",
+    "expected": "leading and trailing whitespace"
+  },
+  {
+    "id": "synthetic_1",
+    "input": "double  space  here",
+    "expected": "double space here"
+  },
+  {
+    "id": "synthetic_2",
+    "input": "space before comma , like this",
+    "expected": "space before comma, like this"
+  },
+  {
+    "id": "synthetic_3",
+    "input": "space before period . like this",
+    "expected": "space before period. like this"
+  },
+  {
+    "id": "synthetic_4",
+    "input": "ALL CAPS TEXT",
+    "expected": "all caps text"
+  },
+  {
+    "id": "synthetic_5",
+    "input": "Mix of  Double  Spaces , spaces before comma , and period . with CAPS",
+    "expected": "mix of double spaces, spaces before comma, and period. with caps"
+  },
+  {
+    "id": "synthetic_6",
+    "input": "āīūṅñṭḍṇḷṃ Capitalized diacritics are NOT handled by [A-Z], only ASCII A-Z",
+    "expected": "āīūṅñṭḍṇḷṃ capitalized diacritics are not handled by [a-z], only ascii a-z"
+  },
+  {
+    "id": "synthetic_7",
+    "input": "",
+    "expected": ""
+  },
+  {
+    "id": "synthetic_8",
+    "input": "Already clean text.",
+    "expected": "already clean text."
+  },
+  {
+    "id": "db_7_dhp_example",
+    "input": "<b>akakkasaṃ</b> viññāpaniṃ,\ngiraṃ saccam'udīraye,\nyāya n'ābhisaje kañci,\ntam'ahaṃ brūmi brāhmaṇaṃ.",
+    "expected": "<b>akakkasaṃ</b> viññāpaniṃ,\ngiraṃ saccam'udīraye,\nyāya n'ābhisaje kañci,\ntam'ahaṃ brūmi brāhmaṇaṃ."
+  },
+  {
+    "id": "db_11_dhp_example",
+    "input": "na brāhmaṇass'etad<b>akiñci</b> seyyo,\nyadā nisedho manaso piyehi,\nyato yato hiṃsamano nivattati,\ntato tato sammati'm'eva dukkhaṃ.",
+    "expected": "na brāhmaṇass'etad<b>akiñci</b> seyyo,\nyadā nisedho manaso piyehi,\nyato yato hiṃsamano nivattati,\ntato tato sammati'm'eva dukkhaṃ."
+  },
+  {
+    "id": "db_13_pat_example",
+    "input": "yo pana bhikkhu jānaṃ tathāvādinā bhikkhunā <b>akaṭ</b>'ānudhammena taṃ diṭṭhiṃ appaṭinissaṭṭhena saddhiṃ sambhuñjeyya vā saṃvaseyya vā saha vā seyyaṃ kappeyya, pācittiyaṃ.",
+    "expected": "yo pana bhikkhu jānaṃ tathāvādinā bhikkhunā <b>akaṭ</b>'ānudhammena taṃ diṭṭhiṃ appaṭinissaṭṭhena saddhiṃ sambhuñjeyya vā saṃvaseyya vā saha vā seyyaṃ kappeyya, pācittiyaṃ."
+  },
+  {
+    "id": "db_13_vib_example",
+    "input": "<b>akaṭ</b>'ānudhammo nāma ukkhitto anosārito.",
+    "expected": "<b>akaṭ</b>'ānudhammo nāma ukkhitto anosārito."
+  },
+  {
+    "id": "db_18_pat_example",
+    "input": "yo pana bhikkhu jānaṃ tathāvādinā bhikkhunā <b>akaṭ'ānudhammena</b> taṃ diṭṭhiṃ appaṭinissaṭṭhena saddhiṃ sambhuñjeyya vā saṃvaseyya vā saha vā seyyaṃ kappeyya, pācittiyaṃ.",
+    "expected": "yo pana bhikkhu jānaṃ tathāvādinā bhikkhunā <b>akaṭ'ānudhammena</b> taṃ diṭṭhiṃ appaṭinissaṭṭhena saddhiṃ sambhuñjeyya vā saṃvaseyya vā saha vā seyyaṃ kappeyya, pācittiyaṃ."
+  },
+  {
+    "id": "db_32_sbs_example_1",
+    "input": "<b>akataṃ</b> dukkaṭaṃ seyyo,\npacchā tappati dukkaṭaṃ,\nkatañ'ca sukataṃ seyyo,\nyaṃ katvā n'ānutappati.",
+    "expected": "<b>akataṃ</b> dukkaṭaṃ seyyo,\npacchā tappati dukkaṭaṃ,\nkatañ'ca sukataṃ seyyo,\nyaṃ katvā n'ānutappati."
+  },
+  {
+    "id": "db_32_dhp_example",
+    "input": "<b>akataṃ</b> dukkaṭaṃ seyyo,\npacchā tappati dukkaṭaṃ,\nkatañ'ca sukataṃ seyyo,\nyaṃ katvā n'ānutappati.",
+    "expected": "<b>akataṃ</b> dukkaṭaṃ seyyo,\npacchā tappati dukkaṭaṃ,\nkatañ'ca sukataṃ seyyo,\nyaṃ katvā n'ānutappati."
+  },
+  {
+    "id": "db_32_class_example",
+    "input": "idha, bhikkhave, rañño nāgo yam'enaṃ hatthidammasārathi kāraṇaṃ kāreti, yadi vā katapubbaṃ yadi vā <b>akata</b>pubbaṃ, taṃ aṭṭhiṃ katvā manasi katvā sabbaṃ cetasā samannāharitvā ohitasoto suṇāti.",
+    "expected": "idha, bhikkhave, rañño nāgo yam'enaṃ hatthidammasārathi kāraṇaṃ kāreti, yadi vā katapubbaṃ yadi vā <b>akata</b>pubbaṃ, taṃ aṭṭhiṃ katvā manasi katvā sabbaṃ cetasā samannāharitvā ohitasoto suṇāti."
+  },
+  {
+    "id": "db_33_class_example",
+    "input": "atthi bhikkhave ajātaṃ abhūtaṃ <b>akataṃ</b> asaṅkhataṃ",
+    "expected": "atthi bhikkhave ajātaṃ abhūtaṃ <b>akataṃ</b> asaṅkhataṃ"
+  },
+  {
+    "id": "db_34_dhp_example",
+    "input": "na paresaṃ vilomāni,\nna paresaṃ kata-<b>akataṃ</b>,\nattano'va avekkheyya,\nkatāni <b>akatāni</b> ca.",
+    "expected": "na paresaṃ vilomāni,\nna paresaṃ kata-<b>akataṃ</b>,\nattano'va avekkheyya,\nkatāni <b>akatāni</b> ca."
+  },
+  {
+    "id": "db_35_vib_example",
+    "input": "samāpajjeyyā'ti katena kataṃ cetāpeti, nissaggiyaṃ pācittiyaṃ. katena <b>akataṃ</b> cetāpeti, nissaggiyaṃ pācittiyaṃ. katena kata-<b>akataṃ</b> cetāpeti, nissaggiyaṃ pācittiyaṃ.",
+    "expected": "samāpajjeyyā'ti katena kataṃ cetāpeti, nissaggiyaṃ pācittiyaṃ. katena <b>akataṃ</b> cetāpeti, nissaggiyaṃ pācittiyaṃ. katena kata-<b>akataṃ</b> cetāpeti, nissaggiyaṃ pācittiyaṃ."
+  },
+  {
+    "id": "db_36_vib_example",
+    "input": "navaṃ nāma <b>akatakappaṃ</b> vuccati.",
+    "expected": "navaṃ nāma <b>akatakappaṃ</b> vuccati."
+  },
+  {
+    "id": "db_37_vib_example",
+    "input": "theyyasattho nāma corā katakammā vā honti <b>akatakammā</b> vā, rājānaṃ vā theyyaṃ gacchanti suṅkaṃ vā pariharanti.",
+    "expected": "theyyasattho nāma corā katakammā vā honti <b>akatakammā</b> vā, rājānaṃ vā theyyaṃ gacchanti suṅkaṃ vā pariharanti."
+  },
+  {
+    "id": "db_46_dhp_example",
+    "input": "assaddho <b>akataññū</b> ca,\nsandhicchedo ca yo naro,\nhat'āvakāso vant'āso,\nsa ve uttamaporiso.",
+    "expected": "assaddho <b>akataññū</b> ca,\nsandhicchedo ca yo naro,\nhat'āvakāso vant'āso,\nsa ve uttamaporiso."
+  },
+  {
+    "id": "db_47_dhp_example",
+    "input": "chinda sotaṃ parakkamma,\nkāme panuda brāhmaṇa,\nsaṅkhārānaṃ khayaṃ ñatvā,\n<b>akataññū</b>'si brāhmaṇa.",
+    "expected": "chinda sotaṃ parakkamma,\nkāme panuda brāhmaṇa,\nsaṅkhārānaṃ khayaṃ ñatvā,\n<b>akataññū</b>'si brāhmaṇa."
+  },
+  {
+    "id": "db_54_class_example",
+    "input": "idha, bhikkhave, rañño nāgo yam'enaṃ hatthidammasārathi kāraṇaṃ kāreti, yadi vā katapubbaṃ yadi vā <b>akatapubbaṃ</b>, taṃ aṭṭhiṃ katvā manasi katvā sabbaṃ cetasā samannāharitvā ohitasoto suṇāti.",
+    "expected": "idha, bhikkhave, rañño nāgo yam'enaṃ hatthidammasārathi kāraṇaṃ kāreti, yadi vā katapubbaṃ yadi vā <b>akatapubbaṃ</b>, taṃ aṭṭhiṃ katvā manasi katvā sabbaṃ cetasā samannāharitvā ohitasoto suṇāti."
+  },
+  {
+    "id": "db_64_sbs_example_1",
+    "input": "pānīyaparibhojanīya-upaṭṭhapanañ'ca, chand'ārahānaṃ bhikkhūnaṃ chand'āharaṇañ'ca, tesaññ'eva <b>akat'uposathānaṃ</b> pārisuddhiyā'pi āharaṇañ'ca",
+    "expected": "pānīyaparibhojanīya-upaṭṭhapanañ'ca, chand'ārahānaṃ bhikkhūnaṃ chand'āharaṇañ'ca, tesaññ'eva <b>akat'uposathānaṃ</b> pārisuddhiyā'pi āharaṇañ'ca"
+  },
+  {
+    "id": "db_67_vib_example",
+    "input": "paripāceti nāma pubbe adātu'kāmānaṃ <b>akattu'kāmānaṃ</b>, ayyo bhāṇako, ayyo bahussuto, ayyo suttantiko, ayyo vinayadharo, ayyo dhammakathiko, detha ayyassa, karotha ayyassā'ti esā paripāceti nāma.",
+    "expected": "paripāceti nāma pubbe adātu'kāmānaṃ <b>akattu'kāmānaṃ</b>, ayyo bhāṇako, ayyo bahussuto, ayyo suttantiko, ayyo vinayadharo, ayyo dhammakathiko, detha ayyassa, karotha ayyassā'ti esā paripāceti nāma."
+  },
+  {
+    "id": "db_74_sbs_example_1",
+    "input": "vicikicchaṃ pahāya tiṇṇavicikiccho viharati <b>akathaṃkathī</b> kusalesu dhammesu, vicikicchāya cittaṃ parisodhesiṃ.",
+    "expected": "vicikicchaṃ pahāya tiṇṇavicikiccho viharati <b>akathaṃkathī</b> kusalesu dhammesu, vicikicchāya cittaṃ parisodhesiṃ."
+  },
+  {
+    "id": "db_74_dhp_example",
+    "input": "yass'ālayā na vijjanti,\naññāya <b>akathaṃkathī</b>,\namat'ogadham'anuppattaṃ,\ntam'ahaṃ brūmi brāhmaṇaṃ.",
+    "expected": "yass'ālayā na vijjanti,\naññāya <b>akathaṃkathī</b>,\namat'ogadham'anuppattaṃ,\ntam'ahaṃ brūmi brāhmaṇaṃ."
+  }
+]
