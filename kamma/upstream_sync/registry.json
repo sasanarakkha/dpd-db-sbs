@@ -3,154 +3,531 @@
     {
       "path": "db/models.py",
       "discuss": true,
-      "discuss_reason": "Adds SBS table (~30 cols), Russian table (~5 cols), Tamil table (ta_meaning), Sinhala table, .sbs/.ru/.ta/.si relationships on DpdHeadword, root_ru_meaning/sanskrit_root_ru_meaning on DpdRoot, and hybrid properties. Blind porting would silently delete all localized tables and columns."
+      "discuss_reason": "Adds SBS table (~30 cols), Russian table (~5 cols), Tamil table (ta_meaning), Sinhala table, .sbs/.ru/.ta/.si relationships on DpdHeadword, root_ru_meaning/sanskrit_root_ru_meaning on DpdRoot, and hybrid properties. Blind porting would silently delete all localized tables and columns.",
+      "sync_rule": "DISCUSS",
+      "local_changes": [
+        "`SBS` table (~30 columns) at line ~1655: chant data, class mapping, SBS-specific indices and hybrid properties (`sbs_index`, `sbs_chant_link_1/2`, `sbs_class_link`).",
+        "`Russian` table (~5 columns) at line ~1865 with `ru_` prefixed fields.",
+        "`Tamil` table (~2 columns) at line ~1879 with `ta_meaning` field for AI-generated Tamil meanings.",
+        "`Sinhala` table at line ~1886.",
+        "`.sbs`, `.ru`, and `.ta` relationships on `DpdHeadword` (lines ~959, ~962, ~965).",
+        "`root_ru_meaning` and `sanskrit_root_ru_meaning` columns on `DpdRoot` (lines ~110-111) and `FamilyRoot` (line ~188).",
+        "`data_ru` JSON pack/unpack helpers on family tables.",
+        "Import of `sbs_table_functions.SBS_table_tools` and `paragraphs_are_similar` (line ~29)."
+      ],
+      "watch_for": [
+        "New upstream columns/relationships on `DpdHeadword` must not overwrite SBS/Russian/Tamil additions — manually merge, never auto-replace.",
+        "Upstream renames of base columns require matching updates in SBS hybrid properties that reference them.",
+        "Any upstream change to `DpdRoot` must preserve `root_ru_meaning`/`sanskrit_root_ru_meaning`.",
+        "Tamil table is minimal (only `ta_meaning` for now) and isolated from Russian; no shared logic to break.",
+        "`paragraphs_are_similar` import from `tools.sbs_table_functions` is DPS-specific — do not remove."
+      ],
+      "why_discuss": "Adds four entire tables (`SBS`, `Russian`, `Tamil`, `Sinhala`) plus relationships (`.sbs`, `.ru`, `.ta`) on `DpdHeadword` and extra columns (`root_ru_meaning`, `sanskrit_root_ru_meaning`) on `DpdRoot`. Blind porting would silently delete all localized schema."
     },
     {
       "path": "exporter/webapp/data_classes.py",
       "discuss": false,
-      "discuss_reason": ""
+      "discuss_reason": "",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "`HeadwordData.__init__` includes `self.sbs` (line ~18) and `self.show_ru_data` flag (line ~26) plus `ru_meaning`, `ru_meaning_lit`, `ru_notes`, `sbs_meaning`, `sbs_notes` fields (lines ~46-50).",
+        "`convert_newlines` `string_columns` extended with SBS/local example fields: `sbs_example_1`, `sbs_example_2`, `dhp_example`, `pat_example`, `vib_example`, `class_example`, `class_example_translation`, `discourses_example`, `extra_example`.",
+        "SBS search URL `/sbs/search_json` referenced in rendered HTML (line ~164)."
+      ],
+      "watch_for": [
+        "New upstream data class fields must be ported to this file AND to `exporter/webapp/data_classes_ru.py` (its shadow).",
+        "If upstream changes `HeadwordData` constructor signature, update both files."
+      ]
     },
     {
       "path": "exporter/webapp/static/app.js",
       "discuss": false,
-      "discuss_reason": ""
+      "discuss_reason": "",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "SBS dictionary link to `sasanarakkha.github.io/study-tools/dict/sbs-pali-dictionary` in UI (line ~380).",
+        "SBS search endpoint references."
+      ],
+      "watch_for": [
+        "Upstream JS refactors may move SBS link anchors — verify after sync that SBS link is still rendered."
+      ]
     },
     {
       "path": "exporter/webapp/static/home.js",
       "discuss": false,
-      "discuss_reason": ""
+      "discuss_reason": "",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "SBS dictionary link to `sasanarakkha.github.io/study-tools/dict/sbs-pali-dictionary` in English start message (line ~67).",
+        "Russian (`language === \"ru\"`) start message block (lines ~77-91): fully localized RU text with links to `devamitta.github.io/dpd.rus/webapp/` and `devamitta.github.io/dpd.rus/`."
+      ],
+      "watch_for": [
+        "Keep SBS link in sync with the one in `app.js` — they reference the same URL.",
+        "If upstream adds new language branches to the start-message block, ensure the RU branch remains syntactically valid alongside them."
+      ]
     },
     {
       "path": "gui2/main.py",
       "discuss": true,
-      "discuss_reason": "Imports fast_api_utils_dps (DPS-specific) and adds DpsView tab. Blind porting would remove this tab and break the DPS GUI."
+      "discuss_reason": "Imports fast_api_utils_dps (DPS-specific) and adds DpsView tab. Blind porting would remove this tab and break the DPS GUI.",
+      "sync_rule": "DISCUSS",
+      "local_changes": [
+        "`from tools.fast_api_utils_dps import start_dpd_server` (line ~11) replaces upstream's `fast_api_utils` import.",
+        "`DpsView` tab (line ~91): `self.dps_view = DpsView(self.page, self.toolkit)`.",
+        "Conditional import for `DpsView` inside the class body (line ~26).",
+        "Runtime font scaling patch (module level, after all imports, before `class App`): patches `ft.Text.__init__`, `ft.TextStyle.__init__`, `ft.TextField.__init__`, and `ft.Dropdown.__init__` via `_make_font_scaler` to multiply `size=` / `text_size=` kwargs by `_DPS_FONT_SCALE = 1.4` (using `round()`). No exclusions — all tabs are scaled uniformly. Adjust `_DPS_FONT_SCALE` in `main.py` to retune the app-wide font size. Also patches `DpdTextField.__init__` (post-init): sets `text_size = round(14 * _DPS_FONT_SCALE)` when `text_size is None`, covering fields that omit an explicit `text_size`. DPS files (`dps_view.py`, `dps_fields.py`, `dps_field_mapping.py`) were normalized to upstream-matching explicit sizes (`text_size=14`, `size=12`, etc.) so the global scale renders them at a consistent visual size."
+      ],
+      "watch_for": [
+        "Upstream GUI refactors that change the tab initialization pattern will break DPS tab injection — check constructor signature.",
+        "If upstream switches from `fast_api_utils` to another server module, `fast_api_utils_dps` must be updated to match the new API.",
+        "New upstream view tabs added to `main.py` should be reviewed to ensure DPS views are still appended correctly.",
+        "If upstream adds new text-bearing widgets with explicit `size=` / `text_size=` args that should scale, add them to the `_make_font_scaler` calls in `main.py`.",
+        "If DPS adds new widgets with explicit sizes, use upstream-matching values (e.g. `text_size=14`, `size=10`) so the global scale renders them correctly."
+      ],
+      "why_discuss": "Imports `fast_api_utils_dps` (DPS-specific server launcher) instead of upstream's `fast_api_utils`, and adds `DpsView` tab. Blind porting removes DPS GUI entirely."
     },
     {
       "path": "gui2/pass2_add_view.py",
       "discuss": false,
-      "discuss_reason": ""
+      "discuss_reason": "",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "`from tools.fast_api_utils_dps import request_dpd_server` (line ~24) replaces upstream's `fast_api_utils` import for DPS server requests.",
+        "All server request calls go through `request_dpd_server` from the DPS shadow module, ensuring DPS-specific server configuration (host/port/timeout) is used instead of upstream defaults."
+      ],
+      "watch_for": [
+        "If upstream changes the function name in `fast_api_utils`, the `fast_api_utils_dps` shadow must be updated to match.",
+        "Upstream GUI refactors to `Pass2AddView` constructor or method signatures need manual review."
+      ]
     },
     {
       "path": ".gitignore",
       "discuss": true,
-      "discuss_reason": "Contains DPS-specific exclusions for local build artifacts, Russian export outputs, and SBS data paths. Blind porting would re-track files that must remain untracked in this fork."
+      "discuss_reason": "Contains DPS-specific exclusions for local build artifacts, Russian export outputs, and SBS data paths. Blind porting would re-track files that must remain untracked in this fork.",
+      "sync_rule": "DISCUSS",
+      "local_changes": [
+        "DPS/SBS/RU-specific block: excludes RU goldendict JS artifacts, kindle epub XHTML outputs, SBS-specific generated files (lines ~114-130).",
+        "Any upstream `.gitignore` additions must be merged, not replaced."
+      ],
+      "watch_for": [
+        "New upstream ignore patterns may conflict with DPS-specific entries — review the diff carefully.",
+        "The DPS block at the bottom must be preserved after every upstream merge."
+      ],
+      "why_discuss": "Contains a `# --- DPS / SBS / RU UNIQUE patterns ---` block (line ~114) listing DPS-specific build artifacts and generated JS/XHTML files. Blind porting would re-track these files in git."
     },
     {
       "path": "AGENTS.md",
       "discuss": true,
-      "discuss_reason": "Fork identity and sync policy sections are localized. Blind porting would overwrite fork-specific AI instructions with upstream defaults, breaking sync and shadow-file protocols."
+      "discuss_reason": "Fork identity and sync policy sections are localized. Blind porting would overwrite fork-specific AI instructions with upstream defaults, breaking sync and shadow-file protocols.",
+      "sync_rule": "DISCUSS",
+      "local_changes": [
+        "\"Localized Rules\" section added with fork identity, local model additions, DPS GitHub issue mapping, shadow sync policy, and engineering standards.",
+        "`kamma/upstream_sync/registry.json` references replace any upstream paths.",
+        "Clean Root Folder Protocol and Shadow Files & Sync Templates sections are fork-specific."
+      ],
+      "watch_for": [
+        "After any upstream AGENTS.md update, review the diff, identify genuinely new rules/tools/workflows, and add a concise summary to the \"Project Rules (from original upstream)\" section of CLAUDE.md.",
+        "Never replace the entire file or the \"Localized Rules\" section.",
+        "Fork-local sections must be preserved verbatim."
+      ],
+      "why_discuss": "Fork identity sections, shadow sync policy, and localized project rules are embedded here. Blind porting would overwrite fork-specific AI agent instructions with upstream defaults."
     },
     {
       "path": "pyproject.toml",
       "discuss": true,
-      "discuss_reason": "Carries local-only dependencies not present upstream (currently num2words>=0.5.14, pyrefly>=1.1.1). The Stage 1 execute_sync checkout overwrites pyproject.toml with the upstream version; without a modified_upstream_files exclusion the local-only deps are silently dropped (regressed in the 2026-06-01 sync). Must be restored and merged manually so local-only deps survive every sync."
+      "discuss_reason": "Carries local-only dependencies not present upstream (currently num2words>=0.5.14, pyrefly>=1.1.1). The Stage 1 execute_sync checkout overwrites pyproject.toml with the upstream version; without a modified_upstream_files exclusion the local-only deps are silently dropped (regressed in the 2026-06-01 sync). Must be restored and merged manually so local-only deps survive every sync.",
+      "sync_rule": "DISCUSS",
+      "local_changes": [
+        "Local-only runtime dependencies appended to `[project].dependencies` that upstream does not declare. Current set: `num2words>=0.5.14`, `pyrefly>=1.1.1`.",
+        "Any future fork-only dependency added to `dependencies` or `[dependency-groups]` must be re-applied after every upstream pull."
+      ],
+      "watch_for": [
+        "After each upstream pull, diff local `pyproject.toml` against `upstream/main:pyproject.toml`, re-apply every local-only dependency, then run `uv lock` + `uv sync --all-groups`.",
+        "This is a MERGE, not a wholesale local-wins replace — also take upstream's new deps; do not delete upstream additions."
+      ],
+      "why_discuss": "Carries local-only dependencies not present upstream (currently `num2words>=0.5.14`, added for `scripts/change_in_db/update_yojana_km.py`). The Stage 1 `execute_sync` checkout overwrites `pyproject.toml` with the upstream version; without an exclusion entry the local-only deps are silently dropped."
     },
     {
       "path": ".pre-commit-config.yaml",
       "discuss": true,
-      "discuss_reason": "Carries a local-only pyrefly hook appended after the upstream pyright hook. Must be re-appended after every upstream pull that overwrites this file."
+      "discuss_reason": "Carries a local-only pyrefly hook appended after the upstream pyright hook. Must be re-appended after every upstream pull that overwrites this file.",
+      "sync_rule": "DISCUSS",
+      "local_changes": [
+        "`pyrefly` hook added: `uv run --with pyrefly pyrefly check --min-severity warn`, runs on all Python files with `pass_filenames: true`."
+      ],
+      "watch_for": [
+        "After each upstream pull, re-append the `pyrefly` hook block after `pyright` if the file was overwritten.",
+        "If upstream adds new hooks, integrate them alongside the local `pyrefly` entry — do not replace wholesale."
+      ],
+      "why_discuss": "Carries a local-only `pyrefly` hook appended after the upstream `pyright` hook. Blind porting would drop this addition."
     }
   ],
   "inspired_by_upstream": {
     ".github/workflows/ru_release.yml": {
       "upstream": ".github/workflows/draft_release.yml",
-      "divergence_reason": "Different pipeline logic for RU release lifecycle."
+      "divergence_reason": "Different pipeline logic for RU release lifecycle.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "Adapted from `draft_release.yml` to build and release Russian dictionary artifacts.",
+        "Release targets RU goldendict/mdict outputs; upload destinations are RU-specific GitHub release.",
+        "\"Add TPD to Lookup Table\" step added after the RPD step (`uv run python db/tpd/tpd_to_lookup.py`)."
+      ],
+      "watch_for": [
+        "Upstream changes to release workflow steps (artifact names, upload actions) need mirroring here.",
+        "The TPD step must remain after RPD and before dealbreakers."
+      ]
     },
     ".github/workflows/ru_release_test.yml": {
       "upstream": ".github/workflows/draft_release.yml",
-      "divergence_reason": "Different pipeline logic for RU release testing."
+      "divergence_reason": "Different pipeline logic for RU release testing.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "Test/dry-run variant of `ru_release.yml` — validates RU release build without publishing.",
+        "Adapted from `draft_release.yml` with test-mode flags.",
+        "\"Add TPD to Lookup Table\" step added after the RPD step — mirrors `ru_release.yml`."
+      ],
+      "watch_for": [
+        "Keep in sync with `ru_release.yml` — divergence causes test/prod environment drift."
+      ]
     },
     ".github/workflows/ru_static.yml": {
       "upstream": ".github/workflows/static.yml",
-      "divergence_reason": "Different CI configuration for RU static build."
+      "divergence_reason": "Different CI configuration for RU static build.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "Adapted from `static.yml` to build and deploy RU static documentation/webapp.",
+        "Deploy targets point to RU-specific GitHub Pages or hosting."
+      ],
+      "watch_for": [
+        "Upstream static workflow changes (build commands, deploy steps) need porting here."
+      ]
     },
     "scripts/bash/generate_components.sh": {
       "upstream": "scripts/bash/generate_components.py",
-      "divergence_reason": "Language mismatch: Bash vs Python; localized build orchestration."
+      "divergence_reason": "Language mismatch: Bash vs Python; localized build orchestration.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "Converted from `generate_components.py` (upstream) to a Bash script.",
+        "Sequential execution of upstream builders followed by Russian shadow builders: `family_root_ru.py`, `family_word_ru.py`, `family_compound_ru.py`, `family_set_ru_update.py`, `family_set_ru.py`, `family_idiom_ru.py`.",
+        "Appends `help_abbrev_add_to_lookup_ru.py` after the upstream help script.",
+        "Includes explicit `uv run` calls for all Python scripts.",
+        "Error handling: `set -e` and explicit dealbreakers status check."
+      ],
+      "watch_for": [
+        "Upstream structural changes to builder order must be ported.",
+        "Ensure all `_ru.py` scripts are executed in the correct dependency order (after their English counterparts)."
+      ]
     },
     "scripts/bash/make_dpd.sh": {
       "upstream": "scripts/bash/makedict.py",
-      "divergence_reason": "Language mismatch: Bash vs Python; localized DPD build logic."
+      "divergence_reason": "Language mismatch: Bash vs Python; localized DPD build logic.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "Interactive config selector: (1) DPD-SBS server, (2) DPD-SBS-RU local.",
+        "Runs `generate_components.sh` (the localized version).",
+        "Exporter sequence: uses `main_sbs.py` and `tpr_exporter_ru.py`.",
+        "Automation: moves mdict files and copies server artifacts if option 1 is selected.",
+        "Post-build cleanup: `git checkout --` for files modified during the build (e.g., `pyproject.toml`)."
+      ],
+      "watch_for": [
+        "The hardcoded branch `sbs-ru` checkout at the beginning.",
+        "Ensure `config_github_local_dpd_sbs.py` is called at the end to reset settings."
+      ]
     },
     "scripts/bash/make_ru_dpd.sh": {
       "upstream": "scripts/bash/makedict.py",
-      "divergence_reason": "Language mismatch: Bash vs Python; RU-specific build entry point."
+      "divergence_reason": "Language mismatch: Bash vs Python; RU-specific build entry point.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "Interactive config selector: (1) RUS-DPD server, (2) RUS-DPD local.",
+        "Conditional component generation: if skipped, it runs `families_to_json_ru.py` directly.",
+        "Exporter sequence: uses `grammar_dict_ru.py`, `main_ru.py`, `deconstructor_exporter_ru.py`, `kindle_exporter_ru.py`, `tbw_exporter_ru.py`, `tpr_exporter_ru.py`.",
+        "Moves Russian mdict files and tarballs the DB."
+      ],
+      "watch_for": [
+        "This script is focused on the Russian-only export profile.",
+        "Coordinate with `ru_zip_goldendict_mdict.py`."
+      ]
     },
     "docs_rus/": {
       "upstream": "docs/",
-      "divergence_reason": "Maintained Russian translation of upstream docs/ handled by Stage 4 Docs Translation Parity."
+      "divergence_reason": "Maintained Russian translation of upstream docs/ handled by Stage 4 Docs Translation Parity.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "Complete Russian translation of the `docs/` directory: features, install, webapp, integrations, contributing, technical sections.",
+        "Served by `mkdocs_ru.yaml`; deployed to `devamitta.github.io/dpd.rus/`.",
+        "Three local-only files with no `docs/` counterpart: `dpd_rus.md`, `contributing/rus_collaboration.md`, `technical/dpd_headwords_table_ru.md`."
+      ],
+      "watch_for": [
+        "Translation parity is checked and updated in Stage 4 of every sync — see `guide.md`.",
+        "Navigation structure in `mkdocs_ru.yaml` must be updated when new files are added.",
+        "Do NOT add local content to `docs/` — use `docs_rus/` or `kamma/` instead."
+      ]
     },
     "mkdocs_ru.yaml": {
       "upstream": "mkdocs.yaml",
-      "divergence_reason": "Different build config: different nav structure and RU-specific plugins."
+      "divergence_reason": "Different build config: different nav structure and RU-specific plugins.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "Site name and docs dir set to Russian fork values.",
+        "Navigation tree translated to Russian and includes `contributing/ru_collaboration.md` and `dpd_rus.md`.",
+        "Social links point to `sasanarakkha/dpd-db-sbs`."
+      ],
+      "watch_for": [
+        "Sync with upstream `mkdocs.yaml` regularly to ensure documentation coverage parity."
+      ]
     },
     "exporter/goldendict/export_dpd_ru.py": {
       "upstream": "exporter/goldendict/export_dpd.py",
-      "divergence_reason": "Significant divergence in data structures and RU output logic."
+      "divergence_reason": "Significant divergence in data structures and RU output logic.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "`DpdHeadwordDbParts` includes `ru: Russian` model; queries filter for `Russian.id.isnot(None)`.",
+        "`render_pali_word_dpd_html` uses `data_classes_dps.HeadwordData` and renders via `dpd_headword_ru.jinja`.",
+        "Size tracking: `size_dict[\"dpd_summary\"]` records `data.ru_meaning` length instead of English meaning.",
+        "Synonyms include Russian set names via `tools_for_ru_exporter.read_set_ru_from_tsv()`.",
+        "`generate_dpd_html` uses `rupth: RuPaths` and `joinedload(DpdHeadword.ru)`."
+      ],
+      "watch_for": [
+        "The Russian filter means only translated words are exported.",
+        "Synonyms logic includes a manual Russian set lookup."
+      ]
     },
     "exporter/goldendict/export_help_ru.py": {
       "upstream": "exporter/goldendict/export_help.py",
-      "divergence_reason": "Localized help export with RU-specific content structure."
+      "divergence_reason": "Localized help export with RU-specific content structure.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "`Abbreviation` and `Help` data classes add `ru_abbrev`, `ru_help`, and `ru_meaning` fields.",
+        "`generate_help_html` uses `rupth: RuPaths` and loads templates from `ru_components/templates/`.",
+        "`add_abbrev_html` and `add_help_html` use `ru_abbrev` or `ru_help` as the GoldenDict dictionary key.",
+        "`add_bibliography` and `add_thanks` use `rupth` paths but remain structurally similar to upstream."
+      ],
+      "watch_for": [
+        "Dictionary keys are in Russian (e.g., Russian abbreviations) to allow lookup from Russian text.",
+        "Template names are suffixed with `_ru.jinja`."
+      ]
     },
     "exporter/goldendict/export_roots_ru.py": {
       "upstream": "exporter/goldendict/export_roots.py",
-      "divergence_reason": "RU-specific data injection makes mechanical parity impractical."
+      "divergence_reason": "RU-specific data injection makes mechanical parity impractical.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "`generate_root_html` signature adds `rupth: RuPaths`.",
+        "Uses `data_classes_dps.RootsData` and `root_headword_ru.jinja` template.",
+        "`size_dict[\"root_definition\"]` tracks the full `final_html` length."
+      ],
+      "watch_for": [
+        "`RootsData` in `data_classes_dps.py` contains the Russian-specific fields (`ru_root_info`, `ru_root_matrix`)."
+      ]
     },
     "exporter/goldendict/export_variant_spelling_ru.py": {
       "upstream": "exporter/goldendict/export_variant_spelling.py",
-      "divergence_reason": "RU output logic diverges from upstream structure."
+      "divergence_reason": "RU output logic diverges from upstream structure.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "`generate_variant_spelling_html` uses `rupth: RuPaths`.",
+        "`generate_see_data_list` logic is entirely removed (merged into other types or omitted).",
+        "`generate_variant_data_list` and `generate_spelling_data_list` use `_ru.jinja` templates.",
+        "Templates use `main` or `correction` variables directly rather than a complex `data` object."
+      ],
+      "watch_for": [
+        "Omission of `see_dict` processing compared to upstream.",
+        "Direct template variable passing instead of `data` object wrapping."
+      ]
     },
     "exporter/goldendict/main_ru.py": {
       "upstream": "exporter/goldendict/main.py",
-      "divergence_reason": "RU-specific dictionary entry point with different build orchestration."
+      "divergence_reason": "RU-specific dictionary entry point with different build orchestration.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "Imports from Russian variants of exporters (e.g., `exporter.goldendict.export_dpd_ru`).",
+        "`GlobalVars` adds `rupth: RuPaths` and sets `self.paths = self.rupth`.",
+        "`prepare_export_to_goldendict_mdict` uses Russian dictionary metadata (bookname, author, website) and sets `target_lang=\"ru\"`.",
+        "JS paths point to `ru_components/javascript/`.",
+        "`dict_name` set to `ru-dpd`."
+      ],
+      "watch_for": [
+        "Ensure all `generate_*_html` calls in `main()` use the Russian versions and pass `rupth`.",
+        "Check that `export_rpd` is used instead of `export_epd`."
+      ]
     },
     "tools/paths_ru.py": {
       "upstream": "tools/paths.py",
-      "divergence_reason": "Fundamental path redirection logic for RU build outputs."
+      "divergence_reason": "Fundamental path redirection logic for RU build outputs.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "`RuPaths` class mapping all upstream `ProjectPaths` constants to Russian-prefixed equivalents.",
+        "Russian-specific paths: `abbreviations_tsv_path` (help_ru), `sets_ru_path`, `ru_components/templates/`, `fdg_dpd_ebts_js_ru_path`, etc.",
+        "`create_dirs` logic filtered to only needed output directories."
+      ],
+      "watch_for": [
+        "New upstream path constants are *silently missing* in this shadow file until ported.",
+        "All localized exporters depend on this file for output locations."
+      ],
+      "triple_shadow": "Both `tools/paths_ru.py` (class `RuPaths`) and `tools/paths_dps.py` (class `DPSPaths`) shadow `tools/paths.py`."
     },
     "exporter/goldendict/export_dpd_sbs.py": {
       "upstream": "exporter/goldendict/export_dpd.py",
-      "divergence_reason": "Significant structural divergence for SBS output format."
+      "divergence_reason": "Significant structural divergence for SBS output format.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "`generate_dpd_html` signature adds `dpspth: DPSPaths`, `show_sbs_data`, `show_ru_data`, `show_ta_data`, and `show_grammar` flags.",
+        "Eagerly loads `.rt`, `.ru`, `.ta`, and `.sbs` relationships.",
+        "Synonyms logic includes a conditional Russian set lookup if `show_ru_data` is true.",
+        "`_parse_batch_top_level` uses `sbs_templates/` and passes all locale flags including `show_ta_data`.",
+        "`DpdHeadwordRenderDataBase` TypedDict includes `show_ta_data: bool`."
+      ],
+      "watch_for": [
+        "When upstream adds new eager-loaded relationships, also add `.ta` to the joinedload chain.",
+        "All locale flags (`show_sbs_data`, `show_ru_data`, `show_ta_data`, `show_grammar`) must be threaded through `render_data`, `_parse_batch_top_level`, and `render_pali_word_dpd_html` in sync."
+      ]
     },
     "exporter/goldendict/export_epd_sbs.py": {
       "upstream": "exporter/goldendict/export_epd.py",
-      "divergence_reason": "SBS-specific output logic diverges from upstream."
+      "divergence_reason": "SBS-specific output logic diverges from upstream.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "`EpdDataSBS` subclass added to handle combined English + Russian + Tamil EPD entries.",
+        "`generate_epd_html` accepts `show_ru_data` and `show_ta_data` flags.",
+        "If `show_ru_data` is true, queries `Lookup.rpd` and merges into the EPD dict.",
+        "If `show_ta_data` is true, queries `Lookup.tpd` and merges into the EPD dict.",
+        "Uses `epd_sbs.jinja` template."
+      ],
+      "watch_for": [
+        "Merged results mean one lookup key can map to DPD + Russian + Tamil equivalents simultaneously.",
+        "Adding a new locale lookup follows the same pattern: query `Lookup.<locale>`, iterate entries, merge into `epd_dict`."
+      ]
     },
     "exporter/goldendict/export_help_sbs.py": {
       "upstream": "exporter/goldendict/export_help.py",
-      "divergence_reason": "SBS-specific help content structure."
+      "divergence_reason": "SBS-specific help content structure.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "`generate_help_html` accepts `show_ru_data` flag and passes it to `add_abbrev_html` and `add_help_html`.",
+        "Templates `help_abbrev_sbs.jinja` and `help_help_sbs.jinja` receive the `show_ru_data` flag to conditionally render Russian columns.",
+        "Uses `utils_sbs.RenderedSizes` and `DPSPaths`."
+      ],
+      "watch_for": [
+        "Requires `utils_sbs.py` to be in sync with `tools/utils.py`."
+      ]
     },
     "exporter/goldendict/export_roots_sbs.py": {
       "upstream": "exporter/goldendict/export_roots.py",
-      "divergence_reason": "SBS data injection makes mechanical parity impractical."
+      "divergence_reason": "SBS data injection makes mechanical parity impractical.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "`generate_root_html` accepts `show_ru_data` flag.",
+        "Uses `root_headword_sbs.jinja` template."
+      ],
+      "watch_for": [
+        "Template structure must match `data_classes_dps.RootsData`."
+      ]
     },
     "exporter/goldendict/main_sbs.py": {
       "upstream": "exporter/goldendict/main.py",
-      "divergence_reason": "SBS-specific dictionary entry point."
+      "divergence_reason": "SBS-specific dictionary entry point.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "`GlobalVars` adds `dpspth: DPSPaths`.",
+        "Config flags `show_sbs_data`, `show_ru_data`, `show_ta_data`, and `show_grammar` are read from `config.ini` during initialization.",
+        "`show_ta_data` is passed to both `generate_dpd_html()` and `generate_epd_html()`.",
+        "`prepare_export_to_goldendict_mdict` appends \"SBS fork by Devamitta\" to the author and description.",
+        "JS paths use `dpspth` and point to `sbs_` prefixed files."
+      ],
+      "watch_for": [
+        "When adding a new locale flag, wire it through `GlobalVars`, `generate_dpd_html`, and `generate_epd_html` — all three must be updated together."
+      ]
     },
     "tools/paths_dps.py": {
       "upstream": "tools/paths.py",
-      "divergence_reason": "Fundamental path redirection for DPS/SBS build outputs."
+      "divergence_reason": "Fundamental path redirection for DPS/SBS build outputs.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "`DPSPaths` class mapping upstream constants to SBS/DPS output directories.",
+        "SBS-specific paths: `sbs_index_path`, `class_index_path`, `ru_user_dict_path`, `anki_csvs_dir`, etc.",
+        "Paths for AI suggestion history and batch reports."
+      ],
+      "watch_for": [
+        "Massive divergence from `ProjectPaths`; must be updated every time a new path is added upstream."
+      ],
+      "triple_shadow": "Shadows `tools/paths.py`."
     },
     "tools/fast_api_utils_dps.py": {
       "upstream": "tools/fast_api_utils.py",
-      "divergence_reason": "DPS-specific FastAPI utilities; architectural divergence from upstream."
+      "divergence_reason": "DPS-specific FastAPI utilities; architectural divergence from upstream.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "`start_dpd_server` launches `main_ru:app` on `127.0.0.1:8080` (GUI internal startup port).",
+        "`request_dpd_server` redirects to `http://127.0.0.1:8080/sbs/`."
+      ],
+      "watch_for": [
+        "Port split is intentional: `8080` = GUI-initiated internal server; `8081` = standalone `main_ru.py` server. Do not collapse them.",
+        "`127.0.0.1` is the correct local Mac development address — never replace it with `0.0.0.0` or `localhost`.",
+        "When upstream `fast_api_utils.py` adds new server helpers or changes the startup API, evaluate whether the DPS equivalent needs a matching `_dps` variant. Do not blindly port — this file is `inspired_only`."
+      ],
+      "shadow_of": "tools/fast_api_utils.py"
     },
     "gui2/dps_view.py": {
       "upstream": "gui2/pass2_add_view.py",
-      "divergence_reason": "Implements the DPS RU/SBS editing tab: reuses upstream's View/Column/PopUpMixin shell but runs an independent data model (Russian/SBS tables), navigation, filters, and DB-write path that have evolved separately for over a year."
+      "divergence_reason": "Implements the DPS RU/SBS editing tab: reuses upstream's View/Column/PopUpMixin shell but runs an independent data model (Russian/SBS tables), navigation, filters, and DB-write path that have evolved separately for over a year.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "Imports the `Russian` and `SBS` models plus `fetch_ru`/`fetch_sbs` from `dps_db_helpers` to load and write the DPS-only `Russian` and `SBS` tables (`_click_edit_headword`, `_update_russian_table`, `_update_sbs_table`), with a bulk update for `class_example_translation`.",
+        "DPS navigation buttons \"Next Ru\" / \"Next Note\": `_click_next_ru` → `_get_next_word_ru` (DpdHeadword JOIN Russian JOIN SBS) and `_click_next_note` → `_get_next_note_ru` (`Russian.ru_notes.like(\"%ИИ%\")`).",
+        "`_handle_filter_change` drives all/vib/class radio filters through `DpsFields.filter_fields()` (upstream uses all/root/compound/sutta/word/pass1).",
+        "`_click_update_db` gated on `tests_passed` from `DpsTestManager`; builds the middle section with `DpsFields` + `DpsExampleField` and reads a DPS CSV/TSV in `_load_translation_examples` for the translation-hint tooltip; constructs `DPSPaths` and a DPS `HistoryManager`.",
+        "Font-scale normalization: explicit `text_size=17 → 14` (3 occurrences) and hint `size=15 → 14` (2 occurrences) so the global `_DPS_FONT_SCALE` renders DPS fields at a consistent size with other tabs."
+      ],
+      "watch_for": [
+        "If upstream changes the `request_dpd_server` signature in `fast_api_utils_dps`, the server calls in `_click_update_db` and related handlers must be updated to match.",
+        "Upstream `Pass2AddView` automation (clone/split/auto/new-word/X-queue/proofreader) is intentionally absent here; only re-evaluate porting if those workflows become relevant to the DPS RU/SBS tab.",
+        "Constructor/base-class changes to `ft.Column`/`PopUpMixin` or the `HistoryManager` API will require manual update of `__init__`."
+      ]
     },
     "gui2/dps_fields.py": {
       "upstream": "gui2/dpd_fields.py",
-      "divergence_reason": "Same field-manager pattern but a wholly different mapping-driven RU/SBS field set with AI translation and SBS chant logic, so it cannot share upstream's FieldConfig-driven implementation."
+      "divergence_reason": "Same field-manager pattern but a wholly different mapping-driven RU/SBS field set with AI translation and SBS chant logic, so it cannot share upstream's FieldConfig-driven implementation.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "Field construction is mapping-driven via `dps_field_mapping` (dict) rather than upstream's `field_configs: list[FieldConfig]`; `_build_fields` special-cases `DpsExampleField`, `DpsMeaningField`, and SBS chant `ft.Dropdown`s.",
+        "Loads the SBS chant index (`_load_sbs_index` from `sbs_index_path` TSV) and auto-fills `chant_eng`/`chapter` via `_handle_sbs_chant_change`.",
+        "AI integration: `_handle_ai_click` → `translate_with_ai_from_gui` (from `dps_ai_service`) for `dps_suggestion`/`dps_notes_suggestion`, plus `_handle_copy_split_click` splitting Russian suggestions on \"досл.\"/\"букв.\" delimiters and `_handle_copy_notes_click`.",
+        "`populate_dps_tab(headword, ru_word, sbs_word)` reads `DpdHeadword` + `Russian` + `SBS` (root_ru_meaning, grammar assembly) over the entirely DPS `dps_*` field set; uses `RuSpellChecker` and `DpsExampleStashManager`.",
+        "Font-scale normalization: label `size=15 → 12` in field rows; `text_size` skipped in the `setattr` loops for `DpsExampleField` and `DpsMeaningField` (scaling is handled by the `DpdTextField` post-init patch in `main.py`, not via `setattr`). `dps_field_mapping.py` `common_params[\"text_size\"]` normalized `17 → 14` for the same reason."
+      ],
+      "watch_for": [
+        "Upstream `DpdFields` carries a large field-automation surface (id_submit, lemma/root/family/construction handlers, etc.) that is deliberately not mirrored — port a handler only if the matching DPS field gains the same behavior.",
+        "If upstream changes `make_meaning_combo` or `read_tsv_dot_dict` signatures, `populate_dps_tab` / `_load_sbs_index` must follow."
+      ]
     },
     "gui2/dps_fields_lists.py": {
       "upstream": "gui2/dpd_fields_lists.py",
-      "divergence_reason": "Centralizes the DPS dps_* field names and Vibhanga/Class view groupings, which have no structural overlap with upstream's DPD filter and operational lists."
+      "divergence_reason": "Centralizes the DPS dps_* field names and Vibhanga/Class view groupings, which have no structural overlap with upstream's DPD filter and operational lists.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "Defines `ALL_DPS` (55 `dps_`-prefixed field names) in place of upstream's `ALL` (59 DPD field names).",
+        "Provides DPS-only view groupings `VIB_FIELDS` (26) and `CLASS_FIELDS` (27); upstream's `ROOT_FIELDS`/`COMPOUND_FIELDS`/`SUTTA_FIELDS`/`WORD_FIELDS`/`PASS1_FIELDS` filter lists and `NO_CLONE_LIST`/`NO_SPLIT_LIST` operational lists are absent."
+      ],
+      "watch_for": [
+        "Any new `dps_*` field added to `dps_field_mapping` must also be appended to `ALL_DPS` and the relevant `VIB_FIELDS`/`CLASS_FIELDS` group, or filtering in `DpsView`/`DpsFields` silently breaks.",
+        "Upstream adding a new filter group does not transfer here; the DPS Vibhanga/Class split is maintained independently."
+      ]
     },
     "gui2/dps_test_manager.py": {
       "upstream": "gui2/test_manager.py",
-      "divergence_reason": "Runs the same PopUpMixin test-runner pattern against DpsView and a string-values dict with DPS-only test loading/saving, diverging from upstream's toolkit-delegated DpdHeadword-based manager."
+      "divergence_reason": "Runs the same PopUpMixin test-runner pattern against DpsView and a string-values dict with DPS-only test loading/saving, diverging from upstream's toolkit-delegated DpdHeadword-based manager.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "`DpsTestManager.__init__(self, db)` loads tests directly from `DPSPaths().internal_tests_path` via `load_tests`, instead of delegating to a toolkit `DbTestManager`.",
+        "`run_all_tests(self, ui: DpsView, values: dict[str, str])` operates on a string-values dict and `DpsView`, not a `DpdHeadword` object / `Pass2AddView`; `integrity_check` validates tests against `dps_field_mapping` keys.",
+        "Adds methods absent upstream: `save_tests`, `add_exception`, `sort_tests_by_name`, plus backward-compat shims `load_tests_compat` / `run_tests` / `show_failures_compat`.",
+        "Defines `IntegrityFailure` / `TestFailure` as local `NamedTuple`s (upstream imports them from `db_tests.db_tests_manager`); `_handle_open_test_file` opens with VSCode `code` rather than LibreOffice."
+      ],
+      "watch_for": [
+        "Upstream changes to `InternalTestRow` or the `db_tests_manager` test schema must be reflected in `load_tests` / `integrity_check`.",
+        "Upstream failure-dialog UI changes (`_create_failure_dialog`, `_show_current_failure`, `_handle_next_failure`) are candidates for porting since the dialog flow is shared in spirit."
+      ]
     }
   },
   "no_sync_files": [
@@ -284,53 +661,591 @@
     "dpd-db.code-workspace"
   ],
   "russian_copies": {
-    "db/families/family_compound_ru.py": "db/families/family_compound.py",
-    "db/families/family_idiom_ru.py": "db/families/family_idiom.py",
-    "db/families/family_root_ru.py": "db/families/family_root.py",
-    "db/families/family_set_ru.py": "db/families/family_set.py",
-    "db/families/family_word_ru.py": "db/families/family_word.py",
-    "db/lookup/help_abbrev_add_to_lookup_ru.py": "db/lookup/help_abbrev_add_to_lookup.py",
-    "exporter/deconstructor/deconstructor_exporter_ru.py": "exporter/deconstructor/deconstructor_exporter.py",
-    "exporter/goldendict/ru_components/javascript/": "exporter/goldendict/javascript/",
-    "exporter/goldendict/ru_components/templates/": "exporter/goldendict/templates/",
-    "exporter/grammar_dict/grammar_dict_ru.py": "exporter/grammar_dict/grammar_dict.py",
-    "exporter/kindle/kindle_exporter_ru.py": "exporter/kindle/kindle_exporter.py",
-    "exporter/kindle/ru_components/cover/": "exporter/kindle/cover/",
-    "exporter/kindle/ru_components/epub/": "exporter/kindle/epub/",
-    "exporter/kindle/ru_components/templates/": "exporter/kindle/templates/",
-    "exporter/tbw/tbw_exporter_ru.py": "exporter/tbw/tbw_exporter.py",
-    "exporter/tpr/tpr_exporter_ru.py": "exporter/tpr/tpr_exporter.py",
-    "exporter/tpr/templates/tpr_headword_ru.jinja": "exporter/tpr/templates/tpr_headword.jinja",
-    "exporter/webapp/data_classes_ru.py": "exporter/webapp/data_classes.py",
-    "exporter/webapp/preloads_ru.py": "exporter/webapp/preloads.py",
-    "exporter/webapp/toolkit_ru.py": "exporter/webapp/toolkit.py",
-    "exporter/webapp/ru_templates/": "exporter/webapp/templates/",
-    "exporter/webapp/main_ru.py": "exporter/webapp/main.py",
-    "scripts/build/families_to_json_ru.py": "scripts/build/families_to_json.py",
-    "shared_data/help_ru/": "shared_data/help/",
-    "db/rpd/rpd_to_lookup.py": "db/epd/epd_to_lookup.py",
-    "exporter/goldendict/export_rpd.py": "exporter/goldendict/export_epd.py",
-    "tools/degree_of_completion_ru.py": "tools/degree_of_completion.py",
-    "tools/ru_spelling.py": "tools/spelling.py",
-    "tools/translit_ru.py": "tools/translit.py",
-    "tools/version_ru.py": "tools/version.py"
+    "db/families/family_compound_ru.py": {
+      "upstream": "db/families/family_compound.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "Writes `html_ru` and `data_ru` columns on `FamilyCompound` model in addition to upstream `html` column.",
+        "Uses `RuPaths` from `tools/paths_ru.py` instead of `ProjectPaths`."
+      ],
+      "watch_for": [
+        "New upstream columns written to `FamilyCompound` must have corresponding `_ru` variants added here.",
+        "Upstream logic refactors (HTML generation, JSON data format) must be mirrored exactly before adding RU layer."
+      ]
+    },
+    "db/families/family_idiom_ru.py": {
+      "upstream": "db/families/family_idiom.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "Imports `ru_degree_of_completion`, `make_short_ru_meaning`, `ru_replace_abbreviations` from Russian utils.",
+        "Adds `joinedload(DpdHeadword.ru)` to DB query to eager-load Russian data.",
+        "Writes `html_ru` and `data_ru` columns on `FamilyIdiom` instead of upstream's `html`/`data`.",
+        "DB update is in-place (lookup + assign) rather than upstream's delete-all / bulk-insert approach.",
+        "Upstream's `sync_idiom_numbers_with_family_compound()` function is entirely absent — Russian fork does not auto-sync idiom numbering."
+      ],
+      "watch_for": [
+        "Upstream idiom auto-sync logic is removed; if upstream changes the numbering scheme, Russian fork won't inherit it.",
+        "Update-in-place vs. delete-insert may diverge on new idiom entries — verify counts after sync.",
+        "**No `update_db_cache()` function** — a historical RU-only `update_db_cache()` overwrote the shared `idioms_set` DB cache with an unfiltered set (all words, no `count > 0` filter), causing the idiom button to appear on entries with no RU idiom translations. It was removed in May 2026. If upstream ever adds a cache-update step, do NOT port it; the RU version must not have it."
+      ]
+    },
+    "db/families/family_root_ru.py": {
+      "upstream": "db/families/family_root.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "Imports `ru_degree_of_completion`, `make_short_ru_meaning`, `ru_replace_abbreviations` from Russian utils.",
+        "Adds `joinedload(DpdHeadword.ru)` to DB query.",
+        "Writes `root_ru_meaning`, `html_ru`, `data_ru` columns on `FamilyRoot`; DB update is in-place.",
+        "Custom `make_root_header_ru()` generates Russian-language header HTML.",
+        "Three upstream functions absent: `update_lookup_table()`, `generate_root_info_html()`, `generate_root_matrix()`.",
+        "Anki deck reduced from two (Family Root + Root Matrix) to one (Family Root RU only)."
+      ],
+      "watch_for": [
+        "Lookup table synchronization is entirely removed — upstream lookup updates do not flow to the Russian fork.",
+        "If upstream changes `FamilyRoot` HTML structure or adds new columns, `html_ru` generation must be updated separately."
+      ]
+    },
+    "db/families/family_set_ru.py": {
+      "upstream": "db/families/family_set.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "Imports `ru_degree_of_completion`, `make_short_ru_meaning`, `ru_replace_abbreviations`, `populate_set_ru_and_check_errors`.",
+        "Adds `joinedload(DpdHeadword.ru)` to DB query.",
+        "Writes `html_ru`, `set_ru`, `data_ru` columns on `FamilySet`; DB update is in-place.",
+        "Calls `populate_set_ru_and_check_errors()` to populate Russian set name translations."
+      ],
+      "watch_for": [
+        "Upstream uses delete-all / bulk-insert; fork uses in-place update — verify record counts after upstream refactors.",
+        "`set_ru` field requires Russian translations to exist; missing translations cause empty columns silently."
+      ]
+    },
+    "db/families/family_word_ru.py": {
+      "upstream": "db/families/family_word.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "Imports `ru_degree_of_completion`, `make_short_ru_meaning`, `ru_replace_abbreviations`.",
+        "Adds `joinedload(DpdHeadword.ru)` to DB query.",
+        "Writes `html_ru` and `data_ru` columns on `FamilyWord`; DB update is in-place.",
+        "Anki data tuple includes Russian data fields not present in upstream."
+      ],
+      "watch_for": [
+        "In-place update vs. upstream delete-insert — check for orphaned entries after upstream structural changes.",
+        "Anki tuple structure must stay in sync if upstream changes the anki data format."
+      ]
+    },
+    "db/lookup/help_abbrev_add_to_lookup_ru.py": {
+      "upstream": "db/lookup/help_abbrev_add_to_lookup.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "Imports and stores `RuPaths` alongside `ProjectPaths`.",
+        "Reads help and abbreviations from Russian-specific TSV files via `RuPaths` (different file paths and column indices than upstream).",
+        "Functions renamed with `_ru` suffix: `add_help_ru()`, `add_abbreviations_ru()`.",
+        "Uses `read_tsv_as_dict_with_different_key()` with hardcoded column indices (2 for help, 5 for abbrev) instead of upstream's `read_tsv_as_dict()`.",
+        "Stores `ru_meaning` from TSV into the Lookup model's Russian meaning column."
+      ],
+      "watch_for": [
+        "Hardcoded column indices will break silently if Russian TSV format changes.",
+        "`help_ru_pack()` and `abbrev_pack()` methods must exist on the `Lookup` model."
+      ]
+    },
+    "exporter/deconstructor/deconstructor_exporter_ru.py": {
+      "upstream": "exporter/deconstructor/deconstructor_exporter.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "`DeconstructorDataRu` subclass overrides `_generate_header` to use `deconstructor_header_ru.jinja` and applies \"deconstructor\" CSS style via `CSSManager`.",
+        "`ProgData` class replaces `GlobalVars`, adding `rupth: RuPaths` and storing both `pth` and `rupth`.",
+        "`make_deconstructor_dict_data` uses `jinja_env_body` from `exporter/goldendict/ru_components/templates` and renders `deconstructor_ru.jinja`.",
+        "Synonyms list logic simplified: removes Sinhala, Devanagari, and Thai unpacks (keeps only Roman and speech marks).",
+        "`prepare_and_export_to_gd_mdict` uses Russian strings for `bookname`, `author`, `description`, and `website` (pointing to `devamitta.github.io/dpd.rus/`).",
+        "Output dictionary names changed to `ru-dpd-deconstructor` and `ru-dpd-deconstructor2`."
+      ],
+      "watch_for": [
+        "Mirror any changes to `DeconstructorData` base class in the `DeconstructorDataRu` override.",
+        "Template paths are redirected to `ru_components/templates/`.",
+        "Removal of non-Roman synonyms is intentional for the Russian fork."
+      ]
+    },
+    "exporter/goldendict/ru_components/javascript/": {
+      "upstream": "exporter/goldendict/javascript/",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "JavaScript components for Russian GoldenDict export; mirrors upstream `templates/javascript/`.",
+        "All GoldenDict JS object names use `rudata_` prefix (e.g., `rudata_family_compound`) to avoid namespace collisions.",
+        "Loader classes and global variables prefixed with `ru_`.",
+        "`ru_main.js` click listener has `target_id.startsWith(\"ru_\")` filter and `event.stopImmediatePropagation()` — prevents the upstream DPD click handler from double-toggling when both SBS and RU dicts are open.",
+        "`ru_loadButtonContent()`: `family_root` block wraps `makeFamilyRootHtml` in `if (fr !== undefined)` guard — upstream omits this guard and crashes when `family_root_json` has no entry for a given key."
+      ],
+      "watch_for": [
+        "Upstream JS logic changes must be mirrored with the `ru_` prefix preserved.",
+        "Coordinate with `scripts/build/families_to_json_ru.py` which generates these files.",
+        "**`stopImmediatePropagation` (item 4)** — upstream does NOT have this; never remove it from the RU listener.",
+        "**`fr !== undefined` guard (item 5)** — upstream omits it in `loadButtonContent`; always keep it in `ru_loadButtonContent`."
+      ]
+    },
+    "exporter/goldendict/ru_components/templates/": {
+      "upstream": "exporter/goldendict/templates/",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "All HTML/Jinja2 templates use `ru_` prefixed IDs, CSS classes, and JS calls (e.g., `ru_load_js()`).",
+        "Specific templates added: `dpd_headword_ru.jinja`, `root_headword_ru.jinja`, `help_abbrev_ru.jinja`, `help_help_ru.jinja`, `deconstructor_ru.jinja`.",
+        "Script loading in `dpd_header.jinja` and `root_header.jinja` uses a sequential `onload`-chaining IIFE instead of the upstream's parallel `forEach`. This ensures `ru_main.js` only executes after all JSON data files have finished loading, preventing a race condition when both SBS and RU dicts are open simultaneously in GoldenDict. **Must be preserved on every sync.**"
+      ],
+      "watch_for": [
+        "Structural changes in upstream templates must be ported while meticulously preserving the `ru_` prefixes.",
+        "Missing templates in this directory will cause exporter failures.",
+        "**Sequential script loading (item 3)** — if upstream changes its `dpd_header.jinja` loader block, do NOT copy the parallel `forEach` into the RU version. Apply the equivalent change to the RU sequential IIFE pattern instead."
+      ],
+      "triple_shadow": "This directory, `exporter/goldendict/sbs_templates/`, and upstream `exporter/goldendict/templates/` are all related."
+    },
+    "exporter/grammar_dict/grammar_dict_ru.py": {
+      "upstream": "exporter/grammar_dict/grammar_dict.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "`GrammarDataRu` subclass overrides `_process_grammar` to translate POS and components using `ru_replace_abbreviations`.",
+        "`ProgData` class adds `rupth: RuPaths`.",
+        "`generate_html_from_lookup` preloads Russian abbreviations and performs string replacements on the rendered HTML (e.g., replacing \"of\" with \"для\").",
+        "`prepare_gd_mdict_and_export` uses Russian metadata and sets `target_lang=\"ru\"`.",
+        "`dict_name` set to `ru-dpd-grammar`."
+      ],
+      "watch_for": [
+        "Manual string replacements in `generate_html_from_lookup` are brittle; verify if upstream template changes.",
+        "Ensure Russian abbreviation table contains all needed grammar terms."
+      ]
+    },
+    "exporter/kindle/kindle_exporter_ru.py": {
+      "upstream": "exporter/kindle/kindle_exporter.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "`render_dpd_xhtml` signature changed to accept `pth` and `rupth`; `script_attr` logic removed (Russian fork uses Roman script only).",
+        "Loads templates from `ru_components/templates/`.",
+        "`render_ebook_entry` builds a Russian summary using `make_ru_meaning_for_ebook`, `ru_replace_abbreviations`, and `ru_degree_of_completion`.",
+        "`render_grammar_templ` and `render_example_templ` use `_ru.jinja` templates.",
+        "`render_rpd_xhtml` (replacing upstream's `render_epd_xhtml`) uses the Russian alphabet and `Lookup.rpd`.",
+        "Output paths resolve via `rupth` (e.g., `ru-dpd-kindle.epub`)."
+      ],
+      "watch_for": [
+        "Upstream `KindleData` class is not used; instead, fields are passed directly to templates.",
+        "The entire EBTS text set logic is preserved but applied to Russian outputs."
+      ]
+    },
+    "exporter/kindle/ru_components/cover/": {
+      "upstream": "exporter/kindle/cover/",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "Russian-language cover image for Kindle/EPUB.",
+        "Replaces upstream metadata attributes with Russian definitions."
+      ],
+      "watch_for": [
+        "Standard Kindle cover dimensions must be maintained if updated."
+      ]
+    },
+    "exporter/kindle/ru_components/epub/": {
+      "upstream": "exporter/kindle/epub/",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "Russian-language EPUB structural files (OEBPS/content.opf, titlepage.xhtml).",
+        "Metadata (title, creator, language=\"ru\") set to Russian fork values.",
+        "`titlepage.xhtml` update date/time is generated locally for the Russian Kindle build; upstream date/time-only changes are intentionally not ported."
+      ],
+      "watch_for": [
+        "Navigation entries in `content.opf` must match the generated letter files.",
+        "Do not sync upstream `titlepage.xhtml` update date/time into the Russian shadow; only port structural or metadata changes."
+      ]
+    },
+    "exporter/kindle/ru_components/templates/": {
+      "upstream": "exporter/kindle/templates/",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "Full set of Russian XHTML templates for ebook export: `ebook_ru_entry.jinja`, `ebook_ru_grammar.jinja`, `ebook_ru_example.jinja`, `ebook_ru_rpd_letter.jinja`, etc.",
+        "Binds Russian localized context variables replacing upstream english variables."
+      ],
+      "watch_for": [
+        "Template variables must match the direct dictionary passing in `kindle_exporter_ru.py`."
+      ]
+    },
+    "exporter/tbw/tbw_exporter_ru.py": {
+      "upstream": "exporter/tbw/tbw_exporter.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "`ProgData` class adds `rupth: RuPaths`.",
+        "`generate_dpd_ebt_dict` uses `ru_replace_abbreviations` for POS and `make_ru_meaning_simpl` for the definition.",
+        "`save_js_files_for_tbw` logic removed; only `save_js_files_for_fdg` remains, outputting to `fdg_dpd_ebts_js_ru_path`.",
+        "Repository targets changed from `TBW2` to `FDG` only."
+      ],
+      "watch_for": [
+        "Verify that the `FDG` repo path in `RuPaths` is correct.",
+        "Definition format is \"simplified\" for TBW usage."
+      ]
+    },
+    "exporter/tpr/tpr_exporter_ru.py": {
+      "upstream": "exporter/tpr/tpr_exporter.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "`GlobalVars` adds `rupth: RuPaths`.",
+        "`make_dpd_db` eagerly loads `.ru` relationship.",
+        "`generate_tpr_data` uses `tpr_headword_ru.jinja` template.",
+        "Roots logic appends `r.root_ru_meaning` to the info string.",
+        "`copy_zip_to_tpr_downloads` uses `rupth.tpr_with_rus_path` and names the asset \"DPD with Russian\"."
+      ],
+      "watch_for": [
+        "The TPR SQL format is rigid; ensure the Russian additions don't break the importer."
+      ]
+    },
+    "exporter/tpr/templates/tpr_headword_ru.jinja": {
+      "upstream": "exporter/tpr/templates/tpr_headword.jinja",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "Template uses Russian-localized POS and meaning fields.",
+        "Drops `compound_type_has_digit` guard (attribute was computed by `generate_tpr_data`; upstream removed the helper, shadow mirrors this)."
+      ],
+      "watch_for": [
+        "Structural changes to `tpr_headword.jinja` must be ported here."
+      ]
+    },
+    "exporter/webapp/data_classes_ru.py": {
+      "upstream": "exporter/webapp/data_classes.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "`HeadwordData.__init__` populates `ru_meaning`, `ru_complete`, `ru_grammar`, `ru_pos`, `ru_plus_case`, `ru_root_base`, `ru_phonetic`, and `inflections_html_ru`.",
+        "`GrammarData` translates headword, POS, and components to Russian.",
+        "`RpdData` class added for Russian EPD lookups."
+      ],
+      "watch_for": [
+        "Shared with the webapp `toolkit_ru.py`.",
+        "Upstream `HeadwordData` additions must be ported here."
+      ]
+    },
+    "exporter/webapp/preloads_ru.py": {
+      "upstream": "exporter/webapp/preloads.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "`make_headwords_clean_set_ru` filters `Lookup` entries to only include those with Russian EPD data (`Lookup.rpd != \"\"`).",
+        "Replaces upstream load routines to utilize localized subsets of database values."
+      ],
+      "watch_for": [
+        "Performance optimization via `defer()` is preserved."
+      ]
+    },
+    "exporter/webapp/toolkit_ru.py": {
+      "upstream": "exporter/webapp/toolkit.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "`make_dpd_html_ru` accepts `rupth: RuPaths`.",
+        "Eagerly loads `.ru` for headword results.",
+        "Renders using `templates_ru` and maps `Lookup.rpd` to `RpdData`.",
+        "\"No results found\" messages translated to Russian."
+      ],
+      "watch_for": [
+        "Ensure all webapp templates exist in `ru_templates/`."
+      ]
+    },
+    "exporter/webapp/ru_templates/": {
+      "upstream": "exporter/webapp/templates/",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "Webapp Jinja2 templates with Russian bindings.",
+        "`home.html` and `home_simple.html` translated."
+      ],
+      "watch_for": [
+        "Complex merge of upstream layout and RU data fields."
+      ]
+    },
+    "exporter/webapp/main_ru.py": {
+      "upstream": "exporter/webapp/main.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "Routes updated: `@app.get(\"/\")` maps to `home_page_ru`, and `/sbs` is added for the English/SBS view.",
+        "`templates_ru` and `templates_sbs` initialized separately.",
+        "`db_search_json_ru` calls `make_dpd_html_ru`.",
+        "`db_search_gd_ru` returns Russian HTML for GoldenDict API.",
+        "Application entry point changed to `main_ru:app`."
+      ],
+      "watch_for": [
+        "This file serves as the main entry point for the Russian webapp (port 8081).",
+        "It maintains a dual-mode (RU at root, SBS at `/sbs`).",
+        "`127.0.0.1` is the correct local Mac development address — never replace it with `0.0.0.0` or `localhost`."
+      ]
+    },
+    "scripts/build/families_to_json_ru.py": {
+      "upstream": "scripts/build/families_to_json.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "`GlobalVars` adds `rupth: RuPaths` and sets `self.paths = rupth`.",
+        "All `export_family_*` methods call `data_ru_unpack` instead of `data_unpack`.",
+        "`export_family_root` uses `root_ru_meaning` instead of `root_meaning`."
+      ],
+      "watch_for": [
+        "This script populates the `.js` files in `exporter/goldendict/ru_components/javascript/`.",
+        "JSON schema must match the expectations of the `ru_` template loader."
+      ]
+    },
+    "shared_data/help_ru/": {
+      "upstream": "shared_data/help/",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "Russian translations for `abbreviations.tsv`, `bibliography.tsv`, `help.tsv`, and `thanks.tsv`.",
+        "`abbreviations.tsv` includes `ru_abbrev` and `ru_meaning` columns.",
+        "`help.tsv` includes `ru_help` and `ru_meaning` columns."
+      ],
+      "watch_for": [
+        "These files are read by `help_abbrev_add_to_lookup_ru.py` using hardcoded column indices.",
+        "New upstream help entries must be translated and added here."
+      ]
+    },
+    "db/rpd/rpd_to_lookup.py": {
+      "upstream": "db/epd/epd_to_lookup.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "Queries `DpdHeadword` with `joinedload(DpdHeadword.ru)` to access Russian data.",
+        "`compile_headwords_data` iterates `ru.ru_meaning` instead of `meaning_1`; applies `ru_replace_abbreviations` for POS.",
+        "`make_clean_meaning_list` performs Russian-specific text cleanup (removes `??`, Cyrillic patterns like `т\\.д\\.`, brackets, extra spaces).",
+        "`compile_roots_data` uses `root_ru_meaning` split on `\", \"` and stores `\"корень\"` as the POS label.",
+        "Stores tuples in `Lookup.rpd` instead of `Lookup.epd`."
+      ],
+      "watch_for": [
+        "If upstream `epd_to_lookup.py` changes its loop, root processing, or `update_test_add` usage, mirror the structural change here.",
+        "`db/rpd/__init__.py` is an empty package init; no sync concern."
+      ],
+      "shadow_of": "db/epd/epd_to_lookup.py"
+    },
+    "exporter/goldendict/export_rpd.py": {
+      "upstream": "exporter/goldendict/export_epd.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "`generate_epd_html` accepts additional `rupth: RuPaths` parameter.",
+        "Uses `ru_components/templates` Jinja2 env instead of `templates`.",
+        "Uses `rpd_ru.jinja` template instead of `epd.jinja`.",
+        "Queries `Lookup.rpd` instead of `Lookup.epd`.",
+        "Uses `RpdData` from `data_classes_dps` instead of `EpdData` from `data_classes`."
+      ],
+      "watch_for": [
+        "If upstream `export_epd.py` changes `generate_epd_html` signature, rendering logic, or size tracking, mirror here.",
+        "`rupth` parameter must always be threaded through all callers (currently `main_ru.py`)."
+      ],
+      "shadow_of": "exporter/goldendict/export_epd.py"
+    },
+    "tools/degree_of_completion_ru.py": {
+      "upstream": "tools/degree_of_completion.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "`ru_degree_of_completion` function wraps upstream `degree_of_completion`.",
+        "If `i.ru.ru_meaning` exists, it removes the `\"gray\"` class from the result of the upstream function (making the completion symbol full-color).",
+        "Otherwise, it falls back to the standard upstream completion symbol."
+      ],
+      "watch_for": [
+        "If upstream changes the completion symbol markup, this regex-based replacement might need updating."
+      ]
+    },
+    "tools/ru_spelling.py": {
+      "upstream": "tools/spelling.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "`RuSpellChecker` singleton using `SpellChecker(language=\"ru\")`.",
+        "Loads custom Russian dictionary from `DPSPaths.ru_user_dict_path`.",
+        "Provides `add_to_ru_dictionary` method to append new words to the custom TSV."
+      ],
+      "watch_for": [
+        "Requires `pyspellchecker` library.",
+        "The custom dictionary file must be UTF-8 encoded."
+      ]
+    },
+    "tools/translit_ru.py": {
+      "upstream": "tools/translit.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "`is_cyrillic` helper using Unicode range check (`\\u0400` - `\\u04FF`).",
+        "`auto_translit_to_roman` short-circuits if `is_cyrillic(text)` is true.",
+        "Transliteration logic preserves Roman Pali, English, and Cyrillic text while converting others to IAST."
+      ],
+      "watch_for": [
+        "Used by the webapp search to handle multilingual input."
+      ]
+    },
+    "tools/version_ru.py": {
+      "upstream": "tools/version.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "`make_version` returns an additional `version_ru` string (prefixed with `ru_`).",
+        "`update_db_version` uses `dpd_sbs_release_version` key in `DbInfo`.",
+        "Metadata fields (email, website, docs, github) point to Russian fork endpoints."
+      ],
+      "watch_for": [
+        "This version is displayed in the Russian webapp footer."
+      ]
+    }
   },
   "sbs_copies": {
-    "exporter/goldendict/sbs_templates/": "exporter/goldendict/templates/",
-    "exporter/webapp/sbs_templates/": "exporter/webapp/templates/",
-    "scripts/fix/character_replacer_sbs.py": "scripts/fix/character_replacer.py",
-    "tools/utils_sbs.py": "tools/utils.py",
-    "scripts/server/update-dpd-sbs.sh": "scripts/server/update-dpd.sh"
+    "exporter/goldendict/sbs_templates/": {
+      "upstream": "exporter/goldendict/templates/",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "All HTML/Jinja2 templates use `sbs_` prefixed IDs and CSS classes.",
+        "Specific templates added: `dpd_headword_sbs.jinja`, `root_headword_sbs.jinja`, `epd_sbs.jinja`, `help_abbrev_sbs.jinja`, `help_help_sbs.jinja`.",
+        "`dpd_headword_sbs.jinja`: Russian block renders when `show_ru_data`; SBS block when `show_sbs_data`; Tamil \"தமிழ்\" row after SBS block when `show_ta_data and d.ta and d.ta.ta_meaning`.",
+        "`main.js` click listener: filters on `target_id.startsWith(\"sbs_\")` and calls `sbs_button_click` — plus `event.stopImmediatePropagation()` to prevent the upstream DPD click handler from double-toggling the same element.",
+        "`sbs_loadButtonContent()`: `family_root` block wraps `sbs_makeFamilyRootHtml` in `if (fr !== undefined)` guard — prevents a TypeError crash when the JSON data has no entry for a given key."
+      ],
+      "watch_for": [
+        "Never blindly overwrite — meticulous prefix preservation is required.",
+        "When upstream adds new grammar table rows, verify the locale rows (RU, SBS, Tamil) are re-applied in order.",
+        "**`stopImmediatePropagation` (item 4)** — upstream does NOT have this; always preserve it in the SBS listener.",
+        "**`fr !== undefined` guard (item 5)** — upstream omits it in `loadButtonContent`; always keep it in `sbs_loadButtonContent`."
+      ],
+      "triple_shadow": "See `exporter/goldendict/ru_components/templates/` — same pattern, SBS variant."
+    },
+    "exporter/webapp/sbs_templates/": {
+      "upstream": "exporter/webapp/templates/",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "Webapp Jinja2 templates with SBS field bindings (chant links, class links).",
+        "Shared layout with `ru_templates/` but different data bindings."
+      ],
+      "watch_for": [
+        "High structural parity with `ru_templates/` is expected."
+      ]
+    },
+    "scripts/fix/character_replacer_sbs.py": {
+      "upstream": "scripts/fix/character_replacer.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "New script: configurable `table` (\"SBS\", \"Russian\", or default) and `column`.",
+        "Eagerly loads both relationships for targeted replacement."
+      ],
+      "watch_for": [
+        "Manually configure `table` and `column` variables at the top before running."
+      ]
+    },
+    "tools/utils_sbs.py": {
+      "upstream": "tools/utils.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "Adds `paragraphs_are_similar` utility (used by `db/models.py`).",
+        "`RenderedSizes` TypedDict adds `sbs_example` field."
+      ],
+      "watch_for": [
+        "Keep structurally aligned with `tools/utils.py`."
+      ]
+    },
+    "scripts/server/update-dpd-sbs.sh": {
+      "upstream": "scripts/server/update-dpd.sh",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "Target directory `dpd-db-sbs`.",
+        "Downloads DB from `sasanarakkha/dpd-db-sbs`.",
+        "Restarts `main_ru:app` on port 8081."
+      ],
+      "watch_for": [
+        "Hardcoded port 8081 must match server firewall settings."
+      ]
+    }
   },
   "dps_copies": {
-    "exporter/goldendict/data_classes_dps.py": "exporter/goldendict/data_classes.py",
-    "db/backup_tsv/backup_dps.py": "db/backup_tsv/backup_dpd_headwords_and_roots.py",
-    "scripts/build/db_rebuild_from_tsv_dps.py": "scripts/build/db_rebuild_from_tsv.py",
-    "gui2/dps_example_field.py": "gui2/dpd_fields_examples.py",
-    "gui2/dps_example_stash_manager.py": "gui2/example_stash_manager.py",
-    "gui2/dps_meaning_field.py": "gui2/dpd_fields_meaning.py"
+    "exporter/goldendict/data_classes_dps.py": {
+      "upstream": "exporter/goldendict/data_classes.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "`HeadwordData.__init__` accepts `ru: Russian | None`, `sbs: SBS | None`, `ta: Tamil | None`, `show_grammar`, `show_sbs_data`, `show_ru_data`, and `show_ta_data` parameters.",
+        "Russian fields populated: `ru_pos`, `ru_plus_case`, `ru_meaning`, `ru_summary`, `ru_complete`, `ru_grammar`, `ru_base`, `ru_phonetic`, `ru_inflections_html`.",
+        "SBS fields populated: `sbs_meaning`, `sbs_notes`, `sbs_index`, `sbs_class`, and many `needs_*_example` flags.",
+        "Tamil: `self.ta` holds the `Tamil` ORM object; `show_ta_data` flag controls rendering.",
+        "`_convert_newlines_ru` replaces `\\n` with `<br>` in `ru_notes` (plain newline, not `\\n, `).",
+        "`_convert_newlines_sbs` handles newline conversion for 11 SBS string fields including `class_example_translation`.",
+        "`RpdData` subclass for Russian EPD entries; `TpdData` subclass for Tamil EPD entries (reserved for future `export_tpd.py`)."
+      ],
+      "watch_for": [
+        "Upstream changes to `HeadwordData` constructor or methods must be meticulously merged to preserve ALL three data layers (RU, SBS, Tamil).",
+        "This file is the primary bridge between the DB models and the templates for all localized forks."
+      ],
+      "dps_shadow_note": "This file serves shared Russian, SBS, and Tamil fork data. It belongs only in `dps_copies`."
+    },
+    "db/backup_tsv/backup_dps.py": {
+      "upstream": "db/backup_tsv/backup_dpd_headwords_and_roots.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "New script: `backup_russian`, `backup_sbs`, `backup_ta`, and `backup_ru_roots` functions.",
+        "Writes to `russian.tsv`, `sbs.tsv`, `tamil.tsv`, and `ru_roots.tsv` in the backup folder.",
+        "Aborts if the `Russian` table is empty (safety check); aborts if `Tamil` table is empty (safety check).",
+        "Tamil backup follows the same TSV structure as Russian and SBS (header row + data rows).",
+        "Does not mirror upstream `split_tsv_file()` chunking; DPS localized backup TSVs are small and are intentionally kept as single files."
+      ],
+      "watch_for": [
+        "No upstream equivalent. This is critical for data persistence in the fork.",
+        "Tamil table will be empty until AI meaning generation is run; empty-check prevents data loss.",
+        "Do not port upstream chunk-size/header behavior from `split_tsv_file()` unless DPS backup TSVs become large enough to require splitting."
+      ]
+    },
+    "scripts/build/db_rebuild_from_tsv_dps.py": {
+      "upstream": "scripts/build/db_rebuild_from_tsv.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "New script: populates localized tables from TSV.",
+        "Duplicate check on IDs before import (Russian, SBS, Tamil).",
+        "Orphaned row check: verifies that all Russian/SBS/Tamil IDs exist in the main `DpdHeadword` table.",
+        "Tamil rebuild helper `make_table_data_ta()` mirrors Russian/SBS pattern: reads TSV, zips columns, filters empty keys, instantiates Tamil rows."
+      ],
+      "watch_for": [
+        "SBS missing rows prompt for removal; Russian and Tamil missing rows are removed silently.",
+        "Tamil TSV will be empty until after AI meaning generation runs and data is backed up."
+      ]
+    },
+    "gui2/dps_example_field.py": {
+      "upstream": "gui2/dpd_fields_examples.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "`DpsExampleField(DpdExampleField)` subclass: `__init__` takes a shared `stash_manager` (`DpsExampleStashManager`), adds `archived_example_index`, and bypasses `super().__init__()` by calling `ft.Column.__init__` directly.",
+        "`get_fields()` is fully replaced to return a dict parsing DPS multi-type field names (`dps_sbs_example_1`, `dps_dhp_example`, …) into source/sutta/example/chant/chapter; stash/reload/last all operate in dict format (`_handle_last_control_blur`, `_click_stash_example`, `_click_reload_example`, `_click_last_example`).",
+        "New SBS archive flow: `_click_arch_example` + `_handle_archive_example` (reads the `sbs_archive` TSV) + `paragraphs_are_similar_sbs` (SequenceMatcher), plus the `_swap_examples` helper.",
+        "Action buttons differ (adds \"Clean\" and \"Arch\"); `clean_text` / `click_clean_example` strip `<b>`/`</b>` tags and drop upstream's THA/THI expansions and \"Add '-\" logic."
+      ],
+      "watch_for": [
+        "This subclasses `DpdExampleField`, so any upstream change to `DpdExampleField.__init__` signature or to inherited methods (value/field/error_text, base parts of `click_choose_example_ok`) can break it — re-check on every upstream `dpd_fields_examples.py` change.",
+        "Upstream changes to `find_cst_source_sutta_example` / `CstSourceSuttaExample` should be ported, since both files depend on them.",
+        "Upstream adds dedicated `click_remove_brackets()` / `click_remove_bold_tags()` methods plus `[]` / `<b>` toolbar buttons (via `remove_brackets`/`remove_bold_tags` in `dpd_fields_functions`). DPS intentionally omits these — the single `Clean` button (`click_clean_example`) already strips `<b>`/`</b>`, and adding them is out of sync scope (new DPS-tab feature). Re-evaluate only if the user requests bracket/bold tooling.",
+        "Upstream's example I/O (`get_fields`, stash/reload/last, swap, `clean_text` THA/THI) is tuple-based `(source, sutta, example)`. DPS replaced the entire interface with a `dict[str, ft.TextField | None]` keyed on multi-type DPS field names (sbs/dhp/pat/vib/class/discourses). Any upstream change to these signatures must NOT be ported verbatim — adapt to the DPS dict interface or skip."
+      ]
+    },
+    "gui2/dps_example_stash_manager.py": {
+      "upstream": "gui2/example_stash_manager.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "`__init__` drops the required `toolkit: ToolKit` dependency (optional `toolkit=None`) and sources the path directly from `Gui2Paths().example_stash_json_path` instead of `toolkit.paths.example_stash_json_path`.",
+        "`stash(key, fields_dict: dict[str, str])` stores a many-field dict, and `reload` / `last_example` return `Optional[dict[str, str]]` instead of upstream's `(source, sutta, example)` tuple."
+      ],
+      "watch_for": [
+        "Upstream changes to `_load` / `_save` / `stash_shared_example` / `reload_shared_example` logic should be ported, adapting the tuple↔dict payload difference.",
+        "If upstream relocates `example_stash_json_path` on `Gui2Paths` / `toolkit.paths`, update the direct `Gui2Paths()` access here."
+      ]
+    },
+    "gui2/dps_meaning_field.py": {
+      "upstream": "gui2/dpd_fields_meaning.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "Swaps `CustomSpellChecker` → `RuSpellChecker`; `add_to_dict` calls `add_to_ru_dictionary(word)` and the add-field label is \"Add Russian spelling \".",
+        "Spell suggestions are written to `field.error_text` directly rather than into a separate `spell_suggestions: ft.Text` widget."
+      ],
+      "watch_for": [
+        "Upstream `DpdMeaningField` has gained `_skip_spell_check`, `on_focus_callback`/`on_blur_callback`, `_handle_on_focus`/`_handle_on_blur`, `_remove_word_from_spell_errors`, and `color`/`helper_text` properties — evaluate porting these (adapted to `RuSpellChecker`) on the next sync.",
+        "If `DpdTextField` focus/blur wiring changes upstream, the direct on_focus/on_blur wiring here must follow.",
+        "Upstream's `_skip_spell_check` optimization + `_remove_word_from_spell_errors()` assume a separate `spell_suggestions` `ft.Text` widget and incremental error removal. DPS uses inline `field.error_text` and relies on a full re-check after add-to-dict to clear stale errors. Do NOT port `_skip_spell_check` — skipping the re-check would leave a stale misspelling error visible. Re-evaluate only if DPS migrates to a separate suggestions widget."
+      ]
+    }
   },
   "tamil_copies": {
-    "db/tpd/tpd_to_lookup.py": "db/epd/epd_to_lookup.py"
+    "db/tpd/tpd_to_lookup.py": {
+      "upstream": "db/epd/epd_to_lookup.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "Queries `DpdHeadword` with `joinedload(DpdHeadword.ta)` instead of `joinedload(DpdHeadword.sbs/ru)`.",
+        "Iterates `ta_meaning`, splits on `\";\"`, and indexes each sub-meaning as a lookup key.",
+        "No root processing (Tamil has no root meanings) — headwords only.",
+        "No POS abbreviation replacement (no Tamil abbreviation map exists).",
+        "Stores `(lemma_clean, pos, ta_meaning)` tuples in `Lookup.tpd`."
+      ],
+      "watch_for": [
+        "If upstream `epd_to_lookup.py` changes its loop or data structure, mirror here.",
+        "`db/tpd/__init__.py` is an empty package init; no sync concern."
+      ],
+      "shadow_of": "db/epd/epd_to_lookup.py"
+    }
   }
 }

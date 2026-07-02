@@ -1,6 +1,7 @@
 """Verify upstream sync registry schema and cross-section integrity."""
 
 import pytest
+
 from kamma.upstream_sync.scripts.validate_registry import (
     validate_cross_section_overlaps,
     validate_inspired_by_upstream,
@@ -14,7 +15,12 @@ from kamma.upstream_sync.scripts.validate_registry import (
 def base_data():
     return {
         "modified_upstream_files": [
-            {"path": "db/models.py", "discuss": True, "discuss_reason": "Reason"}
+            {
+                "path": "db/models.py",
+                "discuss": True,
+                "discuss_reason": "Reason",
+                "sync_rule": "MIRROR_EXACTLY",
+            }
         ],
         "russian_copies": {},
         "sbs_copies": {},
@@ -35,7 +41,11 @@ def test_inspired_by_upstream_valid(base_data, tmp_path):
     upstream_file.touch()
 
     base_data["inspired_by_upstream"] = {
-        "local.py": {"upstream": "upstream.py", "divergence_reason": "One sentence."}
+        "local.py": {
+            "upstream": "upstream.py",
+            "divergence_reason": "One sentence.",
+            "sync_rule": "MIRROR_EXACTLY",
+        }
     }
     errors = validate_inspired_by_upstream(base_data, tmp_path)
     assert not errors
@@ -43,21 +53,30 @@ def test_inspired_by_upstream_valid(base_data, tmp_path):
 
 def test_inspired_by_upstream_missing_upstream(base_data):
     base_data["inspired_by_upstream"] = {
-        "local.py": {"divergence_reason": "One sentence."}
+        "local.py": {
+            "divergence_reason": "One sentence.",
+            "sync_rule": "MIRROR_EXACTLY",
+        }
     }
     errors = validate_inspired_by_upstream(base_data)
     assert any("missing or invalid 'upstream' path" in e for e in errors)
 
 
 def test_inspired_by_upstream_missing_divergence_reason(base_data):
-    base_data["inspired_by_upstream"] = {"local.py": {"upstream": "upstream.py"}}
+    base_data["inspired_by_upstream"] = {
+        "local.py": {"upstream": "upstream.py", "sync_rule": "MIRROR_EXACTLY"}
+    }
     errors = validate_inspired_by_upstream(base_data)
     assert any("missing or empty 'divergence_reason'" in e for e in errors)
 
 
 def test_inspired_by_upstream_empty_divergence_reason(base_data):
     base_data["inspired_by_upstream"] = {
-        "local.py": {"upstream": "upstream.py", "divergence_reason": "  "}
+        "local.py": {
+            "upstream": "upstream.py",
+            "divergence_reason": "  ",
+            "sync_rule": "MIRROR_EXACTLY",
+        }
     }
     errors = validate_inspired_by_upstream(base_data)
     assert any("missing or empty 'divergence_reason'" in e for e in errors)
@@ -69,7 +88,11 @@ def test_inspired_by_upstream_missing_upstream_target_path(base_data, tmp_path):
     # Upstream file does NOT exist
 
     base_data["inspired_by_upstream"] = {
-        "local.py": {"upstream": "upstream.py", "divergence_reason": "Reason"}
+        "local.py": {
+            "upstream": "upstream.py",
+            "divergence_reason": "Reason",
+            "sync_rule": "MIRROR_EXACTLY",
+        }
     }
     errors = validate_inspired_by_upstream(base_data, tmp_path)
     assert any("upstream path 'upstream.py' does not exist" in e for e in errors)
@@ -127,10 +150,17 @@ def test_no_sync_files_rejects_blank_item(base_data):
 
 def test_registry_paths_reject_unsafe_values(base_data):
     base_data["modified_upstream_files"] = [
-        {"path": "/tmp/outside.py", "discuss": False, "discuss_reason": ""}
+        {
+            "path": "/tmp/outside.py",
+            "discuss": False,
+            "discuss_reason": "",
+            "sync_rule": "MIRROR_EXACTLY",
+        }
     ]
     base_data["no_sync_files"] = ["../outside.py"]
-    base_data["russian_copies"] = {"-bad.py": "db/source.py"}
+    base_data["russian_copies"] = {
+        "-bad.py": {"upstream": "db/source.py", "sync_rule": "MIRROR_EXACTLY"}
+    }
 
     errors = validate_registry_core(base_data)
 
@@ -184,7 +214,10 @@ def test_cross_category_overlap_rejected(base_data):
 
 def test_russian_copy_overlap_rejected(base_data):
     base_data["russian_copies"] = {
-        "exporter/webapp/main_ru.py": "exporter/webapp/main.py"
+        "exporter/webapp/main_ru.py": {
+            "upstream": "exporter/webapp/main.py",
+            "sync_rule": "MIRROR_EXACTLY",
+        }
     }
     base_data["unique_paths"] = ["exporter/webapp/main_ru.py"]
 
@@ -199,10 +232,16 @@ def test_russian_copy_overlap_rejected(base_data):
 
 def test_dps_copy_must_not_also_be_registered_as_locale_copy(base_data):
     base_data["russian_copies"] = {
-        "exporter/goldendict/data_classes_dps.py": "exporter/goldendict/data_classes.py"
+        "exporter/goldendict/data_classes_dps.py": {
+            "upstream": "exporter/goldendict/data_classes.py",
+            "sync_rule": "MIRROR_EXACTLY",
+        }
     }
     base_data["sbs_copies"] = {
-        "exporter/goldendict/data_classes_dps.py": "exporter/goldendict/data_classes.py"
+        "exporter/goldendict/data_classes_dps.py": {
+            "upstream": "exporter/goldendict/data_classes.py",
+            "sync_rule": "MIRROR_EXACTLY",
+        }
     }
 
     errors = validate_cross_section_overlaps(base_data)
@@ -228,7 +267,7 @@ def test_shadow_mapping_rejects_non_string_source(base_data):
     errors = validate_shadow_mapping("russian_copies", base_data)
 
     assert errors == [
-        "russian_copies['db/families/family_compound_ru.py']: upstream path must be a string"
+        "russian_copies['db/families/family_compound_ru.py']: entry must be an object"
     ]
 
 
@@ -237,7 +276,10 @@ def test_shadow_mapping_rejects_missing_upstream_source(base_data, tmp_path):
     shadow_file.parent.mkdir(parents=True)
     shadow_file.touch()
     base_data["russian_copies"] = {
-        "db/families/family_compound_ru.py": "db/families/family_compound.py"
+        "db/families/family_compound_ru.py": {
+            "upstream": "db/families/family_compound.py",
+            "sync_rule": "MIRROR_EXACTLY",
+        }
     }
 
     errors = validate_registry_core(base_data, tmp_path)

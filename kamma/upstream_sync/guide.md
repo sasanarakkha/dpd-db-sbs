@@ -1,7 +1,7 @@
 # Upstream Sync Protocol
 
 > This is the canonical protocol for running `/update-upstream`. For per-file merge
-> guidance, see `smd/index.md`. For accumulated lessons, see `archive_improvements.md`.
+> guidance, see `registry.json`. For accumulated lessons, see `archive_improvements.md`.
 
 All local sync-process documentation must stay inside `kamma/upstream_sync/`. The upstream-owned
 `docs/` tree is not a place for local sync-process instructions.
@@ -25,7 +25,7 @@ After that wrapper finishes, all sync work must use the Python scripts in
 1. Open the upstream source file.
 2. See exactly how upstream implements the broken functionality.
 3. Copy that exact solution into the shadow.
-4. Re-apply ONLY the local changes listed in `smd/` for that file.
+4. Re-apply ONLY the local changes listed in `registry.json` for that file.
 
 **FORBIDDEN:**
 - Workarounds, patches, or logic not present in the upstream source.
@@ -162,18 +162,17 @@ Stage 4 is split into two model-bound substages: ADVANCED analysis and FAST tran
    - Run `git fetch upstream` — always fetch before any analysis. No need to search for new commits manually; the scripts derive the range from `accepted_sync.json`.
    - Run `uv run ruff check tools/ scripts/ db/ exporter/ --select F821,E999 --quiet` — catch undefined names and syntax/API breakage before sync work begins.
    - Run `uv run python3 kamma/upstream_sync/scripts/validate_registry.py`
-   - Run `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py`
    - Ensure `kamma/upstream_sync/accepted_sync.json` points at the last accepted upstream sync.
 2. **Factual Diff**:
    - Run `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py <thread_dir>`.
    - Generate `prep_report.md` and `prep_manifest.json` from the explicit upstream range in `accepted_sync.json`.
    - Identify all modified, added, and deleted upstream files relative to the registry.
    - If `prep_manifest.json.discuss_paths` is non-empty, STOP before `execute_sync.py`.
-   - If `prep_manifest.json.needs_classification_paths` is non-empty, those upstream additions have no local collision; register them in `registry.json`/SMD during Stage 2. They do NOT block `execute_sync.py`.
+   - If `prep_manifest.json.needs_classification_paths` is non-empty, those upstream additions have no local collision; register them in `registry.json` during Stage 2. They do NOT block `execute_sync.py`.
    - `prep_analyzer.py` also performs a full local-tree audit (independent of the commit-range diff) by comparing every git-tracked local file against the upstream tree and full upstream history at the target SHA:
-     - If `prep_manifest.json.unregistered_local_paths` is non-empty, those local files have no upstream counterpart (current or historical) and are not covered by any registry category; register them in `registry.json`/SMD during Stage 2 (typically `unique_paths`, or a shadow/inspired category). They do NOT block `execute_sync.py`.
+     - If `prep_manifest.json.unregistered_local_paths` is non-empty, those local files have no upstream counterpart (current or historical) and are not covered by any registry category; register them in `registry.json` during Stage 2 (typically `unique_paths`, or a shadow/inspired category). They do NOT block `execute_sync.py`.
      - If `prep_manifest.json.upstream_deleted_orphans` is non-empty, those local files match a path upstream once had but has since deleted; decide during Stage 2 whether to keep them as an intentional fork divergence (register the decision) or delete them locally to match upstream. They do NOT block `execute_sync.py`.
-   - If `prep_manifest.json.blocker_paths` is non-empty, STOP before `execute_sync.py`. Deletion blockers may be acknowledged by creating `<thread_dir>/run_acknowledged_blockers.txt` (one path per line; `#` comments allowed); `verify_manifest` warns but does not block on acknowledged paths. Collision blockers require registry/SMD changes before `execute_sync.py`.
+   - If `prep_manifest.json.blocker_paths` is non-empty, STOP before `execute_sync.py`. Deletion blockers may be acknowledged by creating `<thread_dir>/run_acknowledged_blockers.txt` (one path per line; `#` comments allowed); `verify_manifest` warns but does not block on acknowledged paths. Collision blockers require registry changes before `execute_sync.py`.
 3. **Automated Pull**:
    - Perform the automated sync by running `uv run python3 kamma/upstream_sync/scripts/execute_sync.py <thread_dir>`.
    - Review and add any run-specific exclusions to `<thread_dir>/run_exclusions.txt` before execution if needed.
@@ -212,7 +211,6 @@ A session must be restartable at any sub-stage boundary from files alone — nev
      - Verification command to confirm the change landed correctly.
      - Structural refactor check — state explicitly whether the upstream diff for this file contains structural refactoring (type hint modernisation, `os` → `pathlib`, `print()`/`rich.print()` → `pr.*`, dead code removal, method signature cleanup, or similar quality improvements). If yes, the shadow/inspired item must include those structural changes in addition to any feature change. If no, write "none found".
    - If any item says "figure out X", "determine Y", or "check Z" — the plan is incomplete. ADVANCED must resolve those before handing off.
-   - **Coupled `.jinja` template pre-registration (MANDATORY):** For every Python shadow in the plan, check `registry.json` for a coupled `.jinja` template (same base name, different extension). If one is found, pre-register the coupled .jinja template in `registry.json` and add it to the plan. Jinja templates silently break when their paired Python file is updated without them.
    - **Union-type propagation (MANDATORY):** When an upstream type or union changes (e.g., a `TypeAlias`, `Literal`, or `TypedDict` field), propagate the change to ALL sibling localized data classes (`_ru`, `_sbs`, `_dps`, `_ta`). Applying the change to only one sibling silently breaks the others.
    - **Shadow/inspired refactor porting check (MANDATORY when upstream change is structural):** For every upstream file in the dynamic plan whose diff shows structural refactoring — type hint modernisation, `os` → `pathlib`, `print()` / `rich.print()` → `pr.*`, dead code removal, method signature cleanup, or similar quality improvements — check `registry.json` for registered shadow copies (`russian_copies`, `sbs_copies`, `dps_copies`, `tamil_copies`) and `inspired_by_upstream` entries with that file as counterpart. If any exist, the `dynamic_plan.md` item for each copy must include those structural changes in addition to any feature change. Do not port a feature change in isolation when the upstream source was also structurally improved in the same commit range.
 2. **Discussion Flags**:
@@ -237,7 +235,7 @@ A session must be restartable at any sub-stage boundary from files alone — nev
    - Perform manual verification (GoldenDict/webapp).
 3. **Cleanup**:
    - Run `uv run python3 tests/test_shadow_cleanup.py --folder <folder> [--apply]` to review or archive orphans.
-   - Update `registry.json` and `smd/` to reflect the new state.
+   - Update `registry.json` to reflect the new state.
    - Run `uv run python tests/smoke_test_sync.py` — re-run after orphan archiving to confirm nothing was broken.
 4. **Template Audit** (every sync):
    - For each local template dir (`ru_components/templates/`, `sbs_templates/`, `ru_templates/`):
@@ -338,19 +336,9 @@ Recurring pitfalls captured from past sync runs. Check these before declaring a 
 | `dps_copies` | Shadow files mirroring upstream with shared DPS fork additions. Strict parity enforced. `dps_copies` is the single category for mixed/shared fork shadows and for local upstream shadows that are not cleanly Russian-only, SBS-only, or Tamil-only. |
 | `tamil_copies` | Shadow files mirroring upstream with Tamil additions. Strict parity enforced. Primary shadow: `db/tpd/tpd_to_lookup.py` → `db/epd/epd_to_lookup.py`. |
 | `inspired_by_upstream` | Local files derived from upstream but structurally diverged. No strict parity; backport useful improvements only. |
-| `unique_paths` | Fork-only cleanup inventory, not sync targets; no SMD entry required. |
+| `unique_paths` | Fork-only cleanup inventory, not sync targets. |
 | `no_sync_files` | Infrastructure files that must never be overwritten. |
 | `skip_sync_patterns` | Upstream-owned or irrelevant paths excluded from Stage 1 analysis only. They are still synced unless also listed in `no_sync_files`. |
-
----
-
-## SMD (Sync Metadata) Structure
-
-Merge rules are no longer in a monolithic file. See the `kamma/upstream_sync/smd/` directory:
-- `index.md`: Entry point and directory of all entries.
-- `db.md`, `exporter.md`, `gui.md`, `scripts.md`, `tools.md`: Domain-specific merge rules.
-
-Every entry must define a `Sync Rule` (`PORT`, `MIRROR_EXACTLY`, `PRESERVE`, `DISCUSS`, or `inspired_only`). Every sync-relevant SMD entry must use the exact same `Category` as its `registry.json` entry.
 
 ---
 

@@ -49,7 +49,6 @@ Each gate requires explicit user approval before manual commit execution.
 | `kamma/upstream_sync/guide.md` | Canonical 5-stage model-split workflow |
 | `kamma/upstream_sync/registry.json` | What to sync, what to skip, what to discuss |
 | `kamma/upstream_sync/accepted_sync.json` | Last accepted upstream sync state |
-| `kamma/upstream_sync/smd/index.md` | Per-file local changes and sync pitfalls |
 | `kamma/upstream_sync/archive_improvements.md` | Accumulated lessons from past runs |
 | `<thread_dir>/handoff.md` | Fresh-session resume source of truth |
 | `<thread_dir>/prep_report.md` | Factual diff of upstream changes |

@@ -7,17 +7,32 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from kamma.upstream_sync.scripts.prep_analyzer import PrepAnalyzer
-from kamma.upstream_sync.scripts.prep_analyzer import get_upstream_changes
+from kamma.upstream_sync.scripts.prep_analyzer import PrepAnalyzer, get_upstream_changes
 from kamma.upstream_sync.scripts.sync_schema import (
     AcceptedSyncState,
     InspiredByUpstreamEntry,
     ModifiedUpstreamEntry,
     RegistryData,
+    ShadowCopyEntry,
 )
 
 FULL_OLD_SHA = "a" * 40
 FULL_NEW_SHA = "b" * 40
+
+
+@pytest.fixture(autouse=True)
+def mock_git_methods():
+    with (
+        patch(
+            "kamma.upstream_sync.scripts.prep_analyzer.get_upstream_tree_paths",
+            return_value=set(),
+        ),
+        patch(
+            "kamma.upstream_sync.scripts.prep_analyzer.get_upstream_ever_added_paths",
+            return_value=set(),
+        ),
+    ):
+        yield
 
 
 @pytest.fixture
@@ -25,22 +40,38 @@ def mock_registry() -> RegistryData:
     return RegistryData(
         modified_upstream_files=[
             ModifiedUpstreamEntry(
-                path="db/models.py", discuss=True, discuss_reason="Reason"
+                path="db/models.py",
+                discuss=True,
+                discuss_reason="Reason",
+                sync_rule="MIRROR_EXACTLY",
             )
         ],
         russian_copies={
-            "db/families/family_compound_ru.py": "db/families/family_compound.py",
-            "db/families/deleted_source_ru.py": "db/families/deleted_source.py",
-            "exporter/webapp/main_ru.py": "exporter/webapp/main.py",
-            "exporter/webapp/ru_templates/": "exporter/webapp/templates/",
+            "db/families/family_compound_ru.py": ShadowCopyEntry(
+                upstream="db/families/family_compound.py"
+            ),
+            "db/families/deleted_source_ru.py": ShadowCopyEntry(
+                upstream="db/families/deleted_source.py"
+            ),
+            "exporter/webapp/main_ru.py": ShadowCopyEntry(
+                upstream="exporter/webapp/main.py"
+            ),
+            "exporter/webapp/ru_templates/": ShadowCopyEntry(
+                upstream="exporter/webapp/templates/"
+            ),
         },
         sbs_copies={},
         dps_copies={},
-        tamil_copies={"db/tpd/tpd_to_lookup.py": "db/epd/epd_to_lookup.py"},
+        tamil_copies={
+            "db/tpd/tpd_to_lookup.py": ShadowCopyEntry(
+                upstream="db/epd/epd_to_lookup.py"
+            )
+        },
         inspired_by_upstream={
             "scripts/bash/make_dpd.sh": InspiredByUpstreamEntry(
                 upstream="scripts/bash/makedict.py",
                 divergence_reason="Reason",
+                sync_rule="MIRROR_EXACTLY",
             )
         },
         unique_paths=[],
@@ -94,14 +125,6 @@ def test_prep_analyzer_report_generation(
         patch.object(analyzer, "_path_exists", return_value=False),
         patch(
             "kamma.upstream_sync.scripts.prep_analyzer.validate_registry_core",
-            return_value=[],
-        ),
-        patch(
-            "kamma.upstream_sync.scripts.prep_analyzer.extract_all_smd_entries",
-            return_value={},
-        ),
-        patch(
-            "kamma.upstream_sync.scripts.prep_analyzer.collect_registry_paths",
             return_value=[],
         ),
     ):
@@ -205,14 +228,6 @@ def test_prep_analyzer_treats_renames_as_delete_and_add(
             "kamma.upstream_sync.scripts.prep_analyzer.validate_registry_core",
             return_value=[],
         ),
-        patch(
-            "kamma.upstream_sync.scripts.prep_analyzer.extract_all_smd_entries",
-            return_value={},
-        ),
-        patch(
-            "kamma.upstream_sync.scripts.prep_analyzer.collect_registry_paths",
-            return_value=[],
-        ),
     ):
         analyzer.run()
 
@@ -261,17 +276,19 @@ def test_get_upstream_changes_uses_nul_delimited_name_status(
 
 
 def test_is_skipped(mock_registry, accepted_sync_state, tmp_path: Path) -> None:
-    with patch(
-        "kamma.upstream_sync.scripts.prep_analyzer.load_registry",
-        return_value=mock_registry,
-    ):
-        with patch(
+    with (
+        patch(
+            "kamma.upstream_sync.scripts.prep_analyzer.load_registry",
+            return_value=mock_registry,
+        ),
+        patch(
             "kamma.upstream_sync.scripts.prep_analyzer.load_accepted_sync_state",
             return_value=accepted_sync_state,
-        ):
-            analyzer = PrepAnalyzer(tmp_path)
-            assert analyzer.is_skipped("tests/test.py")
-            assert not analyzer.is_skipped("src/main.py")
+        ),
+    ):
+        analyzer = PrepAnalyzer(tmp_path)
+        assert analyzer.is_skipped("tests/test.py")
+        assert not analyzer.is_skipped("src/main.py")
 
 
 @patch("kamma.upstream_sync.scripts.prep_analyzer.load_registry")
@@ -302,14 +319,6 @@ def test_added_file_under_mapped_dir_appears_only_in_shadow_section(
             "kamma.upstream_sync.scripts.prep_analyzer.validate_registry_core",
             return_value=[],
         ),
-        patch(
-            "kamma.upstream_sync.scripts.prep_analyzer.extract_all_smd_entries",
-            return_value={},
-        ),
-        patch(
-            "kamma.upstream_sync.scripts.prep_analyzer.collect_registry_paths",
-            return_value=[],
-        ),
     ):
         analyzer.run()
 
@@ -334,24 +343,24 @@ def test_added_file_under_mapped_dir_appears_only_in_shadow_section(
 def test_prep_analyzer_requires_bootstrapped_sync_state(
     mock_registry, tmp_path: Path
 ) -> None:
-    with patch(
-        "kamma.upstream_sync.scripts.prep_analyzer.load_registry",
-        return_value=mock_registry,
-    ):
-        with patch(
+    with (
+        patch(
+            "kamma.upstream_sync.scripts.prep_analyzer.load_registry",
+            return_value=mock_registry,
+        ),
+        patch(
             "kamma.upstream_sync.scripts.prep_analyzer.load_accepted_sync_state",
             return_value=AcceptedSyncState(
                 last_accepted_upstream_sha="BOOTSTRAP_REQUIRED",
                 last_accepted_upstream_date="BOOTSTRAP_REQUIRED",
                 last_accepted_upstream_ref="upstream/main",
             ),
-        ):
-            analyzer = PrepAnalyzer(tmp_path)
+        ),
+    ):
+        analyzer = PrepAnalyzer(tmp_path)
 
-            with pytest.raises(
-                ValueError, match="accepted sync state is not bootstrapped"
-            ):
-                analyzer.run()
+        with pytest.raises(ValueError, match="accepted sync state is not bootstrapped"):
+            analyzer.run()
 
 
 def _run_analyzer_with_changes(
@@ -381,14 +390,6 @@ def _run_analyzer_with_changes(
         ),
         patch(
             "kamma.upstream_sync.scripts.prep_analyzer.validate_registry_core",
-            return_value=[],
-        ),
-        patch(
-            "kamma.upstream_sync.scripts.prep_analyzer.extract_all_smd_entries",
-            return_value={},
-        ),
-        patch(
-            "kamma.upstream_sync.scripts.prep_analyzer.collect_registry_paths",
             return_value=[],
         ),
     ):
@@ -422,14 +423,6 @@ def test_non_colliding_add_goes_to_needs_classification(
         patch.object(analyzer, "_path_exists", return_value=False),
         patch(
             "kamma.upstream_sync.scripts.prep_analyzer.validate_registry_core",
-            return_value=[],
-        ),
-        patch(
-            "kamma.upstream_sync.scripts.prep_analyzer.extract_all_smd_entries",
-            return_value={},
-        ),
-        patch(
-            "kamma.upstream_sync.scripts.prep_analyzer.collect_registry_paths",
             return_value=[],
         ),
     ):
@@ -469,14 +462,6 @@ def test_add_colliding_with_worktree_file_remains_blocker(
             "kamma.upstream_sync.scripts.prep_analyzer.validate_registry_core",
             return_value=[],
         ),
-        patch(
-            "kamma.upstream_sync.scripts.prep_analyzer.extract_all_smd_entries",
-            return_value={},
-        ),
-        patch(
-            "kamma.upstream_sync.scripts.prep_analyzer.collect_registry_paths",
-            return_value=[],
-        ),
     ):
         analyzer.run()
 
@@ -512,14 +497,6 @@ def test_add_colliding_with_registered_local_path_remains_blocker(
             "kamma.upstream_sync.scripts.prep_analyzer.validate_registry_core",
             return_value=[],
         ),
-        patch(
-            "kamma.upstream_sync.scripts.prep_analyzer.extract_all_smd_entries",
-            return_value={},
-        ),
-        patch(
-            "kamma.upstream_sync.scripts.prep_analyzer.collect_registry_paths",
-            return_value=[],
-        ),
     ):
         analyzer.run()
 
@@ -552,14 +529,6 @@ def test_deletion_remains_blocker_with_collision_rule(
         patch.object(analyzer, "_path_exists", return_value=False),
         patch(
             "kamma.upstream_sync.scripts.prep_analyzer.validate_registry_core",
-            return_value=[],
-        ),
-        patch(
-            "kamma.upstream_sync.scripts.prep_analyzer.extract_all_smd_entries",
-            return_value={},
-        ),
-        patch(
-            "kamma.upstream_sync.scripts.prep_analyzer.collect_registry_paths",
             return_value=[],
         ),
     ):

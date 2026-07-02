@@ -39,7 +39,6 @@ For the full protocol, model responsibilities, and Iron Rule, see [guide.md](./g
 | Command | Purpose |
 |---|---|
 | `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` | Validate `registry.json` schema and paths. |
-| `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` | Ensure every sync-relevant registry entry has SMD merge guidance. |
 | `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py <thread_dir>` | Generate Stage 1 report and manifest. |
 | `uv run python3 kamma/upstream_sync/scripts/execute_sync.py <thread_dir>` | Robustly execute selective sync from upstream. |
 | `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>` | Advance accepted sync metadata after Stage 5 acceptance. |
@@ -53,25 +52,22 @@ For the full protocol, model responsibilities, and Iron Rule, see [guide.md](./g
 - **[guide.md](./guide.md)**: Canonical process reference and naming policy.
 - **[accepted_sync.json](./accepted_sync.json)**: Last accepted upstream sync point.
 - **[reviewed_shadow_noops.json](./reviewed_shadow_noops.json)**: Exact reviewed no-op ledger for changed upstream sources that intentionally need no shadow edit.
-- **[smd/index.md](./smd/index.md)**: Per-file merge guidance (Sync Metadata).
-- **[registry.json](./registry.json)**: Source of truth for file mappings and categories.
+- **[registry.json](./registry.json)**: Source of truth for file mappings, categories, and per-file merge guidance.
 - **[archive_improvements.md](./archive_improvements.md)**: Accumulated lessons from past runs.
 
 ## File Inventory
 
 | File | Purpose |
 |---|---|
-| `registry.json` | Machine-readable map of every file that diverges from upstream |
+| `registry.json` | Machine-readable map of every file that diverges from upstream, containing sync rules and merge guidance |
 | `accepted_sync.json` | Last accepted upstream SHA/date/ref used to anchor Stage 1 |
 | `reviewed_shadow_noops.json` | Exact reviewed no-op ledger for changed upstream sources that intentionally need no shadow edit |
-| `smd/` | Shadow Module Descriptions (Directory) — per-file merge guidance |
 | `guide.md` | Canonical process reference: Iron Rule, 5-stage workflow, model responsibilities, naming policy |
 | `archive_improvements.md` | Accumulated lessons from all past sync runs |
 | `templates/` | `plan.md` / `spec.md` starters for new sync kamma threads |
 | `scripts/init_sync_thread.py` | Creates the Kamma sync thread after `scripts/cl_dps/dpd-kamma-sync` backs up DPS data |
 | `scripts/registry_helper.py` | Shared Python helper to load the registry and extract paths |
 | `scripts/validate_registry.py` | Schema and data-quality validator for `registry.json` |
-| `scripts/verify_smd_coverage.py` | Coverage checker — ensures every sync-relevant registry entry has an SMD entry in `smd/` |
 | `scripts/prep_analyzer.py` | Generates factual Stage 1 report and manifest from the accepted sync range |
 | `scripts/execute_sync.py` | Robustly executes selective sync from upstream (Stage 1 automation) |
 | `scripts/finalize_accepted_sync.py` | Advances `accepted_sync.json` from a verified prep manifest |

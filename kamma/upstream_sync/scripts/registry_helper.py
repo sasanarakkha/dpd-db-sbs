@@ -9,6 +9,7 @@ from kamma.upstream_sync.scripts.sync_schema import (
     AcceptedSyncState,
     PrepManifest,
     RegistryData,
+    ShadowCopyEntry,
 )
 
 
@@ -101,19 +102,23 @@ def get_inspired_by_upstream_mapping(registry: RegistryData) -> dict[str, str]:
 
 
 def get_strict_shadow_mappings(registry: RegistryData) -> dict[str, str]:
-    """Return combined strict shadow mappings for every localized category."""
-    return {
-        **registry.russian_copies,
-        **registry.sbs_copies,
-        **registry.dps_copies,
-        **registry.tamil_copies,
-    }
+    """Return combined strict shadow mappings (local -> upstream) for every localized category."""
+    result: dict[str, str] = {}
+    for mapping in [
+        registry.russian_copies,
+        registry.sbs_copies,
+        registry.dps_copies,
+        registry.tamil_copies,
+    ]:
+        for local_path, entry in mapping.items():
+            result[local_path] = entry.upstream
+    return result
 
 
 def get_shadow_mappings_by_category(
     registry: RegistryData,
-) -> dict[str, dict[str, str]]:
-    """Return strict-shadow mappings grouped by logical category."""
+) -> dict[str, dict[str, ShadowCopyEntry]]:
+    """Return strict-shadow entries grouped by logical category."""
     return {
         "russian_copies": registry.russian_copies,
         "sbs_copies": registry.sbs_copies,

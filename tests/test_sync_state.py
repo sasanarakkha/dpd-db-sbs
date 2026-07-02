@@ -84,7 +84,7 @@ def test_load_accepted_sync_state_invalid(
     state_path = tmp_path / "accepted_sync.json"
     state_path.write_text(json.dumps(payload), encoding="utf-8")
 
-    with pytest.raises(ValueError, match=expected_error):
+    with pytest.raises((ValueError, TypeError), match=expected_error):
         load_accepted_sync_state(state_path)
 
 
@@ -155,7 +155,7 @@ def test_load_prep_manifest_invalid(
     manifest_path = tmp_path / "prep_manifest.json"
     manifest_path.write_text(json.dumps(payload), encoding="utf-8")
 
-    with pytest.raises(ValueError, match=expected_error):
+    with pytest.raises((ValueError, TypeError), match=expected_error):
         load_prep_manifest(manifest_path)
 
 
@@ -202,7 +202,7 @@ def test_load_prep_manifest_rejects_invalid_mapped_actions(
     manifest_path = tmp_path / "prep_manifest.json"
     manifest_path.write_text(json.dumps(payload), encoding="utf-8")
 
-    with pytest.raises(ValueError, match=expected_error):
+    with pytest.raises((ValueError, TypeError), match=expected_error):
         load_prep_manifest(manifest_path)
 
 

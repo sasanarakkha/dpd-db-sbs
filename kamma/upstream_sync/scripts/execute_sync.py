@@ -124,6 +124,7 @@ def propagate_upstream_deletions(
         ["git", "cat-file", "-e", f"{last_accepted_sha}^{{commit}}"],
         capture_output=True,
         cwd=cwd,
+        check=False,
     )
     if check.returncode != 0:
         pr.red(
@@ -144,6 +145,7 @@ def propagate_upstream_deletions(
         capture_output=True,
         text=True,
         cwd=cwd,
+        check=False,
     )
     if result.returncode != 0:
         pr.red(f"P0 deletion diff failed: {result.stderr.strip()}")
@@ -291,7 +293,7 @@ def execute_sync(
         pr.green("gathering exclusions")
         permanent = get_permanent_exclusions()
         run_specific = get_run_specific_exclusions(thread_dir)
-        all_exclusions = sorted(list(set(permanent + run_specific)))
+        all_exclusions = sorted(set(permanent + run_specific))
         pr.yes(f"{len(all_exclusions)} paths")
         if run_specific:
             pr.green(f"Included {len(run_specific)} run-specific exclusions.")
@@ -397,7 +399,7 @@ def execute_sync(
         pr.green("✅ Sync execution complete. Ready for Stage 2 (Analysis).")
         return 0
 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         pr.red(f"Sync failed: {e}")
         context.restore_original_state()
         return 1

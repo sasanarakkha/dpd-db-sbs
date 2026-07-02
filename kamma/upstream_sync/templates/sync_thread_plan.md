@@ -20,11 +20,10 @@
   - [ ] If the user confirms a warning is intentionally a no-op but gives no specific reason, use this reason exactly: "User reviewed and confirmed this upstream change does not need to be ported to the shadow."
 - [ ] **1.3 Validation**:
   - [ ] `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` — passes.
-  - [ ] `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` — passes.
 - [ ] **1.4 Factual Diff**:
   - [ ] `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py <thread_dir>` — generates `prep_report.md` and `prep_manifest.json`.
   - [ ] If `prep_manifest.json.discuss_paths` is non-empty, stop before `execute_sync.py`.
-  - [ ] If `prep_manifest.json.blocker_paths` is non-empty, STOP before `execute_sync.py`. To acknowledge deletion blockers you intend to handle in Stage 2, create `<thread_dir>/run_acknowledged_blockers.txt` (one path per line; `#` comments allowed). `verify_manifest` will warn for each acknowledged path but will not block on them. Collision blockers still require registry/SMD changes before `execute_sync.py`.
+  - [ ] If `prep_manifest.json.blocker_paths` is non-empty, STOP before `execute_sync.py`. To acknowledge deletion blockers you intend to handle in Stage 2, create `<thread_dir>/run_acknowledged_blockers.txt` (one path per line; `#` comments allowed). `verify_manifest` will warn for each acknowledged path but will not block on them. Collision blockers still require registry changes before `execute_sync.py`.
   - [ ] Record unexpected command failures exactly in `handoff.md`.
 - [ ] **1.5 Automated Pull + Commit 1 Gate**:
   - [ ] Review `<thread_dir>/run_exclusions.txt` if needed.
@@ -82,7 +81,7 @@
   - [ ] `uv run python tests/smoke_test_sync.py`.
 - [ ] **3.3 Cleanup**:
   - [ ] Run orphan cleanup commands only if explicitly listed in `dynamic_plan.md`.
-  - [ ] Update `registry.json` and `smd/` only if explicitly listed in `dynamic_plan.md`.
+  - [ ] Update `registry.json` only if explicitly listed in `dynamic_plan.md`.
 - [ ] **3.4 Commit 2 Gate**:
   - [ ] Prepare commit message only: `#sync: manual merge resolutions <DATE>`.
 

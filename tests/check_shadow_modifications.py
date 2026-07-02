@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Check whether strict shadow copies were updated when their upstream sources changed."""
 
 import json
@@ -70,7 +69,7 @@ def require_string_list(entry: dict[str, object], field: str, label: str) -> lis
     """Read a required non-empty string list field from a no-op ledger entry."""
     value = entry.get(field)
     if not isinstance(value, list):
-        raise ValueError(f"{label}: field '{field}' must be a list")
+        raise TypeError(f"{label}: field '{field}' must be a list")
 
     paths: list[str] = []
     for index, item in enumerate(value):
@@ -96,14 +95,14 @@ def load_reviewed_shadow_noops(
 
     raw = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(raw, list):
-        raise ValueError("reviewed shadow no-op ledger must be a JSON list")
+        raise TypeError("reviewed shadow no-op ledger must be a JSON list")
 
     noops: list[ReviewedShadowNoop] = []
     seen: set[tuple[str, str, str, frozenset[str]]] = set()
     for index, item in enumerate(raw):
         label = f"reviewed_shadow_noops[{index}]"
         if not isinstance(item, dict):
-            raise ValueError(f"{label}: entry must be an object")
+            raise TypeError(f"{label}: entry must be an object")
 
         entry: dict[str, object] = item
         sync_commit = require_string(entry, "sync_commit", label)
@@ -190,8 +189,8 @@ def check_shadows() -> None:
         "tamil_copies": "Tamil",
     }
     for category, mappings in get_shadow_mappings_by_category(registry).items():
-        for shadow, source in mappings.items():
-            all_mappings.append((category_labels[category], shadow, source))
+        for shadow, entry in mappings.items():
+            all_mappings.append((category_labels[category], shadow, entry.upstream))
 
     unmodified_shadows = []
 

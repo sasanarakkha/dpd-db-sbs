@@ -26,7 +26,7 @@ REQUIRED_TOP_LEVEL_SECTIONS = [
 
 
 def load_registry(registry_path: Path) -> dict[str, object]:
-    with registry_path.open("r") as f:
+    with registry_path.open("r", encoding="utf-8") as f:
         return json.load(f)  # type: ignore[no-any-return]
 
 
@@ -37,6 +37,46 @@ def validate_required_top_level_sections(data: dict[str, object]) -> list[str]:
         for section in REQUIRED_TOP_LEVEL_SECTIONS
         if section not in data
     ]
+
+
+VALID_SYNC_RULES = {"PORT", "MIRROR_EXACTLY", "PRESERVE", "DISCUSS", "inspired_only"}
+
+
+def validate_entry_rubric(label: str, entry: dict[str, object]) -> list[str]:
+    """Enforce merge guidance rubric for an entry."""
+    errors: list[str] = []
+    sync_rule = entry.get("sync_rule")
+    if not isinstance(sync_rule, str) or not sync_rule.strip():
+        sync_rule = ""
+    else:
+        sync_rule = sync_rule.strip()
+
+    if sync_rule and sync_rule not in VALID_SYNC_RULES:
+        errors.append(f"{label}: unknown Sync Rule '{sync_rule}'")
+
+    local_changes = entry.get("local_changes", [])
+    watch_for = entry.get("watch_for", [])
+
+    # Allow local_changes/watch_for to be optional if they are completely missing,
+    # but if they are present, they must be lists. Wait, actually the schema requires
+    # them to be lists, but let's check:
+    if not isinstance(local_changes, list):
+        errors.append(f"{label}: 'local_changes' must be a list")
+        local_changes = []
+    if not isinstance(watch_for, list):
+        errors.append(f"{label}: 'watch_for' must be a list")
+        watch_for = []
+
+    # Enforce minimums
+    if sync_rule not in ["MIRROR_EXACTLY", "inspired_only"] and len(local_changes) < 2:
+        pr.amber(
+            f"Rubric Warning: {label}: only {len(local_changes)} local-change(s), need 2"
+        )
+
+    if sync_rule != "MIRROR_EXACTLY" and len(watch_for) < 1:
+        pr.amber(f"Rubric Warning: {label}: missing watch_for section")
+
+    return errors
 
 
 def validate_modified_upstream_files(data: dict[str, object]) -> list[str]:
@@ -71,6 +111,10 @@ def validate_modified_upstream_files(data: dict[str, object]) -> list[str]:
                         f"modified_upstream_files[{i}] ({entry.get('path')}): "
                         "discuss=true requires a non-empty 'discuss_reason'"
                     )
+        path = str(entry.get("path", ""))
+        errors.extend(
+            validate_entry_rubric(f"modified_upstream_files[{i}] ({path})", entry)
+        )
     return errors
 
 
@@ -114,7 +158,7 @@ def validate_shadow_mapping(
         return [f"{label}: must be an object"]
 
     seen: set[str] = set()
-    for shadow, upstream in value.items():
+    for shadow, entry in value.items():
         if not isinstance(shadow, str) or not shadow.strip():
             errors.append(f"{label}: shadow path must be a non-empty string")
             continue
@@ -122,12 +166,15 @@ def validate_shadow_mapping(
             errors.append(f"{label}: duplicate entry '{shadow}'")
         seen.add(shadow)
 
-        if not isinstance(upstream, str):
-            errors.append(f"{label}['{shadow}']: upstream path must be a string")
+        if not isinstance(entry, dict):
+            errors.append(f"{label}['{shadow}']: entry must be an object")
             continue
-        if not upstream.strip():
-            errors.append(f"{label}['{shadow}']: upstream path must be non-empty")
+        upstream = entry.get("upstream")
+        if not isinstance(upstream, str) or not upstream.strip():
+            errors.append(f"{label}['{shadow}']: missing or invalid 'upstream' path")
             continue
+
+        errors.extend(validate_entry_rubric(f"{label}['{shadow}']", entry))
 
         if repo_root:
             shadow_path = repo_root / shadow
@@ -213,11 +260,10 @@ def validate_cross_section_overlaps(data: dict[str, object]) -> list[str]:
                 )
 
             # Glob pattern
-            elif "*" in path1:
-                if fnmatch.fnmatch(path2, path1):
-                    errors.append(
-                        f"Overlap: Glob '{path1}' ({sec1}) matches '{path2}' ({sec2})"
-                    )
+            elif "*" in path1 and fnmatch.fnmatch(path2, path1):
+                errors.append(
+                    f"Overlap: Glob '{path1}' ({sec1}) matches '{path2}' ({sec2})"
+                )
 
     return errors
 
@@ -240,13 +286,14 @@ def validate_inspired_by_upstream(
         upstream = entry.get("upstream")
         if not upstream or not isinstance(upstream, str):
             errors.append(f"{label}: missing or invalid 'upstream' path")
-        elif repo_root:
-            if not (repo_root / upstream).exists():
-                errors.append(f"{label}: upstream path '{upstream}' does not exist")
+        elif repo_root and not (repo_root / upstream).exists():
+            errors.append(f"{label}: upstream path '{upstream}' does not exist")
 
         reason = entry.get("divergence_reason")
         if not reason or not isinstance(reason, str) or not reason.strip():
             errors.append(f"{label}: missing or empty 'divergence_reason'")
+
+        errors.extend(validate_entry_rubric(label, entry))
 
         if repo_root:
             if path.endswith("/"):
@@ -305,17 +352,19 @@ def validate_registry_path_safety(data: dict[str, object]) -> list[str]:
     for category in ["russian_copies", "sbs_copies", "dps_copies", "tamil_copies"]:
         mapping = data.get(category, {})
         if isinstance(mapping, dict):
-            for shadow, upstream in mapping.items():
+            for shadow, entry in mapping.items():
                 if isinstance(shadow, str):
                     append_path_safety_error(
                         errors, f"{category} key '{shadow}'", shadow
                     )
-                if isinstance(upstream, str):
-                    append_path_safety_error(
-                        errors,
-                        f"{category}['{shadow}']",
-                        upstream,
-                    )
+                if isinstance(entry, dict):
+                    upstream = entry.get("upstream")
+                    if isinstance(upstream, str):
+                        append_path_safety_error(
+                            errors,
+                            f"{category}['{shadow}']",
+                            upstream,
+                        )
 
     inspired = data.get("inspired_by_upstream", {})
     if isinstance(inspired, dict):
@@ -358,7 +407,7 @@ def validate_registry_schema(data: dict[str, object]) -> list[str]:
     """Validate registry item types with the typed schema parser."""
     try:
         RegistryData.from_raw(data)
-    except ValueError as exc:
+    except (ValueError, TypeError) as exc:
         message = str(exc)
         for label in ("unique_paths", "no_sync_files"):
             for suffix in ("must be a string", "must be a non-empty string"):

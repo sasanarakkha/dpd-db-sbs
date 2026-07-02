@@ -27,6 +27,7 @@ def test_finalize_rejects_invalid_manifest(
         last_accepted_upstream_ref="upstream/main",
     )
     mock_load_accepted_state.return_value = accepted_state
+    (tmp_path / "retrospective.md").write_text("done", encoding="utf-8")
 
     result = finalize_accepted_sync(
         thread_dir=str(tmp_path),
@@ -80,6 +81,7 @@ def test_finalize_verifies_manifest_against_current_accepted_state(
     mock_load_accepted_state.return_value = accepted_state
     mock_load_manifest.return_value = manifest
     mock_resolve_date.return_value = "2026-05-31T00:00:00+00:00"
+    (tmp_path / "retrospective.md").write_text("done", encoding="utf-8")
 
     result = finalize_accepted_sync(
         thread_dir=str(tmp_path),

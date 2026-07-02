@@ -1,7 +1,7 @@
 # Upstream Sync Rehearsal: Comprehensive Improvement Analysis
 
-> Historical record only. Current canonical instructions live in `guide.md`,
-> `templates/`, and `smd/`; obsolete names or phase labels below are not active
+> Historical record only. Current canonical instructions live in `guide.md`
+> and `templates/`; obsolete names or phase labels below are not active
 > protocol.
 
 This document provides a unified, exhaustive post-mortem of the Upstream Sync Rehearsal sessions. It identifies friction points, logic gaps, and systemic failures encountered during the process to ensure future synchronizations are more robust, efficient, and maintainable.
@@ -90,7 +90,7 @@ This document provides a unified, exhaustive post-mortem of the Upstream Sync Re
 ## 12. Continuous Template and Registry Management
 **Issue:** Essential local files were flagged as orphans because their upstream sources were deleted. Reusable templates fell behind newly discovered requirements.
 **Recommendation:**
-- Whenever a new sync requirement is discovered, immediately update `kamma/upstream_sync/guide.md` and `kamma/upstream_sync/smd.md`.
+- Whenever a new sync requirement is discovered, immediately update `kamma/upstream_sync/guide.md` and `kamma/upstream_sync/registry.json`.
 - **Promotion Workflow**: If an orphaned original is still in use locally, it must be explicitly promoted to the `unique_paths` section of `kamma/upstream_sync/registry.json`.
 - Keep `kamma/upstream_sync/registry.json` meticulously updated as the absolute source of truth for both shadow mappings and unique exclusions.
 

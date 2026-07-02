@@ -190,7 +190,7 @@ class MappedAction:
                 local_target_path = validate_repo_relative_path(
                     local_target_path, "local_target_path"
                 )
-        except ValueError as exc:
+        except (ValueError, TypeError) as exc:
             if label == "mapped action":
                 raise
             raise ValueError(f"{label}: {exc}") from exc
@@ -328,6 +328,9 @@ class ModifiedUpstreamEntry:
     path: str
     discuss: bool
     discuss_reason: str | None = None
+    sync_rule: str | None = None
+    local_changes: list[str] = field(default_factory=list)
+    watch_for: list[str] = field(default_factory=list)
 
     @classmethod
     def from_raw(cls, raw: object, label: str) -> "ModifiedUpstreamEntry":
@@ -335,15 +338,53 @@ class ModifiedUpstreamEntry:
         data = _as_object(raw, label)
         try:
             path = _required_string(data, "path")
-        except ValueError as exc:
+            if "discuss" not in data:
+                raise ValueError("missing required field 'discuss'")
+            discuss = data["discuss"]
+            if not isinstance(discuss, bool):
+                raise TypeError("field 'discuss' must be a bool")
+            discuss_reason = _optional_string(data, "discuss_reason")
+            sync_rule = _optional_string(data, "sync_rule")
+            local_changes = _optional_string_list(data, "local_changes")
+            watch_for = _optional_string_list(data, "watch_for")
+        except (ValueError, TypeError) as exc:
             raise ValueError(f"{label}: {exc}") from exc
-        if "discuss" not in data:
-            raise ValueError(f"{label}: missing required field 'discuss'")
-        discuss = data["discuss"]
-        if not isinstance(discuss, bool):
-            raise TypeError(f"{label}: field 'discuss' must be a bool")
-        discuss_reason = _optional_string(data, "discuss_reason")
-        return cls(path=path, discuss=discuss, discuss_reason=discuss_reason)
+        return cls(
+            path=path,
+            discuss=discuss,
+            discuss_reason=discuss_reason,
+            sync_rule=sync_rule,
+            local_changes=local_changes,
+            watch_for=watch_for,
+        )
+
+
+@dataclass(frozen=True)
+class ShadowCopyEntry:
+    """Typed registry entry for a shadow copy (russian/sbs/dps/tamil)."""
+
+    upstream: str
+    sync_rule: str | None = None
+    local_changes: list[str] = field(default_factory=list)
+    watch_for: list[str] = field(default_factory=list)
+
+    @classmethod
+    def from_raw(cls, raw: object, label: str) -> "ShadowCopyEntry":
+        """Validate and parse one shadow copy entry."""
+        data = _as_object(raw, label)
+        try:
+            upstream = _required_string(data, "upstream")
+            sync_rule = _optional_string(data, "sync_rule")
+            local_changes = _optional_string_list(data, "local_changes")
+            watch_for = _optional_string_list(data, "watch_for")
+        except (ValueError, TypeError) as exc:
+            raise ValueError(f"{label}: {exc}") from exc
+        return cls(
+            upstream=upstream,
+            sync_rule=sync_rule,
+            local_changes=local_changes,
+            watch_for=watch_for,
+        )
 
 
 @dataclass(frozen=True)
@@ -352,6 +393,9 @@ class InspiredByUpstreamEntry:
 
     upstream: str
     divergence_reason: str
+    sync_rule: str | None = None
+    local_changes: list[str] = field(default_factory=list)
+    watch_for: list[str] = field(default_factory=list)
 
     @classmethod
     def from_raw(cls, raw: object, label: str) -> "InspiredByUpstreamEntry":
@@ -360,9 +404,18 @@ class InspiredByUpstreamEntry:
         try:
             upstream = _required_string(data, "upstream")
             divergence_reason = _required_string(data, "divergence_reason")
-        except ValueError as exc:
+            sync_rule = _optional_string(data, "sync_rule")
+            local_changes = _optional_string_list(data, "local_changes")
+            watch_for = _optional_string_list(data, "watch_for")
+        except (ValueError, TypeError) as exc:
             raise ValueError(f"{label}: {exc}") from exc
-        return cls(upstream=upstream, divergence_reason=divergence_reason)
+        return cls(
+            upstream=upstream,
+            divergence_reason=divergence_reason,
+            sync_rule=sync_rule,
+            local_changes=local_changes,
+            watch_for=watch_for,
+        )
 
 
 @dataclass(frozen=True)
@@ -370,10 +423,10 @@ class RegistryData:
     """Typed upstream sync registry data."""
 
     modified_upstream_files: list[ModifiedUpstreamEntry]
-    russian_copies: dict[str, str]
-    sbs_copies: dict[str, str]
-    dps_copies: dict[str, str]
-    tamil_copies: dict[str, str]
+    russian_copies: dict[str, ShadowCopyEntry]
+    sbs_copies: dict[str, ShadowCopyEntry]
+    dps_copies: dict[str, ShadowCopyEntry]
+    tamil_copies: dict[str, ShadowCopyEntry]
     inspired_by_upstream: dict[str, InspiredByUpstreamEntry]
     unique_paths: list[str]
     no_sync_files: list[str]
@@ -385,10 +438,10 @@ class RegistryData:
         data = _as_object(raw, "registry")
         return cls(
             modified_upstream_files=cls._modified_upstream_files(data),
-            russian_copies=_string_mapping(data, "russian_copies"),
-            sbs_copies=_string_mapping(data, "sbs_copies"),
-            dps_copies=_string_mapping(data, "dps_copies"),
-            tamil_copies=_string_mapping(data, "tamil_copies"),
+            russian_copies=cls._shadow_copy_mapping(data, "russian_copies"),
+            sbs_copies=cls._shadow_copy_mapping(data, "sbs_copies"),
+            dps_copies=cls._shadow_copy_mapping(data, "dps_copies"),
+            tamil_copies=cls._shadow_copy_mapping(data, "tamil_copies"),
             inspired_by_upstream=cls._inspired_by_upstream(data),
             unique_paths=_string_list(data, "unique_paths"),
             no_sync_files=_string_list(data, "no_sync_files"),
@@ -410,6 +463,24 @@ class RegistryData:
             )
             for index, entry in enumerate(entries)
         ]
+
+    @staticmethod
+    def _shadow_copy_mapping(
+        data: dict[str, object], field_name: str
+    ) -> dict[str, ShadowCopyEntry]:
+        if field_name not in data:
+            raise ValueError(f"missing required field '{field_name}'")
+        entries = data[field_name]
+        if not isinstance(entries, dict):
+            raise TypeError(f"field '{field_name}' must be an object")
+        parsed: dict[str, ShadowCopyEntry] = {}
+        for path, entry in entries.items():
+            if not isinstance(path, str) or not path.strip():
+                raise ValueError(f"field '{field_name}' key must be a non-empty string")
+            parsed[path] = ShadowCopyEntry.from_raw(
+                entry, f"field '{field_name}['{path}']'"
+            )
+        return parsed
 
     @staticmethod
     def _inspired_by_upstream(

@@ -1,9 +1,9 @@
 """Verify automated upstream sync execution refuses unsafe repository states."""
 
-import subprocess
-import unittest
 import shutil
+import subprocess
 import tempfile
+import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -245,6 +245,7 @@ class TestExecuteSync(unittest.TestCase):
 
         self.assertEqual(result, 1)
 
+    @patch("kamma.upstream_sync.scripts.execute_sync.subprocess.run")
     @patch("kamma.upstream_sync.scripts.execute_sync.load_registry")
     @patch(
         "kamma.upstream_sync.scripts.execute_sync.run_sync_assertions", return_value=0
@@ -263,6 +264,7 @@ class TestExecuteSync(unittest.TestCase):
         mock_verify_manifest,
         mock_run_assertions,
         mock_load_registry,
+        mock_subprocess_run,
     ):
         context = MagicMock()
         context.is_dirty = False
@@ -279,6 +281,7 @@ class TestExecuteSync(unittest.TestCase):
             MagicMock(stdout=""),  # checkout as_upstream -- .
         ]
 
+        mock_subprocess_run.return_value = MagicMock(returncode=0)
         result = execute_sync(str(self.thread_dir))
 
         self.assertEqual(result, 0)
@@ -302,6 +305,7 @@ class TestExecuteSync(unittest.TestCase):
             [call.args for call in mock_run_git.call_args_list],
         )
 
+    @patch("kamma.upstream_sync.scripts.execute_sync.subprocess.run")
     @patch("kamma.upstream_sync.scripts.execute_sync.load_registry")
     @patch(
         "kamma.upstream_sync.scripts.execute_sync.run_sync_assertions", return_value=0
@@ -320,6 +324,7 @@ class TestExecuteSync(unittest.TestCase):
         mock_verify_manifest,
         mock_run_assertions,
         mock_load_registry,
+        mock_subprocess_run,
     ):
         context = MagicMock()
         context.is_dirty = False
@@ -336,6 +341,7 @@ class TestExecuteSync(unittest.TestCase):
             MagicMock(stdout=""),
         ]
 
+        mock_subprocess_run.return_value = MagicMock(returncode=0)
         result = execute_sync(str(self.thread_dir), stage=True)
 
         self.assertEqual(result, 0)
@@ -408,6 +414,7 @@ class TestExecuteSync(unittest.TestCase):
             ]
         )
 
+    @patch("kamma.upstream_sync.scripts.execute_sync.subprocess.run")
     @patch("kamma.upstream_sync.scripts.execute_sync.load_registry")
     @patch(
         "kamma.upstream_sync.scripts.execute_sync.run_sync_assertions", return_value=1
@@ -424,6 +431,7 @@ class TestExecuteSync(unittest.TestCase):
         mock_verify_manifest,
         mock_run_assertions,
         mock_load_registry,
+        mock_subprocess_run,
     ):
         context = MagicMock()
         context.is_dirty = False
@@ -439,11 +447,13 @@ class TestExecuteSync(unittest.TestCase):
             MagicMock(stdout=""),
         ]
 
+        mock_subprocess_run.return_value = MagicMock(returncode=0)
         result = execute_sync(str(self.thread_dir))
 
         self.assertEqual(result, 1)
         mock_run_assertions.assert_called_once_with("localsha789")
 
+    @patch("kamma.upstream_sync.scripts.execute_sync.subprocess.run")
     @patch("kamma.upstream_sync.scripts.execute_sync.load_registry")
     @patch(
         "kamma.upstream_sync.scripts.execute_sync.run_sync_assertions", return_value=0
@@ -462,6 +472,7 @@ class TestExecuteSync(unittest.TestCase):
         mock_verify_manifest,
         mock_run_assertions,
         mock_load_registry,
+        mock_subprocess_run,
     ):
         context = MagicMock()
         context.is_dirty = False
@@ -477,6 +488,7 @@ class TestExecuteSync(unittest.TestCase):
             MagicMock(stdout=""),  # restore/checkout
         ]
 
+        mock_subprocess_run.return_value = MagicMock(returncode=0)
         result = execute_sync(str(self.thread_dir))
 
         self.assertEqual(result, 0)

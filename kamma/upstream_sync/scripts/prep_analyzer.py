@@ -21,11 +21,6 @@ from kamma.upstream_sync.scripts.registry_helper import (
 )
 from kamma.upstream_sync.scripts.sync_schema import AcceptedSyncState
 from kamma.upstream_sync.scripts.validate_registry import validate_registry_core
-from kamma.upstream_sync.scripts.verify_smd_coverage import (
-    check_rubric,
-    collect_registry_paths,
-    extract_all_smd_entries,
-)
 from tools.printer import printer as pr
 
 type GitChange = tuple[str, str]
@@ -305,12 +300,12 @@ class PrepAnalyzer:
 
         source_to_shadows: dict[str, list[SourceAction]] = {}
         for category, mapping in self.shadow_mappings_by_category.items():
-            for shadow, source in mapping.items():
-                source_to_shadows.setdefault(source, []).append(
+            for shadow, entry in mapping.items():
+                source_to_shadows.setdefault(entry.upstream, []).append(
                     {
                         "category": category,
                         "local_path": shadow,
-                        "source_path": source,
+                        "source_path": entry.upstream,
                     }
                 )
 
@@ -468,34 +463,6 @@ class PrepAnalyzer:
             for error in errors:
                 lines.append(f"- {error}")
             lines.append("")
-
-        lines.append("## SMD Coverage Status")
-        smd_dir = Path("kamma/upstream_sync/smd")
-        try:
-            smd_entries = extract_all_smd_entries(smd_dir)
-            all_paths = collect_registry_paths(self.registry)
-            gaps: list[str] = []
-            rubric_fails: list[str] = []
-            for path, category in all_paths:
-                if path not in smd_entries:
-                    gaps.append(f"MISSING: {path} [{category}]")
-                else:
-                    rubric_fails.extend(check_rubric(path, category, smd_entries[path]))
-
-            if not gaps and not rubric_fails:
-                lines.append("OK: SMD coverage is complete and rubric-compliant.\n")
-            else:
-                if gaps:
-                    lines.append("FAIL: Missing SMD entries:")
-                    for gap in gaps:
-                        lines.append(f"- {gap}")
-                if rubric_fails:
-                    lines.append("WARN: SMD rubric failures:")
-                    for failure in rubric_fails:
-                        lines.append(f"- {failure}")
-                lines.append("")
-        except (OSError, ValueError) as exc:
-            lines.append(f"FAIL: Error checking SMD coverage: {exc}\n")
 
         lines.append("## Modified - Tracked Files")
         if tracked:

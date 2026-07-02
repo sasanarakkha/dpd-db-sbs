@@ -78,9 +78,9 @@ Existing tables have extra `*_ru` columns (e.g., `root_ru_meaning`, `html_ru`).
 
 ## Shadow Files & Sync Templates
 - "Shadow" (`*_ru.py`, `*_sbs.py`, `*_dps.py`, `*_ta.py`) or "unique" files MUST have corresponding sync documentation in `kamma/upstream_sync/`.
-- **Shadow Documentation Gate:** Any new, renamed, moved, or reclassified shadow/local copy MUST update registry.json and the matching `kamma/upstream_sync/smd/*.md` entry in the same change. Do not report the work complete until `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` and `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py` pass.
+- **Shadow Documentation Gate:** Any new, renamed, moved, or reclassified shadow/local copy MUST update registry.json with its metadata (sync_rule, local_changes, watch_for) in the same change. Do not report the work complete until `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` passes.
 - **Single Category Rule:** one local path may appear in exactly one registry category. Use `russian_copies` only for Russian-only shadows, `sbs_copies` only for SBS-only shadows, `tamil_copies` only for Tamil-only shadows, and `dps_copies` for mixed/shared RU/SBS/Tamil/DPS fork shadows or local upstream shadows that do not belong cleanly to one locale.
-- The SMD `Category` line MUST exactly match the `registry.json` category. Do not rely on memory or chat context; update the registry and SMD while making the code change.
+- The `Category` of a shadow file in `registry.json` must match its logical folder/locale. Do not rely on memory or chat context; update the registry while making the code change.
 
 ## Engineering Standards
 - **Request Scope Boundary (Hard Stop):** Only implement the exact change
@@ -141,7 +141,7 @@ Renames/moves are atomic. You MUST:
 1. `grep_search` the old name across the entire repository.
 2. Update all imports, hardcoded paths, scripts, workflows, registries (`kamma/upstream_sync/registry.json`), and docs.
 3. Run a final verification search to empirically prove zero stale references remain.
-4. Stage `registry.json` and all affected `kamma/upstream_sync/smd/*.md` files **in the same commit** as the `git mv`. Never let a rename land in git while its registry/SMD documentation is still in the working tree.
+4. Stage `registry.json` **in the same commit** as the `git mv`. Never let a rename land in git while its registry documentation is still in the working tree.
 
 ## Blast-Radius Check (Shared Code)
 When you change the **behavior, signature, return shape, or contract** of any
@@ -179,13 +179,12 @@ files.
 4. `uv run --with pyrefly pyrefly check --min-severity warn <file>`
 5. `uv run pytest tests/test_<feature>.py -v` (for affected tests)
 6. **If you created, renamed, moved, deleted, or reclassified ANY fork-local file** — this includes:
-   - Shadow files (`*_ru.py`, `*_sbs.py`, `*_dps.py`, `*_ta.py`) → add/update in the correct `registry.json` copies category (`russian_copies`, `sbs_copies`, `tamil_copies`, or `dps_copies`) and update the matching `kamma/upstream_sync/smd/*.md` entry (`Category` line must match registry key exactly)
+   - Shadow files (`*_ru.py`, `*_sbs.py`, `*_dps.py`, `*_ta.py`) → add/update in the correct `registry.json` copies category (`russian_copies`, `sbs_copies`, `tamil_copies`, or `dps_copies`)
    - New fork-specific files with no upstream counterpart → add the path to `unique_paths` in `registry.json`
    - Removed or moved files → remove or update their entry in `registry.json`
 
    Then run:
    - `uv run python3 kamma/upstream_sync/scripts/validate_registry.py`
-   - `uv run python3 kamma/upstream_sync/scripts/verify_smd_coverage.py`
 
 **Do NOT report completion until all checks pass.** This is non-negotiable. Do not skip or defer these. Pyrefly warnings count as failures unless explicitly approved by the user. Type safety is mandatory, not optional.
 - **Verification:** Write tests for accurate data output (not UI components). Readme MUST be updated.

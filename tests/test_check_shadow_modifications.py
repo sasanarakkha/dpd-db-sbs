@@ -10,7 +10,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from kamma.upstream_sync.scripts.registry_helper import get_shadow_mappings_by_category
-from kamma.upstream_sync.scripts.sync_schema import RegistryData
+from kamma.upstream_sync.scripts.sync_schema import RegistryData, ShadowCopyEntry
 
 
 def load_shadow_modification_script() -> ModuleType:
@@ -30,9 +30,9 @@ def load_shadow_modification_script() -> ModuleType:
 def test_get_shadow_mappings_by_category_includes_dps() -> None:
     data = RegistryData(
         modified_upstream_files=[],
-        russian_copies={"a_ru.py": "a.py"},
-        sbs_copies={"a_sbs.py": "a.py"},
-        dps_copies={"a_dps.py": "a.py"},
+        russian_copies={"a_ru.py": ShadowCopyEntry(upstream="a.py")},
+        sbs_copies={"a_sbs.py": ShadowCopyEntry(upstream="a.py")},
+        dps_copies={"a_dps.py": ShadowCopyEntry(upstream="a.py")},
         tamil_copies={},
         inspired_by_upstream={},
         unique_paths=[],
@@ -42,9 +42,9 @@ def test_get_shadow_mappings_by_category_includes_dps() -> None:
 
     mappings = get_shadow_mappings_by_category(data)
 
-    assert mappings["russian_copies"] == {"a_ru.py": "a.py"}
-    assert mappings["sbs_copies"] == {"a_sbs.py": "a.py"}
-    assert mappings["dps_copies"] == {"a_dps.py": "a.py"}
+    assert mappings["russian_copies"] == {"a_ru.py": ShadowCopyEntry(upstream="a.py")}
+    assert mappings["sbs_copies"] == {"a_sbs.py": ShadowCopyEntry(upstream="a.py")}
+    assert mappings["dps_copies"] == {"a_dps.py": ShadowCopyEntry(upstream="a.py")}
 
 
 def test_get_last_sync_commit_uses_latest_upstream_pull(
@@ -222,10 +222,17 @@ def test_check_shadows_skips_reviewed_noop(
     registry_path.write_text(
         json.dumps(
             {
-                "russian_copies": {"shadow/": "source/"},
+                "modified_upstream_files": [],
+                "russian_copies": {
+                    "shadow/": {"upstream": "source/", "sync_rule": "MIRROR_EXACTLY"}
+                },
                 "sbs_copies": {},
                 "dps_copies": {},
                 "tamil_copies": {},
+                "inspired_by_upstream": {},
+                "unique_paths": [],
+                "no_sync_files": [],
+                "skip_sync_patterns": [],
             }
         ),
         encoding="utf-8",
@@ -258,7 +265,7 @@ def test_check_shadows_skips_reviewed_noop(
         "load_registry",
         lambda: RegistryData(
             modified_upstream_files=[],
-            russian_copies={"shadow/": "source/"},
+            russian_copies={"shadow/": ShadowCopyEntry(upstream="source/")},
             sbs_copies={},
             dps_copies={},
             tamil_copies={},

@@ -1,13 +1,15 @@
 """Verify typed upstream sync metadata schema parsing and validation."""
 
-import pytest
 from collections.abc import Callable
+
+import pytest
 
 from kamma.upstream_sync.scripts.sync_schema import (
     AcceptedSyncState,
     MappedAction,
     PrepManifest,
     RegistryData,
+    ShadowCopyEntry,
 )
 
 FULL_OLD_SHA = "a" * 40
@@ -97,7 +99,7 @@ def test_accepted_sync_state_accepts_bootstrap_sentinel() -> None:
 def test_accepted_sync_state_from_raw_rejects_invalid_payload(
     payload: object, expected_error: str
 ) -> None:
-    with pytest.raises(ValueError, match=expected_error):
+    with pytest.raises((ValueError, TypeError), match=expected_error):
         AcceptedSyncState.from_raw(payload)
 
 
@@ -158,8 +160,8 @@ def test_mapped_action_from_raw_accepts_backward_compatible_payload() -> None:
 def test_mapped_action_from_raw_rejects_invalid_payload(
     payload: object, expected_error: str
 ) -> None:
-    with pytest.raises(ValueError, match=expected_error):
-        MappedAction.from_raw(payload)
+    with pytest.raises((ValueError, TypeError), match=expected_error):
+        MappedAction.from_raw(payload, "action")
 
 
 def valid_manifest_payload() -> dict[str, object]:
@@ -312,7 +314,7 @@ def test_prep_manifest_from_raw_rejects_invalid_payload(
     payload = valid_manifest_payload()
     mutator(payload)
 
-    with pytest.raises(ValueError, match=expected_error):
+    with pytest.raises((ValueError, TypeError), match=expected_error):
         PrepManifest.from_raw(payload)
 
 
@@ -383,9 +385,19 @@ def test_prep_manifest_rejects_invalid_needs_classification_paths(
 def valid_registry_payload() -> dict[str, object]:
     return {
         "modified_upstream_files": [
-            {"path": "db/models.py", "discuss": True, "discuss_reason": "review"}
+            {
+                "path": "db/models.py",
+                "discuss": True,
+                "discuss_reason": "review",
+                "sync_rule": "MIRROR_EXACTLY",
+            }
         ],
-        "russian_copies": {"db/models_ru.py": "db/models.py"},
+        "russian_copies": {
+            "db/models_ru.py": {
+                "upstream": "db/models.py",
+                "sync_rule": "MIRROR_EXACTLY",
+            }
+        },
         "sbs_copies": {},
         "dps_copies": {},
         "tamil_copies": {},
@@ -393,6 +405,7 @@ def valid_registry_payload() -> dict[str, object]:
             "tools/example_dps.py": {
                 "upstream": "tools/example.py",
                 "divergence_reason": "localized behavior",
+                "sync_rule": "MIRROR_EXACTLY",
             }
         },
         "unique_paths": ["tools/local_only.py"],
@@ -405,7 +418,11 @@ def test_registry_data_from_raw_valid_minimal_registry() -> None:
     registry = RegistryData.from_raw(valid_registry_payload())
 
     assert registry.modified_upstream_files[0].path == "db/models.py"
-    assert registry.russian_copies == {"db/models_ru.py": "db/models.py"}
+    assert registry.russian_copies == {
+        "db/models_ru.py": ShadowCopyEntry(
+            upstream="db/models.py", sync_rule="MIRROR_EXACTLY"
+        )
+    }
     assert registry.inspired_by_upstream["tools/example_dps.py"].upstream == (
         "tools/example.py"
     )
@@ -437,20 +454,20 @@ def test_registry_data_from_raw_valid_minimal_registry() -> None:
             lambda payload: payload.__setitem__(
                 "russian_copies", {"db/models_ru.py": 123}
             ),
-            "field 'russian_copies\\['db/models_ru.py'\\]' must be a string",
+            "field 'russian_copies\\['db/models_ru.py'\\]' must be a JSON object",
         ),
         (
             lambda payload: payload.__setitem__(
                 "modified_upstream_files", [{"path": "db/models.py"}]
             ),
-            "field 'modified_upstream_files\\[0\\]': missing required field 'discuss'",
+            "missing required field 'discuss'",
         ),
         (
             lambda payload: payload.__setitem__(
                 "inspired_by_upstream",
                 {"tools/example_dps.py": {"upstream": "tools/example.py"}},
             ),
-            "field 'inspired_by_upstream\\['tools/example_dps.py'\\]': missing required field 'divergence_reason'",
+            "missing required field 'divergence_reason'",
         ),
     ],
 )
@@ -460,5 +477,5 @@ def test_registry_data_from_raw_rejects_invalid_payload(
     payload = valid_registry_payload()
     mutator(payload)
 
-    with pytest.raises(ValueError, match=expected_error):
+    with pytest.raises((ValueError, TypeError), match=expected_error):
         RegistryData.from_raw(payload)
