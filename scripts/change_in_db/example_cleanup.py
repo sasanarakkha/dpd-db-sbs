@@ -25,8 +25,6 @@ EXAMPLE_FIELDS: Final[tuple[str, ...]] = (
 def clean_example(text: str) -> str:
     """Clean up a single example text by stripping whitespace, removing double spaces,
     fixing punctuation spacing, and lowercasing English capital letters."""
-    if not text:
-        return ""
     new_val = text.strip()
     new_val = re.sub(r"  +", " ", new_val)
     new_val = re.sub(r" ,", ",", new_val)

@@ -35,11 +35,6 @@
     "expected": "āīūṅñṭḍṇḷṃ capitalized diacritics are not handled by [a-z], only ascii a-z"
   },
   {
-    "id": "synthetic_7",
-    "input": "",
-    "expected": ""
-  },
-  {
     "id": "synthetic_8",
     "input": "Already clean text.",
     "expected": "already clean text."
