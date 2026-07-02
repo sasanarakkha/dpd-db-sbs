@@ -38,7 +38,7 @@ see **[guide.md](../guide.md)**.
 | Commit 1 | After Stage 1 FAST prep and automated pull | `#sync: upstream pull <from>..<to>, <N> files, YYYY-MM-DD` |
 | Commit 2 | After Stage 3 FAST execution and verification | `#sync: manual merge resolutions <DATE>` |
 | Commit 3 | After cleanup/finalization acceptance | `#sync: cleanup and finalization <DATE>` |
-| Docs Commit | After Stage 4.B docs translation if docs changed | `#docs: translate/update docs_rus/ for sync <from>..<to>` |
+| Docs Commit | After Docs Track translation if docs changed | `#docs: translate/update docs_rus/ for sync <from>..<to>` |
 
 Each gate requires explicit user approval before manual commit execution.
 
@@ -46,7 +46,7 @@ Each gate requires explicit user approval before manual commit execution.
 
 | File | Purpose |
 |---|---|
-| `kamma/upstream_sync/guide.md` | Canonical 5-stage model-split workflow |
+| `kamma/upstream_sync/guide.md` | Canonical 4-stage model-split workflow + async Docs Translation Track |
 | `kamma/upstream_sync/registry.json` | What to sync, what to skip, what to discuss |
 | `kamma/upstream_sync/accepted_sync.json` | Last accepted upstream sync state |
 | `kamma/upstream_sync/archive_improvements.md` | Accumulated lessons from past runs |

@@ -17,7 +17,7 @@ from kamma.upstream_sync.scripts.registry_helper import (
 from kamma.upstream_sync.scripts.sync_runtime import verify_manifest
 from tools.printer import printer as pr
 
-DEFAULT_ACCEPTANCE_NOTES = "Accepted after Stage 5 verification."
+DEFAULT_ACCEPTANCE_NOTES = "Accepted after Stage 4 verification."
 
 
 def retrospective_exists(thread_dir: str | Path) -> bool:
@@ -42,7 +42,7 @@ def finalize_accepted_sync(thread_dir: str, state_path: Path, notes: str) -> int
 
     if not retrospective_exists(thread_dir):
         pr.red(
-            "Stage 5 retrospective.md missing — write it before finalizing. "
+            "Stage 4 retrospective.md missing — write it before finalizing. "
             f"Expected: {Path(thread_dir) / 'retrospective.md'}"
         )
         return 1

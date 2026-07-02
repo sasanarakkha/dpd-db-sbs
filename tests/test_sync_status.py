@@ -4,7 +4,12 @@ import json
 import re
 from pathlib import Path
 
-from kamma.upstream_sync.scripts.sync_status import StageDescriptor, derive_stage
+from kamma.upstream_sync.scripts.sync_status import (
+    StageDescriptor,
+    derive_stage,
+    extract_guide_section,
+    print_stage_instructions,
+)
 
 GUIDE_PATH = (
     Path(__file__).resolve().parent.parent / "kamma" / "upstream_sync" / "guide.md"
@@ -49,11 +54,18 @@ def _write_manifest(thread_dir: Path, *, localized: bool, docs: bool = False) ->
 def test_empty_thread_dir_is_stage_1(tmp_path: Path) -> None:
     descriptor = derive_stage(tmp_path)
     assert descriptor.stage == "Stage 1: Prep"
-    assert "prep_analyzer.py" in descriptor.next_command
+    assert "stage1.py" in descriptor.next_command
 
 
 def test_localized_noop_manifest_is_fast_path(tmp_path: Path) -> None:
     _write_manifest(tmp_path, localized=True)
+    descriptor = derive_stage(tmp_path)
+    assert descriptor.stage.startswith("Fast-path")
+    assert "execute_sync.py" in descriptor.next_command
+
+
+def test_docs_only_manifest_is_fast_path(tmp_path: Path) -> None:
+    _write_manifest(tmp_path, localized=True, docs=True)
     descriptor = derive_stage(tmp_path)
     assert descriptor.stage.startswith("Fast-path")
     assert "execute_sync.py" in descriptor.next_command
@@ -72,28 +84,31 @@ def test_dynamic_plan_present_is_stage_3(tmp_path: Path) -> None:
     assert descriptor.stage == "Stage 3: Execution & Verification"
 
 
-def test_docs_translation_plan_present_is_stage_4(tmp_path: Path) -> None:
+def test_docs_paths_with_dynamic_plan_is_stage_3_not_docs_analysis(
+    tmp_path: Path,
+) -> None:
+    _write_manifest(tmp_path, localized=False, docs=True)
+    (tmp_path / "dynamic_plan.md").write_text("plan", encoding="utf-8")
+    descriptor = derive_stage(tmp_path)
+    assert descriptor.stage == "Stage 3: Execution & Verification"
+
+
+def test_docs_translation_plan_presence_has_no_effect_on_routing(
+    tmp_path: Path,
+) -> None:
     _write_manifest(tmp_path, localized=False, docs=True)
     (tmp_path / "dynamic_plan.md").write_text("plan", encoding="utf-8")
     (tmp_path / "docs_translation_plan.md").write_text("plan", encoding="utf-8")
     descriptor = derive_stage(tmp_path)
-    assert descriptor.stage == "Stage 4.B: Docs Translation"
+    assert descriptor.stage == "Stage 3: Execution & Verification"
 
 
-def test_queued_docs_without_translation_plan_is_stage_4a(tmp_path: Path) -> None:
-    _write_manifest(tmp_path, localized=False, docs=True)
-    (tmp_path / "dynamic_plan.md").write_text("plan", encoding="utf-8")
-    descriptor = derive_stage(tmp_path)
-    assert descriptor.stage == "Stage 4.A: Docs Analysis"
-    assert "check_docs_parity.py" in descriptor.next_command
-
-
-def test_retrospective_present_is_stage_5_finalize(tmp_path: Path) -> None:
+def test_retrospective_present_is_stage_4_finalize(tmp_path: Path) -> None:
     _write_manifest(tmp_path, localized=False)
     (tmp_path / "dynamic_plan.md").write_text("plan", encoding="utf-8")
     (tmp_path / "retrospective.md").write_text("retro", encoding="utf-8")
     descriptor = derive_stage(tmp_path)
-    assert descriptor.stage.startswith("Stage 5")
+    assert descriptor.stage.startswith("Stage 4")
     assert "finalize_accepted_sync.py" in descriptor.next_command
 
 
@@ -110,14 +125,8 @@ def _all_descriptors(tmp_path: Path) -> list[StageDescriptor]:
     (tmp_path / "dynamic_plan.md").write_text("plan", encoding="utf-8")
     descriptors.append(derive_stage(tmp_path))  # Stage 3
 
-    _write_manifest(tmp_path, localized=False, docs=True)
-    descriptors.append(derive_stage(tmp_path))  # Stage 4.A
-
-    (tmp_path / "docs_translation_plan.md").write_text("plan", encoding="utf-8")
-    descriptors.append(derive_stage(tmp_path))  # Stage 4.B
-
     (tmp_path / "retrospective.md").write_text("retro", encoding="utf-8")
-    descriptors.append(derive_stage(tmp_path))  # Stage 5
+    descriptors.append(derive_stage(tmp_path))  # Stage 4 (finalize)
 
     return descriptors
 
@@ -168,3 +177,83 @@ def test_commit_gates_match_guide_commit_list(tmp_path: Path) -> None:
                 f"gate {gate!r} references Commit {match.group(1)!r}, which is "
                 f"not in guide.md's documented Commit list (known: {sorted(guide_commits)})"
             )
+
+
+def test_every_descriptor_guide_anchor_resolves_to_nonempty_section(
+    tmp_path: Path,
+) -> None:
+    """Drift guard: every StageDescriptor.guide_anchor must resolve to a real, non-empty guide.md section."""
+    guide_text = GUIDE_PATH.read_text(encoding="utf-8")
+
+    for descriptor in _all_descriptors(tmp_path):
+        section = extract_guide_section(guide_text, descriptor.guide_anchor)
+        assert section.strip(), (
+            f"guide_anchor {descriptor.guide_anchor!r} for stage "
+            f"{descriptor.stage!r} resolved to an empty section"
+        )
+        assert descriptor.guide_anchor in section
+
+
+def test_extract_guide_section_stops_at_next_same_or_higher_heading() -> None:
+    guide_text = (
+        "## Section One\n"
+        "line a\n"
+        "line b\n"
+        "### Subsection\n"
+        "line c\n"
+        "## Section Two\n"
+        "line d\n"
+    )
+
+    section = extract_guide_section(guide_text, "## Section One")
+
+    assert "line a" in section
+    assert "line c" in section
+    assert "Section Two" not in section
+    assert "line d" not in section
+
+
+def test_extract_guide_section_unknown_anchor_raises() -> None:
+    guide_text = "## Section One\nline a\n"
+
+    try:
+        extract_guide_section(guide_text, "## Does Not Exist")
+        raise AssertionError("expected ValueError for unknown anchor")
+    except ValueError as exc:
+        assert "Does Not Exist" in str(exc)
+
+
+def test_print_stage_instructions_prints_nonempty_section_for_every_branch(
+    tmp_path: Path, capsys
+) -> None:
+    for descriptor in _all_descriptors(tmp_path):
+        exit_code = print_stage_instructions(descriptor, GUIDE_PATH)
+        captured = capsys.readouterr()
+
+        assert exit_code == 0
+        assert captured.out.strip()
+
+
+def test_print_stage_instructions_unknown_anchor_returns_clear_error(
+    tmp_path: Path, capsys
+) -> None:
+    guide_path = tmp_path / "guide.md"
+    guide_path.write_text("## Section One\nline a\n", encoding="utf-8")
+    bad_descriptor = StageDescriptor(
+        stage="Stage 1: Prep",
+        next_command="n/a",
+        owner="FAST",
+        dispatch="sync-fast",
+        gate_before=None,
+        gate_after=None,
+        reads=[],
+        produces=[],
+        stop_condition="n/a",
+        guide_anchor="## Does Not Exist",
+    )
+
+    exit_code = print_stage_instructions(bad_descriptor, guide_path)
+    captured = capsys.readouterr()
+
+    assert exit_code == 1
+    assert "Does Not Exist" in captured.out or "Does Not Exist" in captured.err

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Derive whether a Stage 1 prep manifest touches nothing localized, enabling the Stage 1 -> Stage 5 fast-path."""
+"""Derive whether a Stage 1 prep manifest touches nothing localized, enabling the Stage 1 -> Commit 1 -> Stage 4 fast-path."""
 
 import json
 import sys
@@ -43,12 +43,6 @@ def is_localized_noop(manifest: dict[str, object]) -> bool:
     for field in NONEMPTY_BLOCKER_FIELDS:
         if manifest.get(field):
             return False
-
-    changed_upstream_paths = manifest.get("changed_upstream_paths", [])
-    if isinstance(changed_upstream_paths, list):
-        for path in changed_upstream_paths:
-            if isinstance(path, str) and path.startswith("docs/"):
-                return False
 
     return True
 

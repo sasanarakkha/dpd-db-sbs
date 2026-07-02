@@ -167,7 +167,6 @@ def test_prep_analyzer_report_generation(
     ]
     assert manifest["blocker_paths"] == [
         "db/families/deleted_source.py",
-        "deleted_file.py",
     ]
     assert manifest["needs_classification_paths"] == ["new_unmapped.py"]
 
@@ -369,6 +368,7 @@ def _run_analyzer_with_changes(
     changes: list[tuple[str, str]],
     tmp_path: Path,
     path_exists: bool = False,
+    queue_path: Path | None = None,
 ) -> dict[str, object]:
     """Helper: run PrepAnalyzer with mocked changes and return the manifest."""
     with (
@@ -395,9 +395,88 @@ def _run_analyzer_with_changes(
     ):
         analyzer = PrepAnalyzer(tmp_path)
         with patch.object(analyzer, "_path_exists", return_value=path_exists):
-            analyzer.run()
+            analyzer.run(queue_path=queue_path)
 
     return json.loads((tmp_path / "prep_manifest.json").read_text(encoding="utf-8"))
+
+
+def test_queue_append_fresh_docs_path(
+    mock_registry, accepted_sync_state, tmp_path: Path
+) -> None:
+    queue_path = tmp_path / "docs_translation_queue.md"
+    queue_path.write_text("# Docs Translation Queue\n\n## Pending\n", encoding="utf-8")
+
+    _run_analyzer_with_changes(
+        mock_registry,
+        accepted_sync_state,
+        [("M", "docs/technical/quick_start.md")],
+        tmp_path,
+        queue_path=queue_path,
+    )
+
+    queue_text = queue_path.read_text(encoding="utf-8")
+    assert "- [ ] docs/technical/quick_start.md" in queue_text
+
+
+def test_queue_append_skips_existing_unchecked_entry(
+    mock_registry, accepted_sync_state, tmp_path: Path
+) -> None:
+    queue_path = tmp_path / "docs_translation_queue.md"
+    queue_path.write_text(
+        "# Docs Translation Queue\n\n## Pending\n- [ ] docs/technical/quick_start.md\n",
+        encoding="utf-8",
+    )
+
+    _run_analyzer_with_changes(
+        mock_registry,
+        accepted_sync_state,
+        [("M", "docs/technical/quick_start.md")],
+        tmp_path,
+        queue_path=queue_path,
+    )
+
+    queue_text = queue_path.read_text(encoding="utf-8")
+    assert queue_text.count("docs/technical/quick_start.md") == 1
+
+
+def test_queue_append_readds_path_after_it_was_checked_off(
+    mock_registry, accepted_sync_state, tmp_path: Path
+) -> None:
+    queue_path = tmp_path / "docs_translation_queue.md"
+    queue_path.write_text(
+        "# Docs Translation Queue\n\n## Pending\n- [x] docs/technical/quick_start.md\n",
+        encoding="utf-8",
+    )
+
+    _run_analyzer_with_changes(
+        mock_registry,
+        accepted_sync_state,
+        [("M", "docs/technical/quick_start.md")],
+        tmp_path,
+        queue_path=queue_path,
+    )
+
+    queue_text = queue_path.read_text(encoding="utf-8")
+    assert "- [x] docs/technical/quick_start.md" in queue_text
+    assert "- [ ] docs/technical/quick_start.md" in queue_text
+
+
+def test_non_docs_changed_paths_are_not_queued(
+    mock_registry, accepted_sync_state, tmp_path: Path
+) -> None:
+    queue_path = tmp_path / "docs_translation_queue.md"
+    queue_path.write_text("# Docs Translation Queue\n\n## Pending\n", encoding="utf-8")
+
+    _run_analyzer_with_changes(
+        mock_registry,
+        accepted_sync_state,
+        [("M", "db/models.py")],
+        tmp_path,
+        queue_path=queue_path,
+    )
+
+    queue_text = queue_path.read_text(encoding="utf-8")
+    assert "db/models.py" not in queue_text
 
 
 @patch("kamma.upstream_sync.scripts.prep_analyzer.load_registry")
@@ -510,7 +589,7 @@ def test_add_colliding_with_registered_local_path_remains_blocker(
 @patch("kamma.upstream_sync.scripts.prep_analyzer.load_accepted_sync_state")
 @patch("kamma.upstream_sync.scripts.prep_analyzer.get_upstream_changes")
 @patch("kamma.upstream_sync.scripts.prep_analyzer.resolve_target_upstream_sha")
-def test_deletion_remains_blocker_with_collision_rule(
+def test_unmapped_deletion_not_blocker_regardless_of_worktree_state(
     mock_target,
     mock_changes,
     mock_state,
@@ -536,5 +615,62 @@ def test_deletion_remains_blocker_with_collision_rule(
 
     manifest = json.loads((tmp_path / "prep_manifest.json").read_text(encoding="utf-8"))
 
-    assert manifest["blocker_paths"] == ["deleted_upstream.py"]
+    assert manifest["deleted_upstream_paths"] == ["deleted_upstream.py"]
+    assert manifest["blocker_paths"] == []
     assert manifest["needs_classification_paths"] == []
+
+
+def test_unmapped_deletion_is_informational_not_blocker(
+    mock_registry, accepted_sync_state, tmp_path: Path
+) -> None:
+    manifest = _run_analyzer_with_changes(
+        mock_registry,
+        accepted_sync_state,
+        [("D", "totally_unmapped_upstream_file.py")],
+        tmp_path,
+    )
+
+    assert manifest["deleted_upstream_paths"] == ["totally_unmapped_upstream_file.py"]
+    assert manifest["blocker_paths"] == []
+
+
+def test_deletion_of_shadow_source_is_blocker(
+    mock_registry, accepted_sync_state, tmp_path: Path
+) -> None:
+    manifest = _run_analyzer_with_changes(
+        mock_registry,
+        accepted_sync_state,
+        [("D", "db/families/deleted_source.py")],
+        tmp_path,
+    )
+
+    assert manifest["deleted_upstream_paths"] == ["db/families/deleted_source.py"]
+    assert manifest["blocker_paths"] == ["db/families/deleted_source.py"]
+
+
+def test_deletion_of_modified_upstream_file_is_blocker(
+    mock_registry, accepted_sync_state, tmp_path: Path
+) -> None:
+    manifest = _run_analyzer_with_changes(
+        mock_registry,
+        accepted_sync_state,
+        [("D", "db/models.py")],
+        tmp_path,
+    )
+
+    assert manifest["deleted_upstream_paths"] == ["db/models.py"]
+    assert manifest["blocker_paths"] == ["db/models.py"]
+
+
+def test_deletion_of_inspired_by_upstream_source_is_blocker(
+    mock_registry, accepted_sync_state, tmp_path: Path
+) -> None:
+    manifest = _run_analyzer_with_changes(
+        mock_registry,
+        accepted_sync_state,
+        [("D", "scripts/bash/makedict.py")],
+        tmp_path,
+    )
+
+    assert manifest["deleted_upstream_paths"] == ["scripts/bash/makedict.py"]
+    assert manifest["blocker_paths"] == ["scripts/bash/makedict.py"]

@@ -251,7 +251,7 @@
     },
     "docs_rus/": {
       "upstream": "docs/",
-      "divergence_reason": "Maintained Russian translation of upstream docs/ handled by Stage 4 Docs Translation Parity.",
+      "divergence_reason": "Maintained Russian translation of upstream docs/ handled by the async Docs Translation Track.",
       "sync_rule": "inspired_only",
       "local_changes": [
         "Complete Russian translation of the `docs/` directory: features, install, webapp, integrations, contributing, technical sections.",

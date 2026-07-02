@@ -73,9 +73,10 @@ def render_handoff(date_human: str) -> str:
         "Continue upstream sync thread: <thread_dir>.\n"
         "First read:\n"
         "1. <thread_dir>/handoff.md\n"
-        "2. kamma/upstream_sync/guide.md\n"
+        "2. Run `uv run python3 kamma/upstream_sync/scripts/sync_status.py <thread_dir> "
+        "--instructions` for the current stage's guide section.\n"
         "3. <thread_dir>/plan.md\n\n"
-        "Task: run Stage 1 FAST Prep exactly as defined in the plan.\n"
+        "Task: run `uv run python3 kamma/upstream_sync/scripts/stage1.py <thread_dir>`.\n"
         "Do not perform analysis or strategic planning.\n"
         "Stop before Stage 2 and update handoff.md.\n"
         "```\n\n"
@@ -135,9 +136,14 @@ def main() -> None:
     pr.green(f"     Continue upstream sync thread: {thread_dir}.")
     pr.green("     First read:")
     pr.green(f"       - {thread_dir}/handoff.md")
-    pr.green("       - kamma/upstream_sync/guide.md")
+    pr.green(
+        "       - uv run python3 kamma/upstream_sync/scripts/sync_status.py "
+        f"{thread_dir} --instructions"
+    )
     pr.green(f"       - {thread_dir}/plan.md")
-    pr.green("     Task: run Stage 1 FAST Prep exactly as defined in the plan.")
+    pr.green(
+        "     Task: run `uv run python3 kamma/upstream_sync/scripts/stage1.py <thread_dir>`."
+    )
     pr.green("     Do not perform analysis or strategic planning.")
     pr.green("     Stop before Stage 2 and update handoff.md.")
     pr.green("After the sync completes:")

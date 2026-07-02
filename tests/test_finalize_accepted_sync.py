@@ -101,5 +101,5 @@ def test_finalize_verifies_manifest_against_current_accepted_state(
     assert written_state.last_accepted_upstream_sha == FULL_NEW_SHA
 
 
-def test_default_acceptance_notes_reference_stage_five() -> None:
-    assert DEFAULT_ACCEPTANCE_NOTES == "Accepted after Stage 5 verification."
+def test_default_acceptance_notes_reference_stage_four() -> None:
+    assert DEFAULT_ACCEPTANCE_NOTES == "Accepted after Stage 4 verification."

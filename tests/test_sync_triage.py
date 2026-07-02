@@ -1,9 +1,11 @@
 """Verify sync_triage.is_localized_noop correctly flags localized-impact syncs."""
 
+from typing import Any
+
 from kamma.upstream_sync.scripts.sync_triage import is_localized_noop
 
 
-def _base_manifest() -> dict[str, object]:
+def _base_manifest() -> dict[str, Any]:
     return {
         "from_upstream_sha": "0" * 40,
         "to_upstream_sha": "1" * 40,
@@ -46,7 +48,8 @@ def test_nonempty_discuss_paths_blocks_noop() -> None:
     assert is_localized_noop(manifest) is False
 
 
-def test_docs_path_in_changed_upstream_paths_blocks_noop() -> None:
+def test_docs_only_manifest_is_noop() -> None:
     manifest = _base_manifest()
     manifest["changed_upstream_paths"] = ["docs/technical/quick_start.md"]
-    assert is_localized_noop(manifest) is False
+    manifest["mapped_actions"] = {}
+    assert is_localized_noop(manifest) is True

@@ -5,6 +5,7 @@
 import argparse
 import fnmatch
 import json
+import re
 import subprocess
 from datetime import datetime
 from pathlib import Path
@@ -26,6 +27,54 @@ from tools.printer import printer as pr
 type GitChange = tuple[str, str]
 type MappedAction = dict[str, str]
 type SourceAction = dict[str, str]
+
+DEFAULT_DOCS_QUEUE_PATH = Path("kamma/upstream_sync/docs_translation_queue.md")
+DOCS_QUEUE_PENDING_HEADING = "## Pending"
+
+
+def _docs_queue_unchecked_pattern(path: str) -> re.Pattern[str]:
+    """Return a regex matching an existing unchecked queue entry for *path*."""
+    return re.compile(rf"^- \[ \] {re.escape(path)}(\s|$)")
+
+
+def append_to_docs_queue(queue_path: Path, docs_paths: list[str]) -> None:
+    """Append each changed `docs/` path to the queue as an unchecked item.
+
+    Skips a path only when an unchecked entry for it already exists; a path whose
+    only entry is checked off is re-added, since it changed again upstream.
+    """
+    if not docs_paths:
+        return
+
+    text = queue_path.read_text(encoding="utf-8") if queue_path.exists() else ""
+    lines = text.splitlines()
+
+    to_append = [
+        f"- [ ] {path}"
+        for path in sorted(set(docs_paths))
+        if not any(_docs_queue_unchecked_pattern(path).match(line) for line in lines)
+    ]
+    if not to_append:
+        return
+
+    heading_index = next(
+        (
+            i
+            for i, line in enumerate(lines)
+            if line.strip() == DOCS_QUEUE_PENDING_HEADING
+        ),
+        None,
+    )
+    if heading_index is None:
+        lines += ["", DOCS_QUEUE_PENDING_HEADING, "", *to_append]
+    else:
+        insert_at = heading_index + 1
+        if insert_at < len(lines) and lines[insert_at].strip() == "":
+            insert_at += 1
+        lines[insert_at:insert_at] = to_append
+
+    queue_path.parent.mkdir(parents=True, exist_ok=True)
+    queue_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 def match_sources(
@@ -278,7 +327,7 @@ class PrepAnalyzer:
             for action in actions
         ]
 
-    def run(self) -> None:
+    def run(self, queue_path: Path | None = None) -> None:
         """Generate the Stage 1 report and manifest in the thread folder."""
         from_sha = self.accepted_sync.last_accepted_upstream_sha
         if from_sha == "BOOTSTRAP_REQUIRED":
@@ -334,7 +383,6 @@ class PrepAnalyzer:
 
             if status == "D":
                 deleted.append(path)
-                blocker_paths.append(path)
                 shadow_actions = match_sources(path, source_to_shadows)
                 if shadow_actions is not None:
                     mapped_actions[path] = self.build_mapped_actions(
@@ -345,6 +393,12 @@ class PrepAnalyzer:
                     mapped_actions.setdefault(path, []).extend(
                         self.build_mapped_actions(inspired_actions, path)
                     )
+                if (
+                    shadow_actions is not None
+                    or inspired_actions is not None
+                    or path in self.modified_upstream
+                ):
+                    blocker_paths.append(path)
                 continue
 
             changed_upstream_paths.add(path)
@@ -428,6 +482,11 @@ class PrepAnalyzer:
         )
         pr.green(f"Wrote report to {report_path}")
         pr.green(f"Wrote manifest to {manifest_path}")
+
+        docs_changed_paths = [
+            path for path in changed_upstream_paths if path.startswith("docs/")
+        ]
+        append_to_docs_queue(queue_path or DEFAULT_DOCS_QUEUE_PATH, docs_changed_paths)
 
     def generate_report(
         self,

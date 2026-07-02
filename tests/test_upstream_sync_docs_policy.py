@@ -20,12 +20,12 @@ def test_guide_has_no_stale_backup_todo_or_grep_command() -> None:
     assert "use `rg`" in guide
 
 
-def test_guide_keeps_stage_4a_command_execution_with_fast() -> None:
+def test_guide_keeps_docs_track_analysis_command_execution_with_fast() -> None:
     guide = Path("kamma/upstream_sync/guide.md").read_text(encoding="utf-8")
 
     assert (
         "FAST must run `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py "
-        "<thread_dir>` before handing off to Stage 4.A."
+        "<thread_dir>` before handing off to the Analysis phase."
     ) in guide
     assert (
         "Run `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py "
@@ -254,7 +254,7 @@ def test_registry_docs_rus_description_matches_translation_parity_policy() -> No
     guide = Path("kamma/upstream_sync/guide.md").read_text(encoding="utf-8")
 
     assert "not a translation of upstream docs" not in registry
-    assert "Stage 4: Docs Translation Parity" in guide
+    assert "## Docs Translation Track (async)" in guide
     assert "Maintained Russian translation of upstream docs/" in registry
 
 

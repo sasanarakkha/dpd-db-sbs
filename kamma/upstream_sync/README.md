@@ -3,77 +3,31 @@
 Canonical sync process and tooling for the DPD SBS-RU fork.
 
 All local sync-process documentation lives in `kamma/upstream_sync/`. Do not add sync-process
-docs under upstream-owned `docs/`.
+docs under upstream-owned `docs/`. Git commit/push policy is inherited from the global rules.
 
-Lost track of where a sync thread is? Run `uv run python3 kamma/upstream_sync/scripts/sync_status.py <thread_dir>`
-to print the current stage and the exact next command.
+For the full protocol, model responsibilities, registry categories, and the Iron Rule, see
+[guide.md](./guide.md).
 
-## Quick Start: The 5-Stage Model-Split Workflow
+## Entry Commands
 
-Before Stage 1, run `scripts/cl_dps/dpd-kamma-sync`. This is the only sync-related
-Bash entrypoint: it backs up DPS localization tables, commits only the backup TSV
-changes as `backup dps data`, and initializes the Kamma sync thread through
-`kamma/upstream_sync/scripts/init_sync_thread.py`. All actual sync execution stays
-in Python scripts under `kamma/upstream_sync/scripts/`.
-Git commit/push policy is inherited from the global rules.
+- **Start a new sync**: run `scripts/cl_dps/dpd-kamma-sync`. This is the only sync-related Bash
+  entrypoint — it backs up DPS localization tables, commits only the backup TSV changes, and
+  initializes the Kamma sync thread through `kamma/upstream_sync/scripts/init_sync_thread.py`.
+  All actual sync execution then runs through the Python scripts in
+  `kamma/upstream_sync/scripts/`.
+- **Resume a lost thread**: run
+  `uv run python3 kamma/upstream_sync/scripts/sync_status.py <thread_dir>` to print the current
+  stage and next command (add `--instructions` for the matching guide.md section).
 
-Sync operations are executed via Kamma threads. Each stage ends with a hard stop, a fresh-session
-handoff, and an explicit model switch when needed. Stage 4 has two model-bound substages.
-
-1.  **Stage 1: FAST Prep** — factual diffing, scripted validation, and automated upstream pull.
-    -   `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py <thread_dir>`
-2.  **Stage 2: ADVANCED Analysis** — strategic planning and `dynamic_plan.md` creation.
-    -   Interpret FAST outputs, resolve `discuss` flags, and write a literal execution plan.
-3.  **Stage 3: FAST Execution & Verification** — implementation, testing, and cleanup.
-    -   `uv run pytest tests/test_shadow_parity.py tests/test_shadow_cleanup.py tests/test_namespace_isolation.py tests/test_template_syntax.py -v` (Sync-related suites).
-4.  **Stage 4: Docs Translation Parity**
-    -   **Stage 4.A: ADVANCED Docs Analysis** — docs parity analysis and `docs_translation_plan.md`.
-    -   Read FAST-produced `docs_parity_report.md` from the `prep_manifest.json` range; do not run commands in ADVANCED.
-    -   **Stage 4.B: FAST Docs Translation** — execute the approved docs translation plan.
-5.  **Stage 5: ADVANCED Verification & After-sync** — decide acceptance after user verification.
-
-For the full protocol, model responsibilities, and Iron Rule, see [guide.md](./guide.md).
-
-## Core Tooling
-
-| Command | Purpose |
-|---|---|
-| `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` | Validate `registry.json` schema and paths. |
-| `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py <thread_dir>` | Generate Stage 1 report and manifest. |
-| `uv run python3 kamma/upstream_sync/scripts/execute_sync.py <thread_dir>` | Robustly execute selective sync from upstream. |
-| `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>` | Advance accepted sync metadata after Stage 5 acceptance. |
-| `uv run pytest tests/test_shadow_parity.py` | Verify strict shadow parity with upstream. |
-| `uv run python3 tests/check_shadow_modifications.py` | Verify changed upstream sources have matching shadow edits or reviewed no-op entries. |
-| `uv run pytest tests/test_namespace_isolation.py` | Enforce symbol naming policy on localized files. |
-| `uv run pytest tests/test_template_syntax.py` | Detect legacy Mako syntax in Jinja2 templates. |
-
-## Documentation & Metadata
-
-- **[guide.md](./guide.md)**: Canonical process reference and naming policy.
-- **[accepted_sync.json](./accepted_sync.json)**: Last accepted upstream sync point.
-- **[reviewed_shadow_noops.json](./reviewed_shadow_noops.json)**: Exact reviewed no-op ledger for changed upstream sources that intentionally need no shadow edit.
-- **[registry.json](./registry.json)**: Source of truth for file mappings, categories, and per-file merge guidance.
-- **[archive_improvements.md](./archive_improvements.md)**: Accumulated lessons from past runs.
-
-## File Inventory
+## Core Files
 
 | File | Purpose |
 |---|---|
-| `registry.json` | Machine-readable map of every file that diverges from upstream, containing sync rules and merge guidance |
-| `accepted_sync.json` | Last accepted upstream SHA/date/ref used to anchor Stage 1 |
-| `reviewed_shadow_noops.json` | Exact reviewed no-op ledger for changed upstream sources that intentionally need no shadow edit |
-| `guide.md` | Canonical process reference: Iron Rule, 5-stage workflow, model responsibilities, naming policy |
-| `archive_improvements.md` | Accumulated lessons from all past sync runs |
-| `templates/` | `plan.md` / `spec.md` starters for new sync kamma threads |
-| `scripts/init_sync_thread.py` | Creates the Kamma sync thread after `scripts/cl_dps/dpd-kamma-sync` backs up DPS data |
-| `scripts/registry_helper.py` | Shared Python helper to load the registry and extract paths |
-| `scripts/validate_registry.py` | Schema and data-quality validator for `registry.json` |
-| `scripts/prep_analyzer.py` | Generates factual Stage 1 report and manifest from the accepted sync range |
-| `scripts/execute_sync.py` | Robustly executes selective sync from upstream (Stage 1 automation) |
-| `scripts/finalize_accepted_sync.py` | Advances `accepted_sync.json` from a verified prep manifest |
-| `scripts/sync_runtime.py` | Runtime manifest verification for shell automation |
-| `README.md` | Folder-level quick-start and file inventory |
-
-## Registry Categories
-
-See **[guide.md § Registry Categories](./guide.md#registry-categories)** for the canonical table.
+| `guide.md` | Canonical protocol: Iron Rule, model responsibilities, registry categories. See **[guide.md § Registry Categories](./guide.md#registry-categories)**. |
+| `registry.json` | Source of truth for file mappings, categories, and per-file merge guidance. |
+| `accepted_sync.json` | Last accepted upstream SHA/date/ref. |
+| `reviewed_shadow_noops.json` | Reviewed no-op ledger for upstream shadow-source changes that intentionally need no local edit. |
+| `docs_translation_queue.md` | Pending `docs/` paths for the async Docs Translation Track. |
+| `archive_improvements.md` | Accumulated lessons from past sync runs. |
+| `templates/` | `plan.md` / `spec.md` starters for new sync Kamma threads. |
+| `scripts/` | All sync Python scripts (`stage1.py`, `sync_status.py`, `execute_sync.py`, `finalize_accepted_sync.py`, `validate_registry.py`, etc). |

@@ -15,7 +15,9 @@ creates the Kamma thread through `kamma/upstream_sync/scripts/init_sync_thread.p
 Git commit/push policy is inherited from the global rules.
 
 After that wrapper finishes, all sync work must use the Python scripts in
-`kamma/upstream_sync/scripts/` and the 5-stage workflow below. Do not use legacy shell sync wrappers.
+`kamma/upstream_sync/scripts/` and the 4-stage workflow below. Do not use legacy shell sync wrappers.
+Docs translation runs separately as the async Docs Translation Track (see below) — it is never a
+numbered stage in the sync thread.
 
 ---
 
@@ -52,10 +54,9 @@ continue from files only.
   - Stage 1: `prep_report.md` and `prep_manifest.json`
   - Stage 2: `dynamic_plan.md`
   - Stage 3: updated execution status and command/test evidence in `handoff.md`
-  - Stage 4.A: `docs_parity_report.md` and `docs_translation_plan.md`
-  - Stage 4.B: translation execution status in `handoff.md`
-  - Stage 5: verification/finalization notes in `handoff.md`
-- `<thread_dir>/stage_state.json` only when a script or later session needs machine-readable state.
+  - Stage 4: verification/finalization notes in `handoff.md`
+  - Docs Translation Track — Analysis phase: `docs_parity_report.md` and `docs_translation_plan.md`
+  - Docs Translation Track — Translation phase: translation execution status in `handoff.md`
 
 **`handoff.md` must include:**
 - Current stage and owner (`FAST` subagent or `ADVANCED` orchestrator).
@@ -69,7 +70,7 @@ continue from files only.
 - Explicit instruction: "Do not continue in this session."
 
 **Hard Stop Triggers (mandatory session boundary):**
-- After completing any full Stage (1, 2, 3, 4.A, 4.B, or 5).
+- After completing any full Stage (1, 2, 3, or 4), or any Docs Translation Track phase (Analysis or Translation).
 - After preparing ANY commit message (Commit 1, 2, 3, or docs). Preparing a Commit is always a session boundary: update `handoff.md` before ending.
 - When the `sync-fast` subagent encounters work requiring analysis, planning, judgment, or conflict resolution — it returns to the orchestrator.
 - When the orchestrator identifies mechanical work — it dispatches to `sync-fast`.
@@ -119,36 +120,54 @@ ADVANCED must stop when mechanical work is needed: broad file reading, command e
 **Subagent Dispatch (Primary Execution Path):**
 
 The orchestrator (ADVANCED) dispatches mechanical work to the `sync-fast` subagent (`.claude/agents/sync-fast.md`):
-- **Stage 1** (entire stage): dispatch to `sync-fast` after thread init.
+- **Stage 1** (entire stage): the orchestrator may run `uv run python3 kamma/upstream_sync/scripts/stage1.py <thread_dir>` directly — a single pre-authorized, fully scripted stage command is mechanical by construction and needs no `sync-fast` dispatch for a clean run. Dispatch to `sync-fast` remains available when the script reports a failure needing mechanical follow-up.
 - **Stage 3** (batches): dispatch sequential batches to `sync-fast`. Batch size is at the orchestrator's discretion based on complexity and item count — there is no fixed cap.
-- **Stage 4.B** (entire docs translation stage): dispatch to `sync-fast`.
+- **Docs Translation Track — Translation phase**: dispatch to `sync-fast`. This runs in its own
+  async session, independent of any sync thread.
 
-All user-facing gates remain in the orchestrator: Stage 2 approval, Stage 4.A discussion, commit gates, and Stage 5 acceptance. Subagent work is verified from files — read `handoff.md` and stage outputs after each dispatch; subagent self-reports are not trusted.
+All user-facing gates remain in the orchestrator: Stage 2 approval, Docs Translation Track discussion, commit gates, and Stage 4 acceptance. Subagent work is verified from files — read `handoff.md` and stage outputs after each dispatch; subagent self-reports are not trusted.
+
+**Dispatch prompts must embed stage instructions, not a whole-guide read.** Before dispatching, the orchestrator runs `uv run python3 kamma/upstream_sync/scripts/sync_status.py <thread_dir> --instructions` and pastes that output directly into the dispatch prompt. `sync-fast` works from those embedded instructions plus the Iron Rule — it does not read `guide.md` wholesale.
 
 **Stage ownership:**
 - **Stage 1 (Prep)** — FAST; factual collection only.
 - **Stage 2 (Analysis)** — ADVANCED; strategic planning, resolve `discuss` flags, draft `dynamic_plan.md`.
 - **Stage 3 (Execution)** — FAST; mechanical implementation item-by-item per the plan.
-- **Stage 4.A (Docs Analysis)** — ADVANCED; read FAST outputs, decide terminology and translation strategy, draft `docs_translation_plan.md`.
-- **Stage 4.B (Docs Translation)** — FAST; execute `docs_translation_plan.md` file-by-file — translate or update each file, then prepare the commit message.
-- **Stage 5 (Verification + After-sync)** — ADVANCED for acceptance decisions; hand off to FAST for any mechanical finalization.
+- **Stage 4 (Verification + After-sync)** — ADVANCED for acceptance decisions; hand off to FAST for any mechanical finalization.
+- **Docs Translation Track — Analysis phase** — ADVANCED; read FAST outputs, decide terminology and translation strategy, draft `docs_translation_plan.md`. Unnumbered, runs in its own session.
+- **Docs Translation Track — Translation phase** — FAST; execute `docs_translation_plan.md` file-by-file — translate or update each file, then prepare the commit message. Unnumbered, runs in its own session.
 
 **Handoff quality gate (ADVANCED -> FAST, Stage 2 -> 3):** Before switching to FAST for Stage 3, ADVANCED must verify that `dynamic_plan.md` passes this test: *"Could a mechanical executor complete every item without reading any file not explicitly referenced in the plan?"* If the answer is no, expand the plan before handing off. FAST must never be asked to analyze, judge, or discover — only execute.
 
-**Handoff quality gate (ADVANCED -> FAST, Stage 4.A -> 4.B):** Before switching to FAST for Stage 4.B, ADVANCED must verify that `docs_translation_plan.md` includes: (1) a terminology glossary, (2) per-file instructions specifying source path, target path, and whether it is a full translation or a targeted update, (3) explicit rules for what to keep untranslated (Pali terms, product names, image paths, code blocks, URLs). FAST must never decide what to translate — only execute the plan.
+**Handoff quality gate (ADVANCED -> FAST, Docs Translation Track Analysis -> Translation):** Before switching to FAST for the Translation phase, ADVANCED must verify that `docs_translation_plan.md` includes: (1) a terminology glossary, (2) per-file instructions specifying source path, target path, and whether it is a full translation or a targeted update, (3) explicit rules for what to keep untranslated (Pali terms, product names, image paths, code blocks, URLs). FAST must never decide what to translate — only execute the plan.
 
 **The orchestrator manages stage boundaries.** Each stage ends with a handoff note before proceeding. The orchestrator never begins the next stage in the same dispatch that completed the previous one — it reads the subagent's `handoff.md` output first, then decides whether to dispatch the next stage or surface a gate to the user.
 
 ---
 
-## The 5-Stage Sync Workflow
+## The 4-Stage Sync Workflow
 
-Stage 4 is split into two model-bound substages: ADVANCED analysis and FAST translation execution.
+Docs translation is not part of this numbered workflow — it runs as the async Docs Translation
+Track described after Stage 4.
 
 ### Stage 1: Prep (FAST Factual Collection)
 **Goal**: Establish a baseline, validate the environment, and identify what changed upstream.
-**Owner**: FAST only.
+**Owner**: FAST only. **The orchestrator (ADVANCED) may also run the stage command below directly** — a single pre-authorized, fully scripted command is mechanical by construction and needs no `sync-fast` dispatch for a clean run.
 **FAST must stop and request ADVANCED if** registry errors need policy interpretation, new files need classification, a `discuss: true` file changed, command output is ambiguous, or it cannot decide whether something is local, upstream-only, skipped, unique, or shadow.
+
+**Run the whole stage with one command:**
+```
+uv run python3 kamma/upstream_sync/scripts/stage1.py <thread_dir>
+```
+This chains steps 0–2 and step 4's fast-path verdict below, in order, stopping at the first failure
+and printing that step's output plus its remediation. Exit 0 means the chain is clean; it prints the
+resulting stage — fast-path or Stage 2 — and it exits 1 if a step fails or `blocker_paths`/
+`discuss_paths` remain unresolved. It does **not** run `execute_sync.py` — step 3 (Automated Pull)
+below stays a separate, human-reviewed action after the chain passes.
+
+The steps below document exactly what the chain runs, in order, and serve as the manual remediation
+reference when a step fails or when running a step by hand outside the chain.
+
 0. **Pre-sync Shadow Health Check (MANDATORY GATE)**:
    - Run `uv run python3 tests/check_shadow_modifications.py`
    - The output must be **clean** (zero modifications reported) before continuing.
@@ -172,7 +191,7 @@ Stage 4 is split into two model-bound substages: ADVANCED analysis and FAST tran
    - `prep_analyzer.py` also performs a full local-tree audit (independent of the commit-range diff) by comparing every git-tracked local file against the upstream tree and full upstream history at the target SHA:
      - If `prep_manifest.json.unregistered_local_paths` is non-empty, those local files have no upstream counterpart (current or historical) and are not covered by any registry category; register them in `registry.json` during Stage 2 (typically `unique_paths`, or a shadow/inspired category). They do NOT block `execute_sync.py`.
      - If `prep_manifest.json.upstream_deleted_orphans` is non-empty, those local files match a path upstream once had but has since deleted; decide during Stage 2 whether to keep them as an intentional fork divergence (register the decision) or delete them locally to match upstream. They do NOT block `execute_sync.py`.
-   - If `prep_manifest.json.blocker_paths` is non-empty, STOP before `execute_sync.py`. Deletion blockers may be acknowledged by creating `<thread_dir>/run_acknowledged_blockers.txt` (one path per line; `#` comments allowed); `verify_manifest` warns but does not block on acknowledged paths. Collision blockers require registry changes before `execute_sync.py`.
+   - If `prep_manifest.json.blocker_paths` is non-empty, STOP before `execute_sync.py`. A deleted upstream path lands in `blocker_paths` only when it intersects a registered local interest — a mapped shadow/`inspired_by_upstream` source, or a `modified_upstream_files` entry. Deletions with no registered interest are informational only: they appear in `deleted_upstream_paths` and the report's Deleted Files section, and are handled automatically by `execute_sync.py`'s `propagate_upstream_deletions` pass. Deletion blockers may be acknowledged by creating `<thread_dir>/run_acknowledged_blockers.txt` (one path per line; `#` comments allowed); `verify_manifest` warns but does not block on acknowledged paths. Collision blockers require registry changes before `execute_sync.py`.
 3. **Automated Pull**:
    - Perform the automated sync by running `uv run python3 kamma/upstream_sync/scripts/execute_sync.py <thread_dir>`.
    - Review and add any run-specific exclusions to `<thread_dir>/run_exclusions.txt` before execution if needed.
@@ -182,10 +201,12 @@ Stage 4 is split into two model-bound substages: ADVANCED analysis and FAST tran
    - **Upstream deletions propagate.** After the exclusion-restore step, `execute_sync.py` runs `propagate_upstream_deletions` which computes `git diff --no-renames --diff-filter=D <last_accepted_sha>..<target_sha>` and removes any resulting candidate that is not in the protected set (shadows, `no_sync_files`, `modified_upstream_files`, `unique_paths`, and run-specific exclusions). Each removal is worktree-only (`Path.unlink`), never staged — it surfaces as an unstaged deletion in `git diff` for human review before Commit 1. Renamed-away files are covered because `--no-renames` decomposes renames into add+delete.
    - **Staging rule:** NEVER use `git add -A -- <file list>` — gitignore'd paths will trigger errors. If you stage all sync changes manually, use `git add .` which respects `.gitignore` automatically. If you must stage selectively, pre-filter with `git add <file>` one path at a time or check first with `git check-ignore -v <path>`.
 4. **Fast-path triage (advisory):**
-   - After `prep_manifest.json` exists, run `uv run python3 kamma/upstream_sync/scripts/sync_triage.py <thread_dir>`.
-   - It prints the fast-path verdict: pass means no entry in `mapped_actions` has a `category` in `modified_upstream_files`, `russian_copies`, `sbs_copies`, `dps_copies`, `tamil_copies`, or `inspired_by_upstream`; `discuss_paths`, `needs_classification_paths`, `blocker_paths`, `unregistered_local_paths`, and `upstream_deleted_orphans` are all empty; and no `changed_upstream_paths` is under `docs/`.
-   - If the verdict passes, this sync touches nothing localized: skip Stages 2-4 and go straight to Stage 5 (retrospective + `finalize_accepted_sync.py`) after Commit 1.
-   - The triage verdict is advisory only — it never runs Stage 5 or any destructive step automatically. ADVANCED still makes the acceptance decision.
+   - The `stage1.py` chain already runs this as its last step and prints the verdict; run
+     `uv run python3 kamma/upstream_sync/scripts/sync_triage.py <thread_dir>` by hand only outside the
+     chain (e.g. re-checking a manifest without re-running the whole chain).
+   - It prints the fast-path verdict: pass means no entry in `mapped_actions` has a `category` in `modified_upstream_files`, `russian_copies`, `sbs_copies`, `dps_copies`, `tamil_copies`, or `inspired_by_upstream`; `discuss_paths`, `needs_classification_paths`, `blocker_paths`, `unregistered_local_paths`, and `upstream_deleted_orphans` are all empty. `docs/` paths do not affect the verdict — they are queued to the Docs Translation Track independently and never block the fast-path.
+   - If the verdict passes, this sync touches nothing localized: skip Stages 2-3 and go straight to Stage 4 (retrospective + `finalize_accepted_sync.py`) after Commit 1.
+   - The triage verdict is advisory only — it never runs Stage 4 or any destructive step automatically. ADVANCED still makes the acceptance decision.
 
 ### Stage 2: Analysis (ADVANCED Strategic Planning)
 **Goal**: Determine how to integrate upstream changes into localized files.
@@ -247,11 +268,31 @@ A session must be restartable at any sub-stage boundary from files alone — nev
      - If upstream **does** have an equivalent → investigate: was it replaced by inline rendering? If so, delete the local dead copy.
    - Document findings and decisions in `handoff.md` before deleting anything.
 
-### Stage 4: Docs Translation Parity (Async Queue)
-**Goal**: Track `docs/` changes that need Russian translation without blocking the code sync.
+### Stage 4: Verification & After-sync (ADVANCED Acceptance)
+**Goal**: Final human verification and close out the sync record.
+**Owner**: ADVANCED for acceptance decisions. If mechanical finalization is needed, ADVANCED writes exact instructions and hands off to FAST.
+**ADVANCED hard stop (Stage 4):** ADVANCED reads outputs, makes the acceptance decision, and writes exact FAST instructions ONLY. It MUST NOT run any command that mutates state, builds, or runs tests (no `uv sync`, no exporters, no `pytest`, no `finalize_accepted_sync.py`, no source edits). If ADVANCED finds itself about to run such a command, STOP and hand off to FAST immediately. All verification commands and finalization belong to FAST.
 
-**Stage 4 is decoupled from the code sync.** During Stage 3, FAST appends any changed `docs/`
-paths to `kamma/upstream_sync/docs_translation_queue.md` (one unchecked item per path). The
+1. **Full manual verification**
+   - Ask user to verify everything and stay back for feedback. After correcting it, do not proceed until user explicitly says "all is good, proceed."
+2. **Write retrospective.md (REQUIRED before finalize)**
+   - Copy `kamma/upstream_sync/templates/retrospective.md` to `<thread_dir>/retrospective.md`.
+   - Fill the three buckets: **landed** (fixed in code this sync), **promote** (becomes a guide rule / validator / archive entry — do it now), **drop** (genuine one-off, with reason).
+   - Promote any `promote` items to `archive_improvements.md` before running finalize.
+   - `finalize_accepted_sync.py` will refuse to run if `retrospective.md` is absent (hard code gate).
+3. **After sync**
+   - If accepted, write exact FAST handoff instructions to run `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>`.
+
+---
+
+## Docs Translation Track (async)
+
+**Goal**: Track `docs/` changes that need Russian translation without blocking the code sync. This
+track carries no stage numbers — it runs in its own session(s), independent of any sync thread.
+
+During Stage 1 prep, `prep_analyzer.py` appends any changed `docs/` paths in the sync range to
+`kamma/upstream_sync/docs_translation_queue.md` (one unchecked item per path; a path already queued
+unchecked is not duplicated, but a path whose only queue entry was checked off is re-added). The
 code sync commit does **not** block on translation — the queue is drained in a separate session.
 ADVANCED reviews the queue and assigns a strategy (full translation, targeted update, or
 no-translate redirect); FAST executes translations and checks items off.
@@ -264,42 +305,33 @@ See the queue file for pending items: `kamma/upstream_sync/docs_translation_queu
 
 **No-translate files (HTML redirect pattern):** Some `docs/` files do not need Russian translation (e.g. `changelog.md` — mostly Pāḷi data and GitHub issue numbers). For these, the canonical approach is an HTML meta-redirect file: `docs_rus/file.md` redirects to an external URL. This satisfies the parity check (file exists) and MkDocs correctly handles it during build. Add such files to `NO_TRANSLATE` in `check_docs_parity.py` to skip staleness checks.
 
-**Stage 4.A — Analysis (ADVANCED model)**:
-FAST must run `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir>` before handing off to Stage 4.A.
+**Threadless runs:** `check_docs_parity.py` accepts an optional `thread_dir` argument. Run it with no
+`thread_dir` for a normal Docs Track session: it derives the range from `accepted_sync.json`'s last
+accepted SHA through `HEAD` instead of a manifest range, and skips writing `docs_parity_report.md`
+(report output is thread-scoped and optional). Pass a `thread_dir` only when the session needs a
+written report for handoff.
+
+**Analysis phase (ADVANCED model)**:
+FAST must run `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir>` before handing off to the Analysis phase.
 The script reads `<thread_dir>/prep_manifest.json` and reports docs changes from the exact
 `from_upstream_sha -> to_upstream_sha` sync range, not from a moving `HEAD` range.
 
 1. Read `docs_parity_report.md`.
 2. Read 3–5 existing `docs_rus/` files to build a terminology glossary (key EN → RU mappings specific to DPD: headword, inflection template, root family, deconstructor, lookup, etc.).
 3. For each stale file listed in the report, use the exact diff evidence in `docs_parity_report.md`. If the diff evidence is missing, stop and request FAST.
-4. Write `docs_translation_plan.md` in the thread folder containing:
+4. Write `docs_translation_plan.md` in the working folder containing:
    - **Terminology glossary** — EN → RU pairs extracted from existing translations.
    - **Translation rules** — keep Pali terms as-is; keep image paths, code blocks, and URLs unchanged; translate heading text and alt text; keep HTML anchor IDs unchanged.
    - **Per-file tasks** — for each missing file: source path, target path, "full translation". For each stale file: source path, target path, the exact diff evidence from `docs_parity_report.md`, "update only changed sections".
 5. Present `docs_translation_plan.md` to user for approval.
 
-**Stage 4.B — Translation (FAST model)**:
+**Translation phase (FAST model)**:
 1. Read `docs_translation_plan.md` — do not read any other file not referenced there.
 2. Execute file-by-file in order: missing files first (create + translate), stale files second (targeted update).
 3. After all files are written, update `mkdocs_ru.yaml` nav if any new files were added.
 4. Run `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir> --strict` and record the result in `handoff.md`.
 5. Prepare commit: `#docs: translate/update docs_rus/ for sync <from>..<to>`.
 6. Stop and request ADVANCED if terminology, scope, or source diff interpretation is unclear.
-
-### Stage 5: Verification & After-sync (ADVANCED Acceptance)
-**Goal**: Final human verification and close out the sync record.
-**Owner**: ADVANCED for acceptance decisions. If mechanical finalization is needed, ADVANCED writes exact instructions and hands off to FAST.
-**ADVANCED hard stop (Stage 5):** ADVANCED reads outputs, makes the acceptance decision, and writes exact FAST instructions ONLY. It MUST NOT run any command that mutates state, builds, or runs tests (no `uv sync`, no exporters, no `pytest`, no `finalize_accepted_sync.py`, no source edits). If ADVANCED finds itself about to run such a command, STOP and hand off to FAST immediately. All verification commands and finalization belong to FAST.
-
-1. **Full manual verification**
-   - Ask user to verify everything and stay back for feedback. After correcting it, do not proceed until user explicitly says "all is good, proceed."
-2. **Write retrospective.md (REQUIRED before finalize)**
-   - Copy `kamma/upstream_sync/templates/retrospective.md` to `<thread_dir>/retrospective.md`.
-   - Fill the three buckets: **landed** (fixed in code this sync), **promote** (becomes a guide rule / validator / archive entry — do it now), **drop** (genuine one-off, with reason).
-   - Promote any `promote` items to `archive_improvements.md` before running finalize.
-   - `finalize_accepted_sync.py` will refuse to run if `retrospective.md` is absent (hard code gate).
-3. **After sync**
-   - If accepted, write exact FAST handoff instructions to run `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>`.
 
 ---
 
@@ -388,4 +420,4 @@ If a file has `discuss: true` in `registry.json`:
 - `prep_manifest.json`: Stage 1 machine-readable snapshot of the active upstream range, including `blocker_paths` that must be resolved before automated pull.
 - `reviewed_shadow_noops.json`: durable ledger of reviewed upstream shadow changes that intentionally needed no local edit. Entries are exact to the upstream-pull commit and changed path set, so future upstream changes to the same source still get flagged.
 
-These files support the 5-stage workflow. They are not a separate stage.
+These files support the 4-stage workflow. They are not a separate stage.
