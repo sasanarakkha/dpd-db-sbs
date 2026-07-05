@@ -13,13 +13,21 @@ from kamma.upstream_sync.scripts.sync_schema import AcceptedSyncState
 from tools.printer import printer as pr
 
 
-def _load_acknowledged_blockers(thread_dir: str) -> list[str]:
+def _load_acknowledged_blockers(thread_dir: str | Path) -> list[str]:
     """Load acknowledged blocker paths from thread_dir/run_acknowledged_blockers.txt."""
     return read_line_list(Path(thread_dir) / "run_acknowledged_blockers.txt")
 
 
+def effective_blocker_paths(
+    thread_dir: str | Path, blocker_paths: list[str]
+) -> list[str]:
+    """Return blocker_paths minus any acknowledged in run_acknowledged_blockers.txt."""
+    acknowledged = set(_load_acknowledged_blockers(thread_dir))
+    return [p for p in blocker_paths if p not in acknowledged]
+
+
 def verify_manifest(
-    thread_dir: str,
+    thread_dir: str | Path,
     accepted_sync_state: AcceptedSyncState | None = None,
     target_sha: str | None = None,
     allow_discuss: bool = True,
@@ -69,9 +77,7 @@ def verify_manifest(
                 return 1
         for path in acknowledged:
             pr.amber(f"Acknowledged blocker (still present in manifest): {path}")
-        effective_blockers = [
-            p for p in manifest.blocker_paths if p not in set(acknowledged)
-        ]
+        effective_blockers = effective_blocker_paths(thread_dir, manifest.blocker_paths)
         if not allow_blockers and effective_blockers:
             pr.red("Manifest contains blocker paths. Resolve before automated pull:")
             for path in effective_blockers:

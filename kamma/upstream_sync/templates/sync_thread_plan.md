@@ -13,7 +13,8 @@
 **Owner**: FAST (or ADVANCED running the scripted command directly). See guide.md § Stage 1.
 
 - [ ] **1.1 Environmental Check**:
-  - [ ] `git status` — must be clean before sync work begins.
+  - [ ] `git status` — must be clean before sync work begins. (Hard-enforced by
+    `execute_sync.py`'s `GitContext` dirty-tree guard at Stage 1.5, not by this checklist item.)
   - [ ] `git fetch upstream` — fetch latest upstream refs.
   - [ ] `uv run ruff check tools/ scripts/ db/ exporter/ --select F821,E999 --quiet` — catches undefined names and syntax/API breakage before sync work begins.
   - [ ] Review `kamma/upstream_sync/accepted_sync.json` — starting SHA/date/ref are present.
@@ -67,7 +68,9 @@
 
 ## Docs Track: ADVANCED Docs Analysis
 
-**Owner**: ADVANCED only, unnumbered/async. See guide.md § Docs Translation Track.
+**Owner**: ADVANCED only, unnumbered/async. See guide.md § Docs Translation Track. Run
+`uv run python3 kamma/upstream_sync/scripts/sync_status.py --section docs-track` for the guide
+section instead of re-reading the whole guide.
 
 - [ ] Read `docs_parity_report.md` (`uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir>`).
 - [ ] Build a terminology glossary from 3-5 existing `docs_rus/` files.
@@ -79,7 +82,9 @@
 
 ## Docs Track: FAST Docs Translation
 
-**Owner**: FAST only, unnumbered/async. See guide.md § Docs Translation Track.
+**Owner**: FAST only, unnumbered/async. See guide.md § Docs Translation Track. Run
+`uv run python3 kamma/upstream_sync/scripts/sync_status.py --section docs-track` for the guide
+section instead of re-reading the whole guide.
 
 - [ ] Translate/update files exactly as listed in `docs_translation_plan.md`.
 - [ ] `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir> --strict`.
@@ -96,7 +101,7 @@
 - [ ] Review Stage 3 and Docs Track evidence; ask user for manual GoldenDict/webapp verification.
 - [ ] Wait for explicit user confirmation: `all is good, proceed`.
 - [ ] Write `retrospective.md` (required before finalize); promote accepted items to `archive_improvements.md`.
-- [ ] If accepted, write exact FAST handoff instructions to run `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>`.
+- [ ] If accepted, ADVANCED may run `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>` directly (pre-authorized scripted command, same carve-out as Stage 1), or write exact FAST handoff instructions to run it.
 - [ ] Prepare final commit message only after acceptance.
 
 **Final hard stop**: update `handoff.md` with final state, verification evidence, files changed, and any remaining risks, then stop.

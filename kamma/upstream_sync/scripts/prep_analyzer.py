@@ -11,6 +11,7 @@ from datetime import datetime
 from pathlib import Path
 
 from kamma.upstream_sync.scripts.registry_helper import (
+    REPO_ROOT,
     get_inspired_by_upstream_mapping,
     get_modified_upstream_paths,
     get_no_sync_files,
@@ -220,7 +221,7 @@ class PrepAnalyzer:
 
     def _path_exists(self, path: str) -> bool:
         """Return True if path exists in the local worktree."""
-        return Path(path).exists()
+        return (REPO_ROOT / path).exists()
 
     def _all_registered_local_paths(self) -> list[str]:
         """Return all registered local paths from the registry."""

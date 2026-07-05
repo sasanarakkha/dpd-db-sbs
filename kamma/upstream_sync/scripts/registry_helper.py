@@ -12,6 +12,8 @@ from kamma.upstream_sync.scripts.sync_schema import (
     ShadowCopyEntry,
 )
 
+REPO_ROOT = Path(__file__).resolve().parents[3]
+
 
 def read_line_list(path: Path) -> list[str]:
     """Read non-blank, non-`#`-comment lines from a thread-local list file.
@@ -33,12 +35,12 @@ def read_line_list(path: Path) -> list[str]:
 
 def get_registry_path() -> Path:
     """Return the canonical path to registry.json."""
-    return Path("kamma/upstream_sync/registry.json")
+    return REPO_ROOT / "kamma/upstream_sync/registry.json"
 
 
 def get_accepted_sync_path() -> Path:
     """Return the canonical path to accepted_sync.json."""
-    return Path("kamma/upstream_sync/accepted_sync.json")
+    return REPO_ROOT / "kamma/upstream_sync/accepted_sync.json"
 
 
 def load_registry() -> RegistryData:

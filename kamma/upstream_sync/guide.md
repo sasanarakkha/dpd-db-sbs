@@ -127,13 +127,13 @@ The orchestrator (ADVANCED) dispatches mechanical work to the `sync-fast` subage
 
 All user-facing gates remain in the orchestrator: Stage 2 approval, Docs Translation Track discussion, commit gates, and Stage 4 acceptance. Subagent work is verified from files — read `handoff.md` and stage outputs after each dispatch; subagent self-reports are not trusted.
 
-**Dispatch prompts must embed stage instructions, not a whole-guide read.** Before dispatching, the orchestrator runs `uv run python3 kamma/upstream_sync/scripts/sync_status.py <thread_dir> --instructions` and pastes that output directly into the dispatch prompt. `sync-fast` works from those embedded instructions plus the Iron Rule — it does not read `guide.md` wholesale.
+**Dispatch prompts must embed stage instructions, not a whole-guide read.** Before dispatching, the orchestrator runs `uv run python3 kamma/upstream_sync/scripts/sync_status.py <thread_dir> --instructions` and pastes that output directly into the dispatch prompt. For the unnumbered Docs Translation Track (no `derive_stage` descriptor), run `uv run python3 kamma/upstream_sync/scripts/sync_status.py --section docs-track` instead and embed that output. `sync-fast` works from those embedded instructions plus the Iron Rule — it does not read `guide.md` wholesale.
 
 **Stage ownership:**
 - **Stage 1 (Prep)** — FAST; factual collection only.
 - **Stage 2 (Analysis)** — ADVANCED; strategic planning, resolve `discuss` flags, draft `dynamic_plan.md`.
 - **Stage 3 (Execution)** — FAST; mechanical implementation item-by-item per the plan.
-- **Stage 4 (Verification + After-sync)** — ADVANCED for acceptance decisions; hand off to FAST for any mechanical finalization.
+- **Stage 4 (Verification + After-sync)** — ADVANCED for acceptance decisions; may run `finalize_accepted_sync.py` directly (same scripted-command carve-out as Stage 1), or hand off to FAST for any other mechanical finalization.
 - **Docs Translation Track — Analysis phase** — ADVANCED; read FAST outputs, decide terminology and translation strategy, draft `docs_translation_plan.md`. Unnumbered, runs in its own session.
 - **Docs Translation Track — Translation phase** — FAST; execute `docs_translation_plan.md` file-by-file — translate or update each file, then prepare the commit message. Unnumbered, runs in its own session.
 
@@ -268,7 +268,7 @@ A session must be restartable at any sub-stage boundary from files alone — nev
 ### Stage 4: Verification & After-sync (ADVANCED Acceptance)
 **Goal**: Final human verification and close out the sync record.
 **Owner**: ADVANCED for acceptance decisions. If mechanical finalization is needed, ADVANCED writes exact instructions and hands off to FAST.
-**ADVANCED hard stop (Stage 4):** ADVANCED reads outputs, makes the acceptance decision, and writes exact FAST instructions ONLY. It MUST NOT run any command that mutates state, builds, or runs tests (no `uv sync`, no exporters, no `pytest`, no `finalize_accepted_sync.py`, no source edits). If ADVANCED finds itself about to run such a command, STOP and hand off to FAST immediately. All verification commands and finalization belong to FAST.
+**ADVANCED hard stop (Stage 4):** ADVANCED reads outputs and makes the acceptance decision. It MUST NOT run any command that mutates state, builds, or runs tests (no `uv sync`, no exporters, no `pytest`, no source edits). If ADVANCED finds itself about to run such a command, STOP and hand off to FAST immediately. All verification commands belong to FAST. **Exception:** once the user has accepted (Stage 4 step 1), ADVANCED may run `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>` directly — like the Stage 1 carve-out, a single pre-authorized, fully scripted command with its own hard gates (retrospective presence + manifest verification) is mechanical by construction and needs no `sync-fast` dispatch. Otherwise, write exact FAST instructions and hand off.
 
 1. **Full manual verification**
    - Ask user to verify everything and stay back for feedback. After correcting it, do not proceed until user explicitly says "all is good, proceed."

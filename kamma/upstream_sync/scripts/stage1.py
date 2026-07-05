@@ -15,6 +15,7 @@ from kamma.upstream_sync.scripts.registry_helper import (
     get_registry_path,
     read_line_list,
 )
+from kamma.upstream_sync.scripts.sync_runtime import effective_blocker_paths
 from kamma.upstream_sync.scripts.sync_status import derive_stage
 from kamma.upstream_sync.scripts.validate_registry import validate_registry_core
 from tools.printer import printer as pr
@@ -73,7 +74,7 @@ def run_triage_and_status(thread_dir: Path) -> StepResult:
     blockers = blockers_raw if isinstance(blockers_raw, list) else []
     discuss = manifest.get("discuss_paths") or []
     acknowledged = read_line_list(thread_dir / "run_acknowledged_blockers.txt")
-    effective_blockers = [p for p in blockers if p not in set(acknowledged)]
+    effective_blockers = effective_blocker_paths(thread_dir, blockers)
     summary = f"stage: {descriptor.stage}; next: {descriptor.next_command}"
     if acknowledged and not effective_blockers:
         pr.amber(f"Acknowledged blockers cleared: {acknowledged}")

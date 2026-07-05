@@ -9,12 +9,15 @@ import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+from kamma.upstream_sync.scripts.sync_runtime import effective_blocker_paths
 from kamma.upstream_sync.scripts.sync_triage import is_localized_noop
 from tools.printer import printer as pr
 
 GUIDE_PATH = Path(__file__).resolve().parent.parent / "guide.md"
 
 HEADING_PATTERN = re.compile(r"^(#{1,6})\s")
+
+SECTION_ANCHORS = {"docs-track": "## Docs Translation Track (async)"}
 
 
 @dataclass
@@ -120,6 +123,27 @@ def derive_stage(thread_dir: Path) -> StageDescriptor:
             guide_anchor="### Stage 1: Prep (FAST Factual Collection)",
         )
 
+    blockers_raw = manifest.get("blocker_paths") or []
+    blockers = blockers_raw if isinstance(blockers_raw, list) else []
+    discuss_raw = manifest.get("discuss_paths") or []
+    discuss = discuss_raw if isinstance(discuss_raw, list) else []
+    effective = effective_blocker_paths(thread_dir, blockers)
+    done = (thread_dir / "execute_sync_done.json").exists()
+
+    if not effective and not discuss and not done:
+        return StageDescriptor(
+            stage="Stage 1: Automated Pull",
+            next_command=f"uv run python3 kamma/upstream_sync/scripts/execute_sync.py {thread_dir}",
+            owner="FAST",
+            dispatch="sync-fast",
+            gate_before=None,
+            gate_after="Commit 1 (upstream pull)",
+            reads=["prep_manifest.json"],
+            produces=["worktree upstream pull (unstaged)", "execute_sync_done.json"],
+            stop_condition="execute_sync.py completes and Commit 1 prepared",
+            guide_anchor="### Stage 1: Prep (FAST Factual Collection)",
+        )
+
     return StageDescriptor(
         stage="Stage 2: Analysis",
         next_command="Draft dynamic_plan.md (ADVANCED).",
@@ -172,7 +196,7 @@ def print_stage_instructions(descriptor: StageDescriptor, guide_path: Path) -> i
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("thread_dir", type=Path)
+    parser.add_argument("thread_dir", type=Path, nargs="?")
     parser.add_argument(
         "--json",
         action="store_true",
@@ -183,7 +207,25 @@ def main() -> None:
         action="store_true",
         help="Print the guide.md section for the current stage instead of a summary.",
     )
+    parser.add_argument(
+        "--section",
+        choices=sorted(SECTION_ANCHORS),
+        help="Print a named guide.md section (e.g. an unnumbered track) instead of deriving a stage.",
+    )
     args = parser.parse_args()
+
+    if args.section is not None:
+        guide_text = GUIDE_PATH.read_text(encoding="utf-8")
+        try:
+            section = extract_guide_section(guide_text, SECTION_ANCHORS[args.section])
+        except ValueError as exc:
+            pr.red(str(exc))
+            sys.exit(1)
+        print(section)
+        return
+
+    if args.thread_dir is None:
+        parser.error("thread_dir is required unless --section is given")
 
     if not args.thread_dir.exists():
         pr.red(f"Thread directory not found at {args.thread_dir}")

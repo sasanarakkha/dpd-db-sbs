@@ -23,7 +23,14 @@ COMMIT_LIST_PATTERN = re.compile(r"Commit ([\d,\s]+(?:or\s+\d+)?)")
 COMMIT_TOKEN_PATTERN = re.compile(r"Commit (\d+)")
 
 
-def _write_manifest(thread_dir: Path, *, localized: bool, docs: bool = False) -> None:
+def _write_manifest(
+    thread_dir: Path,
+    *,
+    localized: bool,
+    docs: bool = False,
+    blockers: list[str] | None = None,
+    discuss: list[str] | None = None,
+) -> None:
     manifest: dict[str, object] = {
         "from_upstream_sha": "0" * 40,
         "to_upstream_sha": "1" * 40,
@@ -33,8 +40,8 @@ def _write_manifest(thread_dir: Path, *, localized: bool, docs: bool = False) ->
         if docs
         else [".github/workflows/ci.yml"],
         "deleted_upstream_paths": [],
-        "blocker_paths": [],
-        "discuss_paths": [],
+        "blocker_paths": blockers or [],
+        "discuss_paths": discuss or [],
         "needs_classification_paths": [],
         "unregistered_local_paths": [],
         "upstream_deleted_orphans": [],
@@ -88,10 +95,53 @@ def test_localized_noop_after_execute_sync_is_fast_path_stage_4(
     assert "execute_sync.py" not in descriptor.next_command
 
 
-def test_shadow_touching_manifest_without_plan_is_stage_2(tmp_path: Path) -> None:
+def test_shadow_touching_manifest_without_plan_is_automated_pull(
+    tmp_path: Path,
+) -> None:
     _write_manifest(tmp_path, localized=False)
     descriptor = derive_stage(tmp_path)
+    assert descriptor.stage == "Stage 1: Automated Pull"
+    assert "execute_sync.py" in descriptor.next_command
+
+
+def test_shadow_touching_manifest_with_done_marker_is_stage_2(tmp_path: Path) -> None:
+    _write_manifest(tmp_path, localized=False)
+    (tmp_path / "execute_sync_done.json").write_text(
+        json.dumps(
+            {"to_upstream_sha": "1" * 40, "executed_at": "2026-07-02T00:00:00+00:00"}
+        ),
+        encoding="utf-8",
+    )
+    descriptor = derive_stage(tmp_path)
     assert descriptor.stage == "Stage 2: Analysis"
+
+
+def test_shadow_touching_manifest_with_unacknowledged_blockers_is_stage_2(
+    tmp_path: Path,
+) -> None:
+    _write_manifest(tmp_path, localized=False, blockers=["x/y.py"])
+    descriptor = derive_stage(tmp_path)
+    assert descriptor.stage == "Stage 2: Analysis"
+
+
+def test_shadow_touching_manifest_with_discuss_paths_is_stage_2(
+    tmp_path: Path,
+) -> None:
+    _write_manifest(tmp_path, localized=False, discuss=["db/discuss_me.py"])
+    descriptor = derive_stage(tmp_path)
+    assert descriptor.stage == "Stage 2: Analysis"
+
+
+def test_shadow_touching_manifest_with_acknowledged_blockers_is_automated_pull(
+    tmp_path: Path,
+) -> None:
+    _write_manifest(tmp_path, localized=False, blockers=["x/y.py"])
+    (tmp_path / "run_acknowledged_blockers.txt").write_text(
+        "x/y.py\n", encoding="utf-8"
+    )
+    descriptor = derive_stage(tmp_path)
+    assert descriptor.stage == "Stage 1: Automated Pull"
+    assert "execute_sync.py" in descriptor.next_command
 
 
 def test_dynamic_plan_present_is_stage_3(tmp_path: Path) -> None:
@@ -146,6 +196,14 @@ def _all_descriptors(tmp_path: Path) -> list[StageDescriptor]:
     (tmp_path / "execute_sync_done.json").unlink()
 
     _write_manifest(tmp_path, localized=False)
+    descriptors.append(derive_stage(tmp_path))  # Stage 1: Automated Pull
+
+    (tmp_path / "execute_sync_done.json").write_text(
+        json.dumps(
+            {"to_upstream_sha": "1" * 40, "executed_at": "2026-07-02T00:00:00+00:00"}
+        ),
+        encoding="utf-8",
+    )
     descriptors.append(derive_stage(tmp_path))  # Stage 2
 
     (tmp_path / "dynamic_plan.md").write_text("plan", encoding="utf-8")
@@ -218,6 +276,18 @@ def test_every_descriptor_guide_anchor_resolves_to_nonempty_section(
             f"{descriptor.stage!r} resolved to an empty section"
         )
         assert descriptor.guide_anchor in section
+
+
+def test_section_anchors_resolve_to_nonempty_docs_track_sections() -> None:
+    """Drift guard: every SECTION_ANCHORS value must resolve to a real, non-empty guide.md section."""
+    from kamma.upstream_sync.scripts.sync_status import SECTION_ANCHORS
+
+    guide_text = GUIDE_PATH.read_text(encoding="utf-8")
+
+    for anchor in SECTION_ANCHORS.values():
+        section = extract_guide_section(guide_text, anchor)
+        assert section.strip()
+        assert "Docs Translation Track" in section
 
 
 def test_extract_guide_section_stops_at_next_same_or_higher_heading() -> None:

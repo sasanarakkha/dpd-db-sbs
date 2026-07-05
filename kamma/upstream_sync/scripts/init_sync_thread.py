@@ -7,9 +7,10 @@ from pathlib import Path
 from kamma.upstream_sync.scripts.registry_helper import load_accepted_sync_state
 from tools.printer import printer as pr
 
-TEMPLATES_DIR = Path("kamma/upstream_sync/templates")
-THREADS_DIR = Path("kamma/threads")
-ACCEPTED_SYNC_PATH = Path("kamma/upstream_sync/accepted_sync.json")
+ROOT = Path(__file__).resolve().parents[3]
+TEMPLATES_DIR = ROOT / "kamma/upstream_sync/templates"
+THREADS_DIR = ROOT / "kamma/threads"
+ACCEPTED_SYNC_PATH = ROOT / "kamma/upstream_sync/accepted_sync.json"
 
 
 def short_sha(commit_sha: str) -> str:
