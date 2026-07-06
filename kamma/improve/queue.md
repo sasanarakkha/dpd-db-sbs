@@ -62,7 +62,7 @@ Pointer: 149
 
 ### scripts/other
 
-- [x] 43. scripts/other/add_combined_view.py
+- [x] 43. scripts/other/add_combined_view.py → scripts/export/add_combined_view.py
 - [x] 44. scripts/other/ai_batch_api.py — renamed to ai_batch_openai_meaning.py
 - [x] 45. scripts/other/ai_batch_deepseek_meaning.py — archived
 - [x] 46. scripts/other/ai_check_russian_meanings.py

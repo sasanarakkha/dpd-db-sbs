@@ -58,7 +58,7 @@ def test_calls_generate_components() -> None:
 
 def test_calls_add_combined_view() -> None:
     content = SCRIPT.read_text(encoding="utf-8")
-    assert "scripts/other/add_combined_view.py" in content
+    assert "scripts/export/add_combined_view.py" in content
 
 
 def test_calls_apply_all_corrections() -> None:

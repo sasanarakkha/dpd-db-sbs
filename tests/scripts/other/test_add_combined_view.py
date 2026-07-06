@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from scripts.other.add_combined_view import _VIEW_COLUMNS, _build_select_clause
+from scripts.export.add_combined_view import _VIEW_COLUMNS, _build_select_clause
 
 FIXTURE_PATH = Path(__file__).parent / "test_add_combined_view_fixtures.json"
 
