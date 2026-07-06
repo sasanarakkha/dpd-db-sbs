@@ -85,7 +85,10 @@ LANG_CONFIG: dict[str, LangConfig] = {
 
 # generation mode -> checker snapshot files holding verdicts for the regenerated field
 SNAPSHOTS_BY_MODE: dict[str, list[Path]] = {
-    "meaning": [dpspth.ai_meaning_raw_checked, dpspth.ai_meaning_ru_raw_checked],
+    "meaning": [
+        dpspth.ai_meaning_raw_checked,
+        dpspth.ai_russian_grammar_meaning_raw_checked,
+    ],
     "lit": [dpspth.ai_meaning_lit_checked],
     "note": [dpspth.ai_notes_raw_checked],
 }

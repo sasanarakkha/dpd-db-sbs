@@ -70,7 +70,7 @@ uv run python3 kamma/translate/scripts/batch_runner.py --op generate --mode mean
 ```
 
 - Modes: `meaning` (ru/ta), `lit` (ru only), `note` (ru only).
-- Default chunk 25, runs until the pool is empty or quota is exhausted (exit 3).
+- Default chunk 50, runs until the pool is empty or quota is exhausted (exit 3).
 - Forces `-provider antigravity_cli`; add `--fallback` ONLY on explicit user request.
 - On exit 3 (quota): report `resume_at` from state.json and stop. Do not silently
   switch to paid providers.
@@ -83,10 +83,11 @@ Run both, in this order:
 
 1. Mechanical: `uv run python3 kamma/translate/scripts/ai_translation_check.py -lang <ru|ta>`
 2. AI semantic (RU only):
-   `uv run python3 kamma/translate/scripts/batch_runner.py --op check --mode meaning_raw_list`
+   Run exactly and only via DeepSeek (`deepseek-v4-flash`) by passing both `--provider deepseek --model deepseek-v4-flash`:
+   `uv run python3 kamma/translate/scripts/batch_runner.py --op check --mode meaning_raw_list --provider deepseek --model deepseek-v4-flash`
    — checks only the session ids; MISMATCH rows get `ru_meaning_raw` cleared
    automatically and re-enter the Op 1 pool (that IS the retranslate loop).
-   For `lit`: `--mode meaning_lit_list` (report-only, no clearing).
+   For `lit`: `--mode meaning_lit_list --provider deepseek --model deepseek-v4-flash` (report-only, no clearing).
 
 For Tamil there is no semantic checker yet (see Phase 2) — mechanical check only.
 
@@ -115,10 +116,17 @@ Ask the user: run all at once, or chunk by chunk?
 - **All at once**: `--chunk 0` (defaults to all remaining unchecked)
 - **Chunk by chunk**: run with `--chunk <N> --max-chunks 1`. After each chunk, ask if they want to continue or stop.
 
+To ensure checkers run exactly and only via DeepSeek and do not fall back to `antigravity_cli`, always pass both `--provider deepseek --model deepseek-v4-flash`. The checker is configured to save checked IDs and clear database mismatches incrementally in chunks of 50, meaning no progress is lost if the process is interrupted:
 ```bash
-uv run python3 kamma/translate/scripts/batch_runner.py --op check --mode <mode>               # all
-uv run python3 kamma/translate/scripts/batch_runner.py --op check --mode <mode> --chunk <size> --max-chunks 1  # one chunk
+uv run python3 kamma/translate/scripts/batch_runner.py --op check --mode <mode> --provider deepseek --model deepseek-v4-flash               # all
+uv run python3 kamma/translate/scripts/batch_runner.py --op check --mode <mode> --chunk <size> --max-chunks 1 --provider deepseek --model deepseek-v4-flash  # one chunk
 ```
+
+> [!IMPORTANT]
+> For long runs (> 1,000 words), prevent your Mac from sleeping (while still allowing the screen to turn off) by prefixing the command with `caffeinate -i`:
+> ```bash
+> caffeinate -i uv run python3 kamma/translate/scripts/batch_runner.py --op check --mode <mode> --provider deepseek --model deepseek-v4-flash
+> ```
 
 Reports land in `temp/ai_<mode>_check/<timestamp>_mismatches.txt` — after the run,
 read the report and summarize mismatches for the user. Snapshots make re-runs

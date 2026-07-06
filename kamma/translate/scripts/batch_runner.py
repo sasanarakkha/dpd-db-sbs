@@ -25,7 +25,7 @@ PROCESSED_IDS_PATH = PROJECT_ROOT / "temp" / "ai_from_batch_api" / "processed_id
 
 QUOTA_WAIT = timedelta(hours=5)
 QUOTA_MARKER = "possible quota exhaustion"
-DEFAULT_CHUNK = 25
+DEFAULT_CHUNK = 50
 
 STATUS_GENERATE_PROBES: list[tuple[str, str]] = [
     ("meaning", "ru"),

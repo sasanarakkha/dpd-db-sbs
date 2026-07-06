@@ -671,8 +671,24 @@ class RussianMeaningChecker:
                 pr.green(f"Batch {batch_num} done — checked IDs saved to disk")
             results = all_results
         else:
-            pr.white("Using individual processing...")
-            results = self.compare_meanings_individual(comparisons)
+            pr.white("Using individual processing (saving progress every 50 words)...")
+            results = []
+            chunk_size = 50
+            for offset in range(0, len(comparisons), chunk_size):
+                chunk = comparisons[offset : offset + chunk_size]
+                chunk_results = self.compare_meanings_individual(chunk)
+                results.extend(chunk_results)
+                self.save_checked_ids()
+
+                # Clean database mismatches incrementally for this chunk
+                if self.mode in ["meaning_raw", "meaning_raw_list"]:
+                    self._clean_field_for_mismatches(chunk_results, "ru_meaning_raw")
+                elif self.mode == "notes_raw":
+                    self._clean_field_for_mismatches(chunk_results, "ru_notes")
+
+                pr.green(
+                    f"Checked {len(results)}/{len(comparisons)} words — progress saved and database updated"
+                )
 
         # Generate report
         self.generate_report(results)

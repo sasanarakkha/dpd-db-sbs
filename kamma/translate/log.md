@@ -12,3 +12,6 @@ Append-only. One line per chunk/run: `YYYY-MM-DD HH:MM | op mode lang | ok/attem
 - 2026-07-07T06:51:15.133017+08:00 | op=check mode=russian_grammar_meaning_raw lang=- chunk=2 attempted=2 ok=2
 - 2026-07-07T06:51:32.362334+08:00 | op=check mode=meaning_raw lang=- chunk=2 attempted=2 ok=2
 - 2026-07-07T06:52:18.818908+08:00 | op=check mode=russian_grammar_meaning_raw lang=- chunk=2 attempted=2 ok=2
+- 2026-07-07T07:14:33.763409+08:00 | op=check mode=meaning_raw lang=- chunk=500 attempted=500 ok=500
+- 2026-07-07T07:16:19.248100+08:00 | op=check mode=meaning_raw lang=- chunk=50 attempted=50 ok=50
+- 2026-07-07T07:19:45.908575+08:00 | op=check mode=meaning_raw lang=- chunk=50 attempted=50 ok=50
