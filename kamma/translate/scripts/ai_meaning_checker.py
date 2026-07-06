@@ -325,7 +325,15 @@ class RussianMeaningChecker:
         for headword, russian in results:
             english_content = compose_english_content(headword, self.mode)
 
-            if self.mode in ["notes", "notes_raw", "meaning_lit", "meaning_lit_list"]:
+            if self.mode in [
+                "notes",
+                "notes_raw",
+                "meaning_lit",
+                "meaning_lit_list",
+                "meaning_raw",
+                "meaning_raw_list",
+                "meaning_ru_raw",
+            ]:
                 russian_meaning = getattr(russian, russian_field)
             else:
                 if russian.ru_meaning_lit:
@@ -499,9 +507,21 @@ class RussianMeaningChecker:
 
         # Run comparison
         if use_batch:
-            pr.white("Using batch processing...")
-            results = self.compare_meanings_batch(comparisons, batch_size=50)
-            # IDs are now marked as checked within the batch method only on success
+            pr.white("Using batch processing (saving after each batch)...")
+            all_results: list[ComparisonResult] = []
+            batch_size = 50
+            total_batches = (len(comparisons) + batch_size - 1) // batch_size
+            for offset in range(0, len(comparisons), batch_size):
+                batch = comparisons[offset : offset + batch_size]
+                batch_num = offset // batch_size + 1
+                pr.cyan(f"Batch {batch_num}/{total_batches} ({len(batch)} words)")
+                batch_results = self.compare_meanings_batch(
+                    batch, batch_size=batch_size
+                )
+                all_results.extend(batch_results)
+                self.save_checked_ids()
+                pr.green(f"Batch {batch_num} done — checked IDs saved to disk")
+            results = all_results
         else:
             pr.white("Using individual processing...")
             results = self.compare_meanings_individual(comparisons)
