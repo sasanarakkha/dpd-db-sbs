@@ -58,10 +58,9 @@ Recommended default order for a fresh cycle: 1 → 2 → (repeat 1–2 until poo
 
 ### 3. Operations
 
-**Chunk-by-chunk rule for all operations:** If the total pending count exceeds
-100 (or whatever the user considers reasonable), offer to run either all at once
-or chunk by chunk. For chunks, ask for chunk size (e.g. 5000, 10000) and run
-with `--chunk <N> --max-chunks 1`, then ask to continue or stop after each chunk.
+**Chunk-by-chunk rule for all operations:** Run with the default chunk size of 50 words (`--chunk 50` or default).
+- For a test run or initial verification, run exactly 1 chunk of 50 words (`--max-chunks 1`).
+- For a full run, omit `--max-chunks` so the runner automatically loops through all words in chunks of 50.
 
 #### Op 1 — Translate NEW words
 
@@ -105,16 +104,13 @@ recommend `uv run python3 db/backup_tsv/backup_dps.py` first.
 | `notes` | notes vs ru_notes (human) | report only |
 | `notes_raw` | notes vs ru_notes (`[пер. ИИ]`) | **clears ru_notes** |
 
-Evaluate the pending count for the selected mode (from Step 1) and suggest a realistic option to the user:
+Evaluate the pending count for the selected mode (from Step 1) and recommend chunking:
 
-- **Tiny pool (< 100 pending)**: Recommend running **all at once** (`--chunk 0`).
-- **Medium pool (100 - 5000 pending)**: Recommend running **chunk by chunk** with a chunk size of **500 - 1000**.
-- **Large pool (> 5000 pending)**: Recommend starting with a trial run of **500 - 1000** first, or running in chunks of **5000**. Avoid running all at once as it could run into rate limits or take extremely long without intermediate feedback.
+- Always recommend running chunk-by-chunk with a chunk size of 50 (`--chunk 50` or default) to ensure progress is saved and mismatches cleared every 50 words.
+- For a test run or initial verification of a new mode, run exactly 1 chunk of 50 words (`--max-chunks 1`).
+- For a full run to process the entire pool, omit `--max-chunks` so the runner loops through all words 50 at a time until complete.
 
-Ask the user: run all at once, or chunk by chunk?
-
-- **All at once**: `--chunk 0` (defaults to all remaining unchecked)
-- **Chunk by chunk**: run with `--chunk <N> --max-chunks 1`. After each chunk, ask if they want to continue or stop.
+Ask the user: run a single test chunk of 50 words, or run all remaining words in 50-word chunks?
 
 To ensure checkers run exactly and only via DeepSeek and do not fall back to `antigravity_cli`, always pass both `--provider deepseek --model deepseek-v4-flash`. The checker is configured to save checked IDs and clear database mismatches incrementally in chunks of 50, meaning no progress is lost if the process is interrupted:
 ```bash
