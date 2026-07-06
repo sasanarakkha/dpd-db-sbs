@@ -1,10 +1,10 @@
-"""Golden-master tests for tools/ai_meaning_checker.py against real dpd.db data."""
+"""Golden-master tests for kamma/translate/scripts/ai_meaning_checker.py against real dpd.db data."""
 
 import json
 from pathlib import Path
 
 from db.db_helpers import get_db_session
-from tools.ai_meaning_checker import RussianMeaningChecker
+from kamma.translate.scripts.ai_meaning_checker import RussianMeaningChecker
 from tools.paths import ProjectPaths
 
 FIXTURE_PATH = Path(__file__).parent / "test_ai_meaning_checker_fixtures.json"

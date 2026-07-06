@@ -4,31 +4,25 @@
 
 import json
 import tempfile
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from db.models import Base, DpdHeadword
-
-# Tamil will be added in phase 4
-try:
-    from db.models import Tamil
-except ImportError:
-    Tamil = None
+from db.models import Base, DpdHeadword, Tamil
 
 # The renamed script will be available after phase 3
 try:
-    from scripts.other.ai_generate_translation import (
+    from kamma.translate.scripts.ai_generate_translation import (
         create_translation_prompt,
         read_exclude_ids_from_json,
         read_exclude_ids_from_tsv,
     )
 except ImportError:
     # Fall back to old name temporarily
-    from scripts.other.ai_generate_translation import (
+    from kamma.translate.scripts.ai_generate_translation import (
         create_translation_prompt,
         read_exclude_ids_from_json,
         read_exclude_ids_from_tsv,
@@ -38,7 +32,7 @@ from tools.ai_related import generate_messages_for_meaning
 
 
 @pytest.fixture
-def temp_db() -> Generator[Session, None, None]:
+def temp_db() -> Generator[Session]:
     """Create an in-memory SQLite database for testing."""
     engine = create_engine("sqlite:///:memory:")
     Base.metadata.create_all(engine)
@@ -88,6 +82,7 @@ def test_tamil_orm_default_empty_meaning(
     temp_db.commit()
 
     fetched_tamil = temp_db.query(Tamil).filter(Tamil.id == sample_headword.id).first()
+    assert fetched_tamil is not None
     assert fetched_tamil.ta_meaning == ""
 
 
@@ -100,6 +95,7 @@ def test_dpdheadword_ta_relationship(temp_db: Session, sample_headword: DpdHeadw
 
     # Fetch headword and check relationship
     hw = temp_db.query(DpdHeadword).filter(DpdHeadword.id == 1).first()
+    assert hw is not None
     assert hw.ta is not None
     assert isinstance(hw.ta, Tamil)
     assert hw.ta.id == 1
@@ -108,7 +104,9 @@ def test_dpdheadword_ta_relationship(temp_db: Session, sample_headword: DpdHeadw
 def test_custom_id_parsing_from_jsonl():
     """Test that custom_id values like 'request-12345' are parsed correctly."""
     # Create temp JSONL file
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".jsonl", delete=False) as f:
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".jsonl", delete=False, encoding="utf-8"
+    ) as f:
         f.write('{"custom_id": "request-100", "method": "POST"}\n')
         f.write('{"custom_id": "request-200", "method": "POST"}\n')
         f.write('{"custom_id": "request-999", "method": "POST"}\n')
@@ -130,7 +128,7 @@ def test_queued_id_exclusion_from_jsonl():
 
         # Create a JSONL file with queued IDs
         jsonl_file = tmpdir_path / "batch-001.jsonl"
-        with open(jsonl_file, "w") as f:
+        with open(jsonl_file, "w", encoding="utf-8") as f:
             for word_id in [10, 20, 30]:
                 json.dump(
                     {
@@ -150,13 +148,15 @@ def test_queued_id_exclusion_from_jsonl():
 
 def test_processed_id_exclusion_from_json():
     """Test that IDs from processed JSON file are correctly excluded."""
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".json", delete=False, encoding="utf-8"
+    ) as f:
         json.dump({"processed_ids": [50, 60, 70]}, f)
         temp_path = f.name
 
     try:
         # This tests the structure, actual loading depends on implementation
-        with open(temp_path) as f:
+        with open(temp_path, encoding="utf-8") as f:
             data = json.load(f)
         assert "processed_ids" in data
         assert len(data["processed_ids"]) == 3
@@ -166,7 +166,9 @@ def test_processed_id_exclusion_from_json():
 
 def test_malformed_jsonl_handling():
     """Test that malformed JSONL lines are handled safely."""
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".jsonl", delete=False) as f:
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".jsonl", delete=False, encoding="utf-8"
+    ) as f:
         f.write('{"custom_id": "request-100"}\n')
         f.write("this is not json\n")  # malformed
         f.write('{"custom_id": "request-200"}\n')
@@ -198,7 +200,9 @@ def test_tamil_meaning_prompt_builder():
 
 def test_tsv_with_ta_meaning_header():
     """Test that a Tamil TSV with ta_meaning column can be read."""
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".tsv", delete=False) as f:
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".tsv", delete=False, encoding="utf-8"
+    ) as f:
         f.write("id\tta_meaning\n")
         f.write("1\tகோவை பொருள்\n")
         f.write("2\tமற்ற பொருள்\n")

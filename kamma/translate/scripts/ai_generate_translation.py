@@ -566,7 +566,7 @@ def translation_generate(
                 )
 
     if regenerated_ids:
-        project_root = Path(__file__).resolve().parents[2]
+        project_root = Path(__file__).resolve().parents[3]
         temp_dir = project_root / "temp"
         temp_dir.mkdir(exist_ok=True)
         last_translated_path = temp_dir / "last_translated.json"
@@ -751,7 +751,7 @@ if __name__ == "__main__":
             model=model_val,
         )
         if not args.dry_run:
-            check_cmd = f"uv run python3 tests/scripts/others/ai_translation_check.py -lang {args.lang}"
+            check_cmd = f"uv run python3 kamma/translate/scripts/ai_translation_check.py -lang {args.lang}"
             pr.green("\n" + "=" * 60)
             pr.green("Translation run complete!")
             pr.white("To verify the generated translations, run:")

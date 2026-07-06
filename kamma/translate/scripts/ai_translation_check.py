@@ -259,9 +259,9 @@ def check_translations(
                 with open(last_translated_path, "r", encoding="utf-8") as f:
                     data = json.load(f)
                     if data.get("lang") == lang:
-                        ids_to_check = data.get("ids")
+                        ids_to_check = data.get("ids") or []
                         print(
-                            f"Loaded {len(ids_to_check)} IDs from the last translation run."
+                            f"Loaded {len(ids_to_check or [])} IDs from the last translation run."
                         )
             except (OSError, json.JSONDecodeError) as e:
                 print(f"Warning: Failed to load last translated IDs: {e}")

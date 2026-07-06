@@ -5,7 +5,7 @@ import argparse
 import sys
 
 from db.db_helpers import get_db_session
-from tools.ai_meaning_checker import RussianMeaningChecker
+from kamma.translate.scripts.ai_meaning_checker import RussianMeaningChecker
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 

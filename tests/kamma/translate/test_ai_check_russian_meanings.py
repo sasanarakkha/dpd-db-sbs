@@ -1,4 +1,4 @@
-from scripts.other.ai_check_russian_meanings import _MODE_NOTES
+from kamma.translate.scripts.ai_check_russian_meanings import _MODE_NOTES
 
 _ALL_MODES = {
     "meaning",

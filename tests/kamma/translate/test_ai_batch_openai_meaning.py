@@ -1,6 +1,6 @@
 from types import SimpleNamespace
 
-from scripts.other.ai_batch_openai_meaning import serialize_request_counts
+from kamma.translate.scripts.ai_batch_openai_meaning import serialize_request_counts
 
 
 def test_serialize_request_counts_none() -> None:

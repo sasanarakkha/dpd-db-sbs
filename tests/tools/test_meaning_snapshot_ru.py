@@ -5,7 +5,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
-from tools.ai_meaning_checker import RussianMeaningChecker
+from kamma.translate.scripts.ai_meaning_checker import RussianMeaningChecker
 from tools.meaning_snapshot_ru import (
     compose_english_content,
     compute_field_hash,

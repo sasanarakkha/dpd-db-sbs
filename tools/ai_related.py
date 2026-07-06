@@ -82,11 +82,20 @@ def generate_messages_for_meaning(
 
     system_content = "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules."
 
+    if synonyms:
+        synonym_rules = "- Separate synonyms with `;`."
+    else:
+        synonym_rules = (
+            "- Give at most 3 Russian meanings, separated by `;`.\n"
+            "        - Each meaning must be semantically distinct — a different sense, nuance, or usage, not a reworded synonym.\n"
+            "        - If the English definition expresses only one sense, output exactly one translation: fewer distinct meanings is better than padded near-synonyms."
+        )
+
     user_content = f"""
         Translate the English definition of the Pali term into Russian, following these rules:
 
         - Translate all bracketed text (e.g., "(gram)" → "(грам)", "(comm)" → "(комм)", "(vinaya)" → "(виная)", "(of weather)" → "(о погоде)").
-        - Separate synonyms with `;`.
+        {synonym_rules}
         - Match the grammatical structure of the Pali term (noun, verb, etc.).
         - Use lowercase unless it's a proper noun.
         - Translate "lit." as "досл.".
@@ -152,11 +161,17 @@ def generate_messages_for_meaning_ta(
 
     system_content = "You are a skilled assistant that translates English text to Tamil with grammatical accuracy, contextual relevance, and strict adherence to rules."
 
+    synonym_rules = (
+        "- Give at most 3 Tamil meanings, separated by `;`.\n"
+        "        - Each meaning must be semantically distinct — a different sense, nuance, or usage, not a reworded synonym.\n"
+        "        - If the English definition expresses only one sense, output exactly one translation: fewer distinct meanings is better than padded near-synonyms."
+    )
+
     user_content = f"""
         Translate the English definition of the Pali term into Tamil, following these rules:
 
         - Translate all bracketed text (e.g., "(gram)" → "(இலக்கணம்)", "(of weather)" → "(வெயிலைப் பற்றி)").
-        - Separate synonyms with `;`.
+        {synonym_rules}
         - Match the grammatical structure of the Pali term (noun, verb, etc.).
         - Use lowercase unless it's a proper noun.
         - Retain clarifications if any.
