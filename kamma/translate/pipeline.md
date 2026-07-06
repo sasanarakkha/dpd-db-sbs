@@ -58,6 +58,11 @@ Recommended default order for a fresh cycle: 1 → 2 → (repeat 1–2 until poo
 
 ### 3. Operations
 
+**Chunk-by-chunk rule for all operations:** If the total pending count exceeds
+100 (or whatever the user considers reasonable), offer to run either all at once
+or chunk by chunk. For chunks, ask for chunk size (e.g. 5000, 10000) and run
+with `--chunk <N> --max-chunks 1`, then ask to continue or stop after each chunk.
+
 #### Op 1 — Translate NEW words
 
 ```bash
@@ -99,8 +104,14 @@ recommend `uv run python3 db/backup_tsv/backup_dps.py` first.
 | `notes` | notes vs ru_notes (human) | report only |
 | `notes_raw` | notes vs ru_notes (`[пер. ИИ]`) | **clears ru_notes** |
 
+Ask the user: run all at once, or chunk by chunk?
+
+- **All at once**: `--chunk 0` (defaults to all remaining unchecked)
+- **Chunk by chunk**: ask for chunk size (e.g. 10000, 5000), then run with `--chunk <N> --max-chunks 1`. After each chunk, ask if they want to continue or stop.
+
 ```bash
-uv run python3 kamma/translate/scripts/batch_runner.py --op check --mode <mode>
+uv run python3 kamma/translate/scripts/batch_runner.py --op check --mode <mode>               # all
+uv run python3 kamma/translate/scripts/batch_runner.py --op check --mode <mode> --chunk 10000 --max-chunks 1  # one chunk
 ```
 
 Reports land in `temp/ai_<mode>_check/<timestamp>_mismatches.txt` — after the run,
