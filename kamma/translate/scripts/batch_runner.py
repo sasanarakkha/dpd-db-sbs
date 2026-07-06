@@ -205,6 +205,31 @@ def print_status() -> None:
         pr.white(f"  {mode}/{lang}: {total} pending")
 
     pr.white("")
+    pr.white("Pending work (checker pending counts):")
+    from db.db_helpers import get_db_session
+    from kamma.translate.scripts.ai_meaning_checker import RussianMeaningChecker
+    from tools.paths import ProjectPaths
+
+    pth = ProjectPaths()
+    db_session = get_db_session(pth.dpd_db_path)
+    try:
+        for mode in [
+            "meaning",
+            "meaning_raw",
+            "meaning_ru_raw",
+            "meaning_raw_list",
+            "meaning_lit",
+            "meaning_lit_list",
+            "notes",
+            "notes_raw",
+        ]:
+            checker = RussianMeaningChecker(mode=mode)
+            n_pending = checker.get_total_count_with_session(db_session)
+            pr.white(f"  {mode}: {n_pending} pending")
+    finally:
+        db_session.close()
+
+    pr.white("")
     pr.white("Checker snapshot sizes:")
     for snapshot_path in sorted(PROJECT_ROOT.glob("temp/ai_*_check/checked_ids.json")):
         mode = snapshot_path.parent.name.removeprefix("ai_").removesuffix("_check")

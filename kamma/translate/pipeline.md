@@ -42,12 +42,12 @@ Antigravity CLI (`agy`) 5-hour quota window.
 
 ### 2. Present the menu
 
-Show the menu with the current counts inline and ONE recommendation:
+Show the menu with the current counts inline (both generation pool sizes and checker pending counts from `--status`) and ONE recommendation:
 
 ```
-1. Translate NEW words        (ru/ta × meaning/lit/note — words with no entry yet)
+1. Translate NEW words        (meaning/ru: X, lit/ru: Y, note/ru: Z, meaning/ta: W pending)
 2. Verify latest generation   (mechanical check + AI check of just-generated rows)
-3. Check existing columns     (ru_meaning / ru_meaning_raw / ru_meaning_lit / ru_notes)
+3. Check existing columns     (meaning: A, meaning_raw: B, meaning_ru_raw: C, meaning_lit: D, notes: E, notes_raw: F pending)
 4. Synonym audit              (find near-identical synonyms; trim on approval)
 5. Clean irrelevant rows      (empty RU rows / Latin-script TA rows)
 6. Status only / exit
@@ -104,14 +104,20 @@ recommend `uv run python3 db/backup_tsv/backup_dps.py` first.
 | `notes` | notes vs ru_notes (human) | report only |
 | `notes_raw` | notes vs ru_notes (`[пер. ИИ]`) | **clears ru_notes** |
 
+Evaluate the pending count for the selected mode (from Step 1) and suggest a realistic option to the user:
+
+- **Tiny pool (< 100 pending)**: Recommend running **all at once** (`--chunk 0`).
+- **Medium pool (100 - 5000 pending)**: Recommend running **chunk by chunk** with a chunk size of **500 - 1000**.
+- **Large pool (> 5000 pending)**: Recommend starting with a trial run of **500 - 1000** first, or running in chunks of **5000**. Avoid running all at once as it could run into rate limits or take extremely long without intermediate feedback.
+
 Ask the user: run all at once, or chunk by chunk?
 
 - **All at once**: `--chunk 0` (defaults to all remaining unchecked)
-- **Chunk by chunk**: ask for chunk size (e.g. 10000, 5000), then run with `--chunk <N> --max-chunks 1`. After each chunk, ask if they want to continue or stop.
+- **Chunk by chunk**: run with `--chunk <N> --max-chunks 1`. After each chunk, ask if they want to continue or stop.
 
 ```bash
 uv run python3 kamma/translate/scripts/batch_runner.py --op check --mode <mode>               # all
-uv run python3 kamma/translate/scripts/batch_runner.py --op check --mode <mode> --chunk 10000 --max-chunks 1  # one chunk
+uv run python3 kamma/translate/scripts/batch_runner.py --op check --mode <mode> --chunk <size> --max-chunks 1  # one chunk
 ```
 
 Reports land in `temp/ai_<mode>_check/<timestamp>_mismatches.txt` — after the run,

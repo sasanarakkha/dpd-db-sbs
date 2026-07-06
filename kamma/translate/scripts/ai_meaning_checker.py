@@ -68,7 +68,7 @@ class RussianMeaningChecker:
     def __init__(self, db_path: str = "dpd.db", mode: str = "meaning"):
         self.db_path = db_path
         self.mode = mode
-        self.batch_processor = BatchProcessor()
+        self._batch_processor: BatchProcessor | None = None
         dpspth = DPSPaths()
         self.list_ids_file: Path | None = None
 
@@ -103,6 +103,13 @@ class RussianMeaningChecker:
         self.snapshot: dict[int, str] = {}
         self.english_by_id: dict[int, str] = {}
         self.checked_ids = self.load_checked_ids()
+
+    @property
+    def batch_processor(self) -> BatchProcessor:
+        """Lazy load BatchProcessor to avoid heavy AI initialization."""
+        if self._batch_processor is None:
+            self._batch_processor = BatchProcessor()
+        return self._batch_processor
 
     def load_checked_ids(self) -> set[int]:
         """Load the snapshot (v2, auto-migrating v1) and return its IDs."""
@@ -359,9 +366,130 @@ class RussianMeaningChecker:
 
     def get_total_count_with_session(self, db_session: Session) -> int:
         """Get total count of words that need comparison using provided session"""
-        # Use the same query logic as get_words_for_comparison_with_session
-        comparisons = self.get_words_for_comparison_with_session(db_session)
-        return len(comparisons)
+        from db.models import DpdHeadword, Russian
+
+        if self.mode == "meaning":
+            query = (
+                db_session.query(DpdHeadword.id)
+                .join(Russian, DpdHeadword.id == Russian.id)
+                .filter(
+                    and_(
+                        DpdHeadword.meaning_1.isnot(None),
+                        DpdHeadword.meaning_1 != "",
+                        Russian.ru_meaning.isnot(None),
+                        Russian.ru_meaning != "",
+                        ~DpdHeadword.id.in_(list(self.checked_ids)),
+                    )
+                )
+            )
+        elif self.mode in ["meaning_raw", "meaning_ru_raw"]:
+            query = (
+                db_session.query(DpdHeadword.id)
+                .join(Russian, DpdHeadword.id == Russian.id)
+                .filter(
+                    and_(
+                        DpdHeadword.meaning_1.isnot(None),
+                        DpdHeadword.meaning_1 != "",
+                        Russian.ru_meaning == "",
+                        Russian.ru_meaning_raw.isnot(None),
+                        Russian.ru_meaning_raw != "",
+                        ~DpdHeadword.id.in_(list(self.checked_ids)),
+                    )
+                )
+            )
+        elif self.mode == "meaning_raw_list":
+            list_ids = self.load_list_ids()
+            if not list_ids:
+                return 0
+            query = (
+                db_session.query(DpdHeadword.id)
+                .join(Russian, DpdHeadword.id == Russian.id)
+                .filter(
+                    and_(
+                        DpdHeadword.meaning_1.isnot(None),
+                        DpdHeadword.meaning_1 != "",
+                        Russian.ru_meaning == "",
+                        Russian.ru_meaning_raw.isnot(None),
+                        Russian.ru_meaning_raw != "",
+                        DpdHeadword.id.in_(list(list_ids)),
+                        ~DpdHeadword.id.in_(list(self.checked_ids)),
+                    )
+                )
+            )
+        elif self.mode == "notes":
+            query = (
+                db_session.query(DpdHeadword.id)
+                .join(Russian, DpdHeadword.id == Russian.id)
+                .filter(
+                    and_(
+                        DpdHeadword.meaning_1.isnot(None),
+                        DpdHeadword.meaning_1 != "",
+                        DpdHeadword.notes.isnot(None),
+                        DpdHeadword.notes != "",
+                        Russian.ru_notes.isnot(None),
+                        Russian.ru_notes != "",
+                        ~DpdHeadword.id.in_(list(self.checked_ids)),
+                        ~Russian.ru_notes.contains("[пер. ИИ]"),
+                    )
+                )
+            )
+        elif self.mode == "notes_raw":
+            query = (
+                db_session.query(DpdHeadword.id)
+                .join(Russian, DpdHeadword.id == Russian.id)
+                .filter(
+                    and_(
+                        DpdHeadword.meaning_1.isnot(None),
+                        DpdHeadword.meaning_1 != "",
+                        DpdHeadword.notes.isnot(None),
+                        DpdHeadword.notes != "",
+                        Russian.ru_notes.isnot(None),
+                        Russian.ru_notes != "",
+                        ~DpdHeadword.id.in_(list(self.checked_ids)),
+                        Russian.ru_notes.contains("[пер. ИИ]"),
+                    )
+                )
+            )
+        elif self.mode == "meaning_lit":
+            query = (
+                db_session.query(DpdHeadword.id)
+                .join(Russian, DpdHeadword.id == Russian.id)
+                .filter(
+                    and_(
+                        DpdHeadword.meaning_lit.isnot(None),
+                        DpdHeadword.meaning_lit != "",
+                        Russian.ru_meaning.isnot(None),
+                        Russian.ru_meaning != "",
+                        Russian.ru_meaning_lit.isnot(None),
+                        Russian.ru_meaning_lit != "",
+                        ~DpdHeadword.id.in_(list(self.checked_ids)),
+                    )
+                )
+            )
+        elif self.mode == "meaning_lit_list":
+            list_ids = self.load_list_ids()
+            if not list_ids:
+                return 0
+            query = (
+                db_session.query(DpdHeadword.id)
+                .join(Russian, DpdHeadword.id == Russian.id)
+                .filter(
+                    and_(
+                        DpdHeadword.meaning_lit.isnot(None),
+                        DpdHeadword.meaning_lit != "",
+                        Russian.ru_meaning.isnot(None),
+                        Russian.ru_meaning != "",
+                        Russian.ru_meaning_lit.isnot(None),
+                        Russian.ru_meaning_lit != "",
+                        DpdHeadword.id.in_(list(list_ids)),
+                        ~DpdHeadword.id.in_(list(self.checked_ids)),
+                    )
+                )
+            )
+        else:
+            raise ValueError(f"Unknown mode: {self.mode}")
+
+        return query.count()
 
     def compare_meanings_batch(
         self, comparisons: list[WordComparison], batch_size: int = 50
