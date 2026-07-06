@@ -47,7 +47,7 @@ Show the menu with the current counts inline (both generation pool sizes and che
 ```
 1. Translate NEW words        (meaning/ru: X, lit/ru: Y, note/ru: Z, meaning/ta: W pending)
 2. Verify latest generation   (mechanical check + AI check of just-generated rows)
-3. Check existing columns     (meaning: A, meaning_raw: B, meaning_ru_raw: C, meaning_lit: D, notes: E, notes_raw: F pending)
+3. Check existing columns     (meaning: A, meaning_raw: B, russian_grammar_meaning_raw: C, meaning_lit: D, notes: E, notes_raw: F pending)
 4. Synonym audit              (find near-identical synonyms; trim on approval)
 5. Clean irrelevant rows      (empty RU rows / Latin-script TA rows)
 6. Status only / exit
@@ -99,7 +99,7 @@ recommend `uv run python3 db/backup_tsv/backup_dps.py` first.
 |---|---|---|
 | `meaning` | meaning_1 vs ru_meaning (+lit) | report only |
 | `meaning_raw` | meaning_1 vs ru_meaning_raw | **clears ru_meaning_raw** |
-| `meaning_ru_raw` | grammar shape of ru_meaning_raw | report only |
+| `russian_grammar_meaning_raw` | grammar shape of ru_meaning_raw | report only |
 | `meaning_lit` | meaning_lit vs ru_meaning_lit | report only |
 | `notes` | notes vs ru_notes (human) | report only |
 | `notes_raw` | notes vs ru_notes (`[пер. ИИ]`) | **clears ru_notes** |

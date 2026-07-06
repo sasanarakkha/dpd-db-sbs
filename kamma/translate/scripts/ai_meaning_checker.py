@@ -65,9 +65,17 @@ Grammar: {comp.grammar}"""
 class RussianMeaningChecker:
     """Checks if Russian meanings match English meanings using AI"""
 
-    def __init__(self, db_path: str = "dpd.db", mode: str = "meaning"):
+    def __init__(
+        self,
+        db_path: str = "dpd.db",
+        mode: str = "meaning",
+        provider: str | None = None,
+        model: str | None = None,
+    ):
         self.db_path = db_path
         self.mode = mode
+        self.provider = provider
+        self.model = model
         self._batch_processor: BatchProcessor | None = None
         dpspth = DPSPaths()
         self.list_ids_file: Path | None = None
@@ -76,9 +84,9 @@ class RussianMeaningChecker:
         if mode == "meaning_raw":
             self.checked_ids_file = dpspth.ai_meaning_raw_checked
             self.output_txt_folder = dpspth.ai_meaning_raw_report_dir
-        elif mode == "meaning_ru_raw":
-            self.checked_ids_file = dpspth.ai_meaning_ru_raw_checked
-            self.output_txt_folder = dpspth.ai_meaning_ru_raw_report_dir
+        elif mode == "russian_grammar_meaning_raw":
+            self.checked_ids_file = dpspth.ai_russian_grammar_meaning_raw_checked
+            self.output_txt_folder = dpspth.ai_russian_grammar_meaning_raw_report_dir
         elif mode == "meaning_raw_list":
             self.checked_ids_file = dpspth.ai_meaning_raw_checked
             self.output_txt_folder = dpspth.ai_meaning_raw_report_dir
@@ -108,7 +116,9 @@ class RussianMeaningChecker:
     def batch_processor(self) -> BatchProcessor:
         """Lazy load BatchProcessor to avoid heavy AI initialization."""
         if self._batch_processor is None:
-            self._batch_processor = BatchProcessor()
+            self._batch_processor = BatchProcessor(
+                provider=self.provider, model=self.model
+            )
         return self._batch_processor
 
     def load_checked_ids(self) -> set[int]:
@@ -178,7 +188,7 @@ class RussianMeaningChecker:
             )
             russian_field = "ru_meaning"
 
-        elif self.mode == "meaning_raw" or self.mode == "meaning_ru_raw":
+        elif self.mode == "meaning_raw" or self.mode == "russian_grammar_meaning_raw":
             # Raw modes: check ru_meaning_raw
             results = (
                 db_session.query(DpdHeadword, Russian)
@@ -339,7 +349,7 @@ class RussianMeaningChecker:
                 "meaning_lit_list",
                 "meaning_raw",
                 "meaning_raw_list",
-                "meaning_ru_raw",
+                "russian_grammar_meaning_raw",
             ]:
                 russian_meaning = getattr(russian, russian_field)
             else:
@@ -382,7 +392,7 @@ class RussianMeaningChecker:
                     )
                 )
             )
-        elif self.mode in ["meaning_raw", "meaning_ru_raw"]:
+        elif self.mode in ["meaning_raw", "russian_grammar_meaning_raw"]:
             query = (
                 db_session.query(DpdHeadword.id)
                 .join(Russian, DpdHeadword.id == Russian.id)
@@ -513,7 +523,12 @@ class RussianMeaningChecker:
         """Clear the given Russian field for mismatched entries"""
         from db.models import Russian
 
-        mismatches = [r for r in results if r.match_status == "MISMATCH"]
+        if self.mode in ["meaning_raw", "meaning_raw_list"]:
+            mismatches = [
+                r for r in results if r.match_status in ["MISMATCH", "PARTIAL_MATCH"]
+            ]
+        else:
+            mismatches = [r for r in results if r.match_status == "MISMATCH"]
         if not mismatches:
             return
 
@@ -562,8 +577,13 @@ class RussianMeaningChecker:
             "=" * 50 + "\n\n",
         ]
 
-        # Filter for problematic entries - ONLY COMPLETE MISMATCHES (no partial matches)
-        mismatches = [r for r in results if r.match_status == "MISMATCH"]
+        # Filter for problematic entries - treat PARTIAL_MATCH as mismatch in raw modes
+        if self.mode in ["meaning_raw", "meaning_raw_list"]:
+            mismatches = [
+                r for r in results if r.match_status in ["MISMATCH", "PARTIAL_MATCH"]
+            ]
+        else:
+            mismatches = [r for r in results if r.match_status == "MISMATCH"]
         matches = [r for r in results if r.match_status == "MATCH"]
 
         lines.append(f"Total entries analyzed: {len(results)}\n")
@@ -598,7 +618,7 @@ class RussianMeaningChecker:
         elif self.mode == "notes_raw" and mismatches:
             self._clean_field_for_mismatches(results, "ru_notes")
         # Note: meaning_lit and meaning_lit_list modes don't clean database fields, only report
-        # Note: meaning_ru_raw mode also doesn't clean database fields - keeps Russian meanings for review
+        # Note: russian_grammar_meaning_raw mode also doesn't clean database fields - keeps Russian meanings for review
 
         # Save checked IDs after analysis
         self.save_checked_ids()

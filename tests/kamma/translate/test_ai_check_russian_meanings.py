@@ -3,7 +3,7 @@ from kamma.translate.scripts.ai_check_russian_meanings import _MODE_NOTES
 _ALL_MODES = {
     "meaning",
     "meaning_raw",
-    "meaning_ru_raw",
+    "russian_grammar_meaning_raw",
     "meaning_raw_list",
     "meaning_lit",
     "meaning_lit_list",

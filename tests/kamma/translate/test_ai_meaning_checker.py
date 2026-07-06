@@ -30,36 +30,45 @@ def _comparisons_to_dicts(comparisons) -> list[dict]:
 
 def test_get_words_for_comparison_meaning_mode_matches_fixture():
     checker = RussianMeaningChecker(mode="meaning")
+    checker.checked_ids = set()
     comparisons = checker.get_words_for_comparison_with_session(db_session)
     assert _comparisons_to_dicts(comparisons)[:5] == FIXTURES["meaning"]
 
 
 def test_get_words_for_comparison_meaning_raw_mode_matches_fixture():
     checker = RussianMeaningChecker(mode="meaning_raw")
+    checker.checked_ids = set()
     comparisons = checker.get_words_for_comparison_with_session(db_session)
     assert _comparisons_to_dicts(comparisons)[:5] == FIXTURES["meaning_raw"]
 
 
-def test_get_words_for_comparison_meaning_ru_raw_mode_matches_fixture():
-    checker = RussianMeaningChecker(mode="meaning_ru_raw")
+def test_get_words_for_comparison_russian_grammar_meaning_raw_mode_matches_fixture():
+    checker = RussianMeaningChecker(mode="russian_grammar_meaning_raw")
+    checker.checked_ids = set()
     comparisons = checker.get_words_for_comparison_with_session(db_session)
-    assert _comparisons_to_dicts(comparisons)[:5] == FIXTURES["meaning_ru_raw"]
+    assert (
+        _comparisons_to_dicts(comparisons)[:5]
+        == FIXTURES["russian_grammar_meaning_raw"]
+    )
 
 
 def test_get_words_for_comparison_meaning_lit_mode_matches_fixture():
     checker = RussianMeaningChecker(mode="meaning_lit")
+    checker.checked_ids = set()
     comparisons = checker.get_words_for_comparison_with_session(db_session)
     assert _comparisons_to_dicts(comparisons)[:5] == FIXTURES["meaning_lit"]
 
 
 def test_get_words_for_comparison_notes_mode_matches_fixture():
     checker = RussianMeaningChecker(mode="notes")
+    checker.checked_ids = set()
     comparisons = checker.get_words_for_comparison_with_session(db_session)
     assert _comparisons_to_dicts(comparisons)[:5] == FIXTURES["notes"]
 
 
 def test_get_words_for_comparison_notes_raw_mode_matches_fixture():
     checker = RussianMeaningChecker(mode="notes_raw")
+    checker.checked_ids = set()
     comparisons = checker.get_words_for_comparison_with_session(db_session)
     assert _comparisons_to_dicts(comparisons)[:5] == FIXTURES["notes_raw"]
 
@@ -70,6 +79,7 @@ def test_get_words_for_comparison_meaning_lit_list_mode_matches_fixture(tmp_path
     list_file.write_text(json.dumps(ids), encoding="utf-8")
 
     checker = RussianMeaningChecker(mode="meaning_lit_list")
+    checker.checked_ids = set()
     checker.list_ids_file = list_file
     comparisons = checker.get_words_for_comparison_with_session(db_session)
     assert _comparisons_to_dicts(comparisons) == FIXTURES["meaning_lit_list"]
@@ -81,6 +91,7 @@ def test_get_words_for_comparison_meaning_raw_list_mode_matches_fixture(tmp_path
     list_file.write_text(json.dumps(ids), encoding="utf-8")
 
     checker = RussianMeaningChecker(mode="meaning_raw_list")
+    checker.checked_ids = set()
     checker.list_ids_file = list_file
     comparisons = checker.get_words_for_comparison_with_session(db_session)
     assert _comparisons_to_dicts(comparisons) == FIXTURES["meaning_raw_list"]

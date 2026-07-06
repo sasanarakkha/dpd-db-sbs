@@ -1,6 +1,14 @@
 {
   "meaning": [
     {
+      "headword_id": 1,
+      "lemma_1": "a 1.1",
+      "english_meaning": "(gram) letter a; 1st letter of the alphabet; guttural vowel",
+      "russian_meaning": "(грам) буква а; первая буква алфавита; гортанная гласная",
+      "russian_meaning_alt": null,
+      "grammar": "letter , masculine noun"
+    },
+    {
       "headword_id": 2,
       "lemma_1": "a 2.1",
       "english_meaning": "ā prefix shortened before double consonant",
@@ -31,14 +39,6 @@
       "russian_meaning": "(грам) знак спряжения для глаголов 1 ой группы bhū",
       "russian_meaning_alt": null,
       "grammar": "conjugational sign , masculine noun"
-    },
-    {
-      "headword_id": 7,
-      "lemma_1": "akakkasa",
-      "english_meaning": "smooth; tender; not harsh; not rough",
-      "russian_meaning": "деликатный; тактичный; вежливый; не резкий; не грубый",
-      "russian_meaning_alt": null,
-      "grammar": "adjective"
     }
   ],
   "meaning_raw": [
@@ -46,7 +46,7 @@
       "headword_id": 16,
       "lemma_1": "akaṭayūsa",
       "english_meaning": "plain bean soup; bean broth",
-      "russian_meaning": "",
+      "russian_meaning": "простой фасолевый суп; фасолевый отвар",
       "russian_meaning_alt": null,
       "grammar": "masculine noun , compound"
     },
@@ -54,7 +54,7 @@
       "headword_id": 19,
       "lemma_1": "akaṭṭhapāka",
       "english_meaning": "ripening in uncultivated ground; growing wild",
-      "russian_meaning": "",
+      "russian_meaning": "созревающий на необработанной почве; растущий дико",
       "russian_meaning_alt": null,
       "grammar": "adjective , compound"
     },
@@ -62,7 +62,7 @@
       "headword_id": 20,
       "lemma_1": "akaṭṭhapākasālipātubhāva",
       "english_meaning": "appearance of uncultivated ready to eat fine rice",
-      "russian_meaning": "",
+      "russian_meaning": "появление некультивированного готового к употреблению высококачественного риса",
       "russian_meaning_alt": null,
       "grammar": "masculine noun , abstract noun , compound"
     },
@@ -70,7 +70,7 @@
       "headword_id": 22,
       "lemma_1": "akaṇa",
       "english_meaning": "without bran; with the husk removed",
-      "russian_meaning": "",
+      "russian_meaning": "без отрубей; с удалённой шелухой",
       "russian_meaning_alt": null,
       "grammar": "adjective"
     },
@@ -78,17 +78,17 @@
       "headword_id": 28,
       "lemma_1": "akaṇhaasukka",
       "english_meaning": "neither black nor white; neither good nor bad",
-      "russian_meaning": "",
+      "russian_meaning": "ни черный, ни белый; ни хороший, ни плохой",
       "russian_meaning_alt": null,
       "grammar": "adjective , compound"
     }
   ],
-  "meaning_ru_raw": [
+  "russian_grammar_meaning_raw": [
     {
       "headword_id": 16,
       "lemma_1": "akaṭayūsa",
       "english_meaning": "plain bean soup; bean broth",
-      "russian_meaning": "",
+      "russian_meaning": "простой фасолевый суп; фасолевый отвар",
       "russian_meaning_alt": null,
       "grammar": "masculine noun , compound"
     },
@@ -96,7 +96,7 @@
       "headword_id": 19,
       "lemma_1": "akaṭṭhapāka",
       "english_meaning": "ripening in uncultivated ground; growing wild",
-      "russian_meaning": "",
+      "russian_meaning": "созревающий на необработанной почве; растущий дико",
       "russian_meaning_alt": null,
       "grammar": "adjective , compound"
     },
@@ -104,7 +104,7 @@
       "headword_id": 20,
       "lemma_1": "akaṭṭhapākasālipātubhāva",
       "english_meaning": "appearance of uncultivated ready to eat fine rice",
-      "russian_meaning": "",
+      "russian_meaning": "появление некультивированного готового к употреблению высококачественного риса",
       "russian_meaning_alt": null,
       "grammar": "masculine noun , abstract noun , compound"
     },
@@ -112,7 +112,7 @@
       "headword_id": 22,
       "lemma_1": "akaṇa",
       "english_meaning": "without bran; with the husk removed",
-      "russian_meaning": "",
+      "russian_meaning": "без отрубей; с удалённой шелухой",
       "russian_meaning_alt": null,
       "grammar": "adjective"
     },
@@ -120,7 +120,7 @@
       "headword_id": 28,
       "lemma_1": "akaṇhaasukka",
       "english_meaning": "neither black nor white; neither good nor bad",
-      "russian_meaning": "",
+      "russian_meaning": "ни черный, ни белый; ни хороший, ни плохой",
       "russian_meaning_alt": null,
       "grammar": "adjective , compound"
     }
@@ -251,6 +251,24 @@
       "grammar": "present participle"
     }
   ],
+  "meaning_raw_list": [
+    {
+      "headword_id": 16,
+      "lemma_1": "akaṭayūsa",
+      "english_meaning": "plain bean soup; bean broth",
+      "russian_meaning": "простой фасолевый суп; фасолевый отвар",
+      "russian_meaning_alt": null,
+      "grammar": "masculine noun , compound"
+    },
+    {
+      "headword_id": 19,
+      "lemma_1": "akaṭṭhapāka",
+      "english_meaning": "ripening in uncultivated ground; growing wild",
+      "russian_meaning": "созревающий на необработанной почве; растущий дико",
+      "russian_meaning_alt": null,
+      "grammar": "adjective , compound"
+    }
+  ],
   "meaning_lit_list": [
     {
       "headword_id": 11,
@@ -267,24 +285,6 @@
       "russian_meaning": "без шипов",
       "russian_meaning_alt": "без препятствий; без помех",
       "grammar": "adjective"
-    }
-  ],
-  "meaning_raw_list": [
-    {
-      "headword_id": 16,
-      "lemma_1": "akaṭayūsa",
-      "english_meaning": "plain bean soup; bean broth",
-      "russian_meaning": "",
-      "russian_meaning_alt": null,
-      "grammar": "masculine noun , compound"
-    },
-    {
-      "headword_id": 19,
-      "lemma_1": "akaṭṭhapāka",
-      "english_meaning": "ripening in uncultivated ground; growing wild",
-      "russian_meaning": "",
-      "russian_meaning_alt": null,
-      "grammar": "adjective , compound"
     }
   ],
   "load_list_ids_none": [],

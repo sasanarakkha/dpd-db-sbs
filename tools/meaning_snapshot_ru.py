@@ -27,7 +27,7 @@ def compose_english_content(headword: DpdHeadword, mode: str) -> str:
         return headword.notes or ""
     if mode in ("meaning_lit", "meaning_lit_list"):
         return headword.meaning_lit or ""
-    # meaning, meaning_raw, meaning_ru_raw, meaning_raw_list
+    # meaning, meaning_raw, russian_grammar_meaning_raw, meaning_raw_list
     if headword.meaning_lit:
         return f"{headword.meaning_1}; lit. {headword.meaning_lit}"
     return headword.meaning_1 or ""

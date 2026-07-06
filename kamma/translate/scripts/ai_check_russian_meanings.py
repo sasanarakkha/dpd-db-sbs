@@ -11,7 +11,7 @@ from tools.printer import printer as pr
 
 _MODE_NOTES = {
     "meaning_raw": "mismatched entries had their meaning_raw cleared.",
-    "meaning_ru_raw": "checking only Russian grammar without clearing meanings.",
+    "russian_grammar_meaning_raw": "checking only Russian grammar without clearing meanings.",
     "meaning_raw_list": "processing only IDs from ai_processed_ids_json file.",
     "meaning_lit": "checking literal meanings against English meanings.",
     "meaning_lit_list": "processing only IDs from ai_processed_ids_json file for literal meanings.",
@@ -33,7 +33,7 @@ def main() -> None:
         choices=[
             "meaning",
             "meaning_raw",
-            "meaning_ru_raw",
+            "russian_grammar_meaning_raw",
             "meaning_raw_list",
             "meaning_lit",
             "meaning_lit_list",
@@ -41,7 +41,7 @@ def main() -> None:
             "notes_raw",
         ],
         default="meaning",
-        help="Checking mode: meaning (default), meaning_raw, meaning_ru_raw, meaning_raw_list, meaning_lit, meaning_lit_list, notes, or notes_raw",
+        help="Checking mode: meaning (default), meaning_raw, russian_grammar_meaning_raw, meaning_raw_list, meaning_lit, meaning_lit_list, notes, or notes_raw",
     )
     parser.add_argument(
         "--batch",
@@ -61,14 +61,26 @@ def main() -> None:
         action="store_true",
         help="Skip invalidation of checked IDs whose English content changed",
     )
+    parser.add_argument(
+        "--provider",
+        help="AI provider to use (e.g. deepseek, openrouter, gemini)",
+    )
+    parser.add_argument(
+        "--model",
+        help="AI model to use (e.g. deepseek-v4-flash, gemini-2.5-flash)",
+    )
 
     args = parser.parse_args()
 
     # Determine processing mode (default: individual; batch is opt-in)
     use_batch = args.batch
 
-    # Create checker with specified mode
-    checker = RussianMeaningChecker(mode=args.mode)
+    # Create checker with specified mode and explicit provider/model
+    checker = RussianMeaningChecker(
+        mode=args.mode,
+        provider=args.provider,
+        model=args.model,
+    )
 
     if args.reset:
         checker.checked_ids_file.unlink(missing_ok=True)

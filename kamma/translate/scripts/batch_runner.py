@@ -115,7 +115,12 @@ def merge_processed_ids(path: Path, new_ids: list[int]) -> list[int]:
 
 
 def build_generate_command(
-    mode: str, lang: str, chunk: int, fallback: bool
+    mode: str,
+    lang: str,
+    chunk: int,
+    fallback: bool,
+    provider: str | None = None,
+    model: str | None = None,
 ) -> list[str]:
     """Build the subprocess command for a real (non-dry-run) generate chunk."""
     cmd = [
@@ -130,7 +135,11 @@ def build_generate_command(
         "-limit",
         str(chunk),
     ]
-    if not fallback:
+    if provider:
+        cmd.extend(["-provider", provider])
+    if model:
+        cmd.extend(["-model", model])
+    if not fallback and not provider:
         cmd.extend(["-provider", "antigravity_cli"])
     return cmd
 
@@ -152,9 +161,11 @@ def build_status_probe_command(mode: str, lang: str) -> list[str]:
     ]
 
 
-def build_check_command(mode: str, chunk: int) -> list[str]:
+def build_check_command(
+    mode: str, chunk: int, provider: str | None = None, model: str | None = None
+) -> list[str]:
     """Build the subprocess command for a check chunk."""
-    return [
+    cmd = [
         "uv",
         "run",
         "python3",
@@ -164,6 +175,11 @@ def build_check_command(mode: str, chunk: int) -> list[str]:
         "--limit",
         str(chunk),
     ]
+    if provider:
+        cmd.extend(["--provider", provider])
+    if model:
+        cmd.extend(["--model", model])
+    return cmd
 
 
 def run_subprocess_capture(cmd: list[str]) -> tuple[str, int]:
@@ -216,7 +232,7 @@ def print_status() -> None:
         for mode in [
             "meaning",
             "meaning_raw",
-            "meaning_ru_raw",
+            "russian_grammar_meaning_raw",
             "meaning_raw_list",
             "meaning_lit",
             "meaning_lit_list",
@@ -282,6 +298,14 @@ def main() -> None:
     parser.add_argument(
         "--status", action="store_true", help="print status summary and exit"
     )
+    parser.add_argument(
+        "--provider",
+        help="explicit provider preference to pass to workhorse script",
+    )
+    parser.add_argument(
+        "--model",
+        help="explicit model to pass to workhorse script",
+    )
     args = parser.parse_args()
 
     if args.status:
@@ -319,10 +343,15 @@ def main() -> None:
         chunk_start = datetime.now().astimezone()
         if args.op == "generate":
             cmd = build_generate_command(
-                args.mode, args.lang, args.chunk, args.fallback
+                args.mode,
+                args.lang,
+                args.chunk,
+                args.fallback,
+                args.provider,
+                args.model,
             )
         else:
-            cmd = build_check_command(args.mode, args.chunk)
+            cmd = build_check_command(args.mode, args.chunk, args.provider, args.model)
 
         pr.cyan(f"Running: {' '.join(cmd)}")
         output, returncode = run_subprocess_capture(cmd)

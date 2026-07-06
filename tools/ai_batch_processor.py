@@ -51,9 +51,11 @@ class ComparisonResult:
 class BatchProcessor:
     """Handles batch processing of AI meaning comparisons"""
 
-    def __init__(self) -> None:
+    def __init__(self, provider: str | None = None, model: str | None = None) -> None:
         self.ai_manager: AIManager = AIManager()
         self.json_parser: JSONParser = JSONParser()
+        self.provider = provider
+        self.model = model
 
     def extract_headword_id(self, result_dict: dict[str, Any]) -> int | None:
         """Safely extract headword_id from result dictionary"""
@@ -99,8 +101,8 @@ class BatchProcessor:
         # Check if this is literal meaning mode based on mode parameter
         has_lit_mode = mode in ["meaning_lit", "meaning_lit_list"]
 
-        # Check if this is Russian grammar checking mode (meaning_ru_raw)
-        is_ru_raw_mode = mode == "meaning_ru_raw"
+        # Check if this is Russian grammar checking mode (russian_grammar_meaning_raw)
+        is_ru_raw_mode = mode == "russian_grammar_meaning_raw"
 
         if is_ru_raw_mode:
             # Russian grammar-only checking mode - NO English meaning comparison
@@ -315,8 +317,12 @@ ONLY flag as MISMATCH if:
                     # Create prompt for this batch
                     prompt = self.create_comparison_prompt(batch, batch_size, mode)
 
-                    # Make AI request (use default models which includes working fallbacks)
-                    ai_response = self.ai_manager.request(prompt=prompt)
+                    # Make AI request (use default models or specified model/provider)
+                    ai_response = self.ai_manager.request(
+                        prompt=prompt,
+                        provider_preference=self.provider,
+                        model=self.model,
+                    )
 
                     if ai_response.content is not None:
                         # Try to parse response as JSON first
@@ -407,8 +413,12 @@ ONLY flag as MISMATCH if:
             # Create prompt for single comparison
             prompt = self.create_comparison_prompt([comp], 1, mode)
 
-            # Make AI request (use default models which includes working fallbacks)
-            ai_response = self.ai_manager.request(prompt=prompt)
+            # Make AI request (use default models or specified model/provider)
+            ai_response = self.ai_manager.request(
+                prompt=prompt,
+                provider_preference=self.provider,
+                model=self.model,
+            )
 
             if ai_response.content is not None:
                 # Parse response (individual mode - pass the specific word comparison)

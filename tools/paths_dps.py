@@ -2,11 +2,10 @@
 
 import os
 from pathlib import Path
-from typing import Optional
 
 
 class DPSPaths:
-    def __init__(self, base_dir: Optional[Path] = None, create_dirs=True):
+    def __init__(self, base_dir: Path | None = None, create_dirs=True):
         if base_dir is None:
             # The current working directory of the shell.
             base_dir = Path(os.path.abspath("."))
@@ -224,8 +223,8 @@ class DPSPaths:
         self.ai_meaning_raw_checked = base_dir.joinpath(
             Path("temp/ai_meaning_raw_check/checked_ids.json")
         )
-        self.ai_meaning_ru_raw_checked = base_dir.joinpath(
-            Path("temp/ai_meaning_ru_raw_check/checked_ids.json")
+        self.ai_russian_grammar_meaning_raw_checked = base_dir.joinpath(
+            Path("temp/ai_russian_grammar_meaning_raw_check/checked_ids.json")
         )
         self.ai_meaning_lit_checked = base_dir.joinpath(
             Path("temp/ai_meaning_lit_check/checked_ids.json")
@@ -241,8 +240,8 @@ class DPSPaths:
         self.ai_meaning_raw_report_dir = base_dir.joinpath(
             Path("temp/ai_meaning_raw_check/")
         )
-        self.ai_meaning_ru_raw_report_dir = base_dir.joinpath(
-            Path("temp/ai_meaning_ru_raw_check/")
+        self.ai_russian_grammar_meaning_raw_report_dir = base_dir.joinpath(
+            Path("temp/ai_russian_grammar_meaning_raw_check/")
         )
         self.ai_meaning_lit_report_dir = base_dir.joinpath(
             Path("temp/ai_meaning_lit_check/")

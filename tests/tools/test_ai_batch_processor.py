@@ -96,7 +96,9 @@ def test_create_comparison_prompt_standard_mode_includes_word_data() -> None:
     assert "Russian grammarian" not in prompt
 
 
-def test_create_comparison_prompt_ru_raw_mode_skips_english() -> None:
+def test_create_comparison_prompt_russian_grammar_meaning_raw_mode_skips_english() -> (
+    None
+):
     processor = _processor()
     comp = WordComparison(
         headword_id=1,
@@ -105,7 +107,9 @@ def test_create_comparison_prompt_ru_raw_mode_skips_english() -> None:
         russian_meaning="явление",
         grammar="nt",
     )
-    prompt = processor.create_comparison_prompt([comp], mode="meaning_ru_raw")
+    prompt = processor.create_comparison_prompt(
+        [comp], mode="russian_grammar_meaning_raw"
+    )
     assert "Russian language grammarian" in prompt
     assert "Pali Lemma" not in prompt
 
