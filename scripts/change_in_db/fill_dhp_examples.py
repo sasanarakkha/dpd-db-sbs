@@ -2,10 +2,11 @@
 
 import argparse
 import json
-from pathlib import Path
 import re
+from pathlib import Path
 from typing import Any
 
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from db.db_helpers import get_db_session
@@ -139,6 +140,8 @@ def main() -> None:
                         skipped_count += 1
                         continue
 
+                    updated_in_verse.add(headword_id)
+
                     sbs = sbs_map.get(headword_id)
                     exists = sbs and sbs.dhp_example and sbs.dhp_example.strip()
                     if exists and not should_overwrite_existing(
@@ -148,7 +151,6 @@ def main() -> None:
                         prefer_earlier=args.prefer_earlier,
                     ):
                         skipped_count += 1
-                        updated_in_verse.add(headword_id)
                         continue
 
                     example = bold_word_in_verse(
@@ -182,14 +184,12 @@ def main() -> None:
                         sbs.dhp_example = example
                         filled_count += 1
 
-                    updated_in_verse.add(headword_id)
-
             if not args.dry_run:
                 db_session.commit()
 
         pr.yes(f"Finished. Filled: {filled_count}, Skipped: {skipped_count}")
 
-    except Exception as e:
+    except SQLAlchemyError as e:
         pr.no(f"An error occurred: {e}")
         db_session.rollback()
     finally:
