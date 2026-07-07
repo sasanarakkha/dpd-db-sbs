@@ -139,6 +139,9 @@ class DPSPaths:
         self.pat_links_path = base_dir.joinpath(
             Path("shared_data/sbs_csvs/pat_links.tsv")
         )
+        self.dhp_translations_path = base_dir.joinpath(
+            Path("shared_data/sbs_csvs/dhp_translations.tsv")
+        )
         self.ru_total_root_path = base_dir.joinpath(
             Path("shared_data/rus/ru_total_roots.tsv")
         )

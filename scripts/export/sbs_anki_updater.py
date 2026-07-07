@@ -11,27 +11,32 @@ import unicodedata
 from pathlib import Path
 from typing import Any, cast
 
+# isort: off
+# anki.collection must be imported before anki.cards to avoid a circular
+# import in the installed anki package (anki.cards -> anki.collection ->
+# anki.hooks -> anki.hooks_gen -> anki.cards, partially initialized).
 from anki.collection import Collection
-from anki.notes import Note
 from anki.cards import Card
+
+# isort: on
 from anki.errors import DBError
+from anki.notes import Note
 from sqlalchemy.orm import joinedload
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword
+from scripts.export.sbs_anki_collection_verifier import verify_sbs_collection
+from scripts.export.sbs_anki_deck_config import (
+    DECKS,
+    SUTTAS_PREFIX_MAP,
+    VOCAB_CLASS_RANGE,
+    DeckSpec,
+)
+from tools.configger import config_read
 from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
 from tools.printer import printer as pr
-from tools.configger import config_read
 from tools.sbs_table_functions import recalculate_all_sbs_indices
-
-from scripts.export.sbs_anki_deck_config import (
-    DECKS,
-    DeckSpec,
-    SUTTAS_PREFIX_MAP,
-    VOCAB_CLASS_RANGE,
-)
-from scripts.export.sbs_anki_collection_verifier import verify_sbs_collection
 
 
 class UpdateStats:
@@ -74,14 +79,14 @@ def backup_anki_db() -> bool:
         return False
 
     Path(backup_dir).mkdir(parents=True, exist_ok=True)
-    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    timestamp = datetime.datetime.now(datetime.UTC).strftime("%Y%m%d%H%M%S")
     backup_path = Path(backup_dir) / f"collection_{timestamp}.anki2"
 
     try:
         shutil.copy2(anki_db_path, backup_path)
         pr.yes(f"backed up to {backup_path}")
         return True
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - must not abort backup on any failure mode
         pr.no("error")
         pr.red(f"Backup failed: {e}")
         return False
@@ -111,10 +116,9 @@ def setup_anki_updater(
         data_dict, all_data = make_data_dict(notes, cards, deck_dict)
 
         return col, data_dict, all_data, deck_dict, model_dict
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - must close the collection on any setup failure
         pr.red(f"Setup failed: {e}")
-        if col:
-            col.close()
+        col.close()
         return None, None, None, None, None
 
 
@@ -279,19 +283,18 @@ def update_note_values(note: Note, i: DpdHeadword, deck_config: DeckSpec) -> boo
         if field_name in note:
             try:
                 note[field_name] = normalize_anki_text(cast(Any, producer(i)))
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 - producer is an arbitrary field_map lambda
                 pr.red(f"Error producing field '{field_name}' for {i.lemma_1}: {e}")
 
-    if deck_config.updates_tags:
-        if i.sbs:
-            tags = []
-            if i.sbs.sbs_chant_pali_1:
-                tags.extend(i.sbs.sbs_chant_pali_1.split())
-            if i.sbs.sbs_chant_pali_2:
-                tags.extend(i.sbs.sbs_chant_pali_2.split())
-            tags = list(set(filter(None, tags)))
-            if set(note.tags) != set(tags):
-                note.tags = tags
+    if deck_config.updates_tags and i.sbs:
+        tags = []
+        if i.sbs.sbs_chant_pali_1:
+            tags.extend(i.sbs.sbs_chant_pali_1.split())
+        if i.sbs.sbs_chant_pali_2:
+            tags.extend(i.sbs.sbs_chant_pali_2.split())
+        tags = list(set(filter(None, tags)))
+        if set(note.tags) != set(tags):
+            note.tags = tags
 
     return note.fields != old_fields
 
@@ -306,7 +309,7 @@ def update_note_values_csv(
         if field_name in note:
             try:
                 note[field_name] = normalize_anki_text(cast(Any, producer(row)))
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 - producer is an arbitrary field_map lambda
                 pr.red(
                     f"Error producing field '{field_name}' for row {row.get('pali', row.get('id', 'unknown'))}: {e}"
                 )
@@ -440,12 +443,11 @@ def update_from_db(
             top_level = target.split("::")[0]
             if top_level in deck_specs:
                 deck_config = deck_specs[top_level]
-                if deck_config.creates_new_notes:
-                    if make_new_note(
-                        col, target, model_dict, deck_dict, i, deck_config
-                    ):
-                        stats.added += 1
-                        stats.deck_stats[top_level]["added"] += 1
+                if deck_config.creates_new_notes and make_new_note(
+                    col, target, model_dict, deck_dict, i, deck_config
+                ):
+                    stats.added += 1
+                    stats.deck_stats[top_level]["added"] += 1
 
         for item in existing_items:
             if id(item) not in matched_item_ids:
@@ -506,7 +508,7 @@ def update_from_csv(
                         col.update_note(note)
                         stats.updated += 1
                         stats.deck_stats[top_level]["updated"] += 1
-                    except Exception as e:
+                    except Exception as e:  # noqa: BLE001 - must not abort the whole CSV pass
                         pr.amber(f"Failed to update note id={note.id}: {e}")
             else:
                 if deck_config.creates_new_notes:
@@ -644,16 +646,16 @@ def reorder_all_decks(col: Collection) -> None:
             lambda n: (0 if not _get_note_field(n, "extra") else 1,),
         )
 
-    # Roots Pali Class — sbs_class_anki (int)
+    # Roots Pali Class — class_anki (int)
     _apply_order(
         "Roots Pali Class",
-        lambda n: int(_get_note_field(n, "sbs_class_anki") or "0"),
+        lambda n: int(_get_note_field(n, "class_anki") or "0"),
     )
 
-    # Phonetic Changes Pali Class — sbs_class_anki (int)
+    # Phonetic Changes Pali Class — class_anki (int)
     _apply_order(
         "Phonetic Changes Pali Class",
-        lambda n: int(_get_note_field(n, "sbs_class_anki") or "0"),
+        lambda n: int(_get_note_field(n, "class_anki") or "0"),
     )
 
     # Suttas Advanced Pali Class — parent deck + each known subdeck, sorted by source

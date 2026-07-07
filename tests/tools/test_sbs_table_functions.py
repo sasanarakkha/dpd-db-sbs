@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from tools import sbs_table_functions
 from tools.sbs_table_functions import SBS_table_tools, paragraphs_are_similar_sbs
 
 FIXTURE_PATH = Path(__file__).parent / "test_sbs_table_functions_fixtures.json"
@@ -90,3 +91,34 @@ def test_paragraphs_are_similar_sbs_close() -> None:
         paragraphs_are_similar_sbs("hello world foo", "hello world bar", 0.5)
         == FIXTURES["paragraph_results"]["close"]
     )
+
+
+def test_get_dhp_translation_hit(
+    tools: SBS_table_tools, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        sbs_table_functions,
+        "_load_dhp_translations_map",
+        lambda: {
+            "DHP1": {
+                "source": "DHP1",
+                "translation": "figurative text",
+                "literal_translation": "literal text",
+            }
+        },
+    )
+    assert (
+        tools.get_dhp_translation("DHP1")
+        == "Literal: literal text<br>Figurative: figurative text"
+    )
+
+
+def test_get_dhp_translation_miss(
+    tools: SBS_table_tools, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(sbs_table_functions, "_load_dhp_translations_map", dict)
+    assert tools.get_dhp_translation("DHP999") == ""
+
+
+def test_get_dhp_translation_falsy_source(tools: SBS_table_tools) -> None:
+    assert tools.get_dhp_translation("") == ""

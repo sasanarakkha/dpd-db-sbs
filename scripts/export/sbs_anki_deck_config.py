@@ -2,13 +2,14 @@
 
 import datetime
 import re
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable, Literal
+from typing import Any, Literal
 
 from db.models import DpdHeadword
 from tools.sbs_table_functions import SBS_table_tools
 
-current_date: str = datetime.date.today().strftime("%m-%d")
+current_date: str = datetime.datetime.now(datetime.UTC).date().strftime("%m-%d")
 _SBS_TOOLS: SBS_table_tools = SBS_table_tools()
 
 
@@ -38,7 +39,7 @@ def get_feedback(i: DpdHeadword, deck_name: str) -> str:
 
 
 def get_root_key(i: DpdHeadword) -> str:
-    if i.rt:
+    if i.rt is not None:
         return re.sub(r" \d*$", "", i.root_key)
     return ""
 
@@ -106,15 +107,19 @@ def _base_db_fields() -> dict[str, Callable[[DpdHeadword], str]]:
         "meaning_lit": lambda i: i.meaning_lit,
         "native": lambda i: "",
         "sanskrit": lambda i: i.sanskrit,
-        "sanskrit_root": lambda i: i.rt.sanskrit_root if i.rt else "",
-        "sanskrit_root_meaning": lambda i: i.rt.sanskrit_root_meaning if i.rt else "",
-        "sanskrit_root_class": lambda i: i.rt.sanskrit_root_class if i.rt else "",
+        "sanskrit_root": lambda i: i.rt.sanskrit_root if i.rt is not None else "",
+        "sanskrit_root_meaning": lambda i: (
+            i.rt.sanskrit_root_meaning if i.rt is not None else ""
+        ),
+        "sanskrit_root_class": lambda i: (
+            i.rt.sanskrit_root_class if i.rt is not None else ""
+        ),
         "root": get_root_key,
-        "root_has_verb": lambda i: i.rt.root_has_verb if i.rt else "",
-        "root_group": lambda i: str(i.rt.root_group) if i.rt else "",
-        "root_sign": lambda i: i.root_sign if i.rt else "",
-        "root_meaning": lambda i: i.rt.root_meaning if i.rt else "",
-        "root_base": lambda i: i.root_base if i.rt else "",
+        "root_has_verb": lambda i: i.rt.root_has_verb if i.rt is not None else "",
+        "root_group": lambda i: str(i.rt.root_group) if i.rt is not None else "",
+        "root_sign": lambda i: i.root_sign if i.rt is not None else "",
+        "root_meaning": lambda i: i.rt.root_meaning if i.rt is not None else "",
+        "root_base": lambda i: i.root_base if i.rt is not None else "",
         "construction": get_construction,
         "derivative": lambda i: i.derivative,
         "suffix": lambda i: i.suffix,
@@ -224,6 +229,9 @@ DECKS: list[DeckSpec] = [
             "source": lambda i: _to_br(i.sbs.dhp_source) if i.sbs else "",
             "sutta": lambda i: _to_br(i.sbs.dhp_sutta) if i.sbs else "",
             "example": lambda i: _to_br(i.sbs.dhp_example) if i.sbs else "",
+            "translation": lambda i: (
+                _SBS_TOOLS.get_dhp_translation(i.sbs.dhp_source) if i.sbs else ""
+            ),
             "feedback": lambda i: get_feedback(i, "dhp"),
         },
     ),
@@ -294,7 +302,7 @@ DECKS: list[DeckSpec] = [
         source="db",
         field_map={
             **_base_db_fields(),
-            "sbs_class_anki": lambda i: str(i.sbs.class_anki) if i.sbs else "",
+            "class_anki": lambda i: str(i.sbs.class_anki) if i.sbs else "",
             "source_1": lambda i: get_example_for_class(i)[0],
             "sutta_1": lambda i: get_example_for_class(i)[1],
             "example_1": lambda i: get_example_for_class(i)[2],
@@ -313,7 +321,7 @@ DECKS: list[DeckSpec] = [
         source="db",
         field_map={
             **_base_db_fields(),
-            "sbs_class_anki": lambda i: str(i.sbs.class_anki) if i.sbs else "",
+            "class_anki": lambda i: str(i.sbs.class_anki) if i.sbs else "",
             "source_1": lambda i: get_example_for_class(i)[0],
             "sutta_1": lambda i: get_example_for_class(i)[1],
             "example_1": lambda i: get_example_for_class(i)[2],
@@ -374,13 +382,11 @@ DECKS: list[DeckSpec] = [
         source="db",
         field_map={
             **_base_db_fields(),
-            "sbs_class_anki": lambda i: str(i.sbs.class_anki) if i.sbs else "",
+            "class_anki": lambda i: str(i.sbs.class_anki) if i.sbs else "",
             "source": lambda i: get_example_for_class(i)[0],
             "sutta": lambda i: get_example_for_class(i)[1],
             "example": lambda i: get_example_for_class(i)[2],
-            "example_translation": lambda i: (
-                i.sbs.class_example_translation if i.sbs else ""
-            ),
+            "translation": lambda i: i.sbs.class_example_translation if i.sbs else "",
             "extra": lambda i: i.sbs.class_extra if i.sbs else "",
             "sbs_notes": lambda i: _to_br(i.sbs.sbs_notes) if i.sbs else "",
             "feedback": lambda i: get_feedback(i, "class"),

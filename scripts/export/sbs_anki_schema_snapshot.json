@@ -107,6 +107,7 @@
       "source",
       "sutta",
       "example",
+      "translation",
       "link",
       "audio",
       "test",
@@ -171,7 +172,7 @@
     "fields": [
       "id",
       "pali",
-      "sbs_class_anki",
+      "class_anki",
       "grammar",
       "neg",
       "verb",
@@ -220,7 +221,7 @@
     "fields": [
       "id",
       "pali",
-      "sbs_class_anki",
+      "class_anki",
       "grammar",
       "neg",
       "verb",
@@ -370,7 +371,7 @@
     "fields": [
       "id",
       "pali",
-      "sbs_class_anki",
+      "class_anki",
       "grammar",
       "neg",
       "verb",
@@ -398,7 +399,7 @@
       "source",
       "sutta",
       "example",
-      "example_translation",
+      "translation",
       "extra",
       "antonym",
       "synonym",

@@ -621,6 +621,7 @@
     "scripts/export/sbs_anki_templates.py",
     "scripts/export/sbs_anki_update_seed.py",
     "scripts/export/vocab_abbrev_pali_course.py",
+    "scripts/export/extract_translations.py",
     "temp/anki_decks/",
     "scripts/bash/rebuild_db.sh",
     "scripts/bash/download_dpd.sh",

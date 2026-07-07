@@ -1,10 +1,12 @@
 """Golden-master tests for anki_csv.py — pure/logic function outputs."""
 
+import csv
 import json
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from scripts.export import anki_csv
+from tools.paths_dps import DPSPaths
 
 FIXTURE_PATH = Path(__file__).parent / "test_anki_csv_fixtures.json"
 FIXTURES: dict = json.loads(FIXTURE_PATH.read_text(encoding="utf-8"))
@@ -413,3 +415,54 @@ def test_get_unique_example_2() -> None:
     _check("all_empty", sbs3)
 
     assert list(anki_csv.get_unique_example_2(None)) == cases["sbs_is_none"]
+
+
+def _dhp_headword_mock(dhp_source: str) -> MagicMock:
+    hw = MagicMock()
+    hw.id = 1
+    hw.lemma_1 = "kamma"
+    hw.grammar = "nt"
+    hw.neg = ""
+    hw.verb = ""
+    hw.trans = ""
+    hw.plus_case = ""
+    hw.meaning_1 = "action"
+    hw.meaning_2 = ""
+    hw.meaning_lit = ""
+    hw.sanskrit = "karma"
+    hw.rt = None
+    hw.root_sign = ""
+    hw.root_base = ""
+    hw.construction = ""
+    hw.derivative = ""
+    hw.suffix = ""
+    hw.phonetic = ""
+    hw.compound_type = ""
+    hw.compound_construction = ""
+    hw.sbs = MagicMock()
+    hw.sbs.dhp_source = dhp_source
+    hw.sbs.dhp_sutta = "Yamakavaggo"
+    hw.sbs.dhp_example = "manopubbaṅgamā dhammā"
+    hw.link = ""
+    hw.lemma_clean = "kamma"
+    return hw
+
+
+def test_dhp_writes_translation_column(tmp_path: Path) -> None:
+    dpspth = DPSPaths(base_dir=tmp_path)
+    dpd_db = [_dhp_headword_mock("DHP1"), _dhp_headword_mock("DHP2")]
+
+    with patch(
+        "scripts.export.anki_csv.SBS_table_tools.get_dhp_translation",
+        return_value="Literal: x<br>Figurative: y",
+    ):
+        anki_csv.dhp(dpspth, dpd_db)
+
+    output_path = dpspth.anki_csvs_dir / "anki_dhp.csv"
+    with open(output_path, encoding="utf-8") as f:
+        rows = list(csv.reader(f, delimiter="\t"))
+
+    assert len(rows) == 2
+    translation_column_index = 29
+    for row in rows:
+        assert row[translation_column_index] == "Literal: x<br>Figurative: y"

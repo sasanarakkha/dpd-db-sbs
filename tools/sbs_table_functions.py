@@ -37,6 +37,16 @@ def _load_sbs_index_rows() -> tuple[dict[str, str], ...]:
         return tuple(dict(row) for row in reader)
 
 
+def _load_dhp_translations_map() -> dict[str, dict[str, str]]:
+    """Parse dhp_translations.tsv into a {source: row} map."""
+    pth = _paths()
+    if not pth.dhp_translations_path.exists():
+        return {}
+    with open(pth.dhp_translations_path, encoding="utf-8") as f:
+        reader = csv.DictReader(f, delimiter="\t")
+        return {row["source"]: dict(row) for row in reader}
+
+
 class SBS_table_tools:
     def load_chant_index_map(self) -> dict[str, int]:
         """Load the chant-index mapping from a TSV file into a dictionary."""
@@ -87,6 +97,17 @@ class SBS_table_tools:
                     class_num, link = int(row[0]), row[2]
                     class_link_map[class_num] = link
         return class_link_map
+
+    def get_dhp_translation(self, source: str) -> str:
+        """Return formatted literal/figurative translation for a dhp_source, or "" if not found."""
+        if not source:
+            return ""
+        row = _load_dhp_translations_map().get(source)
+        if not row:
+            return ""
+        return (
+            f"Literal: {row['literal_translation']}<br>Figurative: {row['translation']}"
+        )
 
     def generate_sbs_audio(self, lemma_clean: str) -> str:
         """Generate the sbs_audio string based on the presence of an audio file."""
