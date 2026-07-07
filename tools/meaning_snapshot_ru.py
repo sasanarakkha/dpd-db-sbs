@@ -85,17 +85,22 @@ def reconcile_snapshot(
     return n_invalidated, n_seeded
 
 
+SQLITE_MAX_VARIABLES = 900
+
+
 def invalidate_changed(
     snapshot: dict[int, str], db_session: Session, mode: str
 ) -> tuple[int, int]:
     """Query current English content for all snapshot IDs and reconcile."""
     if not snapshot:
         return 0, 0
-    headwords = (
-        db_session.query(DpdHeadword)
-        .filter(DpdHeadword.id.in_(list(snapshot.keys())))
-        .all()
-    )
+    headwords: list[DpdHeadword] = []
+    ids = list(snapshot.keys())
+    for i in range(0, len(ids), SQLITE_MAX_VARIABLES):
+        batch = ids[i : i + SQLITE_MAX_VARIABLES]
+        headwords.extend(
+            db_session.query(DpdHeadword).filter(DpdHeadword.id.in_(batch)).all()
+        )
     current_hashes = {
         hw.id: compute_field_hash(compose_english_content(hw, mode)) for hw in headwords
     }
