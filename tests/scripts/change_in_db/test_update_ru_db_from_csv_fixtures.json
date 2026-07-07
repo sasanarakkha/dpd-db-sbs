@@ -1,0 +1,115 @@
+{
+  "empty_meaning_auto_update": {
+    "csv_row": {
+      "processed": "",
+      "id": "1",
+      "corrections_ru_meaning": "новый перевод"
+    },
+    "current_meaning": "",
+    "current_meaning_lit": "",
+    "new_meaning": "новый перевод",
+    "auto_updated": true,
+    "has_diff": [
+      false,
+      false
+    ]
+  },
+  "same_meaning_no_diff": {
+    "csv_row": {
+      "processed": "",
+      "id": "2",
+      "corrections_ru_meaning": "существующий перевод"
+    },
+    "current_meaning": "существующий перевод",
+    "current_meaning_lit": "",
+    "new_meaning": "существующий перевод",
+    "auto_updated": false,
+    "has_diff": [
+      false,
+      false
+    ]
+  },
+  "different_meaning_has_diff": {
+    "csv_row": {
+      "processed": "",
+      "id": "3",
+      "corrections_ru_meaning": "исправленный перевод"
+    },
+    "current_meaning": "старый перевод",
+    "current_meaning_lit": "",
+    "new_meaning": "старый перевод",
+    "auto_updated": false,
+    "has_diff": [
+      true,
+      false
+    ]
+  },
+  "lit_correction_meaning_no_diff": {
+    "csv_row": {
+      "processed": "",
+      "id": "4",
+      "corrections_ru_meaning_lit": "буквальный перевод"
+    },
+    "current_meaning": "обычный перевод",
+    "current_meaning_lit": "",
+    "new_meaning": "обычный перевод",
+    "auto_updated": false,
+    "has_diff": [
+      false,
+      true
+    ]
+  },
+  "already_processed_skip": {
+    "csv_row": {
+      "processed": "ok",
+      "id": "5",
+      "corrections_ru_meaning": "игнорировать"
+    },
+    "should_skip": true
+  },
+  "empty_corrections_nothing": {
+    "csv_row": {
+      "processed": "",
+      "id": "6"
+    },
+    "current_meaning": "",
+    "current_meaning_lit": "",
+    "new_meaning": "",
+    "auto_updated": false,
+    "has_diff": [
+      false,
+      false
+    ]
+  },
+  "whitespace_only_correction": {
+    "csv_row": {
+      "processed": "",
+      "id": "7",
+      "corrections_ru_meaning": "   "
+    },
+    "current_meaning": "",
+    "current_meaning_lit": "",
+    "new_meaning": "",
+    "auto_updated": false,
+    "has_diff": [
+      false,
+      false
+    ]
+  },
+  "both_fields_have_diff": {
+    "csv_row": {
+      "processed": "",
+      "id": "8",
+      "corrections_ru_meaning": "новый смысл",
+      "corrections_ru_meaning_lit": "новый буквальный"
+    },
+    "current_meaning": "старый смысл",
+    "current_meaning_lit": "старый буквальный",
+    "new_meaning": "старый смысл",
+    "auto_updated": false,
+    "has_diff": [
+      true,
+      true
+    ]
+  }
+}

@@ -32,7 +32,7 @@ Pointer: 149
 - [x] 19. scripts/change_in_db/dhp_examples_copy.py
 - [x] 20. scripts/change_in_db/source_cleanup.py
 - [x] 21. scripts/change_in_db/update_examples_from_csv.py | archived
-- [x] 22. scripts/change_in_db/update_ru_db_from_csv.py | archived
+- [x] 22. scripts/change_in_db/update_ru_db_from_csv.py | changed
 - [x] 23. scripts/change_in_db/update_sbs_chants_in_db.py
 - [x] 24. scripts/change_in_db/update_yojana_km.py
 - [x] 25. scripts/change_in_db/vib_rule_workflow.py

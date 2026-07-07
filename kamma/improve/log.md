@@ -156,3 +156,4 @@
 2026-07-01 | #146 tools/meaning_snapshot_ru.py | passed | clean — 122 lines, modern types, pathlib, all imports used, has tests, no dead code
 2026-07-02 | #147 scripts/cl_dps/dpd-kill-webapp | passed | 1-line pkill command, not in registry.json, nothing to improve
 2026-07-02 | #148 scripts/change_in_db/example_cleanup.py | changed | extract clean_example helper, type hints, add golden master tests
+2026-07-07 | #22 scripts/change_in_db/update_ru_db_from_csv.py | changed | wrapped in main(), console.print→pr, removed dead code, eliminated duplicate diff logic, added type hints, renamed i→csv_row, single-pass CSV read; added 12 characterization tests
