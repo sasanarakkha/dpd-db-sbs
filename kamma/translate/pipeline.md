@@ -4,8 +4,9 @@
 
 Guided, resumable AI translation workflow for the `Russian` and `Tamil` tables.
 The agent presents the menu below, recommends the next sensible operation based on
-current state, and runs it only after the user picks. Batches are sized for the
-Antigravity CLI (`agy`) 5-hour quota window.
+current state, and runs it only after the user picks. All AI operations run
+through DeepSeek (`tools/ai_models.json` → `default_models[0]`) — `antigravity_cli`
+is not used by this pipeline.
 
 **Workhorse scripts** (do not duplicate their logic — call them):
 
@@ -14,13 +15,13 @@ Antigravity CLI (`agy`) 5-hour quota window.
 | `kamma/translate/scripts/ai_generate_translation.py` | Generate translations (`-lang ru\|ta`, `-mode meaning\|lit\|note`), `-remove` cleanup, `-json` batch-API export |
 | `kamma/translate/scripts/ai_check_russian_meanings.py` | AI semantic check of RU columns (8 modes, resumable snapshots) |
 | `kamma/translate/scripts/ai_translation_check.py` | Mechanical anomaly check (`-lang ru\|ta`): leftover Latin, length outliers |
-| `kamma/translate/scripts/batch_runner.py` | Chunked, quota-aware wrapper around the two scripts above |
+| `kamma/translate/scripts/batch_runner.py` | Chunked, resumable wrapper around the two scripts above (defaults to DeepSeek) |
 | `kamma/translate/scripts/synonym_audit.py` | Detect/trim duplicate and near-identical synonyms in meaning fields |
 | `db/backup_tsv/backup_dps.py` | Backup Russian/SBS/Tamil tables to tracked TSVs |
 
 **State & history**
 
-- `kamma/translate/state.json` — quota window, resume time, last operation, totals.
+- `kamma/translate/state.json` — session start, last operation, totals.
   Owned by `batch_runner.py`; read it, never hand-edit during a run.
 - `kamma/translate/log.md` — append-only, one line per chunk/run.
 - Checker snapshots: `temp/ai_*_check/checked_ids.json` (per mode, auto-invalidated
@@ -33,12 +34,8 @@ Antigravity CLI (`agy`) 5-hour quota window.
 ### 1. Read state
 
 1. Run `uv run python3 kamma/translate/scripts/batch_runner.py --status`.
-   It prints: quota window / resume time, last op, totals, and pending-work counts
-   (dry-run row counts for generation per lang/mode, unchecked counts per checker mode).
-2. If `resume_at` is in the future, tell the user how long until the antigravity
-   window reopens and offer: wait, run a non-LLM operation (cleanups, mechanical
-   check, synonym audit without `--ai`), or `--fallback` (paid providers — needs
-   explicit user confirmation every time).
+   It prints: last op, totals, and pending-work counts (dry-run row counts for
+   generation per lang/mode, unchecked counts per checker mode).
 
 ### 2. Present the menu
 
@@ -58,6 +55,8 @@ Recommended default order for a fresh cycle: 1 → 2 → (repeat 1–2 until poo
 
 ### 3. Operations
 
+**Provider policy:** `batch_runner.py` defaults to `tools/ai_models.json` → `default_models[0]` (DeepSeek, `deepseek-v4-flash`) whenever `--provider`/`--model` are omitted — no flags needed. `antigravity_cli` is never used by this pipeline; only pass `--provider`/`--model` explicitly if the user asks for a different provider, and always pass both together (never one alone).
+
 **Chunk-by-chunk rule for all operations:** Run with the default chunk size of 50 words (`--chunk 50` or default).
 - For a test run or initial verification, run exactly 1 chunk of 50 words (`--max-chunks 1`).
 - For a full run, omit `--max-chunks` so the runner automatically loops through all words in chunks of 50.
@@ -69,10 +68,8 @@ uv run python3 kamma/translate/scripts/batch_runner.py --op generate --mode mean
 ```
 
 - Modes: `meaning` (ru/ta), `lit` (ru only), `note` (ru only).
-- Default chunk 50, runs until the pool is empty or quota is exhausted (exit 3).
-- Forces `-provider antigravity_cli`; add `--fallback` ONLY on explicit user request.
-- On exit 3 (quota): report `resume_at` from state.json and stop. Do not silently
-  switch to paid providers.
+- Default chunk 50, runs until the pool is empty (exit 0) or a chunk fails on
+  every provider (exit 2 — a real error; report it and stop, do not loop).
 - After each chunk the runner merges the chunk's ids into
   `temp/ai_from_batch_api/processed_ids.json` so Op 2 can check the whole session.
 
@@ -82,11 +79,10 @@ Run both, in this order:
 
 1. Mechanical: `uv run python3 kamma/translate/scripts/ai_translation_check.py -lang <ru|ta>`
 2. AI semantic (RU only):
-   Run exactly and only via DeepSeek (`deepseek-v4-flash`) by passing both `--provider deepseek --model deepseek-v4-flash`:
-   `uv run python3 kamma/translate/scripts/batch_runner.py --op check --mode meaning_raw_list --provider deepseek --model deepseek-v4-flash`
+   `uv run python3 kamma/translate/scripts/batch_runner.py --op check --mode meaning_raw_list`
    — checks only the session ids; MISMATCH rows get `ru_meaning_raw` cleared
    automatically and re-enter the Op 1 pool (that IS the retranslate loop).
-   For `lit`: `--mode meaning_lit_list --provider deepseek --model deepseek-v4-flash` (report-only, no clearing).
+   For `lit`: `--mode meaning_lit_list` (report-only, no clearing).
 
 For Tamil there is no semantic checker yet (see Phase 2) — mechanical check only.
 
@@ -112,16 +108,16 @@ Evaluate the pending count for the selected mode (from Step 1) and recommend chu
 
 Ask the user: run a single test chunk of 50 words, or run all remaining words in 50-word chunks?
 
-To ensure checkers run exactly and only via DeepSeek and do not fall back to `antigravity_cli`, always pass both `--provider deepseek --model deepseek-v4-flash`. The checker is configured to save checked IDs and clear database mismatches incrementally in chunks of 50, meaning no progress is lost if the process is interrupted:
+The checker is configured to save checked IDs and clear database mismatches incrementally in chunks of 50, meaning no progress is lost if the process is interrupted:
 ```bash
-uv run python3 kamma/translate/scripts/batch_runner.py --op check --mode <mode> --provider deepseek --model deepseek-v4-flash               # all
-uv run python3 kamma/translate/scripts/batch_runner.py --op check --mode <mode> --chunk <size> --max-chunks 1 --provider deepseek --model deepseek-v4-flash  # one chunk
+uv run python3 kamma/translate/scripts/batch_runner.py --op check --mode <mode>               # all
+uv run python3 kamma/translate/scripts/batch_runner.py --op check --mode <mode> --chunk <size> --max-chunks 1  # one chunk
 ```
 
 > [!IMPORTANT]
 > For long runs (> 1,000 words), prevent your Mac from sleeping (while still allowing the screen to turn off) by prefixing the command with `caffeinate -i`:
 > ```bash
-> caffeinate -i uv run python3 kamma/translate/scripts/batch_runner.py --op check --mode <mode> --provider deepseek --model deepseek-v4-flash
+> caffeinate -i uv run python3 kamma/translate/scripts/batch_runner.py --op check --mode <mode>
 > ```
 
 Reports land in `temp/ai_<mode>_check/<timestamp>_mismatches.txt` — after the run,
@@ -152,21 +148,18 @@ Show the dry-run list first; on user confirmation re-run without `--dry-run`.
 (RU: deletes rows where both ru_meaning and ru_meaning_raw are empty;
 TA: deletes ta_meaning rows contaminated with Latin script.)
 
-### 4. Batch & quota protocol
+### 4. Batch protocol
 
-- One "session" = repeated chunks until pool empty (exit 0) or quota hit (exit 3).
-- On exit 3: `state.json` gets `resume_at = now + 5h` (conservative assumption about
-  agy's rolling window). Report it, append the log line, stop the turn.
-- Never bypass `resume_at` except via `--force` at the user's explicit request.
-- `--fallback` (paid chain) always requires fresh explicit user consent — never
-  carry consent over from a previous run.
+- One "session" = repeated chunks until pool empty (exit 0) or a chunk fails on
+  every provider in the chain (exit 2) — a real error, not a quota pause. Report
+  it and stop the turn; the user re-runs the same command when ready.
 - The runner appends one line per chunk to `kamma/translate/log.md`:
   `YYYY-MM-DD HH:MM | op mode lang | ok/attempted | note`
 
 ### 5. End of session
 
-Summarize: chunks run, rows translated/checked/cleared, reports written, current
-pool counts, and (if quota-paused) the resume time and exact resume command.
+Summarize: chunks run, rows translated/checked/cleared, reports written, and
+current pool counts.
 
 ## Safety rules
 

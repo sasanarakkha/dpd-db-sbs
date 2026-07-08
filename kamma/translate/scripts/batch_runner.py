@@ -1,11 +1,11 @@
-"""Run AI translation and checking operations in resumable chunks with antigravity quota tracking."""
+"""Run AI translation and checking operations in resumable chunks, defaulting to the DeepSeek-first provider chain from tools/ai_models.json."""
 
 import argparse
 import json
 import re
 import subprocess
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -14,6 +14,7 @@ from tools.printer import printer as pr
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 STATE_PATH = PROJECT_ROOT / "kamma" / "translate" / "state.json"
 LOG_PATH = PROJECT_ROOT / "kamma" / "translate" / "log.md"
+AI_MODELS_PATH = PROJECT_ROOT / "tools" / "ai_models.json"
 GENERATE_SCRIPT = (
     PROJECT_ROOT / "kamma" / "translate" / "scripts" / "ai_generate_translation.py"
 )
@@ -23,8 +24,6 @@ CHECK_SCRIPT = (
 LAST_TRANSLATED_PATH = PROJECT_ROOT / "temp" / "last_translated.json"
 PROCESSED_IDS_PATH = PROJECT_ROOT / "temp" / "ai_from_batch_api" / "processed_ids.json"
 
-QUOTA_WAIT = timedelta(hours=5)
-QUOTA_MARKER = "possible quota exhaustion"
 DEFAULT_CHUNK = 50
 
 STATUS_GENERATE_PROBES: list[tuple[str, str]] = [
@@ -42,11 +41,8 @@ def default_state() -> dict[str, Any]:
     """Return the default persisted-state shape."""
     return {
         "window_start": None,
-        "quota_exhausted_at": None,
-        "resume_at": None,
         "last_op": None,
         "totals": {"generated": 0, "checked": 0},
-        "note": "resume_at assumes a conservative 5h wait after quota exhaustion",
     }
 
 
@@ -63,6 +59,25 @@ def save_state(path: Path, state: dict[str, Any]) -> None:
     path.write_text(json.dumps(state, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
+def load_default_provider_model() -> tuple[str, str]:
+    """Return the (provider, model) pair from ai_models.json's default_models[0].
+
+    Deliberately reads only "default_models" (never "antigravity_cli_work_models")
+    so an unset --provider/--model never routes through antigravity_cli.
+    """
+    data = json.loads(AI_MODELS_PATH.read_text(encoding="utf-8"))
+    first = data["default_models"][0]
+    return first["provider"], first["model"]
+
+
+def _resolve_provider_model(provider: str | None, model: str | None) -> tuple[str, str]:
+    """Return (provider, model), substituting the ai_models.json default pair when both are unset."""
+    if provider is None and model is None:
+        return load_default_provider_model()
+    assert provider is not None and model is not None
+    return provider, model
+
+
 def parse_generate_counts(output: str) -> tuple[int, int] | None:
     """Parse the generator's "Rows filtered for the process: X / TOTAL" line into (attempted, total)."""
     match = _ROWS_FILTERED_RE.search(output)
@@ -77,11 +92,6 @@ def parse_check_attempted(output: str) -> int | None:
     if match is None:
         return None
     return int(match.group(1))
-
-
-def detect_quota_exhaustion(output: str) -> bool:
-    """Return True if the quota-exhaustion marker appears anywhere in subprocess output."""
-    return QUOTA_MARKER in output
 
 
 def read_generated_ids(path: Path, since: datetime) -> list[int]:
@@ -118,12 +128,17 @@ def build_generate_command(
     mode: str,
     lang: str,
     chunk: int,
-    fallback: bool,
     provider: str | None = None,
     model: str | None = None,
 ) -> list[str]:
-    """Build the subprocess command for a real (non-dry-run) generate chunk."""
-    cmd = [
+    """Build the subprocess command for a real (non-dry-run) generate chunk.
+
+    Falls back to load_default_provider_model() when neither is given, so the
+    call always passes both flags together and never drops into the workhorse
+    script's own antigravity-first default chain.
+    """
+    provider, model = _resolve_provider_model(provider, model)
+    return [
         "uv",
         "run",
         "python3",
@@ -134,14 +149,11 @@ def build_generate_command(
         lang,
         "-limit",
         str(chunk),
+        "-provider",
+        provider,
+        "-model",
+        model,
     ]
-    if provider:
-        cmd.extend(["-provider", provider])
-    if model:
-        cmd.extend(["-model", model])
-    if not fallback and not provider:
-        cmd.extend(["-provider", "antigravity_cli"])
-    return cmd
 
 
 def build_status_probe_command(mode: str, lang: str) -> list[str]:
@@ -164,8 +176,14 @@ def build_status_probe_command(mode: str, lang: str) -> list[str]:
 def build_check_command(
     mode: str, chunk: int, provider: str | None = None, model: str | None = None
 ) -> list[str]:
-    """Build the subprocess command for a check chunk."""
-    cmd = [
+    """Build the subprocess command for a check chunk.
+
+    Falls back to load_default_provider_model() when neither is given, so the
+    call always passes both flags together and never drops into the workhorse
+    script's own antigravity-first default chain.
+    """
+    provider, model = _resolve_provider_model(provider, model)
+    return [
         "uv",
         "run",
         "python3",
@@ -174,12 +192,11 @@ def build_check_command(
         mode,
         "--limit",
         str(chunk),
+        "--provider",
+        provider,
+        "--model",
+        model,
     ]
-    if provider:
-        cmd.extend(["--provider", provider])
-    if model:
-        cmd.extend(["--model", model])
-    return cmd
 
 
 def run_subprocess_capture(cmd: list[str]) -> tuple[str, int]:
@@ -206,8 +223,6 @@ def print_status() -> None:
     """Print persisted state, generate-pool pending counts, and checker snapshot sizes."""
     state = load_state(STATE_PATH)
     pr.white(f"window_start: {state['window_start']}")
-    pr.white(f"quota_exhausted_at: {state['quota_exhausted_at']}")
-    pr.white(f"resume_at: {state['resume_at']}")
     pr.white(f"last_op: {state['last_op']}")
     pr.white(f"totals: {state['totals']}")
 
@@ -259,7 +274,7 @@ def print_status() -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Run AI translation/checking operations in resumable, quota-aware chunks."
+        description="Run AI translation/checking operations in resumable chunks."
     )
     parser.add_argument(
         "--op",
@@ -285,26 +300,19 @@ def main() -> None:
         "--max-chunks",
         type=int,
         default=0,
-        help="safety cap on number of chunks (default: 0 = until done/quota)",
-    )
-    parser.add_argument(
-        "--fallback",
-        action="store_true",
-        help="generate only: omit the forced -provider antigravity_cli",
-    )
-    parser.add_argument(
-        "--force", action="store_true", help="ignore a future resume_at"
+        help="safety cap on number of chunks (default: 0 = until done/failure)",
     )
     parser.add_argument(
         "--status", action="store_true", help="print status summary and exit"
     )
     parser.add_argument(
         "--provider",
-        help="explicit provider preference to pass to workhorse script",
+        help="explicit provider preference to pass to workhorse script "
+        "(must be given together with --model; default: ai_models.json default_models[0])",
     )
     parser.add_argument(
         "--model",
-        help="explicit model to pass to workhorse script",
+        help="explicit model to pass to workhorse script (must be given together with --provider)",
     )
     args = parser.parse_args()
 
@@ -315,24 +323,14 @@ def main() -> None:
     if args.op is None:
         parser.error("--op is required unless --status is given")
 
-    state = load_state(STATE_PATH)
+    if bool(args.provider) != bool(args.model):
+        parser.error(
+            "--provider and --model must be given together (or neither) — a lone "
+            "--provider falls through to the workhorse script's antigravity-first "
+            "default chain."
+        )
 
-    resume_at_raw = state.get("resume_at")
-    if resume_at_raw and not args.force:
-        resume_at = datetime.fromisoformat(resume_at_raw)
-        now = datetime.now().astimezone()
-        if resume_at > now:
-            remaining = resume_at - now
-            pr.amber(
-                f"Quota resume gate: {remaining} remaining until {resume_at.isoformat()}."
-            )
-            rerun_cmd = (
-                f"uv run python3 kamma/translate/scripts/batch_runner.py "
-                f"--op {args.op} --mode {args.mode} --lang {args.lang} "
-                f"--chunk {args.chunk} --force"
-            )
-            pr.white(f"Wait, or force an early resume with: {rerun_cmd}")
-            sys.exit(1)
+    state = load_state(STATE_PATH)
 
     chunks_run = 0
     while True:
@@ -343,12 +341,7 @@ def main() -> None:
         chunk_start = datetime.now().astimezone()
         if args.op == "generate":
             cmd = build_generate_command(
-                args.mode,
-                args.lang,
-                args.chunk,
-                args.fallback,
-                args.provider,
-                args.model,
+                args.mode, args.lang, args.chunk, args.provider, args.model
             )
         else:
             cmd = build_check_command(args.mode, args.chunk, args.provider, args.model)
@@ -380,39 +373,21 @@ def main() -> None:
 
         state["totals"]["generated" if args.op == "generate" else "checked"] += ok
         state["last_op"] = args.op
-        if ok > 0:
-            if state.get("window_start") is None:
-                state["window_start"] = now_iso
-            state["quota_exhausted_at"] = None
-            state["resume_at"] = None
+        if ok > 0 and state.get("window_start") is None:
+            state["window_start"] = now_iso
         save_state(STATE_PATH, state)
 
         if attempted == 0:
             pr.green("pool empty — done")
             sys.exit(0)
 
-        if detect_quota_exhaustion(output) or (
-            ok == 0 and attempted > 0 and not args.fallback
-        ):
-            quota_exhausted_at = datetime.now().astimezone()
-            resume_at = quota_exhausted_at + QUOTA_WAIT
-            state["quota_exhausted_at"] = quota_exhausted_at.isoformat()
-            state["resume_at"] = resume_at.isoformat()
-            save_state(STATE_PATH, state)
-            append_log(
-                LOG_PATH,
-                f"- {quota_exhausted_at.isoformat()} | quota-paused — resume_at={resume_at.isoformat()}",
-            )
-            pr.red(f"Quota exhausted — resume after {resume_at.isoformat()}.")
+        if ok == 0 and attempted > 0:
+            pr.red("All providers failing — stopping (will not loop forever).")
             rerun_cmd = (
                 f"uv run python3 kamma/translate/scripts/batch_runner.py "
                 f"--op {args.op} --mode {args.mode} --lang {args.lang} --chunk {args.chunk}"
             )
-            pr.white(f"Re-run later with: {rerun_cmd}")
-            sys.exit(3)
-
-        if ok == 0 and attempted > 0:
-            pr.red("All providers failing — stopping (will not loop forever).")
+            pr.white(f"Re-run with: {rerun_cmd}")
             sys.exit(2)
 
 
