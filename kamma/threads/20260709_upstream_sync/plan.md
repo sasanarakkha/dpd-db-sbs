@@ -12,21 +12,21 @@
 
 **Owner**: FAST (or ADVANCED running the scripted command directly). See guide.md § Stage 1.
 
-- [ ] **1.1 Environmental Check**:
-  - [ ] `git status` — must be clean before sync work begins. (Hard-enforced by
+- [x] **1.1 Environmental Check**:
+  - [x] `git status` — must be clean before sync work begins. (Hard-enforced by
     `execute_sync.py`'s `GitContext` dirty-tree guard at Stage 1.5, not by this checklist item.)
-  - [ ] `git fetch upstream` — fetch latest upstream refs.
-  - [ ] `uv run ruff check tools/ scripts/ db/ exporter/ --select F821 --extend-exclude scripts/archive,scripts/dps_archive --quiet` — catches undefined names and syntax/API breakage before sync work begins.
-  - [ ] Review `kamma/upstream_sync/accepted_sync.json` — starting SHA/date/ref are present.
-- [ ] **1.2 Pre-sync Shadow Health Check**:
-  - [ ] `uv run python3 tests/check_shadow_modifications.py` — output is clean, or every warning has an exact ADVANCED-reviewed entry in `kamma/upstream_sync/reviewed_shadow_noops.json`.
-  - [ ] If the user confirms a warning is intentionally a no-op but gives no specific reason, use this reason exactly: "User reviewed and confirmed this upstream change does not need to be ported to the shadow."
-- [ ] **1.3 Validation**:
-  - [ ] `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` — passes.
-- [ ] **1.4 Factual Diff**:
-  - [ ] `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py <thread_dir>` — generates `prep_report.md` and `prep_manifest.json`.
-  - [ ] If `prep_manifest.json.discuss_paths` is non-empty, stop before `execute_sync.py`.
-  - [ ] If `prep_manifest.json.blocker_paths` is non-empty, STOP before `execute_sync.py`. To acknowledge deletion blockers you intend to handle in Stage 2, create `<thread_dir>/run_acknowledged_blockers.txt` (one path per line; `#` comments allowed). `verify_manifest` will warn for each acknowledged path but will not block on them. Collision blockers still require registry changes before `execute_sync.py`.
+  - [x] `git fetch upstream` — fetch latest upstream refs.
+  - [x] `uv run ruff check tools/ scripts/ db/ exporter/ --select F821 --extend-exclude scripts/archive,scripts/dps_archive --quiet` — catches undefined names and syntax/API breakage before sync work begins.
+  - [x] Review `kamma/upstream_sync/accepted_sync.json` — starting SHA/date/ref are present.
+- [x] **1.2 Pre-sync Shadow Health Check**:
+  - [x] `uv run python3 tests/check_shadow_modifications.py` — output is clean, or every warning has an exact ADVANCED-reviewed entry in `kamma/upstream_sync/reviewed_shadow_noops.json`.
+  - [x] If the user confirms a warning is intentionally a no-op but gives no specific reason, use this reason exactly: "User reviewed and confirmed this upstream change does not need to be ported to the shadow."
+- [x] **1.3 Validation**:
+  - [x] `uv run python3 kamma/upstream_sync/scripts/validate_registry.py` — passes.
+- [x] **1.4 Factual Diff**:
+  - [x] `uv run python3 kamma/upstream_sync/scripts/prep_analyzer.py <thread_dir>` — generates `prep_report.md` and `prep_manifest.json`.
+  - [x] If `prep_manifest.json.discuss_paths` is non-empty, stop before `execute_sync.py`. (6 discuss paths → routed to Stage 2.)
+  - [x] If `prep_manifest.json.blocker_paths` is non-empty, STOP before `execute_sync.py`. (8 blocker paths → routed to Stage 2.) To acknowledge deletion blockers you intend to handle in Stage 2, create `<thread_dir>/run_acknowledged_blockers.txt` (one path per line; `#` comments allowed). `verify_manifest` will warn for each acknowledged path but will not block on them. Collision blockers still require registry changes before `execute_sync.py`.
 - [ ] **1.5 Automated Pull + Commit 1 Gate**:
   - [ ] Review `<thread_dir>/run_exclusions.txt` if needed.
   - [ ] `uv run python3 kamma/upstream_sync/scripts/execute_sync.py <thread_dir>`.
@@ -41,10 +41,10 @@
 
 **Owner**: ADVANCED only. See guide.md § Stage 2.
 
-- [ ] **2.1** Read `prep_report.md` and `prep_manifest.json`; classify every changed path (port / mirror / preserve / discuss / inspired / skip / docs).
-- [ ] **2.2** Resolve every `discuss: true` entry with the user; record decisions in `dynamic_plan.md`.
-- [ ] **2.3** Write `<thread_dir>/dynamic_plan.md` with exact file paths, anchors, literal edits, and verify commands — no vague wording.
-- [ ] **2.4** Present `dynamic_plan.md` for approval; wait for explicit approval before Stage 3.
+- [x] **2.1** Read `prep_report.md` and `prep_manifest.json`; classify every changed path (port / mirror / preserve / discuss / inspired / skip / docs). (2a complete — see `dynamic_plan.md` §§1-7; includes unregistered-local and orphan classification.)
+- [x] **2.2** Resolve every `discuss: true` entry with the user; record decisions in `dynamic_plan.md`. (2b COMPLETE — D1-D13 resolved; scope correction applied, see `skill_scope_improvement.md`.)
+- [x] **2.3** Write `<thread_dir>/dynamic_plan.md` with exact file paths, anchors, literal edits, and verify commands — no vague wording. (§9 authored; §5/§6/§7 reconciled with 2b corrections; D3/D5/D6/D7 concrete detail added; two high-risk claims empirically verified.)
+- [x] **2.4** Present `dynamic_plan.md` for approval; wait for explicit approval before Stage 3. (APPROVED 2026-07-09. §0 pre-execution mechanics then executed: D8 `tools/ai_models.json` registered in `modified_upstream_files` (PRESERVE, discuss:false); `prep_analyzer.py` rerun; manifest `discuss_paths` → `[]`; `run_acknowledged_blockers.txt` written with the 8 blockers; `validate_registry.py` passes.)
 
 **Hard stop**: update `handoff.md` with decisions and next steps, then stop.
 

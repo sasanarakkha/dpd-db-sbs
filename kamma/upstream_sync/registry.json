@@ -160,6 +160,20 @@
         "If upstream adds new hooks, integrate them alongside the local `pyrefly` entry — do not replace wholesale."
       ],
       "why_discuss": "Carries a local-only `pyrefly` hook appended after the upstream `pyright` hook. Blind porting would drop this addition."
+    },
+    {
+      "path": "tools/ai_models.json",
+      "discuss": false,
+      "sync_rule": "PRESERVE",
+      "local_changes": [
+        "`grounded_models` and work-model lists point at `antigravity_cli`/`deepseek` — the live quota-grounded config the kamma/translate pipeline depends on; upstream's list points at openrouter/gemini models.",
+        "Top-level keys (`antigravity_cli_work_models`, `default_models`, `grounded_models`) share upstream's schema, but the model values are fork-local and always take precedence over upstream's."
+      ],
+      "watch_for": [
+        "Never overwrite with upstream's model list — it would break the translate pipeline's quota-grounded model selection. This file always stays local.",
+        "Upstream `ai_manager.py` reads it via `ProjectPaths().ai_models_json_path`; if that path or the top-level key names change upstream, mirror only the structural/key change into the local file while keeping the local model values."
+      ],
+      "why_discuss": "PRESERVE (discuss=false): active translate-pipeline config that must always stay local; never gates a sync."
     }
   ],
   "inspired_by_upstream": {

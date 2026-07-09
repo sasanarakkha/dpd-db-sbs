@@ -217,16 +217,9 @@
     "shared_data/help/thanks.tsv",
     "tools/cst_source_sutta_example.py"
   ],
-  "discuss_paths": [
-    ".gitignore",
-    ".pre-commit-config.yaml",
-    "AGENTS.md",
-    "db/models.py",
-    "gui2/main.py",
-    "pyproject.toml"
-  ],
+  "discuss_paths": [],
   "from_upstream_sha": "518672a65fa3ea7c36c4c754dc5276bb41f92da7",
-  "generated_at": "2026-07-09T12:24:42+08:00",
+  "generated_at": "2026-07-09T20:25:28+08:00",
   "mapped_actions": {
     ".github/workflows/draft_release.yml": [
       {

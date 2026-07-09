@@ -15,6 +15,7 @@ OK: Registry is valid.
 - gui2/main.py
 - gui2/pass2_add_view.py
 - pyproject.toml
+- tools/ai_models.json
 
 ## Modified - Shadow Sources
 - `db/epd/epd_to_lookup.py` -> shadows: db/rpd/rpd_to_lookup.py, db/tpd/tpd_to_lookup.py
@@ -164,7 +165,6 @@ OK: Registry is valid.
 - tools/ai_antigravity_cli_models.py
 - tools/ai_deepseek_manager.py
 - tools/ai_manager.py
-- tools/ai_models.json
 - tools/bjt.py
 - tools/compound_type_manager.tsv
 - tools/configger.py
