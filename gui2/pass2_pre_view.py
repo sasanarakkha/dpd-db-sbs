@@ -3,11 +3,11 @@ import re
 import flet as ft
 
 from gui2.books import SuttaCentralSegment
-from gui2.flet_functions import highlight_word_in_sentence
+from gui2.flet_functions import highlight_terms
 from gui2.pass2_exceptions import Pass2ExceptionsFileManager
 from gui2.pass2_pre_new_word_manager import Pass2NewWordManager
 from gui2.toolkit import ToolKit
-from tools.cst_source_sutta_example import CstSourceSuttaExample
+from tools.cst_source import CstSourceSuttaExample
 
 LABEL_COLOUR = ft.Colors.GREY_500
 HIGHLIGHT_COLOUR = ft.Colors.BLUE_200
@@ -129,6 +129,11 @@ class Pass2PreProcessView(ft.Column):
             label="check meaning_1 before adding exceptions!",
             label_style=TEXT_FIELD_LABEL_STYLE,
         )
+        self.exceptions_switch = ft.Switch(
+            label="exceptions",
+            value=True,
+            on_change=self.handle_exceptions_toggle,
+        )
         self.examples_count_field = ft.TextField(
             "",
             width=60,
@@ -189,6 +194,7 @@ class Pass2PreProcessView(ft.Column):
                         on_click=self.handle_pass_click,
                     ),
                     self.exceptions_field,
+                    self.exceptions_switch,
                 ],
             ),
             ft.Row(
@@ -261,11 +267,12 @@ class Pass2PreProcessView(ft.Column):
         headword_id = self.controller.headwords[self.controller.headword_index].id
         sentence: SuttaCentralSegment | CstSourceSuttaExample | None = None
 
-        if sentences := self.controller.missing_examples_dict.get(
-            self.controller.word_in_text, []
-        ):
-            if self.selected_sentence_index < len(sentences):
-                sentence = sentences[self.selected_sentence_index]
+        if (
+            sentences := self.controller.missing_examples_dict.get(
+                self.controller.word_in_text, []
+            )
+        ) and self.selected_sentence_index < len(sentences):
+            sentence = sentences[self.selected_sentence_index]
 
         if sentence is None:
             return
@@ -293,11 +300,12 @@ class Pass2PreProcessView(ft.Column):
 
     def handle_new_click(self, e):
         sentence: SuttaCentralSegment | CstSourceSuttaExample | None = None
-        if sentences := self.controller.missing_examples_dict.get(
-            self.controller.word_in_text, []
-        ):
-            if self.selected_sentence_index < len(sentences):
-                sentence = sentences[self.selected_sentence_index]
+        if (
+            sentences := self.controller.missing_examples_dict.get(
+                self.controller.word_in_text, []
+            )
+        ) and self.selected_sentence_index < len(sentences):
+            sentence = sentences[self.selected_sentence_index]
 
         if sentence is None:
             return
@@ -354,9 +362,7 @@ class Pass2PreProcessView(ft.Column):
         self.search_bar.value = ""
         self._filter_examples()
         self.update_examples_count(len(self.filtered_examples))
-        radio_group = self._build_examples_radio_group()
-        self._apply_search_highlight(radio_group)
-        return radio_group
+        return self._build_examples_radio_group()
 
     def _filter_examples(self) -> None:
         cleaned_word_in_text = self.controller.clean_quotes(
@@ -368,7 +374,7 @@ class Pass2PreProcessView(ft.Column):
         }
 
         compiled_exception_regex = None
-        if candidate_exceptions:
+        if self.exceptions_switch.value and candidate_exceptions:
             pattern_parts = [re.escape(exc_text) for exc_text in candidate_exceptions]
             combined_pattern = r"\b(?:" + "|".join(pattern_parts) + r")\b"
             compiled_exception_regex = re.compile(combined_pattern)
@@ -433,9 +439,15 @@ class Pass2PreProcessView(ft.Column):
                         ),
                         ft.Container(
                             content=ft.Text(
-                                spans=highlight_word_in_sentence(
-                                    self.controller.word_in_text,
+                                spans=highlight_terms(
                                     pali.lower().replace("ṁ", "ṃ"),
+                                    [
+                                        (
+                                            self.controller.word_in_text,
+                                            HIGHLIGHT_COLOUR,
+                                        ),
+                                        (self.search_query, ft.Colors.AMBER),
+                                    ],
                                 ),
                                 expand=True,
                                 selectable=True,
@@ -444,7 +456,9 @@ class Pass2PreProcessView(ft.Column):
                         ),
                         ft.Container(
                             content=ft.Text(
-                                english,
+                                spans=highlight_terms(
+                                    english, [(self.search_query, ft.Colors.AMBER)]
+                                ),
                                 expand=True,
                                 color=ft.Colors.GREY_500,
                                 selectable=True,
@@ -504,28 +518,16 @@ class Pass2PreProcessView(ft.Column):
             return
         self._filter_examples()
         self.update_examples_count(len(self.filtered_examples))
-        radio_group = self._build_examples_radio_group()
-        self._apply_search_highlight(radio_group)
-        self.update_examples(radio_group)
+        self.update_examples(self._build_examples_radio_group())
 
-    def _apply_search_highlight(self, radio_group: ft.RadioGroup) -> None:
-        if not self.search_query:
+    def handle_exceptions_toggle(self, e: ft.ControlEvent) -> None:
+        """Toggle exception filtering on/off and refresh the examples list."""
+
+        if not self.examples_list:
             return
-        for example_column in radio_group.content.controls:  # type: ignore
-            if not isinstance(example_column, ft.Column):
-                continue
-            for control in example_column.controls:
-                if isinstance(control, ft.Row):
-                    for row_control in control.controls:
-                        if isinstance(row_control, ft.Text):
-                            self._simple_highlight(row_control, self.search_query)
-                elif isinstance(control, ft.Container):
-                    if isinstance(control.content, ft.Text):
-                        self._simple_highlight(control.content, self.search_query)
-
-    def _simple_highlight(self, text_control: ft.Text, query: str) -> None:
-        text = str(text_control.value or "").lower()
-        text_control.color = ft.Colors.AMBER if query in text else None
+        self._filter_examples()
+        self.update_examples_count(len(self.filtered_examples))
+        self.update_examples(self._build_examples_radio_group())
 
     def add_exception(self, e: ft.ControlEvent) -> None:
         """Add an exception to the pass2 exceptions file,

@@ -42,7 +42,7 @@ def main():
     )
     parser.add_argument(
         "--model",
-        help='Force one model (requires --provider), e.g. "gemini-3-flash-preview"',
+        help='Force one model (requires --provider), e.g. "Gemini 3.5 Flash (Low)"',
     )
     args = parser.parse_args()
 
@@ -116,8 +116,8 @@ def main():
                     provider=args.provider,
                     verse_source=verse["num"],
                     speech_mark_options=verse.get("speech_mark_options"),
-                    progress=lambda event, v_num=verse["num"]: (
-                        _print_translation_progress(v_num, event)
+                    progress=lambda event: _print_translation_progress(
+                        verse["num"], event
                     ),
                     debug=ai_debug,
                     verbose=args.debug,

@@ -35,6 +35,23 @@ makedict-quick:
     script -q -c "uv run python scripts/bash/makedict.py" | tee >(ansi2html > "logs/makedict_$timestamp.html")
     uv run python scripts/build/config_quick_profile.py reset
 
+# Full release export: everything on (uposatha settings), resets config to baseline after
+makedict-all:
+    #!/usr/bin/env bash
+    mkdir -p logs
+    uv run python scripts/build/config_uposatha_day.py force
+    timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
+    script -q -c "uv run python scripts/bash/makedict.py" | tee >(ansi2html > "logs/makedict_$timestamp.html")
+    uv run python scripts/build/config_uposatha_reset.py force
+
+# Minimum baseline export: resets config to baseline (post-uposatha settings) and runs
+makedict-min:
+    #!/usr/bin/env bash
+    mkdir -p logs
+    uv run python scripts/build/config_uposatha_reset.py force
+    timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
+    script -q -c "uv run python scripts/bash/makedict.py" | tee >(ansi2html > "logs/makedict_$timestamp.html")
+
 # Complete rebuild and export everything
 initial_build_db_and_export_all:
     uv run python scripts/bash/initial_build_db_and_export_all.py
@@ -72,6 +89,11 @@ add-variants-phonetic:
 # Process unclassified variant field entries interactively
 variants-processor:
     uv run python scripts/find/variants_process.py
+
+# Review pass2 exceptions that block examples for meaningless headwords
+alias pass2 := pass2-exceptions
+pass2-exceptions:
+    uv run python scripts/fix/pass2exceptions.py
 
 # Run ruff linter and formatter (excludes archive/ and resources/)
 lint:
@@ -170,6 +192,10 @@ families:
 find_comm:
     uv run python scripts/find/comm_not_in_decon_finder.py
 
+# Count words pass2pre will surface in each Aṅguttara Nikāya book
+an-remaining:
+    uv run python scripts/find/pass2pre_an_counts.py
+
 # ===== AUDIO =====
 
 # Generate missing audio files
@@ -249,7 +275,7 @@ server-update:
     git pull
     uv sync
     uv run python audio/db_release_download.py
-    wget -qO- https://github.com/digitalpalidictionary/dpd-db/releases/latest/download/dpd.db.tar.bz2 | tar -xj
+    wget -qO- https://github.com/digitalpalidictionary/dpd-db/releases/latest/download/dpd.db.tar.xz | tar -xJ
     uv run exporter/webapp/generate_search_index.py
     pkill -f "uvicorn exporter.webapp.main:app" || true
     sleep 2
@@ -291,13 +317,13 @@ cpd-extras:
 
 # ===== CONFIGURATION =====
 
-# Turn off deconstructor premade mode
-decon-off:
-    uv run python -c "from tools.configger import config_update; config_update('deconstructor', 'use_premade', 'yes')"
-
-# Turn on deconstructor premade mode
+# Turn on deconstructor regeneration
 decon-on:
-    uv run python -c "from tools.configger import config_update; config_update('deconstructor', 'use_premade', 'no')"
+    uv run python -c "from tools.configger import config_update; config_update('generate', 'deconstructor', 'yes')"
+
+# Turn off deconstructor regeneration
+decon-off:
+    uv run python -c "from tools.configger import config_update; config_update('generate', 'deconstructor', 'no')"
 
 # Run the Go deconstructor
 decon:

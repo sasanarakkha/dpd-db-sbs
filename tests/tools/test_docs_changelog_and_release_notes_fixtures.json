@@ -34725,7 +34725,7 @@
     "akataññujātaka"
   ],
   "expected": {
-    "line_1_headwords": "300 headwords, 218 complete, 30 partially complete, 52 incomplete entries",
+    "line_1_headwords": "300 headwords, 218 (72.7%) complete, 30 (10.0%) partially complete, 52 (17.3%) incomplete entries",
     "line_5_cell_of_pali_data": "8 674 cells of Pāḷi word data",
     "root_families": {
       "√kaṅkh 2 √kaṅkh": 2,

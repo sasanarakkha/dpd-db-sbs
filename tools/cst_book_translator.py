@@ -6,7 +6,7 @@ Four identifier types, any of which can be translated into the others:
 2. ``cst_book_name`` e.g. ``Dīghanikāya, Sīlakkhandhavagga``
 3. ``gui_book_code`` e.g. ``dn1`` (as used in ``gui2.dpd_fields_examples``)
 4. ``dpd_book_code`` e.g. ``DN`` / ``DNa`` (as used in
-   ``shared_data/help/abbreviations.tsv`` and bold_definitions ``file_list``)
+   ``shared_data/reference/abbreviations.tsv`` and bold_definitions ``file_list``)
 
 Data lives next to this module in ``cst_book_translator.tsv``.
 
@@ -24,7 +24,8 @@ from pathlib import Path
 
 from tools.paths import ProjectPaths
 
-_TSV_PATH = Path(__file__).with_suffix(".tsv")
+pth = ProjectPaths()
+_TSV_PATH = pth.cst_book_translator_tsv_path
 
 
 @dataclass(frozen=True)
@@ -36,7 +37,7 @@ class BookInfo:
 
     @property
     def cst_xml_path(self) -> Path:
-        return ProjectPaths().cst_xml_dir / f"{self.cst_filename}.xml"
+        return pth.cst_xml_dir / f"{self.cst_filename}.xml"
 
 
 def _load() -> tuple[

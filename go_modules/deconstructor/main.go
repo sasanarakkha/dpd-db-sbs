@@ -11,11 +11,7 @@ import (
 )
 
 var tic = tools.Tic()
-var doNotRun = !((tools.IniTest("exporter", "make_deconstructor", "yes") ||
-	tools.IniTest("exporter", "make_tpr", "yes") ||
-	tools.IniTest("exporter", "make_ebook", "yes") ||
-	tools.IniTest("regenerate", "db_rebuild", "yes")) &&
-	tools.IniTest("deconstructor", "use_premade", "no"))
+var doNotRun = !tools.IniTest("generate", "deconstructor", "yes")
 
 func init() {
 	tools.PTitle("deconstructing compounds")
@@ -80,7 +76,8 @@ func main() {
 		close(jobs)
 	}()
 
-	workerpool.Run(numWorkers, jobs, deconstruct)
+	accs := workerpool.RunCollect(numWorkers, data.NewMatchData, jobs, deconstruct)
+	data.M.Merge(accs)
 	data.M.Summary()
 	data.M.SaveMatchedTsv()
 	data.M.SaveUnmatchedTsv()
@@ -94,9 +91,10 @@ func main() {
 	tic.Toc()
 }
 
-func deconstruct(w data.WordData) {
+func deconstruct(acc *data.MatchData, w data.WordData) {
+	w.Acc = acc
 	splitters.Split2(w)
 	splitters.Split3(w)
 	splitters.SplitRecursive(w)
-	data.M.SaveWordStats(w)
+	acc.SaveWordStats(w)
 }

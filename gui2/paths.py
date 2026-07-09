@@ -15,14 +15,19 @@ class Gui2Paths:
     pass2_new_words_path: Path = gui2_data_path / "pass2_new_words.json"
     history_json_path: Path = gui2_data_path / "history.json"
     example_stash_json_path: Path = gui2_data_path / "example_stash.json"
+    commentary_stash_json_path: Path = gui2_data_path / "commentary_stash.json"
     headword_stash_json_path: Path = gui2_data_path / "headword_stash.json"
     corrections_path: Path = gui2_data_path / "corrections.json"
     corrections_added_path: Path = gui2_data_path / "corrections_added.json"
     additions_path: Path = gui2_data_path / "additions.json"
     additions_added_path: Path = gui2_data_path / "additions_added.json"
     filter_presets_path: Path = gui2_data_path / "filter_presets.json"
+    in_commentary_exceptions_path: Path = (
+        gui2_data_path / "in_commentary_exceptions.txt"
+    )
 
     # Other paths
+    pass2_x_manager_py_path: Path = gui2_dir / "pass2_x_manager.py"
     find_words_dump_path: Path = gui2_dir / "data/find_words_with_examples_dump.json"
     find_words_exceptions_path: Path = (
         gui2_dir / "data/find_words_with_examples_no.json"

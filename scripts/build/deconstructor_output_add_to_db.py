@@ -15,16 +15,14 @@ from db.db_helpers import get_db_session
 from tools.lookup_sync import sync_lookup_column
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
-from tools.configger import config_read, config_test
+from tools.configger import config_read
 
 
 def main() -> None:
     pr.tic()
     pr.yellow_title("adding deconstructor output to lookup db")
 
-    if config_read("generate", "deconstructor", "yes") == "no" or not config_test(
-        "deconstructor", "use_premade", "yes"
-    ):
+    if config_read("generate", "deconstructor", "yes") == "no":
         pr.green_title("disabled in config.ini")
         pr.toc()
         return
@@ -41,7 +39,9 @@ def main() -> None:
     pr.yes("ok")
 
     pr.green_tmr("syncing deconstructor column")
-    result = sync_lookup_column(db_session, "deconstructor", top_five_dict)
+    result = sync_lookup_column(
+        db_session, "deconstructor", top_five_dict, use_raw_sql=True
+    )
     db_session.close()
     pr.yes(result.updated + result.inserted)
 
