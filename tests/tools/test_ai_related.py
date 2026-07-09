@@ -91,3 +91,49 @@ def test_generate_messages_for_meaning_lit_no_ru() -> None:
         "dhamma", "masc, nom sg", "that which is held"
     )
     assert result == FIXTURES["generate_messages_for_meaning_lit_no_ru"]
+
+
+def test_generate_messages_for_meaning_with_root_examples() -> None:
+    result = generate_messages_for_meaning(
+        "accagamā 1",
+        "verb, aorist",
+        "went beyond",
+        "",
+        root_examples=[
+            ("samannāgata", "endowed with", "наделённый"),
+            ("gacchati 2", "goes", "идёт"),
+        ],
+        root_key="√gam",
+        root_ru_meaning="идти",
+    )
+    assert result == FIXTURES["generate_messages_for_meaning_with_root_examples"]
+    assert "√√" not in result[1]["content"]
+
+
+def test_generate_messages_for_meaning_lit_with_construction() -> None:
+    result = generate_messages_for_meaning_lit(
+        "accagamā 1",
+        "verb, aorist",
+        "went beyond",
+        "переступил",
+        construction="ati > aty > acc + a + √gam + ā",
+    )
+    assert result == FIXTURES["generate_messages_for_meaning_lit_with_construction"]
+
+
+def test_generate_messages_for_meaning_lit_with_root_examples() -> None:
+    result = generate_messages_for_meaning_lit(
+        "accagamā 1",
+        "verb, aorist",
+        "went beyond",
+        "переступил",
+        construction="ati > aty > acc + a + √gam + ā",
+        root_examples=[
+            ("sugata 1", "su + √gam + ta", "well gone", "хорошо ушедший"),
+            ("agata 1", "na > a + √gam + ta", "", "не ушедший"),
+        ],
+        root_key="√gam",
+        root_ru_meaning="идти",
+    )
+    assert result == FIXTURES["generate_messages_for_meaning_lit_with_root_examples"]
+    assert "√√" not in result[1]["content"]

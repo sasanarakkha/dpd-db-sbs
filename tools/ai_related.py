@@ -77,6 +77,9 @@ def generate_messages_for_meaning(
     sentence: str,
     translation_example: str = "",
     synonyms: bool = False,
+    root_examples: list[tuple[str, str, str]] | None = None,
+    root_key: str = "",
+    root_ru_meaning: str = "",
 ) -> list[dict[str, str]]:
     """Generate messages for translation."""
 
@@ -108,6 +111,21 @@ def generate_messages_for_meaning(
         **Grammar**: {grammar}
         **Definition**: {meaning}
     """
+
+    if root_examples:
+        examples_block = "\n".join(
+            f'- {ex_lemma}: "{ex_meaning}" → "{ex_ru}"'
+            for ex_lemma, ex_meaning, ex_ru in root_examples
+        )
+        user_content += (
+            f"\n**Reference — verified Russian translations of other words "
+            f'from the same root** ({root_key} — root meaning: "{root_ru_meaning}"):\n'
+            f"{examples_block}\n"
+            "Match the terminology, register, and phrasing conventions "
+            "established in these reference translations for the same root "
+            "family. Do not copy them verbatim if the definition differs — "
+            "adapt consistently."
+        )
 
     if sentence:
         user_content += f"\n- Consider Pali context: {sentence}"
@@ -197,11 +215,22 @@ def generate_messages_for_meaning_ta(
 
 
 def generate_messages_for_meaning_lit(
-    lemma_1: str, grammar: str, meaning_lit: str, ru_meaning: str = ""
+    lemma_1: str,
+    grammar: str,
+    meaning_lit: str,
+    ru_meaning: str = "",
+    construction: str = "",
+    root_examples: list[tuple[str, str, str, str]] | None = None,
+    root_key: str = "",
+    root_ru_meaning: str = "",
 ) -> list[dict[str, str]]:
     """Generate messages for literal meaning translation with duplication check."""
 
     system_content = "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules."
+
+    construction_line = (
+        f"\n        **Construction**: {construction}" if construction else ""
+    )
 
     user_content = f"""
         Translate the English literal definition of the Pali term into Russian, following these rules:
@@ -217,10 +246,27 @@ def generate_messages_for_meaning_lit(
         **IMPORTANT**: If the literal translation is already contained in the existing Russian meaning, return only an empty string "" without any translation or comments.
 
         **Pali Term**: {lemma_1}
-        **Grammar**: {grammar}
+        **Grammar**: {grammar}{construction_line}
         **Literal Definition**: {meaning_lit}
         **Existing Russian Meaning**: {ru_meaning}
     """
+
+    if root_examples:
+        examples_block = "\n".join(
+            f'- {ex_lemma} (construction: {ex_constr}): "{ex_lit}" → "{ex_ru_lit}"'
+            for ex_lemma, ex_constr, ex_lit, ex_ru_lit in root_examples
+        )
+        user_content += (
+            f"\n**Reference — verified literal Russian translations of other "
+            f'words from the same root** ({root_key} — root meaning: "{root_ru_meaning}"):\n'
+            f"{examples_block}\n"
+            "Build the literal Russian meaning compositionally: start from "
+            "the root's Russian meaning above, then translate each "
+            "prefix/suffix in the **Construction** the same way these "
+            "reference examples translate theirs. Do not translate the "
+            "English literal definition word-for-word if it conflicts with "
+            "this compositional pattern."
+        )
 
     return [
         {"role": "system", "content": system_content},

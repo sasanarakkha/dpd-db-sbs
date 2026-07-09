@@ -12,7 +12,7 @@ from typing import Any, TypedDict
 from sqlalchemy import and_, case, null, or_
 
 from db.db_helpers import get_db_session
-from db.models import DpdHeadword, Russian, Tamil
+from db.models import DpdHeadword, DpdRoot, Russian, Tamil
 from tools.ai_manager import AIManager
 from tools.ai_manager import load_models_from_json as load_ai_models_by_kind
 from tools.ai_related import (
@@ -34,6 +34,17 @@ pth = ProjectPaths()
 dpspth = DPSPaths()
 db_session = get_db_session(pth.dpd_db_path)
 date = year_month_day_hour_minute_dash()
+
+_root_ru_meaning_cache: dict[str, str] = {}
+_meaning_examples_cache: dict[tuple[str, str], list[tuple[str, str, str]]] = {}
+_lit_examples_cache: dict[tuple[str, str, str], list[tuple[str, str, str, str]]] = {}
+
+
+def _first_construction_token(construction: str) -> str:
+    """First whitespace-token of the construction's first line, or ''."""
+    tokens = construction.split("\n")[0].split()
+    return tokens[0] if tokens else ""
+
 
 ai_manager: AIManager | None = None
 
@@ -350,6 +361,169 @@ def filter_words_for_translation(
     return db
 
 
+def get_verified_root_keys() -> set[str]:
+    """Root keys that have at least one verified (non-empty ru_meaning) headword."""
+    rows = (
+        db_session.query(DpdHeadword.root_key)
+        .join(Russian, DpdHeadword.id == Russian.id)
+        .filter(DpdHeadword.root_key != "", Russian.ru_meaning != "")
+        .distinct()
+        .all()
+    )
+    return {root_key for (root_key,) in rows}
+
+
+def select_reset_grounded_rows(
+    limit: int | None,
+) -> list[tuple[DpdHeadword, Russian]]:
+    """Rooted ru_meaning_raw drafts whose root has verified same-root examples.
+
+    A pending draft has ru_meaning empty, so it can never be its own
+    verified example — no self-exclusion is needed here.
+    """
+    verified_roots = get_verified_root_keys()
+    if not verified_roots:
+        return []
+    query = (
+        db_session.query(DpdHeadword, Russian)
+        .join(Russian, DpdHeadword.id == Russian.id)
+        .filter(
+            Russian.ru_meaning_raw != "",
+            or_(Russian.ru_meaning.is_(None), Russian.ru_meaning == ""),
+            DpdHeadword.root_key != "",
+            DpdHeadword.root_key.in_(verified_roots),
+        )
+        .order_by(DpdHeadword.ebt_count.desc())
+    )
+    if limit is not None:
+        query = query.limit(limit)
+    return [(word, russian) for word, russian in query.all()]
+
+
+def reset_grounded_drafts(limit: int | None, dry_run: bool = False) -> None:
+    """Clear ru_meaning_raw for grounded-eligible drafts so they re-enter the pool."""
+    rows = select_reset_grounded_rows(limit)
+    pr.white(f"Grounded-reset candidates: {len(rows)}")
+    if dry_run:
+        pr.amber(f"[DRY-RUN] Would clear ru_meaning_raw for {len(rows)} rows:")
+        for idx, (word, _russian) in enumerate(rows, 1):
+            pr.white(f"  {idx}/{len(rows)} {word.id}, {word.ebt_count} {word.lemma_1}")
+        return
+    for _word, russian in rows:
+        russian.ru_meaning_raw = ""
+    db_session.commit()
+    pr.green(
+        f"Cleared ru_meaning_raw for {len(rows)} rows — "
+        "back in the meaning/ru generation pool (regenerate via Op 1)."
+    )
+
+
+def get_root_ru_meaning(root_key: str) -> str:
+    """Verified Russian gloss of the root, memo-cached ('' if none)."""
+    if not root_key:
+        return ""
+    if root_key not in _root_ru_meaning_cache:
+        root = db_session.query(DpdRoot).filter(DpdRoot.root == root_key).first()
+        _root_ru_meaning_cache[root_key] = root.root_ru_meaning if root else ""
+    return _root_ru_meaning_cache[root_key]
+
+
+def get_same_root_meaning_examples(
+    word: DpdHeadword, limit: int = 5
+) -> list[tuple[str, str, str]]:
+    """Verified same-root (lemma_1, meaning_combo, ru_meaning) examples.
+
+    Same-pos rows first, then ebt_count descending; deduplicated by base
+    lemma (homonym number stripped); the queried word itself is excluded.
+    """
+    if not word.root_key:
+        return []
+    key = (word.root_key, word.pos)
+    if key not in _meaning_examples_cache:
+        rows = (
+            db_session.query(DpdHeadword, Russian)
+            .join(Russian, DpdHeadword.id == Russian.id)
+            .filter(
+                DpdHeadword.root_key == word.root_key,
+                Russian.ru_meaning != "",
+            )
+            .order_by(
+                case((DpdHeadword.pos == word.pos, 0), else_=1),
+                DpdHeadword.ebt_count.desc(),
+            )
+            .limit(limit * 4)
+            .all()
+        )
+        examples: list[tuple[str, str, str]] = []
+        seen_lemmas: set[str] = set()
+        for hw, ru in rows:
+            base_lemma = re.sub(r"\s+\d+$", "", hw.lemma_1)
+            if base_lemma in seen_lemmas:
+                continue
+            seen_lemmas.add(base_lemma)
+            examples.append((hw.lemma_1, make_meaning_combo(hw), ru.ru_meaning))
+        _meaning_examples_cache[key] = examples
+    return [t for t in _meaning_examples_cache[key] if t[0] != word.lemma_1][:limit]
+
+
+def get_same_root_lit_examples(
+    word: DpdHeadword, limit: int = 5
+) -> list[tuple[str, str, str, str]]:
+    """Verified same-root (lemma_1, construction, meaning_lit, ru_meaning_lit).
+
+    Rows whose construction starts with the same first token as the
+    target's construction come first (prefix affinity), then same-pos,
+    then ebt_count descending; deduplicated by first-line construction;
+    the queried word itself is excluded; constructions are normalized to
+    their first line.
+    """
+    if not word.root_key:
+        return []
+    first_tok = _first_construction_token(word.construction or "")
+    key = (word.root_key, word.pos, first_tok)
+    if key not in _lit_examples_cache:
+        order_terms: list[Any] = []
+        if first_tok:
+            order_terms.append(
+                case(
+                    (
+                        or_(
+                            DpdHeadword.construction == first_tok,
+                            DpdHeadword.construction.startswith(
+                                first_tok + " ", autoescape=True
+                            ),
+                        ),
+                        0,
+                    ),
+                    else_=1,
+                )
+            )
+        order_terms.append(case((DpdHeadword.pos == word.pos, 0), else_=1))
+        order_terms.append(DpdHeadword.ebt_count.desc())
+        rows = (
+            db_session.query(DpdHeadword, Russian)
+            .join(Russian, DpdHeadword.id == Russian.id)
+            .filter(
+                DpdHeadword.root_key == word.root_key,
+                DpdHeadword.construction != "",
+                Russian.ru_meaning_lit != "",
+            )
+            .order_by(*order_terms)
+            .limit(limit * 4)
+            .all()
+        )
+        examples: list[tuple[str, str, str, str]] = []
+        seen_constructions: set[str] = set()
+        for hw, ru in rows:
+            constr = hw.construction.split("\n")[0]
+            if constr in seen_constructions:
+                continue
+            seen_constructions.add(constr)
+            examples.append((hw.lemma_1, constr, hw.meaning_lit, ru.ru_meaning_lit))
+        _lit_examples_cache[key] = examples
+    return [t for t in _lit_examples_cache[key] if t[0] != word.lemma_1][:limit]
+
+
 def create_translation_prompt(
     word: DpdHeadword, mode: str, lang: str = "ru", model: str | None = None
 ) -> dict[str, Any]:
@@ -364,15 +538,37 @@ def create_translation_prompt(
         if lang not in LANG_CONFIG:
             raise ValueError(f"Unsupported language: {lang}")
         prompt_builder = LANG_CONFIG[lang]["prompt_builder"]
+        extra_kwargs: dict[str, Any] = {}
+        if lang == "ru" and word.root_key:
+            root_examples = get_same_root_meaning_examples(word)
+            if root_examples:
+                extra_kwargs = {
+                    "root_examples": root_examples,
+                    "root_key": word.root_key,
+                    "root_ru_meaning": get_root_ru_meaning(word.root_key),
+                }
         messages = prompt_builder(
-            word.lemma_1, grammar, meaning, example, translation_example
+            word.lemma_1,
+            grammar,
+            meaning,
+            example,
+            translation_example,
+            **extra_kwargs,
         )
     elif mode == "lit":
+        construction = (word.construction or "").split("\n")[0]
+        lit_examples = get_same_root_lit_examples(word) if word.root_key else []
         messages = generate_messages_for_meaning_lit(
             word.lemma_1,
             grammar,
             word.meaning_lit,
             word.ru.ru_meaning if word.ru else "",
+            construction=construction,
+            root_examples=lit_examples or None,
+            root_key=word.root_key,
+            root_ru_meaning=(
+                get_root_ru_meaning(word.root_key) if lit_examples else ""
+            ),
         )
     elif mode == "note":
         messages = generate_messages_for_notes(word.lemma_1, grammar, word.notes)
@@ -388,41 +584,13 @@ def create_translation_prompt(
     }
 
 
-def translate(
-    lemma_1: str,
-    grammar: str,
-    pos: str,
-    meaning: str,
-    sentence: str,
-    notes: str,
+def request_translation(
+    messages: list[dict[str, str]],
     mode: str,
-    lang: str = "ru",
     provider: str | None = None,
     model: str | None = None,
 ) -> str | None:
-    pos_example_map = load_translation_examples(dpspth, lang=lang)
-    translation_example = pos_example_map.get(pos, "")
-    grammar = replace_abbreviations(grammar)
-
-    if mode == "meaning":
-        if lang not in LANG_CONFIG:
-            raise ValueError(f"Unsupported language: {lang}")
-        prompt_builder = LANG_CONFIG[lang]["prompt_builder"]
-        messages = prompt_builder(
-            lemma_1, grammar, meaning, sentence, translation_example
-        )
-
-    elif mode == "lit":
-        # For lit mode, we need the ru_meaning to check if translation is already present
-        messages = generate_messages_for_meaning_lit(
-            lemma_1, grammar, meaning, sentence
-        )
-
-    elif mode == "note":
-        messages = generate_messages_for_notes(lemma_1, grammar, notes)
-    else:
-        raise ValueError(f"Invalid mode: {mode}")
-
+    """Send prebuilt prompt messages to the AI manager; postprocess by mode."""
     sys_content = messages[0]["content"]
     user_content = messages[1]["content"]
     response = get_ai_manager().request(
@@ -434,12 +602,9 @@ def translate(
     if response.content is None:
         pr.red(response.status_message)
         return None
-    if mode == "meaning" or mode == "lit":
-        return response.content
-    elif mode == "note":
+    if mode == "note":
         return f"[пер. ИИ] {response.content}"
-    else:
-        raise ValueError(f"Invalid mode: {mode}")
+    return response.content
 
 
 def save_prompts_to_json(prompts: list[dict[str, Any]], filename: str | Path) -> None:
@@ -489,17 +654,9 @@ def translation_generate(
     regenerated_ids: set[int] = set()
     total = len(words)
     for idx, word in enumerate(words, 1):
-        meaning_result = translate(
-            word.lemma_1,
-            word.grammar,
-            word.pos,
-            make_meaning_combo(word),
-            word.example_1 or "",
-            word.notes or "",
-            mode,
-            lang=lang,
-            provider=provider,
-            model=model,
+        prompt = create_translation_prompt(word, mode, lang=lang, model=model)
+        meaning_result = request_translation(
+            prompt["body"]["messages"], mode, provider=provider, model=model
         )
         if meaning_result:
             regenerated_ids.add(word.id)
@@ -666,6 +823,18 @@ if __name__ == "__main__":
         help="Run remove_irrelevant instead of translation_generate/make_json",
     )
     parser.add_argument(
+        "-reset-grounded",
+        "--reset-grounded",
+        action="store_true",
+        dest="reset_grounded",
+        help=(
+            "Clear ru_meaning_raw for rooted drafts that have verified "
+            "same-root examples, so they re-enter the meaning/ru pool and "
+            "get regenerated with grounded prompts. ru only. "
+            "Respects -limit and -dry-run."
+        ),
+    )
+    parser.add_argument(
         "-json",
         "--json",
         action="store_true",
@@ -736,6 +905,10 @@ if __name__ == "__main__":
 
     if args.remove:
         remove_irrelevant(args.limit, lang=args.lang, dry_run=args.dry_run)
+    elif args.reset_grounded:
+        if args.lang != "ru":
+            parser.error("-reset-grounded is only supported with -lang ru")
+        reset_grounded_drafts(args.limit, dry_run=args.dry_run)
     elif args.json:
         make_json(
             args.mode,

@@ -116,5 +116,35 @@
       "role": "user",
       "content": "\n        Translate the English literal definition of the Pali term into Russian, following these rules:\n\n        - Translate all bracketed text (e.g., \"(of weather)\" → \"(о погоде)\").\n        - Match the grammatical structure of the Pali term (noun, verb, etc.).\n        - Use lowercase unless it's a proper noun.\n        - Retain clarifications if any (e.g., \"(of trap) laid down\" → \"(о капкане) установленный\").\n        - Translate idioms to Russian equivalents.\n        - Ensure no English remains untranslated, including within brackets.\n        - Output only the translation of the literal Definition, without labels like \"Перевод\" etc, without any comments, without translation of the Grammar and in one line.\n\n        **IMPORTANT**: If the literal translation is already contained in the existing Russian meaning, return only an empty string \"\" without any translation or comments.\n\n        **Pali Term**: dhamma\n        **Grammar**: masc, nom sg\n        **Literal Definition**: that which is held\n        **Existing Russian Meaning**: \n    "
     }
+  ],
+  "generate_messages_for_meaning_with_root_examples": [
+    {
+      "role": "system",
+      "content": "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules."
+    },
+    {
+      "role": "user",
+      "content": "\n        Translate the English definition of the Pali term into Russian, following these rules:\n\n        - Translate all bracketed text (e.g., \"(gram)\" → \"(грам)\", \"(comm)\" → \"(комм)\", \"(vinaya)\" → \"(виная)\", \"(of weather)\" → \"(о погоде)\").\n        - Give at most 3 Russian meanings, separated by `;`.\n        - Each meaning must be semantically distinct — a different sense, nuance, or usage, not a reworded synonym.\n        - If the English definition expresses only one sense, output exactly one translation: fewer distinct meanings is better than padded near-synonyms.\n        - Match the grammatical structure of the Pali term (noun, verb, etc.).\n        - Use lowercase unless it's a proper noun.\n        - Translate \"lit.\" as \"досл.\".\n        - Retain clarifications if any (e.g., \"(of trap) laid down\" → \"(о капкане) установленный\").\n        - Translate idioms to Russian equivalents.\n        - Ensure no English remains untranslated, including within brackets.\n        - Output only the translation of the Definition, without labels like \"Перевод\" etc, without any comments, without translation of the Grammar and in one line.\n\n        **Pali Term**: accagamā 1\n        **Grammar**: verb, aorist\n        **Definition**: went beyond\n    \n**Reference — verified Russian translations of other words from the same root** (√gam — root meaning: \"идти\"):\n- samannāgata: \"endowed with\" → \"наделённый\"\n- gacchati 2: \"goes\" → \"идёт\"\nMatch the terminology, register, and phrasing conventions established in these reference translations for the same root family. Do not copy them verbatim if the definition differs — adapt consistently."
+    }
+  ],
+  "generate_messages_for_meaning_lit_with_construction": [
+    {
+      "role": "system",
+      "content": "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules."
+    },
+    {
+      "role": "user",
+      "content": "\n        Translate the English literal definition of the Pali term into Russian, following these rules:\n\n        - Translate all bracketed text (e.g., \"(of weather)\" → \"(о погоде)\").\n        - Match the grammatical structure of the Pali term (noun, verb, etc.).\n        - Use lowercase unless it's a proper noun.\n        - Retain clarifications if any (e.g., \"(of trap) laid down\" → \"(о капкане) установленный\").\n        - Translate idioms to Russian equivalents.\n        - Ensure no English remains untranslated, including within brackets.\n        - Output only the translation of the literal Definition, without labels like \"Перевод\" etc, without any comments, without translation of the Grammar and in one line.\n\n        **IMPORTANT**: If the literal translation is already contained in the existing Russian meaning, return only an empty string \"\" without any translation or comments.\n\n        **Pali Term**: accagamā 1\n        **Grammar**: verb, aorist\n        **Construction**: ati > aty > acc + a + √gam + ā\n        **Literal Definition**: went beyond\n        **Existing Russian Meaning**: переступил\n    "
+    }
+  ],
+  "generate_messages_for_meaning_lit_with_root_examples": [
+    {
+      "role": "system",
+      "content": "You are a skilled assistant that translates English text to Russian with grammatical accuracy, contextual relevance, and strict adherence to rules."
+    },
+    {
+      "role": "user",
+      "content": "\n        Translate the English literal definition of the Pali term into Russian, following these rules:\n\n        - Translate all bracketed text (e.g., \"(of weather)\" → \"(о погоде)\").\n        - Match the grammatical structure of the Pali term (noun, verb, etc.).\n        - Use lowercase unless it's a proper noun.\n        - Retain clarifications if any (e.g., \"(of trap) laid down\" → \"(о капкане) установленный\").\n        - Translate idioms to Russian equivalents.\n        - Ensure no English remains untranslated, including within brackets.\n        - Output only the translation of the literal Definition, without labels like \"Перевод\" etc, without any comments, without translation of the Grammar and in one line.\n\n        **IMPORTANT**: If the literal translation is already contained in the existing Russian meaning, return only an empty string \"\" without any translation or comments.\n\n        **Pali Term**: accagamā 1\n        **Grammar**: verb, aorist\n        **Construction**: ati > aty > acc + a + √gam + ā\n        **Literal Definition**: went beyond\n        **Existing Russian Meaning**: переступил\n    \n**Reference — verified literal Russian translations of other words from the same root** (√gam — root meaning: \"идти\"):\n- sugata 1 (construction: su + √gam + ta): \"well gone\" → \"хорошо ушедший\"\n- agata 1 (construction: na > a + √gam + ta): \"\" → \"не ушедший\"\nBuild the literal Russian meaning compositionally: start from the root's Russian meaning above, then translate each prefix/suffix in the **Construction** the same way these reference examples translate theirs. Do not translate the English literal definition word-for-word if it conflicts with this compositional pattern."
+    }
   ]
 }

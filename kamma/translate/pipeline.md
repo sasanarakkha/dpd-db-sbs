@@ -47,7 +47,8 @@ Show the menu with the current counts inline (both generation pool sizes and che
 3. Check existing columns     (meaning: A, meaning_raw: B, russian_grammar_meaning_raw: C, meaning_lit: D, notes: E, notes_raw: F pending)
 4. Synonym audit              (find near-identical synonyms; trim on approval)
 5. Clean irrelevant rows      (empty RU rows / Latin-script TA rows)
-6. Status only / exit
+6. Re-ground existing drafts  (clear rooted ru_meaning_raw drafts → back into pool 1)
+7. Status only / exit
 ```
 
 Recommended default order for a fresh cycle: 1 → 2 → (repeat 1–2 until pool empty)
@@ -147,6 +148,30 @@ uv run python3 kamma/translate/scripts/ai_generate_translation.py -remove -lang 
 Show the dry-run list first; on user confirmation re-run without `--dry-run`.
 (RU: deletes rows where both ru_meaning and ru_meaning_raw are empty;
 TA: deletes ta_meaning rows contaminated with Latin script.)
+
+#### Op 6 — Re-ground existing drafts
+
+One-shot reset that re-enters existing AI drafts into the Op 1 pool so they
+are regenerated with same-root grounded prompts. Selects only drafts whose
+prompt actually changes: `root_key` non-empty AND ≥1 verified same-root
+`ru_meaning` exists (~26k of ~65k pending drafts as of 2026-07-09).
+
+⚠️ Destructive (clears `ru_meaning_raw`). Protocol:
+
+1. Fresh backup first: `uv run python3 db/backup_tsv/backup_dps.py`
+2. Dry-run and show the user the count:
+   `uv run python3 kamma/translate/scripts/ai_generate_translation.py -reset-grounded -dry-run [-limit N]`
+3. On explicit confirmation, re-run without `-dry-run`.
+4. Proceed straight to Op 1 (meaning/ru) to regenerate, then Op 2 to verify.
+
+- Do NOT run Op 5 between the reset and regeneration: cleared rows match
+  Op 5's empty-row filter and would be deleted (losing any `ru_notes`).
+- Runs directly, not through `batch_runner.py`; the regeneration itself is
+  ordinary Op 1.
+- Rollout: pilot with `-limit 100` → regenerate → human-review quality →
+  full reset only after the pilot is approved.
+- ru only. There is no lit-mode analog: `ru_meaning_lit` has no
+  raw/verified split, so a bulk overwrite could destroy human work.
 
 ### 4. Batch protocol
 
