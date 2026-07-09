@@ -12,6 +12,9 @@ no-translate redirect). Items are checked off as translations land.
 
 ## Pending
 
+- [ ] docs/technical/local_server_setup.md
+- [ ] docs/technical/quick_start.md
+- [ ] docs/technical/use_db.md
 <!-- Stage 1 prep appends items here, e.g.:
 - [ ] docs/changelog.md  (no-translate — mostly Pali data; use redirect pattern)
 - [ ] docs/technical/dpd_headwords_table.md  (full translation needed)

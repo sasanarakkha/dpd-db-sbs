@@ -1,0 +1,287 @@
+# Upstream Sync Preparation Report
+
+## Upstream Range
+- From: `518672a65fa3ea7c36c4c754dc5276bb41f92da7`
+- To: `be49bffe2c2c85971784337d4e09915ad1f42800`
+
+## Registry Validation Status
+OK: Registry is valid.
+
+## Modified - Tracked Files
+- .gitignore
+- .pre-commit-config.yaml
+- AGENTS.md
+- db/models.py
+- gui2/main.py
+- gui2/pass2_add_view.py
+- pyproject.toml
+
+## Modified - Shadow Sources
+- `db/epd/epd_to_lookup.py` -> shadows: db/rpd/rpd_to_lookup.py, db/tpd/tpd_to_lookup.py
+- `db/lookup/help_abbrev_add_to_lookup.py` -> shadows: db/lookup/help_abbrev_add_to_lookup_ru.py
+- `exporter/deconstructor/deconstructor_exporter.py` -> shadows: exporter/deconstructor/deconstructor_exporter_ru.py
+- `exporter/goldendict/export_epd.py` -> shadows: exporter/goldendict/export_rpd.py
+- `exporter/grammar_dict/grammar_dict.py` -> shadows: exporter/grammar_dict/grammar_dict_ru.py
+- `exporter/kindle/epub/OEBPS/Text/titlepage.xhtml` -> shadows: exporter/kindle/ru_components/epub/
+- `exporter/kindle/kindle_exporter.py` -> shadows: exporter/kindle/kindle_exporter_ru.py
+- `exporter/kindle/templates/ebook_example.jinja` -> shadows: exporter/kindle/ru_components/templates/
+- `exporter/kindle/templates/ebook_grammar.jinja` -> shadows: exporter/kindle/ru_components/templates/
+- `gui2/dpd_fields_examples.py` -> shadows: gui2/dps_example_field.py
+- `gui2/example_stash_manager.py` -> shadows: gui2/dps_example_stash_manager.py
+- `scripts/server/update-dpd.sh` -> shadows: scripts/server/update-dpd-sbs.sh
+- `tools/spelling.py` -> shadows: tools/ru_spelling.py
+
+## Modified - Inspired Sources
+- `.github/workflows/draft_release.yml` -> inspired: .github/workflows/ru_release.yml, .github/workflows/ru_release_test.yml
+- `docs/technical/local_server_setup.md` -> inspired: docs_rus/
+- `docs/technical/quick_start.md` -> inspired: docs_rus/
+- `docs/technical/use_db.md` -> inspired: docs_rus/
+- `exporter/goldendict/export_dpd.py` -> inspired: exporter/goldendict/export_dpd_ru.py, exporter/goldendict/export_dpd_sbs.py
+- `exporter/goldendict/export_epd.py` -> inspired: exporter/goldendict/export_epd_sbs.py
+- `exporter/goldendict/export_help.py` -> inspired: exporter/goldendict/export_help_ru.py, exporter/goldendict/export_help_sbs.py
+- `exporter/goldendict/export_variant_spelling.py` -> inspired: exporter/goldendict/export_variant_spelling_ru.py
+- `exporter/goldendict/main.py` -> inspired: exporter/goldendict/main_ru.py, exporter/goldendict/main_sbs.py
+- `gui2/dpd_fields.py` -> inspired: gui2/dps_fields.py
+- `gui2/pass2_add_view.py` -> inspired: gui2/dps_view.py
+- `scripts/bash/generate_components.py` -> inspired: scripts/bash/generate_components.sh
+- `tools/paths.py` -> inspired: tools/paths_ru.py, tools/paths_dps.py
+
+## New Or Unmapped Upstream Changes
+- .github/workflows/mobile_release.yml
+- .github/workflows/pdf_test.yml
+- CONTRIBUTING.md
+- audio/error_check/delete_silent_files.py
+- audio/error_check/trim_audio.py
+- db/app/create_app_db.py
+- db/backup_tsv/dpd_headwords_part_001.tsv
+- db/backup_tsv/dpd_headwords_part_002.tsv
+- db/backup_tsv/dpd_headwords_part_003.tsv
+- db/grammar/grammar_to_lookup.py
+- db/inflections/generate_inflection_tables.py
+- db/inflections/inflection_templates.xlsx
+- db/inflections/inflections_to_headwords.py
+- db/inflections/transliterate_inflections.py
+- db/lookup/transliterate_lookup_table.py
+- db/sanskrit/root_families_sanskrit.tsv
+- db/variants/find_examples.py
+- db/variants/variants_modules.py
+- exporter/analysis/README.md
+- exporter/analysis/ai_batch_translate.py
+- exporter/analysis/ai_pali_translate.py
+- exporter/analysis/ai_response.py
+- exporter/analysis/book_to_verses.py
+- exporter/analysis/example_bolding.py
+- exporter/analysis/export_words_csv.py
+- exporter/analysis/passage_by_code.py
+- exporter/analysis/passage_extraction.py
+- exporter/analysis/paths.py
+- exporter/analysis/prompts.py
+- exporter/analysis/rendering.py
+- exporter/analysis/study_passage.py
+- exporter/analysis/translate_core.py
+- exporter/analysis/ui_utils.py
+- exporter/deconstructor/data_classes.py
+- exporter/grammar_dict/data_classes.py
+- exporter/kindle/data_classes.py
+- go_modules/deconstructor/data/globaldata.go
+- go_modules/deconstructor/data/matchdata.go
+- go_modules/deconstructor/data/sandhi_rules.go
+- go_modules/deconstructor/data/stats.go
+- go_modules/deconstructor/data/worddata.go
+- go_modules/deconstructor/importer/sandhi_rules.go
+- go_modules/deconstructor/importer/unmatched.go
+- go_modules/deconstructor/main.go
+- go_modules/deconstructor/splitters/split_2words.go
+- go_modules/deconstructor/splitters/split_3words.go
+- go_modules/deconstructor/splitters/split_apicaevaiti.go
+- go_modules/deconstructor/splitters/split_ati.go
+- go_modules/deconstructor/splitters/split_double.go
+- go_modules/deconstructor/splitters/split_dur.go
+- go_modules/deconstructor/splitters/split_ika.go
+- go_modules/deconstructor/splitters/split_ka.go
+- go_modules/deconstructor/splitters/split_lwfb.go
+- go_modules/deconstructor/splitters/split_lwff.go
+- go_modules/deconstructor/splitters/split_neg.go
+- go_modules/deconstructor/splitters/split_nir.go
+- go_modules/deconstructor/splitters/split_prefixes.go
+- go_modules/deconstructor/splitters/split_pīti.go
+- go_modules/deconstructor/splitters/split_recursive.go
+- go_modules/deconstructor/splitters/split_sa.go
+- go_modules/deconstructor/splitters/split_su.go
+- go_modules/deconstructor/splitters/split_tissa.go
+- go_modules/deconstructor/splitters/split_tta.go
+- go_modules/deconstructor/splitters/split_ādi.go
+- go_modules/deconstructor/workerpool/workerpool.go
+- go_modules/deconstructor/workerpool/workerpool_test.go
+- go_modules/frequency/gradient/gradient.go
+- go_modules/frequency/main.go
+- go_modules/frequency/setup/2SC.go
+- go_modules/frequency/setup/main.go
+- go_modules/tools/json.go
+- go_modules/tools/pth.go
+- gui2/daily_log.py
+- gui2/data/additions_added.json
+- gui2/data/corrections_added.json
+- gui2/data/pass2_exceptions.json
+- gui2/dpd_fields_commentary.py
+- gui2/dpd_fields_functions.py
+- gui2/flet_functions.py
+- gui2/pass2_auto_control.py
+- gui2/pass2_pre_controller.py
+- gui2/pass2_pre_file_manager.py
+- gui2/pass2_pre_new_word_manager.py
+- gui2/pass2_pre_view.py
+- gui2/paths.py
+- justfile
+- resources/deconstructor_output
+- resources/other-dictionaries
+- resources/tpr_downloads
+- scripts/add/vagga_codes/apply.py
+- scripts/add/vagga_codes/dhp_m2.py
+- scripts/add/vagga_codes/kn_suggestions.py
+- scripts/add/vagga_codes/runner.py
+- scripts/add/vagga_codes/shared.py
+- scripts/build/config_uposatha_day.py
+- scripts/build/config_uposatha_reset.py
+- scripts/build/deconstructor_output_add_to_db.py
+- scripts/build/sanskrit_root_families_updater.py
+- scripts/build/tarball_db.py
+- scripts/build/tarball_deconstructor_output.py
+- scripts/export/db_filter_export.py
+- scripts/export/sanskrit_export.py
+- scripts/extractor/extract_cone.py
+- scripts/extractor/extract_cpd.py
+- scripts/fix/fix_synonym_entries.py
+- scripts/info/suffix_counter.py
+- scripts/onboarding/contributor_setup.py
+- scripts/onboarding/contributor_update.py
+- scripts/tutorial/quick_start.py
+- shared_data/deconstructor/checked.csv
+- shared_data/deconstructor/manual_corrections.tsv
+- shared_data/deconstructor/variant_readings.tsv
+- shared_data/user_dictionary.txt
+- tools/ai_antigravity_cli.py
+- tools/ai_antigravity_cli_models.py
+- tools/ai_deepseek_manager.py
+- tools/ai_manager.py
+- tools/ai_models.json
+- tools/bjt.py
+- tools/compound_type_manager.tsv
+- tools/configger.py
+- tools/css_manager.py
+- tools/deconstructed_words.py
+- tools/docs_changelog_and_release_notes.py
+- tools/goldendict_exporter.py
+- tools/lookup_sync.py
+- tools/meaning_construction.py
+- tools/proofreader.py
+- tools/script_runner.py
+- tools/tokenizer.py
+- uv.lock
+
+## Deleted Files
+- scripts/build/deconstructor_extract_archive.py
+- shared_data/help/README.md
+- shared_data/help/abbreviations.tsv
+- shared_data/help/abbreviations_other.tsv
+- shared_data/help/abbreviations_other_README.md
+- shared_data/help/bibliography.tsv
+- shared_data/help/help.tsv
+- shared_data/help/thanks.tsv
+- tools/cst_source_sutta_example.py
+
+## Needs Classification (Stage 2)
+These upstream additions have no local collision. Register them in `registry.json` during Stage 2.
+- go_modules/deconstructor/data/globaldata_test.go
+- go_modules/deconstructor/data/worddata_test.go
+- go_modules/deconstructor/importer/unmatched_test.go
+- go_modules/deconstructor/splitters/split_helpers.go
+- go_modules/deconstructor/splitters/split_helpers_test.go
+- gui2/data/in_commentary_exceptions.txt
+- gui2/pass2x/in_commentary_controller.py
+- gui2/pass2x/in_commentary_exceptions.py
+- gui2/pass2x/in_commentary_tui.py
+- gui2/pass2x/in_commentary_view.py
+- scripts/fix/pass2exceptions.json
+- scripts/fix/pass2exceptions.py
+- shared_data/reference/README.md
+- shared_data/reference/abbreviations.tsv
+- shared_data/reference/abbreviations_other.tsv
+- shared_data/reference/abbreviations_other_README.md
+- shared_data/reference/bibliography.tsv
+- shared_data/reference/help.tsv
+- shared_data/reference/thanks.tsv
+- tools/cst_source/examples.py
+- tools/cst_source/extractor.py
+- tools/cst_source/loader.py
+- tools/cst_source/models.py
+- tools/cst_source/parsers/abhidhamma.py
+- tools/cst_source/parsers/base.py
+- tools/cst_source/parsers/commentary.py
+- tools/cst_source/parsers/khuddaka.py
+- tools/cst_source/parsers/misc.py
+- tools/cst_source/parsers/registry.py
+- tools/cst_source/parsers/sutta.py
+- tools/cst_source/parsers/vinaya.py
+- tools/cst_source/peyyala_data.py
+- tools/cst_source/text_utils.py
+
+## Unregistered Local Paths (Stage 2)
+These local files have no upstream counterpart (current or historical) and are not covered by any registry category. Classify them in `registry.json`/SMD during Stage 2 (typically `unique_paths`, or a shadow/inspired category if a counterpart exists).
+- .github/workflows/anki_release.yml
+- .github/workflows/ru_release_kindle.yml
+- db/tpd/__init__.py
+- docs/pics/kindle/Dictionary_Selection_01_Note_1920x1355.png
+- docs/pics/kindle/Dictionary_Selection_02_Note_1920x1355.png
+- docs/pics/kindle/Dictionary_Selection_03_Note_1920x1355.png
+- docs/pics/kindle/ariyasacca_Entry_01_1920x1355.png
+- docs/pics/kindle/copy_dpd_on_kindle_02.png
+- docs_setup_guide.md
+- exporter/deconstructor/deconstructor_header_ru.jinja
+- gui2/data/addition_processed.json
+- gui2/data/addition_replaced.json
+- gui2/data/corrections_processed.json
+- gui2/data/dps_example_stash.json
+- gui2/data/dps_history.json
+- misc/ebt-md/an.md
+- misc/ebt-md/dn.md
+- misc/ebt-md/kn_ebt.md
+- misc/ebt-md/mn.md
+- misc/ebt-md/sn.md
+- resources/anki/collection_media.tar.gz
+- resources/anki/seed_collection.anki2.tar.gz
+- scripts/build/deconstructor_extract_archive.py
+- scripts/export/add_combined_view.py
+- scripts/export/sbs_anki_schema_snapshot.json
+- scripts/extractor/README.md
+- scripts/patch/README.md
+- scripts/project_management/README.md
+- scripts/server/README.md
+- shared_data/russian_words_user_dict.txt
+- shared_data/tamil/ta_translation_examples.csv
+- shared_data/tamil/tam.md
+- shared_data/tpr_parsing_errors.tsv
+
+## Upstream-Deleted Orphans (Stage 2)
+These local files match a path upstream once had but has since deleted. Decide during Stage 2 whether to keep them as an intentional fork divergence (register the decision) or delete them locally to match upstream.
+- audio/bhashini/bhashini_generate_dpd.py
+- audio/bhashini/bhashini_generate_single.py
+- shared_data/help/README.md
+- shared_data/help/abbreviations.tsv
+- shared_data/help/abbreviations_other.tsv
+- shared_data/help/abbreviations_other_README.md
+- shared_data/help/bibliography.tsv
+- shared_data/help/help.tsv
+- shared_data/help/thanks.tsv
+- tools/cst_source_sutta_example.py
+
+## Stage 1 Blocker Paths
+Resolve these paths before running `execute_sync.py`; rerun prep after registry/SMD or run-specific scope changes.
+- exporter/analysis/ui_utils.py (exists in local worktree)
+- shared_data/help/README.md
+- shared_data/help/abbreviations.tsv
+- shared_data/help/abbreviations_other.tsv
+- shared_data/help/abbreviations_other_README.md
+- shared_data/help/bibliography.tsv
+- shared_data/help/help.tsv
+- shared_data/help/thanks.tsv

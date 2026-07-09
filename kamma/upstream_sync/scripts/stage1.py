@@ -97,7 +97,7 @@ def build_default_steps(thread_dir: Path) -> list[Stage1Step]:
             ),
         ),
         Stage1Step(
-            name="lint gate (F821,E999)",
+            name="lint gate (F821)",
             remediation="fix the reported ruff errors before continuing",
             run=lambda: run_subprocess_step(
                 [
@@ -110,7 +110,9 @@ def build_default_steps(thread_dir: Path) -> list[Stage1Step]:
                     "db/",
                     "exporter/",
                     "--select",
-                    "F821,E999",
+                    "F821",
+                    "--extend-exclude",
+                    "scripts/archive,scripts/dps_archive",
                     "--quiet",
                 ]
             ),

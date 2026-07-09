@@ -178,7 +178,8 @@ reference when a step fails or when running a step by hand outside the chain.
    - Rationale: accumulated shadow drift that slips through one sync becomes a multi-hour
      remediation in the next sync (see Stage 3.5 in the April 2026 sync thread).
 1. **Environmental Validation**:
-   - Run `uv run ruff check tools/ scripts/ db/ exporter/ --select F821,E999 --quiet` — catch undefined names and syntax/API breakage before sync work begins.
+   - Run `uv run ruff check tools/ scripts/ db/ exporter/ --select F821 --extend-exclude scripts/archive,scripts/dps_archive --quiet` — catch undefined names and syntax/API breakage before sync work begins. (Syntax errors are always reported by ruff regardless of selection; the former `E999` rule id was removed in ruff 0.5+ and must not be selected.)
+   - Archive policy: `archive/` and `scripts/archive/` are pulled from upstream verbatim but their contents are never linted, analyzed, or worried about; `scripts/dps_archive/` is fork-local only and excluded from every sync activity.
    - Run `uv run python3 kamma/upstream_sync/scripts/validate_registry.py`
    - Run `git fetch upstream` — fetch before the factual diff. No need to search for new commits manually; the scripts derive the range from `accepted_sync.json`.
    - Ensure `kamma/upstream_sync/accepted_sync.json` points at the last accepted upstream sync.

@@ -34,7 +34,9 @@ def test_no_test_flag_fails():
 def test_missing_file_fails():
     """Non-existent source file must produce FAIL."""
     output, exit_code = _run_gate(
-        "nonexistent/file.py", "--test", "tests/kamma/improve/test_archive_check.py"
+        "nonexistent/file.py",
+        "--test",
+        "tests/kamma_tests/improve/test_archive_check.py",
     )
     assert exit_code != 0
     assert "not found" in output.lower()

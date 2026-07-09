@@ -117,7 +117,7 @@ This document provides a unified, exhaustive post-mortem of the Upstream Sync Re
 ## 16. Pre-Sync API Health Check
 **Issue:** In the 2026-05-02 sync, 188 Printer API violations (`pr.title()`, `pr.info()`, `pr.warning()`, `pr.error()` — non-existent methods) were present in the codebase before the sync began. They were not caught until Stage 3 manual verification, causing a large unplanned fix mid-session.
 **Recommendation:**
-- Run `uv run ruff check tools/ scripts/ db/ exporter/ --select F821,E999 --quiet` in Stage 1 Environmental Validation to catch dead-code and API violations before sync begins.
+- Run `uv run ruff check tools/ scripts/ db/ exporter/ --select F821 --extend-exclude scripts/archive,scripts/dps_archive --quiet` in Stage 1 Environmental Validation to catch dead-code and API violations before sync begins. (`E999` was removed as a selectable rule in newer ruff; syntax errors are always reported. Archive folders are never linted: `archive/` and `scripts/archive/` are pulled from upstream but their contents are not our concern; `scripts/dps_archive/` is fork-local and outside all sync activity.)
 - Pre-existing failures are in scope — fix them in a separate commit before the sync commits.
 
 ## 17. Scope Discipline and Out-of-Scope Directories

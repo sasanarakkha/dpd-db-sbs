@@ -1,4 +1,4 @@
-# Plan: Upstream Sync <DATE>
+# Plan: Upstream Sync 2026-07-09
 
 > Follow the 4-stage workflow + async Docs Translation Track in `kamma/upstream_sync/guide.md`.
 > Mark tasks `[~]` before starting, `[x]` on completion. Every stage ends with a fresh-session hard
@@ -60,7 +60,7 @@
   - [ ] `uv run python3 tests/check_shadow_modifications.py`.
   - [ ] `uv run python tests/smoke_test_sync.py`.
 - [ ] **3.3** Cleanup only as explicitly listed in `dynamic_plan.md`.
-- [ ] **3.4 Commit 2 Gate**: prepare commit message only: `#sync: manual merge resolutions <DATE>`.
+- [ ] **3.4 Commit 2 Gate**: prepare commit message only: `#sync: manual merge resolutions 2026-07-09`.
 
 **Hard stop**: update `handoff.md` with completed/failed items, files changed, test evidence, then stop.
 
