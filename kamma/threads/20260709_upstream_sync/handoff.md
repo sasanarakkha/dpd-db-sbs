@@ -2,8 +2,10 @@
 
 ## Status
 
-**Stage 1.5 pull DONE and verified.** At the **Commit 1 gate** (USER commits), then a **fresh
-session** runs Stage 3 FAST. Stage 2 was COMPLETE + APPROVED in a prior session.
+**Stage 1.5 pull DONE + verified; Commit 1 LANDED (`699c10cd1`).** Next: a **fresh Opus session**
+runs Stage 3 (ADVANCED orchestrator dispatching `haiku` sync-fast subagents). Stage 2 was
+COMPLETE + APPROVED in a prior session. Tree is clean at Commit 1; three redundant session stashes
+remain to drop (see below).
 
 ## What happened this session (pull + a tooling-bug detour)
 
@@ -33,20 +35,16 @@ session** runs Stage 3 FAST. Stage 2 was COMPLETE + APPROVED in a prior session.
    deletions verified upstream-deleted (matches expected ~108 P0). All local-only files preserved.
    `cst_source_sutta_example.py` correctly removed (S10). `as_upstream` → `be49bffe2`.
 
-## COMMIT 1 GATE (next action — USER commits)
+## COMMIT 1 — LANDED (`699c10cd1`)
 
-**Message:** `#sync: upstream pull 518672a6..be49bffe, 363 files, 2026-07-09`
-(363 = 255 add/modify + 108 delete, excluding resources/*; kamma bookkeeping folded in.)
+`#sync: upstream pull 518672a6..be49bffe, 363 files, 2026-07-09` (255 add/modify + 108 delete,
+excluding `resources/*`; kamma bookkeeping folded in). Committed with **`--no-verify` (user-approved)**
+— see Future-Sync Improvements #4. Pristine index committed; ruff worktree-noise stashed off.
 
-**Scope:** stage the sync content (M/D/A upstream files) + kamma bookkeeping
-(`execute_sync_done.json` marker, `plan.md`, this `handoff.md`).
-**EXCLUDE `resources/*`** — all 7 are dirty content only, **no gitlink (recorded SHA) change** was
-pulled (verified: SHAs identical, only `-dirty` suffix). Suggested staging that excludes them:
-`git add -A -- . ':(exclude)resources'` then commit.
-
-**Redundant session stashes to drop after Commit 1:** `sync-rerun-20260709` and
-`sync-rerun2-20260709` (they hold now-regenerated upstream files). `git stash drop` each. The other
-`stash@{...}` WIP entries belong to the USER — DO NOT touch.
+**THREE redundant session stashes to drop** (all safe — hold now-committed upstream files or hook
+noise): `ruff-worktree-noise-20260709`, `sync-rerun2-20260709`, `sync-rerun-20260709`.
+`git stash drop` each. **The other `stash@{...}` WIP entries belong to the USER — DO NOT touch.**
+(Left undropped this session because tree-wide/stash destructive ops need explicit user naming.)
 
 ## After Commit 1 — forward plan (Stage 3 FAST, fresh session)
 
@@ -76,23 +74,98 @@ pulled (verified: SHAs identical, only `-dirty` suffix). Suggested staging that 
 - **To (PINNED)**: `be49bffe2c2c85971784337d4e09915ad1f42800` (2026-07-09).
   `upstream/main` is actually at `820113551…` (+2 CI-only commits, deferred).
 
-## Errors, Issues, And Repeated Mistakes (this run)
+## ⭐ FUTURE-SYNC IMPROVEMENTS (from this session — MUST be actioned in Stage 4 retrospective)
 
-- **execute_sync.py no-overlay restore wiped the tree** — fixed with `--overlay` (`7c2ea4035`).
-  Add a regression test as a Stage-4 retrospective item.
-- **`git stash -u` swallows uncommitted tracked changes** — commit tooling fixes before any pull.
-- **`git checkout <stash> --` with empty pathspec DETACHES HEAD** — reattach with `git checkout sbs-ru`.
-- `execute_sync.py` dirty-guard counts UNTRACKED files → tree must be free of untracked before pull.
-- Dirty `resources/*` submodules: NOT commit scope unless a gitlink SHA actually changed.
+Everything below was surfaced this run. Each is a concrete improvement to the sync **tooling**,
+**guide**, or **process**. Promote accepted items to `archive_improvements.md` at Stage 4.
 
-## Retrospective candidates (for Stage 4)
+### 1. `execute_sync.py` no-overlay restore DELETED all local files (CRITICAL — fixed `7c2ea4035`)
+- **Problem:** step 5 used `git restore --source as_upstream --worktree -- .`. The no-overlay
+  default DELETES every tracked file absent from upstream → wiped ~2780 local-only files (shadows,
+  `unique_paths`, `inspired_by`, all local data TSVs, `russian_words_user_dict.txt`). Regression
+  introduced at `33ed53d34` (2026-06-11, `git checkout as_upstream -- .` → `git restore …`); never
+  caught because the last sync (2026-06-13) was driven manually in batches, so the automated
+  `restore` path's first real execution was THIS run.
+- **Fix applied:** `git restore --overlay …` (preserves local-only files, still updates/creates
+  upstream paths, still worktree-only/unstaged). Verified in an isolated repo.
+- **Still to do (Stage 4):** add a **regression test** — build a tiny repo with a local-only tracked
+  file, run the restore step, assert the local file survives AND an upstream-changed file updates
+  AND changes stay unstaged. Consider a `smoke_test_sync.py`-level check that exercises
+  `execute_sync.py` end-to-end against a fixture so any future restore/overlay regression fails CI.
 
-- **NEW (high priority):** `execute_sync.py` `--overlay` regression — add a regression test that
-  asserts a local-only tracked file survives a pull; consider CI coverage of the sync entrypoint.
-- (carried) stage1 lint gate fixes; tests/kamma rename; "never name a tests/ subpackage after a
-  top-level repo package".
-- Local-commit sweep caught unregistered locally-modified upstream files — consider adding to prep_analyzer.
-- `skill_scope_improvement.md` — guide/skill fixes; apply as a SEPARATE post-sync task.
+### 2. `execute_sync.py` has NO worktree rollback on partial failure (HIGH)
+- **Problem:** when step 5 wiped the tree, the `except` block only calls
+  `context.restore_original_state()` which restores the **branch**, not the **worktree**. The
+  destroyed worktree was left in place; recovery was manual (`git checkout HEAD -- .`). Only luck
+  (changes are worktree-only, never committed/staged, HEAD intact) made recovery possible.
+- **Improvement:** wrap the mutating steps (5–6b) so that ANY failure restores the worktree to the
+  pre-run `sbs_ru_original_sha` (e.g. snapshot via a temp stash/commit, or `git checkout
+  <original_sha> -- .` on failure). The unstaged/worktree-only design is GOOD and must be preserved
+  — but failure must auto-rollback, not leave a half-wiped tree.
+
+### 3. Upstream advancing MID-SYNC has no clean documented procedure (MEDIUM)
+- **Problem:** `execute_sync.py` runs `git fetch upstream` internally and re-resolves the MOVING ref
+  `upstream/main`. Between Stage-2 approval and the pull, upstream added 2 commits, so the target
+  drifted past the approved/analyzed SHA. The manifest gate correctly blocked, but pinning required
+  hand-editing **two** files (`accepted_sync.json.last_accepted_upstream_ref` AND
+  `prep_manifest.json.target_upstream_ref`) PLUS remembering a Stage-4 reset (finalize derives the
+  next ref from `manifest.target_upstream_ref`). Fragile and undocumented.
+- **Improvement options:** (a) `verify_manifest`/`execute_sync` should target
+  `manifest.to_upstream_sha` (the analyzed pinned SHA) directly rather than re-`rev-parse` the moving
+  ref — the analysis pinned a SHA, the pull should honor it; (b) add a documented `--pin` helper or a
+  guide recipe for "upstream advanced mid-sync"; (c) surface the Stage-4 ref-reset automatically so it
+  can't be forgotten. See PIN NOTE above for the exact two-file edit used this run.
+
+### 4. Pre-commit hooks BLOCK Commit 1 (verbatim upstream) — `--no-verify` needed but undocumented (MEDIUM)
+- **Problem:** Commit 1 is by design the **verbatim upstream pull**, but the fork's pre-commit
+  `ruff`/`pyright`/`pyrefly` hooks lint that raw code: `ruff check --fix` auto-modified **202**
+  upstream files in the worktree and reported **21** unfixable errors → commit aborted. Letting the
+  hooks run corrupts the pristine baseline Stage 3 must diff against. Resolved by `--no-verify`
+  (user-approved) committing the pristine index, then stashing off the ruff worktree-noise.
+- **Conflict:** the project rule "**never `--no-verify`**" targets normal fork work, but the
+  raw-upstream Commit 1 is a legitimate exception. This is NOT documented anywhere.
+- **Improvement:** document in `guide.md` that **Commit 1 uses `--no-verify`** (raw upstream is
+  accepted verbatim; lint/type standards apply to fork/shadow code in Stage 3, not the raw drop).
+  Better: a pre-commit config that **skips hooks for the sync-pull commit** (e.g. env guard or a
+  dedicated commit path) so `--no-verify` isn't a manual step. Note the guide already says
+  `archive/`/`scripts/archive/` are "never linted" — extend that principle to the whole Commit-1 drop.
+
+### 5. `execute_sync.py` dirty-guard + `git stash -u` interaction (MEDIUM)
+- **Problem A:** the dirty-guard counts **untracked** files, so leftovers from a failed pull block
+  the re-run. Recovering from a partial failure requires manually clearing untracked upstream files
+  before retrying — awkward and error-prone (a naive tree-wide `rm`/`clean` risks pre-existing local
+  data).
+- **Problem B:** `git stash --include-untracked` also **swallows uncommitted tracked changes** — this
+  silently stashed the in-flight `--overlay` fix, so two pulls ran the OLD code. Root lesson: **any
+  tooling fix must be COMMITTED before running the pull** (the guard demands a clean tree, so the fix
+  can't ride along uncommitted).
+- **Improvement:** (a) make `execute_sync.py` **idempotent/resumable** — on a clean-but-for-its-own-
+  prior-additions tree, clean up its own untracked upstream additions rather than blocking; (b) the
+  guard could ignore untracked (it exists to protect uncommitted tracked edits, per its docstring);
+  (c) guide note: commit tooling fixes first; use `git stash push -- <path>` scoped, not bare
+  `stash -u`, when a fix is in flight.
+
+### 6. Operational lessons (process, not tooling)
+- `git checkout <stash> --` with an EMPTY pathspec **detaches HEAD** to the stash commit. Never run
+  ambiguous `checkout <ref> --`; reattach with `git checkout sbs-ru`.
+- The auto-mode classifier blocks tree-wide destructive ops (`rm -rf` loops, `git checkout -- .`,
+  `git clean -fd`). Use **reversible** cleanup (`git stash push`) instead of hard deletes; it clears
+  the guard AND is recoverable. (This is why 3 redundant stashes remain — dropping them also needs
+  explicit user naming.)
+- Dirty `resources/*` submodules are NOT commit scope unless a gitlink (recorded SHA) actually
+  changed — verify with `git diff HEAD -- resources/ | grep 'Subproject commit'` (SHA change vs
+  mere `-dirty` suffix). This run: no gitlink change, all excluded.
+- **What saved every near-miss:** `execute_sync.py` leaves changes worktree-only/unstaged and never
+  touches HEAD. Preserve this invariant at all costs — it's the entire recovery margin.
+
+### 7. Carried retrospective candidates (from prior handoff)
+- stage1 lint gate fixes; `tests/kamma` rename; "never name a `tests/` subpackage after a top-level
+  repo package" (`tests/exporter/` still shadows root `exporter/`).
+- prep_analyzer local-commit sweep caught unregistered locally-modified upstream files
+  (`ai_models.json`, example_bolding fix) the registry missed — consider folding the sweep into
+  `prep_analyzer.py`.
+- `skill_scope_improvement.md` — guide/skill fixes surfaced during 2b scope correction; apply as a
+  SEPARATE post-sync task (do NOT act during this sync).
 
 ## Next Model
 
