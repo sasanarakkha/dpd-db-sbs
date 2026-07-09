@@ -305,9 +305,24 @@ def execute_sync(
         run_git(["git", "update-ref", "refs/heads/as_upstream", target_sha])
         pr.yes("ok")
 
-        # 5. Sync upstream-tracked paths into the current sbs-ru worktree (worktree only — leaves index unchanged so changes remain unstaged for review)
+        # 5. Sync upstream-tracked paths into the current sbs-ru worktree. Overlay
+        # mode NEVER removes files: it updates/creates paths present in as_upstream but
+        # leaves local-only tracked files (shadows, unique_paths, inspired_by, local
+        # data) untouched. Worktree-only, so changes remain unstaged for review.
+        # Upstream deletions are handled deliberately in step 6b, not by this restore.
         pr.green("performing restore from as_upstream")
-        run_git(["git", "restore", "--source", "as_upstream", "--worktree", "--", "."])
+        run_git(
+            [
+                "git",
+                "restore",
+                "--overlay",
+                "--source",
+                "as_upstream",
+                "--worktree",
+                "--",
+                ".",
+            ]
+        )
         pr.yes("ok")
 
         # 6. Restore excluded files
