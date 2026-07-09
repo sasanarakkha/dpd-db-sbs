@@ -516,7 +516,7 @@
     "tools/cst_source/peyyala_data.py",
     "tools/cst_source/text_utils.py"
   ],
-  "target_upstream_ref": "upstream/main",
+  "target_upstream_ref": "be49bffe2c2c85971784337d4e09915ad1f42800",
   "to_upstream_sha": "be49bffe2c2c85971784337d4e09915ad1f42800",
   "unregistered_local_paths": [
     ".github/workflows/anki_release.yml",

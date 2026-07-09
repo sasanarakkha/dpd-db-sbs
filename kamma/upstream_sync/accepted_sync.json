@@ -1,6 +1,6 @@
 {
   "last_accepted_upstream_sha": "518672a65fa3ea7c36c4c754dc5276bb41f92da7",
   "last_accepted_upstream_date": "2026-06-12T20:48:06+08:00",
-  "last_accepted_upstream_ref": "upstream/main",
-  "notes": "Accepted after Stage 5 verification."
+  "last_accepted_upstream_ref": "be49bffe2c2c85971784337d4e09915ad1f42800",
+  "notes": "TEMP PIN for sync 20260709: ref pinned to analyzed SHA be49bffe (upstream/main advanced +2 CI-only commits to 820113551 mid-sync; deferred to next sync). finalize_accepted_sync.py restores the moving ref from manifest.target_upstream_ref='upstream/main'."
 }

@@ -28,6 +28,7 @@
   - [x] If `prep_manifest.json.discuss_paths` is non-empty, stop before `execute_sync.py`. (6 discuss paths → routed to Stage 2.)
   - [x] If `prep_manifest.json.blocker_paths` is non-empty, STOP before `execute_sync.py`. (8 blocker paths → routed to Stage 2.) To acknowledge deletion blockers you intend to handle in Stage 2, create `<thread_dir>/run_acknowledged_blockers.txt` (one path per line; `#` comments allowed). `verify_manifest` will warn for each acknowledged path but will not block on them. Collision blockers still require registry changes before `execute_sync.py`.
 - [ ] **1.5 Automated Pull + Commit 1 Gate**:
+  - **PIN NOTE (2026-07-09):** upstream/main advanced +2 CI-only commits (`188600bbf`, `820113551`, single new file `.github/workflows/deconstructor_ci_test.yml`) after Stage 2 approval. Per user decision (Option A), `accepted_sync.json.last_accepted_upstream_ref` pinned to the analyzed SHA `be49bffe…`; the 2 new commits are deferred to the next sync. Pin self-corrects at finalize.
   - [ ] Review `<thread_dir>/run_exclusions.txt` if needed.
   - [ ] `uv run python3 kamma/upstream_sync/scripts/execute_sync.py <thread_dir>`.
   - [ ] Confirm `execute_sync.py <thread_dir>` leaves changes unstaged by default; review `git diff` before manual staging.
