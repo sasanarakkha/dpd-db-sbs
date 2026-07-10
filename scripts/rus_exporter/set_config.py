@@ -187,6 +187,19 @@ PROFILES: dict[str, dict[str, dict[str, str]]] = {
         "anki": {"update": "no"},
         "goldendict": {"copy_unzip": "no"},
     },
+    "build_full": {
+        "exporter": {"make_variants": "no"},
+        "generate": {
+            "suttas": "yes",
+            "grammar": "yes",
+            "epd": "yes",
+            "rpd": "yes",
+            "tpd": "yes",
+            "inflections_to_headwords": "yes",
+            "search_index": "yes",
+            "deconstructor": "yes",
+        },
+    },
     "release_full_ru": {
         "regenerate": {
             "db_rebuild": "yes",
@@ -228,6 +241,7 @@ PROFILE_DESCRIPTIONS: dict[str, str] = {
     "release_sbs": "GitHub release for DPD-SBS — SBS data only, minimal exports",
     "release_ta": "GitHub release for DPD-TA — Tamil data only, minimal exports",
     "server_sbs": "DPD-SBS for the fileserver — SBS data, MDict, no copy/unzip",
+    "build_full": "Full DB population — every lookup-populating step on (variants + all generate.*); does NOT touch exporter output toggles",
     "release_full_ru": "Full Russian release — complete DB rebuild, all regenerations, all exporters",
     "anki_ci": "CI Anki paths — sets anki.db_path_sbs and anki.backup_path_sbs from GITHUB_WORKSPACE",
 }

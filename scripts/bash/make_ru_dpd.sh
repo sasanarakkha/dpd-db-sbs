@@ -51,7 +51,7 @@ uv run python scripts/rus_exporter/ru_zip_goldendict_mdict.py
 
 uv run python scripts/moving/distribute.py move_mdict_ru
 
-uv run python scripts/build/tarball_db.py
+# uv run python scripts/build/tarball_db.py
 
 uv run python exporter/tbw/tbw_exporter_ru.py
 

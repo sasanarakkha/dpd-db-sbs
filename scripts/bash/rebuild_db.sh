@@ -17,6 +17,7 @@ fi
 
 answer=$(uv run tools/ask.py -c cyan "Rebuild db from db/backup_tsv? [y/n] ")
 if [ "$answer" = "y" ]; then
+    uv run python scripts/rus_exporter/set_config.py --profile build_full
     scripts/build/db_rebuild_from_tsv.py
     scripts/change_in_db/apply_all_additions.py
     scripts/build/db_rebuild_from_tsv_dps.py

@@ -29,3 +29,4 @@
 - 2026-06-22 [POSITIVE] Moving pipeline logic from model instructions to zero-LLM local Python scripts drastically reduces start-up overhead and ensures stable validation.
 - 2026-07-06 [WORKFLOW] Concurrent or unrelated commits on the active branch can reset git-index rename metadata for staged moves, requiring re-adding files together to restore rename detection.
 - 2026-07-06 [WORKFLOW] git mv on untracked targets fails with "not under version control" errors; use plain mv instead.
+- 2026-07-10 [BEHAVIOR] A pyrefly-driven rename (get_fields→get_fields_dps) was never added to test_shadow_parity.py's WHITELIST, so the shadow parity test actually failed at HEAD even though the sync's own handoff.md and retrospective.md claimed "all automated sync tests pass" — only an independent review re-running the suite caught it. Already covered by CLAUDE.md's Pre-Completion Validation and Blast-Radius Check rules; this is a reminder to actually run them, not a new rule.

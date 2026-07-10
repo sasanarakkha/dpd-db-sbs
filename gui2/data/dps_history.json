@@ -1,5 +1,9 @@
 [
     {
+        "id": 48512,
+        "lemma_1": "buddha 2"
+    },
+    {
         "id": 61972,
         "lemma_1": "saṃvega 1"
     },
@@ -94,9 +98,5 @@
     {
         "id": 73955,
         "lemma_1": "micchāsaṅkappagocara"
-    },
-    {
-        "id": 74170,
-        "lemma_1": "kammakiliṭṭha"
     }
 ]
