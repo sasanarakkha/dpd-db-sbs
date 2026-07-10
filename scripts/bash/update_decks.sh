@@ -14,6 +14,7 @@ if [[ $response == "y" ]]; then
     uv run python scripts/change_in_db/source_cleanup.py
     uv run python scripts/change_in_db/example_cleanup.py
     uv run python scripts/change_in_db/update_sbs_chants_in_db.py
+    uv run python scripts/change_in_db/dhp_examples_copy.py
     if ! uv run python db_tests/sbs_consistency_tests.py; then
         uv run "$PROJECT_DIR/tools/ask.py" --print -c red "SBS consistency tests FAILED. Aborting before anki_csv.py."
         exit 1

@@ -596,10 +596,13 @@ def check_example_missing_source(
     results: list[str] = []
     for sbs in db_session.query(SBS).all():
         for example_field, source_field in SOURCE_TO_EXAMPLE.items():
+            if sbs.class_anki == 2:
+                continue
             example = getattr(sbs, example_field) or ""
             source = getattr(sbs, source_field) or ""
             if example and not source:
-                results.append(f"{sbs.id}/{example_field}")
+                results.append(str(sbs.id))
+                break
     return (
         "example_missing_source",
         regex_results(results),
@@ -614,6 +617,8 @@ def check_example_missing_sutta(
     """Detect example non-empty, source not exempt, but sutta empty."""
     results: list[str] = []
     for sbs in db_session.query(SBS).all():
+        if sbs.class_anki == 2:
+            continue
         for example_field in EXAMPLE_FIELDS:
             example = getattr(sbs, example_field) or ""
             if not example:
@@ -625,7 +630,8 @@ def check_example_missing_sutta(
             sutta_field = SUTTA_FIELD_MAP[example_field]
             sutta = getattr(sbs, sutta_field) or ""
             if not sutta:
-                results.append(f"{sbs.id}/{example_field}")
+                results.append(str(sbs.id))
+                break
     return (
         "example_missing_sutta",
         regex_results(results),

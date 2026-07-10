@@ -15,6 +15,7 @@ def update_sbs_chants(db_session: Session, sbs_tools: SBS_table_tools) -> None:
     pr.green("update sbs chants")
     pr.bip()
 
+    whitespace_fixed = 0
     auto_fixed = 0
     fuzzy_fixed = 0
     unresolved: list[str] = []
@@ -28,6 +29,14 @@ def update_sbs_chants(db_session: Session, sbs_tools: SBS_table_tools) -> None:
             chap_attr = f"sbs_chapter_{number}"
             chant_pali: str = getattr(sbs, pali_attr, "")
             if not chant_pali:
+                continue
+
+            if chant_pali == " ":
+                setattr(sbs, pali_attr, "")
+                setattr(sbs, eng_attr, "")
+                setattr(sbs, chap_attr, "")
+                pr.amber(f"ID {sbs.id} {pali_attr}: cleared ' ' value")
+                whitespace_fixed += 1
                 continue
 
             # Pass A: exact match → auto-correct eng/chapter
@@ -73,6 +82,8 @@ def update_sbs_chants(db_session: Session, sbs_tools: SBS_table_tools) -> None:
 
     db_session.commit()
 
+    if whitespace_fixed:
+        pr.yes(f"{whitespace_fixed} whitespace-fixed")
     if auto_fixed:
         pr.yes(f"{auto_fixed} auto-fixed")
     if fuzzy_fixed:
@@ -81,7 +92,7 @@ def update_sbs_chants(db_session: Session, sbs_tools: SBS_table_tools) -> None:
         pr.no(f"{len(unresolved)} unresolved")
         for item in unresolved:
             pr.amber(item)
-    if not auto_fixed and not fuzzy_fixed and not unresolved:
+    if not whitespace_fixed and not auto_fixed and not fuzzy_fixed and not unresolved:
         pr.yes("no changes needed")
 
     pr.toc()
