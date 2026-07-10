@@ -348,7 +348,13 @@ def make_mobi(pth: RuPaths) -> None:
                 for line in process.stdout:
                     pr.white(escape(line.rstrip()))
             process.wait()
-            pr.yes("Converted with Calibre")
+            pr.amber(
+                "NOTE (macOS local build only): Calibre cannot compile Kindle "
+                "dictionary markup (idx:entry), so this local .mobi is a broken "
+                "~256 KB stub with all entries dropped — do NOT distribute it. "
+                "The valid full mobi is built by kindlegen on GitHub CI "
+                "(ru_release.yml)."
+            )
             return
         else:
             pr.red("No compatible MOBI converter found on macOS.")

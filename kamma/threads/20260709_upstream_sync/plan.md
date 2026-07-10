@@ -59,13 +59,13 @@
 - [x] **3.1** Execute `dynamic_plan.md` item by item; mark progress. (All batches A–F done + verified
   from files: A registry-merges, B simple ports+rename+removals, B-completion cst_source, C header-once
   ports, D shadow ports+I3–I8/I11/I14, E I1/I2 ProcessPoolExecutor rewrites, F registry §7 additions.)
-- [~] **3.2** Run every plan verification command, plus:
-  - [~] `pytest test_shadow_parity test_shadow_cleanup test_namespace_isolation test_template_syntax`:
-    `test_shadow_cleanup` ✓, `test_template_syntax` ✓ (178). **`test_shadow_parity` (collection error) +
-    `test_namespace_isolation` (30 fail) are PRE-EXISTING breakage** — both helpers read registry copies
-    as `{shadow: upstream_str}` but the schema is `{shadow: {upstream: str, …}}` since `bdddb9e3c`; fails
-    at HEAD too, on shadows this sync never touched. **Awaiting user decision** (trivial 1-line fix in
-    each helper `upstream` → `upstream["upstream"]`, vs defer as separate thread — out of sync-port scope).
+- [x] **3.2** Run every plan verification command, plus:
+  - [x] `pytest test_shadow_parity test_shadow_cleanup test_namespace_isolation test_template_syntax`:
+    `test_shadow_cleanup` ✓, `test_template_syntax` ✓ (178). The `test_shadow_parity` (collection error)
+    + `test_namespace_isolation` (30 fail) PRE-EXISTING breakage (both helpers read registry copies as
+    `{shadow: upstream_str}` but the schema is `{shadow: {upstream: str, …}}` since `bdddb9e3c`) was
+    **RESOLVED during Commit 2** (user-authorized): each helper `upstream` → `upstream["upstream"]` in
+    `test_shadow_parity.py` + `test_namespace_isolation.py`; 3 intentional divergences whitelisted. See §3.4.
   - [x] `uv run python3 tests/check_shadow_modifications.py` — SUCCESS (added S9 titlepage no-op ledger
     entry for the current sync_commit `699c10cd1…` in `reviewed_shadow_noops.json`).
   - [x] `uv run python tests/smoke_test_sync.py` — 25 passed / 0 failed.
@@ -73,9 +73,18 @@
     (formatted `export_variant_spelling_ru.py`); `test_ai_manager.py` 20 passed; §8.7 import smoke OK.
 - [x] **3.3** Cleanup only as explicitly listed in `dynamic_plan.md`. (D7 rename, D11/D12 removals,
   docs relocations — all done in Batches B/B-completion.)
-- [~] **3.4 Commit 2 Gate**: commit message prepared: `#sync: manual merge resolutions 2026-07-09`.
-  Index currently flattened (7 staged / 56 unstaged; D7 rename split) — restage full non-`resources/`
-  changeset so git re-detects the rename. **STOP for user — no autonomous commit.**
+- [x] **3.4 Commit 2 Gate**: landed as `426aa64fc` (`#sync: manual merge resolutions 2026-07-09`),
+  60 files. User authorized commit. Pre-commit hook fully green (ruff/format/pyright/pyrefly).
+  Excluded (unstaged, intentional): kindle build artifacts (`titlepage.xhtml`, `content.opf`,
+  `shared_data/changed_templates`) and all `resources/*` submodule pointers.
+  - Pre-existing test-helper breakage (rich-object registry schema) fixed in
+    `test_shadow_parity.py` + `test_namespace_isolation.py`; 3 intentional divergences whitelisted.
+  - Pre-commit pyrefly (NOT pyright — pyright excludes gui2, pyrefly has no config so checks all
+    staged files) blocked on 18 pre-existing errors in `gui2/dps_example_field.py`. User chose to
+    fix them: resolved via `cast()` accessors (`_stash`/`_view`/`_active_page`) for the intentional
+    incompatible base-attribute overrides, `cast(ft.ControlEvent, None)` for the base handler that
+    ignores `e`, and renamed the incompatible `get_fields`→`get_fields_dps` (all 6 base callers are
+    child-overridden and no external caller exists, so behavior is preserved). 0 pyrefly diagnostics.
 
 **Hard stop**: update `handoff.md` with completed/failed items, files changed, test evidence, then stop.
 
@@ -113,10 +122,10 @@ section instead of re-reading the whole guide.
 
 **Owner**: ADVANCED for acceptance; hand off to FAST for mechanical finalization. See guide.md § Stage 4.
 
-- [ ] Review Stage 3 and Docs Track evidence; ask user for manual GoldenDict/webapp verification.
-- [ ] Wait for explicit user confirmation: `all is good, proceed`.
-- [ ] Write `retrospective.md` (required before finalize); promote accepted items to `archive_improvements.md`.
-- [ ] If accepted, ADVANCED may run `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>` directly (pre-authorized scripted command, same carve-out as Stage 1), or write exact FAST handoff instructions to run it.
-- [ ] Prepare final commit message only after acceptance.
+- [x] Review Stage 3 and Docs Track evidence; ask user for manual GoldenDict/webapp verification.
+- [x] Wait for explicit user confirmation: `all is good, proceed`. (Received 2026-07-10, incl. the Batch E `joinedload(DpdHeadword.rt)` root-render watch item + the kindle-mobi investigation.)
+- [x] Write `retrospective.md` (required before finalize); promote accepted items to `archive_improvements.md`. (Done: `retrospective.md` written; promoted §21–§23.)
+- [x] If accepted, ADVANCED may run `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>` directly. (Ran, exit 0; `accepted_sync.json` advanced to `be49bffe`. PIN reset applied: `last_accepted_upstream_ref` → `"upstream/main"`; +2 CI-only commits `188600bbf`/`820113551` deferred to next sync.)
+- [ ] Prepare final commit message only after acceptance. (Working-tree fixes still to commit — user's call; see handoff.)
 
 **Final hard stop**: update `handoff.md` with final state, verification evidence, files changed, and any remaining risks, then stop.

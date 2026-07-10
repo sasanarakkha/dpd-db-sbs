@@ -144,3 +144,22 @@ This document provides a unified, exhaustive post-mortem of the Upstream Sync Re
 - **Asynchronous Docs Sync**: Decouple Stage 4. Stage 3 should merely log changed docs to `kamma/upstream_sync/docs_translation_queue.md`.
 - **Inline Retrospective**: Replace Stage 5's standalone report with a mandatory "Errors & Friction Log" maintained *during* the sync in `handoff.md`. Finalize the sync with a 10-minute retrospective session that pushes these logs into `archive_improvements.md` and `guide.md`.
 
+## 21. Atomic Rename Must Sweep ALL `tools/paths_*.py` Siblings (July 2026)
+**Issue:** D7 renamed `shared_data/help_ru/` → `shared_data/reference_ru/` and updated `tools/paths_ru.py` (RuPaths) but missed the sibling `tools/paths_dps.py` (DPSPaths), which carried its own copies of the same 5 TSV paths. The Atomic Rename Protocol's grep step ran but did not treat the parallel path module as a mandatory target, so the miss surfaced only at runtime as `FileNotFoundError: shared_data/help_ru/abbreviations.tsv` during the SBS build.
+**Recommendation:**
+- When renaming or moving any `shared_data/` (or other data) directory, the Atomic Rename grep MUST explicitly enumerate **every** `tools/paths_*.py` module (`paths.py`, `paths_ru.py`, `paths_dps.py`, `paths_ta.py`, …), not just the one for the locale you think owns the path. These modules duplicate path constants per-locale and drift silently.
+- Add the sibling-paths sweep to the rename checklist / a validator: `grep -rl "<old_dir_name>" tools/paths_*.py` must return zero after the rename.
+
+## 22. Go Struct ↔ `db/models.py` Column Parity (July 2026)
+**Issue:** The Go deconstructor's `Lookup` struct (`go_modules/dpdDb/model.go`) silently drifted from `db/models.py`. Upstream added `abbrev_other` to the Python model (#77) but never mirrored it to Go; the Go `SaveToDb()` does `DELETE FROM lookup` then re-inserts every row through the struct, so a NOT-NULL column missing from the struct fails the whole re-insert — and the failure was swallowed (see below), shipping an emptied `lookup` table. The struct also sits at ~97% of SQLite's 32766 per-statement variable ceiling, so adding a single column (16→18 cols × batch 2000) overflowed it.
+**Recommendation:**
+- Treat the Go `Lookup` struct as a mirror of the `db/models.py` `Lookup` columns. Any column added to the Python model MUST be added to the Go struct in the same change (add to the sync watch-list for `db/models.py` diffs).
+- Keep `CreateInBatches` batch size defensively low (currently 1500 → 27000 params) so a new column doesn't trip the variable limit; recompute `batch × cols < 32766` whenever a column is added.
+- Go DB writes MUST check `.Error` on `CreateInBatches`/`Commit` and `Rollback()` on failure — a swallowed error ships a silently-broken table (see also: build steps must exit non-zero on DB-population failure).
+
+## 23. macOS Local Kindle Builds Are Not Authoritative (July 2026)
+**Issue:** A local macOS `dpd-makedict` produced `ru-dpd-kindle.mobi` at ~256 KB (from a valid 19 MB epub), which looked like a build failure. Root cause: `make_mobi()` uses Calibre `ebook-convert` on macOS, but Calibre is not a dictionary compiler — it silently strips content inside Amazon Kindle dictionary markup (`<mbp:frameset>`/`<idx:entry>`), dropping every entry. The bundled `exporter/kindle/kindlegen` is a Linux 32-bit ELF and cannot run on macOS. CI (`ru_release.yml`, ubuntu) uses kindlegen and produces the correct ~73 MB mobi.
+**Recommendation:**
+- The authoritative Kindle mobi is always the CI/kindlegen build. macOS local `.mobi` output is a diagnostic stub only — never distribute it and never treat its size as a build-health signal.
+- Enforced in code: the macOS branch of `make_mobi` (`kindle_exporter_ru.py`) now prints a `pr.amber(...)` warning instead of a false "Converted" success. Keep that warning on future syncs.
+

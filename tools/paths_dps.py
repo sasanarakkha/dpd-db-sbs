@@ -96,14 +96,18 @@ class DPSPaths:
             base_dir / "exporter/goldendict/sbs_templates/help_help.jinja"
         )
 
-        # shared_data/help_ru/
-        self.abbreviations_tsv_path = base_dir / "shared_data/help_ru/abbreviations.tsv"
-        self.abbreviations_other_tsv_path = (
-            base_dir / "shared_data/help_ru/abbreviations_other.tsv"
+        # shared_data/reference_ru/
+        self.abbreviations_tsv_path = (
+            base_dir / "shared_data/reference_ru/abbreviations.tsv"
         )
-        self.bibliography_tsv_path = base_dir / "shared_data/help_ru/bibliography.tsv"
-        self.help_tsv_path = base_dir / "shared_data/help_ru/help.tsv"
-        self.thanks_tsv_path = base_dir / "shared_data/help_ru/thanks.tsv"
+        self.abbreviations_other_tsv_path = (
+            base_dir / "shared_data/reference_ru/abbreviations_other.tsv"
+        )
+        self.bibliography_tsv_path = (
+            base_dir / "shared_data/reference_ru/bibliography.tsv"
+        )
+        self.help_tsv_path = base_dir / "shared_data/reference_ru/help.tsv"
+        self.thanks_tsv_path = base_dir / "shared_data/reference_ru/thanks.tsv"
 
         # db/suttas
         self.dv_catalogue_suttas_tsv_path = (
