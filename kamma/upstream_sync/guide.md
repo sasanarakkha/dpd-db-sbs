@@ -46,7 +46,22 @@ Each stage runs in its own fresh session. The chat history is never the source o
 folder is. At every hard stop, the current agent must save enough state for the next fresh session to
 continue from files only.
 
+**Every stop is one of two kinds — every handoff must say which:**
+- **⛔ USER GATE** — the user must act (verify, approve, commit, decide). State exactly
+  what the user must do and the exact phrase that releases the gate. Nothing proceeds —
+  in any session — until the user releases it.
+- **🔄 SESSION BOUNDARY** — no user action needed. Just start a fresh session with the
+  model and start prompt named in the handoff's "Next session" block.
+
 **Prefer frequent restarts.** Shorter sessions are better. Starting a fresh session is cheap; a degraded context window is expensive and causes errors. Bias toward stopping early and handing off rather than completing "one more task" in a heavy session.
+
+**Cheap resume (context cost rule):** Only the FIRST session of a sync reads
+`guide.md` in full. Every later session starts from:
+1. `<thread_dir>/handoff.md` (state + next action + "Next session" block), and
+2. `uv run python3 kamma/upstream_sync/scripts/sync_status.py <thread_dir> --instructions`
+   — prints only the current stage's guide section (`--section docs-track` for the
+   Docs Track).
+Read other guide sections only when the stage instructions reference them.
 
 **Required hard-stop artifacts:**
 - `<thread_dir>/handoff.md`
@@ -67,16 +82,21 @@ continue from files only.
 - Open decisions.
 - Errors, issues, and repeated mistakes.
 - Exact next action.
+- **`## Next session` closing block (MANDATORY — never omit):**
+  - **Model:** FAST (Sonnet) or ADVANCED (Opus), per the Session Models map.
+  - **User action required first:** `none`, or an exact checklist (what to run, what
+    to check, what to say to release the gate).
+  - **Start prompt:** the exact prompt to paste into the fresh session.
 - Explicit instruction: "Do not continue in this session."
 
-**Hard Stop Triggers (mandatory session boundary):**
+**Hard Stop Triggers (each one is a 🔄 SESSION BOUNDARY unless labeled ⛔ USER GATE):**
 - After completing any full Stage (1, 2, 3, or 4), or any Docs Translation Track phase (Analysis or Translation).
-- After preparing ANY commit message (Commit 1, 2, 3, or docs). Preparing a Commit is always a session boundary: update `handoff.md` before ending.
+- After a commit lands (Commit 1, 2, 3, or docs). Preparing the commit message belongs to the SAME session that completed the stage — stage-end + commit-prep is ONE boundary, not two. The commit itself is a ⛔ USER GATE (user reviews and commits); after it lands, run the commit-closeout checklist, then stop.
 - When the `sync-fast` subagent encounters work requiring analysis, planning, judgment, or conflict resolution — it returns to the orchestrator.
 - When the orchestrator identifies mechanical work — it dispatches to `sync-fast`.
 - If output is too large, context feels stale, failures repeat, state becomes unclear, or the agent is relying on memory instead of files.
 
-Hard stop procedure: save artifacts -> update `handoff.md` -> STOP. Do not continue in the same session.
+Hard stop procedure: save artifacts -> append this session's friction/improvement notes to `## Friction notes` in `handoff.md` (or write `none`) -> update `handoff.md` including the `## Next session` block -> STOP. Do not continue in the same session.
 
 **Commit-closeout checklist (mandatory after each commit lands):** Before proceeding, update `handoff.md` Status + Next Action to reflect the commit that just landed, and mark resolved ledger/approval items DONE. A handoff written before this update causes the next dispatch to re-do already-finished work.
 
@@ -85,11 +105,44 @@ Hard stop procedure: save artifacts -> update `handoff.md` -> STOP. Do not conti
 **Pre-Authorized Commands:**
 All commands listed in this guide (`uv run`, `rg`, `git diff`, `git log`, `ruff`, `pytest`, `python temp/`) are pre-authorized for the entire sync session. Use `rg` for repo searches. Write all ad-hoc logic to `temp/<name>.py` and run via `uv run python temp/<name>.py`. Never use inline `python -c "..."`. Delete temp files when done.
 
+**Pre-commit hooks are inviolable.** Never use `--no-verify`; never suggest skipping,
+whitelisting, or ignoring a pre-commit hook error. Every reported error gets a real,
+behaviour-preserving fix (see CLAUDE.md "Pre-commit gate"). If the fix requires
+judgment, that is an ADVANCED decision — hand off; do not bypass.
+
 ---
 
 ## Model Responsibility Contract
 
 The sync workflow is split by responsibility, not convenience.
+
+### Session Models
+
+| Tier | Model (current) | Used for |
+|---|---|---|
+| FAST | Sonnet | scripted stages, mechanical execution, bulk translation |
+| ADVANCED | Opus | analysis, planning, judgment, acceptance |
+
+This table is the single source of truth for tier → model mapping. When models are
+renamed or upgraded, edit ONLY this table.
+
+**Initial model:** start `/update-upstream` on **FAST (Sonnet)** — the pre-sync
+entrypoint and Stage 1 are fully scripted.
+
+**Per-session map:**
+
+| Session | Tier |
+|---|---|
+| Pre-sync entrypoint + Stage 1 + Commit 1 | FAST |
+| Stage 2 (2a–2d) | ADVANCED |
+| Stage 3 orchestration (mechanical bulk runs in `sync-fast` subagents, pinned to `sonnet`) | ADVANCED |
+| Stage 4 | ADVANCED |
+| Docs Track — Analysis | ADVANCED |
+| Docs Track — Translation | FAST |
+
+A normal code sync has exactly **one planned model switch** (FAST → ADVANCED after
+Commit 1), plus one more for the async Docs translation session. Never switch models
+mid-session; switch only at a stop, following the handoff's "Next session" block.
 
 **FAST model owns mechanical work only:**
 - Run commands and scripted checks.
@@ -197,7 +250,7 @@ reference when a step fails or when running a step by hand outside the chain.
    - Perform the automated sync by running `uv run python3 kamma/upstream_sync/scripts/execute_sync.py <thread_dir>`.
    - Review and add any run-specific exclusions to `<thread_dir>/run_exclusions.txt` before execution if needed.
    - `execute_sync.py` pins `as_upstream` directly to the verified manifest SHA without switching branches.
-   - (Commit 1 gate). Message format: `#sync: upstream pull <from>..<to>, <N> files, YYYY-MM-DD`
+   - ⛔ USER GATE — user reviews the diff and commits. (Commit 1 gate). Message format: `#sync: upstream pull <from>..<to>, <N> files, YYYY-MM-DD`
    - `execute_sync.py <thread_dir>` leaves changes unstaged by default. Review `git diff` before manual staging; use `--stage` only when you intentionally want the script to run `git add .`.
    - **Upstream deletions propagate.** After the exclusion-restore step, `execute_sync.py`'s `propagate_upstream_deletions` pass removes files upstream deleted or renamed away since the last accepted sync (protected paths are never touched; see the function docstring for the exact diff command and protected set). Each removal is worktree-only and unstaged, surfacing in `git diff` for human review before Commit 1.
    - **Staging rule:** NEVER use `git add -A -- <file list>` — gitignore'd paths will trigger errors. If you stage all sync changes manually, use `git add .` which respects `.gitignore` automatically. If you must stage selectively, pre-filter with `git add <file>` one path at a time or check first with `git check-ignore -v <path>`.
@@ -212,11 +265,57 @@ reference when a step fails or when running a step by hand outside the chain.
 **ADVANCED must stop and request FAST if** files need to be copied, generated, formatted, tested, translated in bulk, or mechanically edited.
 
 **Stage 2 sub-stage splitting (context safety):** Stage 2 routinely exceeds one session's context. Split it into restartable sub-stages, updating `handoff.md` at each boundary so a fresh session can resume from files alone:
-- **2a — Impact assessment:** read `prep_report.md` + `prep_manifest.json`; classify every changed path (port / mirror / preserve / discuss / inspired / skip / docs) in `dynamic_plan.md`, then hard stop. For every changed path with a registered shadow/`inspired_by_upstream` mapping, read the actual upstream diff at this stage (not later) and note whether it contains structural refactoring — see the "Structural refactor check" field required in 2c. Also classify every path in `unregistered_local_paths` (register in the appropriate registry category) and `upstream_deleted_orphans` (keep-as-divergence or delete-to-match-upstream).
-- **2b — Discuss resolution:** resolve each `discuss: true` item with the user one at a time; record each as RESOLVED in `dynamic_plan.md`, then hard stop.
-- **2c — Literal plan authoring:** write self-contained per-file instructions (anchors, literal edits, verify commands); split again after each major domain if context grows, then hard stop.
-- **2d — Approval gate:** present `dynamic_plan.md` for approval.
+- **2a — Impact assessment:** read `prep_report.md` + `prep_manifest.json`; classify every changed path (port / mirror / preserve / discuss / inspired / skip / docs) in `dynamic_plan.md`, then hard stop (🔄 SESSION BOUNDARY). For every changed path with a registered shadow/`inspired_by_upstream` mapping, read the actual upstream diff at this stage (not later) and note whether it contains structural refactoring — see the "Structural refactor check" field required in 2c. Also classify every path in `unregistered_local_paths` (register in the appropriate registry category) and `upstream_deleted_orphans` (keep-as-divergence or delete-to-match-upstream).
+- **2b — Discuss resolution:** resolve each `discuss: true` item with the user one at a time; record each as RESOLVED in `dynamic_plan.md`, then hard stop (⛔ USER GATE per item, then 🔄 SESSION BOUNDARY).
+- **2c — Literal plan authoring:** write self-contained per-file instructions (anchors, literal edits, verify commands); split again after each major domain if context grows, then hard stop (🔄 SESSION BOUNDARY).
+- **2d — Approval gate:** present `dynamic_plan.md` for approval (⛔ USER GATE — released by the user approving dynamic_plan.md).
 A session must be restartable at any sub-stage boundary from files alone — never rely on chat history.
+
+#### Merge scope vs. verbatim pull
+
+**The registry is the sole source of truth for what gets merged.** The decision is
+binary, per path:
+
+1. **Registered as a maintained local special** — appears in `registry.json` under
+   `modified_upstream_files`, `unique_paths`, `inspired_by_upstream`, `russian_copies`,
+   `sbs_copies`, `dps_copies`, or `tamil_copies`.
+   → **3-way merge.** Layer local changes on top of upstream; preserve local content.
+
+2. **Not registered** — everything else.
+   → **Pull and overwrite verbatim.** Zero permitted local divergence. No divergence
+   analysis. No discuss item. If the checkout would clobber a local edit, that edit was
+   never sanctioned; discard it.
+
+There is no third "found a local edit, so preserve it" category. A genuine local edit
+in an unregistered file means one of two things:
+- it should be a registered special → register it (this is the ONLY correct use of the
+  local-commit sweep), or
+- it should not exist → overwrite it (if still valid, PR it upstream, don't keep a
+  local delta).
+
+**The local-commit sweep's only purpose is detecting missing registrations, never
+preserving unregistered edits.** Output should be phrased as "these unregistered files
+have local edits — register them or let them be overwritten," not "preserve these."
+
+**Area-specific policies:**
+- **`docs/` is upstream-only, mirrored exactly.** Never register local files under
+  `docs/`. The only maintained docs surface is `docs_rus/` (a direct translation of
+  `docs/` with the few documented no-translate exceptions). Local files that have crept
+  into `docs/` are removed to match upstream unless something local references them.
+- **`audio/` is always synced with upstream.** No local audio scripts are maintained;
+  upstream-deleted audio files are deleted locally to match.
+- **`scripts/*` folders are plain upstream sync targets.** Local-only READMEs or helper
+  files added into upstream script dirs are removed, not registered, unless they are a
+  deliberate registered `unique_paths` fork feature.
+- **`AGENTS.md` merge is scope-filtered.** Only merge upstream rule additions that
+  govern files/areas we actually maintain (registered specials) or our own sync
+  process. Do not adopt upstream-only workflow rules for work we do not perform —
+  scope-filter upstream `AGENTS.md` rule additions against the fork mission in
+  `kamma/project.md`.
+
+**Stage 2a guardrail:** Before flagging any path as discuss/preserve, assert it is
+present in the registry; if not, classify as verbatim-pull or as a registration
+candidate — never open a discuss item for an unregistered path.
 
 1. **Dynamic Planning**:
    - Create `dynamic_plan.md` in the thread folder.
@@ -235,7 +334,7 @@ A session must be restartable at any sub-stage boundary from files alone — nev
 2. **Discussion Flags**:
    - Check `discuss` flags in `registry.json`. If `true`, resolve with the user before planning.
    - **Discussion flow**: Discuss each flagged item in chat, one at a time. Do not ask the user to edit any file. Once a decision is reached, mark the item `RESOLVED` in `dynamic_plan.md` with the agreed strategy. Only then proceed.
-3. **Draft Plan Review**:
+3. **Draft Plan Review** (⛔ USER GATE):
    - Present the `dynamic_plan.md` to the user for approval. Say: "Please review and reply with proceed / skip / or any objection for each item."
 
 **Shadow category rule**: one local shadow path may appear in exactly one registry category. `dps_copies` is the single category for mixed/shared fork shadows, including files that combine Russian, SBS, Tamil, or general DPS behavior. Do not duplicate a DPS shadow into `russian_copies`, `sbs_copies`, or `tamil_copies`.
@@ -271,11 +370,19 @@ A session must be restartable at any sub-stage boundary from files alone — nev
 **Owner**: ADVANCED for acceptance decisions. If mechanical finalization is needed, ADVANCED writes exact instructions and hands off to FAST.
 **ADVANCED hard stop (Stage 4):** ADVANCED reads outputs and makes the acceptance decision. It MUST NOT run any command that mutates state, builds, or runs tests (no `uv sync`, no exporters, no `pytest`, no source edits). If ADVANCED finds itself about to run such a command, STOP and hand off to FAST immediately. All verification commands belong to FAST. **Exception:** once the user has accepted (Stage 4 step 1), ADVANCED may run `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>` directly — like the Stage 1 carve-out, a single pre-authorized, fully scripted command with its own hard gates (retrospective presence + manifest verification) is mechanical by construction and needs no `sync-fast` dispatch. Otherwise, write exact FAST instructions and hand off.
 
-1. **Full manual verification**
-   - Ask user to verify everything and stay back for feedback. After correcting it, do not proceed until user explicitly says "all is good, proceed."
+1. **⛔ USER GATE — full manual verification (the user acts, not the agent):**
+   - The handoff must tell the user exactly what to run and what to check (e.g. build
+     via `dpd-makedict` / `scripts/cl/dpd-build-db`, spot-check RU + SBS output in
+     GoldenDict/webapp, plus any sync-specific watch items named in the plan).
+   - The user runs these at their own pace and reports issues; each fix round happens
+     in a fresh session. This gate does NOT mean "start a new session" — it means the
+     agent stops and the user tests.
+   - The gate is released ONLY by the user saying **"all is good, proceed."** Until
+     then: no retrospective, no finalize, no next step in any session.
 2. **Write retrospective.md (REQUIRED before finalize)**
    - Copy `kamma/upstream_sync/templates/retrospective.md` to `<thread_dir>/retrospective.md`.
    - Fill the three buckets: **landed** (fixed in code this sync), **promote** (becomes a guide rule / validator / archive entry — do it now), **drop** (genuine one-off, with reason).
+   - Harvest `## Friction notes` from `handoff.md` first — every note lands in one of the three buckets. This section exists so improvements are captured per-session, not reconstructed from memory at the end.
    - Promote any `promote` items to `archive_improvements.md` before running finalize.
    - `finalize_accepted_sync.py` will refuse to run if `retrospective.md` is absent (hard code gate).
 3. **After sync**
@@ -321,7 +428,7 @@ The script reads `<thread_dir>/prep_manifest.json` and reports docs changes from
    - **Terminology glossary** — EN → RU pairs extracted from existing translations.
    - **Translation rules** — keep Pali terms as-is; keep image paths, code blocks, and URLs unchanged; translate heading text and alt text; keep HTML anchor IDs unchanged.
    - **Per-file tasks** — for each missing file: source path, target path, "full translation". For each stale file: source path, target path, the exact diff evidence from `docs_parity_report.md`, "update only changed sections".
-5. Present `docs_translation_plan.md` to user for approval.
+5. ⛔ USER GATE — present `docs_translation_plan.md` to user for approval.
 
 **Translation phase (FAST model)**:
 1. Read `docs_translation_plan.md` — do not read any other file not referenced there.
@@ -408,7 +515,7 @@ Enforced via `tests/test_namespace_isolation.py`:
 If a file has `discuss: true` in `registry.json`:
 1. **STOP**. Do not modify.
 2. Present the relevant upstream diff from the active Prep range and the `discuss_reason` to the user.
-3. Wait for explicit approval before proceeding.
+3. ⛔ USER GATE — wait for explicit approval before proceeding.
 
 ---
 

@@ -41,4 +41,6 @@ At the end of every dispatch, overwrite `<thread_dir>/handoff.md` with:
 - Files changed.
 - Open decisions or failures encountered.
 - Exact next action for the resuming session.
+- Append any friction/improvement notes from this dispatch to `## Friction notes` (or leave it untouched if none).
+- Fill the `## Next session` block: tier (FAST or ADVANCED — model names live in guide.md § Session Models), user action required first, exact start prompt.
 - "Do not continue in this session."

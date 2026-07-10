@@ -81,6 +81,14 @@ def render_handoff(date_human: str) -> str:
         "Do not perform analysis or strategic planning.\n"
         "Stop before Stage 2 and update handoff.md.\n"
         "```\n\n"
+        "## Friction notes\n\n"
+        "(append-only — one bullet per session; harvested into retrospective.md at Stage 4)\n\n"
+        "- none yet\n\n"
+        "## Next session\n\n"
+        "- **Model:** FAST (Sonnet)\n"
+        "- **User action required first:** none\n"
+        "- **Start prompt:** Continue the sync: run Stage 1 via "
+        "`uv run python3 kamma/upstream_sync/scripts/stage1.py <thread_dir>`\n\n"
         "Do not continue in this session.\n"
     )
 

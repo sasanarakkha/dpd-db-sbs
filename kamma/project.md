@@ -12,6 +12,8 @@ sasanarakkha/dpd-db-sbs. It extends the upstream database with:
 upstream dpd-db/main at all times. Local extensions (Russian, SBS) are layered on
 top without diverging from core upstream logic.
 
+**Fork mission (one line):** we keep upstream sync and maintain localized shadows/translations (RU, SBS, DPS, Tamil); we do not perform upstream's full development workflow.
+
 ## Who it is for
 - Russian-speaking Dhamma practitioners and Pāḷi students
 - Students following the SBS curriculum
