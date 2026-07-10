@@ -2,6 +2,7 @@
 # Interactive CLI wrapper for building and distributing DPD dictionaries.
 
 PROJECT_ROOT="$HOME/Documents/dpd-db"
+cd "$PROJECT_ROOT" || exit 1
 
 MASTER_SCRIPT="$HOME/.local/bin/run_and_log.sh"
 

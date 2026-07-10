@@ -9,6 +9,7 @@ set -o pipefail
 
 # move all decks on the server and GitHub
 
+ASK_PY="$HOME/Documents/dpd-db/tools/ask.py"
 ANKI_CSVS_SRC_DIR="$HOME/Documents/dpd-db/temp/anki_csvs"
 ANKI_DECKS_DIR="$HOME/Documents/dpd-db/temp/anki_decks"
 FILESRV_DEST_BASE_DIR="$HOME/filesrv1/share1/Sharing between users/1 For Everyone/Software/Anki (learning tool)"
@@ -23,14 +24,14 @@ safe_copy_file() {
     local dest_file="$2"
 
     if [ ! -f "$src_file" ]; then
-        uv run tools/ask.py -p -c yellow "Warning: Source file '$src_file' not found. Skipping copy."
+        uv run "$ASK_PY" -p -c yellow "Warning: Source file '$src_file' not found. Skipping copy."
         return 0
     fi
     
     local dest_dir
     dest_dir=$(dirname "$dest_file")
     if [ ! -d "$dest_dir" ]; then
-        uv run tools/ask.py -p -c red "Error: Destination directory '$dest_dir' does not exist. Stopping."
+        uv run "$ASK_PY" -p -c red "Error: Destination directory '$dest_dir' does not exist. Stopping."
         exit 1
     fi
 
@@ -39,7 +40,7 @@ safe_copy_file() {
     # --no-perms, --no-owner, --no-group prevent rsync from trying to set these on the destination,
     # which can cause "Operation not permitted" errors on some network shares.
     if ! rsync --times --no-perms --no-owner --no-group "$src_file" "$dest_file"; then
-        uv run tools/ask.py -p -c red "Error: Failed to copy '$src_file' to '$dest_file'."
+        uv run "$ASK_PY" -p -c red "Error: Failed to copy '$src_file' to '$dest_file'."
         FAILURES+=("$src_file → $dest_file")
         return 1
     fi
@@ -47,16 +48,16 @@ safe_copy_file() {
 }
 
 if [ ! -d "$FILESRV_DEST_BASE_DIR" ]; then
-    uv run tools/ask.py -p -c red "Error: Fileserver directory not found: $FILESRV_DEST_BASE_DIR. Stopping."
+    uv run "$ASK_PY" -p -c red "Error: Fileserver directory not found: $FILESRV_DEST_BASE_DIR. Stopping."
     exit 1
 fi
 if [ ! -d "$FILESRV_PAT_DIR" ]; then
-    uv run tools/ask.py -p -c red "Error: Fileserver directory not found: $FILESRV_PAT_DIR. Stopping."
+    uv run "$ASK_PY" -p -c red "Error: Fileserver directory not found: $FILESRV_PAT_DIR. Stopping."
     exit 1
 fi
 
-uv run tools/ask.py -p "--- Processing CSV files ---"
-cd "$ANKI_CSVS_SRC_DIR" || { uv run tools/ask.py -p -c red "Error: Could not cd to $ANKI_CSVS_SRC_DIR. Exiting."; exit 1; }
+uv run "$ASK_PY" -p "--- Processing CSV files ---"
+cd "$ANKI_CSVS_SRC_DIR" || { uv run "$ASK_PY" -p -c red "Error: Could not cd to $ANKI_CSVS_SRC_DIR. Exiting."; exit 1; }
 
 safe_copy_file "anki_patimokkha.csv" "$FILESRV_DEST_BASE_DIR/Pātimokkha Word By Word/patimokkha-word-by-word.csv" || true
 safe_copy_file "anki_patimokkha.csv" "$TEMP_PUSH_DEST_DIR/patimokkha-word-by-word.csv" || true
@@ -72,8 +73,8 @@ safe_copy_file "anki_vibhanga.csv" "$FILESRV_DEST_BASE_DIR/Vibhanga/vibhanga.csv
 safe_copy_file "anki_vibhanga.csv" "$TEMP_PUSH_DEST_DIR/vibhanga.csv" || true
 safe_copy_file "sbs_rus.csv" "$TEMP_PUSH_DEST_DIR/sbs-rus.csv" || true
 
-uv run tools/ask.py -p "--- Processing APKG files ---"
-cd "$ANKI_DECKS_DIR" || { uv run tools/ask.py -p -c red "Error: Could not cd to $ANKI_DECKS_DIR. Exiting."; exit 1; }
+uv run "$ASK_PY" -p "--- Processing APKG files ---"
+cd "$ANKI_DECKS_DIR" || { uv run "$ASK_PY" -p -c red "Error: Could not cd to $ANKI_DECKS_DIR. Exiting."; exit 1; }
 
 safe_copy_file "pali_patimokkha_word_by_word.apkg" "$FILESRV_DEST_BASE_DIR/Pātimokkha Word By Word/patimokkha-word-by-word.apkg" || true
 safe_copy_file "pali_patimokkha_word_by_word.apkg" "$TEMP_PUSH_DEST_DIR/patimokkha-word-by-word.apkg" || true
@@ -92,10 +93,10 @@ safe_copy_file "pali_bhikkhu_vibhanga.apkg" "$FILESRV_DEST_BASE_DIR/Vibhanga/vib
 safe_copy_file "pali_bhikkhu_vibhanga.apkg" "$TEMP_PUSH_DEST_DIR/vibhanga.apkg" || true
 
 if [ ${#FAILURES[@]} -eq 0 ]; then
-    uv run tools/ask.py -p -c green "All files copied successfully."
+    uv run "$ASK_PY" -p -c green "All files copied successfully."
 else
-    uv run tools/ask.py -p -c red "The following copies failed:"
+    uv run "$ASK_PY" -p -c red "The following copies failed:"
     for f in "${FAILURES[@]}"; do
-        uv run tools/ask.py -p -c red "  - $f"
+        uv run "$ASK_PY" -p -c red "  - $f"
     done
 fi

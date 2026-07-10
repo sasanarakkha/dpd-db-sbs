@@ -2,6 +2,7 @@
 set -euo pipefail
 
 PROJECT_ROOT="$HOME/Documents/dpd-db"
+cd "$PROJECT_ROOT"
 MASTER_SCRIPT="$HOME/.local/bin/run_and_log.sh"
 LOG_BASE_NAME="anki_update"
 

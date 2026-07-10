@@ -4,6 +4,7 @@
 set -e
 
 PROJECT_ROOT="$(dirname "$(realpath "$0")")/../.."
+cd "${PROJECT_ROOT}"
 
 uv run tools/ask.py --print -c cyan "──────────────────────────────────────────"
 uv run tools/ask.py --print -c cyan "Step 1: Reviewing Corrections"

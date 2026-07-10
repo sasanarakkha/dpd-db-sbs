@@ -2,16 +2,14 @@
 
 # This script is running push_dpd.sh
 
+cd "$HOME/Documents/dpd-db" || exit 1
+
 mount_confirm=$(uv run tools/ask.py -c blue "Mount the fileserver? [y/n] ")
 if [ "$mount_confirm" = "y" ]; then
     mnt
 fi
 
-cd "$HOME/Documents/dpd-db"
-
 uv run bash scripts/bash/push_dpd.sh
-
-cd
 
 umount_confirm=$(uv run tools/ask.py -c blue "Unmount the fileserver? [y/n] ")
 if [ "$umount_confirm" = "y" ]; then

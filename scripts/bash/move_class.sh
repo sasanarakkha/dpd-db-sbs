@@ -9,6 +9,7 @@ set -o pipefail
 
 # move all class materials on the server and GitHub
 
+ASK_PY="$HOME/Documents/dpd-db/tools/ask.py"
 ANKI_DECKS_DIR="$HOME/Documents/dpd-db/temp/anki_decks"
 ANKI_CSVS_SRC_BASE_DIR="$HOME/Documents/dpd-db/temp/anki_csvs"
 PALI_CLASS_CSVS_SRC_DIR="$ANKI_CSVS_SRC_BASE_DIR/pali_class"
@@ -24,14 +25,14 @@ safe_copy_file() {
     local dest_file="$2"
 
     if [ ! -f "$src_file" ]; then
-        uv run tools/ask.py -p -c yellow "Warning: Source file '$src_file' not found. Skipping copy."
+        uv run "$ASK_PY" -p -c yellow "Warning: Source file '$src_file' not found. Skipping copy."
         return 0 # Continue script execution
     fi
     
     local dest_dir
     dest_dir=$(dirname "$dest_file")
     if [ ! -d "$dest_dir" ]; then
-        uv run tools/ask.py -p -c red "Error: Destination directory '$dest_dir' does not exist. Stopping."
+        uv run "$ASK_PY" -p -c red "Error: Destination directory '$dest_dir' does not exist. Stopping."
         exit 1
     fi
 
@@ -40,7 +41,7 @@ safe_copy_file() {
     # --no-perms, --no-owner, --no-group prevent rsync from trying to set these on the destination,
     # which can cause "Operation not permitted" errors on some network shares.
     if ! rsync --times --no-perms --no-owner --no-group "$src_file" "$dest_file"; then
-        uv run tools/ask.py -p -c red "Error: Failed to copy '$src_file' to '$dest_file'."
+        uv run "$ASK_PY" -p -c red "Error: Failed to copy '$src_file' to '$dest_file'."
         FAILURES+=("$src_file → $dest_file")
         return 1
     fi
@@ -53,7 +54,7 @@ safe_copy_dir_contents() {
     local dest_dir="$2"
 
     if [ ! -d "$src_dir" ]; then
-        uv run tools/ask.py -p -c yellow "Warning: Source directory '$src_dir' not found. Skipping copy of its contents."
+        uv run "$ASK_PY" -p -c yellow "Warning: Source directory '$src_dir' not found. Skipping copy of its contents."
         return 0 # Continue script execution
     fi
     
@@ -62,7 +63,7 @@ safe_copy_dir_contents() {
     fi
 
     if [ ! -d "$dest_dir" ]; then
-        uv run tools/ask.py -p -c red "Error: Destination directory '$dest_dir' does not exist. Stopping."
+        uv run "$ASK_PY" -p -c red "Error: Destination directory '$dest_dir' does not exist. Stopping."
         exit 1
     fi
     
@@ -72,7 +73,7 @@ safe_copy_dir_contents() {
     # --no-perms, --no-owner, --no-group: avoid permission issues on network shares
     # The trailing slash on "${src_dir}/" ensures rsync copies the *contents* of the source directory.
     if ! rsync -r --times --no-perms --no-owner --no-group --exclude '.DS_Store' "${src_dir}/" "$dest_dir/"; then
-        uv run tools/ask.py -p -c red "Error: Failed to copy contents of '$src_dir' to '$dest_dir'."
+        uv run "$ASK_PY" -p -c red "Error: Failed to copy contents of '$src_dir' to '$dest_dir'."
         FAILURES+=("$src_dir/ → $dest_dir/")
         return 1
     fi
@@ -80,17 +81,17 @@ safe_copy_dir_contents() {
 }
 
 if [ ! -d "$FILESRV_BASE_DEST_DIR" ]; then
-    uv run tools/ask.py -p -c red "Error: Fileserver directory not found: $FILESRV_BASE_DEST_DIR. Stopping."
+    uv run "$ASK_PY" -p -c red "Error: Fileserver directory not found: $FILESRV_BASE_DEST_DIR. Stopping."
     exit 1
 fi
 if [ ! -d "$FILESRV_CSVS_DEST_DIR" ]; then
-    uv run tools/ask.py -p -c red "Error: Fileserver directory not found: $FILESRV_CSVS_DEST_DIR. Stopping."
+    uv run "$ASK_PY" -p -c red "Error: Fileserver directory not found: $FILESRV_CSVS_DEST_DIR. Stopping."
     exit 1
 fi
 
-cd "$ANKI_DECKS_DIR" || { uv run tools/ask.py -p -c red "Error: Could not cd to $ANKI_DECKS_DIR. Exiting."; exit 1; }
+cd "$ANKI_DECKS_DIR" || { uv run "$ASK_PY" -p -c red "Error: Could not cd to $ANKI_DECKS_DIR. Exiting."; exit 1; }
 
-uv run tools/ask.py -p "--- Processing APKG files ---"
+uv run "$ASK_PY" -p "--- Processing APKG files ---"
 safe_copy_file "vocab_pali_class.apkg" "$TEMP_PUSH_DEST_DIR/vocab-pali-class.apkg" || true
 safe_copy_file "vocab_pali_class.apkg" "$FILESRV_BASE_DEST_DIR/Vocab Pali Class.apkg" || true
 safe_copy_file "grammar_pali_class.apkg" "$TEMP_PUSH_DEST_DIR/grammar-pali-class.apkg" || true
@@ -104,7 +105,7 @@ safe_copy_file "common_roots.apkg" "$FILESRV_BASE_DEST_DIR/Common Roots.apkg" ||
 safe_copy_file "suttas_advanced_pali_class.apkg" "$TEMP_PUSH_DEST_DIR/suttas-advanced-pali-class.apkg" || true
 safe_copy_file "suttas_advanced_pali_class.apkg" "$FILESRV_BASE_DEST_DIR/Suttas Advanced Pali Class.apkg" || true
 
-uv run tools/ask.py -p "--- Processing CSV files ---"
+uv run "$ASK_PY" -p "--- Processing CSV files ---"
 # Copy all files and subdirectories from pali_class source to fileserver csvs destination
 safe_copy_dir_contents "$PALI_CLASS_CSVS_SRC_DIR" "$FILESRV_CSVS_DEST_DIR" || true
 
@@ -123,10 +124,10 @@ safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/grammar/cl_sum_sandhi.csv" "$TEMP_PUSH_
 safe_copy_file "$PALI_CLASS_CSVS_SRC_DIR/grammar/ru_cl_sum_gramm.csv" "$TEMP_PUSH_DEST_DIR/ru-grammar-pali-class-gramm.csv" || true
 
 if [ ${#FAILURES[@]} -eq 0 ]; then
-    uv run tools/ask.py -p -c green "All files copied successfully."
+    uv run "$ASK_PY" -p -c green "All files copied successfully."
 else
-    uv run tools/ask.py -p -c red "The following copies failed:"
+    uv run "$ASK_PY" -p -c red "The following copies failed:"
     for f in "${FAILURES[@]}"; do
-        uv run tools/ask.py -p -c red "  - $f"
+        uv run "$ASK_PY" -p -c red "  - $f"
     done
 fi

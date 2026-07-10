@@ -3,13 +3,15 @@
 # This script downloads the latest Pali Classes files from GitHub and saves them to a specified directory.
 # It also checks for an internet connection before proceeding with the download.
 
+ASK_PY="$HOME/Documents/dpd-db/tools/ask.py"
+
 # Check for internet connection
 if ! ping -c 1 google.com &> /dev/null; then
-    uv run tools/ask.py -p -c red "Error: No internet connection. Please check your network settings."
+    uv run "$ASK_PY" -p -c red "Error: No internet connection. Please check your network settings."
     exit 1
 fi
 
-uv run tools/ask.py --print "--- download_pali_classes Script Started at $(date) ---"
+uv run "$ASK_PY" --print "--- download_pali_classes Script Started at $(date) ---"
 
 mkdir -p "$HOME/Downloads/Pali_classes"
 cd "$HOME/Downloads/Pali_classes"
@@ -24,9 +26,9 @@ Class_links=(
 
 # Loop through the list of links and download them
 for link in "${Class_links[@]}"; do
-    uv run tools/ask.py --print "Downloading $link..."
+    uv run "$ASK_PY" --print "Downloading $link..."
     curl -q -# -L -O "$link"
 done
 
 # print success message
-uv run tools/ask.py -p -c green "All files downloaded successfully."
+uv run "$ASK_PY" -p -c green "All files downloaded successfully."
