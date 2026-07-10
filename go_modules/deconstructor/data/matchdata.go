@@ -477,8 +477,12 @@ func (m MatchData) SaveToDb() {
 	tx.Exec("DELETE FROM lookup")
 
 	// add the updated rows
-	tx.CreateInBatches(updatedResults, 2000)
-	tx.Commit()
+	// batch size kept below SQLite's per-statement bound-variable limit (18 columns/row)
+	if err := tx.CreateInBatches(updatedResults, 1500).Error; err != nil {
+		tx.Rollback()
+		tools.HardCheck(err)
+	}
+	tools.HardCheck(tx.Commit().Error)
 
 	tools.PGreen("added:")
 	tools.POk(fmt.Sprintf("%v", addedCount))
