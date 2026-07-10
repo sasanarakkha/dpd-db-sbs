@@ -1,9 +1,10 @@
 """Database model for use by SQLAlchemy."""
 
+import inspect
 import json
 import re
 from functools import cached_property, lru_cache
-from typing import List, Optional
+from typing import Any, List, Optional, cast
 
 from aksharamukha import transliterate
 from sqlalchemy import DateTime, ForeignKey, and_, case, null, or_
@@ -1020,6 +1021,23 @@ def _load_sutta_alias_map() -> dict[str, str]:
     return result
 
 
+# aksharamukha's convert_default() rescans PreProcess/PostProcess via
+# inspect.getmembers() on every transliterate.process() call in the whole
+# project (lemma_ipa below, tools/translit.py, tools/sinhala_tools.py,
+# audio/bhashini_class.py), regardless of whether pre/post options are
+# passed. Neither module defines functions dynamically, so the scan result
+# is constant for the process lifetime; caching it benefits every caller.
+# cast: the lru_cache wrapper is behaviourally identical to inspect.getmembers
+# (same call signature) but does not carry its overloaded type; present it as Any
+# so the monkey-patch assignment type-checks (runtime no-op).
+transliterate.getmembers = cast(Any, lru_cache(maxsize=None)(inspect.getmembers))
+
+
+@lru_cache(maxsize=None)
+def _lemma_ipa_transliterate(lemma_clean: str) -> str:
+    return str(transliterate.process("IASTPali", "IPA", lemma_clean))
+
+
 class DpdHeadword(Base):
     __tablename__ = "dpd_headwords"
 
@@ -1178,13 +1196,7 @@ class DpdHeadword(Base):
         # from tools.ipa import convert_uni_to_ipa
         # return convert_uni_to_ipa(self.lemma_clean, "ipa")
 
-        return str(
-            transliterate.process(
-                "IASTPali",
-                "IPA",
-                self.lemma_clean,
-            )
-        )
+        return _lemma_ipa_transliterate(self.lemma_clean)
 
     # meaning construction
 

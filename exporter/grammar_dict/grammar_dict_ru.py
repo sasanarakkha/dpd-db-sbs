@@ -13,7 +13,7 @@ from tools.paths import ProjectPaths
 from tools.paths_ru import RuPaths
 from tools.printer import printer as pr
 from exporter.jinja2_env import get_jinja2_env
-from exporter.grammar_dict.data_classes import GrammarData
+from exporter.grammar_dict.data_classes import GrammarData, generate_grammar_header
 
 from tools.tools_for_ru_exporter import (
     ru_replace_abbreviations,
@@ -96,6 +96,7 @@ def generate_html_from_lookup(g: ProgData_ru) -> None:
 
     jinja_env = get_jinja2_env("exporter/grammar_dict")
     template = jinja_env.get_template("grammar.jinja")
+    header = generate_grammar_header(jinja_env)
 
     html_dict: dict[str, str] = {}
     grammar_cache: dict[str, str] = {}
@@ -108,7 +109,7 @@ def generate_html_from_lookup(g: ProgData_ru) -> None:
             entry_html = grammar_cache[grammar_data]
         else:
             # Use ViewModel
-            data = GrammarData_ru(lookup_entry, g.pth, jinja_env)
+            data = GrammarData_ru(lookup_entry, header)
             entry_html = template.render(data=data)
 
             # Since the Jinja template hardcodes "of", we need to replace it with "для"

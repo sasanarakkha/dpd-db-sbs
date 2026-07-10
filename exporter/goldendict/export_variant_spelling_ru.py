@@ -21,8 +21,7 @@ from exporter.goldendict.data_classes_dps import VariantData, SpellingData
 
 
 def generate_variant_spelling_html(
-    pth: ProjectPaths,
-    rupth: RuPaths
+    pth: ProjectPaths, rupth: RuPaths
 ) -> Tuple[List[DictEntry], RenderedSizes]:
     """Generate html for variant readings and spelling corrections."""
 
@@ -49,8 +48,7 @@ def generate_variant_spelling_html(
     )
     rendered_sizes.append(sizes)
 
-    if variant_data_list:
-        variant_spelling_data_list = variant_data_list + spelling_data_list
+    variant_spelling_data_list = variant_data_list + spelling_data_list
 
     pr.yes(len(variant_spelling_data_list))
     return variant_spelling_data_list, sum_rendered_sizes(rendered_sizes)
@@ -69,14 +67,15 @@ def test_and_make_variant_dict(pth: ProjectPaths) -> dict:
             # test if variant equals main reading
             if variant == main:
                 pr.red(f"ERROR: variant==main! {variant}: {main}")
+                continue
 
             # test if variant occurs twice
             if variant in variant_dict:
                 pr.red(f"ERROR: dupes! {variant}")
+                continue
 
             # all ok then add
-            else:
-                variant_dict[variant] = main
+            variant_dict[variant] = main
 
     return variant_dict
 
@@ -90,10 +89,10 @@ def generate_variant_data_list(
 
     variant_data_list: List[DictEntry] = []
 
+    # The plain header has no per-entry variables — render it once.
+    header_squashed = squash_whitespaces(VariantData("", "", jinja_env).header)
+
     for __counter__, (variant, main) in enumerate(variant_dict.items()):
-        data = VariantData(variant, main, jinja_env)
-        header = data.header
-        
         template = jinja_env.get_template("dpd_variant_reading_ru.jinja")
         content = template.render(main=main)
 
@@ -102,7 +101,7 @@ def generate_variant_data_list(
         html += content
         html += "</body></html>"
 
-        html = squash_whitespaces(header) + minify(html)
+        html = header_squashed + minify(html)
 
         size_dict["variant_readings"] += len(html)
         synonyms = add_niggahitas([variant])
@@ -134,14 +133,15 @@ def test_and_make_spelling_dict(pth: ProjectPaths) -> dict:
             # test if mistake equals correction
             if mistake == correction:
                 pr.red(f"ERROR: mistake==correction! {mistake}: {correction}")
+                continue
 
             # test if variant occurs twice
             if mistake in spelling_dict:
                 pr.red(f"ERROR: dupes! {mistake}")
+                continue
 
             # all ok then add
-            else:
-                spelling_dict[mistake] = correction
+            spelling_dict[mistake] = correction
 
         assert "mātāpituraakhatañca" in spelling_dict
 
@@ -157,10 +157,10 @@ def generate_spelling_data_list(
 
     spelling_data_list: List[DictEntry] = []
 
-    for __counter__, (mistake, correction) in enumerate(spelling_dict.items()):
-        data = SpellingData(mistake, correction, jinja_env)
-        header = data.header
+    # The plain header has no per-entry variables — render it once.
+    header_squashed = squash_whitespaces(SpellingData("", "", jinja_env).header)
 
+    for __counter__, (mistake, correction) in enumerate(spelling_dict.items()):
         template = jinja_env.get_template("dpd_spelling_mistake_ru.jinja")
         content = template.render(correction=correction)
 
@@ -169,7 +169,7 @@ def generate_spelling_data_list(
         html += content
         html += "</body></html>"
 
-        html = squash_whitespaces(header) + minify(html)
+        html = header_squashed + minify(html)
 
         size_dict["spelling_mistakes"] += len(html)
         synonyms = add_niggahitas([mistake])

@@ -204,6 +204,19 @@
         "Keep in sync with `ru_release.yml` — divergence causes test/prod environment drift."
       ]
     },
+    ".github/workflows/ru_release_kindle.yml": {
+      "upstream": ".github/workflows/draft_release.yml",
+      "divergence_reason": "RU Kindle/ePub release variant — builds the Russian Kindle & ePub outputs, not the goldendict/mdict draft release.",
+      "sync_rule": "inspired_only",
+      "local_changes": [
+        "Adapted from `draft_release.yml` to build and release the Russian Kindle & ePub artifacts via `uv run python exporter/kindle/kindle_exporter_ru.py`.",
+        "Lookup-table build steps (Suttas, EPD, RPD) run before the Kindle export step."
+      ],
+      "watch_for": [
+        "Upstream changes to release workflow steps (artifact names, upload actions, lookup-build order) need mirroring here.",
+        "Keep the Kindle export step consuming the RU exporter output; do not adopt the draft_release goldendict/mdict upload targets."
+      ]
+    },
     ".github/workflows/ru_static.yml": {
       "upstream": ".github/workflows/static.yml",
       "divergence_reason": "Different CI configuration for RU static build.",
@@ -587,6 +600,21 @@
   "unique_paths": [
     ".github/workflows/submodules_update.yml",
     ".github/workflows/sync_upstream.yml",
+    ".github/workflows/anki_release.yml",
+    "db/tpd/__init__.py",
+    "gui2/data/addition_processed.json",
+    "gui2/data/addition_replaced.json",
+    "gui2/data/corrections_processed.json",
+    "gui2/data/dps_example_stash.json",
+    "gui2/data/dps_history.json",
+    "misc/ebt-md/",
+    "resources/anki/collection_media.tar.gz",
+    "resources/anki/seed_collection.anki2.tar.gz",
+    "scripts/export/add_combined_view.py",
+    "scripts/export/sbs_anki_schema_snapshot.json",
+    "shared_data/russian_words_user_dict.txt",
+    "shared_data/tamil/",
+    "shared_data/tpr_parsing_errors.tsv",
     "scripts/cl_dps/",
     "scripts/rus_exporter/",
     "scripts/dps_archive/",
@@ -672,7 +700,8 @@
     "shared_data/all_tipitaka_words",
     "shared_data/changed_templates",
     ".metadata_never_index",
-    "dpd-db.code-workspace"
+    "dpd-db.code-workspace",
+    "tools/cst_source/__init__.py"
   ],
   "russian_copies": {
     "db/families/family_compound_ru.py": {
@@ -777,6 +806,17 @@
         "Mirror any changes to `DeconstructorData` base class in the `DeconstructorDataRu` override.",
         "Template paths are redirected to `ru_components/templates/`.",
         "Removal of non-Roman synonyms is intentional for the Russian fork."
+      ]
+    },
+    "exporter/deconstructor/deconstructor_header_ru.jinja": {
+      "upstream": "exporter/deconstructor/deconstructor_header.jinja",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "`lang=\"ru\"` attribute and Russian `<title>DPD Деконструктор</title>` replace the upstream English values."
+      ],
+      "watch_for": [
+        "Structural changes to `deconstructor_header.jinja` must be ported here.",
+        "Rendered once per run by `generate_deconstructor_header_ru()` in `deconstructor_exporter_ru.py`."
       ]
     },
     "exporter/goldendict/ru_components/javascript/": {
@@ -993,8 +1033,8 @@
         "JSON schema must match the expectations of the `ru_` template loader."
       ]
     },
-    "shared_data/help_ru/": {
-      "upstream": "shared_data/help/",
+    "shared_data/reference_ru/": {
+      "upstream": "shared_data/reference/",
       "sync_rule": "PORT",
       "local_changes": [
         "Russian translations for `abbreviations.tsv`, `bibliography.tsv`, `help.tsv`, and `thanks.tsv`.",
@@ -1003,7 +1043,8 @@
       ],
       "watch_for": [
         "These files are read by `help_abbrev_add_to_lookup_ru.py` using hardcoded column indices.",
-        "New upstream help entries must be translated and added here."
+        "New upstream help entries must be translated and added here.",
+        "Renamed from `shared_data/help_ru/` in the 2026-07-09 sync to follow upstream's `help/`→`reference/` rename (D7)."
       ]
     },
     "db/rpd/rpd_to_lookup.py": {
@@ -1213,7 +1254,7 @@
       ],
       "watch_for": [
         "This subclasses `DpdExampleField`, so any upstream change to `DpdExampleField.__init__` signature or to inherited methods (value/field/error_text, base parts of `click_choose_example_ok`) can break it — re-check on every upstream `dpd_fields_examples.py` change.",
-        "Upstream changes to `find_cst_source_sutta_example` / `CstSourceSuttaExample` should be ported, since both files depend on them.",
+        "Upstream changes to `find_cst_source_sutta_example` / `CstSourceSuttaExample` (now imported from the locally-materialized `tools/cst_source/` package, not the old `tools/cst_source_sutta_example` module) should be ported, since both files depend on them.",
         "Upstream adds dedicated `click_remove_brackets()` / `click_remove_bold_tags()` methods plus `[]` / `<b>` toolbar buttons (via `remove_brackets`/`remove_bold_tags` in `dpd_fields_functions`). DPS intentionally omits these — the single `Clean` button (`click_clean_example`) already strips `<b>`/`</b>`, and adding them is out of sync scope (new DPS-tab feature). Re-evaluate only if the user requests bracket/bold tooling.",
         "Upstream's example I/O (`get_fields`, stash/reload/last, swap, `clean_text` THA/THI) is tuple-based `(source, sutta, example)`. DPS replaced the entire interface with a `dict[str, ft.TextField | None]` keyed on multi-type DPS field names (sbs/dhp/pat/vib/class/discourses). Any upstream change to these signatures must NOT be ported verbatim — adapt to the DPS dict interface or skip."
       ]
@@ -1227,7 +1268,8 @@
       ],
       "watch_for": [
         "Upstream changes to `_load` / `_save` / `stash_shared_example` / `reload_shared_example` logic should be ported, adapting the tuple↔dict payload difference.",
-        "If upstream relocates `example_stash_json_path` on `Gui2Paths` / `toolkit.paths`, update the direct `Gui2Paths()` access here."
+        "If upstream relocates `example_stash_json_path` on `Gui2Paths` / `toolkit.paths`, update the direct `Gui2Paths()` access here.",
+        "Upstream added a `last_commentary` property (getter/setter over a `commentary_stash` payload) in the 2026-07-09 sync — intentionally NOT ported: the DPS view has no commentary-stash flow. Re-evaluate only if DPS gains a commentary stash."
       ]
     },
     "gui2/dps_meaning_field.py": {

@@ -60,6 +60,30 @@ Use `from tools.printer import printer as pr` for colored terminal output and ti
     if [ "$answer" = "y" ]; then ...
     ```
 
+## Data Verification
+- For questions about actual dictionary data (which source codes exist, how a field is populated, row counts), query the live `dpd.db` directly (`sqlite3 dpd.db` or `get_db_session`). The `db/backup_tsv/` files are regenerated backups overwritten on each db backup — not the live source of truth. Don't infer data shape from TSVs or downstream exporter code.
+
+## Dependencies
+
+### Optional/transitive deps belong to their parent — don't list them as bare standalones
+- If a package is only needed because another package loads it (an engine, backend, or feature plugin), prefer declaring it through the parent's extra rather than as its own top-level entry — the dep then self-documents and auto-removes if the parent is ever dropped.
+- Why it matters: these are dynamic, string-keyed imports (`pd.read_excel` → `import_optional_dependency("openpyxl")`). No static tool (deptry, grep, pipdeptree) can see them, so a bare entry looks unused and gets wrongly pruned — only a test/build run reveals the break.
+- EXCEPTION — keep it bare WITH an inline comment naming the owner when the extra is unusable:
+  - the extra is too broad (e.g. `pandas[excel]` pulls 5 engines we never use, so we keep bare `openpyxl` for `pd.read_excel`), or
+  - no extra provides it (e.g. `httpx2` is starlette's TestClient backend, but no fastapi/starlette extra ships it — their extras pull the old `httpx`).
+  - In both cases the comment is mandatory so the dep never again looks orphaned.
+- Before removing any dep that looks unused, confirm it is not a parent's optional engine/backend, then re-run the full test suite AND a build cycle — `uv sync` succeeding proves nothing about dynamic imports.
+
+## Testing
+- Slow tests (those that parse large CST XML) are marked `@pytest.mark.slow` and are deselected by default (`addopts = -m 'not slow'`). Run them on demand with `uv run pytest -m slow`. New tests that parse big source files should be marked `slow`.
+
+## Pre-commit gate
+- **TOUCH A FILE = OWN ITS LINT.** The moment you edit any file, you are responsible for making it pass `ruff check` AND `pyright` cleanly — including PRE-EXISTING errors you did not introduce. The hook stages the whole file and rejects the commit on any error in it, so "it was already broken" is not an out. Fix every reported error with a real, behaviour-preserving fix (never `# noqa`). This is a repeated issue — do not skip it.
+- The hook runs ruff + pyright on EVERY staged Python file (top-level `exclude:` in `.pre-commit-config.yaml` only covers `archive/`, `scripts/archive/`, `scripts/bash/`, `tools/writemdict/`). So editing any other file — even a one-line import swap — stages it and subjects its PRE-EXISTING lint errors to the gate, which blocks the commit. Before finishing, run `uv run ruff check <file>` + `uv run pyright <file>` on every touched file and fix ALL reported errors with real, behaviour-preserving fixes (narrow blind `except Exception`, direct boolean returns, `next(iter(d))`, etc.) — not `# noqa`. `gui2/` is pyright-excluded but NOT ruff-excluded, so it commonly carries pre-existing ruff violations that only surface when you touch the file.
+
+## Performance Work
+- Never `INSERT OR REPLACE` on `lookup` (blanks the other 16 columns); use `ON CONFLICT ... DO UPDATE SET <col> = excluded.<col>` (see the `_raw_sql_sync` pattern in `tools/lookup_sync.py`).
+
 # Localized Rules (local fork)
 
 ## Project Overview

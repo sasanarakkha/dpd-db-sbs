@@ -94,19 +94,29 @@ def generate_epd_html(
 
     epd_data_list: List[DictEntry] = []
 
+    if not epd_dict:
+        pr.yes(0)
+        return epd_data_list, size_dict
+
+    # The header has no per-entry variables, so it is identical for every
+    # entry — generate it once instead of per row.
+    first_word, first_html_entries = next(iter(epd_dict.items()))
+    header_squashed = squash_whitespaces(
+        EpdDataSBS(first_word, first_html_entries, pth, jinja_env).header
+    )
+
     for word, html_entries in epd_dict.items():
         data = EpdDataSBS(word, html_entries, pth, jinja_env)
 
         html_rendered = template.render(d=data)
 
         # Re-calculate parts for parity
-        header = data.header
         body = extract_body(html_rendered)
 
-        final_html = squash_whitespaces(header) + minify(body)
+        final_html = header_squashed + minify(body)
 
         size_dict["epd"] += len(final_html)
-        size_dict["epd_header"] += len(squash_whitespaces(header))
+        size_dict["epd_header"] += len(header_squashed)
 
         res = DictEntry(
             word=word,

@@ -49,7 +49,7 @@ db/suttas/Untitled Document
 docs/rss.xml
 docs_site
 dpd-db.code-workspace
-dpd.db.tar.bz2
+dpd.db.tar.xz
 exporter/archive/other_dictionaries_legacy/*
 exporter/archive/other_dictionaries_legacy/bmp_files/
 exporter/archive/other_dictionaries_legacy/code/cone/bulk_dump_html.html
@@ -73,6 +73,7 @@ exporter/kindle/epub/OEBPS/Text/epd_*.xhtml
 exporter/mcp/output/*
 exporter/mcp/input/*
 exporter/pdf/typst_data_lite.typ
+exporter/pdf/typst_chunk_*
 exporter/share/
 exporter/tester/fonts/
 exporter/tester/tester/
@@ -87,6 +88,7 @@ gui/icons/
 gui/stash/
 gui/window_layout.py
 gui2/build/
+gui2/data/commentary_stash.json
 gui2/data/daily_log.json
 gui2/data/example_stash.json
 gui2/data/filter_presets.json
@@ -159,3 +161,7 @@ memory
 NOTES.md
 dpd.db-shm
 dpd.db-wal
+
+# pass2x diagnostic step TSVs (regeneratable, can be large)
+gui2/pass2x/data/
+/scripts/fix/pass2exceptions.json

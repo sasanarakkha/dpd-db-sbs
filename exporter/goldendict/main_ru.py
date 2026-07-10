@@ -5,6 +5,7 @@
 
 import csv
 import pickle
+from dataclasses import dataclass, field
 from typing import List
 
 from sqlalchemy.orm import Session
@@ -31,32 +32,50 @@ from tools.mdict_exporter import export_to_mdict
 from tools.paths import ProjectPaths
 from tools.paths_ru import RuPaths
 from tools.printer import printer as pr
-from tools.speech_marks import SpeechMarkManager
+from tools.speech_marks import SpeechMarkManager, SpeechMarksDict
 from tools.utils import RenderedSizes, sum_rendered_sizes
 
 
+@dataclass
 class GlobalVars:
-    def __init__(self) -> None:
-        self.pth = ProjectPaths()
-        self.rupth = RuPaths()
-        self.db_session: Session = get_db_session(self.pth.dpd_db_path)
-        self.speech_marks_manager = SpeechMarkManager()
-        self.speech_marks = self.speech_marks_manager.get_speech_marks()
-        self.cf_set: set = load_cf_set()  # type: ignore[assignment]
-        self.idioms_set: set = load_idioms_set()  # type: ignore[assignment]
-        self.roots_count_dict = make_roots_count_dict(self.db_session)
-        self.rendered_sizes: List[RenderedSizes] = []
-        self.data_limit = int(config_read("dictionary", "data_limit") or "0")
-        self.dict_data: list[DictEntry]
+    pth: ProjectPaths
+    rupth: RuPaths
+    db_session: Session
+    speech_marks: SpeechMarksDict
+    cf_set: set[str]
+    idioms_set: set[str]
+    roots_count_dict: dict[str, int]
+    data_limit: int
+    make_mdict: bool
+    make_slob: bool
+    paths: RuPaths
+    rendered_sizes: List[RenderedSizes] = field(default_factory=list)
+    dict_data: list[DictEntry] = field(default_factory=list)
 
-        # config tests
-        self.make_mdict: bool = False
-        if config_test("dictionary", "make_mdict", "yes"):
-            self.make_mdict: bool = True
 
-        self.make_slob = config_read("goldendict", "make_slob", "no") == "yes"
+def build_global_vars() -> GlobalVars:
+    pth = ProjectPaths()
+    rupth = RuPaths()
+    db_session = get_db_session(pth.dpd_db_path)
 
-        self.paths = self.rupth
+    # config tests
+    make_mdict: bool = False
+    if config_test("dictionary", "make_mdict", "yes"):
+        make_mdict = True
+
+    return GlobalVars(
+        pth=pth,
+        rupth=rupth,
+        db_session=db_session,
+        speech_marks=SpeechMarkManager().get_speech_marks(),
+        cf_set=load_cf_set(),  # type: ignore[arg-type]
+        idioms_set=load_idioms_set(),  # type: ignore[arg-type]
+        roots_count_dict=make_roots_count_dict(db_session),
+        data_limit=int(config_read("dictionary", "data_limit") or "0"),
+        make_mdict=make_mdict,
+        make_slob=config_read("goldendict", "make_slob", "no") == "yes",
+        paths=rupth,
+    )
 
 
 def main():
@@ -68,7 +87,7 @@ def main():
         pr.toc()
         return
 
-    g = GlobalVars()
+    g = build_global_vars()
 
     dpd_data_list, sizes = generate_dpd_html(
         g.db_session,
@@ -185,7 +204,7 @@ def write_size_dict(pth: ProjectPaths, size_dict):
     pr.green_tmr("writing size_dict")
     filename = pth.temp_dir.joinpath("size_dict.tsv")
 
-    with open(filename, "w", newline="") as csvfile:
+    with filename.open("w", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile, delimiter="\t")
         for key, value in size_dict.items():
             writer.writerow([key, value])

@@ -39,8 +39,6 @@ uv run python exporter/anki/anki_apkg_exporter.py
 
 uv run python db/variants/main.py 
 
-uv run python scripts/build/deconstructor_extract_archive.py
-uv run python scripts/build/deconstructor_output_add_to_db.py
 go run go_modules/deconstructor/main.go
 uv run python scripts/build/tarball_deconstructor_output.py
 

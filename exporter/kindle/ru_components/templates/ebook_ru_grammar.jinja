@@ -27,16 +27,16 @@
     </tr>
 {% endif %}
 {% endif %}
-{% if i.root_base %}
+{% if friendly.root_base %}
     <tr>
         <td class='th'>Основа</td>
-        <td>{{ i.root_base }}</td>
+        <td>{{ friendly.root_base }}</td>
     </tr>
 {% endif %}
-{% if i.construction %}
+{% if friendly.construction %}
     <tr>
         <td class='th'>Образование</td>
-        <td>{{ i.construction }}</td>
+        <td>{{ friendly.construction }}</td>
     </tr>
 {% endif %}
 {% if i.derivative %}
@@ -45,16 +45,16 @@
         <td>{{ i.derivative }} ({{ i.suffix }})</td>
     </tr>
 {% endif %}
-{% if i.phonetic %}
+{% if friendly.phonetic %}
     <tr>
         <td class='th'>Фонетика</td>
-        <td>{{ i.phonetic }}</td>
+        <td>{{ friendly.phonetic }}</td>
     </tr>
 {% endif %}
-{% if i.compound_type and "?" not in i.compound_type %}
+{% if friendly.compound_type and "?" not in friendly.compound_type %}
     <tr>
         <td class='th'>Составное</td>
-        <td>{{ i.compound_type }} ({{ i.compound_construction }})</td>
+        <td>{{ friendly.compound_type }} ({{ i.compound_construction }})</td>
     </tr>
 {% endif %}
 {% if i.antonym %}
@@ -75,33 +75,33 @@
         <td>{{ i.variant }}</td>
     </tr>
 {% endif %}
-{% if (i.commentary and i.commentary != "-") %}
+{% if (friendly.commentary and friendly.commentary != "-") %}
     <tr>
         <td class='th'>Комментарий</td>
-        <td>{{ i.commentary }}</td>
+        <td>{{ friendly.commentary }}</td>
     </tr>
 {% endif %}
-{% if i.ru and i.ru.ru_notes %}
+{% if friendly.ru_notes %}
     <tr>
         <td class='th'>Заметки</td>
-        <td>{{ i.ru.ru_notes }}</td>
+        <td>{{ friendly.ru_notes }}</td>
     </tr>
-{% if "[пер. ИИ]" in i.ru.ru_notes and i.notes %}
+{% if "[пер. ИИ]" in friendly.ru_notes and friendly.notes %}
             <tr>
                 <td class='th'>Notes</td>
-                <td>{{ i.notes }}</td>
+                <td>{{ friendly.notes }}</td>
             </tr>
 {% endif %}
-{% elif i.notes %}
+{% elif friendly.notes %}
     <tr>
         <td class='th'>Notes</td>
-        <td>{{ i.notes }}</td>
+        <td>{{ friendly.notes }}</td>
     </tr>
 {% endif %}
-{% if i.cognate %}
+{% if friendly.cognate %}
     <tr>
         <td class='th'>English Cognate</td>
-        <td>{{ i.cognate }}</td>
+        <td>{{ friendly.cognate }}</td>
     </tr>
 {% endif %}
 {% if i.link %}
@@ -124,10 +124,10 @@
         <td><i>{{ i.non_ia }}</i></td>
     </tr>
 {% endif %}
-{% if i.sanskrit %}
+{% if friendly.sanskrit %}
     <tr>
         <td class='th'>Санскрит</td>
-        <td><i>{{ i.sanskrit }}</i></td>
+        <td><i>{{ friendly.sanskrit }}</i></td>
     </tr>
 {% endif %}
 {% if i.root_key %}

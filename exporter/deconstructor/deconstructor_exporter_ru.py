@@ -2,6 +2,7 @@
 
 """Export Deconstructor To GoldenDict and MDict formats."""
 
+from jinja2 import Environment
 from minify_html import minify
 
 from db.db_helpers import get_db_session
@@ -25,13 +26,17 @@ from exporter.jinja2_env import get_jinja2_env
 from exporter.deconstructor.data_classes import DeconstructorData
 
 
-class DeconstructorData_ru(DeconstructorData):
-    def _generate_header(self, pth: ProjectPaths, jinja_env) -> str:
-        header_templ = jinja_env.get_template("deconstructor_header_ru.jinja")
-        css_manager = CSSManager()
-        html_header = header_templ.render(css="", js="")
-        html_header = css_manager.update_style(html_header, "deconstructor")
-        return squash_whitespaces(html_header)
+def generate_deconstructor_header_ru(jinja_env: Environment) -> str:
+    """Render the constant deconstructor header once.
+
+    The header has no per-entry variables, so it is identical for every entry
+    and is rendered a single time per run instead of once per compound.
+    """
+    header_templ = jinja_env.get_template("deconstructor_header_ru.jinja")
+    css_manager = CSSManager()
+    html_header = header_templ.render(css="", js="")
+    html_header = css_manager.update_style(html_header, "deconstructor")
+    return squash_whitespaces(html_header)
 
 
 class ProgData_ru:
@@ -70,13 +75,14 @@ def make_deconstructor_dict_data(g: ProgData_ru) -> None:
     jinja_env_header = get_jinja2_env("exporter/deconstructor")
     jinja_env_body = get_jinja2_env("exporter/goldendict/ru_components/templates")
     template = jinja_env_body.get_template("deconstructor_ru.jinja")
+    header = generate_deconstructor_header_ru(jinja_env_header)
 
     pr.yes(len(deconstructor_db))
 
     for counter, i in enumerate(deconstructor_db):
-        data = DeconstructorData_ru(i, g.pth, jinja_env_header)
+        data = DeconstructorData(i)
 
-        html_string = data.header + minify(template.render(data=data))
+        html_string = header + minify(template.render(data=data))
 
         # make synonyms list
         synonyms = add_niggahitas([i.lookup_key], all=False)

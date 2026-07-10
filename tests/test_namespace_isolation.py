@@ -98,9 +98,12 @@ def get_test_cases() -> list[tuple[str, str, str]]:
     categories = {"russian_copies": "_ru", "sbs_copies": "_sbs", "dps_copies": "_dps"}
 
     for cat, expected in categories.items():
-        for shadow, upstream in registry.get(cat, {}).items():  # type: ignore[union-attr]
+        for shadow, entry in registry.get(cat, {}).items():  # type: ignore[union-attr]
             if not shadow.endswith(".py"):
                 continue
+            # Registry copies map shadow -> {"upstream": path, ...} (rich object schema);
+            # tolerate a bare-string value too for backward compatibility.
+            upstream = entry["upstream"] if isinstance(entry, dict) else entry
             cases.append((shadow, upstream, expected))
     return cases
 

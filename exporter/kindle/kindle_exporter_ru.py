@@ -42,6 +42,7 @@ from tools.tools_for_ru_exporter import (
     ru_make_grammar_line,
 )
 from exporter.jinja2_env import get_jinja2_env
+from exporter.kindle.data_classes import _make_friendly, html_friendly
 
 
 def render_dpd_xhtml_ru(pth: ProjectPaths, rupth: RuPaths) -> int:
@@ -194,31 +195,15 @@ def render_ebook_entry_ru(
     if "&" in summary:
         summary = summary.replace(" & ", " и ")
 
-    # clean up for html
-    for attr in [
-        "root_base",
-        "construction",
-        "sanskrit",
-        "compound_type",
-        "phonetic",
-        "example_1",
-        "example_2",
-        "sutta_1",
-        "sutta_2",
-        "commentary",
-        "notes",
-        "cognate",
-    ]:
-        val = getattr(i, attr)
-        if isinstance(val, str):
-            setattr(i, attr, html_friendly(val))
+    # precompute html-friendly text without mutating the ORM-tracked headword
+    friendly = _make_friendly(i)
     if i.ru and i.ru.ru_notes:
-        i.ru.ru_notes = html_friendly(i.ru.ru_notes)
+        friendly["ru_notes"] = html_friendly(i.ru.ru_notes)
 
-    grammar_table = render_grammar_templ_ru(jinja_env, i)
+    grammar_table = render_grammar_templ_ru(jinja_env, i, friendly)
     if "&" in grammar_table:
         grammar_table = grammar_table.replace(" & ", " и ")
-    examples = render_example_templ_ru(jinja_env, i)
+    examples = render_example_templ_ru(jinja_env, i, friendly)
 
     template = jinja_env.get_template("ebook_ru_entry.jinja")
     return template.render(
@@ -232,21 +217,25 @@ def render_ebook_entry_ru(
     )
 
 
-def render_grammar_templ_ru(jinja_env: Environment, i: DpdHeadword) -> str:
+def render_grammar_templ_ru(
+    jinja_env: Environment, i: DpdHeadword, friendly: dict[str, str]
+) -> str:
     """html table of grammatical information"""
     if i.meaning_1:
         grammar = ru_make_grammar_line(i)
         meaning = f"{make_meaning_combo_html(i)}"
         template = jinja_env.get_template("ebook_ru_grammar.jinja")
-        return template.render(i=i, grammar=grammar, meaning=meaning)
+        return template.render(i=i, friendly=friendly, grammar=grammar, meaning=meaning)
     return ""
 
 
-def render_example_templ_ru(jinja_env: Environment, i: DpdHeadword) -> str:
+def render_example_templ_ru(
+    jinja_env: Environment, i: DpdHeadword, friendly: dict[str, str]
+) -> str:
     """render sutta examples html"""
     if i.meaning_1 and i.example_1:
         template = jinja_env.get_template("ebook_ru_example.jinja")
-        return template.render(i=i)
+        return template.render(i=i, friendly=friendly)
     return ""
 
 
@@ -279,6 +268,8 @@ def save_abbreviations_xhtml_page(rupth: RuPaths, id_counter: int) -> None:
     abbreviation_entries = []
     for i in abbreviations_list:
         for key, value in i.items():
+            if not isinstance(value, str):
+                continue
             if value == ">":
                 value = "&gt;"
             i[key] = html_friendly(value)
@@ -371,16 +362,6 @@ def make_mobi(pth: RuPaths) -> None:
                 pr.white(escape(line.rstrip()))
         process.wait()
         pr.yes("Converted with kindlegen")
-
-
-def html_friendly(text: str) -> str:
-    try:
-        text = text.replace("\n", "<br/>")
-        text = text.replace(" > ", " &gt; ")
-        text = text.replace(" < ", " &lt; ")
-        return text
-    except Exception:
-        return text
 
 
 def render_rpd_xhtml_ru(pth: ProjectPaths, rupth: RuPaths, id_counter: int) -> int:

@@ -1,4 +1,5 @@
 import cProfile
+import re
 import time
 from pathlib import Path
 
@@ -61,6 +62,7 @@ class App:
         from gui2.pass2_add_view import Pass2AddView
         from gui2.pass2_auto_view import Pass2AutoView
         from gui2.pass2_pre_view import Pass2PreProcessView
+        from gui2.pass2x.in_commentary_view import Pass2xInCommentaryView
         from gui2.tests_tab_view import TestsTabView
         from gui2.translations_view import TranslationsView
 
@@ -115,6 +117,9 @@ class App:
             self.pass1_auto_view.controller,
         )
         self.pass2_pre_view: Pass2PreProcessView = Pass2PreProcessView(
+            self.page, self.toolkit
+        )
+        self.pass2x_view: Pass2xInCommentaryView = Pass2xInCommentaryView(
             self.page, self.toolkit
         )
         self.pass2_auto_view: Pass2AutoView = Pass2AutoView(self.page, self.toolkit)
@@ -220,17 +225,18 @@ class App:
                 self.page.update()
 
     def _get_current_lemma(self) -> str:
-        """Return lemma_1 from the active add-view, or empty string."""
+        """Return lemma_clean from the active add-view, or empty string."""
         tab_to_view = {
             3: self.pass1_add_view,
-            6: self.pass2_add_view,
+            7: self.pass2_add_view,
         }
         view = tab_to_view.get(self.tabs.selected_index)
         if view is None:
             return ""
         try:
             field = view.dpd_fields.get_field("lemma_1")
-            return (field.value or "").strip() if field else ""
+            lemma_1 = (field.value or "").strip() if field else ""
+            return re.sub(r" \d.*$", "", lemma_1)
         except Exception:
             return ""
 
@@ -268,6 +274,10 @@ class App:
                 ft.Tab(
                     text="Pass2Pre",
                     content=self.pass2_pre_view,
+                ),
+                ft.Tab(
+                    text="Pass2x",
+                    content=self.pass2x_view,
                 ),
                 ft.Tab(
                     text="Pass2Auto",
@@ -339,7 +349,6 @@ def main(page: ft.Page) -> None:
     if enable_profiling and profiler is not None:
         profiler.disable()
         profiler.dump_stats(str(profile_file))
-        print(f"snakeviz {profile_file}")
 
 
 if __name__ == "__main__":

@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+from typing import TYPE_CHECKING, cast
+
 import flet as ft
 
 from gui2.dpd_fields_examples import DpdExampleField, book_codes
@@ -6,12 +7,16 @@ from gui2.dpd_fields_classes import DpdTextField
 from gui2.dpd_fields_functions import clean_example
 from gui2.dps_example_stash_manager import DpsExampleStashManager
 from gui2.toolkit import ToolKit
-from tools.cst_source_sutta_example import (
+from tools.cst_source import (
     CstSourceSuttaExample,
 )
 from tools.speech_marks import SpeechMarkManager
 from tools.tsv_read_write import read_tsv_dict
 from difflib import SequenceMatcher
+
+if TYPE_CHECKING:
+    from gui2.dps_view import DpsView
+    from gui2.example_stash_manager import ExampleStashManager
 
 
 class DpsExampleField(DpdExampleField):
@@ -28,9 +33,7 @@ class DpsExampleField(DpdExampleField):
         on_blur=None,
         simple_mode: bool = False,
     ):
-        from gui2.dps_view import DpsView
-
-        self.ui: DpsView = ui
+        self.ui = ui
         self.field_name = field_name
         self.dps_fields = dps_fields
 
@@ -40,8 +43,13 @@ class DpsExampleField(DpdExampleField):
         self.speech_marks_dict = self.speech_marks_manager.get_speech_marks()
 
         self.simple_mode = simple_mode
-        # Use passed stash manager or create new one if not provided
-        self.stash_manager = stash_manager or DpsExampleStashManager(self.ui.toolkit)
+        # Use passed stash manager or create new one if not provided. DPS supplies its
+        # own stash-manager type; cast to the base attribute type so the intentional
+        # override type-checks, and read it back through `_stash` for DPS-typed access.
+        self.stash_manager = cast(
+            "ExampleStashManager",
+            stash_manager or DpsExampleStashManager(self.ui.toolkit),
+        )
         # Initialize archive index as instance variable
         self.archived_example_index = 0
         ft.Column.__init__(self, expand=True)
@@ -77,7 +85,7 @@ class DpsExampleField(DpdExampleField):
             )
 
             self.book_options = [
-                ft.dropdown.Option(key=item, text=item) for item in book_codes.keys()
+                ft.dropdown.Option(key=item, text=item) for item in book_codes
             ]
 
             self.book_dropdown = ft.Dropdown(
@@ -166,14 +174,30 @@ class DpsExampleField(DpdExampleField):
         self.cst_examples: list[CstSourceSuttaExample] = []
         self.example_index: str = ""
 
+    @property
+    def _stash(self) -> "DpsExampleStashManager":
+        """DPS-typed view of the stash manager stored in the base attribute."""
+        return cast("DpsExampleStashManager", self.stash_manager)
+
+    @property
+    def _view(self) -> "DpsView":
+        """DPS-typed view of the base `ui` attribute."""
+        return cast("DpsView", self.ui)
+
+    @property
+    def _active_page(self) -> ft.Page:
+        """Non-optional page handle (base exposes `page` as `Page | None`)."""
+        return cast(ft.Page, self.page)
+
     def _handle_last_control_blur(self, e: ft.ControlEvent):
         """Hides the tools if they are visible when the last control loses focus.
         Also adds apostrophes, hyphenations and saves current example"""
 
         if self._search_row.visible:
-            self._toggle_tools_visibility(None)
+            # Base handler ignores `e`; pass a typed None for the programmatic toggle.
+            self._toggle_tools_visibility(cast(ft.ControlEvent, None))
 
-        fields_dict = self.get_fields()
+        fields_dict = self.get_fields_dps()
 
         # Save current example to stash
         example_field = fields_dict.get("example")
@@ -185,7 +209,7 @@ class DpsExampleField(DpdExampleField):
                     stash_dict[field_name] = field.value
 
             if stash_dict:
-                self.stash_manager.last_example = stash_dict
+                self._stash.last_example = stash_dict
 
         # handle hyphenations and apostrophes
         if (
@@ -196,8 +220,13 @@ class DpsExampleField(DpdExampleField):
         ):
             self._handle_hyphens_and_apostrophes(example_field.value)
 
-    def get_fields(self) -> dict[str, ft.TextField | None]:
-        """Return all relevant fields for the current example field as a dictionary."""
+    def get_fields_dps(self) -> dict[str, ft.TextField | None]:
+        """Return all relevant fields for the current example field as a dictionary.
+
+        Named distinctly from the base ``get_fields`` (which returns a source/sutta/
+        example tuple): DPS overrides every base caller, so this DPS-only dict contract
+        never has to satisfy the base method's signature.
+        """
         # Extract example type and index from field name
         # e.g., "dps_sbs_example_1" -> type="sbs", index="1"
         # e.g., "dps_dhp_example" -> type="dhp", index=None
@@ -269,11 +298,11 @@ class DpsExampleField(DpdExampleField):
 
     def click_choose_example_ok(self, e: ft.ControlEvent):
         self.choose_example_dialog.open = False
-        self.page.update()
+        self._active_page.update()
 
         # add back into page
         cst_example = self.cst_examples[int(self.example_index)]
-        fields_dict = self.get_fields()
+        fields_dict = self.get_fields_dps()
 
         source_field = fields_dict.get("source")
         sutta_field = fields_dict.get("sutta")
@@ -300,7 +329,7 @@ class DpsExampleField(DpdExampleField):
             self.word_to_find_field.update()  # Force immediate UI update
             self.word_to_find_field.focus()  # Focus on the field for quick editing
 
-        self.page.update()
+        self._active_page.update()
 
     def click_clean_example(self, e: ft.ControlEvent):
         if self.value:
@@ -366,10 +395,10 @@ class DpsExampleField(DpdExampleField):
             sutta_to.value = sutta_x
             example_to.value = example_x
 
-            self.page.update()
+            self._active_page.update()
 
     def click_delete_example(self, e: ft.ControlEvent):
-        fields_dict = self.get_fields()
+        fields_dict = self.get_fields_dps()
 
         # Clear all fields in the dictionary
         for field in fields_dict.values():
@@ -394,11 +423,11 @@ class DpsExampleField(DpdExampleField):
             if chapter_field:
                 chapter_field.value = ""
 
-        self.page.update()
+        self._active_page.update()
 
     def _click_stash_example(self, e: ft.ControlEvent):
         """Stashes all relevant fields for the current example."""
-        fields_dict = self.get_fields()
+        fields_dict = self.get_fields_dps()
 
         # Create dictionary with field values
         stash_dict: dict[str, str] = {}
@@ -407,38 +436,38 @@ class DpsExampleField(DpdExampleField):
                 stash_dict[field_name] = field.value
 
         if stash_dict:
-            self.stash_manager.stash_shared_example(stash_dict)
+            self._stash.stash_shared_example(stash_dict)
             self.ui.update_message("Stashed current example data")
         else:
             self.ui.update_message("No data to stash")
 
     def _click_reload_example(self, e: ft.ControlEvent):
         """Reloads stashed data into all relevant fields."""
-        stashed_data = self.stash_manager.reload_shared_example()
+        stashed_data = self._stash.reload_shared_example()
         if stashed_data:
-            fields_dict = self.get_fields()
+            fields_dict = self.get_fields_dps()
             for field_name, field in fields_dict.items():
                 if field and field_name in stashed_data:
                     field.value = stashed_data[field_name]
 
-            self.page.update()
+            self._active_page.update()
             self.ui.update_message("Reloaded stashed example data")
         else:
             self.ui.update_message("No stashed data found")
 
     def _click_last_example(self, e: ft.ControlEvent):
         """Loads the last saved example from stash."""
-        if last_example := self.stash_manager.last_example:
-            fields_dict = self.get_fields()
+        if last_example := self._stash.last_example:
+            fields_dict = self.get_fields_dps()
             for field_name, field in fields_dict.items():
                 if field and field_name in last_example:
                     field.value = last_example[field_name]
 
-            self.page.update()
+            self._active_page.update()
 
     def _click_arch_example(self, e: ft.ControlEvent):
         """Loads an example from the archive."""
-        current_id = self.ui.headword.id if self.ui.headword else ""
+        current_id = self._view.headword.id if self._view.headword else ""
         if not current_id:
             self.ui.update_message("No headword loaded")
             return
@@ -464,7 +493,7 @@ class DpsExampleField(DpdExampleField):
         )
 
         self.archived_example_index = new_index
-        self.page.update()
+        self._active_page.update()
 
     def paragraphs_are_similar_sbs(self, paragraph1, paragraph2, threshold):
         """Check if two paragraphs are similar based on a similarity threshold."""
@@ -475,7 +504,7 @@ class DpsExampleField(DpdExampleField):
         self, current_id, ex_1, ex_2, ex_3, ex_4, ex_5, ex_6, ex_7, index
     ):
         """Handle archive example logic."""
-        word_data = read_tsv_dict(self.ui.dpspth.sbs_archive)
+        word_data = read_tsv_dict(self._view.dpspth.sbs_archive)
         input_examples = {ex_1, ex_2, ex_3, ex_4, ex_5, ex_6, ex_7}
         total_examples = 4  # Check all 4 examples from archive
 
@@ -533,4 +562,4 @@ class DpsExampleField(DpdExampleField):
             .replace("'nti", "n'ti")
         )
         self.update_counter(e)
-        self.page.update()
+        self._active_page.update()

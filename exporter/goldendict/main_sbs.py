@@ -5,7 +5,8 @@
 
 import csv
 import pickle
-from typing import List
+from dataclasses import dataclass, field
+from typing import List, cast
 
 from sqlalchemy.orm import Session
 
@@ -28,49 +29,75 @@ from tools.mdict_exporter import export_to_mdict
 from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
 from tools.printer import printer as pr
-from tools.speech_marks import SpeechMarkManager
+from tools.speech_marks import SpeechMarkManager, SpeechMarksDict
 from tools.utils_sbs import RenderedSizes, sum_rendered_sizes
 
 
+@dataclass
 class GlobalVars:
-    def __init__(self) -> None:
-        self.pth = ProjectPaths()
-        self.dpspth = DPSPaths()
-        self.db_session: Session = get_db_session(self.pth.dpd_db_path)
-        self.speech_marks_manager = SpeechMarkManager()
-        self.speech_marks = self.speech_marks_manager.get_speech_marks()
-        self.cf_set: set = load_cf_set()  # type: ignore[assignment]
-        self.idioms_set: set = load_idioms_set()  # type: ignore[assignment]
-        self.roots_count_dict = make_roots_count_dict(self.db_session)
-        self.rendered_sizes: List[RenderedSizes] = []
-        self.data_limit = int(config_read("dictionary", "data_limit") or "0")
-        self.dict_data: list[DictEntry]
+    pth: ProjectPaths
+    dpspth: DPSPaths
+    db_session: Session
+    speech_marks: SpeechMarksDict
+    cf_set: set[str]
+    idioms_set: set[str]
+    roots_count_dict: dict[str, int]
+    data_limit: int
+    make_mdict: bool
+    make_slob: bool
+    paths: ProjectPaths
+    show_sbs_data: bool = False
+    show_ru_data: bool = False
+    show_ta_data: bool = False
+    show_grammar: bool = False
+    rendered_sizes: List[RenderedSizes] = field(default_factory=list)
+    dict_data: list[DictEntry] = field(default_factory=list)
 
-        # config tests
-        self.make_mdict: bool = False
-        if config_test("dictionary", "make_mdict", "yes"):
-            self.make_mdict: bool = True
 
-        self.make_slob = config_read("goldendict", "make_slob", "no") == "yes"
+def build_global_vars() -> GlobalVars:
+    pth = ProjectPaths()
+    dpspth = DPSPaths()
+    db_session = get_db_session(pth.dpd_db_path)
 
-        self.show_sbs_data: bool = False
-        self.show_ru_data: bool = False
-        self.show_ta_data: bool = False
-        self.show_grammar: bool = False
+    # config tests
+    make_mdict: bool = False
+    if config_test("dictionary", "make_mdict", "yes"):
+        make_mdict = True
 
-        if config_test("dictionary", "show_sbs_data", "yes"):
-            self.show_sbs_data: bool = True
+    show_sbs_data: bool = False
+    show_ru_data: bool = False
+    show_ta_data: bool = False
+    show_grammar: bool = False
 
-        if config_test("dictionary", "show_ru_data", "yes"):
-            self.show_ru_data: bool = True
+    if config_test("dictionary", "show_sbs_data", "yes"):
+        show_sbs_data = True
 
-        if config_test("dictionary", "show_ta_data", "yes"):
-            self.show_ta_data: bool = True
+    if config_test("dictionary", "show_ru_data", "yes"):
+        show_ru_data = True
 
-        if config_test("dictionary", "show_grammar", "yes"):
-            self.show_grammar: bool = True
+    if config_test("dictionary", "show_ta_data", "yes"):
+        show_ta_data = True
 
-        self.paths = self.pth
+    if config_test("dictionary", "show_grammar", "yes"):
+        show_grammar = True
+
+    return GlobalVars(
+        pth=pth,
+        dpspth=dpspth,
+        db_session=db_session,
+        speech_marks=SpeechMarkManager().get_speech_marks(),
+        cf_set=load_cf_set(),  # type: ignore[arg-type]
+        idioms_set=load_idioms_set(),  # type: ignore[arg-type]
+        roots_count_dict=make_roots_count_dict(db_session),
+        data_limit=int(config_read("dictionary", "data_limit") or "0"),
+        make_mdict=make_mdict,
+        make_slob=config_read("goldendict", "make_slob", "no") == "yes",
+        paths=pth,
+        show_sbs_data=show_sbs_data,
+        show_ru_data=show_ru_data,
+        show_ta_data=show_ta_data,
+        show_grammar=show_grammar,
+    )
 
 
 def main():
@@ -82,7 +109,7 @@ def main():
         pr.toc()
         return
 
-    g = GlobalVars()
+    g = build_global_vars()
 
     dpd_data_list, sizes = generate_dpd_html(
         g.db_session,
@@ -106,12 +133,15 @@ def main():
         g.rendered_sizes.append(sizes)
 
         variant_spelling_data_list, sizes = generate_variant_spelling_html(g.pth)
-        g.rendered_sizes.append(sizes)
+        # base-typed sizes (tools.utils.RenderedSizes) into the SBS-typed list;
+        # runtime-safe as sum_rendered_sizes only reads present keys.
+        g.rendered_sizes.append(cast(RenderedSizes, sizes))
 
         epd_data_list, sizes = generate_epd_html(
             g.db_session, g.dpspth, g.show_ru_data, g.show_ta_data
         )
-        g.rendered_sizes.append(sizes)
+        # base-typed sizes into the SBS-typed list (see note above).
+        g.rendered_sizes.append(cast(RenderedSizes, sizes))
 
         help_data_list, sizes = generate_help_html(
             g.db_session, g.dpspth, g.show_ru_data
@@ -204,7 +234,7 @@ def write_size_dict(pth: ProjectPaths, size_dict):
     pr.green_tmr("writing size_dict")
     filename = pth.temp_dir.joinpath("size_dict.tsv")
 
-    with open(filename, "w", newline="") as csvfile:
+    with filename.open("w", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile, delimiter="\t")
         for key, value in size_dict.items():
             writer.writerow([key, value])

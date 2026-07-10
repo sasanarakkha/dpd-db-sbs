@@ -65,14 +65,19 @@ class RuSpellChecker:
             return results
 
     def add_to_ru_dictionary(self, word: str) -> str:
-        """Add a word to both the session dictionary and the Russian custom dictionary file."""
+        """Add a word to the session dictionary and rewrite the Russian custom dictionary file sorted and deduplicated."""
         with RuSpellChecker._lock:
             # Add to the current spell checker session
             self.spell.word_frequency.load_words([word])
 
             # Add to the Russian custom dictionary file
             if self.user_dict:
-                with open(self.user_dict, "a", encoding="utf-8") as f:
-                    f.write(f"{word}\n")
+                with open(self.user_dict, "r", encoding="utf-8") as f:
+                    words = {line.strip() for line in f if line.strip()}
+                words.add(word.strip())
+                with open(self.user_dict, "w", encoding="utf-8") as f:
+                    f.write(
+                        "\n".join(sorted(words, key=lambda w: (w.lower(), w))) + "\n"
+                    )
 
         return f"Added Russian word '{word}' to dictionary"

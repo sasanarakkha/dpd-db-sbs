@@ -517,14 +517,14 @@ jobs:
         asset_name: ru-dpd-kindle.mobi
         asset_content_type: application/zip
 
-    - name: Upload Asset dpd.db.tar.bz2
+    - name: Upload Asset dpd.db.tar.xz
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GH_PAT }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: exporter/share/dpd.db.tar.bz2
-        asset_name: dpd.db.tar.bz2
+        asset_path: exporter/share/dpd.db.tar.xz
+        asset_name: dpd.db.tar.xz
         asset_content_type: application/zip
 
     - name: Upload Asset pli2ru_dpd.json

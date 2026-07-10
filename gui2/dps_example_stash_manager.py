@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
 import json
 import re
 from pathlib import Path
-from typing import Optional
 
 from gui2.paths import Gui2Paths
 from tools.printer import printer as pr
@@ -11,8 +9,8 @@ from tools.printer import printer as pr
 class DpsExampleStashManager:
     """Manages stashing and reloading example data (source, sutta, example) for DPS fields."""
 
-    def __init__(self, toolkit=None):
-        self._stash_path: Path = Gui2Paths().example_stash_json_path
+    def __init__(self, toolkit=None, stash_path: Path | None = None):
+        self._stash_path: Path = stash_path or Gui2Paths().example_stash_json_path
         self.stash_data: dict[str, dict[str, str]] = {}
         self._load()
 
@@ -26,7 +24,7 @@ class DpsExampleStashManager:
             with open(self._stash_path, "r", encoding="utf-8") as f:
                 if loaded := json.load(f):
                     self.stash_data = loaded if isinstance(loaded, dict) else {}
-        except (json.JSONDecodeError, Exception) as e:
+        except (json.JSONDecodeError, OSError) as e:
             pr.red(f"Error loading DPS stash {self._stash_path}: {e}")
             self.stash_data = {}
 
@@ -36,7 +34,7 @@ class DpsExampleStashManager:
             self._stash_path.parent.mkdir(parents=True, exist_ok=True)
             with open(self._stash_path, "w", encoding="utf-8") as f:
                 json.dump(self.stash_data, f, indent=4, ensure_ascii=False)
-        except Exception as e:
+        except OSError as e:
             pr.red(f"Error saving DPS stash {self._stash_path}: {e}")
 
     def stash(self, key: str, fields_dict: dict[str, str]) -> None:
@@ -48,13 +46,13 @@ class DpsExampleStashManager:
         self.stash_data[key] = fields_dict
         self._save()
 
-    def reload(self, key: str) -> Optional[dict[str, str]]:
+    def reload(self, key: str) -> dict[str, str] | None:
         """Reload stashed data from specified slot."""
         self._load()
         return self.stash_data.get(key)
 
     @property
-    def last_example(self) -> Optional[dict[str, str]]:
+    def last_example(self) -> dict[str, str] | None:
         """Get the last stashed example."""
         return self.reload("last")
 
@@ -67,6 +65,6 @@ class DpsExampleStashManager:
         """Stashes the shared example data for DPS fields."""
         self.stash("stash", fields_dict)
 
-    def reload_shared_example(self) -> Optional[dict[str, str]]:
+    def reload_shared_example(self) -> dict[str, str] | None:
         """Reloads the shared example data for DPS fields."""
         return self.reload("stash")

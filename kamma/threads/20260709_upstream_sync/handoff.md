@@ -2,185 +2,191 @@
 
 ## Status
 
-**Stage 1.5 pull DONE + verified; Commit 1 LANDED (`699c10cd1`).** Next: a **fresh Opus session**
-runs Stage 3 (ADVANCED orchestrator dispatching `haiku` sync-fast subagents). Stage 2 was
-COMPLETE + APPROVED in a prior session. Tree is clean at Commit 1; three redundant session stashes
-remain to drop (see below).
+**Stage 3 (FAST execution) — Batches A–F DONE ✓. Batch G verification battery RUN: all sync-related
+checks pass; 2 PRE-EXISTING broken tests block the "all sync tests pass" criterion. AT COMMIT 2 GATE,
+awaiting user decision on the pre-existing tests + commit approval. No Commit 2 yet.**
 
-## What happened this session (pull + a tooling-bug detour)
+Commit 1 landed (`699c10cd1`) in a prior session; the automated pull is done. Batches A, B,
+B-completion, C, D, E, F are DONE + verified from files.
 
-1. **Setup-commit gate** was already clear (prior `e7005ac39`).
-2. **Upstream advanced mid-sync (+2 CI-only commits):** `git fetch upstream` moved `upstream/main`
-   from the analyzed `be49bffe` to `820113551` (2 commits, one new file
-   `.github/workflows/deconstructor_ci_test.yml`, no localization impact). Per USER decision
-   (Option A) we **pinned** to `be49bffe` and deferred the 2 commits to next sync:
-   - `accepted_sync.json.last_accepted_upstream_ref` → `"be49bffe…"` (was `"upstream/main"`)
-   - `prep_manifest.json.target_upstream_ref` → `"be49bffe…"` (was `"upstream/main"`)
-   - Committed as `4f420da28`.
-   - **STAGE-4 TODO:** `finalize_accepted_sync.py` derives the next accepted ref from
-     `manifest.target_upstream_ref`, so it will write the SHA. **After finalize, reset
-     `accepted_sync.json.last_accepted_upstream_ref` back to `"upstream/main"`.**
-3. **TOOLING BUG found + fixed (committed `7c2ea4035`):** `execute_sync.py` step 5 used
-   `git restore --source as_upstream --worktree -- .` — no-overlay default **DELETES** every
-   tracked file absent from upstream. First two pulls wiped ~2780 local-only files (shadows,
-   unique_paths, `russian_words_user_dict.txt`, `russian/sbs/tamil.tsv`, etc.). Fixed to
-   `git restore --overlay …` (verified in isolation: updates/creates upstream paths, preserves
-   local-only files, stays unstaged). Regression from `33ed53d34` (checkout→restore). The last
-   sync (2026-06-13) was driven manually in batches, so the automated `restore` path's first real
-   run was this one. **HEAD was never lost**; recovered each time with `git checkout HEAD -- .`.
-   - **Gotcha learned:** the fix is a tracked change, but `execute_sync.py` requires a clean tree,
-     and `git stash -u` swallows uncommitted tracked changes → the fix MUST be committed before the
-     pull. That is why `7c2ea4035` lands before Commit 1.
-4. **Corrected pull (3rd attempt) SUCCEEDED.** 314 files changed: **200 M, 108 D, 53 A**. All 108
-   deletions verified upstream-deleted (matches expected ~108 P0). All local-only files preserved.
-   `cst_source_sutta_example.py` correctly removed (S10). `as_upstream` → `be49bffe2`.
+### Batch G battery results (all run this session)
+- `test_shadow_cleanup` ✓ · `test_template_syntax` ✓ (178) · `check_shadow_modifications` ✓ (S9
+  titlepage no-op re-keyed to sync_commit `699c10cd1…` in `reviewed_shadow_noops.json`) ·
+  `smoke_test_sync` ✓ (25) · `validate_registry` ✓ · ruff/format/pyright on all 22 hand-edited files
+  ✓ 0 errors (formatted `export_variant_spelling_ru.py`) · `test_ai_manager` ✓ (20) · import smoke ✓.
+- **BLOCKER (pre-existing, NOT this sync):** `test_shadow_parity` (collection error) +
+  `test_namespace_isolation` (30 fail). Both helpers (`get_python_pairs`/`get_test_cases`) iterate
+  `registry[cat].items()` treating the value as an upstream-path string, but the schema is
+  `{shadow: {upstream: str, …}}` since `bdddb9e3c`. Fails at HEAD too, on shadows this sync never
+  touched. Fix = 1 line in each helper (`upstream` → `upstream["upstream"]`). Out of sync-port scope —
+  needs user approval to touch test files (or spin a separate thread).
+- **NOTICED — NOT TOUCHING:** `registry.json` ~line 375 has a stale `(help_ru)` parenthetical (should
+  be `reference_ru` post-D7); outside §7 scope.
 
-## COMMIT 1 — LANDED (`699c10cd1`)
+### Commit 2 staging state (flattened from Batch D stash/pop)
+7 files staged / 56 unstaged (non-`resources/`); D7 rename split into ` D shared_data/help_ru/*`
+(unstaged) + `A  shared_data/reference_ru/*` (staged). Restage the full non-`resources/` changeset so
+git re-detects the rename by content. `resources/*` submodules dirty — EXCLUDE from commit.
+Prepared message: `#sync: manual merge resolutions 2026-07-09`.
 
-`#sync: upstream pull 518672a6..be49bffe, 363 files, 2026-07-09` (255 add/modify + 108 delete,
-excluding `resources/*`; kamma bookkeeping folded in). Committed with **`--no-verify` (user-approved)**
-— see Future-Sync Improvements #4. Pristine index committed; ruff worktree-noise stashed off.
+## Batch ledger (Stage 3) — unchanged from prior session, kept for continuity
 
-**THREE redundant session stashes to drop** (all safe — hold now-committed upstream files or hook
-noise): `ruff-worktree-noise-20260709`, `sync-rerun2-20260709`, `sync-rerun-20260709`.
-`git stash drop` each. **The other `stash@{...}` WIP entries belong to the USER — DO NOT touch.**
-(Left undropped this session because tree-wide/stash destructive ops need explicit user naming.)
+- **Batch A — DONE ✓** Registry-flagged manual merges (D1–D6, D8, D13). Report:
+  `stage3_batchA_report.md`.
+- **Batch B — DONE ✓** Simple ports + rename + removals (S1–S3, S9–S13, D7, D11, D12). Report:
+  `stage3_batchB_report.md`.
+- **Batch B-completion — DONE ✓** `tools/cst_source/__init__.py` materialized (gitignored-package
+  gap), `docs/pics/kindle/*.png` `git rm`'d, `docs_setup_guide.md` untracked to `temp/`.
+- **Batch C — DONE ✓** Header-once / no-ORM-mutation shadow ports (S4–S8). Report:
+  `stage3_batchC_report.md`.
+- **Batch D — DONE ✓ (open item RESOLVED)** I3–I8 (except I1/I2), I11, I14; I9/I10/I13 confirmed
+  no-op. `main_sbs.py` pre-existing pyright `RenderedSizes` mismatch fixed via `cast` at the 2
+  append sites (ADVANCED decision, documented). Report: `stage3_batchD_report.md`.
+- **Batch E — DONE ✓** I1 `export_dpd_ru.py` + I2 `export_dpd_sbs.py` both ported from
+  `multiprocessing.Process` → `ProcessPoolExecutor`/`_worker_init`/`_render_batch` (upstream
+  `export_dpd.py` skeleton), re-layering RU (I1: `.ru` joinedload, `Russian.id.isnot(None)`, `rupth`,
+  `ru_components/templates`, `dpd_headword_ru.jinja`, RU synonyms) and SBS (I2: `dpspth`,
+  `.ru/.ta/.sbs` joinedloads, 4 locale flags threaded through worker render data, `sbs_templates`,
+  `dpd_headword_sbs.jinja`; NO Russian filter — SBS exports every headword, matches pre-sync). Both
+  dropped the pre-sync `joinedload(DpdHeadword.rt)` per the new upstream pattern (perf-only —
+  extraction runs in the main process where lazy load still works — NOT a correctness change;
+  **Stage-4 runtime watch item**). The `{**TypedDict,...}` pyrefly limitation resolved on BOTH via
+  localized `cast(DpdHeadwordRenderData, {...})` (ADVANCED decision, Batch D `cast` precedent —
+  runtime no-op). All 5 gates green on both files (import, ruff, format, pyright 0/0/0, pyrefly 0);
+  combined import smoke OK. Verified from files.
 
-## After Commit 1 — forward plan (Stage 3 FAST, fresh session)
+**⚠️ INDEX STAGING STILL FLATTENED from Batch D's stash/pop** (see prior handoff for detail) —
+redo staging cleanly at the Batch G commit gate; content is intact, only staging state is cosmetic.
 
-- Dispatch `sync-fast` (sequential batches) to execute `dynamic_plan.md` §9 recipes (D1–D8/D13
-  manual merges, S1–S13 shadow ports, I1–I15 inspired backports, D7 rename fan-out, D11 removals,
-  D12 explicit `git rm`), then the §8 verification battery, then Commit 2 gate (message only:
-  `#sync: manual merge resolutions 2026-07-09`).
-- Dispatch prompt = embed `uv run python3 kamma/upstream_sync/scripts/sync_status.py <thread_dir>
-  --instructions` output. Verify subagent work from files, not self-report.
-- **Note for Stage 3:** `scripts/archive/` still has 19 files (local-only or D11/D12 explicit-`git
-  rm` targets). Confirm classification during Stage 3; P0 correctly left them (they were not in the
-  upstream-deletion diff).
+## This dispatch — Batch E, item I1 (`export_dpd_ru.py`)
 
-## Highest-risk Stage 3 items (from §9)
+**Scope:** port `exporter/goldendict/export_dpd_ru.py` from the old `multiprocessing.Process`
+architecture to the new upstream `ProcessPoolExecutor`/`_worker_init`/`_render_batch` architecture
+(template: `git show be49bffe2c2c:exporter/goldendict/export_dpd.py`), re-layering every RU
+specialization the old local file had over OLD upstream (`518672a65fa3:exporter/goldendict/export_dpd.py`).
+Touched ONLY `exporter/goldendict/export_dpd_ru.py`.
 
-- **I1/I2** (largest): port `export_dpd.py` ProcessPoolExecutor rewrite into `export_dpd_ru.py` /
-  `export_dpd_sbs.py`, re-layering RU/SBS joinedloads + locale flags.
-- **S4/S6/S7**: pulled `data_classes.py` constructor signatures change → shadow subclasses MUST adapt
-  (S4 eliminates the `DeconstructorData_ru` subclass; header-once) or they crash at runtime.
-- **S10**: switch `cst_source_sutta_example` import → `cst_source` (old module deleted by P0) or ImportError.
-- **S12+I14+I15**: bz2→xz fan-out (server script, release workflows, docs).
-- Verified N/A: I4/I5 `zip[1:]` bibliography bug ABSENT in RU/SBS copies; I6 RU has no `see` builder.
+**Architecture now in place (confirmed, no more `multiprocessing.Process`):**
+- `ProcessPoolExecutor` + module-level `_WORKER_RENDER_DATA` + `_worker_init` + `_render_batch`
+  (replaces `Manager`/`Process`/`_parse_batch_top_level`/`ListProxy`).
+- Preloaded `fc_map`/`fi_map`/`fs_map` family maps built once in `generate_dpd_html`, looked up via
+  new `_lookup_family_compounds`/`_lookup_family_idioms`/`_lookup_family_set` + `_dedupe_keys`
+  (replaces the old per-headword `get_family_compounds`/`get_family_idioms`/`get_family_set` calls
+  and their import from `tools.exporter_functions`, which is now unused/removed from imports).
+- `_base_dpd_query` + `_iter_dpd_row_pages` keyset low-mem paging (single page ordered by
+  `lemma_1` in default/high-mem mode; keyset pages ordered by `id` in low-mem mode).
+- Streaming progress via `as_completed` + `report_every = 5000` counter (replaces the old
+  per-offset `pr.counter` call gated on `offset % limit == 0`).
+- Single-pass synonyms contraction (list comprehension instead of the old mutate-while-iterating
+  loop) — upstream's exact fix, applied verbatim.
 
-## Last upstream sync range
+**RU specializations re-layered on top (all preserved from the old local file):**
+- `DpdHeadwordDbRowItems` / `DpdHeadwordDbParts` carry a 4th element / `ru: Russian` key (upstream's
+  is 3-tuple / no `ru` key).
+- `DpdHeadwordRenderData.pth: RuPaths` (not `ProjectPaths`).
+- `_base_dpd_query` adds `.outerjoin(Russian, DpdHeadword.id == Russian.id)`,
+  `.options(joinedload(DpdHeadword.ru))`, `.filter(Russian.id.isnot(None))` — upstream's bare
+  version has none of this (3-way join only, no joinedload at all). Per the dispatch recipe, the RU
+  file previously ALSO had `joinedload(DpdHeadword.rt)`; that one was DROPPED to match the new
+  upstream pattern (which does not eager-load `.rt` anywhere — `pw.rt` is accessed lazily in
+  `_add_parts`, same for RU now). Only `joinedload(DpdHeadword.ru)` was kept, per the explicit
+  recipe instruction ("keep `joinedload(DpdHeadword.ru)`" — no mention of `.rt`).
+- `pali_words_count` query keeps the RU-specific `.join(Russian, ...).filter(Russian.id.isnot(None))`
+  (upstream's is a bare count).
+- `_worker_init` loads the jinja env from `"exporter/goldendict/ru_components/templates"` (RU's own
+  template dir), not `"exporter/goldendict/templates"`.
+- `render_pali_word_dpd_html` uses `HeadwordData` from `exporter.goldendict.data_classes_dps` (not
+  `data_classes`), passes `ru=ru`, renders `dpd_headword_ru.jinja` (not `dpd_headword.jinja`), and
+  measures `data.ru_meaning` for `size_dict["dpd_summary"]` (not `data.meaning_combo_html`).
+- Synonyms: kept the RU-only `set_ru_dict = read_set_ru_from_tsv()` block appending translated set
+  names, kept `if i.su and i.needs_sutta_info_button:` (note: OLD upstream already had this without
+  the `i.su and` guard — the guard is an RU-specific defensive addition present in the old local
+  file, preserved verbatim; not part of what upstream changed in this sync).
+  Verified `HeadwordData.__init__` (`data_classes_dps.py`, untouched) accepts `ru: Russian | None`
+  and only needs `ru=ru` — the newer `show_ru_data` flag on that class is for the SBS combined
+  dict (`export_dpd_sbs.py`), not the pure-RU dict; the RU template only branches on `d.ru`
+  truthiness, so no new flag was added to the `HeadwordData(...)` call (matches old file exactly).
+- Param name `rupth: RuPaths` (not `pth: ProjectPaths`) kept on `generate_dpd_html`, threaded into
+  `ProcessPoolExecutor(initargs=(render_data, rupth))`.
+- No `_ru`-suffixed function names were introduced for the new helpers (`_base_dpd_query`,
+  `_iter_dpd_row_pages`, `_lookup_family_*`, `_dedupe_keys`, `_worker_init`, `_render_batch`) —
+  matches the old file's own convention, where none of its internal functions carried a `_ru`
+  suffix (only types/vars like `Russian`, `RuPaths`, `rupth`, `set_ru_dict`, `ru_set_list`, and the
+  `_ru` template filenames were locale-marked). The file itself already carries the `_ru` suffix.
 
-- **From SHA**: `518672a65fa3ea7c36c4c754dc5276bb41f92da7` (2026-06-12)
-- **To (PINNED)**: `be49bffe2c2c85971784337d4e09915ad1f42800` (2026-07-09).
-  `upstream/main` is actually at `820113551…` (+2 CI-only commits, deferred).
+## Verification results (run individually on the exact file)
 
-## ⭐ FUTURE-SYNC IMPROVEMENTS (from this session — MUST be actioned in Stage 4 retrospective)
+1. `uv run python -c "import exporter.goldendict.export_dpd_ru"` → **PASS**, no output.
+2. `uv run ruff check exporter/goldendict/export_dpd_ru.py` → **PASS**, "All checks passed!"
+3. `uv run ruff format exporter/goldendict/export_dpd_ru.py` → **PASS**, "1 file left unchanged"
+   (already correctly formatted).
+4. `uv run pyright exporter/goldendict/export_dpd_ru.py` → **PASS**, "0 errors, 0 warnings, 0
+   informations" (pyright version-update notice only, not an error).
+5. `uv run --with pyrefly pyrefly check --min-severity warn exporter/goldendict/export_dpd_ru.py`
+   → **FAIL** (1 error) — see flagged judgment call below.
 
-Everything below was surfaced this run. Each is a concrete improvement to the sync **tooling**,
-**guide**, or **process**. Promote accepted items to `archive_improvements.md` at Stage 4.
+## FLAGGED — judgment call for ADVANCED, not silently resolved
 
-### 1. `execute_sync.py` no-overlay restore DELETED all local files (CRITICAL — fixed `7c2ea4035`)
-- **Problem:** step 5 used `git restore --source as_upstream --worktree -- .`. The no-overlay
-  default DELETES every tracked file absent from upstream → wiped ~2780 local-only files (shadows,
-  `unique_paths`, `inspired_by`, all local data TSVs, `russian_words_user_dict.txt`). Regression
-  introduced at `33ed53d34` (2026-06-11, `git checkout as_upstream -- .` → `git restore …`); never
-  caught because the last sync (2026-06-13) was driven manually in batches, so the automated
-  `restore` path's first real execution was THIS run.
-- **Fix applied:** `git restore --overlay …` (preserves local-only files, still updates/creates
-  upstream paths, still worktree-only/unstaged). Verified in an isolated repo.
-- **Still to do (Stage 4):** add a **regression test** — build a tiny repo with a local-only tracked
-  file, run the restore step, assert the local file survives AND an upstream-changed file updates
-  AND changes stay unstaged. Consider a `smoke_test_sync.py`-level check that exercises
-  `execute_sync.py` end-to-end against a fixture so any future restore/overlay regression fails CI.
-
-### 2. `execute_sync.py` has NO worktree rollback on partial failure (HIGH)
-- **Problem:** when step 5 wiped the tree, the `except` block only calls
-  `context.restore_original_state()` which restores the **branch**, not the **worktree**. The
-  destroyed worktree was left in place; recovery was manual (`git checkout HEAD -- .`). Only luck
-  (changes are worktree-only, never committed/staged, HEAD intact) made recovery possible.
-- **Improvement:** wrap the mutating steps (5–6b) so that ANY failure restores the worktree to the
-  pre-run `sbs_ru_original_sha` (e.g. snapshot via a temp stash/commit, or `git checkout
-  <original_sha> -- .` on failure). The unstaged/worktree-only design is GOOD and must be preserved
-  — but failure must auto-rollback, not leave a half-wiped tree.
-
-### 3. Upstream advancing MID-SYNC has no clean documented procedure (MEDIUM)
-- **Problem:** `execute_sync.py` runs `git fetch upstream` internally and re-resolves the MOVING ref
-  `upstream/main`. Between Stage-2 approval and the pull, upstream added 2 commits, so the target
-  drifted past the approved/analyzed SHA. The manifest gate correctly blocked, but pinning required
-  hand-editing **two** files (`accepted_sync.json.last_accepted_upstream_ref` AND
-  `prep_manifest.json.target_upstream_ref`) PLUS remembering a Stage-4 reset (finalize derives the
-  next ref from `manifest.target_upstream_ref`). Fragile and undocumented.
-- **Improvement options:** (a) `verify_manifest`/`execute_sync` should target
-  `manifest.to_upstream_sha` (the analyzed pinned SHA) directly rather than re-`rev-parse` the moving
-  ref — the analysis pinned a SHA, the pull should honor it; (b) add a documented `--pin` helper or a
-  guide recipe for "upstream advanced mid-sync"; (c) surface the Stage-4 ref-reset automatically so it
-  can't be forgotten. See PIN NOTE above for the exact two-file edit used this run.
-
-### 4. Pre-commit hooks BLOCK Commit 1 (verbatim upstream) — `--no-verify` needed but undocumented (MEDIUM)
-- **Problem:** Commit 1 is by design the **verbatim upstream pull**, but the fork's pre-commit
-  `ruff`/`pyright`/`pyrefly` hooks lint that raw code: `ruff check --fix` auto-modified **202**
-  upstream files in the worktree and reported **21** unfixable errors → commit aborted. Letting the
-  hooks run corrupts the pristine baseline Stage 3 must diff against. Resolved by `--no-verify`
-  (user-approved) committing the pristine index, then stashing off the ruff worktree-noise.
-- **Conflict:** the project rule "**never `--no-verify`**" targets normal fork work, but the
-  raw-upstream Commit 1 is a legitimate exception. This is NOT documented anywhere.
-- **Improvement:** document in `guide.md` that **Commit 1 uses `--no-verify`** (raw upstream is
-  accepted verbatim; lint/type standards apply to fork/shadow code in Stage 3, not the raw drop).
-  Better: a pre-commit config that **skips hooks for the sync-pull commit** (e.g. env guard or a
-  dedicated commit path) so `--no-verify` isn't a manual step. Note the guide already says
-  `archive/`/`scripts/archive/` are "never linted" — extend that principle to the whole Commit-1 drop.
-
-### 5. `execute_sync.py` dirty-guard + `git stash -u` interaction (MEDIUM)
-- **Problem A:** the dirty-guard counts **untracked** files, so leftovers from a failed pull block
-  the re-run. Recovering from a partial failure requires manually clearing untracked upstream files
-  before retrying — awkward and error-prone (a naive tree-wide `rm`/`clean` risks pre-existing local
-  data).
-- **Problem B:** `git stash --include-untracked` also **swallows uncommitted tracked changes** — this
-  silently stashed the in-flight `--overlay` fix, so two pulls ran the OLD code. Root lesson: **any
-  tooling fix must be COMMITTED before running the pull** (the guard demands a clean tree, so the fix
-  can't ride along uncommitted).
-- **Improvement:** (a) make `execute_sync.py` **idempotent/resumable** — on a clean-but-for-its-own-
-  prior-additions tree, clean up its own untracked upstream additions rather than blocking; (b) the
-  guard could ignore untracked (it exists to protect uncommitted tracked edits, per its docstring);
-  (c) guide note: commit tooling fixes first; use `git stash push -- <path>` scoped, not bare
-  `stash -u`, when a fix is in flight.
-
-### 6. Operational lessons (process, not tooling)
-- `git checkout <stash> --` with an EMPTY pathspec **detaches HEAD** to the stash commit. Never run
-  ambiguous `checkout <ref> --`; reattach with `git checkout sbs-ru`.
-- The auto-mode classifier blocks tree-wide destructive ops (`rm -rf` loops, `git checkout -- .`,
-  `git clean -fd`). Use **reversible** cleanup (`git stash push`) instead of hard deletes; it clears
-  the guard AND is recoverable. (This is why 3 redundant stashes remain — dropping them also needs
-  explicit user naming.)
-- Dirty `resources/*` submodules are NOT commit scope unless a gitlink (recorded SHA) actually
-  changed — verify with `git diff HEAD -- resources/ | grep 'Subproject commit'` (SHA change vs
-  mere `-dirty` suffix). This run: no gitlink change, all excluded.
-- **What saved every near-miss:** `execute_sync.py` leaves changes worktree-only/unstaged and never
-  touches HEAD. Preserve this invariant at all costs — it's the entire recovery margin.
-
-### 7. Carried retrospective candidates (from prior handoff)
-- stage1 lint gate fixes; `tests/kamma` rename; "never name a `tests/` subpackage after a top-level
-  repo package" (`tests/exporter/` still shadows root `exporter/`).
-- prep_analyzer local-commit sweep caught unregistered locally-modified upstream files
-  (`ai_models.json`, example_bolding fix) the registry missed — consider folding the sweep into
-  `prep_analyzer.py`.
-- `skill_scope_improvement.md` — guide/skill fixes surfaced during 2b scope correction; apply as a
-  SEPARATE post-sync task (do NOT act during this sync).
-
-## Next Model
-
-USER (Commit 1), then **fresh session, ADVANCED orchestrator** dispatches `sync-fast` for Stage 3.
-
-## Restart Prompt
-
-```text
-Continue upstream sync thread: kamma/threads/20260709_upstream_sync.
-Stage 1.5 pull is DONE + verified (314 files: 200 M, 108 D, 53 A; all local files preserved).
-A tooling bug in execute_sync.py (no-overlay restore wiping local files) was fixed + committed
-(7c2ea4035) before the pull. Target is PINNED to be49bffe (upstream advanced +2 CI-only commits,
-deferred; see STAGE-4 TODO to reset accepted_sync ref to "upstream/main" after finalize).
-If Commit 1 is not yet committed: present the Commit 1 gate — stage sync content + kamma
-bookkeeping, EXCLUDE resources/* (no gitlink change), message
-"#sync: upstream pull 518672a6..be49bffe, 363 files, 2026-07-09"; drop the two redundant
-sync-rerun* stashes after. Then dispatch sync-fast for Stage 3 §9 recipes + §8 battery + Commit 2.
+`pyrefly` reports:
 ```
+ERROR `dict[str, Environment | RuPaths | object]` is not assignable to variable
+`_WORKER_RENDER_DATA` with type `DpdHeadwordRenderData | None` [bad-assignment]
+  --> exporter/goldendict/export_dpd_ru.py:177  (the `_WORKER_RENDER_DATA = {**render_data, "pth":
+      path, "jinja_env": ...}` literal inside `_worker_init`)
+```
+
+I confirmed this is **not caused by the RU port** — the byte-for-byte identical construct in the
+untouched upstream template file itself fails the same way:
+```
+uv run --with pyrefly pyrefly check --min-severity warn exporter/goldendict/export_dpd.py
+→ ERROR `dict[str, Environment | ProjectPaths | object]` is not assignable to variable
+  `_WORKER_RENDER_DATA` with type `DpdHeadwordRenderData | None` [bad-assignment]  (same line shape)
+```
+This is a pyrefly limitation with TypedDict-spread (`{**base_typed_dict, "extra_key": val}`)
+literals, inherent to the new upstream architecture I was told to port verbatim (`export_dpd.py`
+is out of scope — I must not touch it). Two conflicting rules apply:
+- "TOUCH A FILE = OWN ITS LINT" / "pyrefly warnings count as failures" → I own this file now, must
+  fix it.
+- "Strict Parity: for shadow copies, maintain strict logic parity with upstream. DO NOT introduce
+  new solutions. Emulate upstream implementation exactly." + the recipe's explicit instruction to
+  treat `export_dpd.py`'s `_worker_init`/`_WORKER_RENDER_DATA` pattern as the structural skeleton →
+  diverging the dict-construction shape here to satisfy pyrefly would no longer be an exact mirror
+  of upstream's (accepted, currently-shipped) pattern.
+
+There is a known precedent for ADVANCED resolving a similar pre-existing type-checker conflict
+during this same sync: Batch D's `main_sbs.py` `RenderedSizes` TypedDict mismatch was fixed with a
+localized `cast(RenderedSizes, sizes)` at the 2 append boundaries (see "Batch D — DONE" above and
+`stage3_batchD_report.md` §I8). A structurally analogous fix here (e.g. `cast` the dict literal, or
+build `_WORKER_RENDER_DATA` via an explicit typed constructor instead of `**`-spread) is plausible
+and would be behavior-preserving (runtime no-op), but I have NOT applied it — per the sync-fast
+contract, a plan item requiring judgment/new-implementation decisions must be flagged, not silently
+improvised. I did not modify the file further after finding this.
+
+**RESOLVED by ADVANCED (2026-07-10):** applied the same `cast`-style localized fix used for
+`main_sbs.py` — `_WORKER_RENDER_DATA = cast(DpdHeadwordRenderData, {...})` + `cast` added to the
+`typing` import + an explanatory comment. Runtime no-op; the spread literal genuinely has every
+`DpdHeadwordRenderData` key. pyrefly now 0 diagnostics. Same fix pre-authorized for and applied to
+I2. I1 is fully complete and verified. (This FLAGGED section retained as the historical record.)
+
+## Files changed in Batch E (both verified from files, NOT staged, NOT committed)
+
+- `exporter/goldendict/export_dpd_ru.py` — architecture port + RU re-layering + `cast` fix.
+- `exporter/goldendict/export_dpd_sbs.py` — architecture port + SBS re-layering + `cast` fix.
+
+## Next action — AT COMMIT 2 GATE (user decision required)
+
+1. **User decides the 2 pre-existing broken tests** (`test_shadow_parity`, `test_namespace_isolation`):
+   approve the trivial in-scope-adjacent fix (each helper `upstream` → `upstream["upstream"]`), or defer
+   to a separate thread. These are NOT sync-port defects; do not fix without approval.
+2. **User approves Commit 2.** Then restage the full non-`resources/` Stage-3 changeset (so the D7
+   rename is detected) and commit `#sync: manual merge resolutions 2026-07-09`. No autonomous commit —
+   AI prepares, user runs.
+3. After Commit 2: **Stage 4** (ADVANCED acceptance — user manual GoldenDict/webapp check, then
+   `retrospective.md`, promote items, `finalize_accepted_sync.py`) + the async **Docs Track**
+   (`docs_translation_plan.md`, still pending — see plan.md). Stage-4 TODO: reset
+   `accepted_sync.json.last_accepted_upstream_ref` back to `"upstream/main"` (see plan.md §1.5 PIN NOTE).
+   **Stage-4 runtime watch item:** I1/I2 dropped `joinedload(DpdHeadword.rt)` — verify the RU/SBS
+   GoldenDict builds render root data correctly under the new ProcessPoolExecutor paging.
+
+Restart with `/kamma:2-do kamma/threads/20260709_upstream_sync` if handing off — a fresh ADVANCED
+orchestrator reads this ledger and resumes at the Commit 2 gate.

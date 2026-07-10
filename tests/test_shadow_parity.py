@@ -24,21 +24,13 @@ def get_python_pairs() -> list[tuple[str, str]]:
     registry = load_registry()
     pairs: list[tuple[str, str]] = []
 
-    for shadow, upstream in registry.get("russian_copies", {}).items():  # type: ignore[union-attr]
-        if shadow.endswith(".py") and upstream.endswith(".py"):
-            pairs.append((shadow, upstream))
-
-    for shadow, upstream in registry.get("sbs_copies", {}).items():  # type: ignore[union-attr]
-        if shadow.endswith(".py") and upstream.endswith(".py"):
-            pairs.append((shadow, upstream))
-
-    for shadow, upstream in registry.get("dps_copies", {}).items():  # type: ignore[union-attr]
-        if shadow.endswith(".py") and upstream.endswith(".py"):
-            pairs.append((shadow, upstream))
-
-    for shadow, upstream in registry.get("tamil_copies", {}).items():  # type: ignore[union-attr]
-        if shadow.endswith(".py") and upstream.endswith(".py"):
-            pairs.append((shadow, upstream))
+    for category in ("russian_copies", "sbs_copies", "dps_copies", "tamil_copies"):
+        for shadow, entry in registry.get(category, {}).items():  # type: ignore[union-attr]
+            # Registry copies map shadow -> {"upstream": path, ...} (rich object schema);
+            # tolerate a bare-string value too for backward compatibility.
+            upstream = entry["upstream"] if isinstance(entry, dict) else entry
+            if shadow.endswith(".py") and upstream.endswith(".py"):
+                pairs.append((shadow, upstream))
 
     return pairs
 
@@ -120,6 +112,12 @@ WHITELIST: dict[str, WhitelistEntry] = {
             "_make_dict_vars",
         ],
         "classes": ["GlobalVars"],
+        # S4 (2026-07-09 sync): the RU shadow defines its own module-level
+        # generate_deconstructor_header_ru() (RU template) instead of importing
+        # upstream's generate_deconstructor_header.
+        "imports": [
+            "exporter.deconstructor.data_classes.generate_deconstructor_header"
+        ],
     },
     "exporter/goldendict/export_dpd_ru.py": {
         "imports": [
@@ -332,7 +330,7 @@ WHITELIST: dict[str, WhitelistEntry] = {
             "gui2.dpd_fields.DpdFields",
             "gui2.example_stash_manager.ExampleStashManager",
             "gui2.pass1_add_view.Pass1AddView",
-            "tools.cst_source_sutta_example.find_cst_source_sutta_example",
+            "tools.cst_source.find_cst_source_sutta_example",
             "gui2.dpd_fields_functions.remove_brackets",
             "gui2.flet_functions.highlight_word_in_sentence",
         ],
@@ -358,6 +356,9 @@ WHITELIST: dict[str, WhitelistEntry] = {
     "gui2/dps_example_stash_manager.py": {
         "imports": ["gui2.toolkit.ToolKit"],
         "classes": ["ExampleStashManager"],
+        # S11 (2026-07-09 sync): upstream added a last_commentary property; the
+        # DPS shadow has no commentary-stash flow and intentionally omits it.
+        "functions": ["last_commentary"],
     },
     "gui2/dps_meaning_field.py": {
         "imports": [

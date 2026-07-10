@@ -1,5 +1,14 @@
 [
   {
+    "sync_commit": "699c10cd1742c33a611e2f69ad3b9b255493c498",
+    "source": "exporter/kindle/epub/",
+    "shadow": "exporter/kindle/ru_components/epub/",
+    "changed_paths": [
+      "exporter/kindle/epub/OEBPS/Text/titlepage.xhtml"
+    ],
+    "reason": "S9 (2026-07-09 sync): upstream titlepage change is date/time-only and irrelevant for the Russian shadow, whose dates are generated locally by the Russian Kindle build. Intentional no-op."
+  },
+  {
     "sync_commit": "99623c19688d5364e49704768634a2dd16dafe45",
     "source": "exporter/kindle/epub/",
     "shadow": "exporter/kindle/ru_components/epub/",

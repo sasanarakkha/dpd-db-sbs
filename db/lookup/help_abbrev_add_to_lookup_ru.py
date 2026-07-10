@@ -3,7 +3,7 @@
 """Add help and abbreviations to the Lookup table (ru)."""
 
 from dataclasses import dataclass
-from sqlalchemy import inspect as sa_inspect, text
+
 from sqlalchemy.orm import Session
 
 from db.db_helpers import get_db_session
@@ -22,19 +22,7 @@ class GlobalVars:
 
 
 def normalize_other_abbreviation_key(key: str) -> str:
-    return key[:-1] if key.endswith(".") else key
-
-
-def ensure_abbrev_other_column(g: GlobalVars) -> None:
-    """Add abbrev_other column to lookup table if it doesn't already exist."""
-    insp = sa_inspect(g.db_session.get_bind())
-    columns = [col["name"] for col in insp.get_columns("lookup")]
-    if "abbrev_other" not in columns:
-        g.db_session.execute(
-            text("ALTER TABLE lookup ADD COLUMN abbrev_other TEXT DEFAULT ''")
-        )
-        g.db_session.commit()
-        pr.green("added abbrev_other column to lookup")
+    return key.removesuffix(".")
 
 
 def add_help_ru(g: GlobalVars) -> None:
@@ -80,7 +68,6 @@ def main() -> None:
     pr.yellow_title("adding help and abbreviations to lookup (ru)")
     pth = ProjectPaths()
     g = GlobalVars(pth=pth, rupth=RuPaths(), db_session=get_db_session(pth.dpd_db_path))
-    ensure_abbrev_other_column(g)
     add_help_ru(g)
     add_abbreviations_ru(g)
     add_abbreviations_other_ru(g)

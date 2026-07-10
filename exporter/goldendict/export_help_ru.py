@@ -126,14 +126,16 @@ def add_abbrev_other_html(
 
     template = jinja_env.get_template("help_abbrev_other_ru.jinja")
 
+    # The secondary header has no per-entry variables — render it once.
+    header_squashed = squash_whitespaces(AbbrevOtherData("", [], jinja_env).header)
+
     for abbreviation, entries in grouped.items():
         data = AbbrevOtherData(abbreviation, entries, jinja_env)
         html_rendered = template.render(d=data)
 
-        header = data.header
         body = extract_body(html_rendered)
 
-        final_html = squash_whitespaces(header) + minify(body)
+        final_html = header_squashed + minify(body)
 
         help_data_list.append(
             DictEntry(
@@ -169,10 +171,10 @@ def add_abbrev_html(
 
     items = list(map(_csv_row_to_abbreviations, rows))
 
-    for i in items:
-        data = AbbreviationsData(i, jinja_env)
-        header = data.header
+    # The secondary header has no per-entry variables — render it once.
+    header_squashed = squash_whitespaces(AbbreviationsData(None, jinja_env).header)
 
+    for i in items:
         template = jinja_env.get_template("help_abbrev_ru.jinja")
         content = template.render(i=i)
 
@@ -181,7 +183,7 @@ def add_abbrev_html(
         html += content
         html += "</body></html>"
 
-        final_html = squash_whitespaces(header) + minify(html)
+        final_html = header_squashed + minify(html)
 
         if i.ru_abbrev:
             word = i.ru_abbrev
@@ -219,10 +221,10 @@ def add_help_html(
 
     items = list(map(_csv_row_to_help, rows))
 
-    for i in items:
-        data = HelpData(i, jinja_env)
-        header = data.header
+    # The secondary header has no per-entry variables — render it once.
+    header_squashed = squash_whitespaces(HelpData(None, jinja_env).header)
 
+    for i in items:
         template = jinja_env.get_template("help_help_ru.jinja")
         content = template.render(i=i)
 
@@ -231,7 +233,7 @@ def add_help_html(
         html += content
         html += "</body></html>"
 
-        final_html = squash_whitespaces(header) + minify(html)
+        final_html = header_squashed + minify(html)
 
         word = i.ru_help
 
@@ -259,6 +261,7 @@ def add_bibliography(rupth: RuPaths, header: str) -> List[DictEntry]:
     html += "<h2>Bibliography</h2>"
 
     # i = current item, n = next item
+    n = None
     for x in range(len(bibliography_dict)):
         i = bibliography_dict[x]
         if x + 1 < len(bibliography_dict):
@@ -286,7 +289,7 @@ def add_bibliography(rupth: RuPaths, header: str) -> List[DictEntry]:
         if i.surname:
             html += "</li>"
 
-        if n.category:
+        if n is not None and n.category:
             html += "</ul>"
 
     html += "</div></body></html>"

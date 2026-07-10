@@ -56,13 +56,26 @@
 
 **Owner**: FAST only. See guide.md § Stage 3.
 
-- [ ] **3.1** Execute `dynamic_plan.md` item by item; mark progress.
-- [ ] **3.2** Run every plan verification command, plus:
-  - [ ] `uv run pytest tests/test_shadow_parity.py tests/test_shadow_cleanup.py tests/test_namespace_isolation.py tests/test_template_syntax.py -v`.
-  - [ ] `uv run python3 tests/check_shadow_modifications.py`.
-  - [ ] `uv run python tests/smoke_test_sync.py`.
-- [ ] **3.3** Cleanup only as explicitly listed in `dynamic_plan.md`.
-- [ ] **3.4 Commit 2 Gate**: prepare commit message only: `#sync: manual merge resolutions 2026-07-09`.
+- [x] **3.1** Execute `dynamic_plan.md` item by item; mark progress. (All batches A–F done + verified
+  from files: A registry-merges, B simple ports+rename+removals, B-completion cst_source, C header-once
+  ports, D shadow ports+I3–I8/I11/I14, E I1/I2 ProcessPoolExecutor rewrites, F registry §7 additions.)
+- [~] **3.2** Run every plan verification command, plus:
+  - [~] `pytest test_shadow_parity test_shadow_cleanup test_namespace_isolation test_template_syntax`:
+    `test_shadow_cleanup` ✓, `test_template_syntax` ✓ (178). **`test_shadow_parity` (collection error) +
+    `test_namespace_isolation` (30 fail) are PRE-EXISTING breakage** — both helpers read registry copies
+    as `{shadow: upstream_str}` but the schema is `{shadow: {upstream: str, …}}` since `bdddb9e3c`; fails
+    at HEAD too, on shadows this sync never touched. **Awaiting user decision** (trivial 1-line fix in
+    each helper `upstream` → `upstream["upstream"]`, vs defer as separate thread — out of sync-port scope).
+  - [x] `uv run python3 tests/check_shadow_modifications.py` — SUCCESS (added S9 titlepage no-op ledger
+    entry for the current sync_commit `699c10cd1…` in `reviewed_shadow_noops.json`).
+  - [x] `uv run python tests/smoke_test_sync.py` — 25 passed / 0 failed.
+  - [x] Also: `validate_registry.py` valid; ruff/format/pyright on all 22 hand-edited files 0 errors
+    (formatted `export_variant_spelling_ru.py`); `test_ai_manager.py` 20 passed; §8.7 import smoke OK.
+- [x] **3.3** Cleanup only as explicitly listed in `dynamic_plan.md`. (D7 rename, D11/D12 removals,
+  docs relocations — all done in Batches B/B-completion.)
+- [~] **3.4 Commit 2 Gate**: commit message prepared: `#sync: manual merge resolutions 2026-07-09`.
+  Index currently flattened (7 staged / 56 unstaged; D7 rename split) — restage full non-`resources/`
+  changeset so git re-detects the rename. **STOP for user — no autonomous commit.**
 
 **Hard stop**: update `handoff.md` with completed/failed items, files changed, test evidence, then stop.
 
