@@ -350,6 +350,11 @@ WHITELIST: dict[str, WhitelistEntry] = {
             "_handle_book_blur",
             "_click_search_dialog_ok",
             "_toggle_tools_visibility",
+            # 2026-07-09 sync: upstream `get_fields` is reimplemented in the DPS
+            # shadow and renamed to `get_fields_dps` (the DPS override returns a
+            # `dict[str, ft.TextField | None]`, an LSP-incompatible signature vs.
+            # the base tuple; the `_dps` suffix follows the namespace convention).
+            "get_fields",
         ],
         "classes": ["DpdExampleField"],
     },

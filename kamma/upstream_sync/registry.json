@@ -385,7 +385,7 @@
       "sync_rule": "inspired_only",
       "local_changes": [
         "`RuPaths` class mapping all upstream `ProjectPaths` constants to Russian-prefixed equivalents.",
-        "Russian-specific paths: `abbreviations_tsv_path` (help_ru), `sets_ru_path`, `ru_components/templates/`, `fdg_dpd_ebts_js_ru_path`, etc.",
+        "Russian-specific paths: `abbreviations_tsv_path` (reference_ru), `sets_ru_path`, `ru_components/templates/`, `fdg_dpd_ebts_js_ru_path`, etc.",
         "`create_dirs` logic filtered to only needed output directories."
       ],
       "watch_for": [
@@ -1248,7 +1248,7 @@
       "sync_rule": "PORT",
       "local_changes": [
         "`DpsExampleField(DpdExampleField)` subclass: `__init__` takes a shared `stash_manager` (`DpsExampleStashManager`), adds `archived_example_index`, and bypasses `super().__init__()` by calling `ft.Column.__init__` directly.",
-        "`get_fields()` is fully replaced to return a dict parsing DPS multi-type field names (`dps_sbs_example_1`, `dps_dhp_example`, …) into source/sutta/example/chant/chapter; stash/reload/last all operate in dict format (`_handle_last_control_blur`, `_click_stash_example`, `_click_reload_example`, `_click_last_example`).",
+        "`get_fields()` is fully replaced (and renamed `get_fields_dps()` — the DPS override's `dict[str, ft.TextField | None]` return is LSP-incompatible with the base tuple signature) to return a dict parsing DPS multi-type field names (`dps_sbs_example_1`, `dps_dhp_example`, …) into source/sutta/example/chant/chapter; stash/reload/last all operate in dict format (`_handle_last_control_blur`, `_click_stash_example`, `_click_reload_example`, `_click_last_example`).",
         "New SBS archive flow: `_click_arch_example` + `_handle_archive_example` (reads the `sbs_archive` TSV) + `paragraphs_are_similar_sbs` (SequenceMatcher), plus the `_swap_examples` helper.",
         "Action buttons differ (adds \"Clean\" and \"Arch\"); `clean_text` / `click_clean_example` strip `<b>`/`</b>` tags and drop upstream's THA/THI expansions and \"Add '-\" logic."
       ],
