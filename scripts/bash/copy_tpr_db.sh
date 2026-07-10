@@ -38,7 +38,9 @@ if [ -d "$DEST_DPD_DIR" ]; then
     rm -rf "$DEST_DPD_DIR"
 fi
 
-if cp -R "$SRC_DPD_DIR" "$DEST_DPD_DIR"; then
+# rsync (not cp -R) so we can exclude macOS .DS_Store files; trailing
+# slashes copy the *contents* of the source into the freshly-removed dest.
+if rsync -a --exclude '.DS_Store' "$SRC_DPD_DIR/" "$DEST_DPD_DIR/"; then
     uv run tools/ask.py --print -c green "dpd folder replaced successfully in $DEST_DPD_DIR"
 else
     uv run tools/ask.py --print -c red "Failed to copy dpd folder"

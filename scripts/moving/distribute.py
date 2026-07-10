@@ -13,6 +13,14 @@ from zipfile import ZipFile
 from tools.configger import config_read, config_test
 from tools.printer import printer as pr
 
+_IGNORE_NAMES = shutil.ignore_patterns(".DS_Store")
+
+
+def _is_ds_store(member: str) -> bool:
+    """True if a zip member is a macOS .DS_Store file at any depth."""
+    return Path(member).name == ".DS_Store"
+
+
 _SHARE_MDICT_MEMBERS = {
     "dpd-grammar-mdict.mdx",
     "dpd-grammar-mdict.mdd",
@@ -57,9 +65,11 @@ def _unzip(
         pr.red(f"{src} is missing. Cannot proceed with unzipping.")
         return
     with ZipFile(src, "r") as zip_obj:
-        members = None
-        if member_predicate is not None:
-            members = [m for m in zip_obj.namelist() if member_predicate(m)]
+        members = [
+            m
+            for m in zip_obj.namelist()
+            if not _is_ds_store(m) and (member_predicate is None or member_predicate(m))
+        ]
         zip_obj.extractall(dest, members=members)
     pr.green(f"{src.name} has been unpacked to {dest}")
 
@@ -78,7 +88,7 @@ def _copy_tree(src: Path, dest: Path, *, archive_base: Path | None = None) -> No
         return
     if dest.exists():
         shutil.rmtree(dest)
-    shutil.copytree(src, dest)
+    shutil.copytree(src, dest, ignore=_IGNORE_NAMES)
     pr.green(f"{src.name} folder copied to {dest}")
     if archive_base is not None:
         shutil.make_archive(str(archive_base), "zip", str(dest))
@@ -299,7 +309,7 @@ def safe_copy(src: Path, dest: Path) -> None:
             else:
                 dest.unlink()
         if src.is_dir():
-            shutil.copytree(src, dest)
+            shutil.copytree(src, dest, ignore=_IGNORE_NAMES)
         else:
             shutil.copy2(src, dest)
         pr.green(f"{src.name} copied successfully")
