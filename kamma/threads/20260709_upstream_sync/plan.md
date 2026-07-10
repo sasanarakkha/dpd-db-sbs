@@ -96,9 +96,9 @@
 `uv run python3 kamma/upstream_sync/scripts/sync_status.py --section docs-track` for the guide
 section instead of re-reading the whole guide.
 
-- [ ] Read `docs_parity_report.md` (`uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir>`).
-- [ ] Build a terminology glossary from 3-5 existing `docs_rus/` files.
-- [ ] Write `<thread_dir>/docs_translation_plan.md`; present for approval.
+- [x] Read `docs_parity_report.md` (`uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir>`). (0 missing, 3 stale — all same 1-line `.tar.bz2`→`.tar.xz` diff; 1 unexpected-local file noted informationally.)
+- [x] Build a terminology glossary from 3-5 existing `docs_rus/` files. (`build_db.md`, `index.md`, `dpd_headwords_table_ru.md`, `rootdict.md`.)
+- [x] Write `<thread_dir>/docs_translation_plan.md`; present for approval. (Written — awaiting user approval before Translation phase.)
 
 **Hard stop**: update `handoff.md` with translation plan decisions, then stop.
 
@@ -110,9 +110,16 @@ section instead of re-reading the whole guide.
 `uv run python3 kamma/upstream_sync/scripts/sync_status.py --section docs-track` for the guide
 section instead of re-reading the whole guide.
 
-- [ ] Translate/update files exactly as listed in `docs_translation_plan.md`.
-- [ ] `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir> --strict`.
-- [ ] Prepare commit message only: `#docs: translate/update docs_rus/ for sync <from>..<to>`.
+- [x] Translate/update files exactly as listed in `docs_translation_plan.md`. (3 one-line
+  `.tar.bz2`→`.tar.xz` edits: `local_server_setup.md`, `quick_start.md`, `use_db.md`. User approved
+  the plan 2026-07-10.)
+- [x] `uv run python3 kamma/upstream_sync/scripts/check_docs_parity.py <thread_dir> --strict`. (Exit 1
+  — expected: "stale" is a range-based flag (EN file changed within the fixed sync range), not a live
+  content diff, so it never clears for this thread regardless of the fix. Confirmed via source read of
+  `check_docs_parity.py` lines 236-239. `git diff --stat` confirms exactly the 3 intended 1-line edits
+  landed, nothing else.)
+- [x] Prepare commit message only: `#docs: translate/update docs_rus/ for sync <from>..<to>`. (See
+  handoff.md — message drafted, not committed.)
 
 **Hard stop**: update `handoff.md` with files changed and next action, then stop.
 
@@ -126,6 +133,6 @@ section instead of re-reading the whole guide.
 - [x] Wait for explicit user confirmation: `all is good, proceed`. (Received 2026-07-10, incl. the Batch E `joinedload(DpdHeadword.rt)` root-render watch item + the kindle-mobi investigation.)
 - [x] Write `retrospective.md` (required before finalize); promote accepted items to `archive_improvements.md`. (Done: `retrospective.md` written; promoted §21–§23.)
 - [x] If accepted, ADVANCED may run `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>` directly. (Ran, exit 0; `accepted_sync.json` advanced to `be49bffe`. PIN reset applied: `last_accepted_upstream_ref` → `"upstream/main"`; +2 CI-only commits `188600bbf`/`820113551` deferred to next sync.)
-- [ ] Prepare final commit message only after acceptance. (Working-tree fixes still to commit — user's call; see handoff.)
+- [x] Prepare final commit message only after acceptance. (Landed as `39c73fd6f` `#sync: Stage 4 finalize + build-verification fixes` and `436145647` `fix(go-deconstructor): local stopgaps for lookup table db-population`; the separate cl_dps CWD-hardening fix landed as `3828db917`. All confirmed via `git log`.)
 
 **Final hard stop**: update `handoff.md` with final state, verification evidence, files changed, and any remaining risks, then stop.

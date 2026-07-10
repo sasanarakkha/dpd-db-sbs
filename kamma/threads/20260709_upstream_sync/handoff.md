@@ -341,6 +341,52 @@ warning that the local .mobi is a broken stub and the valid one is built by CI. 
 impact, no registry change (edit to an existing shadow, not a rename/move/create). All 4 gates green
 (ruff/format/pyright 0/0/0/pyrefly 0). Commit with the sync's separate local-fix batch, or standalone.
 
+## Stage 4 commit follow-up — CONFIRMED DONE (2026-07-10, later session)
+
+The "REMAINING (user's call)" commit items listed below were completed in a prior session (git log
+confirms, this session only verified + synced `plan.md`):
+- `39c73fd6f` `#sync: Stage 4 finalize + build-verification fixes` (paths_dps.py, kindle_exporter_ru.py,
+  kamma docs, accepted_sync.json, archive_improvements.md).
+- `436145647` `fix(go-deconstructor): local stopgaps for lookup table db-population` (model.go,
+  matchdata.go).
+- `3828db917` `fix: resolve tools/ask.py relative-path failures across cl_dps and bash scripts`
+  (separate cl_dps CWD-hardening fix, as planned).
+Current `git status --short` dirty files are all pre-existing/user's-own/build-side-effects per the
+exclusion list below — nothing new to commit for this thread. `plan.md` Stage 4 final box → `[x]`.
+
+## Docs Track — ADVANCED analysis DONE, awaiting user approval (2026-07-10)
+
+- `check_docs_parity.py kamma/threads/20260709_upstream_sync` run → `docs_parity_report.md`: 0
+  missing, 3 stale (`quick_start.md`, `local_server_setup.md`, `use_db.md` — all the same
+  `.tar.bz2`→`.tar.xz` one-line diff), 1 "unexpected local-only" file
+  (`docs_rus/technical/generate_pli2ru_json.md` — NOTICED, NOT TOUCHING, out of scope).
+- **Finding:** all 3 "stale" files are actually pre-existing untranslated English placeholders
+  (unchanged since original sync commit `c0c4db6d0`), not previously-Russian text. Scoped the plan to
+  a **targeted update only** (patch the 1-line diff, do not expand into a full translation) —
+  full translation flagged as a separate, larger candidate task, not decided unilaterally.
+- `docs_translation_plan.md` written and presented for user approval. `plan.md` ADVANCED Docs Analysis
+  items → `[x]`.
+
+**User approved 2026-07-10.** Translation phase executed:
+- 3 one-line edits applied: `docs_rus/technical/local_server_setup.md` (line 40),
+  `docs_rus/technical/quick_start.md` (line 14), `docs_rus/technical/use_db.md` (line 7) —
+  `dpd.db.tar.bz2`/`tar -xj` → `dpd.db.tar.xz`/`tar -xJ`, exactly as `docs_translation_plan.md`
+  specified. `use_db.md`'s existing fork-localized release URL preserved verbatim. `git diff --stat`
+  confirms exactly these 3 files, 1 line each.
+- `check_docs_parity.py --strict` → exit 1 (expected, not a regression): "stale" is computed as "EN
+  file changed within `[sha, to_ref]`" (source-confirmed, `check_docs_parity.py:236-239`), a
+  range-based flag independent of whether `docs_rus/` was updated — it will report the same 3 files
+  stale for this thread's fixed range regardless of the fix applied. No further action needed.
+- Commit message prepared (not committed, per protocol):
+  `#docs: translate/update docs_rus/ for sync 518672a6..be49bffe`
+- `plan.md` Docs Track (both ADVANCED analysis and FAST translation sections) → all `[x]`.
+
+**Docs Track is now fully complete.** Only remaining open item for this thread: filing the upstream
+Go issue (`upstream_issue_suggestion_go_lookup_struct.md`) — any session, non-blocking, not required
+to close this thread. The code sync itself was already finalized and accepted (see STAGE 4 section
+above). Suggest running `/kamma:3-review` next, per the standard `/kamma:2-do` handoff convention, once
+the user is ready — or `/kamma:4-finalize` if review is not desired for this thread.
+
 ## STAGE 4 — FINALIZED (2026-07-10)
 
 User gave acceptance ("all is good, proceed", incl. the `.rt` root-render watch item + mobi
