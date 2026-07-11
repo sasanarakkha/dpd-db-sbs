@@ -385,7 +385,7 @@
       "sync_rule": "inspired_only",
       "local_changes": [
         "`RuPaths` class mapping all upstream `ProjectPaths` constants to Russian-prefixed equivalents.",
-        "Russian-specific paths: `abbreviations_tsv_path` (reference_ru), `sets_ru_path`, `ru_components/templates/`, `fdg_dpd_ebts_js_ru_path`, etc.",
+        "Russian-specific paths: `abbreviations_tsv_path` (reference_ru), `sets_ru_path`, `ru_components/templates/`, `fdg_dpd_ebts_js_ru_path`, `sc_pli2ru_dpd_json`, etc.",
         "`create_dirs` logic filtered to only needed output directories."
       ],
       "watch_for": [
