@@ -20,8 +20,8 @@ if ! run "$PROJECT_ROOT/db_tests/sbs_consistency_tests.py"; then
 fi
 
 answer=$(uv run tools/ask.py "Update 'test' and 'feedback' fields in Anki notes?")
-case "${answer,,}" in
-    y*)
+case "$answer" in
+    [Yy]*)
         uv run tools/ask.py --print --color green "Updating test/feedback fields..."
         run "$PROJECT_ROOT/scripts/export/dps_anki_updater.py" "test"
         ;;
