@@ -63,6 +63,7 @@ class DpdHeadwordRenderDataBase(TypedDict):
     cf_set: set[str]
     idioms_set: set[str]
     show_id: bool
+    set_ru_dict: dict[str, str]
 
 
 class DpdHeadwordRenderData(DpdHeadwordRenderDataBase):
@@ -141,7 +142,7 @@ def render_pali_word_dpd_html(
     synonyms += i.inflections_thai_list
     synonyms += i.family_set_list
 
-    set_ru_dict = read_set_ru_from_tsv()
+    set_ru_dict = rd["set_ru_dict"]
     ru_set_list = []
     for english_word in i.family_set_list:
         if english_word in set_ru_dict:
@@ -339,6 +340,7 @@ def generate_dpd_html(
         "cf_set": cf_set,
         "idioms_set": idioms_set,
         "show_id": show_id,
+        "set_ru_dict": read_set_ru_from_tsv(),
     }
 
     # Preload the family tables once instead of 3 queries per headword.
@@ -406,9 +408,6 @@ def generate_dpd_html(
                     marker = batch_result[0][0].word if batch_result else ""
                     pr.counter(processed, pali_words_count, marker)
                     reported = processed
-
-            # Evict processed records to prevent memory leak
-            db_session.expunge_all()
 
     total_sizes = sum_rendered_sizes(rendered_sizes)
 

@@ -312,7 +312,7 @@
         "`DpdHeadwordDbParts` includes `ru: Russian` model; queries filter for `Russian.id.isnot(None)`.",
         "`render_pali_word_dpd_html` uses `data_classes_dps.HeadwordData` and renders via `dpd_headword_ru.jinja`.",
         "Size tracking: `size_dict[\"dpd_summary\"]` records `data.ru_meaning` length instead of English meaning.",
-        "Synonyms include Russian set names via `tools_for_ru_exporter.read_set_ru_from_tsv()`.",
+        "`DpdHeadwordRenderDataBase` preloads Russian set names via `read_set_ru_from_tsv()` once at the start of `generate_dpd_html`; each render accesses the dict from `render_data`.",
         "`generate_dpd_html` uses `rupth: RuPaths` and `joinedload(DpdHeadword.ru)`."
       ],
       "watch_for": [
@@ -401,7 +401,7 @@
       "local_changes": [
         "`generate_dpd_html` signature adds `dpspth: DPSPaths`, `show_sbs_data`, `show_ru_data`, `show_ta_data`, and `show_grammar` flags.",
         "Eagerly loads `.rt`, `.ru`, `.ta`, and `.sbs` relationships.",
-        "Synonyms logic includes a conditional Russian set lookup if `show_ru_data` is true.",
+        "`DpdHeadwordRenderDataBase` preloads Russian set names via `read_set_ru_from_tsv()` once at the start of `generate_dpd_html`; each render accesses the dict conditionally from `render_data` if `show_ru_data` is true.",
         "`_parse_batch_top_level` uses `sbs_templates/` and passes all locale flags including `show_ta_data`.",
         "`DpdHeadwordRenderDataBase` TypedDict includes `show_ta_data: bool`."
       ],

@@ -33,7 +33,9 @@ jobs:
         haskell: true
         large-packages: true
         docker-images: true
-        swap-storage: true
+        # keep the default swap file: the goldendict high-mem exporter needs
+        # it on 16GB runners (upstream draft_release keeps swap too)
+        swap-storage: false
 
     - name: Checkout repository
       uses: actions/checkout@v5
