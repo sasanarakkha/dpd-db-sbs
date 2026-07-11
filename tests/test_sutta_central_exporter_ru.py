@@ -8,8 +8,8 @@ instance attributes manually, keeping tests independent of the DB.
 
 import json
 from io import StringIO
-from pathlib import Path
-from unittest.mock import MagicMock, call, patch
+from typing import Any
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -21,12 +21,14 @@ from exporter.sutta_central.sutta_central_exporter_ru import SuttaCentralExporte
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _bare(with_ai: bool = False, with_eng_fallback: bool = False) -> SuttaCentralExporterRu:
+
+def _bare(with_ai: bool = False, with_eng_fallback: bool = False) -> Any:
     """Return a SuttaCentralExporterRu instance without running __init__."""
     inst = object.__new__(SuttaCentralExporterRu)
     inst.with_ai = with_ai
     inst.with_eng_fallback = with_eng_fallback
     inst.pth = MagicMock()
+    inst.ru_pth = MagicMock()
     inst.db_session = MagicMock()
     inst.sc_word_set = set()
     inst.lookup_dict = {}
@@ -69,6 +71,7 @@ def _lookup(headword_ids=None, deconstructions=None):
 # ---------------------------------------------------------------------------
 # flip()
 # ---------------------------------------------------------------------------
+
 
 class TestFlip:
     def setup_method(self):
@@ -146,28 +149,39 @@ class TestMakeScHeadwordEntry:
     def test_empty_ru_meaning_lit_excluded(self, _abbr):
         """Empty ru_meaning_lit (falsy) must not add '; досл.' clause."""
         inst = _bare()
-        result = inst.make_sc_headword_entry(_hw(ru=_ru(ru_meaning="учение", ru_meaning_lit="")))
+        result = inst.make_sc_headword_entry(
+            _hw(ru=_ru(ru_meaning="учение", ru_meaning_lit=""))
+        )
         assert "досл." not in result
         assert result == "сущ. <b>учение</b>"
 
     @patch(f"{MODULE}.ru_replace_abbreviations", return_value="гл")
     def test_ai_entry_when_ai_enabled(self, _abbr):
         inst = _bare(with_ai=True)
-        result = inst.make_sc_headword_entry(_hw(pos="verb", ru=_ru(ru_meaning_raw="понимать")))
+        result = inst.make_sc_headword_entry(
+            _hw(pos="verb", ru=_ru(ru_meaning_raw="понимать"))
+        )
         assert result == "гл. <i>[пер. ИИ]</i> понимать"
 
     @patch(f"{MODULE}.ru_replace_abbreviations", return_value="гл")
     def test_ai_entry_returns_none_when_ai_disabled(self, _abbr):
         inst = _bare(with_ai=False)
-        result = inst.make_sc_headword_entry(_hw(pos="verb", ru=_ru(ru_meaning_raw="понимать")))
+        result = inst.make_sc_headword_entry(
+            _hw(pos="verb", ru=_ru(ru_meaning_raw="понимать"))
+        )
         assert result is None
 
     @patch(f"{MODULE}.ru_replace_abbreviations", return_value="гл")
     def test_ai_entry_includes_construction(self, _abbr):
         inst = _bare(with_ai=True)
         result = inst.make_sc_headword_entry(
-            _hw(pos="verb", ru=_ru(ru_meaning_raw="понимать"), construction_summary="pa + jānā")
+            _hw(
+                pos="verb",
+                ru=_ru(ru_meaning_raw="понимать"),
+                construction_summary="pa + jānā",
+            )
         )
+        assert result is not None
         assert "[pa + jānā]" in result
 
     @patch(f"{MODULE}.make_meaning_combo", return_value="teaching; law")
@@ -189,14 +203,19 @@ class TestMakeScHeadwordEntry:
     @patch(f"{MODULE}.ru_replace_abbreviations", return_value="сущ")
     def test_eng_fallback_includes_construction(self, _abbr, _combo):
         inst = _bare(with_eng_fallback=True)
-        result = inst.make_sc_headword_entry(_hw(ru=None, construction_summary="dhā + ma"))
+        result = inst.make_sc_headword_entry(
+            _hw(ru=None, construction_summary="dhā + ma")
+        )
+        assert result is not None
         assert "[dhā + ma]" in result
 
     @patch(f"{MODULE}.ru_replace_abbreviations", return_value="сущ")
     def test_all_empty_ru_fields_returns_none(self, _abbr):
         """ru object with all empty meaning fields → None."""
         inst = _bare()
-        result = inst.make_sc_headword_entry(_hw(ru=_ru(ru_meaning="", ru_meaning_raw="")))
+        result = inst.make_sc_headword_entry(
+            _hw(ru=_ru(ru_meaning="", ru_meaning_raw=""))
+        )
         assert result is None
 
     @patch(f"{MODULE}.ru_replace_abbreviations", return_value="сущ")
@@ -206,6 +225,7 @@ class TestMakeScHeadwordEntry:
         result = inst.make_sc_headword_entry(
             _hw(ru=_ru(ru_meaning="учение", ru_meaning_raw="ИИ перевод"))
         )
+        assert result is not None
         assert "<b>учение</b>" in result
         assert "[пер. ИИ]" not in result
 
@@ -221,6 +241,7 @@ class TestMakeScHeadwordEntry:
 # ---------------------------------------------------------------------------
 # make_sc_dict()
 # ---------------------------------------------------------------------------
+
 
 class TestMakeScDict:
     def test_word_not_in_lookup_dict_skipped(self):
@@ -290,7 +311,9 @@ class TestMakeScDict:
         hw = _hw(lemma_1="dhamma", pos="masc", ru=_ru(ru_meaning="учение"))
         inst = _bare()
         inst.sc_word_set = {"dhamma"}
-        inst.lookup_dict = {"dhamma": _lookup(headword_ids=[1], deconstructions=["x + y"])}
+        inst.lookup_dict = {
+            "dhamma": _lookup(headword_ids=[1], deconstructions=["x + y"])
+        }
         inst.headword_dict = {1: hw}
         inst.make_sc_dict()
         assert len(inst.sc_dict["dhamma"]) == 2
@@ -321,6 +344,7 @@ class TestMakeScDict:
 # ---------------------------------------------------------------------------
 # compile_sc_dict()
 # ---------------------------------------------------------------------------
+
 
 class TestCompileScDict:
     def test_empty_word_set(self):
@@ -426,6 +450,7 @@ class TestCompileScDict:
 # make_lookup_dict()
 # ---------------------------------------------------------------------------
 
+
 class TestMakeLookupDict:
     def test_populates_lookup_dict_from_db(self):
         inst = _bare()
@@ -464,6 +489,7 @@ class TestMakeLookupDict:
 # ---------------------------------------------------------------------------
 # make_headwords_dict()
 # ---------------------------------------------------------------------------
+
 
 class TestMakeHeadwordsDict:
     def test_populates_headword_dict_by_id(self):
@@ -512,6 +538,7 @@ class TestMakeHeadwordsDict:
 # save_sc_dict()
 # ---------------------------------------------------------------------------
 
+
 class TestSaveScDict:
     def _run_save(self, inst):
         """Run save_sc_dict, capture written bytes, return parsed JSON."""
@@ -532,9 +559,14 @@ class TestSaveScDict:
     def test_creates_parent_directory(self):
         inst = _bare()
         inst.sc_dict_compiled = []
-        with patch("builtins.open", return_value=MagicMock(__enter__=lambda s: StringIO(), __exit__=lambda s, *a: None)):
+        with patch(
+            "builtins.open",
+            return_value=MagicMock(
+                __enter__=lambda s: StringIO(), __exit__=lambda s, *a: None
+            ),
+        ):
             inst.save_sc_dict()
-        inst.pth.sc_pli2ru_dpd_json.parent.mkdir.assert_called_once_with(
+        inst.ru_pth.sc_pli2ru_dpd_json.parent.mkdir.assert_called_once_with(
             parents=True, exist_ok=True
         )
 
@@ -575,12 +607,17 @@ class TestSaveScDict:
         inst = _bare()
         inst.sc_dict_compiled = []
         mock_path = MagicMock()
-        inst.pth.sc_pli2ru_dpd_json = mock_path
+        inst.ru_pth.sc_pli2ru_dpd_json = mock_path
 
-        with patch("builtins.open", return_value=MagicMock(__enter__=lambda s: StringIO(), __exit__=lambda s, *a: None)) as m_open:
+        with patch(
+            "builtins.open",
+            return_value=MagicMock(
+                __enter__=lambda s: StringIO(), __exit__=lambda s, *a: None
+            ),
+        ) as m_open:
             inst.save_sc_dict()
 
-        m_open.assert_called_once_with(mock_path, "w")
+        m_open.assert_called_once_with(mock_path, "w", encoding="utf-8")
 
 
 # ---------------------------------------------------------------------------

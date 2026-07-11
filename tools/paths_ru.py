@@ -327,6 +327,11 @@ class RuPaths:
             base_dir / "resources/tpr_downloads/release_zips/dpd_with_rus.zip"
         )
 
+        # resources/sc-data/dictionaries/simple/ru
+        self.sc_pli2ru_dpd_json = (
+            base_dir / "resources/sc-data/dictionaries/simple/ru/pli2ru_dpd.json"
+        )
+
         # identity/
         self.dpd_css_path = base_dir / "identity/css/dpd.css"
         self.dpd_variables_css_path = base_dir / "identity/css/dpd-variables.css"

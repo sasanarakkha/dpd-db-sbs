@@ -36,6 +36,7 @@ from tools.meaning_construction import make_meaning_combo
 from tools.pali_sort_key import pali_sort_key
 from tools.pali_text_files import sc_texts
 from tools.paths import ProjectPaths
+from tools.paths_ru import RuPaths
 from tools.printer import printer as pr
 from tools.tools_for_ru_exporter import ru_replace_abbreviations
 
@@ -44,6 +45,7 @@ DEBUG = False
 
 class SuttaCentralExporterRu:
     pth: ProjectPaths = ProjectPaths()
+    ru_pth: RuPaths = RuPaths()
     db_session: Session = get_db_session(pth.dpd_db_path)
 
     sc_books_list = [
@@ -255,8 +257,8 @@ class SuttaCentralExporterRu:
         """Save to JSON."""
 
         pr.green_tmr("saving sc dict")
-        self.pth.sc_pli2ru_dpd_json.parent.mkdir(parents=True, exist_ok=True)
-        with open(self.pth.sc_pli2ru_dpd_json, "w") as f:
+        self.ru_pth.sc_pli2ru_dpd_json.parent.mkdir(parents=True, exist_ok=True)
+        with open(self.ru_pth.sc_pli2ru_dpd_json, "w", encoding="utf-8") as f:
             dump(self.sc_dict_compiled, f, ensure_ascii=False, indent=2)
         pr.yes("OK")
 
