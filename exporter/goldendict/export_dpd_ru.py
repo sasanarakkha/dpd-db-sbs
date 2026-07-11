@@ -407,6 +407,9 @@ def generate_dpd_html(
                     pr.counter(processed, pali_words_count, marker)
                     reported = processed
 
+            # Evict processed records to prevent memory leak
+            db_session.expunge_all()
+
     total_sizes = sum_rendered_sizes(rendered_sizes)
 
     return dpd_data_list, total_sizes

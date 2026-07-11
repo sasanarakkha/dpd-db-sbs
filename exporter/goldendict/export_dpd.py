@@ -2,7 +2,7 @@
 
 from collections.abc import Iterator
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from typing import TypedDict
+from typing import TypedDict, cast
 
 import jinja2
 import psutil
@@ -160,11 +160,14 @@ def _worker_init(
     """Worker initializer: build the jinja env and full render data once per
     worker, reused across every batch that worker handles."""
     global _WORKER_RENDER_DATA
-    _WORKER_RENDER_DATA = {
-        **render_data,
-        "pth": path,
-        "jinja_env": get_jinja2_env("exporter/goldendict/templates"),
-    }
+    _WORKER_RENDER_DATA = cast(
+        DpdHeadwordRenderData,
+        {
+            **render_data,
+            "pth": path,
+            "jinja_env": get_jinja2_env("exporter/goldendict/templates"),
+        },
+    )
 
 
 def _render_batch(
@@ -373,6 +376,9 @@ def generate_dpd_html(
                     marker = batch_result[0][0].word if batch_result else ""
                     pr.counter(processed, pali_words_count, marker)
                     reported = processed
+
+            # Evict processed records to prevent memory leak
+            db_session.expunge_all()
 
     total_sizes = sum_rendered_sizes(rendered_sizes)
 
