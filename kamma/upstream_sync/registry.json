@@ -573,7 +573,6 @@
     "exporter/wxt_extension/",
     "exporter/mobile/",
     "exporter/tester/",
-    "exporter/sutta_central/",
     "exporter/pdf/",
     "tests/",
     "scripts/find/",
@@ -1126,6 +1125,20 @@
       ],
       "watch_for": [
         "This version is displayed in the Russian webapp footer."
+      ]
+    },
+    "exporter/sutta_central/sutta_central_exporter_ru.py": {
+      "upstream": "exporter/sutta_central/sutta_central_exporter.py",
+      "sync_rule": "PORT",
+      "local_changes": [
+        "Uses `RuPaths` from `tools/paths_ru.py` instead of `ProjectPaths`.",
+        "Prioritizes `ru_meaning` over `ru_meaning_raw` (if `with_ai` is enabled).",
+        "Uses `ru_replace_abbreviations` to translate POS abbreviations to Russian.",
+        "Saves the compiled SC dictionary to `ru_pth.sc_pli2ru_dpd_json`.",
+        "Adds cli options `--with-ai` and `--with-eng-fallback` to customize the export."
+      ],
+      "watch_for": [
+        "Upstream dictionary format changes (e.g. key structure, flip helper updates) must be mirrored."
       ]
     }
   },
