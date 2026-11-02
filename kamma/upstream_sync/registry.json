@@ -610,6 +610,7 @@
     "resources/anki/collection_media.tar.gz",
     "resources/anki/seed_collection.anki2.tar.gz",
     "scripts/export/add_combined_view.py",
+    "scripts/export/word_form_counts.py",
     "scripts/export/sbs_anki_schema_snapshot.json",
     "shared_data/russian_words_user_dict.txt",
     "shared_data/tamil/",
