@@ -802,7 +802,7 @@
   ],
   "discuss_paths": [],
   "from_upstream_sha": "be49bffe2c2c85971784337d4e09915ad1f42800",
-  "generated_at": "2026-11-05T15:45:04+08:00",
+  "generated_at": "2026-11-05T15:48:04+08:00",
   "mapped_actions": {
     ".github/workflows/draft_release.yml": [
       {
@@ -1889,7 +1889,7 @@
     "tools/server_mode.py"
   ],
   "target_upstream_ref": "upstream/main",
-  "to_upstream_sha": "c54f942ee3f6ff645f2245269e66709ac6f59826",
+  "to_upstream_sha": "ee38f7a84781d8758ce0633822e8660ec31169d9",
   "unregistered_local_paths": [
     ".github/workflows/submodules_update.yml",
     "db/inflections/inflection_templates.xlsx",
