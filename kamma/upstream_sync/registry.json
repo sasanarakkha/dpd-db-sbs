@@ -1174,7 +1174,7 @@
         "Keep structurally aligned with `tools/utils.py`."
       ]
     },
-    "scripts/server/update-dpd-sbs.sh": {
+    "scripts/server_dpdict/update-dpd-sbs.sh": {
       "upstream": "scripts/server_dpdict/update-dpd.sh",
       "sync_rule": "PORT",
       "local_changes": [

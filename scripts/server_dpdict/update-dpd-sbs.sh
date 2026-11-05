@@ -57,5 +57,5 @@ echo "App started in background."
 echo "Check logs with: tail -f $LOG_FILE"
 ps -ef | grep uvicorn | grep -v grep
 
-# scp scripts/server/update-dpd-sbs.sh django@85.215.66.115:~/update-dpd-sbs.sh
-# cp scripts/server/update-dpd-sbs.sh ~/update-dpd-sbs.sh
+# scp scripts/server_dpdict/update-dpd-sbs.sh django@85.215.66.115:~/update-dpd-sbs.sh
+# cp scripts/server_dpdict/update-dpd-sbs.sh ~/update-dpd-sbs.sh
