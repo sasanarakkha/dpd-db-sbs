@@ -87,20 +87,6 @@
       "why_discuss": "Imports `fast_api_utils_dps` (DPS-specific server launcher) instead of upstream's `fast_api_utils`, and adds `DpsView` tab. Blind porting removes DPS GUI entirely."
     },
     {
-      "path": "gui2/pass2_add_view.py",
-      "discuss": false,
-      "discuss_reason": "",
-      "sync_rule": "PORT",
-      "local_changes": [
-        "`from tools.fast_api_utils_dps import request_dpd_server` (line ~24) replaces upstream's `fast_api_utils` import for DPS server requests.",
-        "All server request calls go through `request_dpd_server` from the DPS shadow module, ensuring DPS-specific server configuration (host/port/timeout) is used instead of upstream defaults."
-      ],
-      "watch_for": [
-        "If upstream changes the function name in `fast_api_utils`, the `fast_api_utils_dps` shadow must be updated to match.",
-        "Upstream GUI refactors to `Pass2AddView` constructor or method signatures need manual review."
-      ]
-    },
-    {
       "path": ".gitignore",
       "discuss": true,
       "discuss_reason": "Contains DPS-specific exclusions for local build artifacts, Russian export outputs, and SBS data paths. Blind porting would re-track files that must remain untracked in this fork.",
@@ -135,10 +121,10 @@
     {
       "path": "pyproject.toml",
       "discuss": true,
-      "discuss_reason": "Carries local-only dependencies not present upstream (currently num2words>=0.5.14, pyrefly>=1.1.1). The Stage 1 execute_sync checkout overwrites pyproject.toml with the upstream version; without a modified_upstream_files exclusion the local-only deps are silently dropped (regressed in the 2026-06-01 sync). Must be restored and merged manually so local-only deps survive every sync.",
+      "discuss_reason": "Carries local-only dependencies not present upstream (currently num2words>=0.5.14). The Stage 1 execute_sync checkout overwrites pyproject.toml with the upstream version; without a modified_upstream_files exclusion the local-only deps are silently dropped (regressed in the 2026-06-01 sync). Must be restored and merged manually so local-only deps survive every sync.",
       "sync_rule": "DISCUSS",
       "local_changes": [
-        "Local-only runtime dependencies appended to `[project].dependencies` that upstream does not declare. Current set: `num2words>=0.5.14`, `pyrefly>=1.1.1`.",
+        "Local-only runtime dependencies appended to `[project].dependencies` that upstream does not declare. Current set: `num2words>=0.5.14`.",
         "Any future fork-only dependency added to `dependencies` or `[dependency-groups]` must be re-applied after every upstream pull."
       ],
       "watch_for": [
@@ -171,7 +157,8 @@
       ],
       "watch_for": [
         "Never overwrite with upstream's model list — it would break the translate pipeline's quota-grounded model selection. This file always stays local.",
-        "Upstream `ai_manager.py` reads it via `ProjectPaths().ai_models_json_path`; if that path or the top-level key names change upstream, mirror only the structural/key change into the local file while keeping the local model values."
+        "Upstream `ai_manager.py` reads it via `ProjectPaths().ai_models_json_path`; if that path or the top-level key names change upstream, mirror only the structural/key change into the local file while keeping the local model values.",
+        "2026-11-05 sync: upstream dropped the `antigravity_cli_work_models` key; upstream `ai_manager.py` no longer reads it. Local key kept (read only by local tooling); `batch_runner.py` reads only `default_models`."
       ],
       "why_discuss": "PRESERVE (discuss=false): active translate-pipeline config that must always stay local; never gates a sync."
     }
@@ -597,7 +584,6 @@
     "scripts/dbreader.py"
   ],
   "unique_paths": [
-    ".github/workflows/submodules_update.yml",
     ".github/workflows/sync_upstream.yml",
     ".github/workflows/anki_release.yml",
     "db/tpd/__init__.py",
@@ -696,12 +682,12 @@
     "gui2/data/pass2_auto_failures.txt",
     "gui2/data/pass2_new_words.json",
     "gui2/data/word_to_add.txt",
-    "scripts/cl/dpd-gui2",
     "shared_data/all_tipitaka_words",
     "shared_data/changed_templates",
     ".metadata_never_index",
     "dpd-db.code-workspace",
-    "tools/cst_source/__init__.py"
+    "tools/cst_source/__init__.py",
+    "exporter/kindle/kindlegen"
   ],
   "russian_copies": {
     "db/families/family_compound_ru.py": {
@@ -942,7 +928,8 @@
         "`copy_zip_to_tpr_downloads` uses `rupth.tpr_with_rus_path` and names the asset \"DPD with Russian\"."
       ],
       "watch_for": [
-        "The TPR SQL format is rigid; ensure the Russian additions don't break the importer."
+        "The TPR SQL format is rigid; ensure the Russian additions don't break the importer.",
+        "Upstream stopped the monthly TPR export (788e92046, #279) and will delete `exporter/tpr/` + TPR paths/config after end-2026. When that lands: archive `tpr_exporter_ru.py`, `tpr_headword_ru.jinja` and `scripts/rus_exporter/check_tpr_download_index.py` to `archive/dps/` and update this registry in the same sync. Automatic RU TPR runs were removed in the 2026-11-05 sync (D7)."
       ]
     },
     "exporter/tpr/templates/tpr_headword_ru.jinja": {
@@ -1196,7 +1183,7 @@
       ]
     },
     "scripts/server/update-dpd-sbs.sh": {
-      "upstream": "scripts/server/update-dpd.sh",
+      "upstream": "scripts/server_dpdict/update-dpd.sh",
       "sync_rule": "PORT",
       "local_changes": [
         "Target directory `dpd-db-sbs`.",

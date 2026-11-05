@@ -1,0 +1,3 @@
+# B1/B2 resolved by analysis, dynamic_plan.md §1
+exporter/kindle/templates/ebook_deconstructor_entry.jinja
+scripts/server/update-dpd.sh

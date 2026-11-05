@@ -1,0 +1,1029 @@
+# Upstream Sync Preparation Report
+
+## Upstream Range
+- From: `be49bffe2c2c85971784337d4e09915ad1f42800`
+- To: `c54f942ee3f6ff645f2245269e66709ac6f59826`
+
+## Registry Validation Status
+OK: Registry is valid.
+
+## Modified - Tracked Files
+- .gitignore
+- AGENTS.md
+- db/models.py
+- exporter/webapp/data_classes.py
+- exporter/webapp/static/app.js
+- gui2/main.py
+- pyproject.toml
+- tools/ai_models.json
+
+## Modified - Shadow Sources
+- `db/backup_tsv/backup_dpd_headwords_and_roots.py` -> shadows: db/backup_tsv/backup_dps.py
+- `db/families/family_set.py` -> shadows: db/families/family_set_ru.py
+- `exporter/deconstructor/deconstructor_exporter.py` -> shadows: exporter/deconstructor/deconstructor_exporter_ru.py
+- `exporter/goldendict/javascript/family_compound_template.js` -> shadows: exporter/goldendict/ru_components/javascript/
+- `exporter/goldendict/javascript/family_idiom_template.js` -> shadows: exporter/goldendict/ru_components/javascript/
+- `exporter/goldendict/javascript/family_root_template.js` -> shadows: exporter/goldendict/ru_components/javascript/
+- `exporter/goldendict/javascript/family_set_template.js` -> shadows: exporter/goldendict/ru_components/javascript/
+- `exporter/goldendict/javascript/feedback_template.js` -> shadows: exporter/goldendict/ru_components/javascript/
+- `exporter/goldendict/templates/dpd_headword.jinja` -> shadows: exporter/goldendict/ru_components/templates/, exporter/goldendict/sbs_templates/
+- `exporter/grammar_dict/grammar_dict.py` -> shadows: exporter/grammar_dict/grammar_dict_ru.py
+- `exporter/kindle/epub/OEBPS/Styles/dpd_kindle.css` -> shadows: exporter/kindle/ru_components/epub/
+- `exporter/kindle/epub/OEBPS/Text/nav.xhtml` -> shadows: exporter/kindle/ru_components/epub/
+- `exporter/kindle/epub/OEBPS/Text/titlepage.xhtml` -> shadows: exporter/kindle/ru_components/epub/
+- `exporter/kindle/epub/OEBPS/toc.ncx` -> shadows: exporter/kindle/ru_components/epub/
+- `exporter/kindle/kindle_exporter.py` -> shadows: exporter/kindle/kindle_exporter_ru.py
+- `exporter/kindle/templates/ebook_content_opf.jinja` -> shadows: exporter/kindle/ru_components/templates/
+- `exporter/kindle/templates/ebook_entry.jinja` -> shadows: exporter/kindle/ru_components/templates/
+- `exporter/kindle/templates/ebook_epd_letter.jinja` -> shadows: exporter/kindle/ru_components/templates/
+- `exporter/kindle/templates/ebook_form_entry.jinja` -> shadows: exporter/kindle/ru_components/templates/
+- `exporter/kindle/templates/ebook_letter.jinja` -> shadows: exporter/kindle/ru_components/templates/
+- `exporter/tpr/tpr_exporter.py` -> shadows: exporter/tpr/tpr_exporter_ru.py
+- `exporter/webapp/data_classes.py` -> shadows: exporter/webapp/data_classes_ru.py
+- `exporter/webapp/main.py` -> shadows: exporter/webapp/main_ru.py
+- `exporter/webapp/templates/dpd_headword.html` -> shadows: exporter/webapp/ru_templates/, exporter/webapp/sbs_templates/
+- `exporter/webapp/templates/home.html` -> shadows: exporter/webapp/ru_templates/, exporter/webapp/sbs_templates/
+- `exporter/webapp/templates/home_simple.html` -> shadows: exporter/webapp/ru_templates/, exporter/webapp/sbs_templates/
+- `exporter/webapp/toolkit.py` -> shadows: exporter/webapp/toolkit_ru.py
+- `gui2/dpd_fields_examples.py` -> shadows: gui2/dps_example_field.py
+- `gui2/dpd_fields_meaning.py` -> shadows: gui2/dps_meaning_field.py
+- `scripts/build/db_rebuild_from_tsv.py` -> shadows: scripts/build/db_rebuild_from_tsv_dps.py
+- `scripts/build/families_to_json.py` -> shadows: scripts/build/families_to_json_ru.py
+- `scripts/fix/character_replacer.py` -> shadows: scripts/fix/character_replacer_sbs.py
+- `scripts/server_dpdict/update-dpd.sh` -> shadows: scripts/server/update-dpd-sbs.sh
+- `shared_data/reference/abbreviations.tsv` -> shadows: shared_data/reference_ru/
+- `shared_data/reference/abbreviations_other.tsv` -> shadows: shared_data/reference_ru/
+- `shared_data/reference/bibliography.tsv` -> shadows: shared_data/reference_ru/
+- `tools/degree_of_completion.py` -> shadows: tools/degree_of_completion_ru.py
+- `tools/spelling.py` -> shadows: tools/ru_spelling.py
+- `tools/translit.py` -> shadows: tools/translit_ru.py
+- `tools/utils.py` -> shadows: tools/utils_sbs.py
+- `tools/version.py` -> shadows: tools/version_ru.py
+
+## Modified - Inspired Sources
+- `.github/workflows/draft_release.yml` -> inspired: .github/workflows/ru_release.yml, .github/workflows/ru_release_test.yml, .github/workflows/ru_release_kindle.yml
+- `docs/bibliography.md` -> inspired: docs_rus/
+- `docs/changelog.md` -> inspired: docs_rus/
+- `docs/contact.md` -> inspired: docs_rus/
+- `docs/contributing/code.md` -> inspired: docs_rus/
+- `docs/contributing/index.md` -> inspired: docs_rus/
+- `docs/contributing/pali.md` -> inspired: docs_rus/
+- `docs/contributing/resources.md` -> inspired: docs_rus/
+- `docs/features/sutta_info.md` -> inspired: docs_rus/
+- `docs/how_to_cite.md` -> inspired: docs_rus/
+- `docs/index.md` -> inspired: docs_rus/
+- `docs/install/koreader.md` -> inspired: docs_rus/
+- `docs/integrations/add_your_app.md` -> inspired: docs_rus/
+- `docs/integrations/dhamma_gift.md` -> inspired: docs_rus/
+- `docs/integrations/epitaka.md` -> inspired: docs_rus/
+- `docs/integrations/sutamaya.md` -> inspired: docs_rus/
+- `docs/integrations/tpr.md` -> inspired: docs_rus/
+- `docs/license.md` -> inspired: docs_rus/
+- `docs/newsletters.md` -> inspired: docs_rus/
+- `docs/other_dicts.md` -> inspired: docs_rus/
+- `docs/pics/dpdict.net/dpdict_feedback_permalink_dark.png` -> inspired: docs_rus/
+- `docs/pics/dpdict.net/dpdict_feedback_permalink_light.png` -> inspired: docs_rus/
+- `docs/pics/epitaka/lookup-phone-dark.png` -> inspired: docs_rus/
+- `docs/pics/epitaka/lookup-phone-light.png` -> inspired: docs_rus/
+- `docs/pics/epitaka/main-view-dark.png` -> inspired: docs_rus/
+- `docs/pics/epitaka/main-view-light.png` -> inspired: docs_rus/
+- `docs/pics/koreader/database_status_dark.png` -> inspired: docs_rus/
+- `docs/pics/koreader/database_status_light.png` -> inspired: docs_rus/
+- `docs/pics/koreader/database_status_menu_dark.png` -> inspired: docs_rus/
+- `docs/pics/koreader/database_status_menu_light.png` -> inspired: docs_rus/
+- `docs/pics/koreader/hero_dark.png` -> inspired: docs_rus/
+- `docs/pics/koreader/hero_light.png` -> inspired: docs_rus/
+- `docs/pics/koreader/lookup_dark.png` -> inspired: docs_rus/
+- `docs/pics/koreader/lookup_light.png` -> inspired: docs_rus/
+- `docs/pics/koreader/main_dark.png` -> inspired: docs_rus/
+- `docs/pics/koreader/main_light.png` -> inspired: docs_rus/
+- `docs/pics/newsletters/055d6c99f31c.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/2026-10/epitaka-android.png` -> inspired: docs_rus/
+- `docs/pics/newsletters/2026-10/epitaka-app.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/38dec4f8be4b.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/4e4cf3b3d2f6.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/983c769bb4d2.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/c957ad0fd41a.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/cfc409b522d4.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/d9fdfd5353b9.jpg` -> inspired: docs_rus/
+- `docs/pics/newsletters/e0a09c53d3e5.jpg` -> inspired: docs_rus/
+- `docs/pics/sutamaya/library-phone-dark.png` -> inspired: docs_rus/
+- `docs/pics/sutamaya/library-phone-light.png` -> inspired: docs_rus/
+- `docs/pics/sutamaya/lookup-phone-dark.png` -> inspired: docs_rus/
+- `docs/pics/sutamaya/lookup-phone-light.png` -> inspired: docs_rus/
+- `docs/pics/sutamaya/settings-dark.png` -> inspired: docs_rus/
+- `docs/pics/sutamaya/settings-light.png` -> inspired: docs_rus/
+- `docs/technical/api_endpoints.md` -> inspired: docs_rus/
+- `docs/technical/dpd_headwords_table.md` -> inspired: docs_rus/
+- `docs/technical/project_folder_structure.md` -> inspired: docs_rus/
+- `docs/technical/style_guide_for_dpd_entries.md` -> inspired: docs_rus/
+- `docs/technical/tipitaka_source_files.md` -> inspired: docs_rus/
+- `exporter/goldendict/export_dpd.py` -> inspired: exporter/goldendict/export_dpd_ru.py, exporter/goldendict/export_dpd_sbs.py
+- `exporter/goldendict/export_help.py` -> inspired: exporter/goldendict/export_help_ru.py, exporter/goldendict/export_help_sbs.py
+- `exporter/goldendict/main.py` -> inspired: exporter/goldendict/main_ru.py, exporter/goldendict/main_sbs.py
+- `gui2/dpd_fields.py` -> inspired: gui2/dps_fields.py
+- `gui2/dpd_fields_lists.py` -> inspired: gui2/dps_fields_lists.py
+- `gui2/pass2_add_view.py` -> inspired: gui2/dps_view.py
+- `gui2/test_manager.py` -> inspired: gui2/dps_test_manager.py
+- `mkdocs.yaml` -> inspired: mkdocs_ru.yaml
+- `scripts/bash/generate_components.py` -> inspired: scripts/bash/generate_components.sh
+- `scripts/bash/makedict.py` -> inspired: scripts/bash/make_dpd.sh, scripts/bash/make_ru_dpd.sh
+- `tools/fast_api_utils.py` -> inspired: tools/fast_api_utils_dps.py
+- `tools/paths.py` -> inspired: tools/paths_ru.py, tools/paths_dps.py
+
+## New Or Unmapped Upstream Changes
+- .github/ISSUE_TEMPLATE/bug_report.md
+- .github/ISSUE_TEMPLATE/feature_request.md
+- .github/ISSUE_TEMPLATE/maintenance.md
+- .github/workflows/mobile_release.yml
+- .gitmodules
+- CONTRIBUTING.md
+- README.md
+- audio/bhashini/bhashini_class.py
+- audio/db_release_download.py
+- audio/error_check/trim_audio.py
+- audio/index_release_download.py
+- db/backup_tsv/dpd_headwords_part_001.tsv
+- db/backup_tsv/dpd_headwords_part_002.tsv
+- db/backup_tsv/dpd_headwords_part_003.tsv
+- db/backup_tsv/dpd_roots_part_001.tsv
+- db/backup_tsv/sutta_info.tsv
+- db/bold_definitions/update_bold_definitions_db.py
+- db/db_helpers.py
+- db/families/root_info.py
+- db/families/root_matrix.py
+- db/inflections/README.md
+- db/inflections/create_inflection_templates.py
+- db/inflections/generate_inflection_tables.py
+- db/inflections/transliterate_inflections.py
+- db/lookup/transliterate_lookup_table.py
+- db/sanskrit/root_families_sanskrit.tsv
+- db/suttas/dv_catalogue_suttas.py
+- db/suttas/suttas_update.py
+- db/variants/extract_variants_from_sya.py
+- db/variants/files_to_books.py
+- db/variants/variants_modules.py
+- exporter/analysis/README.md
+- exporter/analysis/ai_batch_translate.py
+- exporter/analysis/analyzer.py
+- exporter/analysis/book_to_verses.py
+- exporter/analysis/passage_by_code.py
+- exporter/analysis/ranking.py
+- exporter/analysis/study_passage.py
+- exporter/kindle/README.md
+- exporter/variants/variants_exporter.py
+- exporter/webapp/README.md
+- exporter/webapp/generate_search_index.py
+- exporter/webapp/static/dpd-logo-dark.svg
+- exporter/webapp/static/dpd-logo.svg
+- exporter/webapp/static/dpd.css
+- exporter/webapp/static/home.css
+- exporter/webapp/static/home_simple.css
+- exporter/webapp/static/tipitaka_translations.js
+- go_modules/deconstructor/data/matchdata.go
+- go_modules/deconstructor/importer/manualCorrections.go
+- go_modules/deconstructor/importer/unmatched.go
+- go_modules/deconstructor/main.go
+- go_modules/frequency/file_maps/sya_file_map.json
+- go_modules/frequency/setup/2SC.go
+- go_modules/frequency/setup/4SYA.go
+- go_modules/tools/cleanMachine.go
+- go_modules/tools/pth.go
+- gui2/README.md
+- gui2/additions_manager.py
+- gui2/bold_search_view.py
+- gui2/books.py
+- gui2/compound_type_tab_view.py
+- gui2/corrections_manager.py
+- gui2/data/additions_added.json
+- gui2/data/pass2_exceptions.json
+- gui2/database_manager.py
+- gui2/dpd_fields_classes.py
+- gui2/dpd_fields_commentary.py
+- gui2/dpd_fields_compound_construction.py
+- gui2/dpd_fields_family_set.py
+- gui2/dpd_fields_functions.py
+- gui2/dpd_fields_notes.py
+- gui2/filter_component.py
+- gui2/filter_tab_view.py
+- gui2/global_tab_view.py
+- gui2/linux/dpd-gui2.desktop
+- gui2/mixins.py
+- gui2/needs_example.py
+- gui2/pass1_add_controller.py
+- gui2/pass1_add_view.py
+- gui2/pass1_auto_controller.py
+- gui2/pass1_auto_view.py
+- gui2/pass1_file_manager.py
+- gui2/pass2_auto_control.py
+- gui2/pass2_auto_view.py
+- gui2/pass2_pre_controller.py
+- gui2/pass2_pre_file_manager.py
+- gui2/pass2_pre_new_word_manager.py
+- gui2/pass2_pre_view.py
+- gui2/pass2x/in_commentary_view.py
+- gui2/paths.py
+- gui2/roots_tab_view.py
+- gui2/sandhi_files_manager.py
+- gui2/sandhi_find_replace_view.py
+- gui2/sandhi_view.py
+- gui2/spelling.py
+- gui2/test_app.py
+- gui2/tests_tab_controller.py
+- gui2/tests_tab_view.py
+- gui2/toolkit.py
+- gui2/translations_view.py
+- gui2/ui_utils.py
+- gui2/user.py
+- gui2/utilities/find_words_with_examples.py
+- gui2/utilities/sandhi_contraction_find_replace_gui.py
+- gui2/variants.py
+- gui2/wordfinder_popup.py
+- gui2/wordfinder_widget.py
+- identity/css/dpd-css-and-fonts.css
+- identity/css/dpd.css
+- justfile
+- resources/bw2
+- resources/dpd_submodules
+- resources/fdg_dpd
+- resources/other-dictionaries
+- resources/sc-data
+- resources/tipitaka_translation_db
+- resources/tpr_downloads
+- scripts/README.md
+- scripts/add/README.md
+- scripts/add/add_words_commentaries.py
+- scripts/add/add_words_ebts.py
+- scripts/add/add_words_random.py
+- scripts/bash/initial_build_db.py
+- scripts/bash/initial_build_db_and_export_all.py
+- scripts/bash/initial_setup_run_once.py
+- scripts/build/api_ca_eva_iti_iva_hi.py
+- scripts/build/config_uposatha_day.py
+- scripts/build/config_uposatha_reset.py
+- scripts/build/cst4_xml_to_txt.py
+- scripts/build/dealbreakers.py
+- scripts/build/deconstructor_output_add_to_db.py
+- scripts/build/docs_add_indexes.py
+- scripts/build/docs_update_css.py
+- scripts/build/ebt_counter.py
+- scripts/build/sanskrit_root_families_updater.py
+- scripts/build/tarball_db.py
+- scripts/build/transliterate_bjt.py
+- scripts/build/version_print.py
+- scripts/build/zip_goldendict_mdict.py
+- scripts/build/zip_wxt_extension.py
+- scripts/export/db_filter_export.py
+- scripts/export/sanskrit_export.py
+- scripts/extractor/extract_cone.py
+- scripts/fix/README.md
+- scripts/fix/example_1_2_cleaner.py
+- scripts/fix/extra_brackets_remover.py
+- scripts/fix/family_compound_and_idiom_update.py
+- scripts/fix/family_root_rename.py
+- scripts/fix/family_word_update.py
+- scripts/info/corpus_size.py
+- scripts/info/plus_case.py
+- scripts/info/suffix_counter.py
+- scripts/onboarding/contributor_setup.py
+- scripts/patch/patch_dpd.py
+- scripts/project_management/project_health_check.py
+- scripts/tutorial/quick_start.py
+- shared_data/deconstructor/checked.csv
+- shared_data/deconstructor/manual_corrections.tsv
+- shared_data/deconstructor/sandhi_rules.tsv
+- shared_data/deconstructor/spelling_mistakes.tsv
+- shared_data/deconstructor/variant_readings.tsv
+- shared_data/user_dictionary.txt
+- tools/ai_antigravity_cli.py
+- tools/ai_antigravity_cli_models.py
+- tools/ai_claude_manager.py
+- tools/ai_gemini_manager.py
+- tools/ai_gpt_manager.py
+- tools/ai_manager.py
+- tools/all_tipitaka_words.py
+- tools/bjt.py
+- tools/bjt_source_sutta_example.py
+- tools/bold_definitions_search.py
+- tools/cache_load.py
+- tools/clean_sentence.py
+- tools/compound_type_manager.py
+- tools/compound_type_manager.tsv
+- tools/configger.py
+- tools/cst_sc_text_sets.py
+- tools/cst_source/examples.py
+- tools/cst_source/extractor.py
+- tools/cst_source/parsers/abhidhamma.py
+- tools/cst_source/parsers/base.py
+- tools/cst_source/parsers/commentary.py
+- tools/cst_source/parsers/khuddaka.py
+- tools/cst_source/parsers/misc.py
+- tools/cst_source/parsers/sutta.py
+- tools/cst_source/parsers/vinaya.py
+- tools/date_and_time.py
+- tools/docs_changelog_and_release_notes.py
+- tools/docs_update_bibliography.py
+- tools/exporter_functions.py
+- tools/fuzzy_tools.py
+- tools/goldendict_exporter.py
+- tools/goldendict_path.py
+- tools/goldendict_tools.py
+- tools/lemma_traditional.py
+- tools/list_deduper.py
+- tools/logo.py
+- tools/lookup_is_another_value.py
+- tools/lookup_sync.py
+- tools/negative_to_positive.py
+- tools/niggahitas.py
+- tools/phonetic_change_manager.py
+- tools/phonetic_changes.tsv
+- tools/printer.py
+- tools/proofreader.py
+- tools/sanskrit_translit.py
+- tools/script_runner.py
+- tools/sinhala_tools.py
+- tools/speech_marks.json
+- tools/speech_marks.py
+- tools/speech_marks_replacement.py
+- tools/superscripter.py
+- tools/sutta_codes.py
+- tools/sutta_name_cleaning.py
+- tools/tarballer.py
+- tools/tipitaka_db.py
+- tools/tokenizer.py
+- tools/tpr_codes_gen.py
+- tools/tsv_read_write.py
+- tools/unicode_char.py
+- tools/uposatha_day.ini
+- tools/uposatha_day.py
+- tools/zip_up.py
+- uv.lock
+
+## Deleted Files
+- .github/workflows/opencode.yml
+- .github/workflows/pdf_test.yml
+- .github/workflows/submodules_update.yml
+- db/inflections/inflection_templates.xlsx
+- db/inflections/inflections_raw.py
+- db_tests_gui/README.md
+- db_tests_gui/add_antonyms.py
+- db_tests_gui/add_antonyms_sync.py
+- db_tests_gui/add_antonyms_sync_dict.json
+- db_tests_gui/add_family_compound_neg.py
+- db_tests_gui/add_family_compound_su_dur.py
+- db_tests_gui/add_family_compound_taddhita.py
+- db_tests_gui/add_hyphenations.json
+- db_tests_gui/add_hyphenations.py
+- db_tests_gui/internal_tests.py
+- db_tests_gui/main.py
+- exporter/kindle/kindlegen
+- exporter/kindle/templates/ebook_deconstructor_entry.jinja
+- exporter/mcp/README.md
+- exporter/mcp/__init__.py
+- exporter/mcp/config.py
+- exporter/mcp/server.py
+- gui2/ai_search.py
+- resources/deconstructor_output
+- resources/other_pali_texts/kathāsallāpasikkhā.old.txt
+- resources/other_pali_texts/kathāsallāpasikkhā.txt
+- resources/syāmaraṭṭha_1927/canon/01_Vinaya_Mahaavi_1.txt
+- resources/syāmaraṭṭha_1927/canon/02_Vinaya_Mahaavi_2.txt
+- resources/syāmaraṭṭha_1927/canon/03_Vinaya_Bhikkhunii.txt
+- resources/syāmaraṭṭha_1927/canon/04_Vinaya_Mahaa_1.txt
+- resources/syāmaraṭṭha_1927/canon/05_Vinaya_Mahaa_2.txt
+- resources/syāmaraṭṭha_1927/canon/06_Vinaya_Culla_1.txt
+- resources/syāmaraṭṭha_1927/canon/07_Vinaya_Culla_2.txt
+- resources/syāmaraṭṭha_1927/canon/08_Vinaya_Parivaara.txt
+- resources/syāmaraṭṭha_1927/canon/09_Sutta_DN_Siilakhanda.txt
+- resources/syāmaraṭṭha_1927/canon/10_Sutta_DN_Mahaa.txt
+- resources/syāmaraṭṭha_1927/canon/11_Sutta_DN_Paatika.txt
+- resources/syāmaraṭṭha_1927/canon/12_Sutta_MN_Muu.txt
+- resources/syāmaraṭṭha_1927/canon/13_Sutta_MN_Ma.txt
+- resources/syāmaraṭṭha_1927/canon/14_Sutta_MN_U.txt
+- resources/syāmaraṭṭha_1927/canon/15_Sutta_SN_Sa.txt
+- resources/syāmaraṭṭha_1927/canon/16_Sutta_SN_Ni.txt
+- resources/syāmaraṭṭha_1927/canon/17_Sutta_SN_Kha.txt
+- resources/syāmaraṭṭha_1927/canon/18_Sutta_SN_Sala.txt
+- resources/syāmaraṭṭha_1927/canon/19_Sutta_SN_Ma.txt
+- resources/syāmaraṭṭha_1927/canon/20_Sutta_AN_1.txt
+- resources/syāmaraṭṭha_1927/canon/21_Sutta_AN_2.txt
+- resources/syāmaraṭṭha_1927/canon/22_Sutta_AN_3.txt
+- resources/syāmaraṭṭha_1927/canon/23_Sutta_AN_4.txt
+- resources/syāmaraṭṭha_1927/canon/24_Sutta_AN_5.txt
+- resources/syāmaraṭṭha_1927/canon/25_Sutta_Khu_Khu.txt
+- resources/syāmaraṭṭha_1927/canon/26_Sutta_Khu_Vimana.txt
+- resources/syāmaraṭṭha_1927/canon/27_Sutta_Khu_Jaa_1.txt
+- resources/syāmaraṭṭha_1927/canon/28_Sutta_Khu_Jaa_2.txt
+- resources/syāmaraṭṭha_1927/canon/29_Sutta_Khu_Ma.txt
+- resources/syāmaraṭṭha_1927/canon/30_Sutta_Khu_Cuu.txt
+- resources/syāmaraṭṭha_1927/canon/31_Sutta_Khu_Pati.txt
+- resources/syāmaraṭṭha_1927/canon/32_Sutta_Khu_Apa_1.txt
+- resources/syāmaraṭṭha_1927/canon/33_Sutta_Khu_Apa_2.txt
+- resources/syāmaraṭṭha_1927/canon/34_Abhi_Dhs.txt
+- resources/syāmaraṭṭha_1927/canon/35_Abhi_Vi.txt
+- resources/syāmaraṭṭha_1927/canon/36_Abhi_Dhaa.txt
+- resources/syāmaraṭṭha_1927/canon/37_Abhi_Ka.txt
+- resources/syāmaraṭṭha_1927/canon/38_Abhi_Ya_1.txt
+- resources/syāmaraṭṭha_1927/canon/39_Abhi_Ya_2.txt
+- resources/syāmaraṭṭha_1927/canon/40_Abhi_Pa_1.txt
+- resources/syāmaraṭṭha_1927/canon/41_Abhi_Pa_2.txt
+- resources/syāmaraṭṭha_1927/canon/42_Abhi_Pa_3.txt
+- resources/syāmaraṭṭha_1927/canon/43_Abhi_Pa_4.txt
+- resources/syāmaraṭṭha_1927/canon/44_Abhi_Pa_5.txt
+- resources/syāmaraṭṭha_1927/canon/45_Abhi_Pa_6.txt
+- resources/syāmaraṭṭha_1927/commentary/01_Vinaya_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/02_Vinaya_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/03_Vinaya_A3.txt
+- resources/syāmaraṭṭha_1927/commentary/04_DN_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/05_DN_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/06_DN_A3.txt
+- resources/syāmaraṭṭha_1927/commentary/07_MN_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/08_MN_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/09_MN_A3.txt
+- resources/syāmaraṭṭha_1927/commentary/10_MN_A4.txt
+- resources/syāmaraṭṭha_1927/commentary/11_SN_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/12_SN_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/13_SN_A3.txt
+- resources/syāmaraṭṭha_1927/commentary/14_AN_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/15_AN_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/16_AN_A3.txt
+- resources/syāmaraṭṭha_1927/commentary/17_Khuddaka_A.txt
+- resources/syāmaraṭṭha_1927/commentary/18_Dha_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/19_Dha_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/20_Dha_A3.txt
+- resources/syāmaraṭṭha_1927/commentary/21_Dha_A4.txt
+- resources/syāmaraṭṭha_1927/commentary/22_Dha_A5.txt
+- resources/syāmaraṭṭha_1927/commentary/23_Dha_A6.txt
+- resources/syāmaraṭṭha_1927/commentary/24_Dha_A7.txt
+- resources/syāmaraṭṭha_1927/commentary/25_Dha_A8.txt
+- resources/syāmaraṭṭha_1927/commentary/26_U_A.txt
+- resources/syāmaraṭṭha_1927/commentary/27_Iti_A.txt
+- resources/syāmaraṭṭha_1927/commentary/28_Sutta_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/29_Sutta_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/30_Vimaana_A.txt
+- resources/syāmaraṭṭha_1927/commentary/31_Peta_A.txt
+- resources/syāmaraṭṭha_1927/commentary/32_Thera_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/33_Thera_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/34_Theri_A.txt
+- resources/syāmaraṭṭha_1927/commentary/35_Jaa_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/36_Jaa_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/37_Jaa_A3.txt
+- resources/syāmaraṭṭha_1927/commentary/38_Jaa_A4.txt
+- resources/syāmaraṭṭha_1927/commentary/39_Jaa_A5.txt
+- resources/syāmaraṭṭha_1927/commentary/40_Jaa_A6.txt
+- resources/syāmaraṭṭha_1927/commentary/41_Jaa_A7.txt
+- resources/syāmaraṭṭha_1927/commentary/42_Jaa_A8.txt
+- resources/syāmaraṭṭha_1927/commentary/43_Jaa_A9.txt
+- resources/syāmaraṭṭha_1927/commentary/44_Jaa_A10.txt
+- resources/syāmaraṭṭha_1927/commentary/45_Nid_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/46_Nid_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/47_Patisam_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/48_Patisam_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/49_Apa_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/50_Apa_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/51_Buddhavamsa_A.txt
+- resources/syāmaraṭṭha_1927/commentary/52_Cariya_A.txt
+- resources/syāmaraṭṭha_1927/commentary/53_Dhs_A.txt
+- resources/syāmaraṭṭha_1927/commentary/54_Vibh_A.txt
+- resources/syāmaraṭṭha_1927/commentary/55_Panca_A.txt
+- resources/syāmaraṭṭha_1927/commentary/56_Milindapanha.txt
+- resources/syāmaraṭṭha_1927/commentary/57_Visuddhimagga_1.txt
+- resources/syāmaraṭṭha_1927/commentary/58_Visuddhimagga_2.txt
+- resources/syāmaraṭṭha_1927/commentary/59_Visuddhimagga_3.txt
+- resources/syāmaraṭṭha_1927/commentary/60_Abhidh_s_vi.txt
+- resources/syāmaraṭṭha_1927/commentary/61_Visuddhi_tika_1.txt
+- resources/syāmaraṭṭha_1927/commentary/62_Visuddhi_tika_2.txt
+- resources/syāmaraṭṭha_1927/commentary/63_Visuddhi_tika_3.txt
+- resources/syāmaraṭṭha_1927/commentary/64_Vinaya_tika_1.txt
+- resources/syāmaraṭṭha_1927/commentary/65_Vinaya_tika_2.txt
+- resources/syāmaraṭṭha_1927/commentary/66_Vinaya_tika_3.txt
+- resources/syāmaraṭṭha_1927/commentary/67_Vinaya_tika_4.txt
+- resources/syāmaraṭṭha_1927/commentary/68_Mangalatthadiipanii_1.txt
+- resources/syāmaraṭṭha_1927/commentary/69_Mangalatthadiipanii_2.txt
+- resources/syāmaraṭṭha_1927/commentary/70_Bhikkhupaatimokkhapaali.txt
+- scripts/add/add_additions_to_db.py
+- scripts/add/add_words_from_egs_&_commentary_columns.py
+- scripts/add/vagga_codes/__init__.py
+- scripts/add/vagga_codes/an.py
+- scripts/add/vagga_codes/apply.py
+- scripts/add/vagga_codes/dhp_m2.py
+- scripts/add/vagga_codes/kn.py
+- scripts/add/vagga_codes/kn_suggestions.py
+- scripts/add/vagga_codes/mn.py
+- scripts/add/vagga_codes/runner.py
+- scripts/add/vagga_codes/shared.py
+- scripts/add/vagga_codes/sn.py
+- scripts/build/newsletter_processed.json
+- scripts/build/newsletter_scraper.py
+- scripts/build/tarball_deconstructor_output.py
+- scripts/cl/README.md
+- scripts/cl/dpd-anki
+- scripts/cl/dpd-bhashini
+- scripts/cl/dpd-build-db
+- scripts/cl/dpd-example
+- scripts/cl/dpd-gui
+- scripts/cl/dpd-kill-webapp
+- scripts/cl/dpd-makedict
+- scripts/cl/dpd-sandhi
+- scripts/cl/dpd-webapp
+- scripts/extractor/_load_cpd.py
+- scripts/extractor/_read_cpd.py
+- scripts/extractor/extract_cpd.py
+- scripts/fix/family_set_update.py
+- scripts/fix/family_word_remover.py
+- scripts/fix/fix_synonym_entries.json
+- scripts/fix/fix_synonym_entries.py
+- scripts/fix/gitignore_cleaner.py
+- scripts/fix/meaning_lit_fixer.py
+- scripts/fix/nir_add_to_family_compound.py
+- scripts/fix/null_remover.py
+- scripts/fix/pass2exceptions.json
+- scripts/fix/pass2exceptions.py
+- scripts/fix/root_sign_plus_remover.py
+- scripts/fix/sandhi_contraction_find_replace.py
+- scripts/fix/sanskrit_sutra_bsk.py
+- scripts/fix/sn_set_updater.py
+- scripts/server/update-dpd.sh
+- scripts/session.py
+- tools/add_encoding_declaration.sh
+- tools/addition_class.py
+- tools/ai_deepseek_manager.py
+- tools/ai_open_router.py
+- tools/all_words_in_dpd.py
+- tools/dprint.py
+- tools/fuzzy_search_regex.py
+- tools/gatha_cleaner.py
+- tools/hex_decoder.py
+- tools/ipa.py
+- tools/ipa.tsv
+- tools/link_generator.py
+- tools/missing_meanings.py
+- tools/proofreader.tsv
+- tools/time_log.py
+- tools/unpickle.py
+- tools/writemdict/writemdict old.py
+
+## Needs Classification (Stage 2)
+These upstream additions have no local collision. Register them in `registry.json` during Stage 2.
+- .github/workflows/typecheck.yml
+- .graphifyignore
+- .zenodo.json
+- CITATION.cff
+- LICENSE
+- audio/github_release.py
+- db/inflections/inflection_template_files.py
+- db/inflections/templates/a adj east.tsv
+- db/inflections/templates/a adj.tsv
+- db/inflections/templates/a masc east.tsv
+- db/inflections/templates/a masc pl.tsv
+- db/inflections/templates/a masc.tsv
+- db/inflections/templates/a nt east.tsv
+- db/inflections/templates/a nt irreg.tsv
+- db/inflections/templates/a nt pl.tsv
+- db/inflections/templates/a nt.tsv
+- db/inflections/templates/a ordin east.tsv
+- db/inflections/templates/a ordin.tsv
+- db/inflections/templates/a perf.tsv
+- db/inflections/templates/a pp east.tsv
+- db/inflections/templates/a pp.tsv
+- db/inflections/templates/a pron east.tsv
+- db/inflections/templates/a pron.tsv
+- db/inflections/templates/a ptp.tsv
+- db/inflections/templates/a1 card.tsv
+- db/inflections/templates/a2 card.tsv
+- db/inflections/templates/a2 masc.tsv
+- db/inflections/templates/addasā imperf.tsv
+- db/inflections/templates/addha masc.tsv
+- db/inflections/templates/ahaṃ pron.tsv
+- db/inflections/templates/aka adj.tsv
+- db/inflections/templates/amu pron.tsv
+- db/inflections/templates/ant adj.tsv
+- db/inflections/templates/ant masc.tsv
+- db/inflections/templates/anta adj.tsv
+- db/inflections/templates/anta masc.tsv
+- db/inflections/templates/anta prp.tsv
+- db/inflections/templates/ar fem.tsv
+- db/inflections/templates/ar masc.tsv
+- db/inflections/templates/ar2 masc.tsv
+- db/inflections/templates/arahant masc.tsv
+- db/inflections/templates/as masc.tsv
+- db/inflections/templates/assosi aor.tsv
+- db/inflections/templates/ati fut.tsv
+- db/inflections/templates/ati pr.tsv
+- db/inflections/templates/atthi pr.tsv
+- db/inflections/templates/avaca imperf.tsv
+- db/inflections/templates/avoca aor.tsv
+- db/inflections/templates/aī adj.tsv
+- db/inflections/templates/aī ordin.tsv
+- db/inflections/templates/bhavant masc.tsv
+- db/inflections/templates/brahma masc.tsv
+- db/inflections/templates/brūti pr.tsv
+- db/inflections/templates/catu card.tsv
+- db/inflections/templates/cha card.tsv
+- db/inflections/templates/dajjā opt.tsv
+- db/inflections/templates/dakkhati pr.tsv
+- db/inflections/templates/dammi pr.tsv
+- db/inflections/templates/ddasa aor.tsv
+- db/inflections/templates/dvi card.tsv
+- db/inflections/templates/eka adj.tsv
+- db/inflections/templates/eka card.tsv
+- db/inflections/templates/ekacca pron.tsv
+- db/inflections/templates/enta prp.tsv
+- db/inflections/templates/esi aor.tsv
+- db/inflections/templates/essa cond.tsv
+- db/inflections/templates/eti pr 2.tsv
+- db/inflections/templates/eti pr.tsv
+- db/inflections/templates/eyya opt.tsv
+- db/inflections/templates/go masc.tsv
+- db/inflections/templates/hanati pr.tsv
+- db/inflections/templates/hari aor.tsv
+- db/inflections/templates/hiti fut.tsv
+- db/inflections/templates/hosi aor.tsv
+- db/inflections/templates/hoti pr.tsv
+- db/inflections/templates/i adj.tsv
+- db/inflections/templates/i aor aṃsu.tsv
+- db/inflections/templates/i aor issaṃ.tsv
+- db/inflections/templates/i aor isuṃ.tsv
+- db/inflections/templates/i aor.tsv
+- db/inflections/templates/i card.tsv
+- db/inflections/templates/i fem pl.tsv
+- db/inflections/templates/i fem.tsv
+- db/inflections/templates/i masc pl.tsv
+- db/inflections/templates/i masc.tsv
+- db/inflections/templates/i nt.tsv
+- db/inflections/templates/i2 card.tsv
+- db/inflections/templates/ima pron.tsv
+- db/inflections/templates/issa cond.tsv
+- db/inflections/templates/issati fut.tsv
+- db/inflections/templates/jantu masc.tsv
+- db/inflections/templates/jāniyā opt.tsv
+- db/inflections/templates/jāti fem.tsv
+- db/inflections/templates/ka pron.tsv
+- db/inflections/templates/kaci pron.tsv
+- db/inflections/templates/kamma nt.tsv
+- db/inflections/templates/kari aor.tsv
+- db/inflections/templates/karoti pr.tsv
+- db/inflections/templates/kati pron pl.tsv
+- db/inflections/templates/kayirā opt.tsv
+- db/inflections/templates/kubbati pr.tsv
+- db/inflections/templates/lattha aor.tsv
+- db/inflections/templates/māna prp.tsv
+- db/inflections/templates/mātar fem.tsv
+- db/inflections/templates/nadī fem.tsv
+- db/inflections/templates/natthi pr.tsv
+- db/inflections/templates/o letter.tsv
+- db/inflections/templates/onta prp.tsv
+- db/inflections/templates/oti pr.tsv
+- db/inflections/templates/paccabyādhi aor.tsv
+- db/inflections/templates/parisā fem.tsv
+- db/inflections/templates/pivi aor.tsv
+- db/inflections/templates/pokkharaṇī fem.tsv
+- db/inflections/templates/ratti fem.tsv
+- db/inflections/templates/rāja masc.tsv
+- db/inflections/templates/santa adj.tsv
+- db/inflections/templates/santa masc.tsv
+- db/inflections/templates/santa prp.tsv
+- db/inflections/templates/siyā opt.tsv
+- db/inflections/templates/ssa opt.tsv
+- db/inflections/templates/ssati fut.tsv
+- db/inflections/templates/ta pron.tsv
+- db/inflections/templates/ti card.tsv
+- db/inflections/templates/tvaṃ pron.tsv
+- db/inflections/templates/u adj.tsv
+- db/inflections/templates/u fem pl.tsv
+- db/inflections/templates/u fem.tsv
+- db/inflections/templates/u masc pl.tsv
+- db/inflections/templates/u masc.tsv
+- db/inflections/templates/u nt pl.tsv
+- db/inflections/templates/u nt.tsv
+- db/inflections/templates/u root.tsv
+- db/inflections/templates/u ve.tsv
+- db/inflections/templates/ubha pron.tsv
+- db/inflections/templates/ubhaya adj.tsv
+- db/inflections/templates/unta prp.tsv
+- db/inflections/templates/vajjā opt.tsv
+- db/inflections/templates/vī fem.tsv
+- db/inflections/templates/ya pron.tsv
+- db/inflections/templates/yuva masc.tsv
+- db/inflections/templates/ā card.tsv
+- db/inflections/templates/ā fem pl.tsv
+- db/inflections/templates/ā fem.tsv
+- db/inflections/templates/ā imperf.tsv
+- db/inflections/templates/ā letter.tsv
+- db/inflections/templates/ā root.tsv
+- db/inflections/templates/āha perf.tsv
+- db/inflections/templates/āna prp.tsv
+- db/inflections/templates/āsi aor irreg.tsv
+- db/inflections/templates/āsi aor iṃsu.tsv
+- db/inflections/templates/āsi aor.tsv
+- db/inflections/templates/āti pr.tsv
+- db/inflections/templates/ī adj.tsv
+- db/inflections/templates/ī fem pl.tsv
+- db/inflections/templates/ī fem.tsv
+- db/inflections/templates/ī masc pl.tsv
+- db/inflections/templates/ī masc.tsv
+- db/inflections/templates/ū adj.tsv
+- db/inflections/templates/ū fem.tsv
+- db/inflections/templates/ū masc.tsv
+- db/inflections/templates/ṃ ve.tsv
+- db/inflections/templates_index.tsv
+- db/suttas/convert_pts_concordance.py
+- db/suttas/pts_concordance.py
+- db/suttas/pts_concordance.tsv
+- exporter/epitaka/README.md
+- exporter/epitaka/epitaka_exporter.py
+- exporter/webapp/precompressed_index.py
+- exporter/webapp/response_encoding.py
+- exporter/webapp/static/cc_icons.svg
+- go_modules/deconstructor/data/matchdata_test.go
+- go_modules/deconstructor/importer/manualCorrections_test.go
+- go_modules/frequency/setup/2SC_test.go
+- go_modules/frequency/setup/4SYA_test.go
+- go_modules/tools/cleanMachine_test.go
+- gui2/ai_search_window.py
+- gui2/contributor_proposal.py
+- gui2/contributor_tabs.py
+- gui2/data/additions_alice.json
+- gui2/data/checked_alice.csv
+- gui2/data/component_words_ignore.txt
+- gui2/data/contrib_lines_merged.json
+- gui2/data/db_test_exceptions_alice.tsv
+- gui2/data/manual_corrections_alice.tsv
+- gui2/data/pass1_auto_ap.json
+- gui2/data/pass1_auto_bv.json
+- gui2/data/pass1_auto_cp.json
+- gui2/data/pass1_auto_pv.json
+- gui2/data/pass1_auto_vv.json
+- gui2/field_help.json
+- gui2/field_help.py
+- gui2/filter_logic.py
+- gui2/inflection_templates_tab_view.py
+- gui2/pass1_context.py
+- gui2/pass2_eg_manager.py
+- gui2/pass2_pre_translations.py
+- gui2/preview.py
+- gui2/save_router.py
+- gui2/shortcuts_dialog.py
+- gui2/spelling_find_replace_view.py
+- misc/inflection_templates_legacy.xlsx
+- misc/jev-quickstart.md
+- newsletter/2026-10/newsletter.md
+- newsletter/README.md
+- newsletter/newsletter_build.py
+- newsletter/newsletter_template.md
+- newsletter/useful_links.md
+- resources/other_pali_texts/Kathāsallāpasikkhā_Antonio_August_2026.txt
+- resources/tipitaka.rte
+- scripts/add/example_word_gap_reviewer.py
+- scripts/build/decon_cache_update.py
+- scripts/export/inflections_raw.py
+- scripts/fix/add_agent_nouns_set.py
+- scripts/fix/ati_prefix_to_compound.py
+- scripts/fix/sort_family_sets.py
+- scripts/fix/variant_to_var_text.py
+- scripts/fix/verb_grammar_fixer.py
+- scripts/repo_maintenance/gitignore_cleaner.py
+- scripts/script_template.py
+- scripts/server_contrib/NEW_SERVER_RUNBOOK.md
+- scripts/server_contrib/README.md
+- scripts/server_contrib/add_contributor.sh
+- scripts/server_contrib/config_server.md
+- scripts/server_contrib/config_server.template
+- scripts/server_contrib/contrib_pull.py
+- scripts/server_contrib/contrib_push.py
+- scripts/server_contrib/contrib_reconcile.py
+- scripts/server_contrib/dpd-contrib-pull.service
+- scripts/server_contrib/dpd-contrib-pull.timer
+- scripts/server_contrib/dpd-gui@.service
+- scripts/server_contrib/generate_components_server.py
+- scripts/server_contrib/maintenance_window.py
+- scripts/server_contrib/merge_contrib_files.py
+- scripts/server_contrib/nginx_contrib.conf.template
+- scripts/server_contrib/nginx_contrib_user.conf.template
+- scripts/server_contrib/nginx_status.conf.template
+- scripts/server_contrib/server_setup.sh
+- tools/ai_openai_compat.py
+- tools/contrib_entry.py
+- tools/cst_source/corpus_index.py
+- tools/dharmamitra_client.py
+- tools/docs_update_how_to_cite.py
+- tools/epitaka_sentences.py
+- tools/example_cleaning.py
+- tools/github_api.py
+- tools/hashed_words.py
+- tools/prepare_webapp_lookup.py
+- tools/search_deadline.py
+- tools/server_mode.py
+
+## Unregistered Local Paths (Stage 2)
+These local files have no upstream counterpart (current or historical) and are not covered by any registry category. Classify them in `registry.json`/SMD during Stage 2 (typically `unique_paths`, or a shadow/inspired category if a counterpart exists).
+- .github/workflows/submodules_update.yml
+- db/inflections/inflection_templates.xlsx
+- db/inflections/inflections_raw.py
+- db_tests_gui/add_antonyms.py
+- db_tests_gui/add_antonyms_sync.py
+- db_tests_gui/add_antonyms_sync_dict.json
+- db_tests_gui/add_family_compound_neg.py
+- db_tests_gui/add_family_compound_su_dur.py
+- db_tests_gui/add_family_compound_taddhita.py
+- db_tests_gui/add_hyphenations.json
+- db_tests_gui/add_hyphenations.py
+- db_tests_gui/main.py
+- resources/deconstructor_output
+- scripts/add/add_words_from_egs_&_commentary_columns.py
+- scripts/fix/family_set_update.py
+- scripts/fix/null_remover.py
+- scripts/fix/sandhi_contraction_find_replace.py
+- scripts/server/update-dpd.sh
+- tools/ipa.py
+
+## Upstream-Deleted Orphans (Stage 2)
+These local files match a path upstream once had but has since deleted. Decide during Stage 2 whether to keep them as an intentional fork divergence (register the decision) or delete them locally to match upstream.
+- .github/workflows/opencode.yml
+- .github/workflows/pdf_test.yml
+- db_tests_gui/README.md
+- db_tests_gui/internal_tests.py
+- exporter/kindle/templates/ebook_deconstructor_entry.jinja
+- exporter/mcp/README.md
+- exporter/mcp/__init__.py
+- exporter/mcp/config.py
+- exporter/mcp/server.py
+- exporter/sutta_central/sc_dict.json
+- gui2/ai_search.py
+- resources/other_pali_texts/kathāsallāpasikkhā.old.txt
+- resources/other_pali_texts/kathāsallāpasikkhā.txt
+- resources/syāmaraṭṭha_1927/canon/01_Vinaya_Mahaavi_1.txt
+- resources/syāmaraṭṭha_1927/canon/02_Vinaya_Mahaavi_2.txt
+- resources/syāmaraṭṭha_1927/canon/03_Vinaya_Bhikkhunii.txt
+- resources/syāmaraṭṭha_1927/canon/04_Vinaya_Mahaa_1.txt
+- resources/syāmaraṭṭha_1927/canon/05_Vinaya_Mahaa_2.txt
+- resources/syāmaraṭṭha_1927/canon/06_Vinaya_Culla_1.txt
+- resources/syāmaraṭṭha_1927/canon/07_Vinaya_Culla_2.txt
+- resources/syāmaraṭṭha_1927/canon/08_Vinaya_Parivaara.txt
+- resources/syāmaraṭṭha_1927/canon/09_Sutta_DN_Siilakhanda.txt
+- resources/syāmaraṭṭha_1927/canon/10_Sutta_DN_Mahaa.txt
+- resources/syāmaraṭṭha_1927/canon/11_Sutta_DN_Paatika.txt
+- resources/syāmaraṭṭha_1927/canon/12_Sutta_MN_Muu.txt
+- resources/syāmaraṭṭha_1927/canon/13_Sutta_MN_Ma.txt
+- resources/syāmaraṭṭha_1927/canon/14_Sutta_MN_U.txt
+- resources/syāmaraṭṭha_1927/canon/15_Sutta_SN_Sa.txt
+- resources/syāmaraṭṭha_1927/canon/16_Sutta_SN_Ni.txt
+- resources/syāmaraṭṭha_1927/canon/17_Sutta_SN_Kha.txt
+- resources/syāmaraṭṭha_1927/canon/18_Sutta_SN_Sala.txt
+- resources/syāmaraṭṭha_1927/canon/19_Sutta_SN_Ma.txt
+- resources/syāmaraṭṭha_1927/canon/20_Sutta_AN_1.txt
+- resources/syāmaraṭṭha_1927/canon/21_Sutta_AN_2.txt
+- resources/syāmaraṭṭha_1927/canon/22_Sutta_AN_3.txt
+- resources/syāmaraṭṭha_1927/canon/23_Sutta_AN_4.txt
+- resources/syāmaraṭṭha_1927/canon/24_Sutta_AN_5.txt
+- resources/syāmaraṭṭha_1927/canon/25_Sutta_Khu_Khu.txt
+- resources/syāmaraṭṭha_1927/canon/26_Sutta_Khu_Vimana.txt
+- resources/syāmaraṭṭha_1927/canon/27_Sutta_Khu_Jaa_1.txt
+- resources/syāmaraṭṭha_1927/canon/28_Sutta_Khu_Jaa_2.txt
+- resources/syāmaraṭṭha_1927/canon/29_Sutta_Khu_Ma.txt
+- resources/syāmaraṭṭha_1927/canon/30_Sutta_Khu_Cuu.txt
+- resources/syāmaraṭṭha_1927/canon/31_Sutta_Khu_Pati.txt
+- resources/syāmaraṭṭha_1927/canon/32_Sutta_Khu_Apa_1.txt
+- resources/syāmaraṭṭha_1927/canon/33_Sutta_Khu_Apa_2.txt
+- resources/syāmaraṭṭha_1927/canon/34_Abhi_Dhs.txt
+- resources/syāmaraṭṭha_1927/canon/35_Abhi_Vi.txt
+- resources/syāmaraṭṭha_1927/canon/36_Abhi_Dhaa.txt
+- resources/syāmaraṭṭha_1927/canon/37_Abhi_Ka.txt
+- resources/syāmaraṭṭha_1927/canon/38_Abhi_Ya_1.txt
+- resources/syāmaraṭṭha_1927/canon/39_Abhi_Ya_2.txt
+- resources/syāmaraṭṭha_1927/canon/40_Abhi_Pa_1.txt
+- resources/syāmaraṭṭha_1927/canon/41_Abhi_Pa_2.txt
+- resources/syāmaraṭṭha_1927/canon/42_Abhi_Pa_3.txt
+- resources/syāmaraṭṭha_1927/canon/43_Abhi_Pa_4.txt
+- resources/syāmaraṭṭha_1927/canon/44_Abhi_Pa_5.txt
+- resources/syāmaraṭṭha_1927/canon/45_Abhi_Pa_6.txt
+- resources/syāmaraṭṭha_1927/commentary/01_Vinaya_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/02_Vinaya_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/03_Vinaya_A3.txt
+- resources/syāmaraṭṭha_1927/commentary/04_DN_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/05_DN_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/06_DN_A3.txt
+- resources/syāmaraṭṭha_1927/commentary/07_MN_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/08_MN_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/09_MN_A3.txt
+- resources/syāmaraṭṭha_1927/commentary/10_MN_A4.txt
+- resources/syāmaraṭṭha_1927/commentary/11_SN_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/12_SN_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/13_SN_A3.txt
+- resources/syāmaraṭṭha_1927/commentary/14_AN_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/15_AN_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/16_AN_A3.txt
+- resources/syāmaraṭṭha_1927/commentary/17_Khuddaka_A.txt
+- resources/syāmaraṭṭha_1927/commentary/18_Dha_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/19_Dha_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/20_Dha_A3.txt
+- resources/syāmaraṭṭha_1927/commentary/21_Dha_A4.txt
+- resources/syāmaraṭṭha_1927/commentary/22_Dha_A5.txt
+- resources/syāmaraṭṭha_1927/commentary/23_Dha_A6.txt
+- resources/syāmaraṭṭha_1927/commentary/24_Dha_A7.txt
+- resources/syāmaraṭṭha_1927/commentary/25_Dha_A8.txt
+- resources/syāmaraṭṭha_1927/commentary/26_U_A.txt
+- resources/syāmaraṭṭha_1927/commentary/27_Iti_A.txt
+- resources/syāmaraṭṭha_1927/commentary/28_Sutta_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/29_Sutta_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/30_Vimaana_A.txt
+- resources/syāmaraṭṭha_1927/commentary/31_Peta_A.txt
+- resources/syāmaraṭṭha_1927/commentary/32_Thera_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/33_Thera_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/34_Theri_A.txt
+- resources/syāmaraṭṭha_1927/commentary/35_Jaa_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/36_Jaa_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/37_Jaa_A3.txt
+- resources/syāmaraṭṭha_1927/commentary/38_Jaa_A4.txt
+- resources/syāmaraṭṭha_1927/commentary/39_Jaa_A5.txt
+- resources/syāmaraṭṭha_1927/commentary/40_Jaa_A6.txt
+- resources/syāmaraṭṭha_1927/commentary/41_Jaa_A7.txt
+- resources/syāmaraṭṭha_1927/commentary/42_Jaa_A8.txt
+- resources/syāmaraṭṭha_1927/commentary/43_Jaa_A9.txt
+- resources/syāmaraṭṭha_1927/commentary/44_Jaa_A10.txt
+- resources/syāmaraṭṭha_1927/commentary/45_Nid_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/46_Nid_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/47_Patisam_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/48_Patisam_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/49_Apa_A1.txt
+- resources/syāmaraṭṭha_1927/commentary/50_Apa_A2.txt
+- resources/syāmaraṭṭha_1927/commentary/51_Buddhavamsa_A.txt
+- resources/syāmaraṭṭha_1927/commentary/52_Cariya_A.txt
+- resources/syāmaraṭṭha_1927/commentary/53_Dhs_A.txt
+- resources/syāmaraṭṭha_1927/commentary/54_Vibh_A.txt
+- resources/syāmaraṭṭha_1927/commentary/55_Panca_A.txt
+- resources/syāmaraṭṭha_1927/commentary/56_Milindapanha.txt
+- resources/syāmaraṭṭha_1927/commentary/57_Visuddhimagga_1.txt
+- resources/syāmaraṭṭha_1927/commentary/58_Visuddhimagga_2.txt
+- resources/syāmaraṭṭha_1927/commentary/59_Visuddhimagga_3.txt
+- resources/syāmaraṭṭha_1927/commentary/60_Abhidh_s_vi.txt
+- resources/syāmaraṭṭha_1927/commentary/61_Visuddhi_tika_1.txt
+- resources/syāmaraṭṭha_1927/commentary/62_Visuddhi_tika_2.txt
+- resources/syāmaraṭṭha_1927/commentary/63_Visuddhi_tika_3.txt
+- resources/syāmaraṭṭha_1927/commentary/64_Vinaya_tika_1.txt
+- resources/syāmaraṭṭha_1927/commentary/65_Vinaya_tika_2.txt
+- resources/syāmaraṭṭha_1927/commentary/66_Vinaya_tika_3.txt
+- resources/syāmaraṭṭha_1927/commentary/67_Vinaya_tika_4.txt
+- resources/syāmaraṭṭha_1927/commentary/68_Mangalatthadiipanii_1.txt
+- resources/syāmaraṭṭha_1927/commentary/69_Mangalatthadiipanii_2.txt
+- resources/syāmaraṭṭha_1927/commentary/70_Bhikkhupaatimokkhapaali.txt
+- scripts/add/add_additions_to_db.py
+- scripts/add/vagga_codes/__init__.py
+- scripts/add/vagga_codes/an.py
+- scripts/add/vagga_codes/apply.py
+- scripts/add/vagga_codes/dhp_m2.py
+- scripts/add/vagga_codes/kn.py
+- scripts/add/vagga_codes/kn_suggestions.py
+- scripts/add/vagga_codes/mn.py
+- scripts/add/vagga_codes/runner.py
+- scripts/add/vagga_codes/shared.py
+- scripts/add/vagga_codes/sn.py
+- scripts/build/newsletter_processed.json
+- scripts/build/newsletter_scraper.py
+- scripts/build/tarball_deconstructor_output.py
+- scripts/cl/README.md
+- scripts/cl/dpd-anki
+- scripts/cl/dpd-bhashini
+- scripts/cl/dpd-build-db
+- scripts/cl/dpd-example
+- scripts/cl/dpd-gui
+- scripts/cl/dpd-gui2
+- scripts/cl/dpd-kill-webapp
+- scripts/cl/dpd-makedict
+- scripts/cl/dpd-sandhi
+- scripts/cl/dpd-webapp
+- scripts/extractor/_load_cpd.py
+- scripts/extractor/_read_cpd.py
+- scripts/extractor/extract_cpd.py
+- scripts/fix/family_word_remover.py
+- scripts/fix/fix_synonym_entries.json
+- scripts/fix/fix_synonym_entries.py
+- scripts/fix/gitignore_cleaner.py
+- scripts/fix/meaning_lit_fixer.py
+- scripts/fix/nir_add_to_family_compound.py
+- scripts/fix/pass2exceptions.json
+- scripts/fix/pass2exceptions.py
+- scripts/fix/root_sign_plus_remover.py
+- scripts/fix/sanskrit_sutra_bsk.py
+- scripts/fix/sn_set_updater.py
+- scripts/session.py
+- tools/add_encoding_declaration.sh
+- tools/addition_class.py
+- tools/ai_deepseek_manager.py
+- tools/ai_open_router.py
+- tools/all_words_in_dpd.py
+- tools/dprint.py
+- tools/fuzzy_search_regex.py
+- tools/gatha_cleaner.py
+- tools/hex_decoder.py
+- tools/ipa.tsv
+- tools/link_generator.py
+- tools/missing_meanings.py
+- tools/proofreader.tsv
+- tools/time_log.py
+- tools/unpickle.py
+- tools/writemdict/writemdict old.py
+
+## Stage 1 Blocker Paths
+Resolve these paths before running `execute_sync.py`; rerun prep after registry/SMD or run-specific scope changes.
+- exporter/kindle/templates/ebook_deconstructor_entry.jinja
