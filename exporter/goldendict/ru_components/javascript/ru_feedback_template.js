@@ -47,7 +47,7 @@ function ru_makeFeedback(data) {
     </p>
     <p>
         <a class="dpd-link"
-        href="https://digitalpalidictionary.github.io/how_to_cite/">
+        href="https://devamitta.github.io/dpd.rus/how_to_cite/">
         Как цитировать</a><span>. DPD обновляется каждый месяц, поэтому, пожалуйста, указывайте версию, которой вы пользовались.</span>
     </p>
     <p>

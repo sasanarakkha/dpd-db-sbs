@@ -70,7 +70,10 @@ Before marking any task complete, verify:
       4. `uv run --with pyrefly pyrefly check --min-severity warn <file>`
       5. `uv run pytest tests/test_<thread_name>.py -v`
       **Do NOT report completion until every command passes.**
-      Pyrefly warnings count as failures unless explicitly approved by the user.
+      Pyrefly errors count as failures. Pyrefly warnings should be fixed
+      unless there is a good reason not to (e.g. upstream parity, or another
+      checker requires the flagged construct) — list each one left, with its
+      reason, in the completion report.
       **NEVER use bare `uv run pytest` without a specific file path —
       parallel bash calls spawn concurrent processes and cause macOS memory
       explosions (91 GB+). Enforced by `~/.claude/hooks/guard_pytest.sh`.**

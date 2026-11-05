@@ -22,7 +22,7 @@ while true; do
 done
 
 echo "Config:"
-python -c "from tools.configger import print_config_settings; print_config_settings(['dictionary', 'goldendict', 'exporter'])"
+python -c "from tools.configger import config; from tools.printer import printer as pr; [(pr.green(f'[{s}]'), [pr.green(f'{k} = {v}') for k, v in config.items(s)]) for s in ['dictionary', 'goldendict', 'exporter'] if config.has_section(s)]"
 
 while true; do
     echo -ne "\033[1;36m generate_components?\033[0m"

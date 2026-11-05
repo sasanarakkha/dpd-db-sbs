@@ -221,7 +221,7 @@ files.
    Then run:
    - `uv run python3 kamma/upstream_sync/scripts/validate_registry.py`
 
-**Do NOT report completion until all checks pass.** This is non-negotiable. Do not skip or defer these. Pyrefly warnings count as failures unless explicitly approved by the user. Type safety is mandatory, not optional.
+**Do NOT report completion until all checks pass.** This is non-negotiable. Do not skip or defer these. Pyrefly errors are failures (the pre-commit hook blocks on errors only). Pyrefly warnings in files you touch should be fixed unless there is a good reason not to — e.g. the code is upstream-sourced and fixing it would break upstream parity, or another checker requires the flagged construct (pyright needs the `cast`). List every warning left in place, with its reason, in the completion report. Type safety is mandatory, not optional.
 - **Verification:** Write tests for accurate data output (not UI components). Readme MUST be updated.
 - **Research:** Always perform Google Search for framework/OS quirks.
 - **Sync Tracking:** Only track and update exporters in the sync registry that contain localized data (Russian, SBS, or DPS-specific).

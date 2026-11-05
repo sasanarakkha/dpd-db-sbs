@@ -302,6 +302,12 @@ have local edits — register them or let them be overwritten," not "preserve th
   `docs/`. The only maintained docs surface is `docs_rus/` (a direct translation of
   `docs/` with the few documented no-translate exceptions). Local files that have crept
   into `docs/` are removed to match upstream unless something local references them.
+- **RU surfaces link RU docs.** When porting upstream docs links
+  (`https://digitalpalidictionary.github.io/<page>/`) into RU shadows (webapp
+  `ru_templates/`, GoldenDict `ru_components/`, kindle RU, etc.), rewrite them to
+  `https://devamitta.github.io/dpd.rus/<page>/`. If `docs_rus/<page>.md` does not exist
+  yet, confirm the page is in `docs_translation_queue.md` and note the dependency in
+  `handoff.md`.
 - **`audio/` is always synced with upstream.** No local audio scripts are maintained;
   upstream-deleted audio files are deleted locally to match.
 - **`scripts/*` folders are plain upstream sync targets.** Local-only READMEs or helper

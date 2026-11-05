@@ -163,3 +163,46 @@ This document provides a unified, exhaustive post-mortem of the Upstream Sync Re
 - The authoritative Kindle mobi is always the CI/kindlegen build. macOS local `.mobi` output is a diagnostic stub only — never distribute it and never treat its size as a build-health signal.
 - Enforced in code: the macOS branch of `make_mobi` (`kindle_exporter_ru.py`) now prints a `pr.amber(...)` warning instead of a false "Converted" success. Keep that warning on future syncs.
 
+
+## 24. `execute_sync.py` P0 Deletion Propagation Defects (November 2026)
+**Issue:** `propagate_upstream_deletions` crashed mid-P0 calling `Path.unlink()` on a submodule gitlink dir (`resources/deconstructor_output`, EPERM). It also ran `git diff --name-only` without `-z`, so non-ASCII paths (`syāmaraṭṭha_1927`, `kathāsallāpasikkhā`) came back C-quoted and were silently skipped. P0 had to be completed by hand (227 files removed; gitlink removed with `git update-index --force-remove`). Related: `execute_sync.py --dry-run` refuses a dirty tree, so it cannot verify before the pre-pull commit. `verify_manifest` also rejects an acknowledged-blockers file that still names a cleared blocker.
+**Recommendation:**
+- Use `git diff -z --name-only` and split on `\0`. Detect gitlinks (mode `160000`) and remove them with `git rm --cached` / `update-index --force-remove`, never `unlink`.
+- Let `--dry-run` run on a dirty tree, since it does not mutate anything.
+- Make stale acknowledged blockers a warning, not a rejection, or have the prep rerun rewrite the ack file.
+
+## 25. Sync Tooling Reads the Wrong Tree or Ignores Registry Categories (November 2026)
+**Issue:**
+- `tests/test_shadow_cleanup.py` lists `git ls-tree HEAD`. Before the sync commit it therefore reported every staged deletion as an orphan (126/137 hits were noise). It also ignores the `inspired_by_upstream` category and `skip_sync_patterns` (`scripts/archive/`).
+- `sync_status.py --instructions` infers the stage from which files exist (`dynamic_plan.md`). It reported "Stage 3" during 2b and again at Stage 4.
+- `validate_registry.py` checks that upstream source paths exist in the repo root. It fails before the pull for a repointed upstream path that only exists after the pull.
+- `prep_report` "Needs Classification" says "register them", which contradicts the mirror-without-registry policy.
+**Recommendation:** The orphan scanner should read the index (`git ls-files`) and honour every registry category plus `skip_sync_patterns`. `sync_status.py` should read the handoff status line or the plan checkboxes. The registry validator should check repointed upstream paths against `upstream/<to_sha>` instead of the working tree. Fix the prep_report wording.
+
+## 26. Subagent Lint Commands Must Use Literal File Paths (November 2026)
+**Issue:** sync-fast ran `f=<file> && ... ruff check --fix $f && ruff format $f` after a failing step. `$f` was empty, so ruff fixed and formatted the whole repo, including the `resources/*` submodules. Repair needed byte-exact classification (current == ruff(HEAD) → restore HEAD) across 48 main-repo files and 4 submodules, plus hand reconstruction where the user had their own edits.
+**Recommendation:** Dispatch prompts must spell out every lint/format command with literal file paths: no shell variables, no `&&`-chained variable assignment. Never run `ruff --fix`/`ruff format` without an explicit path argument.
+
+## 27. `tests/` Is skip_sync, So Prep Cannot See Test Drift (November 2026)
+**Issue:** Because `tests/` is skip_sync, prep cannot see three kinds of test drift:
+- 36 pre-range test orphans had to be found manually.
+- New upstream tests that hard-code local-extended lists (`tests/gui2/test_main.py` TAB_LABELS without `"DPS"`) could not be registered: a registry entry under `tests/` overlaps skip_sync and fails validation.
+- Local golden tests broke on upstream import renames.
+**Recommendation:** Stage 2a must run an explicit `git diff --name-status <from>..<to> -- tests/` and AST-scan the local `tests/` for imports of symbols that changed upstream. Record upstream-test watch items in the owning source file's `watch_for`.
+
+## 28. Re-verify 2a/2b Facts and Dry-run Plan Verify Commands (November 2026)
+**Issue:** Several 2a/2b findings were factually wrong and only caught while writing 2c:
+- `submodules_update.yml` was reported absent but is present and registered.
+- RU kindle nav "dead links" were claimed but do not exist.
+- The Kindle blocker was mapped to a non-existent RU path, because the registry is dir-level for kindle templates.
+- `skip_sync_patterns` was misread as "local keep" (it is analysis-only).
+- D1 "verbatim .gitignore" missed the `.claude/` tracking conflict.
+
+Many plan Verify commands failed as written: the flet version attribute (`flet.version.flet_version`), `curl -sI` against a GET-only route (405), a `dhamma 1` query with no such headword, a `show_tbw` count of 5 vs actual 4, and `tests/test_kindle_jinja.py` (no test functions).
+
+Separately, the kamma spec-gate hook blocks all non-kamma edits whenever any `kamma/threads/*` dir lacks spec/plan.
+**Recommendation:** 2c recipe writing must re-verify every 2a/2b claim against the actual files before relying on it. Every Verify command must be dry-run once when written. Park draft threads in `kamma/drafts/`, never `kamma/threads/`.
+
+## 29. Framework-Version Migration Audits Need AST + Pinned Probes (November 2026)
+**Issue:** The 2a grep-based Flet 0.x→1.0 audit missed instance-method removals (`Page.set_clipboard`) and silent renames (bare `TextField.error_text` → `error`).
+**Recommendation:** For framework major-version migrations, AST-scan every `ft.*` attribute/call in local files. Probe questionable APIs against the target version with `uv run --no-project --with flet==<ver> python -c ...`. Shell gotcha seen twice: in zsh, `$SHA:path` triggers modifier expansion (`:e`, `:g`). Always write `${SHA}:path`, and avoid bare `=====` in `echo`.

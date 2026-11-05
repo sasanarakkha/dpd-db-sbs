@@ -25,8 +25,11 @@ def load_additions_data(json_path: Path) -> dict[str, int]:
     """
     additions_data = json.loads(json_path.read_text(encoding="utf-8"))
 
-    id_mapping = {}
+    id_mapping: dict[str, int] = {}
     for entry in additions_data:
+        # rejected additions are logged without id / id_add
+        if entry.get("_rejected"):
+            continue
         id_add = str(entry["id_add"])
         id_val = entry["id"]
         id_mapping[id_add] = id_val

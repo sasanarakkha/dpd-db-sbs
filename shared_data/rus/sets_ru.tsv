@@ -2,6 +2,7 @@
 Sanskritisms	Санскритизмы
 Sri Lanka	Шри-Ланка
 abbreviations	сокращения
+agent nouns	существительные со значением деятеля
 animals	животные
 astronomical terms	астрономические термины
 bhikkhupātimokkha rules	правила Бхиккху Патимоккхи
@@ -16,6 +17,7 @@ books of the Saṃyutta Nikāya	книги Самьютта Никаи
 books of the Suttapiṭaka	книги Суттапитаки
 books of the Vinayapiṭaka	книги Винаяпитаки
 cardinal numbers	количественные числительные
+castes	касты
 cattāro oghā	cattāro oghā
 chapters of the Jātakas	главы Джатак
 chapters of the Majjhima Nikāya	главы Маджхима Никаи
@@ -67,6 +69,7 @@ measures of time	меры времени
 measures of volume	меры объема
 measures of weight	меры веса
 medicines	лекарства
+metres	размеры стиха
 mita guṇa	измеренные качества
 money	деньги
 months of the lunar year	месяцы лунного года
@@ -112,6 +115,7 @@ previous incarnations of the Buddha	предыдущие воплощения Б
 previous incarnations of Ānanda	предыдущие воплощения Ананды
 pronouns	местоимения
 pureland deities	божества Чистой Земли
+reasons for a discourse	основания для наставления
 root groups	группы корней
 saṃyuttas of the Saṃyutta Nikāya	самьютты Самьютта-никаи
 seasons	сезоны
@@ -200,6 +204,7 @@ suttas of the Theragāthā	сутты Тхерагатхи
 suttas of the Therīgāthā	сутты Тхеригатхи
 suttas of the Udāna	сутты Уданы
 suttas of the Vimānavatthu	сутты Виманаватту
+sweets	сладости
 tastes	вкусы
 ten kinds of wives	десять типов жен
 three daughters of Mara	три дочери Мары
@@ -211,6 +216,7 @@ types of ariyas	типы ариев
 types of ariyas.	типы арьев
 types of ascetics	типы аскетов
 types of elephants	виды слонов
+types of faith	виды веры
 types of lightning	типы молний
 types of monastics	типы монашества
 types of supernatural beings	типы сверхъестественных существ
@@ -344,3 +350,4 @@ villages, towns and cities	деревни, поселки и города
 vinaya offences	нарушения винаи
 weapons	оружие
 ā for emphasis	ā для акцента
+ā instrumental	инструментальный падеж на -ā
