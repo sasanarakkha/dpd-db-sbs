@@ -1,216 +1,559 @@
-"""AI-Powered Dictionary Proofreading System."""
+"""AI-Powered Dictionary Proofreading System.
 
+Proofreads three fields, each into its own queue TSV + incremental cache:
+
+- ``meaning_1``   — every entry with a non-empty meaning_1.
+- ``meaning_lit`` — every entry with a non-empty meaning_lit; the prompt is fed
+  the entry's meaning_1 as read-only context, because meaning_lit is a
+  deliberately literal gloss that must NOT be made more idiomatic.
+- ``meaning_2``   — only entries where meaning_1 is empty (meaning_2 is then the
+  primary meaning).
+
+Each field keeps an id -> last-checked-source-text cache so re-runs only
+re-proofread entries whose source text changed.
+"""
+
+import argparse
 import csv
 import json
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from filelock import FileLock
 from sqlalchemy.orm import Session
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword
-from tools.ai_manager import AIManager
+from tools.ai_manager import AIManager, AIResponse
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 
 
-def get_db_data(db_session: Session) -> list[dict[str, Any]]:
-    """Query DpdHeadword table for entries with meanings."""
-    results = db_session.query(DpdHeadword).filter(DpdHeadword.meaning_1 != "").all()
-    return [
-        {"id": r.id, "lemma_1": r.lemma_1, "meaning_1": r.meaning_1} for r in results
-    ]
+@dataclass
+class ProofreadField:
+    """One proofreading pass: which DB field, where its queue/cache live, and
+    how to build its prompt."""
+
+    name: str
+    tsv_path: Path
+    cache_path: Path
+    context_field: str | None = None
+    only_empty_meaning_1: bool = False
+    require_meaning_1: bool = False
+    include_pos: bool = False
+
+
+def get_db_data(
+    db_session: Session,
+    field: str = "meaning_1",
+    context_field: str | None = None,
+    only_empty_meaning_1: bool = False,
+    require_meaning_1: bool = False,
+    include_pos: bool = False,
+) -> list[dict[str, Any]]:
+    """Query DpdHeadword for entries with a non-empty ``field``.
+
+    ``context_field`` (e.g. meaning_1 for a meaning_lit pass) is included in each
+    row so the prompt can show it as read-only context. ``only_empty_meaning_1``
+    restricts the pass to entries whose meaning_1 is empty; ``require_meaning_1``
+    restricts it to entries whose meaning_1 is non-empty (the meaning_lit pass
+    only proofreads glosses that have a dictionary meaning to judge against).
+    ``include_pos`` adds the part of speech so the model can judge the meaning
+    against it.
+    """
+    column = getattr(DpdHeadword, field)
+    query = db_session.query(DpdHeadword).filter(column != "")
+    if only_empty_meaning_1:
+        query = query.filter(DpdHeadword.meaning_1 == "")
+    if require_meaning_1:
+        query = query.filter(DpdHeadword.meaning_1 != "")
+
+    rows: list[dict[str, Any]] = []
+    for r in query.all():
+        row: dict[str, Any] = {
+            "id": r.id,
+            "lemma_1": r.lemma_1,
+            field: getattr(r, field),
+        }
+        if include_pos:
+            row["pos"] = r.pos
+        if context_field:
+            row[context_field] = getattr(r, context_field)
+        rows.append(row)
+    return rows
 
 
 def batch_data(
-    data: list[dict[str, Any]], batch_size: int = 50
+    data: list[dict[str, Any]], batch_size: int = 25
 ) -> list[list[dict[str, Any]]]:
     """Split data into chunks."""
     return [data[i : i + batch_size] for i in range(0, len(data), batch_size)]
 
 
-def construct_prompt(batch: list[dict[str, Any]]) -> str:
-    """Format the batch into a JSON-like prompt."""
+_OXFORD_SPELLING = """\
+SPELLING — READ THIS TWICE. This dictionary uses Oxford British English, which spells these verbs and their derivatives with a Z, not an S. The Z spelling is CORRECT. It is NOT an Americanism and NOT a mistake. Never change a Z to an S.
+
+CORRECT (leave alone, never "fix"): realize, realized, realizing, realization, recognize, recognized, organize, organized, organization, criticize, criticized, apologize, characterize, civilize, emphasize, equalize, familiarize, harmonize, idolize, memorize, minimize, mobilize, moralize, normalize, stabilize, sympathize, utilize.
+
+WRONG (change these to the Z form): realise, realised, realising, realisation, recognise, recognised, organise, organised, organisation, criticise, criticised, apologise, characterise, civilise, emphasise, equalise, familiarise, harmonise, idolise, memorise, minimise, mobilise, moralise, normalise, stabilise, sympathise, utilise.
+
+Two sets of genuine exceptions that take an S and must KEEP it. Never change these to a Z:
+
+- verbs where -ise is part of the stem, not a suffix: advertise, advise, arise, chastise, comprise, compromise, despise, devise, disguise, exercise, improvise, revise, supervise, surmise, surprise, televise.
+- -lyse/-yse verbs, which are NOT -ize words even in Oxford spelling: analyse, paralyse, catalyse (and analysed, analysing, paralysed).
+"""
+
+_HOUSE_STYLE = """\
+HOUSE STYLE. These spellings are already CORRECT. They are NOT mistakes. Never "fix" them, and never replace them with the more common English form:
+
+'Brahman' is the correct spelling. 'Brahmin' is WRONG. If the text says 'Brahman', LEAVE IT — do not change it to 'Brahmin'. If the text says 'Brahmin', change it to 'Brahman'.
+
+'daemon' is the correct spelling. 'demon' is WRONG. If the text says 'daemon', LEAVE IT — do not change it to 'demon'. If the text says 'demon', change it to 'daemon'.
+
+Large numbers use spaces between thousands, not commas. '100 000 000' is correct and must be LEFT ALONE. '100,000,000' is wrong — change it to '100 000 000'.
+
+Pāḷi words and proper names keep their diacritics exactly as written (Aṅga, Jāṇussoṇi, Pāḷi). Never strip or alter a diacritic.
+
+'having not' is the correct word order here and renders the Pāḷi accurately (e.g. 'having not gone', 'having not eaten'). LEAVE IT AS IT IS. Do not reorder it to 'not having'. Only change it in the rare case where the sentence is genuinely unreadable as written — if in any doubt at all, leave it alone.
+"""
+
+
+def _dictionary_prompt(field: str) -> str:
+    """Instructions for the dictionary-meaning fields (meaning_1, meaning_2)."""
+    return f"""\
+You are proofreading dictionary '{field}' entries for clear, obvious spelling mistakes and clear grammatical errors ONLY.
+
+{_OXFORD_SPELLING}
+Semicolons separate alternative synonyms and are the normal structure of these entries. NEVER change a semicolon to a comma, and NEVER add 'and' or 'or' to a semicolon-separated list — 'mastering; controlling; governing' is CORRECT as it stands and must be left exactly alone.
+
+The Oxford (serial) comma rule applies ONLY inside a run of three or more items already separated by commas and ending in 'and'/'or': put a comma before that final 'and'/'or' (e.g. 'past, present, and future', never 'past, present and future'). Do NOT add a comma to two-item phrases like 'black and white' or 'here and there'. If the entry has no comma-separated list ending in 'and'/'or', the Oxford comma rule does not apply at all. Adding a genuinely missing Oxford comma IS a correction you should make.
+
+If you are unsure whether something is actually wrong, omit that entry entirely — do not guess.
+
+Do NOT change the meaning, word choice, punctuation style, semicolon conventions, or abbreviations like (comm), other than adding a missing Oxford comma.
+
+Do NOT add extra meanings — only correct what is already there.
+
+Do NOT add a full stop at the end.
+
+The 'pos' (part of speech) is given as context — use it to judge whether the wording fits the part of speech. For an agent noun, a meaning that starts with 'who ...' (e.g. 'who does such and such') is correct and idiomatic here — do NOT change it to 'one who ...'.
+
+{_HOUSE_STYLE}
+
+Do NOT rewrite for style. Do NOT rephrase correct sentences. Only fix genuine typos, genuine grammatical errors, and missing Oxford commas.
+"""
+
+
+def _literal_prompt(field: str, context_field: str) -> str:
+    """Instructions for meaning_lit — a literal, word-for-word English gloss."""
+    return f"""\
+You are proofreading '{field}', a deliberately LITERAL, word-for-word English rendering of a Pāḷi word (its '{context_field}' dictionary definition is shown alongside for context). It is meant to be a literal English version of the Pāḷi, NOT grammatical English — second-language translators use it to render into their own language, so it may read as ungrammatical English and that is correct and expected.
+
+{_OXFORD_SPELLING}
+{_HOUSE_STYLE}
+Do NOT correct grammar: the wording is grammatical in Pāḷi even when it is ungrammatical in English.
+
+Focus ONLY on genuine spelling mistakes, judged in relation to '{context_field}'.
+
+Do NOT add unnecessary punctuation — a comma only where genuinely necessary, little else, and no full stop at the end.
+
+Do NOT change '{context_field}' — it is shown as context only.
+
+If you are unsure whether something is actually wrong, omit that entry entirely — do not guess.
+"""
+
+
+def construct_prompt(
+    batch: list[dict[str, Any]],
+    field: str = "meaning_1",
+    context_field: str | None = None,
+) -> str:
+    """Format the batch into a JSON-like prompt for the given field."""
     batch_json = json.dumps(batch, ensure_ascii=False, indent=2)
+    corrected_field = f"{field}_corrected"
+
+    if context_field:
+        body = _literal_prompt(field, context_field)
+    else:
+        body = _dictionary_prompt(field)
+
     return (
-        "Correct the spelling and grammar of the following dictionary meanings. "
-        "Correct all spelling mistakes, and only serious grammatical errors. "
-        "Phrases starting with 'who ...' are ok, unless there's another problem. "
-        "Separate meanings with a semicolon. "
-        "DO NOT add a fulltop at the end of the meaning. "
-        "DO NOT add a fullstop to abbreaviations like (comm). "
-        "Use standard British English spelling. "
-        "Return the result as a JSON list of objects with 'id' and 'meaning_1_corrected' fields. "
-        "IMPORTANT: Only include entries in the JSON list that actually required a correction. "
-        "DO NOT write any additional notes. "
-        "If a meaning is already correct, do not include it in the output. "
-        "Do not change the meaning, only fix errors.\n\n"
+        f"""\
+{body}
+Return the result as a JSON list of objects with 'id' and '{corrected_field}' fields.
+
+IMPORTANT: Only include entries in the JSON list that actually required a correction. DO NOT write any additional notes. If an entry is already correct, do not include it in the output.
+
+"""
         f"{batch_json}"
     )
+
+
+PRIMARY_PROVIDER = "zai"
+PRIMARY_MODEL = "glm-5.2"
+FALLBACK_PROVIDER = "deepseek"
+FALLBACK_MODEL = "deepseek-v4-pro"
+
+
+def _parse_corrected_list(response: AIResponse) -> list[dict[str, Any]] | None:
+    """Parse a raw AI response into a list of correction dicts, or None on failure."""
+    if not response.content:
+        pr.red(f"Error: No content from AI: {response.status_message}")
+        return None
+
+    try:
+        content = response.content.strip()
+        # Handle potential markdown formatting
+        if content.startswith("```json"):
+            content = content.replace("```json", "", 1)
+        if content.endswith("```"):
+            content = content.rsplit("```", 1)[0]
+
+        corrected_list = json.loads(content)
+        if isinstance(corrected_list, list):
+            return corrected_list
+        pr.red(f"Error: AI response is not a list: {response.content}")
+        return None
+    except json.JSONDecodeError:
+        pr.red(f"Error decoding JSON from AI response: {response.content}")
+        return None
 
 
 def process_batch(
     ai_manager: AIManager,
     batch: list[dict[str, Any]],
-    model: str,
-) -> list[dict[str, Any]]:
-    """Send a batch to the AI and parse the response."""
-    prompt = construct_prompt(batch)
+    field: str = "meaning_1",
+    context_field: str | None = None,
+) -> tuple[bool, list[dict[str, Any]]]:
+    """Send a batch to the AI, trying the primary model then a fallback.
 
-    # Using AIManager allows for fallback and easy model switching.
-    # Specify OpenRouter and the free model as requested.
+    Returns (success, corrections). success is False only when both models
+    failed to return parseable JSON — the caller must not treat that batch as
+    checked, so it gets retried on the next run instead of being cached as done.
+    """
+    prompt = construct_prompt(batch, field, context_field)
+
     response = ai_manager.request(
         prompt=prompt,
-        provider_preference="openrouter",
-        model=model,
+        provider_preference=PRIMARY_PROVIDER,
+        model=PRIMARY_MODEL,
+    )
+    corrected_list = _parse_corrected_list(response)
+    if corrected_list is not None:
+        return True, corrected_list
+
+    pr.amber(
+        f"{PRIMARY_PROVIDER}/{PRIMARY_MODEL} failed, "
+        f"retrying with {FALLBACK_PROVIDER}/{FALLBACK_MODEL}."
+    )
+    response = ai_manager.request(
+        prompt=prompt,
+        provider_preference=FALLBACK_PROVIDER,
+        model=FALLBACK_MODEL,
+    )
+    corrected_list = _parse_corrected_list(response)
+    if corrected_list is not None:
+        return True, corrected_list
+
+    return False, []
+
+
+BATCH_SIZE = 25
+
+
+def tsv_fieldnames(field: str) -> list[str]:
+    """Column order for a field's queue TSV."""
+    return ["id", "lemma_1", field, f"{field}_corrected"]
+
+
+def load_checked_cache(cache_path: Path) -> dict[str, str]:
+    """Load the id -> last-checked source-text cache. Missing/broken file -> empty."""
+    if not cache_path.exists():
+        return {}
+    try:
+        return json.loads(cache_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as e:
+        pr.red(f"Error loading {cache_path}: {e}")
+        return {}
+
+
+def save_checked_cache(cache_path: Path, cache: dict[str, str]) -> None:
+    """Save the id -> last-checked source-text cache.
+
+    Written atomically (temp file + os.replace) — a truncated in-place write,
+    if killed mid-write, would make load_checked_cache discard the whole
+    cache and force a full re-check, the exact cost this cache exists to avoid.
+    """
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = cache_path.with_suffix(cache_path.suffix + ".tmp")
+    tmp_path.write_text(
+        json.dumps(cache, ensure_ascii=False, indent=2, sort_keys=True),
+        encoding="utf-8",
+    )
+    tmp_path.replace(cache_path)
+
+
+def load_tsv_queue(tsv_path: Path) -> dict[str, dict[str, str]]:
+    """Load the pending-correction queue from the TSV, keyed by id."""
+    if not tsv_path.exists():
+        return {}
+    with open(tsv_path, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f, delimiter="\t")
+        return {row["id"]: row for row in reader if row.get("id") and row["id"] != "id"}
+
+
+def save_tsv_queue(
+    tsv_path: Path, queue: dict[str, dict[str, str]], field: str = "meaning_1"
+) -> None:
+    """Write the pending-correction queue back out, sorted by id.
+
+    Written atomically (temp file + os.replace) — a truncated in-place write
+    could silently drop corrections the user hasn't yet pulled through PRead.
+    """
+    tsv_path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = tsv_path.with_suffix(tsv_path.suffix + ".tmp")
+    with open(tmp_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=tsv_fieldnames(field), delimiter="\t")
+        writer.writeheader()
+        for id_str in sorted(queue, key=int):
+            writer.writerow(queue[id_str])
+    tmp_path.replace(tsv_path)
+
+
+def filter_unchecked(
+    data: list[dict[str, Any]], checked_cache: dict[str, str], field: str = "meaning_1"
+) -> list[dict[str, Any]]:
+    """Keep only entries whose source text has no cache entry or has changed."""
+    return [d for d in data if checked_cache.get(str(d["id"])) != d[field]]
+
+
+def tsv_lock(tsv_path: Path) -> FileLock:
+    """A cross-process lock guarding a proofreader queue TSV.
+
+    The CLI run and gui2's PRead both write these files. A lock alone only
+    serializes access — callers must also reload the queue from disk *while
+    holding the lock*, right before mutating it, rather than trusting an
+    in-memory copy, or a lost-update race (last writer wins) is still possible.
+    """
+    return FileLock(str(tsv_path) + ".lock")
+
+
+def build_corrected_by_id(
+    corrected_batch: list[dict[str, Any]], field: str = "meaning_1"
+) -> dict[str, str]:
+    """Index a batch's corrections by id, normalized to str.
+
+    The model may echo "id" back as a string rather than the int we sent;
+    normalizing here (rather than at each lookup site) keeps the match
+    working regardless of what type the model returns it as.
+    """
+    corrected_field = f"{field}_corrected"
+    return {
+        str(item.get("id")): item.get(corrected_field, "") for item in corrected_batch
+    }
+
+
+def apply_checked_item(
+    tsv_queue: dict[str, dict[str, str]],
+    checked_cache: dict[str, str],
+    item: dict[str, Any],
+    corrected_meaning: str,
+    field: str = "meaning_1",
+) -> None:
+    """Merge one freshly-checked item into the TSV queue and cache, in place.
+
+    Drops any stale queued row for this id (it referred to now-superseded
+    text), adds a fresh row only if a correction was actually found, and
+    marks the id as checked against its current source text.
+    """
+    item_id = str(item["id"])
+    tsv_queue.pop(item_id, None)
+    if corrected_meaning and corrected_meaning != item[field]:
+        row = {
+            "id": item_id,
+            "lemma_1": item["lemma_1"],
+            field: item[field],
+            f"{field}_corrected": corrected_meaning,
+        }
+        tsv_queue[item_id] = row
+    checked_cache[item_id] = item[field]
+
+
+def run_field(
+    ai_manager: AIManager,
+    db_session: Session,
+    field_cfg: ProofreadField,
+) -> None:
+    """Run one proofreading pass for a single field."""
+    field = field_cfg.name
+    print()
+    pr.green_title(f"Proofreading {field}")
+
+    data = get_db_data(
+        db_session,
+        field=field,
+        context_field=field_cfg.context_field,
+        only_empty_meaning_1=field_cfg.only_empty_meaning_1,
+        require_meaning_1=field_cfg.require_meaning_1,
+        include_pos=field_cfg.include_pos,
+    )
+    pr.green(f"Extracted {len(data)} {field} entries from database.")
+
+    checked_cache = load_checked_cache(field_cfg.cache_path)
+    unchecked_data = filter_unchecked(data, checked_cache, field)
+    pr.green(
+        f"{len(unchecked_data)}/{len(data)} {field} entries need checking "
+        f"({len(data) - len(unchecked_data)} unchanged since last check)."
     )
 
-    if response.content:
-        try:
-            content = response.content.strip()
-            # Handle potential markdown formatting
-            if content.startswith("```json"):
-                content = content.replace("```json", "", 1)
-            if content.endswith("```"):
-                content = content.rsplit("```", 1)[0]
+    batches = batch_data(unchecked_data, BATCH_SIZE)
 
-            corrected_list = json.loads(content)
-            if isinstance(corrected_list, list):
-                return corrected_list
-            pr.red(f"Error: AI response is not a list: {response.content}")
-        except json.JSONDecodeError:
-            pr.red(f"Error decoding JSON from AI response: {response.content}")
-    else:
-        pr.red(f"Error: No content from AI: {response.status_message}")
+    total = len(data)
+    already_done = total - len(unchecked_data)
+    checked_this_run = 0
 
-    return []
+    for i, batch in enumerate(batches):
+        pr.green(f"Processing {field} batch {i + 1}/{len(batches)}...")
+        success, corrected_batch = process_batch(
+            ai_manager, batch, field, field_cfg.context_field
+        )
+
+        if not success:
+            pr.red(
+                f"Batch {i + 1} failed on both models; "
+                "leaving these entries unchecked for the next run."
+            )
+            continue
+
+        corrected_by_id = build_corrected_by_id(corrected_batch, field)
+
+        # Reload fresh under the lock rather than trusting an in-memory
+        # copy — gui2's PRead may have popped/saved rows since our last read.
+        with tsv_lock(field_cfg.tsv_path):
+            tsv_queue = load_tsv_queue(field_cfg.tsv_path)
+
+            for item in batch:
+                corrected_meaning = corrected_by_id.get(str(item["id"]), "")
+                apply_checked_item(
+                    tsv_queue, checked_cache, item, corrected_meaning, field
+                )
+
+            save_tsv_queue(field_cfg.tsv_path, tsv_queue, field)
+
+        save_checked_cache(field_cfg.cache_path, checked_cache)
+        checked_this_run += len(batch)
+        done = already_done + checked_this_run
+        pr.green(
+            f"{field} batch: {i + 1}  Done: {done:,}  "
+            f"Remaining: {total - done:,}  Total: {total:,}"
+        )
+
+    pr.green(f"{field} complete. Results in {field_cfg.tsv_path}")
 
 
-def main():
-    batch_size = 100
+def build_field_configs(pth: ProjectPaths) -> list[ProofreadField]:
+    """The three proofreading passes, in priority order."""
+    return [
+        ProofreadField(
+            name="meaning_1",
+            tsv_path=pth.proofreader_tsv_path,
+            cache_path=pth.proofreader_checked_json_path,
+            include_pos=True,
+        ),
+        ProofreadField(
+            name="meaning_lit",
+            tsv_path=pth.proofreader_meaning_lit_tsv_path,
+            cache_path=pth.proofreader_meaning_lit_checked_json_path,
+            context_field="meaning_1",
+            require_meaning_1=True,
+        ),
+        ProofreadField(
+            name="meaning_2",
+            tsv_path=pth.proofreader_meaning_2_tsv_path,
+            cache_path=pth.proofreader_meaning_2_checked_json_path,
+            only_empty_meaning_1=True,
+            include_pos=True,
+        ),
+    ]
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--field",
+        choices=["meaning_1", "meaning_lit", "meaning_2"],
+        help="Run only this field's pass (default: run all three).",
+    )
+    args = parser.parse_args()
+
     pth = ProjectPaths()
-    output_file = pth.proofreader_tsv_path
-    db_path = pth.dpd_db_path
-    model = "nvidia/nemotron-3-nano-30b-a3b:free"
-    # model = "xiaomi/mimo-v2-flash:free"
-    # model = "google/gemini-2.0-flash-exp:free"
-    # model = "mistralai/devstral-2512:free"
-    # model = "z-ai/glm-4.5-air:free"
+    configs = build_field_configs(pth)
+    if args.field:
+        configs = [c for c in configs if c.name == args.field]
 
-    db_session = get_db_session(db_path)
-    data = get_db_data(db_session)
-    pr.green(f"Extracted {len(data)} entries from database.")
-
-    batches = batch_data(data, batch_size)
+    db_session = get_db_session(pth.dpd_db_path)
     ai_manager = AIManager()
 
-    lookup = {d["id"]: d for d in data}
-    output_path = Path(output_file)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-
     try:
-        output_exists = output_path.exists()
-        with open(output_path, "a", newline="", encoding="utf-8") as tsvfile:
-            fieldnames = ["id", "lemma_1", "meaning_1", "meaning_1_corrected"]
-            writer = csv.DictWriter(tsvfile, fieldnames=fieldnames, delimiter="\t")
-            if not output_exists or output_path.stat().st_size == 0:
-                writer.writeheader()
-
-            for i, batch in enumerate(batches):
-                pr.green(f"Processing batch {i + 1}/{len(batches)}...")
-                corrected_batch = process_batch(ai_manager, batch, model)
-
-                batch_results = []
-
-                for item in corrected_batch:
-                    item_id = item.get("id")
-
-                    if item_id in lookup:
-                        original = lookup[item_id]
-
-                        corrected_meaning = item.get("meaning_1_corrected", "")
-
-                        if (
-                            corrected_meaning
-                            and corrected_meaning != original["meaning_1"]
-                        ):
-                            result = original.copy()
-
-                            result["meaning_1_corrected"] = corrected_meaning
-
-                            batch_results.append(result)
-
-                if batch_results:
-                    writer.writerows(batch_results)
-                    tsvfile.flush()
-                    pr.green(f"Batch {i + 1} results written to {output_file}")
-
+        for field_cfg in configs:
+            run_field(ai_manager, db_session, field_cfg)
     except Exception as e:  # noqa: BLE001
         pr.red(f"Error during processing: {e}")
     finally:
         db_session.close()
 
-    pr.green(f"All processing complete. Results saved in {output_file}")
+    pr.green("All processing complete.")
 
 
 class ProofreaderManager:
-    def __init__(self, tsv_path: str | Path):
-        self.tsv_path = Path(tsv_path)
-        self.corrections: list[dict[str, str]] = self.load_corrections()
+    """Drains the per-field correction queues for gui2's PRead button.
 
-    def load_corrections(self) -> list[dict[str, str]]:
-        if not self.tsv_path.exists():
-            return []
-        try:
-            with open(self.tsv_path, "r", encoding="utf-8") as f:
-                reader = csv.DictReader(f, delimiter="\t")
-                # Filter out header rows and empty rows
-                return [row for row in reader if row.get("id") and row["id"] != "id"]
-        except Exception as e:  # noqa: BLE001
-            print(f"Error loading {self.tsv_path}: {e}")
-            return []
+    Constructed with an ordered list of (field, tsv_path); get_next_correction
+    pops from the first non-empty queue and reports which field the row targets
+    so the gui can load it into the right add-field.
+    """
 
-    def save_corrections(self) -> None:
-        try:
-            with open(self.tsv_path, "w", newline="", encoding="utf-8") as f:
-                if not self.corrections:
-                    # Write header even if empty
-                    writer = csv.DictWriter(
-                        f,
-                        fieldnames=[
-                            "id",
-                            "lemma_1",
-                            "meaning_1",
-                            "meaning_1_corrected",
-                        ],
-                        delimiter="\t",
-                    )
-                    writer.writeheader()
-                    return
-
-                fieldnames = list(self.corrections[0].keys())
-                writer = csv.DictWriter(f, fieldnames=fieldnames, delimiter="\t")
-                writer.writeheader()
-                writer.writerows(self.corrections)
-        except Exception as e:  # noqa: BLE001
-            print(f"Error saving {self.tsv_path}: {e}")
+    def __init__(self, queues: list[tuple[str, str | Path]]):
+        self.queues: list[tuple[str, Path]] = [(f, Path(p)) for f, p in queues]
 
     @property
     def count(self) -> int:
-        return len(self.corrections)
+        return sum(len(load_tsv_queue(path)) for _, path in self.queues)
 
-    def get_next_correction(self) -> tuple[dict[str, str] | None, int]:
-        """
-        Retrieves and removes the next correction from the list.
-        Returns a tuple of (correction, remaining_count).
-        """
-        self.corrections = self.load_corrections()
-        if not self.corrections:
-            return None, 0
+    def next_queue_status(self) -> tuple[str | None, int]:
+        """Field name and pending count of the queue PRead will drain next
+        (the first non-empty queue in priority order)."""
+        for field, path in self.queues:
+            n = len(load_tsv_queue(path))
+            if n:
+                return field, n
+        return None, 0
 
-        correction = self.corrections.pop(0)
-        self.save_corrections()
-        return correction, len(self.corrections)
+    def get_next_correction(
+        self,
+    ) -> tuple[dict[str, str] | None, int, str | None]:
+        """Retrieve and remove the next correction across all queues.
+
+        Returns (correction, remaining_total, field). Each queue is reloaded
+        fresh under its own lock rather than trusting an in-memory copy, which
+        may be stale by the time this is called (the CLI writes the same files).
+        """
+        popped: dict[str, str] | None = None
+        popped_field: str | None = None
+
+        for field, path in self.queues:
+            with tsv_lock(path):
+                queue = load_tsv_queue(path)
+                if not queue:
+                    continue
+                first_id = next(iter(queue))
+                popped = queue.pop(first_id)
+                popped_field = field
+                save_tsv_queue(path, queue, field)
+                break
+
+        return popped, self.count, popped_field
 
 
 if __name__ == "__main__":

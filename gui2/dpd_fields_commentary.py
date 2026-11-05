@@ -2,10 +2,12 @@ import flet as ft
 
 from db.models import BoldDefinition
 from gui2.dpd_fields_classes import DpdTextField
-from gui2.dpd_fields_functions import clean_commentary, clean_lemma_1
+from gui2.dpd_fields_functions import clean_lemma_1
+from tools.example_cleaning import clean_commentary
 from gui2.example_stash_manager import ExampleStashManager
 from gui2.flet_functions import process_bold_tags
 from gui2.toolkit import ToolKit
+from gui2.ui_utils import compact_button_style, field_border, request_focus, set_error
 from tools.bold_definitions_search import BoldDefinitionsSearchManager
 from tools.clean_sentence import split_pali_sentence_into_words
 from tools.speech_marks import SpeechMarkManager
@@ -35,7 +37,6 @@ class DpdCommentaryField(ft.Column):
         from gui2.pass2_add_view import Pass2AddView
 
         self.ui: Pass2AddView | Pass1AddView = ui
-        self.page: ft.Page = self.ui.page
         self.field_name = field_name
         self.dpd_fields: DpdFields = dpd_fields
         self.toolkit: ToolKit = toolkit
@@ -58,6 +59,7 @@ class DpdCommentaryField(ft.Column):
         # --- Controls for Toggle Visibility ---
         self.search_field_1 = ft.TextField(
             "",
+            border=field_border(),
             width=200,
             on_focus=self._search_field_1_focus,
             on_submit=self.click_commentary_search,
@@ -66,6 +68,7 @@ class DpdCommentaryField(ft.Column):
         )
         self.search_field_2 = ft.TextField(
             "",
+            border=field_border(),
             width=200,
             on_submit=self.click_commentary_search,
             hint_text="which contains",
@@ -85,14 +88,16 @@ class DpdCommentaryField(ft.Column):
             [
                 self.search_field_1,
                 self.search_field_2,
-                ft.ElevatedButton(
+                ft.Button(
                     "Clear",
                     on_click=self.click_commentary_clear,
+                    style=compact_button_style(),
                 ),
-                ft.ElevatedButton(
+                ft.Button(
                     "Last",
                     on_click=self._click_last_commentary,
                     on_blur=self._handle_last_control_blur,
+                    style=compact_button_style(),
                 ),
             ],
             spacing=0,
@@ -145,12 +150,12 @@ class DpdCommentaryField(ft.Column):
         if invisible:
             self._toggle_tools_button.icon = ft.Icons.VISIBILITY_OUTLINED
             self._toggle_tools_button.tooltip = "Hide Search Tools"
-            self.search_field_1.focus()
+            request_focus(self.search_field_1)
         else:
             self._toggle_tools_button.icon = ft.Icons.VISIBILITY_OFF_OUTLINED
             self._toggle_tools_button.tooltip = "Show Search Tools"
 
-            self.commentary_field.focus()
+            request_focus(self.commentary_field)
 
         self.page.update()
 
@@ -170,7 +175,8 @@ class DpdCommentaryField(ft.Column):
         for word in text_list:
             if "-" in word or "'" in word:
                 clean_word = word.replace("-", "").replace("'", "")
-                self.speech_marks_manager.update_variants(clean_word, word)
+                if clean_word:
+                    self.speech_marks_manager.update_variants(clean_word, word)
 
     def _search_field_1_focus(self, e: ft.ControlEvent) -> None:
         """Auto-fill search_field_1 with cleaned lemma_1[:-1] on first focus."""
@@ -196,7 +202,7 @@ class DpdCommentaryField(ft.Column):
                 self.search_field_1.value = lemma_clean
                 self.dpd_fields.flags.commentary_search_done = True
 
-        self.search_field_1.error_text = None
+        set_error(self.search_field_1, None)
 
         commentary_searcher = BoldDefinitionsSearchManager()
         if (
@@ -214,12 +220,12 @@ class DpdCommentaryField(ft.Column):
             if self.commentary_list:
                 self.choose_commentary()
             else:
-                self.search_field_1.error_text = "not found"
+                set_error(self.search_field_1, "not found")
                 if self.commentary_field.value == "":
                     self.commentary_field.value = "-"
-                    self.commentary_field.focus()
+                    request_focus(self.commentary_field)
                 else:
-                    self.search_field_1.focus()
+                    request_focus(self.search_field_1)
                 self.page.update()
 
     def choose_commentary(self):
@@ -287,15 +293,15 @@ class DpdCommentaryField(ft.Column):
                 expand=True,
                 scroll=ft.ScrollMode.AUTO,
             ),
-            alignment=ft.alignment.center,
-            title_padding=ft.padding.all(25),
+            alignment=ft.Alignment.CENTER,
+            title_padding=ft.Padding.all(25),
             actions=[
                 ft.TextButton("OK", on_click=self.click_choose_example_ok),
                 ft.TextButton("Cancel", on_click=self.click_choose_example_cancel),
             ],
         )
 
-        self.page.open(self.choose_example_dialog)
+        self.page.show_dialog(self.choose_example_dialog)
         self.page.update()
 
     def update_checked_items(self, e):
@@ -310,7 +316,7 @@ class DpdCommentaryField(ft.Column):
     def click_choose_example_cancel(self, e: ft.ControlEvent):
         self.choose_example_dialog.open = False
         self.commentary_field.value = "-"
-        self.commentary_field.focus()
+        request_focus(self.commentary_field)
         self.page.update()
 
     def click_choose_example_ok(self, e: ft.ControlEvent):
@@ -330,7 +336,7 @@ class DpdCommentaryField(ft.Column):
         )
 
         self.commentary_field.value = commentary_clean
-        self.commentary_field.focus()
+        request_focus(self.commentary_field)
         self.page.update()
 
     def click_commentary_clear(self, e: ft.ControlEvent):

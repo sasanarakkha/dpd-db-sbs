@@ -18,18 +18,19 @@ function ru_makeFamilyIdioms(data) {
     familyIdiomList.forEach(item => {
         fi = ru_family_idiom_json[item]
         itemTag = item.replace(/ /g, "_")
+        const idioms = ruPlural(fi.count, "идиома, содержащая", "идиомы, содержащие", "идиом, содержащих")
 
         if (familyIdiomList.length > 1) {
             html += `<p class="heading underlined overlined" `
             html += `id=${lemmaTag}_fi_${itemTag}>`;
-            html += `<b>${fi.count}</b> идиом(ы) содержат `;
+            html += `<b>${fi.count}</b> ${idioms} `;
             html += `<b>${ru_superScripter(item)}</b>`;
             html += `<a class="jump" href="#${lemmaTag}_fi_top"> ⤴</a></p>`;
         } else if (familyIdiomList.length == 1) {
             html += `<p class="heading underlined" `
             html += `id=${lemmaTag}_fi_top>`;
-            html += `<b>${fi.count}</b> идиома содержащая `;
-            html += `<b>${ru_superScripter(item)}</b>`;
+            html += `<b>${fi.count}</b> ${idioms} `;
+            html += `<b>${ru_superScripter(item)}</b></p>`;
         };
         
         

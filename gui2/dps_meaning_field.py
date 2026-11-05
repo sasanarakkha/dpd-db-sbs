@@ -1,6 +1,7 @@
 import flet as ft
 
 from gui2.dpd_fields_classes import DpdTextField
+from gui2.ui_utils import field_border, is_mounted, request_focus
 from tools.ru_spelling import RuSpellChecker
 
 
@@ -24,7 +25,6 @@ class DpsMeaningField(ft.Column):
         from gui2.dps_view import DpsView
 
         self.ui: DpsView = ui
-        self.page: ft.Page = self.ui.page
         self.field_name = field_name
         self.dps_fields = dps_fields
         self.spellchecker = spellchecker  # Store spellchecker instance
@@ -41,6 +41,7 @@ class DpsMeaningField(ft.Column):
 
         # Field to add words to the Russian dictionary
         self.add_to_dict_field = ft.TextField(
+            border=field_border(),
             label="Add Russian spelling ",
             label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=15),
             dense=True,
@@ -87,7 +88,7 @@ class DpsMeaningField(ft.Column):
             self.ui.update_message(message)
             e.control.value = ""
             self.page.update()
-            self.meaning_field.focus()
+            request_focus(self.meaning_field)
 
     def _handle_spell_check(self, e: ft.ControlEvent):
         """Common logic for spell checking the Russian meaning field."""
@@ -104,4 +105,5 @@ class DpsMeaningField(ft.Column):
             field.error_text = error_string
         else:
             field.error_text = None
-        self.page.update()
+        if is_mounted(self):
+            self.page.update()

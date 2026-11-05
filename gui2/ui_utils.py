@@ -1,4 +1,137 @@
+import inspect
+
 import flet as ft
+
+
+def page_of(control: ft.BaseControl) -> ft.Page | None:
+    """The control's page, or None when it is not mounted.
+
+    Flet 1.0 turned `Control.page` into a property that walks up to the `Page`
+    and **raises `RuntimeError` when it finds none**. In 0.28 it was a plain
+    attribute that read `None`, so the whole codebase tests for mounting with
+    `if control.page`/`if control.page is None` — an idiom that now raises the
+    very error it was written to avoid.
+    """
+    try:
+        return control.page
+    except RuntimeError:
+        return None
+
+
+def is_mounted(control: ft.BaseControl) -> bool:
+    """Whether the control is attached to a page. See `page_of`."""
+    return page_of(control) is not None
+
+
+def is_inside(control: ft.BaseControl, ancestor: ft.BaseControl) -> bool:
+    """Whether `control` is `ancestor` or sits somewhere inside it.
+
+    Flet links a control to its parent only once it is mounted, so an
+    unmounted control is inside nothing but itself.
+    """
+    current: ft.BaseControl | None = control
+    while current is not None:
+        if current is ancestor:
+            return True
+        current = current.parent
+    return False
+
+
+def request_focus(control: ft.BaseControl) -> None:
+    """Move focus to `control` from synchronous handler code.
+
+    Flet 1.0 made `Control.focus()` a coroutine. Calling it without awaiting is
+    silent — no error, no focus — which made every "move to the next field"
+    in the editor a no-op, so focus fell back to whichever control carries
+    `autofocus` and the cursor jumped to the top of the form after each edit.
+
+    `focus()` only sends a fire-and-forget message to the client
+    (`await self._invoke_method("focus")`), so scheduling it on the page's loop
+    is faithful to 0.28 and keeps the ~50 calling handlers synchronous.
+    """
+    page = page_of(control)
+    if page is not None:
+        page.run_task(_focus_quietly, control)
+
+
+async def _focus_quietly(control: ft.BaseControl) -> None:
+    # A missed focus only leaves the cursor where it was, so it must not reach
+    # the terminal as an unhandled task error. It fails when the client never
+    # answers the invoke (TimeoutError), or when the form is rebuilt between
+    # scheduling and running and the control is gone (RuntimeError).
+    try:
+        await control.focus()  # pyright: ignore[reportAttributeAccessIssue]
+    except (TimeoutError, RuntimeError):
+        pass
+
+
+FIELD_RADIUS = 20
+"""The editor's standard corner radius for text fields and dropdowns."""
+
+FIELD_BORDER_COLOUR = ft.Colors.GREY_800
+"""The editor's standard resting border colour for a form field.
+
+Measured, not chosen: 0.28 rendered an unstyled field's outline at exactly
+`#424242`, which is this constant. 1.0's dark theme resolves the same unstyled
+field to `#8d9199` — over twice as bright — which is why every text field
+looked white next to the dropdowns, those having always named the colour
+themselves.
+"""
+
+
+def field_border(
+    color: ft.ColorValue | None = None,
+    width: float = 1.0,
+    radius: float = FIELD_RADIUS,
+) -> ft.OutlineInputBorder:
+    """The standard rounded border for a `TextField` or `Dropdown`.
+
+    Flet 1.0 deprecated `border_radius` / `border_color` / `border_width` on
+    form fields in favour of a single `border=` object, and changed the
+    Dart-side default from a rounded outline to a square one — so fields that
+    set nothing at all lost their corners. Every field now states its border
+    explicitly through this helper rather than relying on the default.
+
+    `color` defaults to the resting colour rather than to the theme, so that
+    every field matches. Only the focused and error states stay
+    theme-resolved — stating a side styles the enabled state alone, which is
+    the same division 0.28 had.
+    """
+    resolved = FIELD_BORDER_COLOUR if color is None else color
+    return ft.OutlineInputBorder(
+        border_radius=radius, side=ft.BorderSide(width=width, color=resolved)
+    )
+
+
+def compact_button_style() -> ft.ButtonStyle:
+    """The style for the small action buttons that sit inside a field's column.
+
+    A field row is `label | field | transfer button | _add field`, so anything
+    stacked under the field shares that middle column's width. Flet's default
+    button padding and text size make a row of these overrun it and draw over
+    the `_add` field to the right.
+    """
+    return ft.ButtonStyle(
+        padding=ft.Padding.symmetric(vertical=6, horizontal=18),
+        text_style=ft.TextStyle(size=13),
+    )
+
+
+def set_error(field: ft.TextField, message: str | None) -> None:
+    """Set a bare `TextField`'s error message and colour its border to match.
+
+    The `Dpd*` field classes derive this in `before_update()`, but a bare
+    `ft.TextField` has no such hook. 1.0 resolves the error state against the
+    theme, which the explicit `border=` these fields carry overrides — so
+    without this the message appears and the outline stays grey, where 0.28
+    turned it red.
+
+    Only for fields whose resting border is the default `field_border()`. A
+    field with its own resting colour would come back from an error wearing
+    the wrong one.
+    """
+    field.error = message
+    field.border = field_border(color=ft.Colors.RED) if message else field_border()
 
 
 def show_global_snackbar(
@@ -27,4 +160,46 @@ def show_global_snackbar(
         bgcolor=bgcolor,
         duration=duration,
     )
-    page.open(snackbar)
+    page.show_dialog(snackbar)
+
+
+_CANCEL_LABELS = ("Cancel", "Close")
+
+
+def is_dialog_open(page: ft.Page) -> bool:
+    """True when a popup covers the page. SnackBars share the dialog stack but
+    leave the page usable, so they do not count."""
+    return any(
+        dialog.open and not isinstance(dialog, ft.SnackBar)
+        for dialog in page._dialogs.controls
+    )
+
+
+async def cancel_top_dialog(page: ft.Page) -> bool:
+    """Press the Cancel/Close button of the topmost open modal dialog.
+
+    Flutter ignores Escape on a modal dialog, so the editor's popups never
+    closed with it. Pressing the dialog's own button, rather than popping the
+    dialog, keeps each popup's cancel side-effects (resetting a field, firing
+    a callback with None). A non-modal dialog on top is left alone: Flutter
+    already dismisses it on Escape, so handling it here would close twice.
+    SnackBars share the dialog stack but are not popups, so they are skipped.
+    """
+    for dialog in reversed(page._dialogs.controls):
+        if not dialog.open or isinstance(dialog, ft.SnackBar):
+            continue
+        if not (isinstance(dialog, ft.AlertDialog) and dialog.modal):
+            return False
+        for action in dialog.actions:
+            if getattr(action, "content", None) in _CANCEL_LABELS:
+                handler = getattr(action, "on_click", None)
+                if handler is None:
+                    return False
+                # Every gui2 cancel handler takes one ignored event argument;
+                # a zero-argument lambda here would raise TypeError.
+                result = handler(None)
+                if inspect.isawaitable(result):
+                    await result
+                return True
+        return False
+    return False

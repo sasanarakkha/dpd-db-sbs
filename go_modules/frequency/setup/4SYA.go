@@ -2,10 +2,43 @@ package main
 
 import (
 	"dpd/go_modules/tools"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 )
+
+// The Syāmaraṭṭha edition packs Vimānavatthu, Petavatthu, Theragāthā and
+// Therīgāthā into one physical volume. Th/Thi belong in Khuddaka 1 but Vv/Pv
+// in Khuddaka 2, so the whole-file mapping mis-buckets Th/Thi. syaFileSlices
+// splits this one volume at the (unique) Theragāthā heading so each half maps
+// to its correct bucket in sya_file_map.json. The two synthetic keys are also
+// referenced by scripts/build/ebt_counter.py.
+const (
+	syaCombinedVol = "Canonical/26-Vv-Pv-Th-Thi.txt"
+	syaTheraMarker = "suttantapiṭake khuddakanikāyassa theragāthā"
+	syaVvPvKey     = "Canonical/26-Vv-Pv-Th-Thi.txt::vv-pv"
+	syaThThiKey    = "Canonical/26-Vv-Pv-Th-Thi.txt::th-thi"
+)
+
+// syaFileSlices returns the frequency-map key(s) and raw text for one SYA
+// source file: a single slice keyed by its own path, except the combined
+// volume 26, split at the Theragāthā heading (that line and everything after
+// it is Th+Thi; everything before is Vv+Pv). Splitting on the whole-line
+// heading preserves the exact word multiset.
+func syaFileSlices(relKey string, text string) map[string]string {
+	if relKey != syaCombinedVol {
+		return map[string]string{relKey: text}
+	}
+	idx := strings.Index(text, syaTheraMarker)
+	if idx == -1 {
+		tools.HardCheck(fmt.Errorf("theragāthā marker not found in %s", relKey))
+	}
+	return map[string]string{
+		syaVvPvKey:  text[:idx],
+		syaThThiKey: text[idx:],
+	}
+}
 
 func makeSyaFreq() {
 	tools.PGreenTitle("Save word frequency in Thai texts to JSON")
@@ -17,7 +50,7 @@ func makeSyaFreq() {
 		tools.Pth.SyaTextDir,
 	)
 
-	folders := []string{"canon", "commentary"}
+	folders := []string{"Canonical", "Non-Canonical"}
 
 	counter := 1
 	for _, folder := range folders {
@@ -40,11 +73,12 @@ func makeSyaFreq() {
 			dataRead, err := os.ReadFile(filePath)
 			tools.HardCheck(err)
 
-			text := string(dataRead)
-			textClean := tools.CleanMachine(text, "ṃ", false, "sya")
-			textList := strings.Fields(textClean)
-			freqMap := tools.ListCounter(textList)
-			fileFreqMap[filePathRel] = freqMap
+			text := strings.TrimPrefix(string(dataRead), "\uFEFF")
+			for key, sliceText := range syaFileSlices(filePathRel, text) {
+				textClean := tools.CleanMachine(sliceText, "ṃ", false, "sya")
+				textList := strings.Fields(textClean)
+				fileFreqMap[key] = tools.ListCounter(textList)
+			}
 			counter++
 		}
 	}

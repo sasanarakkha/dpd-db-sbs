@@ -25,7 +25,8 @@ from typing import Any, cast
 from sqlalchemy.orm import Session
 
 from db.models import Lookup
-from tools.lookup_is_another_value import is_another_value
+from tools.cache_load import invalidate_decon_no_headwords_cache
+from tools.lookup_is_another_value import TRANSLITERATION_COLUMNS, is_another_value
 
 LOOKUP_COLUMNS = [c.name for c in Lookup.__table__.columns]
 
@@ -53,6 +54,8 @@ def sync_lookup_column(
     - ``clear_stale``: clear/delete rows that currently hold a value in ``column``
       but are no longer in ``data``. A stale row is cleared (column set to "") when
       another column still holds a value, otherwise the whole row is deleted.
+      Transliteration columns do not count as a value — see
+      ``TRANSLITERATION_COLUMNS``.
     - keys in ``data`` are updated if the row exists, inserted otherwise.
     - ``pack_attr`` defaults to ``f"{column}_pack"``; pass it explicitly when the
       column's pack method uses a non-standard name.
@@ -64,10 +67,18 @@ def sync_lookup_column(
     Commits internally: once after the stale pass and once per chunk of the
     update/insert loop. Callers do not need to commit afterwards.
 
+    When ``column`` is ``headwords`` or ``deconstructor``, the
+    all_decon_no_headwords DbInfo cache is deleted in-session BEFORE any
+    commit, so the invalidation lands atomically with the first data
+    change — a crash can never leave changed data with an intact cache.
+
     Returns counts of rows updated / inserted / cleared / deleted.
     """
 
     pack_attr = pack_attr or f"{column}_pack"
+
+    if column in ("headwords", "deconstructor"):
+        invalidate_decon_no_headwords_cache(db_session, commit=False)
 
     if use_raw_sql:
         return _raw_sql_sync(db_session, column, data, pack_attr, clear_stale)
@@ -148,7 +159,7 @@ def _raw_sql_sync(
             others_empty = " AND ".join(
                 f"IFNULL({c}, '') = ''"
                 for c in LOOKUP_COLUMNS
-                if c not in ("lookup_key", column)
+                if c not in ("lookup_key", column, *TRANSLITERATION_COLUMNS)
             )
             deleted = conn.exec_driver_sql(
                 f"DELETE FROM lookup WHERE {column} != '' "

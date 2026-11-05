@@ -28,6 +28,7 @@ from tools.synonym_variant import (
     PhoneticVariantDetector,
     assign_relationship,
     exception_key,
+    pair_consistently_related,
     split_field,
 )
 
@@ -71,10 +72,9 @@ def find_pairs(g: GlobalVars) -> None:
 
 def _format_fields(hw: DpdHeadword) -> str:
     syn = hw.synonym.split(", ") if hw.synonym else []
-    var = hw.variant.split(", ") if hw.variant else []
     var_text = hw.var_text.split(", ") if hw.var_text else []
     phon = sorted(split_field(hw.var_phonetic))
-    return f"  syn:{syn}\n  var:{var}\n  var_text:{var_text}\n  var_phon:{phon}"
+    return f"  syn:{syn}\n  var_text:{var_text}\n  var_phon:{phon}"
 
 
 def _show_result(hw: DpdHeadword) -> None:
@@ -112,6 +112,13 @@ def prompt_pairs(g: GlobalVars) -> bool:
     for counter, pair in enumerate(g.pairs):
         hw_a = pair.source
         hw_b = pair.target
+
+        # the same two headwords can appear under several rules, so a choice
+        # made earlier in this session must suppress the later duplicates
+        if pair_consistently_related(hw_a, hw_b):
+            continue
+        if exception_key(hw_a, hw_b) in g.exceptions:
+            continue
 
         print("\n" + "-" * 70 + "\n")
         print(

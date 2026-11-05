@@ -1,3 +1,5 @@
+"""Send AI requests to the Google Gemini API, with optional Google Search grounding. Used by tools/ai_manager.py as the 'gemini' provider."""
+
 import time
 from typing import Optional
 
@@ -101,10 +103,12 @@ class GeminiManager:
                     and response.candidates[0].content
                     and response.candidates[0].content.parts
                 ):
+                    # `hasattr` only proved the attribute exists; it is typed
+                    # `str | None` and a None part made the join raise TypeError.
                     text_content = "".join(
                         part.text
                         for part in response.candidates[0].content.parts
-                        if hasattr(part, "text")  # type: ignore
+                        if part.text
                     )
                     if text_content:
                         return AIResponse(

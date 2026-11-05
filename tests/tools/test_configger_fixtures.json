@@ -62,6 +62,11 @@
     ],
     [
       "exporter",
+      "make_variants",
+      "yes"
+    ],
+    [
+      "exporter",
       "make_ebook",
       "yes"
     ],
@@ -155,7 +160,7 @@
     [
       "exporter",
       "make_mobile",
-      "no"
+      "yes"
     ],
     [
       "exporter",
@@ -227,6 +232,11 @@
     [
       "regenerate",
       "freq_maps",
+      "yes"
+    ],
+    [
+      "generate",
+      "deconstructor",
       "yes"
     ],
     [
@@ -312,7 +322,7 @@
     [
       "anki",
       "update",
-      "no"
+      "yes"
     ],
     [
       "goldendict",
@@ -449,11 +459,6 @@
     [
       "exporter",
       "make_changelog",
-      "no"
-    ],
-    [
-      "exporter",
-      "make_newsletter",
       "no"
     ],
     [

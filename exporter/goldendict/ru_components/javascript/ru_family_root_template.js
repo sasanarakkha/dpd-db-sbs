@@ -6,8 +6,7 @@ function ru_makeFamilyRootHtml(fr, data, source, link) {
 
     var html = `
         <p class="heading">
-            <b>${fr.count}</b> 
-            слов(а) принадлежат к семье корня 
+            <b>${fr.count}</b> ${ruPlural(fr.count, "слово, относящееся к семье корня", "слова, относящихся к семье корня", "слов, относящихся к семье корня")} 
             <b>${ru_superScripter(fr.root_family)}</b> 
             (${fr.root_meaning})
         </p>

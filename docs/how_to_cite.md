@@ -1,0 +1,66 @@
+# How to Cite DPD
+
+DPD is revised every month. Always cite the version you used.
+
+## The dictionary
+
+> Bodhirasa Bhikkhu. Digital Pāḷi Dictionary. Version v0.4.20261026. https://doi.org/10.5281/zenodo.22979413
+
+The DOI <https://doi.org/10.5281/zenodo.22979413> always resolves to the newest release.
+
+## A single entry
+
+> Bodhirasa Bhikkhu. "gacchati 1." *Digital Pāḷi Dictionary*, version v0.4.20261026. <https://dpdict.net/24043>
+
+**Chicago (note)**
+
+> Bodhirasa Bhikkhu, "gacchati 1," *Digital Pāḷi Dictionary*, version v0.4.20261026,
+> https://dpdict.net/24043.
+
+**MLA**
+
+> Bodhirasa Bhikkhu. "gacchati 1." *Digital Pāḷi Dictionary*, version v0.4.20261026,
+> dpdict.net/24043.
+
+**APA**
+
+> Bodhirasa Bhikkhu. (2026). gacchati 1. In *Digital Pāḷi Dictionary*
+> (version v0.4.20261026). https://dpdict.net/24043
+
+## Finding the version
+
+**Online** — go to [dpdict.net](https://www.dpdict.net/). The version is in the footer line at the
+bottom of the page, right after the *how to cite* link.
+
+**GoldenDict, MDict, DictTango** — look up **`cite`**. The entry gives you the whole
+citation, with the version of the copy you have installed already filled in.
+
+**DPD app** — the info menu, under **How to Cite**, with a copy button.
+
+**PDF** — on the second page, under *How to cite this dictionary*.
+
+**Database** — the `db_info` table has a `dpd_release_version` row, and a `citation` row
+holding the finished citation.
+
+## Finding the permalink
+
+Look the word up, click the **feedback** button in the row of buttons under the entry,
+and copy the permalink.
+
+![the permalink in the feedback tab](pics/dpdict.net/dpdict_feedback_permalink_light.png#only-light)
+![the permalink in the feedback tab](pics/dpdict.net/dpdict_feedback_permalink_dark.png#only-dark)
+
+Ids are permanent and are never reused, so the link will always reach that same entry.
+
+To cite a word rather than one particular entry of it, use the word itself:
+`https://www.dpdict.net/?q=gacchati`
+
+## From the repository
+
+The [GitHub project page](https://github.com/digitalpalidictionary/dpd-db) has a **Cite this repository** button that
+generates APA or BibTeX.
+
+## Licence
+
+[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) — see the
+[licence page](license.md).

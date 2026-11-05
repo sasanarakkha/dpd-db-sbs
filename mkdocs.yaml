@@ -25,6 +25,7 @@ nav:
       - Linux: "install/linux.md"
       - Kindle: "install/kindle.md"
       - Kobo: "install/kobo.md"
+      - KOReader: "install/koreader.md"
       - Anki: "install/anki.md"
       - ChromeBook: "install/chromebook.md"
       - Chrome & Firefox Extension: "install/browser_extension.md"
@@ -46,11 +47,14 @@ nav:
   - Software Integrations:
       - integrations/index.md
       - Dhamma.gift website: "integrations/dhamma_gift.md"
+      - ePitaka: "integrations/epitaka.md"
       - Simsapa Dhamma Reader: "integrations/simsapa.md"
+      - Sutamaya: "integrations/sutamaya.md"
       - Sutta Central Website: "integrations/sutta_central.md"
       - The Buddha's Words: "integrations/tbw.md"
       - Tipitaka Pali Reader: "integrations/tpr.md"
       - Tipitakapali.org: "integrations/tipitakapali.md"
+      - Add Your App: "integrations/add_your_app.md"
   - Feedback:
       - "feedback/index.md"
       - Correct a Mistake: "feedback/correct_mistake.md"
@@ -60,12 +64,14 @@ nav:
       - "contributing/index.md"
       - Pāḷi: "contributing/pali.md"
       - Code: "contributing/code.md"
+      - Resources: "contributing/resources.md"
   - Other Dictionaries: other_dicts.md
   - What Users Say: users_say.md
   - Abbreviations: "abbreviations.md"
   - Bibliography: "bibliography.md"
   - Thanks: "thanks.md"
   - Contact: "contact.md"
+  - How to Cite: "how_to_cite.md"
   - License: "license.md"
   - Changelog: "changelog.md"
   - Newsletters: "newsletters.md"

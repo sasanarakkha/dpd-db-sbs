@@ -191,7 +191,13 @@ class ChangelogGenerator:
             md = [
                 rf"- [#{i.number} {i.title}]({i.html_url})"
                 for i in issues
-                if i.milestone is not None
+                # html_url check excludes PRs without triggering PyGithub's
+                # lazy per-issue API fetch (rate-limited when unauthenticated)
+                if "/pull/" not in i.html_url
+                and i.closed_at is not None
+                and i.closed_at >= since_date
+                # "not_planned" and "duplicate" closures are not finished work
+                and i.state_reason == "completed"
             ]
             self.github_issues = "\n".join(
                 sorted(md, key=lambda x: int(x.split("#")[1].split()[0]))
@@ -204,6 +210,8 @@ class ChangelogGenerator:
             self.github_issues = "GitHub issues not available right now..."
 
     def _get_github_issues_section(self) -> str:
+        if not self.github_issues:
+            return ""
         return f"""
 ### GitHub Issues Closed
 {self.github_issues}
@@ -220,8 +228,8 @@ class ChangelogGenerator:
 - {self.line_6_cells_of_root_data}
 - Pass1 complete: VIN1-4, DN1-3, MN1-3, SN1-5, AN1-11, KN1-5, KN8-9
 - Pass1 in progress: VIN5
-- Pass2 complete: DN1-3, MN1-3, SN1-5, AN1-3
-- Pass2 in progress: AN4
+- Pass2 complete: DN1-3, MN1-3, SN1-5, AN1-5
+- Pass2 in progress: AN6
 - numerous additions and corrections based on user feedback
 """
 

@@ -14,6 +14,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+import flet as ft
+
 from gui2.dps_field_mapping import dps_field_mapping
 
 FIXTURE_PATH = Path(__file__).parent / "test_dps_field_mapping_fixtures.json"
@@ -28,6 +30,11 @@ def _serialize(mapping: dict[str, dict[str, Any]]) -> dict[str, Any]:
         for key, value in params.items():
             if key == "options":
                 ser_params[key] = [[opt.key, opt.text] for opt in value]
+            elif isinstance(value, ft.OutlineInputBorder):
+                ser_params[key] = {
+                    "border_radius": value.border_radius,
+                    "color": str(value.side.color) if value.side else None,
+                }
             elif hasattr(value, "name") and not isinstance(value, (bool, int, str)):
                 ser_params[key] = str(value)
             else:

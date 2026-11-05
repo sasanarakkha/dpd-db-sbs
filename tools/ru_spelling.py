@@ -43,14 +43,14 @@ class RuSpellChecker:
 
             RuSpellChecker._initialized = True
 
-    def check_sentence(self, sentence: str) -> Dict[str, List[str]]:
+    def check_sentence(self, sentence: str | None) -> Dict[str, List[str]]:
         """Check spelling in a Russian sentence and return misspelled words with suggestions."""
 
         # Use lock to prevent concurrent access to the shared SpellChecker instance
         with RuSpellChecker._lock:
             # Split the sentence into words and remove punctuation
             words = "".join(
-                c if c.isalpha() or c.isspace() else " " for c in sentence
+                c if c.isalpha() or c.isspace() else " " for c in (sentence or "")
             ).split()
 
             # Find misspelled words

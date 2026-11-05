@@ -2,7 +2,7 @@ import json
 
 from gui2.books import SuttaCentralSegment
 from gui2.paths import Gui2Paths
-from tools.cst_source import CstSourceSuttaExample
+from tools.cst_source.models import CstSourceSuttaExample
 from tools.printer import printer as pr
 
 
@@ -41,7 +41,7 @@ class Pass2PreFileManager:
                 self.new_word = {}
                 return False
         else:
-            print(f"[yellow]pass2_pre data file not found at {self._json_path}")
+            pr.amber(f"pass2_pre data file not found at {self._json_path}")
             return False
 
     def save_data(self) -> None:

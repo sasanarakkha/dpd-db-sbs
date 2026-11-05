@@ -12,13 +12,16 @@ Download the latest dictionary files from the [GitHub Releases page](https://git
 | Ancient Buddhist Texts Glossary | [abt-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/abt-gd.zip) |
 | Apte Sanskrit-English Dictionary | [apte-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/apte-gd.zip) |
 | Buddhist Hybrid Sanskrit | [bhs-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/bhs-gd.zip) |
+| Buddhist Wiki | [buddhist-wiki-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/buddhist-wiki-gd.zip) |
 | CST Bold Definitions | [bold-def-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/bold-def-gd.zip) |
 | Critical Pāli Dictionary | [cpd-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/cpd-gd.zip) |
 | Dictionary of Pāli Proper Names | [dppn-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/dppn-gd.zip) |
 | DPR Analysis | [dpr-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/dpr-gd.zip) |
 | Margaret Cone Dictionary | [cone-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/cone-gd.zip) |
 | Monier Williams (Cologne) | [mw-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/mw-gd.zip) |
+| Nyanatiloka's Buddhist Dictionary | [nyanatiloka-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/nyanatiloka-gd.zip) |
 | Pali English Ultimate | [peu-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/peu-gd.zip) |
+| PTS Pāḷi-English Dictionary | [pts-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/pts-gd.zip) |
 | Simsapa Combined Dictionary | [simsapa-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/simsapa-gd.zip) |
 | Sinhala-English-Sinhala | [sin-eng-sin-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/sin-eng-sin-gd.zip) |
 | Whitney's Roots | [whitney-gd.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/whitney-gd.zip) |
@@ -31,13 +34,16 @@ Download the latest dictionary files from the [GitHub Releases page](https://git
 | Ancient Buddhist Texts Glossary | [abt-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/abt-mdict.zip) |
 | Apte Sanskrit-English Dictionary | [apte-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/apte-mdict.zip) |
 | Buddhist Hybrid Sanskrit | [bhs-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/bhs-mdict.zip) |
+| Buddhist Wiki | [buddhist-wiki-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/buddhist-wiki-mdict.zip) |
 | CST Bold Definitions | [bold-def-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/bold-def-mdict.zip) |
 | Critical Pāli Dictionary | [cpd-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/cpd-mdict.zip) |
 | Dictionary of Pāli Proper Names | [dppn-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/dppn-mdict.zip) |
 | DPR Analysis | [dpr-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/dpr-mdict.zip) |
 | Margaret Cone Dictionary | [cone-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/cone-mdict.zip) |
 | Monier Williams (Cologne) | [mw-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/mw-mdict.zip) |
+| Nyanatiloka's Buddhist Dictionary | [nyanatiloka-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/nyanatiloka-mdict.zip) |
 | Pali English Ultimate | [peu-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/peu-mdict.zip) |
+| PTS Pāḷi-English Dictionary | [pts-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/pts-mdict.zip) |
 | Simsapa Combined Dictionary | [simsapa-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/simsapa-mdict.zip) |
 | Sinhala-English-Sinhala | [sin-eng-sin-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/sin-eng-sin-mdict.zip) |
 | Whitney's Roots | [whitney-mdict.zip](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest/download/whitney-mdict.zip) |
@@ -62,6 +68,15 @@ PEU is a project in progress to translate the Abhidhan's definitions into Englis
 
 ## Dictionary of Pāli Proper Names (DPPN)
 The DPPN by G. P. Malalasekera has been updated and revised by Ven. Ānandajoti in June 2025. It is available online from his website, [Ancient Buddhist Texts](https://ancient-buddhist-texts.net/Textual-Studies/DPPN/index.htm){target="_blank"} or via the links above for offline use.
+
+## Nyanatiloka's Buddhist Dictionary
+*Buddhist Dictionary: Manual of Buddhist Terms and Doctrines* by Nyanatiloka Mahathera, 4th revised edition, edited by Nyanaponika Mahathera, Buddhist Publication Society, 1980. The full text is hosted at [dhammatalks.net](https://www.dhammatalks.net/Buddhist.Dictionary/){target="_blank"}; the links above package it for offline use. It is also one of the four dictionaries combined (without individual attribution) inside the Simsapa Combined Dictionary above.
+
+## Buddhist Wiki
+About 23,800 articles on Buddhism from English Wikipedia: teachings, texts, schools, people, temples and places. The articles come from Wikipedia's Buddhism category tree, five levels deep. Each entry is the article's text with images, tables and references removed. Links between articles open the linked entry within the dictionary. Text from English Wikipedia, licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/){target="_blank"}; each entry links back to its online article. Not affiliated with or endorsed by Wikipedia or the Wikimedia Foundation.
+
+## PTS Pāḷi-English Dictionary
+*The Pali Text Society's Pali-English Dictionary* by T. W. Rhys Davids and William Stede, 1921–25. The text comes from the [BuddhaDust](https://obo.genaud.net/backmatter/glossology/ped/pts_ped/ped.htm){target="_blank"} edition, which follows the PTS 2015 corrected reprint. BuddhaDust states that the corrected reprint is © The Pāḷi Text Society, licensed CC BY-NC, with commercial rights reserved. BuddhaDust's own notes and the material it merged from other dictionaries are left out, and its lost references to the Atthasālinī (DhsA) are restored. A few untagged BuddhaDust edits may remain. The links above package it for offline use, and it is also built into the DPD app.
 
 ## CST Bold Definitions
 These are are the bold-defined terms contained in Chaṭṭha Saṅgāyana Tipiṭaka texts. The same data is searchable on [www.dpdict.net](https://www.dpdict.net/?tab=bd&q1=&q2=&option=regex){target="_blank"}.

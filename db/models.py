@@ -4,10 +4,10 @@ import inspect
 import json
 import re
 from functools import cached_property, lru_cache
-from typing import Any, List, Optional, cast
+from typing import List, Optional
 
 from aksharamukha import transliterate
-from sqlalchemy import DateTime, ForeignKey, and_, case, null, or_
+from sqlalchemy import DateTime, ForeignKey, Index, and_, case, null, or_
 from sqlalchemy import Column, Integer
 
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -256,6 +256,8 @@ class Lookup(Base):
     sinhala: Mapped[str] = mapped_column(default="")
     devanagari: Mapped[str] = mapped_column(default="")
     thai: Mapped[str] = mapped_column(default="")
+
+    __table_args__ = (Index("ix_lookup_key_nocase", lookup_key.collate("NOCASE")),)
 
     # headwords pack unpack
 
@@ -572,6 +574,91 @@ thai:          {self.thai}
 #         DateTime(timezone=True), onupdate=func.now())
 
 
+# KN books s.4nt.org serves as one page per book, nested under "kn/".
+_S4NT_KN_BOOKS = frozenset(
+    {
+        "kp",
+        "dhp",
+        "ud",
+        "iti",
+        "snp",
+        "vv",
+        "pv",
+        "thag",
+        "thig",
+        "ja",
+        "mnd",
+        "cnd",
+        "ps",
+        "ne",
+        "pe",
+        "cp",
+        "bv",
+        "mil",
+        "tha-ap",
+        "thi-ap",
+    }
+)
+
+# s.4nt.org container pages (SN saṃyutta, AN nipāta, KN book) embed one TOC
+# anchor id per sutta/verse, almost always exactly `sc_code.lower()`. These
+# 45 sc_codes are the exceptions where the site groups things differently
+# than DPD does - 19 peyyala-compressed sutta runs (DPD codes each sutta in
+# the run individually; the site groups them under one combined anchor) and
+# 26 DHP vagga-range codes (DPD codes a whole vagga as one row; the site has
+# no combined anchor, so this pins to the vagga's first verse instead).
+# Derived once by extracting every real anchor id from the site's own
+# cloned repo (github.com/frankksutta/s.4nt) and cross-checking against
+# every sc_code in dpd.db - not guessed.
+_S4NT_ANCHOR_OVERRIDES = {
+    "AN3.156": "an3.156-162",
+    "AN3.163": "an3.163-182",
+    "DHP1-20": "dhp1",
+    "DHP100-115": "dhp100",
+    "DHP116-128": "dhp116",
+    "DHP129-145": "dhp129",
+    "DHP146-156": "dhp146",
+    "DHP157-166": "dhp157",
+    "DHP167-178": "dhp167",
+    "DHP179-196": "dhp179",
+    "DHP197-208": "dhp197",
+    "DHP209-220": "dhp209",
+    "DHP21-32": "dhp21",
+    "DHP221-234": "dhp221",
+    "DHP235-255": "dhp235",
+    "DHP256-272": "dhp256",
+    "DHP273-289": "dhp273",
+    "DHP290-305": "dhp290",
+    "DHP306-319": "dhp306",
+    "DHP320-333": "dhp320",
+    "DHP33-43": "dhp33",
+    "DHP334-359": "dhp334",
+    "DHP360-382": "dhp360",
+    "DHP383-423": "dhp383",
+    "DHP44-59": "dhp44",
+    "DHP60-75": "dhp60",
+    "DHP76-89": "dhp76",
+    "DHP90-00": "dhp90",
+    "SN12.83": "sn12.83-92",
+    "SN12.93-103": "sn12.93-213",
+    "SN23.23": "sn23.23-33",
+    "SN23.35": "sn23.35-45",
+    "SN33.11": "sn33.11-15",
+    "SN33.16": "sn33.16-20",
+    "SN33.51": "sn33.51-54",
+    "SN34.46": "sn34.46-49",
+    "SN34.50": "sn34.50-52",
+    "SN34.53": "sn34.53-54",
+    "SN35.33": "sn35.33-42",
+    "SN35.43": "sn35.43-51",
+    "SN43.14": "sn43.14-43",
+    "SN45.104": "sn45.104-108",
+    "SN45.110": "sn45.110-114",
+    "SN45.116": "sn45.116-120",
+    "SN45.141": "sn45.141-145",
+}
+
+
 class SuttaInfo(Base):
     __tablename__ = "sutta_info"
     # dpd
@@ -687,7 +774,7 @@ class SuttaInfo(Base):
     @cached_property
     def sc_book_code(self) -> str | None:
         if self.sc_code:
-            return re.sub(r"\d+\.*-*\d*", "", self.sc_code)
+            return re.sub(r"\d.*", "", self.sc_code)
         else:
             return None
 
@@ -710,7 +797,7 @@ class SuttaInfo(Base):
     @cached_property
     def dhamma_gift(self) -> str | None:
         if self.sc_code:
-            return f"https://find.dhamma.gift/read/?q={self.sc_code}"
+            return f"https://dhamma.gift/{self.sc_code.lower()}"
         else:
             return None
 
@@ -763,9 +850,9 @@ class SuttaInfo(Base):
                 "THI",
             ]:
                 if sc_book_code == "iti":
-                    return "https://find.dhamma.gift/bw/it/it.html"
+                    return "https://f.dhamma.gift/bw/it/it.html"
                 else:
-                    return f"https://find.dhamma.gift/bw/{sc_book_code.lower()}/{self.sc_code.lower()}.html"
+                    return f"https://f.dhamma.gift/bw/{sc_book_code.lower()}/{self.sc_code.lower()}.html"
             else:
                 return None
         else:
@@ -777,6 +864,42 @@ class SuttaInfo(Base):
             return f"https://www.sc-voice.net/#/sutta/{self.sc_code.lower()}/en/sujato"
         else:
             return None
+
+    @cached_property
+    def s_4nt_link(self) -> str | None:
+        sc_code = self.sc_code
+        sc_book_code = self.sc_book_code
+        if not (sc_code and sc_book_code):
+            return None
+
+        book = sc_book_code.lower()
+        code = sc_code.lower()
+
+        if book in ("dn", "mn"):
+            # one page per sutta - already exact, no fragment needed
+            return f"https://s.4nt.org/{book}/{code}/index.html"
+
+        if book in ("sn", "an"):
+            # one page per saṃyutta/nipāta - derive its number from the code
+            m = re.match(rf"^{book}(\d+)", code)
+            if not m:
+                return None
+            path = f"{book}/{book}{m.group(1)}"
+            if code == f"{book}{m.group(1)}":
+                # bare nipāta-only code (e.g. "AN5") - no sutta to anchor to
+                return f"https://s.4nt.org/{path}/index.html"
+            # vagga rows share sc_code with their first sutta, so this also
+            # lands a vagga link on the first sutta of that vagga - correct
+            # and simple, since that's right at the top of the vagga anyway
+            fragment = _S4NT_ANCHOR_OVERRIDES.get(sc_code, code)
+            return f"https://s.4nt.org/{path}/index.html#{fragment}"
+
+        if book in _S4NT_KN_BOOKS:
+            # one page per book, nested under "kn/" - anchor to the sutta/verse
+            fragment = _S4NT_ANCHOR_OVERRIDES.get(sc_code, code)
+            return f"https://s.4nt.org/kn/{book}/index.html#{fragment}"
+
+        return None
 
     @cached_property
     def tpp_org(self) -> str | None:
@@ -814,8 +937,7 @@ class SuttaInfo(Base):
     @cached_property
     def dv_exists(self) -> bool:
         if (
-            self.dv_pts
-            or self.dv_main_theme
+            self.dv_main_theme
             or self.dv_subtopic
             or self.dv_stage
             or self.dv_training
@@ -1027,10 +1149,8 @@ def _load_sutta_alias_map() -> dict[str, str]:
 # audio/bhashini_class.py), regardless of whether pre/post options are
 # passed. Neither module defines functions dynamically, so the scan result
 # is constant for the process lifetime; caching it benefits every caller.
-# cast: the lru_cache wrapper is behaviourally identical to inspect.getmembers
-# (same call signature) but does not carry its overloaded type; present it as Any
-# so the monkey-patch assignment type-checks (runtime no-op).
-transliterate.getmembers = cast(Any, lru_cache(maxsize=None)(inspect.getmembers))
+# pyrefly: ignore  # lru_cache collapses getmembers' overloads; correct at runtime
+transliterate.getmembers = lru_cache(maxsize=None)(inspect.getmembers)
 
 
 @lru_cache(maxsize=None)
@@ -1042,7 +1162,9 @@ class DpdHeadword(Base):
     __tablename__ = "dpd_headwords"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    lemma_1: Mapped[str] = mapped_column(ForeignKey("sutta_info.dpd_sutta"), default="")
+    lemma_1: Mapped[str] = mapped_column(
+        ForeignKey("sutta_info.dpd_sutta"), unique=True, default=""
+    )
     lemma_2: Mapped[str] = mapped_column(default="")
     pos: Mapped[str] = mapped_column(default="")
     grammar: Mapped[str] = mapped_column(default="")
@@ -1089,6 +1211,10 @@ class DpdHeadword(Base):
 
     antonym: Mapped[str] = mapped_column(default="")
     synonym: Mapped[str] = mapped_column(default="")
+    # TODO DELETE ON NEXT DB MODEL CHANGE — data migrated to var_text on
+    # 2026-07-25 (scripts/fix/variant_to_var_text.py); the column is now always
+    # empty. Drop it along with variant_list, the gui2 remnants, and the
+    # `variant` branches in the exporters and templates.
     variant: Mapped[str] = mapped_column(default="")
     var_phonetic: Mapped[str] = mapped_column(default="")
     var_text: Mapped[str] = mapped_column(default="")
@@ -1193,9 +1319,6 @@ class DpdHeadword(Base):
 
     @cached_property
     def lemma_ipa(self) -> str:
-        # from tools.ipa import convert_uni_to_ipa
-        # return convert_uni_to_ipa(self.lemma_clean, "ipa")
-
         return _lemma_ipa_transliterate(self.lemma_clean)
 
     # meaning construction

@@ -19,38 +19,32 @@ initial_build_db:
 generate_components:
     uv run python scripts/bash/generate_components.py
 
-# Export all dictionary formats
-makedict:
+# Run makedict in a pty (keeps ANSI colours) and save an HTML log; no transcript artifact
+_logged-makedict:
     #!/usr/bin/env bash
     mkdir -p logs
-    timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
-    script -q -c "uv run python scripts/bash/makedict.py" | tee >(ansi2html > "logs/makedict_$timestamp.html")
+    script -q -c "uv run python scripts/bash/makedict.py" /dev/null | tee >(ansi2html > "logs/makedict_$(date +"%Y-%m-%d_%H-%M-%S").html")
+
+# Export all dictionary formats
+makedict:
+    just _logged-makedict
 
 # Fast DPD-only build: turns off everything off-able, then re-enables generate components
 makedict-quick:
-    #!/usr/bin/env bash
-    mkdir -p logs
     uv run python scripts/build/config_quick_profile.py
-    timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
-    script -q -c "uv run python scripts/bash/makedict.py" | tee >(ansi2html > "logs/makedict_$timestamp.html")
+    just _logged-makedict
     uv run python scripts/build/config_quick_profile.py reset
 
 # Full release export: everything on (uposatha settings), resets config to baseline after
 makedict-all:
-    #!/usr/bin/env bash
-    mkdir -p logs
     uv run python scripts/build/config_uposatha_day.py force
-    timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
-    script -q -c "uv run python scripts/bash/makedict.py" | tee >(ansi2html > "logs/makedict_$timestamp.html")
+    just _logged-makedict
     uv run python scripts/build/config_uposatha_reset.py force
 
 # Minimum baseline export: resets config to baseline (post-uposatha settings) and runs
 makedict-min:
-    #!/usr/bin/env bash
-    mkdir -p logs
     uv run python scripts/build/config_uposatha_reset.py force
-    timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
-    script -q -c "uv run python scripts/bash/makedict.py" | tee >(ansi2html > "logs/makedict_$timestamp.html")
+    just _logged-makedict
 
 # Complete rebuild and export everything
 initial_build_db_and_export_all:
@@ -66,9 +60,60 @@ test:
 db-test:
     uv run python db_tests/db_tests_relationships.py
 
+# Run every db test in sequence, pausing between each
+db-tests:
+    uv run python db_tests/run_all_tests.py
+
+# Add missing antonyms to negative words
+add-antonyms:
+    uv run python -m db_tests.single.add_antonyms
+
+# Add the antonym link that is missing on one side
+add-antonyms-sync:
+    uv run python -m db_tests.single.add_antonyms_sync
+
+# Add missing family compounds from negative words
+add-fc-neg:
+    uv run python -m db_tests.single.add_family_compound_neg
+
+# Add missing family compounds from su, dur, sa and nir words
+add-fc-su-dur:
+    uv run python -m db_tests.single.add_family_compound_su_dur
+
+# Add missing family compounds from taddhita words
+add-fc-taddhita:
+    uv run python -m db_tests.single.add_family_compound_taddhita
+
+# Choose one spelling for long hyphenated words
+add-hyphenations:
+    uv run python -m db_tests.single.add_hyphenations
+
 # Run phonetic changes test
 test-phonetic:
     uv run python -m db_tests.single.add_phonetic_changes
+
+# Find inconsistent sandhi apostrophe contractions
+test-sandhi:
+    uv run python db_tests/single/test_sandhi_errors.py
+
+# Suggest a second construction line from longer compound parts
+test-compounds:
+    uv run python db_tests/single/test_longest_compound_parts.py
+
+# Repoint verbal forms at a present verb or a root
+test-verb-grammar:
+    uv run python db_tests/single/test_verb_grammar_sync.py
+
+# Show which verbal forms need repointing, without writing
+test-verb-grammar-dry-run:
+    uv run python db_tests/single/test_verb_grammar_sync.py --dry-run
+
+# ===== SUTTA ANALYSIS =====
+
+# Stage 1 (study passage) + Stage 2 (export CSV) in sequence, interactive prompts
+analyze:
+    uv run python exporter/analysis/study_passage.py
+    uv run python exporter/analysis/export_words_csv.py
 
 # Add single-meaning synonyms interactively
 add-synonyms-single:
@@ -90,15 +135,18 @@ add-variants-phonetic:
 variants-processor:
     uv run python scripts/find/variants_process.py
 
-# Review pass2 exceptions that block examples for meaningless headwords
-alias pass2 := pass2-exceptions
-pass2-exceptions:
-    uv run python scripts/fix/pass2exceptions.py
-
 # Run ruff linter and formatter (excludes archive/ and resources/)
 lint:
     uv run ruff check . --exclude archive --exclude resources
     uv run ruff format . --exclude archive --exclude resources
+
+# Run pyrefly type checker across the whole repo (config in pyproject.toml)
+typecheck:
+    uv run pyrefly check
+
+# Check for unused, missing and transitive dependencies (config in pyproject.toml); exits 1 while any finding remains
+deps:
+    uv run deptry .
 
 # Show project version
 version:
@@ -141,11 +189,15 @@ export-variants:
 
 # Export mobile SQLite database for DPD Flutter app
 export-mobile:
-    uv run python exporter/mobile/mobile_exporter.py
+    uv run python exporter/mobile/mobile_exporter.py --cone
 
 # Export TPR data for Tipitaka Pali Reader
 export-tpr:
     uv run python exporter/tpr/tpr_exporter.py
+
+# Copy the mobile DPD database into the local ePitaka app
+export-epitaka:
+    uv run python exporter/epitaka/epitaka_exporter.py
 
 # Export TBW format only
 export-tbw:
@@ -170,6 +222,10 @@ export-apple-dictionary:
 # Build WXT browser extension package
 wxt:
     @cd exporter/wxt_extension && npm run package
+
+# Bump the WXT extension version (patch|minor|major)
+wxt-bump level="patch":
+    @cd exporter/wxt_extension && npm version {{level}} --no-git-tag-version
 
 # ===== DATABASE COMPONENTS =====
 
@@ -212,6 +268,26 @@ audio-download:
 
 # ===== MAINTENANCE =====
 
+# Run the AI proofreader over meaning_1, meaning_lit and meaning_2, incrementally
+# updating each field's tools/proofreader*.tsv (use --field to run one)
+proofread:
+    uv run tools/proofreader.py
+
+# Restart the meaning_1 pass from scratch: wipe its cache + queue, then run
+proofread-fresh-1:
+    rm -f tools/proofreader.tsv tools/proofreader.tsv.tmp tools/proofreader_checked.json tools/proofreader_checked.json.tmp
+    uv run tools/proofreader.py --field meaning_1
+
+# Restart the meaning_lit pass from scratch: wipe its cache + queue, then run
+proofread-fresh-lit:
+    rm -f tools/proofreader_meaning_lit.tsv tools/proofreader_meaning_lit.tsv.tmp tools/proofreader_meaning_lit_checked.json tools/proofreader_meaning_lit_checked.json.tmp
+    uv run tools/proofreader.py --field meaning_lit
+
+# Restart the meaning_2 pass from scratch: wipe its cache + queue, then run
+proofread-fresh-2:
+    rm -f tools/proofreader_meaning_2.tsv tools/proofreader_meaning_2.tsv.tmp tools/proofreader_meaning_2_checked.json tools/proofreader_meaning_2_checked.json.tmp
+    uv run tools/proofreader.py --field meaning_2
+
 # Propagate CSS across the project
 css:
     uv run python tools/css_manager.py
@@ -219,6 +295,26 @@ css:
 # Backup the database to .tsv
 backup:
     uv run python db/backup_tsv/backup_dpd_headwords_and_roots.py
+
+# Pull the contributors' files from the server now (the daily timer runs the same command)
+contrib-pull:
+    uv run scripts/server_contrib/contrib_pull.py
+
+# Install the daily contributor pull as a systemd user timer
+contrib-pull-install:
+    test -n "$(command -v uv)" || { echo 'uv not found on PATH'; exit 1; }
+    mkdir -p ~/.config/systemd/user
+    sed "s|@REPO@|{{justfile_directory()}}|; s|@HOME@|$HOME|; s|@UV@|$(command -v uv)|" scripts/server_contrib/dpd-contrib-pull.service > ~/.config/systemd/user/dpd-contrib-pull.service
+    cp scripts/server_contrib/dpd-contrib-pull.timer ~/.config/systemd/user/dpd-contrib-pull.timer
+    systemctl --user daemon-reload
+    systemctl --user enable --now dpd-contrib-pull.timer
+
+# Replaced by contrib-pull (the daily timer). Do not run both.
+# Merge the server's contributions branch into main, then fold the flag files into the shared files
+contrib-merge:
+    git fetch origin contributions
+    git merge --no-edit origin/contributions
+    uv run scripts/server_contrib/merge_contrib_files.py
 
 # Update Anki cards from the DB
 anki:
@@ -232,22 +328,17 @@ anki-templates:
 anki-apkg:
     uv run exporter/anki/anki_apkg_exporter.py
 
-# Enable newsletter scraping
-newsletter-on:
-    uv run python -c "from tools.configger import config_update; config_update('exporter', 'make_newsletter', 'yes')"
+# Start a new month's newsletter from the template (newsletter/<YYYY-MM>/)
+newsletter-new month:
+    uv run newsletter/newsletter_build.py {{month}} --init
 
-# Disable newsletter scraping
-newsletter-off:
-    uv run python -c "from tools.configger import config_update; config_update('exporter', 'make_newsletter', 'no')"
+# Live preview in the browser, rebuilt on every save (default: newest month)
+newsletter-preview month="":
+    uv run newsletter/newsletter_build.py {{month}} --watch
 
-# Scrape newsletters from Gmail and build docs/newsletters.md
-newsletter:
-    uv run python scripts/build/newsletter_scraper.py
-
-# Reprocess all newsletters from scratch
-newsletter-fresh:
-    rm -f scripts/build/newsletter_processed.json
-    uv run python scripts/build/newsletter_scraper.py
+# Gmail draft with the pics embedded; on uposatha days also the docs newsletters page
+newsletter-publish month="":
+    uv run newsletter/newsletter_build.py {{month}} --publish
 
 # Generate changelog and release notes
 changelog:
@@ -258,6 +349,7 @@ docs-update:
     uv run python tools/docs_update_abbreviations.py
     uv run python tools/docs_update_bibliography.py
     uv run python tools/docs_update_thanks.py
+    uv run python tools/docs_update_how_to_cite.py
     uv run python tools/docs_changelog_and_release_notes.py
 
 # Open most recent log file in browser
@@ -266,30 +358,31 @@ showlog:
     latest_file=$(ls -t logs/* | head -1)
     xdg-open "$latest_file"
 
-# ===== SERVER =====
+# ===== DPDICT SERVER =====
 
-# Complete server update: code, data, db, search index, restart
-server-update:
+# Print user@host for the dpdict.net server from config.ini [dpdict_server]
+_dpdict-login:
     #!/usr/bin/env bash
     set -e
-    git pull
-    uv sync
-    uv run python audio/db_release_download.py
-    wget -qO- https://github.com/digitalpalidictionary/dpd-db/releases/latest/download/dpd.db.tar.xz | tar -xJ
-    uv run exporter/webapp/generate_search_index.py
-    pkill -f "uvicorn exporter.webapp.main:app" || true
-    sleep 2
-    mkdir -p logs
-    nohup uv run uvicorn exporter.webapp.main:app --host 0.0.0.0 --port 8080 > "logs/$(date '+%Y-%m-%d_%H-%M-%S').uvicorn.log" 2>&1 &
+    login=$(uv run python -c "from tools.configger import config_read; print(f\"{config_read('dpdict_server', 'user')}@{config_read('dpdict_server', 'host')}\")")
+    case "$login" in
+        None@*|*@None|*None*) echo "Set user and host in the [dpdict_server] section of config.ini" >&2; exit 1 ;;
+    esac
+    echo "$login"
 
-# Quick reload: pull code and restart server
-server-reload:
+# SSH into the dpdict.net server
+dpdict-ssh:
     #!/usr/bin/env bash
-    git pull
-    pkill -f "uvicorn exporter.webapp.main:app" || true
-    sleep 2
-    mkdir -p logs
-    nohup uv run uvicorn exporter.webapp.main:app --host 0.0.0.0 --port 8080 > "logs/$(date '+%Y-%m-%d_%H-%M-%S').uvicorn.log" 2>&1 &
+    set -e
+    exec ssh "$(just _dpdict-login)"
+
+# Copy the latest update-dpd.sh to the dpdict.net server
+dpdict-push:
+    #!/usr/bin/env bash
+    set -e
+    login=$(just _dpdict-login)
+    scp scripts/server_dpdict/update-dpd.sh "$login:~/update-dpd.sh"
+    ssh "$login" "chmod +x ~/update-dpd.sh"
 
 # ===== CONE DICTIONARY IMPORT =====
 
@@ -319,15 +412,20 @@ cpd-extras:
 
 # Turn on deconstructor regeneration
 decon-on:
-    uv run python -c "from tools.configger import config_update; config_update('generate', 'deconstructor', 'yes')"
+    uv run python -c "from tools.configger import config_update; config_update('generate', 'deconstructor', 'yes'); config_update('exporter', 'make_deconstructor', 'yes')"
 
 # Turn off deconstructor regeneration
 decon-off:
-    uv run python -c "from tools.configger import config_update; config_update('generate', 'deconstructor', 'no')"
+    uv run python -c "from tools.configger import config_update; config_update('generate', 'deconstructor', 'no'); config_update('exporter', 'make_deconstructor', 'no')"
 
-# Run the Go deconstructor
+# Run the Go deconstructor and sync its output into the lookup db
 decon:
     go run ./go_modules/deconstructor
+    uv run python scripts/build/deconstructor_output_add_to_db.py
+
+# Generate frequency source JSON from all text corpora
+freq-setup:
+    go run ./go_modules/frequency/setup
 
 # Run the Go frequency tables
 freq:

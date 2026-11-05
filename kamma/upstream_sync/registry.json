@@ -45,7 +45,7 @@
       "discuss_reason": "",
       "sync_rule": "PORT",
       "local_changes": [
-        "SBS dictionary link to `sasanarakkha.github.io/study-tools/dict/sbs-pali-dictionary` in UI (line ~380).",
+        "SBS dictionary link to `sasanarakkha.github.io/study-tools/dict/sbs-pali-dictionary` in UI (line ~415).",
         "SBS search endpoint references."
       ],
       "watch_for": [
@@ -82,7 +82,8 @@
         "If upstream switches from `fast_api_utils` to another server module, `fast_api_utils_dps` must be updated to match the new API.",
         "New upstream view tabs added to `main.py` should be reviewed to ensure DPS views are still appended correctly.",
         "If upstream adds new text-bearing widgets with explicit `size=` / `text_size=` args that should scale, add them to the `_make_font_scaler` calls in `main.py`.",
-        "If DPS adds new widgets with explicit sizes, use upstream-matching values (e.g. `text_size=14`, `size=10`) so the global scale renders them correctly."
+        "If DPS adds new widgets with explicit sizes, use upstream-matching values (e.g. `text_size=14`, `size=10`) so the global scale renders them correctly.",
+        "Upstream `tests/gui2/test_main.py` hard-codes TAB_LABELS (tests/ is skip_sync, so it cannot be registered): after each sync re-append \"DPS\" to its TAB_LABELS (2026-11-05 sync)."
       ],
       "why_discuss": "Imports `fast_api_utils_dps` (DPS-specific server launcher) instead of upstream's `fast_api_utils`, and adds `DpsView` tab. Blind porting removes DPS GUI entirely."
     },
@@ -139,7 +140,7 @@
       "discuss_reason": "Carries a local-only pyrefly hook appended after the upstream pyright hook. Must be re-appended after every upstream pull that overwrites this file.",
       "sync_rule": "DISCUSS",
       "local_changes": [
-        "`pyrefly` hook added: `uv run --with pyrefly pyrefly check --min-severity warn`, runs on all Python files with `pass_filenames: true`."
+        "`pyrefly` hook added: `uv run --with pyrefly pyrefly check` (errors only), runs on staged Python files with `pass_filenames: true`; hook-level `exclude:` mirrors `[tool.pyrefly] project-excludes` (gui2, tools/cst_source, scripts/suttas, exporter/anki, resources, temp, kamma, conductor) because pyrefly ignores project-excludes for explicitly passed files (user decision 2026-11-05)."
       ],
       "watch_for": [
         "After each upstream pull, re-append the `pyrefly` hook block after `pyright` if the file was overwritten.",
@@ -239,7 +240,7 @@
       "local_changes": [
         "Interactive config selector: (1) DPD-SBS server, (2) DPD-SBS-RU local.",
         "Runs `generate_components.sh` (the localized version).",
-        "Exporter sequence: uses `main_sbs.py` and `tpr_exporter_ru.py`.",
+        "Exporter sequence: uses `main_sbs.py`.",
         "Automation: moves mdict files and copies server artifacts if option 1 is selected.",
         "Post-build cleanup: `git checkout --` for files modified during the build (e.g., `pyproject.toml`)."
       ],
@@ -255,7 +256,7 @@
       "local_changes": [
         "Interactive config selector: (1) RUS-DPD server, (2) RUS-DPD local.",
         "Conditional component generation: if skipped, it runs `families_to_json_ru.py` directly.",
-        "Exporter sequence: uses `grammar_dict_ru.py`, `main_ru.py`, `deconstructor_exporter_ru.py`, `kindle_exporter_ru.py`, `tbw_exporter_ru.py`, `tpr_exporter_ru.py`.",
+        "Exporter sequence: uses `grammar_dict_ru.py`, `main_ru.py`, `deconstructor_exporter_ru.py`, `kindle_exporter_ru.py`, `tbw_exporter_ru.py`.",
         "Moves Russian mdict files and tarballs the DB."
       ],
       "watch_for": [
@@ -300,7 +301,8 @@
         "`render_pali_word_dpd_html` uses `data_classes_dps.HeadwordData` and renders via `dpd_headword_ru.jinja`.",
         "Size tracking: `size_dict[\"dpd_summary\"]` records `data.ru_meaning` length instead of English meaning.",
         "`DpdHeadwordRenderDataBase` preloads Russian set names via `read_set_ru_from_tsv()` once at the start of `generate_dpd_html`; each render accesses the dict from `render_data`.",
-        "`generate_dpd_html` uses `rupth: RuPaths` and `joinedload(DpdHeadword.ru)`."
+        "`generate_dpd_html` uses `rupth: RuPaths` and `joinedload(DpdHeadword.ru)`.",
+        "`show_tbw` render-data field + `jinja_env.globals` (upstream #252); `_worker_init` uses the TypedDict constructor like upstream."
       ],
       "watch_for": [
         "The Russian filter means only translated words are exported.",
@@ -390,7 +392,8 @@
         "Eagerly loads `.rt`, `.ru`, `.ta`, and `.sbs` relationships.",
         "`DpdHeadwordRenderDataBase` preloads Russian set names via `read_set_ru_from_tsv()` once at the start of `generate_dpd_html`; each render accesses the dict conditionally from `render_data` if `show_ru_data` is true.",
         "`_parse_batch_top_level` uses `sbs_templates/` and passes all locale flags including `show_ta_data`.",
-        "`DpdHeadwordRenderDataBase` TypedDict includes `show_ta_data: bool`."
+        "`DpdHeadwordRenderDataBase` TypedDict includes `show_ta_data: bool`.",
+        "`show_tbw` render-data field + `jinja_env.globals` (upstream #252); `_worker_init` uses the TypedDict constructor like upstream."
       ],
       "watch_for": [
         "When upstream adds new eager-loaded relationships, also add `.ta` to the joinedload chain.",
@@ -949,7 +952,8 @@
       "local_changes": [
         "`HeadwordData.__init__` populates `ru_meaning`, `ru_complete`, `ru_grammar`, `ru_pos`, `ru_plus_case`, `ru_root_base`, `ru_phonetic`, and `inflections_html_ru`.",
         "`GrammarData` translates headword, POS, and components to Russian.",
-        "`RpdData` class added for Russian EPD lookups."
+        "`RpdData` class added for Russian EPD lookups.",
+        "`HeadwordData.permalink` uses local `RU_PERMALINK_BASE = https://ru.dpdict.net` instead of upstream `tools.version.make_permalink` (dpdict.net)."
       ],
       "watch_for": [
         "Shared with the webapp `toolkit_ru.py`.",
@@ -974,7 +978,8 @@
         "`make_dpd_html_ru` accepts `rupth: RuPaths`.",
         "Eagerly loads `.ru` for headword results.",
         "Renders using `templates_ru` and maps `Lookup.rpd` to `RpdData`.",
-        "\"No results found\" messages translated to Russian."
+        "\"No results found\" messages translated to Russian.",
+        "Imports `LICENSE_HTML` from upstream toolkit (no duplicate constants)."
       ],
       "watch_for": [
         "Ensure all webapp templates exist in `ru_templates/`."
@@ -1188,7 +1193,8 @@
       "local_changes": [
         "Target directory `dpd-db-sbs`.",
         "Downloads DB from `sasanarakkha/dpd-db-sbs`.",
-        "Restarts `main_ru:app` on port 8081."
+        "Restarts `main_ru:app` on port 8081.",
+        "Keeps the `git pull` failure fallback (submodule sync) that upstream does not have; no docs-site pull."
       ],
       "watch_for": [
         "Hardcoded port 8081 must match server firewall settings."
@@ -1222,7 +1228,8 @@
         "Writes to `russian.tsv`, `sbs.tsv`, `tamil.tsv`, and `ru_roots.tsv` in the backup folder.",
         "Aborts if the `Russian` table is empty (safety check); aborts if `Tamil` table is empty (safety check).",
         "Tamil backup follows the same TSV structure as Russian and SBS (header row + data rows).",
-        "Does not mirror upstream `split_tsv_file()` chunking; DPS localized backup TSVs are small and are intentionally kept as single files."
+        "Does not mirror upstream `split_tsv_file()` chunking; DPS localized backup TSVs are small and are intentionally kept as single files.",
+        "`git_commit_dps` uses upstream's path-limited `subprocess git commit -- <files>` (GitPython dropped upstream, 2026-11-05)."
       ],
       "watch_for": [
         "No upstream equivalent. This is critical for data persistence in the fork.",

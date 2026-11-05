@@ -7,18 +7,23 @@ failure reason and empty sutta-metadata columns so nothing gets silently lost.
 """
 
 import csv
+import re
 import sys
 from collections import defaultdict
 
+from sqlalchemy.orm import Session
+
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword
-from scripts.add.vagga_codes.shared import ANY_CODE_RE, DPD_CODE_RE
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 
 pth = ProjectPaths()
 SUTTA_INFO_TSV = pth.sutta_info_tsv_path
 OUTPUT_TSV = pth.compile_vaggas_tsv_path
+
+DPD_CODE_RE = re.compile(r"^([A-Za-z]+)(\d+)(?:\.(\d+))?")
+ANY_CODE_RE = re.compile(r"\(([A-Za-z]+\d+(?:\.\d+)?(?:-(?:\d+\.)?\d+)?)\)")
 
 
 def first_sutta_from_range(dpd_code: str) -> str | None:
@@ -78,7 +83,7 @@ def load_sutta_info() -> tuple[
     return headers, exact_map, ordered_codes, start_map, last_in_section_map
 
 
-def load_vagga_headwords(db_session) -> list[tuple[int, str, str]]:
+def load_vagga_headwords(db_session: Session) -> list[tuple[int, str, str]]:
     """Return list of (id, lemma_1, dpd_code) for vagga/paṇṇāsaka/saṃyuttapāḷi/saṃyutta headwords."""
     results: list[tuple[int, str, str]] = []
 
@@ -204,6 +209,7 @@ def resolve_source_row(
 
 
 def main() -> None:
+    """Build vagga rows from sutta_info.tsv and the db, then write the TSV."""
     pr.tic()
     pr.yellow_title("Vagga sutta_info row generator")
 
@@ -265,7 +271,8 @@ def main() -> None:
         default=999999,
     )
 
-    def _sort_key(r: dict) -> tuple[int, int, int, int]:
+    def _sort_key(r: dict[str, str]) -> tuple[int, int, int, int]:
+        """Order SN rows by saṃyutta, others by anchor position in sutta_info."""
         sutta = r["dpd_sutta"]
         code = r["dpd_code"]
         if code.startswith("SN"):

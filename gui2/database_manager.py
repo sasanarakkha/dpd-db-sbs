@@ -1,13 +1,22 @@
 # -*- coding: utf-8 -*-
 import re
+import threading
+import time
+from collections.abc import Callable, Container, Iterator
+from pathlib import Path
 
 from sqlalchemy import delete as sa_delete
 from sqlalchemy import desc, func
 from sqlalchemy import insert as sa_insert
-from sqlalchemy.orm import defer
+from sqlalchemy.orm import defer, load_only
 from sqlalchemy.orm.session import Session
 
 from db.db_helpers import get_db_session
+from db.inflections.create_inflection_templates import (
+    add_pending_templates,
+    sync_templates,
+)
+from db.inflections.inflection_template_files import load_templates
 from db.models import (
     DpdHeadword,
     DpdRoot,
@@ -17,31 +26,100 @@ from db.models import (
     InflectionTemplates,
     Lookup,
 )
-from gui2.dpd_fields_functions import clean_lemma_1
-from gui2.needs_example import is_missing_sutta_example
+from gui2.dpd_fields_functions import clean_lemma_1, make_dpd_headword_from_dict
+from gui2.needs_example import is_missing_any_example, is_missing_sutta_example
+from tools.cache_load import (
+    load_decon_no_headwords_cache,
+    save_decon_no_headwords_cache,
+)
+from tools.hashed_words import HashedWords
 from tools.pali_sort_key import pali_sort_key
 from tools.paths import ProjectPaths
+from tools.server_mode import is_headless_server
 from tools.synonym_variant import RelationshipDetector
+
+# Lets a burst of rapid saves coalesce into a single detector rebuild.
+DETECTOR_REBUILD_DEBOUNCE_SECS = 1.0
+
+# First id of the range reserved for contributor additions.
+CONTRIB_ID_BASE = 10_000_000
+
+# The headword columns a contributor's instance reads: the synonym and phonetic
+# detector (tools/synonym_variant.py). freq_data is added only for a headword
+# with an empty meaning_1, the one case where the detector reads it.
+CONTRIBUTOR_CORPUS_COLUMNS = (
+    "construction",
+    "family_root",
+    "family_word",
+    "grammar",
+    "lemma_1",
+    "meaning_1",
+    "pos",
+    "root_base",
+    "root_key",
+    "root_sign",
+    "synonym",
+    "var_phonetic",
+    "var_text",
+    "variant",
+)
 
 
 class DatabaseManager:
-    def __init__(self) -> None:
+    # A contributor builds the inflection sets without the corpus, so the corpus
+    # generation counter cannot say when they need rebuilding.
+    _inflections_ready: bool = False
+    # Counts mark_corpus_stale() calls, so a build can tell that a refresh landed
+    # while it ran and must not mark its sets as fresh.
+    _stale_epoch: int = 0
+
+    def __init__(self, own_sandhi_checked: Path | None = None) -> None:
         self.pth: ProjectPaths = ProjectPaths()
 
         self.db_session: Session
         self.new_db_session()
 
+        # Contributors only: returns (corrections, additions), the live dicts
+        # of their own JSON edits. Read on every lookup, so a new save shows
+        # at once. None for user 1, so the db answers alone.
+        self._own_edits: (
+            Callable[[], tuple[dict[str, dict], dict[str, dict]]] | None
+        ) = None
+
         self.db: list[DpdHeadword]
-        self.all_inflections: set[str] = set()
-        self.all_inflections_missing_meaning: set[str] = set()
+        # Single cached corpus (see load_corpus). The generation counter
+        # lets derived sets skip rebuilding when the corpus hasn't changed.
+        self._corpus_stale: bool = True
+        self._corpus_gen: int = 0
+        # False until initialize_db() finishes. Saving before then commits on
+        # the shared session, which (NullPool) closes the connection out from
+        # under the background load's in-flight query → "Cannot operate on a
+        # closed database". Save paths gate on is_db_loaded().
+        self.db_loaded: bool = False
+        self._corpus_lock = threading.Lock()
+        self._inflections_gen: int = -1
+        self._pass2_gen: int = -1
+
+        self.all_inflections: Container[str] = set()
+        self.all_inflections_missing_meaning: Container[str] = set()
 
         self.sandhi_ok_list: set[str] = set(
             self.pth.decon_checked.read_text(encoding="utf-8").splitlines()
         )  # FIXME make a file manager for this
+        # A contributor's own "Sandhi OK" words count as checked for them too.
+        if own_sandhi_checked and own_sandhi_checked.exists():
+            self.sandhi_ok_list.update(
+                own_sandhi_checked.read_text(encoding="utf-8").splitlines()
+            )
 
         # for pass2 preprocessor
         self.all_inflections_missing_example: set[str] = set()
+        self.all_inflections_missing_any_example: set[str] = set()
         self.all_suffixes: set[str] = set()
+
+        # for pass2 preprocessor "in comps" mode
+        self.compound_components_map: dict[str, list[str]] = {}
+        self._components_gen: int = -1
 
         # only need these later
         self.all_lemma_1: set[str] | None = None
@@ -78,8 +156,19 @@ class DatabaseManager:
 
         # synonym/phonetic detector — built lazily on first use
         self._relationship_detector: RelationshipDetector | None = None
+        self._detector_init_lock = threading.Lock()
+        self._detector_rebuild_lock = threading.Lock()
+        self._detector_rebuild_pending: bool = False
+        self._detector_rebuild_running: bool = False
 
     def new_db_session(self):
+        # Deliberately NO close() of the old session here: Flet handlers run
+        # in a thread pool, so a long query may still be running on the old
+        # session in another thread (e.g. the DB tab's filter query) when a
+        # different tab swaps sessions — closing it kills that query mid-
+        # fetch. An abandoned session's connection returns to the shared
+        # engine's pool when the last reference (e.g. the in-flight Query)
+        # is garbage-collected.
         self.db_session: Session = get_db_session(self.pth.dpd_db_path)
 
     # --- INITIALIZE DB ---
@@ -101,18 +190,80 @@ class DatabaseManager:
         self.get_all_word_families()
         self.get_all_patterns()
         self.get_all_decon_no_headwords()
-        self.db = (
-            self.db_session.query(DpdHeadword)
-            .options(
-                defer(DpdHeadword.inflections_html),
-                defer(DpdHeadword.freq_html),
-                defer(DpdHeadword.inflections_sinhala),
-                defer(DpdHeadword.inflections_devanagari),
-                defer(DpdHeadword.inflections_thai),
-            )
+        # The relationship detector is NOT built here: it costs ~0.8-0.9 s
+        # (full corpus scan) and is only read when a word's synonym field is
+        # used. get_relationship_detector() builds it lazily; the app warm-up
+        # (gui2/main.py, after the db load) pre-builds it off the critical
+        # path so the first click doesn't pay for it.
+        self.db_loaded = True
+
+    def is_db_loaded(self) -> bool:
+        """True once initialize_db() has populated the lookup sets and the
+        decon cache. The corpus is NOT loaded by then — it loads lazily via
+        load_corpus() (first use or app warm-up). Save paths check this so
+        a save can't close the shared connection while initialize_db is
+        still reading it."""
+        return self.db_loaded
+
+    # --- CORPUS CACHE ---
+
+    def load_corpus(self) -> list[DpdHeadword]:
+        """The single authoritative full-table load, cached in `self.db`.
+
+        Reloads only after mark_corpus_stale() (any GUI write to
+        dpd_headwords). The big HTML columns stay deferred; freq_data
+        stays loaded because the relationship detector reads it on rows
+        that may outlive their session.
+        """
+        with self._corpus_lock:
+            if self._corpus_stale or getattr(self, "db", None) is None:
+                if is_headless_server():
+                    self.db = self._load_contributor_corpus()
+                else:
+                    self.db = (
+                        self.db_session.query(DpdHeadword)
+                        .options(
+                            defer(DpdHeadword.inflections_html),
+                            defer(DpdHeadword.freq_html),
+                            defer(DpdHeadword.inflections_sinhala),
+                            defer(DpdHeadword.inflections_devanagari),
+                            defer(DpdHeadword.inflections_thai),
+                        )
+                        .all()
+                    )
+                self._corpus_stale = False
+                self._corpus_gen += 1
+            return self.db
+
+    def _load_contributor_corpus(self) -> list[DpdHeadword]:
+        """Every headword, but only the columns the detector reads, in id order.
+
+        A full row costs about 7.5 KB of Python objects for 59 attributes; this
+        keeps 14 (15 for a headword with no meaning). Only rows with no
+        meaning_1 carry freq_data, because `has_textual_occurrence` reads it
+        nowhere else. Outside this module only the Tests tab reads the corpus
+        (gui2/tests_tab_controller.py), and a contributor cannot open it
+        (gui2/contributor_tabs.py). The DB tab a contributor can open queries its
+        own rows.
+        """
+        columns = [getattr(DpdHeadword, name) for name in CONTRIBUTOR_CORPUS_COLUMNS]
+        query = self.db_session.query(DpdHeadword)
+        with_meaning = (
+            query.filter(DpdHeadword.meaning_1 != "").options(load_only(*columns)).all()
+        )
+        without_meaning = (
+            query.filter(DpdHeadword.meaning_1 == "")
+            .options(load_only(*columns, DpdHeadword.freq_data))
             .all()
         )
-        self._relationship_detector = RelationshipDetector(self.db)
+        return sorted(with_meaning + without_meaning, key=lambda hw: hw.id)
+
+    def mark_corpus_stale(self) -> None:
+        """Call after any write to dpd_headwords so the next load_corpus()
+        (and the sets derived from it) sees fresh data."""
+        self._corpus_stale = True
+        self._inflections_ready = False
+        self._stale_epoch += 1
 
     def get_all_roots(self) -> None:
         roots = self.db_session.query(DpdRoot.root).distinct().all()
@@ -121,6 +272,11 @@ class DatabaseManager:
     def get_all_lemma_1_and_lemma_clean(self):
         lemmas = self.db_session.query(DpdHeadword.lemma_1).all()
         self.all_lemma_1 = set([lemma[0] for lemma in lemmas])
+        if self._own_edits:
+            for entries in self._own_edits():
+                for entry in entries.values():
+                    if entry.get("lemma_1"):
+                        self.all_lemma_1.add(str(entry["lemma_1"]))
         self.all_lemma_clean = set([clean_lemma_1(lemma) for lemma in self.all_lemma_1])
 
     def get_all_pos(self):
@@ -173,6 +329,7 @@ class DatabaseManager:
         all_sets_raw = (
             self.db_session.query(DpdHeadword.family_set)
             .filter(DpdHeadword.family_set != "")
+            .distinct()
             .all()
         )
 
@@ -186,7 +343,7 @@ class DatabaseManager:
                     if cleaned_component:
                         unique_components.add(cleaned_component)
 
-        self.all_family_sets = sorted(list(unique_components))
+        self.all_family_sets = sorted(unique_components, key=str.lower)
         self.all_family_sets.insert(0, "")
 
     def get_all_verbs(self) -> None:
@@ -212,6 +369,17 @@ class DatabaseManager:
         self.all_patterns = set([p[0] for p in patterns_query if p[0]])
 
     def get_all_decon_no_headwords(self):
+        """All lookup keys with a deconstruction but no headword.
+
+        Reads the DbInfo cache (~0.15 s vs ~1.4-2.2 s live scan). The cache
+        is invalidated by every headwords/deconstructor lookup sync; on a
+        cache miss this falls back to the live query and refreshes the
+        cache so the next launch is fast again."""
+        cached = load_decon_no_headwords_cache(self.db_session)
+        if cached is not None:
+            self.all_decon_no_headwords = cached
+            return
+
         lookup_result = (
             self.db_session.query(Lookup.lookup_key)
             .filter(Lookup.headwords == "")
@@ -219,34 +387,69 @@ class DatabaseManager:
             .all()
         )
         self.all_decon_no_headwords = set([i[0] for i in lookup_result if i[0]])
+        try:
+            save_decon_no_headwords_cache(self.db_session, self.all_decon_no_headwords)
+        except Exception as exc:
+            # The cache is a pure optimisation — a failed refresh (db write
+            # lock held by the build pipeline, concurrent self-heal race)
+            # must never gate db_loaded. The set is already in memory.
+            print(f"decon cache refresh failed: {exc}")
+            # The failed write leaves the session in a rolled-back-pending
+            # state; later queries on it would raise until it is rolled back.
+            self.db_session.rollback()
 
     # --- PASS1 AUTO ---
 
     def make_inflections_lists(self) -> None:
-        """Load data from the database."""
+        """Derive the pass1 inflection sets from the cached corpus.
 
-        self.db: list[DpdHeadword] = (
-            self.db_session.query(DpdHeadword)
-            .options(
-                defer(DpdHeadword.inflections_html),
-                defer(DpdHeadword.freq_html),
-                defer(DpdHeadword.inflections_sinhala),
-                defer(DpdHeadword.inflections_devanagari),
-                defer(DpdHeadword.inflections_thai),
-                defer(DpdHeadword.freq_data),
+        Rebuilds only when the corpus was reloaded since the last derive."""
+
+        if is_headless_server():
+            self._make_contributor_inflections_lists()
+            return
+
+        corpus = self.load_corpus()
+        if self._inflections_gen == self._corpus_gen:
+            return
+
+        all_inflections: set[str] = set()
+        all_inflections_missing_meaning: set[str] = set()
+        for i in corpus:
+            all_inflections.update(i.inflections_list_all)
+            if not i.meaning_1:
+                all_inflections_missing_meaning.update(i.inflections_list_all)
+
+        self.all_inflections = all_inflections
+        self.all_inflections_missing_meaning = all_inflections_missing_meaning
+        self._inflections_gen = self._corpus_gen
+
+    def _make_contributor_inflections_lists(self) -> None:
+        """The same two sets, as compact hash arrays built from the columns
+        alone: the sets hold 1.6 million words (about 270 MB as Python
+        strings, 13 MB as hashes) and nothing reads more than `in`."""
+
+        def words(meaning_empty_only: bool) -> Iterator[str]:
+            query = self.db_session.query(
+                DpdHeadword.inflections, DpdHeadword.inflections_api_ca_eva_iti
             )
-            .all()
-        )
+            if meaning_empty_only:
+                query = query.filter(DpdHeadword.meaning_1 == "")
+            for inflections, api_ca_eva_iti in query:
+                yield from inflections.split(",")
+                yield from api_ca_eva_iti.split(",")
 
-        self.all_inflections: set[str] = set()  # reset
-        [self.all_inflections.update(i.inflections_list_all) for i in self.db]
-
-        self.all_inflections_missing_meaning: set[str] = set()  # reset
-        [
-            self.all_inflections_missing_meaning.update(i.inflections_list_all)
-            for i in self.db
-            if not i.meaning_1
-        ]
+        # The lock keeps these queries off the shared session while the warm-up
+        # thread loads the corpus on it.
+        with self._corpus_lock:
+            if self._inflections_ready:
+                return
+            epoch = self._stale_epoch
+            self.all_inflections = HashedWords(words(meaning_empty_only=False))
+            self.all_inflections_missing_meaning = HashedWords(
+                words(meaning_empty_only=True)
+            )
+            self._inflections_ready = epoch == self._stale_epoch
 
     def get_related_dict_entries(self, word_in_text) -> list[str]:
         """Get all the possible lemma, pos meaning for a word."""
@@ -286,33 +489,70 @@ class DatabaseManager:
     # --- PASS2 PREPROCESSOR ---
 
     def make_pass2_lists(self) -> None:
-        """Data that pass2 preprocessor needs."""
+        """Derive the pass2 preprocessor sets from the cached corpus.
 
-        self.db: list[DpdHeadword] = (
-            self.db_session.query(DpdHeadword)
-            .options(
-                defer(DpdHeadword.inflections_html),
-                defer(DpdHeadword.freq_html),
-                defer(DpdHeadword.inflections_sinhala),
-                defer(DpdHeadword.inflections_devanagari),
-                defer(DpdHeadword.inflections_thai),
-                defer(DpdHeadword.freq_data),
-            )
-            .all()
-        )
+        Rebuilds only when the corpus was reloaded since the last derive."""
 
-        self.all_inflections_missing_example: set[str] = set()  # reset
-        [
-            self.all_inflections_missing_example.update(i.inflections_list_all)
-            for i in self.db
-            if is_missing_sutta_example(i)
-        ]
+        corpus = self.load_corpus()
+        if self._pass2_gen == self._corpus_gen:
+            return
 
-        self.all_suffixes: set[str] = set()  # reset
-        [self.all_suffixes.add(i.suffix) for i in self.db if i.suffix != ""]
+        all_inflections_missing_example: set[str] = set()
+        all_inflections_missing_any_example: set[str] = set()
+        all_suffixes: set[str] = set()
+        for i in corpus:
+            if is_missing_sutta_example(i):
+                all_inflections_missing_example.update(i.inflections_list_all)
+            if is_missing_any_example(i):
+                all_inflections_missing_any_example.update(i.inflections_list_all)
+            if i.suffix != "":
+                all_suffixes.add(i.suffix)
 
-    def get_headwords(self, word_in_text: str) -> list[DpdHeadword]:
+        self.all_inflections_missing_example = all_inflections_missing_example
+        self.all_inflections_missing_any_example = all_inflections_missing_any_example
+        self.all_suffixes = all_suffixes
+        self._pass2_gen = self._corpus_gen
+
+    def make_compound_components_map(self) -> None:
+        """Map every inflection of a compound headword to its construction
+        components, for the pass2 preprocessor's "in comps" mode.
+
+        Rebuilds only when the corpus was reloaded since the last derive."""
+
+        self.make_pass2_lists()
+        corpus = self.load_corpus()
+        if self._components_gen == self._corpus_gen:
+            return
+
+        compound_components_map: dict[str, list[str]] = {}
+        for i in corpus:
+            if not re.findall(r"\bcomp\b", i.grammar):
+                continue
+            parts = i.construction_line1_clean_list
+            if len(parts) < 2:
+                continue
+            components = [
+                word for word in parts if word and word not in self.all_suffixes
+            ]
+            if not components:
+                continue
+            for inflection in i.inflections_list_all:
+                # inflections_list_all contains "" when either inflections
+                # column is empty — never map the empty string
+                if inflection:
+                    compound_components_map[inflection] = components
+
+        self.compound_components_map = compound_components_map
+        self._components_gen = self._corpus_gen
+
+    def get_headwords(
+        self, word_in_text: str, commentary_book: bool = False
+    ) -> list[DpdHeadword]:
         """Find headwords which match the inflection."""
+
+        is_missing = (
+            is_missing_any_example if commentary_book else is_missing_sutta_example
+        )
 
         lookup_item: Lookup | None = (
             self.db_session.query(Lookup)
@@ -336,16 +576,19 @@ class DatabaseManager:
                         # )  # remove to include commentary words
                         .first()
                     )
-                    if headword and is_missing_sutta_example(headword):
+                    if headword and is_missing(headword):
                         results_list.append(headword)
 
                 return results_list
             else:
-                return self.get_headwords_from_deconstructor(lookup_item)
+                return self.get_headwords_from_deconstructor(
+                    lookup_item, commentary_book
+                )
 
     def get_headwords_from_deconstructor(
         self,
         lookup_item: Lookup,
+        commentary_book: bool = False,
     ) -> list[DpdHeadword]:
         headwords_list: list[DpdHeadword] = []
         deconstruction = lookup_item.deconstructor_unpack
@@ -354,7 +597,7 @@ class DatabaseManager:
             decon_word_list = self.make_decon_word_list(deconstruction)
 
             for word in decon_word_list:
-                headwords_list.extend(self.get_headwords(word))
+                headwords_list.extend(self.get_headwords(word, commentary_book))
             return headwords_list
         else:
             return headwords_list
@@ -504,9 +747,14 @@ class DatabaseManager:
             else:
                 for col in DpdRoot.__table__.columns:
                     if col.name not in ("root", "created_at", "updated_at"):
-                        setattr(existing, col.name, getattr(root, col.name))
+                        new_val = getattr(root, col.name)
+                        if new_val is not None:
+                            setattr(existing, col.name, new_val)
 
             self.db_session.commit()
+            if new_key != original_key:
+                # the rename cascaded root_key onto dpd_headwords rows
+                self.mark_corpus_stale()
             return (True, "")
         except Exception as e:
             self.db_session.rollback()
@@ -519,6 +767,8 @@ class DatabaseManager:
                 return (False, f"Root '{root_key}' not found")
             self.db_session.delete(existing)
             self.db_session.commit()
+            # the ORM cascade may have cleared root_key on dpd_headwords rows
+            self.mark_corpus_stale()
             return (True, "")
         except Exception as e:
             self.db_session.rollback()
@@ -532,13 +782,74 @@ class DatabaseManager:
             .count()
         )
 
+    # --- INFLECTION TEMPLATE CRUD ---
+
+    def get_pattern_headword_count(self, pattern: str) -> int:
+        """Count DpdHeadword rows using this pattern."""
+        return (
+            self.db_session.query(DpdHeadword)
+            .filter(DpdHeadword.pattern == pattern)
+            .count()
+        )
+
+    def rename_pattern_in_headwords(self, old: str, new: str) -> int:
+        """Set DpdHeadword.pattern from old to new. Returns the count."""
+        count: int = (
+            self.db_session.query(DpdHeadword)
+            .filter(DpdHeadword.pattern == old)
+            .update({"pattern": new}, synchronize_session=False)
+        )
+        self.db_session.commit()
+        return count
+
+    def sync_inflection_templates(self) -> list[str]:
+        """Load the TSV files, sync the db, add pending, refresh patterns.
+
+        Returns the changed pattern names."""
+        templates = load_templates(
+            self.pth.inflection_templates_index_path,
+            self.pth.inflection_templates_dir,
+        )
+        changed = sync_templates(self.db_session, templates)
+        add_pending_templates(self.db_session, self.pth, changed)
+        self.db_session.commit()
+        self.get_all_patterns()
+        return changed
+
     # --- GENERIC DB SEARCHES ---
 
+    def set_overlay(
+        self, own_edits: Callable[[], tuple[dict[str, dict], dict[str, dict]]]
+    ) -> None:
+        """Show a contributor's own JSON edits on top of the db.
+
+        own_edits returns (corrections, additions). Only the single-word
+        lookups, the duplicate-check lemma set and the next id see them."""
+        self._own_edits = own_edits
+
+    def _own_additions(self) -> dict[str, dict]:
+        return self._own_edits()[1] if self._own_edits else {}
+
+    def _own_headword(self, field: str, value: str | int) -> DpdHeadword | None:
+        """A transient headword built from an own edit, or None. Corrections
+        come before additions. It is never added to a session."""
+        if self._own_edits is None:
+            return None
+        for entries in self._own_edits():
+            for entry in entries.values():
+                if str(entry.get(field)) == str(value):
+                    return make_dpd_headword_from_dict(entry)
+        return None
+
     def get_headword_by_id(self, id: int) -> DpdHeadword | None:
-        return self.db_session.query(DpdHeadword).filter_by(id=id).first()
+        return self._own_headword("id", id) or (
+            self.db_session.query(DpdHeadword).filter_by(id=id).first()
+        )
 
     def get_headword_by_lemma(self, lemma_1: str) -> DpdHeadword | None:
-        return self.db_session.query(DpdHeadword).filter_by(lemma_1=lemma_1).first()
+        return self._own_headword("lemma_1", lemma_1) or (
+            self.db_session.query(DpdHeadword).filter_by(lemma_1=lemma_1).first()
+        )
 
     def get_headword_by_id_or_lemma(self, user_input: str) -> DpdHeadword | None:
         """Decide where the input is an id or a lemma and query accordingly."""
@@ -558,33 +869,49 @@ class DatabaseManager:
     def get_relationship_detector(self) -> RelationshipDetector:
         """Detector for synonym/phonetic-variant suggestions.
 
-        Built eagerly at the end of `initialize_db`. The lazy-rebuild path
-        below only triggers if the cache was invalidated by a write
-        (add/update/delete) and someone calls before the next initialize.
+        Built lazily on first use (~0.8-0.9 s corpus scan + build) — NOT in
+        `initialize_db`, which must stay fast. The app warm-up
+        (gui2/main.py) pre-builds it off the critical path so the first
+        synonym click doesn't pay for it. The lazy-rebuild path below only
+        triggers if the cache was invalidated by a write
+        (add/update/delete) and someone calls before the rebuild finishes.
         """
         if self._relationship_detector is None:
-            headwords = (
-                self.db
-                if getattr(self, "db", None) is not None
-                else self.db_session.query(DpdHeadword).all()
-            )
-            self._relationship_detector = RelationshipDetector(headwords)
+            # Double-checked locking: a synonym click can land while the
+            # warm-up thread is still building — build once, not twice.
+            with self._detector_init_lock:
+                if self._relationship_detector is None:
+                    self._relationship_detector = RelationshipDetector(
+                        self.load_corpus()
+                    )
         return self._relationship_detector
 
     def invalidate_relationship_detector(self) -> None:
-        """Rebuild the detector in a background thread so saves return
-        immediately. The current detector keeps serving suggestions until
-        the new one is ready, then atomically swaps in. Worst case: a
-        relationship just saved isn't visible until the rebuild finishes
-        (a few seconds), which is well before the user reaches the next
-        word.
+        """Rebuild the detector in a single background worker so saves
+        return immediately. Rapid saves coalesce: while a rebuild is
+        running (or the debounce window is open), further invalidations
+        only set a pending flag and the worker runs once more when it
+        finishes — N saves cost at most one running rebuild plus one
+        queued, never N concurrent full-table loads. The current detector
+        keeps serving suggestions until the new one atomically swaps in.
         """
-        import threading
+        with self._detector_rebuild_lock:
+            self._detector_rebuild_pending = True
+            if self._detector_rebuild_running:
+                return
+            self._detector_rebuild_running = True
 
-        from db.db_helpers import get_db_session
+        threading.Thread(target=self._detector_rebuild_worker, daemon=True).start()
 
-        def _rebuild() -> None:
+    def _detector_rebuild_worker(self) -> None:
+        while True:
+            time.sleep(DETECTOR_REBUILD_DEBOUNCE_SECS)
+            with self._detector_rebuild_lock:
+                self._detector_rebuild_pending = False
             try:
+                # A private session and load, not load_corpus(): the corpus
+                # cache belongs to the UI-facing flows and must not be
+                # swapped out from under them by this worker.
                 bg_session = get_db_session(self.pth.dpd_db_path)
                 headwords = (
                     bg_session.query(DpdHeadword)
@@ -597,13 +924,14 @@ class DatabaseManager:
                     )
                     .all()
                 )
-                detector = RelationshipDetector(headwords)
-                self._relationship_detector = detector
+                self._relationship_detector = RelationshipDetector(headwords)
                 bg_session.close()
             except Exception as exc:
                 print(f"relationship detector rebuild failed: {exc}")
-
-        threading.Thread(target=_rebuild, daemon=True).start()
+            with self._detector_rebuild_lock:
+                if not self._detector_rebuild_pending:
+                    self._detector_rebuild_running = False
+                    return
 
     # --- DB FUNCTIONS ---
 
@@ -611,6 +939,7 @@ class DatabaseManager:
         try:
             self.db_session.add(new_word)
             self.db_session.commit()
+            self.mark_corpus_stale()
             self.invalidate_relationship_detector()
             return (True, "")
 
@@ -628,6 +957,7 @@ class DatabaseManager:
                     if not key.startswith("_") and key != "id":
                         setattr(existing, key, value)
                 self.db_session.commit()
+                self.mark_corpus_stale()
                 self.invalidate_relationship_detector()
                 return (True, "")
             return (False, "Word not found")
@@ -644,6 +974,7 @@ class DatabaseManager:
             id = headword.id
             self.db_session.query(DpdHeadword).filter_by(id=id).delete()
             self.db_session.commit()
+            self.mark_corpus_stale()
             self.invalidate_relationship_detector()
             return (True, "")
         except Exception as e:
@@ -652,8 +983,13 @@ class DatabaseManager:
             return (False, str(e))
 
     def get_next_id(self) -> int:
+        own_ids = [int(e["id"]) for e in self._own_additions().values() if e.get("id")]
+        if self._own_edits is not None:
+            # A contributor takes ids from a reserved range, so a new word can
+            # never collide with an id the maintainer adds to the db meanwhile.
+            return max([CONTRIB_ID_BASE, *own_ids]) + 1
         last_id: int = self.db_session.query(func.max(DpdHeadword.id)).scalar() or 0
-        return last_id + 1
+        return max([last_id, *own_ids]) + 1
 
     # --- DPD FIELDS FUNCTIONS ---
 

@@ -24,7 +24,9 @@ repos:
 
       - id: pyrefly
         name: pyrefly
-        entry: uv run --with pyrefly pyrefly check --min-severity warn
+        entry: uv run --with pyrefly pyrefly check
         language: system
         types: [python]
         pass_filenames: true
+        # mirror [tool.pyrefly] project-excludes (ignored when filenames are passed)
+        exclude: ^(gui2|tools/cst_source|scripts/suttas|exporter/anki|resources|temp|kamma|conductor)/

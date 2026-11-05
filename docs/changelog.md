@@ -5,6 +5,100 @@ search:
 
 # Changelog
 
+## 2026-10-26
+
+### GitHub Issues Closed
+- [#228 Where's the data?](https://github.com/digitalpalidictionary/dpd-db/issues/228)
+- [#241 DPD for KOReader](https://github.com/digitalpalidictionary/dpd-db/issues/241)
+- [#262 How to cite DPD](https://github.com/digitalpalidictionary/dpd-db/issues/262)
+- [#267 Buddhist Wiki](https://github.com/digitalpalidictionary/dpd-db/issues/267)
+- [#268 Add server-side limits to webapp searches](https://github.com/digitalpalidictionary/dpd-db/issues/268)
+- [#270 42 lookup keys have leading or trailing spaces, so exact lookup cannot find their content](https://github.com/digitalpalidictionary/dpd-db/issues/270)
+- [#271 Contributions: update docs and new Google Form](https://github.com/digitalpalidictionary/dpd-db/issues/271)
+- [#272 GitHub: Draft release updates the TBW, Sutta Central, FDG, and TPR submodules](https://github.com/digitalpalidictionary/dpd-db/issues/272)
+- [#273 inflection templates: move from the spreadsheet to tsv files](https://github.com/digitalpalidictionary/dpd-db/issues/273)
+
+
+### Dictionary Data Updates
+- 89 763 headwords, 55 060 (61.3%) complete, 9 078 (10.1%) partially complete, 25 625 (28.5%) incomplete entries
+- 753 roots, 3 326 root families, 37 132 words derived from roots
+- 852 434 deconstructed compounds
+- 1 500 798 unique inflected forms recognized
+- 2 300 427 cells of Pāḷi word data
+- 18 311 cells of Pāḷi root data
+- Pass1 complete: VIN1-4, DN1-3, MN1-3, SN1-5, AN1-11, KN1-5, KN8-9
+- Pass1 in progress: VIN5
+- Pass2 complete: DN1-3, MN1-3, SN1-5, AN1-5
+- Pass2 in progress: AN6
+- numerous additions and corrections based on user feedback
+
+### New Words
+accācarati, accharāsaṅgha, adhigamasaddhā, adhipatatta, anatthapadasaṃhita, anvādisati, anvādisi, apāsādika 2, abala 3, ayamanudhammo 2, ayoni 2, alabhi 2, avabodhana, avahāya, aviccaṃ, ahamassa 1, ahamassa 2, āgamanīyasaddhā, āghātavinaya 1, āghātavinaya 2, ācikkhāpeti, ādigāthā, ādiyamāna 2, āramati 1.2, ārambha 1.4, ārodanā 1, itipissa, idamatthiya, indasama, uccaṃ, ujjāleti, utusamaya, uddesa 8, upakārānupakāra, upakkilissati 2, upaṭṭhita 4, upalāpanā, ubbilāvita, ullaṅghati, ullaṅghāpeti, ussaṅkita, ussāreti 2.1, ekissā 2, okappanasaddhā, ogadha 2.1, oḍḍiyitvā, onati, katamanukaroti, kathita 3, kathetumāraddha, kapicitta, kinti 3, kismici 2, kuppadhamma, kumbhaṭṭhāna, kulupaka 2, kusumbha 2, kodhanīya, kosambakavatthu, khāṇu 2, khiṇoti, gaṅgākūla, gacchati 3, gamanīya 3, gahaṇa 4, gaḷa 2.1, gīvā 3, ghaṇḍi, ghaṇḍikā, ghusati, cakkadhārī, cakkānuvattana, catuppāda 2, calayati, calayituṃ, cundasūkarikavatthu, cumbāpeti, chappāda, chātaka 3, jaggati 2, ṭhārasa, takkayati, taruṇakāla, tedha 2, thirakatha, deti 5, doṇabrāhmaṇa, dhammajāti, nattheso, nānappakāraṃ, nikhanati, nigama 3, nīcaṃ, nīharati 3, nesajja 2, pacchima 9, pañcakanipāta 1, paññattāpaññatta 2, paṭidesita 1, paṭipakkhabhāva, paṭivinodaya, paṭivinodayitvā, paṭisantharati 3, paṭisevitar 2, padakkhiṇaṃ, pabbājayati, parāmasati 1.3, parikuppa, parititta, paropadesa, paligedhī, pavajjati 2.1, pavaḍḍhana 2, pavāhayati, pasādasaddhā, pāda 10, pādanakha, pāsa 2.5, pāsādika 3, piṅgiyānī, pidahati 2, pupphī, pesetabba 2, bandhanatthāya 1, bandhumatī 3, bahubhaṇḍa 2, bāliya, bilaṅga 3, bhañji 2, bhatti 3, bhavataṇhāparikkhaya, bhikkhābhājana, bhuñjāpeti, bhūmyaṃ, bhoga 1.5, macchariyappahāna, maṭṭhakuṇḍalīvatthu, maṇi 4, mathana 1, madhura 2.2, maya 2, mariyāda 2, mahākāḷattheravatthu, māgadhika 2, muccati 1.4, muccati 1.6, rāgavirāgī 2, rosiyati, vaṇṇanā 3, vācca, vicinitvā 2, viḍayhati, vinayanta, vibhūsita 2, vimānita 1, virāga 2.2, vilajjati, vilasita 1, viviccaṃ, vissajjitar, vuṭṭhāpetvā 3, vega 3, veṇī 3, saṅkasāyati 2, saṇṭharituṃ, saṇṭhāpetuṃ, santharituṃ, sandhiyati 3, saparikkamana 2, sabhāga 3, samādahituṃ 1, sampaṭicchati 2, sampaṭicchi 3, sampaṭicchitvā 1, sampassati 2, saṃvāsana, saṃharati 4, sāka 3, sādhāraṇa 3, sīlānisaṃsa, supaṭivinodaya, subhikkha 3, sumanadevīvatthu, suratta 2, sūcipāsa, sotthi 2.1, sopādisesa, sobhana 3, hatthanakha, haliddirāga [190]
+
+
+
+## 2026-09-26
+
+### GitHub Issues Closed
+- [#217 Request to add transliterations as synonyms for kindle mobi dict](https://github.com/digitalpalidictionary/dpd-db/issues/217)
+- [#261 Webapp: Add CC license to search results](https://github.com/digitalpalidictionary/dpd-db/issues/261)
+- [#263 GitHub Issues: Migrate labels to Issue Type, Priority and Effort](https://github.com/digitalpalidictionary/dpd-db/issues/263)
+- [#266 Grammar: resolve all verbal forms to a present tense or root](https://github.com/digitalpalidictionary/dpd-db/issues/266)
+
+
+### Dictionary Data Updates
+- 89 587 headwords, 54 323 (60.6%) complete, 9 343 (10.4%) partially complete, 25 921 (28.9%) incomplete entries
+- 753 roots, 3 319 root families, 37 012 words derived from roots
+- 852 483 deconstructed compounds
+- 1 497 887 unique inflected forms recognized
+- 2 289 424 cells of Pāḷi word data
+- 18 310 cells of Pāḷi root data
+- Pass1 complete: VIN1-4, DN1-3, MN1-3, SN1-5, AN1-11, KN1-5, KN8-9
+- Pass1 in progress: VIN5
+- Pass2 complete: DN1-3, MN1-3, SN1-5, AN1-3
+- Pass2 in progress: AN4
+- numerous additions and corrections based on user feedback
+
+### New Words
+agghāpeti, ajjhotthariyati, aṭṭhamaka 1, aḍḍhasamavutti, adāyaka 2, anajjatana, anicchanta 3, aniyatakāla, anissajjetvā, anukkamanta 1, anuggata 2.1, anuṭṭhubhā, anusāsayati, apayāti, aparisaṅkanīya, apahanati, apādānavacana, appadhānaliṅga, abbāhati, abhilapati, abhilambati, abhilambanta, abhisamekkha, abhisamekkhati, avanamati, avanīpati, avasavati, avasīdati, asamikkhya, āghāya, ādiya 3.1, ādīpeti, ānetvā 3, āpātalikā, āmantanavacana, āyata 2, āyata 3, āloleti, āsaṃsati, āsaṃsitabba, āsīdati 2, ukkhipāpeti, ukkhipīyati, uggatā, uggaha 3, uṇṇamati 1, uṇṇamati 2, uttama 2, uttarati 2, utrāseti, uddhumāta 1, upakkilissati, upagami 2, upagīti, upajāti, upaṭṭhitā, upadisiyati, usabhamatta 1, ojadāna, opacchandasaka, ovadiyati, ovadīyati, ovādeti, ohiyati, katavijja, kammakaraṇa 1, kammavacana, kārapesi, kulachinnaka, khala 2.2, khippati, khīyi 2, khudati, khudita, khepayati, gaṇayati, gadya, gāhati, gīti, guṇīpada, guru 1, gopayati, ghaṭṭāpeti, ghaṭṭiyati, catudīpa, cāleti 2, cāvayati, cintanīya, chādayati, chindeti, chedāpayati, chedeti, jahāpeti, jhāpayati, ñāṇattaya, ṇāpi, tassīla, tiṭṭhubhā, tosetvā 2, thambhati, thomiyati, daṇḍāpeti 1, daṇḍāpeti 2, dānānisaṃsa, dāpayati, dīghasutta, dīghasuttiya, dīpaka 1.2, dukkhati, dodhaka, dosetuṃ, doha 1.1, doha 2.1, dohati, dohanta, dhaneti, dhareti, dhāriyati, dhī 2.1, naccāpeti, naccāpesi, nādayati, nāsayati, nikhaṇāpesi, nigghātita, niyyātar 2, niyyādayitvāna, niyyāyati, nivedayati, nhāpayati, pakujjhati, pakkandati, pakkāmayati, pakkuthati, pakkuthitvā, pakkhālayati, paggharāpeti, pacalana, paccaya 2, paccupaṭṭhapeti, paññapiyati, paṭigacchati, paṭiggahāpeti, paṭiggahāpesi, paṭipaveseti, paṭimaṇḍeti, paṭisaṅkhāti, paṭisāmayati, paṇipatati, pathyā, padāti, padya, padhānaliṅga, panujjati, papañcayati, pabhañjati, pabheda 5, pamādeti, pamitakkharā, payirupāsayati, payujjati, parajjhati, parikaroti, parikkharoti, parigacchati, parijappati, paritussati, paridameti, paridahessati, paridhaṃsati, pariniṭṭhapeti, paripphandati, paribrūheti, paribhāveti, pariyeti, parirakkhanīya, parivaṭṭeti, parivārayati, parisaṅkanīya, palehati, pavajati, pavaḍḍheti, pavattiyati, pavadati 1, pavadati 2, pavahati, pavesayati, pasaveti, pahāpeti, pācāpayati, pādayuga 1, pādayuga 2, pālayati, pihitadvāra 3, pīḷayati, pucchāpeti, pucchāpesi, pucchiyati, pucchīyati, pupphitaggā, pūrayati, pekkhita 1, pothayati, posāpeti, phusayati, phoṭayati, bādhīyati, bījiyati, brahatī, bhajjāpeti, bhaññati, bhujjati, bhedayati, bhedeti, majjhima 09, mattāvutti, madeti, madhurāyati, mantabheda, mahayati, māgadhikā, miyati, muñcāpeti, muṇḍa 2, moseti, yāciyati, yuttatta, yojāpeti 2, rathoddhatā, randhayati, ruhati, laṅghayati, lambati 2, lābheti, liṅgati, luñcāpeti, lehati, locayati, lobheti, lohitadāna, vañcayati, vaṇṇakāma 2.1, vaṇṇiyati, vattayati 1, vattayati 2, vambhayati, vavatthāpeti, vasanaka 1, vasitta, vaṃsaṭṭhā, vāccaliṅga, vijjhīyati, viññāpayati, vittharati, vitthāriyati, vidhaṃsayati, vinata 1, vinata 2, vipulā, vibudha 2, vibhañjaka, vibhañjesi, vimocayati, viyūḷha 1, viyūḷha 2, virecati, vilīyāpeti, visamavutti, vissajjetvā 2, vegavatī, vetālīya, vosajjati, saṅkappayati, saṅkaleti, saṅkaletvā, saṅkalenta, saṅkhāyati, saṅkhyāpadhāna, saṅkhyāpūraṇa, sajja 1, sañcāleti, sadisaka, sane, santāseti, samanusāsati, samavutti, samuṭṭhahati, sampareti, sampādayati, sampādenta 2, sampihita, sambharati, sambharanta, sambhāvayati, saṃkhādati, saṃkhādana, saṃkhipati, saṃcuṇṇeti, saṃphulla, saṃlimpati, saṃvaṇṇiyati, saṃvirūhati, saṃvoharati, saṃsajjati, saṃsati 2, siṅghatā, siṅghaṃ, sinoti, sirasa, sīlatta, sukkhāpayati, sukhāpeti, suvādigaṇa, seviyati, socayati, sobhayati, svāgatā, hasabhāva, hāsayati [319]
+
+
+
+## 2026-07-28
+
+### GitHub Issues Closed
+- [#144 Database: Split textual variants & phonetic variants](https://github.com/digitalpalidictionary/dpd-db/issues/144)
+- [#157 Refactoring](https://github.com/digitalpalidictionary/dpd-db/issues/157)
+- [#196 Automated proofreading](https://github.com/digitalpalidictionary/dpd-db/issues/196)
+- [#197 Create a Pāḷi grammar Analyzer](https://github.com/digitalpalidictionary/dpd-db/issues/197)
+- [#217 Request to add transliterations as synonyms for kindle mobi dict](https://github.com/digitalpalidictionary/dpd-db/issues/217)
+- [#227 DPD Android app beta](https://github.com/digitalpalidictionary/dpd-db/issues/227)
+- [#231 Use BUDSIR for Thai texts](https://github.com/digitalpalidictionary/dpd-db/issues/231)
+- [#245 Mobile db: Include Monier Williams, Edgerton, & CPD in GitHub build](https://github.com/digitalpalidictionary/dpd-db/issues/245)
+- [#248 Go `Lookup` struct missing `abbrev_other`, silent save failure, batch size near SQLite variable limit](https://github.com/digitalpalidictionary/dpd-db/issues/248)
+- [#251 Sutta info: include s.4nt.org link](https://github.com/digitalpalidictionary/dpd-db/issues/251)
+- [#252 Sutta Info: Remove TBW Classic from links](https://github.com/digitalpalidictionary/dpd-db/issues/252)
+- [#253 Browser extension updates](https://github.com/digitalpalidictionary/dpd-db/issues/253)
+
+
+### Dictionary Data Updates
+- 89 280 headwords, 53 775 (60.2%) complete, 9 411 (10.5%) partially complete, 26 094 (29.2%) incomplete entries
+- 753 roots, 3 358 root families, 36 836 words derived from roots
+- 852 543 deconstructed compounds
+- 1 487 581 unique inflected forms recognized
+- 2 276 851 cells of Pāḷi word data
+- 18 310 cells of Pāḷi root data
+- Pass1 complete: VIN1-4, DN1-3, MN1-3, SN1-5, AN1-11, KN1-5, KN8-9
+- Pass1 in progress: VIN5
+- Pass2 complete: DN1-3, MN1-3, SN1-5, AN1-3
+- Pass2 in progress: AN4
+- numerous additions and corrections based on user feedback
+
+### New Words
+akampaneyyatā, akayiramāna 2, akkhaparājita, acchati 4, ajjhotthaṭa 2, aññajana 2.1, aṭṭi, atitta 2, atitti 1, atuccha 2, atta 1.3, attajjhāsaya 2, atthakusala 2, atthaṅgameti 2, atthaso, aniṭṭhena, anukampitabba, anukkamanta, anupādana, andhagaṇa, apadhārita, aparimita 2, appatiṭṭhahitvā 2, aphāsukamakāsi, abajjhitvā, abhineti 2, abhibhavanta 2, ayācita 3, avaṭṭhitacitta, avassutacitta, asajjitvā, asantāsa, asantāsaṭṭhena, ahidīpa, ākāsena gacchanta, āyatanaso 2, āyācati 2, āyācana 2, āyācamāna 2, āruyhi, āliyati, āvahati 3, āsaya 4, iṭṭhena, issara 3, ukkhepaka 1, uttamaṅgaruha 2, udakavappa, udāyī 3, upakūjī, upajāyati 2, upavāsa 2, uyyojetvā 2, usīra 2, ekakkhaṇa 2, ekakkhaṇe, ekavācikaṃ, odhi 2, omadditvā 2, kaṭuviya 2, katabhāva 2, kāmaguṇālaya, kāradīpa, kiñcana 2.1, koṭika 4, koṭṭāpeti 2, koṭṭāpetvā 2, gaṇhāti 8, gabbhaṃ gaṇhi, gaha 4, gādha 2, gocara 2, ghaṭeti 1.2, cakka 4, cakkavākapakūjita, cakkavākūpakūjita, catucakka 2, candanagandhika, candamaṇḍala 2, candimasuriyā 2, cipiṭa, cihaciha, cunda 4, channa 2.3, chindana, jambāla, ṭhapetvā 7, ṭhānantara 2, ṭhāniya 4, temaṃ, thaddhabhāva 2, tharuggaha, thalavappa, thunanta 2.1, dakkhasī, dasabhāga, dāsabhāva, dīghamaddhāna 2, dukkhapphala, duṭṭhalohita, dūsitabba, dosabahula, dvarati, dvāra 3, dvevācikaṃ, dhammattha, dhammapada 4, dhammarakkhita 3, dhaṃsī 4, nadīcara, navāhā, nānujaññā 2, nāsa 2.2, nāsika, nikkhāmetvā 2, niṭṭhaṃ gata, niyojayati 2, nivattāpeti 2, nekacitta, pakiritvā 2, pakūjī, pakkamati 2, pacchimapada, pañcasatima, paṭikkūlatta, paṭivutta 2.1, paṇāmetvā 3, patārayi, patiṭṭhāti 3, patitaphala, pattheti 2, pathanta, padumanāḷa, padumanāḷasutta, padumuppalaka, parajjhāsaya 2, paramaṃ 2, paripuñchana, pariyāyavacana 3, parivattati 4, pavattesi 6, pasādetvā 2, pasāritahattha, passa 2.2, paharanta 2, pahaṃ, pādamūla 2, pādamūla 3, pisanta 3, pīṭha 2, puggala 2, pubbaddha 2, pottha, bandhati 7, bandhanaṃ nigacchati, bāhiya 2, byāpanna 2, bhañjanaka 2, bhaṭa 4, bhaṭa 5, bhāginī, bhinna 5, mandāraka, mandālaka, mamāyitatta 2, mallikādevī, mahallakitthi, mahodaka 2, māna 1.2, mānagantha 2, mukhapiḷakā, mukhapīḷakā, mudu 4, mudutta 1, mūḷhaka, meghasamāna, meghasamānavaṇṇa, moyhati, mosetvā, mohitabba, yantaka 2, yamakapāṭihīra, yamati 1, yodhī 2, laṅgheti 1, loṇamattikā, vaja 2, vajjiputta 4, vaṇaghaṭṭita, vaṇṇiyamāna, vasitar, vāta 6, vādī 3, vārappatta, vicintayitvā, vicchidda, viññatvā 2, viññāpeti 4, viññāpesi 1, visodheti 2, vissajjīyati 1, vissajjīyati 2, vissāsaṃ, voharati 2, vohārapatha 1, sajjati 1.4, sajjhukāra, sattakammapatha, saddakaraṇa, saddhivihārika 3, santikāvacaratta, samaka 2, samakaṃ, samānavassikaṃ, samudaya 2, sameta 2, samocita, sampajji 1, sammadda, sahassapāda, sāmikabhāva 2, sāsapakakka, sikkhana 2, sirīsavana, sītibhavati, sīdati 4, sīsaṃ, sukha 5, suṭṭhutaraṃ, suppanā, suppitatta, susammaṭṭha 2, sūriyamaṇḍala 2, setaṭṭikā, seyyā 5, soṇaka 2, hatthaka 2, hatthavilaṅghakena 2, hanuka, hayavāhana, harītaka 3 [241]
+
+
+
 ## 2026-05-31
 
 ### GitHub Issues Closed

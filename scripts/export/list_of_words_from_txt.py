@@ -4,16 +4,50 @@
 Save list of words from text.txt which are not in sbs db
 """
 
+import re
 from typing import Any
 
 from sqlalchemy import and_, func, or_
 
 from db.db_helpers import get_db_session
 from db.models import SBS, DpdHeadword, Lookup
-from tools.cst_sc_text_sets import make_cst_text_list_from_file
+from tools.clean_machine import clean_machine
+from tools.cst_sc_text_sets import hyphenated_parts_adder
 from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
 from tools.printer import printer as pr
+
+
+def make_cst_text_list_from_file(
+    dpspth: DPSPaths,
+    niggahita: str = "ṃ",
+    dedupe: bool = True,
+    add_hyphenated_parts: bool = True,
+) -> list[str]:
+    """Make an ordered list of words from dpspth.text_to_add_path.
+
+    Moved here from tools/cst_sc_text_sets.py (removed upstream)."""
+    words_list: list[str] = []
+    if dpspth.text_to_add_path:
+        try:
+            with open(dpspth.text_to_add_path, "r", encoding="utf-8") as f:
+                text_string = re.sub(r"\(.+?\)", "", f.read())
+                text_string = clean_machine(
+                    text_string,
+                    niggahita=niggahita,
+                    remove_hyphen=not add_hyphenated_parts,
+                )
+                words_list.extend(text_string.split())
+        except FileNotFoundError:
+            pr.red(f"file {dpspth.text_to_add_path} does not exist")
+            return words_list
+
+    if add_hyphenated_parts:
+        words_list = hyphenated_parts_adder(words_list)
+
+    if dedupe:
+        return list(dict.fromkeys(words_list))
+    return words_list
 
 
 def make_field_conditions(fields: str | list[str]) -> list[Any]:

@@ -6,6 +6,7 @@ from sqlalchemy import or_
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword
 from gui2.toolkit import ToolKit
+from gui2.ui_utils import field_border, is_mounted, request_focus
 from tools.paths import ProjectPaths
 
 
@@ -16,7 +17,6 @@ class SandhiFindReplaceView(ft.Column):
         toolkit: ToolKit,
     ):
         super().__init__(expand=True, spacing=5, controls=[])
-        self.page = page
         self.toolkit: ToolKit = toolkit
 
         self.find_me: str = ""
@@ -29,17 +29,16 @@ class SandhiFindReplaceView(ft.Column):
             "",
             width=400,
             on_blur=self.handle_find_blur,
-            border_radius=20,
-            border=ft.InputBorder.OUTLINE,
+            border=field_border(),
         )
         self.replace_text = ft.TextField(
             "",
             width=400,
-            border_radius=20,
-            border=ft.InputBorder.OUTLINE,
+            border=field_border(),
         )
-        self.find_button = ft.ElevatedButton("Find", on_click=self.find_clicked)
-        self.clear_button = ft.ElevatedButton("Clear", on_click=self.clear_search)
+        self.strip_switch = ft.Switch(label="strip", value=True)
+        self.find_button = ft.Button("Find", on_click=self.find_clicked)
+        self.clear_button = ft.Button("Clear", on_click=self.clear_search)
         self.message = ft.Text("", expand=True)
         self.found_field = ft.Text(width=800, expand=True, selectable=True)
         self.replaced_field_text = ft.Text(width=800, expand=True, selectable=True)
@@ -49,12 +48,11 @@ class SandhiFindReplaceView(ft.Column):
             expand=True,
             multiline=True,
             disabled=True,
-            border_radius=20,
-            border=ft.InputBorder.OUTLINE,
+            border=field_border(),
         )
         self.replaced_field = self.replaced_field_text  # Reference to current widget
-        self.commit_button = ft.ElevatedButton("Commit", on_click=self.commit_clicked)
-        self.ignore_button = ft.ElevatedButton("Ignore", on_click=self.ignore_clicked)
+        self.commit_button = ft.Button("Commit", on_click=self.commit_clicked)
+        self.ignore_button = ft.Button("Ignore", on_click=self.ignore_clicked)
 
         # Build sections
         self._top_section = ft.Container(
@@ -64,6 +62,7 @@ class SandhiFindReplaceView(ft.Column):
                         [
                             ft.Text("Find:", width=100),
                             self.find_text,
+                            self.strip_switch,
                         ]
                     ),
                     ft.Row(
@@ -115,6 +114,11 @@ class SandhiFindReplaceView(ft.Column):
 
         self.controls = [self._top_section, self._middle_section]
 
+    def on_tab_focus(self) -> None:
+        """Focus the find field when the tab (Alt+') is activated."""
+        if is_mounted(self.find_text):
+            request_focus(self.find_text)
+
     def _set_replaced_field_mode(self, editable: bool):
         """Set the replaced field to be editable (TextField) or read-only (Text)."""
 
@@ -162,21 +166,23 @@ class SandhiFindReplaceView(ft.Column):
         self.update()
 
     def clear_search(self, e):
+        """Clear all fields, highlights, search variables and state."""
         self.find_text.value = ""
         self.replace_text.value = ""
         self.message.value = ""
-        self.found_field.value = ""
-        self.replaced_field.value = ""
-        # Reset replaced_field to disabled state
+        self.find_me = ""
+        self.replace_me = ""
         if self.replaced_field != self.replaced_field_text:
             self._set_replaced_field_mode(editable=False)
-        self.replaced_field_text.value = ""
-        self.replaced_field_input.value = ""
-        # Reset to clean state
+        self.clear_fields()
         self._reset_state()
         self.update()
 
     def find_clicked(self, e):
+        if self.strip_switch.value:
+            self.find_text.value = (self.find_text.value or "").strip()
+            self.replace_text.value = (self.replace_text.value or "").strip()
+            self.update()
         if self.find_text.value and self.replace_text.value:
             self.update_message("")
             self.find_me = self.find_text.value
@@ -273,6 +279,7 @@ class SandhiFindReplaceView(ft.Column):
             new_value = re.sub(self.find_me, self.replace_me, self.data.this_field_text)
             setattr(self.data.this_headword, self.data.this_field_name, new_value)
             self.data.commit()
+            self.toolkit.db_manager.mark_corpus_stale()
             self._increment()
         else:
             # Phase 2 logic (manual edit)
@@ -280,6 +287,7 @@ class SandhiFindReplaceView(ft.Column):
             new_value = self.replaced_field.value
             setattr(self.data.this_headword, self.data.this_field_name, new_value)
             self.data.commit()
+            self.toolkit.db_manager.mark_corpus_stale()
             self._increment()
 
     def ignore_clicked(self, e):
@@ -291,10 +299,15 @@ class SandhiFindReplaceView(ft.Column):
         self._load_next_result()
 
     def handle_find_blur(self, e: ft.ControlEvent):
-        """Copy find text to replace text when user exits find field."""
+        """Strip the find text, copy it to replace, and focus the replace field
+        with the cursor at the end."""
+        if self.strip_switch.value and self.find_text.value:
+            self.find_text.value = self.find_text.value.strip()
         if self.find_text.value and not self.replace_text.value:
             self.replace_text.value = self.find_text.value
-            self.update()
+        self.update()
+        if self.strip_switch.value and self.find_text.value:
+            request_focus(self.replace_text)
 
     def _highlight_found(self, text):
         spans = []

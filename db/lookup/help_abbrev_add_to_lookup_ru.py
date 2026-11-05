@@ -2,7 +2,9 @@
 
 """Add help and abbreviations to the Lookup table (ru)."""
 
+import csv
 from dataclasses import dataclass
+from pathlib import Path
 
 from sqlalchemy.orm import Session
 
@@ -11,7 +13,7 @@ from tools.lookup_sync import sync_lookup_column
 from tools.paths import ProjectPaths
 from tools.paths_ru import RuPaths
 from tools.printer import printer as pr
-from tools.tsv_read_write import read_tsv_as_dict_with_different_key, read_tsv_dict
+from tools.tsv_read_write import read_tsv_dict
 
 
 @dataclass
@@ -21,6 +23,25 @@ class GlobalVars:
     db_session: Session
 
 
+def read_tsv_as_dict_with_different_key_ru(
+    file_path: Path, key_index: int
+) -> dict[str, dict[str, str]]:
+    """Read a TSV into {row[key_index]: {header: value}} without the key column.
+
+    Local copy of the helper upstream removed from tools/tsv_read_write.py."""
+    dict_result: dict[str, dict[str, str]] = {}
+    with open(file_path, encoding="utf-8") as tsv_file:
+        tsv_reader = csv.reader(tsv_file, delimiter="\t")
+        headers = next(tsv_reader)
+        for row in tsv_reader:
+            key = row[key_index]
+            if key:
+                dict_result[key] = {
+                    headers[i]: value for i, value in enumerate(row) if i != key_index
+                }
+    return dict_result
+
+
 def normalize_other_abbreviation_key(key: str) -> str:
     return key.removesuffix(".")
 
@@ -28,7 +49,7 @@ def normalize_other_abbreviation_key(key: str) -> str:
 def add_help_ru(g: GlobalVars) -> None:
     pr.green("adding help (ru)")
 
-    ru_help_data = read_tsv_as_dict_with_different_key(g.rupth.help_tsv_path, 2)
+    ru_help_data = read_tsv_as_dict_with_different_key_ru(g.rupth.help_tsv_path, 2)
     data = {key: v["ru_meaning"] for key, v in ru_help_data.items()}
     sync_lookup_column(g.db_session, "help", data)
 
@@ -37,7 +58,9 @@ def add_abbreviations_ru(g: GlobalVars) -> None:
     """Add abbreviations to lookup (ru)"""
     pr.green("adding abbreviations (ru)")
 
-    ru_abbrevs = read_tsv_as_dict_with_different_key(g.rupth.abbreviations_tsv_path, 5)
+    ru_abbrevs = read_tsv_as_dict_with_different_key_ru(
+        g.rupth.abbreviations_tsv_path, 5
+    )
     sync_lookup_column(g.db_session, "abbrev", ru_abbrevs)
 
 

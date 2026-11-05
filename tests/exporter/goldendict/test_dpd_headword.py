@@ -182,8 +182,9 @@ def _minimal_su(**kwargs) -> SimpleNamespace:
     return SimpleNamespace(**defaults)
 
 
-def _render(d: SimpleNamespace) -> str:
+def _render(d: SimpleNamespace, show_tbw: bool = False) -> str:
     env = _make_env()
+    env.globals["show_tbw"] = show_tbw
     template = env.get_template("dpd_headword.jinja")
     return template.render(d=d)
 
@@ -209,6 +210,25 @@ class TestNormalSuttaRow:
         assert "Mūlapaṇṇāsaka" in html
         assert "Sammādiṭṭhisutta" in html
         assert "sammādiṭṭhi" in html
+
+    def test_pts_shown_under_own_heading_without_dv_data(self):
+        su = _minimal_su(is_vagga=False, is_samyutta=False, dv_pts="D i 1,7")
+        html = _render(_minimal_d(su))
+        assert "Pali Text Society" in html
+        assert "D i 1,7" in html
+        assert "Dhamma Vinaya Tools" not in html
+
+    def test_pts_and_dv_headings_both_shown(self):
+        su = _minimal_su(
+            is_vagga=False,
+            is_samyutta=False,
+            dv_pts="D i 1,7",
+            dv_exists=True,
+            dv_main_theme="ethics",
+        )
+        html = _render(_minimal_d(su))
+        assert html.index("Pali Text Society") < html.index("Dhamma Vinaya Tools")
+        assert "ethics" in html
 
     def test_dv_catalogue_shown(self):
         su = _minimal_su(
@@ -292,6 +312,12 @@ class TestVaggaRow:
         assert "Dhamma Vinaya Tools" not in html
         assert "ethics" not in html
 
+    def test_pts_hidden(self):
+        su = _minimal_su(is_vagga=True, is_samyutta=False, dv_pts="D i 1,7")
+        html = _render(_minimal_d(su))
+        assert "Pali Text Society" not in html
+        assert "D i 1,7" not in html
+
     def test_sc_vagga_card_link(self):
         su = _minimal_su(
             is_vagga=True,
@@ -318,6 +344,12 @@ class TestVaggaRow:
 
 
 class TestSamyuttaRow:
+    def test_pts_hidden(self):
+        su = _minimal_su(is_vagga=False, is_samyutta=True, dv_pts="S v 244,4")
+        html = _render(_minimal_d(su))
+        assert "Pali Text Society" not in html
+        assert "S v 244,4" not in html
+
     def test_button_label_is_samyutta(self):
         su = _minimal_su(is_vagga=False, is_samyutta=True)
         html = _render(_minimal_d(su))
@@ -387,3 +419,50 @@ class TestSamyuttaRow:
         html = _render(_minimal_d(su))
         assert "Linked Discourses on Causality" not in html
         assert "Contains discourses" not in html
+
+
+class TestTbwLegacyToggle:
+    def test_hidden_by_default(self):
+        su = _minimal_su(
+            is_vagga=False,
+            is_samyutta=False,
+            tbw_legacy="https://f.dhamma.gift/bw/mn/mn1.html",
+        )
+        html = _render(_minimal_d(su))
+        assert "TBW Legacy" not in html
+
+    def test_shown_when_enabled(self):
+        su = _minimal_su(
+            is_vagga=False,
+            is_samyutta=False,
+            tbw_legacy="https://f.dhamma.gift/bw/mn/mn1.html",
+        )
+        html = _render(_minimal_d(su), show_tbw=True)
+        assert "TBW Legacy" in html
+        assert "https://f.dhamma.gift/bw/mn/mn1.html" in html
+
+    def test_absent_when_no_legacy_link(self):
+        su = _minimal_su(is_vagga=False, is_samyutta=False, tbw_legacy=None)
+        html = _render(_minimal_d(su), show_tbw=True)
+        assert "TBW Legacy" not in html
+
+
+class TestDhammaGiftLink:
+    def test_shown_with_short_link(self) -> None:
+        # Built by the real property, not a literal, so a revert of the link
+        # form fails here instead of leaving this export silently unguarded.
+        real = SuttaInfo()
+        real.sc_code = "MN1"
+        su = _minimal_su(
+            is_vagga=False,
+            is_samyutta=False,
+            dhamma_gift=real.dhamma_gift,
+        )
+        html = _render(_minimal_d(su))
+        assert "Dhamma.gift" in html
+        assert "https://dhamma.gift/mn1" in html
+
+    def test_absent_when_no_link(self) -> None:
+        su = _minimal_su(is_vagga=False, is_samyutta=False, dhamma_gift=None)
+        html = _render(_minimal_d(su))
+        assert "Dhamma.gift" not in html

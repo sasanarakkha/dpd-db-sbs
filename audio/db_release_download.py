@@ -5,6 +5,12 @@ Simple Download Latest Release Script for DPD Audio Database
 Downloads the latest GitHub release and extracts the database.
 """
 
+import sqlite3
+import sys
+import tempfile
+from contextlib import closing
+from pathlib import Path
+
 import requests
 from rich.progress import (
     BarColumn,
@@ -16,33 +22,12 @@ from rich.progress import (
     TransferSpeedColumn,
 )
 
+from audio.github_release import download_index, find_index_asset, get_latest_release
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 from tools.tarballer import extract_tarball
 
 pth = ProjectPaths()
-
-
-def get_latest_release():
-    """Get latest release information from GitHub."""
-
-    pr.green_tmr("fetching latest GitHub release")
-    headers = {"Accept": "application/vnd.github.v3+json"}
-    try:
-        response = requests.get(
-            "https://api.github.com/repos/digitalpalidictionary/dpd-audio/releases/latest",
-            headers=headers,
-            timeout=30,
-        )
-        response.raise_for_status()
-        release_info = response.json()
-        pr.yes("ok")
-        return release_info
-    except requests.exceptions.RequestException as e:
-        pr.no("failed")
-        pr.red("Error fetching latest release:")
-        pr.red(str(e))
-        return None
 
 
 def find_archive_asset(release_info):
@@ -65,49 +50,7 @@ def find_archive_asset(release_info):
     return None
 
 
-def find_index_asset(release_info):
-    """Find the index TSV in release assets."""
-    pr.green_tmr("finding index tsv")
-    assets = release_info.get("assets", [])
-
-    for asset in assets:
-        name = asset["name"]
-        if name.startswith("dpd_audio_index_") and name.endswith(".tsv"):
-            pr.yes("ok")
-            return asset
-
-    pr.no("failed")
-    pr.red("no index tsv found")
-    return None
-
-
-def download_index(asset):
-    """Download the index TSV asset to the static path."""
-    pr.green_tmr("downloading index tsv")
-    try:
-        response = requests.get(asset["browser_download_url"], stream=True, timeout=30)
-        response.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        pr.no("failed")
-        pr.red(f"Error downloading index tsv: {e}")
-        return None
-
-    target = pth.dpd_audio_index_tsv_path
-    with open(target, "wb") as f:
-        for chunk in response.iter_content(chunk_size=8192):
-            f.write(chunk)
-
-    if target.stat().st_size == 0:
-        pr.no("failed")
-        pr.red("empty index tsv")
-        return None
-
-    pr.yes("ok")
-    pr.green(f"saved to: {target}")
-    return target
-
-
-def download_archive(asset):
+def download_archive(asset, work_dir: Path) -> Path | None:
     """Download the release archive."""
     pr.green_title("downloading database")
 
@@ -121,8 +64,7 @@ def download_archive(asset):
         pr.red(f"Content-Type: {content_type}")
         return None
 
-    db_dir = pth.dpd_audio_db_path.parent
-    archive_path = db_dir / asset["name"]
+    archive_path = work_dir / asset["name"]
 
     total_size = int(response.headers.get("content-length", 0))
 
@@ -162,11 +104,27 @@ def download_archive(asset):
     return archive_path
 
 
-def extract_database(archive_path):
-    """Extract database from archive."""
+def install_database(archive_path: Path, work_dir: Path) -> bool:
+    """Extract the database, test it has rows, then swap it in for the live one."""
 
-    db_dir = pth.dpd_audio_db_path.parent
-    extract_tarball(archive_path, db_dir, preserve_structure=False)
+    extract_tarball(archive_path, work_dir, preserve_structure=False)
+    new_db = work_dir / pth.dpd_audio_db_path.name
+
+    pr.green_tmr("testing database")
+    try:
+        with closing(sqlite3.connect(new_db)) as conn:
+            rows = conn.execute("SELECT COUNT(*) FROM dpd_audio").fetchone()[0]
+    except sqlite3.Error as e:
+        pr.no("failed")
+        pr.red(f"database test failed: {e}")
+        return False
+    if rows == 0:
+        pr.no("failed")
+        pr.red("database has no rows")
+        return False
+    pr.yes(rows)
+
+    new_db.replace(pth.dpd_audio_db_path)
     pr.green(f"saved to: {pth.dpd_audio_db_path}")
     return True
 
@@ -176,29 +134,25 @@ def main():
     pr.yellow_title("download db release")
 
     release_info = get_latest_release()
-    if not release_info:
-        return False
 
     asset = find_archive_asset(release_info)
     if not asset:
         return False
 
-    archive_path = download_archive(asset)
-    if not archive_path:
-        return False
+    # Same filesystem as the live db, so the final replace is atomic.
+    with tempfile.TemporaryDirectory(dir=pth.dpd_audio_db_path.parent) as tmp:
+        work_dir = Path(tmp)
+        archive_path = download_archive(asset, work_dir)
+        if not archive_path:
+            return False
+        if not install_database(archive_path, work_dir):
+            return False
 
-    extract_database(archive_path)
-
-    index_asset = find_index_asset(release_info)
-    if not index_asset:
-        return False
-
-    if not download_index(index_asset):
-        return False
+    download_index(find_index_asset(release_info))
 
     pr.toc()
     return True
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(0 if main() else 1)

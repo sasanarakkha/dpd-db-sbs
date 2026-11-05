@@ -5,13 +5,10 @@ This script updates all tables with the latest derived data in preparation for e
 You can finely control which parts get run in ./config.ini
 """
 
-from tools.script_runner import run_script, check_db_exists
-
-# Check if database exists (replaces: if [ ! -e "dpd.db" ]; then echo "Error..."; exit 1; fi)
-check_db_exists()
+from tools.script_runner import check_db_exists, run_script
 
 # List of commands to execute - all commands from the original script
-COMMANDS = [
+COMMANDS: list[str] = [
     "uv run pytest tests/",
     #
     "tools/logo.py",
@@ -37,7 +34,7 @@ COMMANDS = [
     "db/variants/main.py",
     #
     "go run go_modules/deconstructor/main.go",
-    "scripts/build/tarball_deconstructor_output.py",
+    "scripts/build/deconstructor_output_add_to_db.py",
     #
     "scripts/build/api_ca_eva_iti_iva_hi.py",
     #
@@ -59,6 +56,8 @@ COMMANDS = [
     #
     "db/epd/epd_to_lookup.py",
     #
+    "scripts/build/decon_cache_update.py",
+    #
     "exporter/webapp/generate_search_index.py",
     #
     "audio/bhashini/generate_dpd.py",
@@ -68,4 +67,12 @@ COMMANDS = [
     "scripts/build/dealbreakers.py",
 ]
 
-run_script("Generate Components", COMMANDS)
+
+def main() -> None:
+    """Exit if dpd.db is missing, then run every component step in order."""
+    check_db_exists()
+    run_script("Generate Components", COMMANDS)
+
+
+if __name__ == "__main__":
+    main()

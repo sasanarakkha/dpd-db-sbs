@@ -10,6 +10,7 @@ import flet as ft
 from db_tests.db_tests_manager import InternalTestRow
 from gui2.dps_view import DpsView
 from gui2.mixins import PopUpMixin
+from gui2.ui_utils import request_focus
 from tools.paths_dps import DPSPaths
 
 
@@ -39,7 +40,7 @@ class DpsTestManager(PopUpMixin):
         self.fieldnames: list[str] = []
         self.current_tests: list[InternalTestRow] = []
         self.integrity_ok, self.integrity_failures = self.integrity_check()
-        
+
         # UI state
         self.ui: DpsView | None = None
         self.page: ft.Page | None = None
@@ -84,7 +85,7 @@ class DpsTestManager(PopUpMixin):
                         "display_1": row["display_1"],
                         "display_2": row["display_2"],
                         "display_3": row["display_3"],
-                        "notes": row.get("notes", "")  # Optional field
+                        "notes": row.get("notes", ""),  # Optional field
                     }
                     self.current_tests.append(InternalTestRow(**reordered_row))
             return self.current_tests
@@ -105,6 +106,7 @@ class DpsTestManager(PopUpMixin):
         """
         # Get DPS field names from the field mapping
         from gui2.dps_field_mapping import dps_field_mapping
+
         dps_field_names = list(dps_field_mapping.keys())
         dps_field_names.append("")  # Add "" to allow empty values
 
@@ -150,7 +152,7 @@ class DpsTestManager(PopUpMixin):
                         invalid_value=str(sign_value),
                     )
                     failures.append(failure)
-                    
+
         if failures:
             return False, failures
         else:
@@ -216,13 +218,11 @@ class DpsTestManager(PopUpMixin):
                 )
             elif test_logic == "contains word":
                 test_results[f"test{count}"] = (
-                    re.findall(rf"\b{test_string}\b", values.get(test_column, ""))
-                    != []
+                    re.findall(rf"\b{test_string}\b", values.get(test_column, "")) != []
                 )
             elif test_logic == "does not contain word":
                 test_results[f"test{count}"] = (
-                    re.findall(rf"\b{test_string}\b", values.get(test_column, ""))
-                    == []
+                    re.findall(rf"\b{test_string}\b", values.get(test_column, "")) == []
                 )
             elif test_logic == "is empty":
                 test_results[f"test{count}"] = values.get(test_column, "") == ""
@@ -270,19 +270,19 @@ class DpsTestManager(PopUpMixin):
     def run_all_tests(self, ui: DpsView, values: dict[str, str]) -> None:
         """Run all tests and handle UI interaction - same as GuiTestManager"""
         self.current_tests = self.load_tests()
-        
+
         # Clear previous error highlights before running tests
         for field in ui.dps_fields.fields.values():
-            if isinstance(field, ft.TextField) and hasattr(field, "error_text"):
-                field.error_text = None
-        
+            if isinstance(field, ft.TextField):
+                field.error = None
+
         # Get headword ID for exception management
         headword_id_str = values.get("dps_id", "")
         try:
             self.current_headword_id = int(headword_id_str) if headword_id_str else None
         except ValueError:
             self.current_headword_id = None
-            
+
         passed, failure_list = self.run_all_tests_on_values(values)
         self.passed = passed
         self.failure_list = failure_list
@@ -300,8 +300,8 @@ class DpsTestManager(PopUpMixin):
             for f in failure_list:
                 if isinstance(f, TestFailure):
                     field = ui.dps_fields.fields.get(f.error_column)
-                    if isinstance(field, ft.TextField) and hasattr(field, "error_text"):
-                        field.error_text = f.test_name
+                    if isinstance(field, ft.TextField):
+                        field.error = f.test_name
                 elif isinstance(f, IntegrityFailure):
                     ui.update_message(
                         f"error in TSV: {f.test_row} {f.test_name} {f.invalid_field_name} {f.invalid_value}"
@@ -437,9 +437,7 @@ class DpsTestManager(PopUpMixin):
                 except FileNotFoundError:
                     self.ui.update_message("Error: 'code' command not found.")
                 except Exception as sub_err:
-                    self.ui.update_message(
-                        f"Error opening file with VSCode: {sub_err}"
-                    )
+                    self.ui.update_message(f"Error opening file with VSCode: {sub_err}")
             else:
                 self.ui.update_message(
                     f"Error: Test file not found at expected path: {self.tests_path}"
@@ -454,7 +452,7 @@ class DpsTestManager(PopUpMixin):
             if isinstance(failure, TestFailure):
                 field = self.ui.dps_fields.fields.get(failure.error_column)
                 if field and hasattr(field, "focus"):
-                    field.focus()  # type: ignore
+                    request_focus(field)
             self.ui.update_message(f"Edit field: {failure.test_name}")
 
     def _handle_next_failure(self, e: ft.ControlEvent) -> None:
@@ -541,10 +539,10 @@ class DpsTestManager(PopUpMixin):
         if not self.current_tests:
             print("No tests loaded, nothing to sort.")
             return
-            
+
         # Sort the internal tests list by test_name
         self.current_tests.sort(key=lambda test: test.test_name)
-        
+
         # Save the sorted tests back to the TSV file
         self.save_tests()
 
@@ -556,18 +554,20 @@ class DpsTestManager(PopUpMixin):
     def run_tests(self, values: dict[str, str]) -> tuple[bool, list[dict]]:
         """Backward compatibility method - run DPS tests using the same logic as Pass2Add"""
         passed, failure_list = self.run_all_tests_on_values(values)
-        
+
         # Convert to old format for compatibility
         failures = []
         for failure in failure_list:
             if isinstance(failure, TestFailure):
-                failures.append({
-                    "test_name": failure.test_name,
-                    "test_number": failure.test_row,
-                    "failed_criteria": [],  # Not used in DPS UI
-                    "error_column": failure.error_column
-                })
-        
+                failures.append(
+                    {
+                        "test_name": failure.test_name,
+                        "test_number": failure.test_row,
+                        "failed_criteria": [],  # Not used in DPS UI
+                        "error_column": failure.error_column,
+                    }
+                )
+
         return passed, failures
 
     def show_failures_compat(self, page=None) -> None:

@@ -49,6 +49,7 @@ DEFAULT_CONFIG = {
     "dictionary": {
         "make_mdict": "yes",
         "show_id": "no",
+        "show_tbw": "no",
         "data_limit": "0",
     },
     "exporter": {
@@ -57,6 +58,7 @@ DEFAULT_CONFIG = {
         "make_grammar": "no",
         "make_variants": "no",
         "make_tpr": "no",
+        "make_epitaka": "no",
         "make_mobile": "no",
         "make_ebook": "no",
         "make_tbw": "no",
@@ -66,7 +68,6 @@ DEFAULT_CONFIG = {
         "make_abbrev": "no",
         "tarball_db": "no",
         "make_changelog": "no",
-        "make_newsletter": "no",
         "update_simsapa_db": "no",
         "make_audio_db": "yes",
         "upload_audio_db": "no",
@@ -74,7 +75,8 @@ DEFAULT_CONFIG = {
     "apis": {"openai": "", "deepseek": "", "gemini": "", "openrouter": ""},
     "anki": {"update": "no", "db_path": "", "backup_path": ""},
     "simsapa": {"app_path": "", "db_path": ""},
-    "tpr": {"db_path": ""},
+    "tpr": {"db_path": "", "make_beta": "no"},
+    "epitaka": {"db_path": ""},
 }
 
 PROFILES: dict[str, dict[str, dict[str, str]]] = {
@@ -92,6 +94,7 @@ PROFILES: dict[str, dict[str, dict[str, str]]] = {
         "exporter": {
             "make_grammar": "yes",
             "make_deconstructor": "yes",
+            "make_variants": "yes",
             "make_ebook": "yes",
             "make_tpr": "yes",
             "make_mobile": "yes",
@@ -114,7 +117,7 @@ PROFILES: dict[str, dict[str, dict[str, str]]] = {
             "make_variants": "no",
             "make_ebook": "no",
             "make_tpr": "yes",
-            "make_mobile": "no",
+            "make_mobile": "yes",
             "make_tbw": "no",
             "make_sutta_central": "no",
             "make_pdf": "no",
@@ -134,6 +137,9 @@ PROFILES: dict[str, dict[str, dict[str, str]]] = {
             "transliterations": "yes",
             "freq_maps": "yes",
         },
+        "generate": {
+            "deconstructor": "yes",
+        },
         "dictionary": {"make_mdict": "yes", "show_id": "no", "data_limit": "0"},
         "exporter": {
             "make_dpd": "yes",
@@ -150,7 +156,7 @@ PROFILES: dict[str, dict[str, dict[str, str]]] = {
             "make_mobile": "yes",
             "make_pdf": "yes",
         },
-        "anki": {"update": "no"},
+        "anki": {"update": "yes"},
         "goldendict": {"copy_unzip": "no", "make_slob": "yes"},
     },
     "quick": {
@@ -184,7 +190,6 @@ PROFILES: dict[str, dict[str, dict[str, str]]] = {
             "make_abbrev": "no",
             "tarball_db": "no",
             "make_changelog": "no",
-            "make_newsletter": "no",
             "update_simsapa_db": "no",
             "make_audio_db": "no",
             "upload_audio_db": "no",
@@ -270,31 +275,12 @@ def config_update_default_value(section: str, option: str) -> None:
         pr.red(f"missing default value for {section}: {option}")
 
 
-def config_test_section(section):
-    """Test config.ini to see if a section exists."""
-    if config.has_section(section):
-        return True
-    else:
-        return False
-
-
 def config_test_option(section, option):
     """Test config.ini to see if a section, option exists."""
     if config.has_section(section):
         return config.has_option(section, option)
     else:
         return False
-
-
-def print_config_settings(sections_to_print=None) -> None:
-    """Print specified sections from config.ini or all if not specified."""
-    if sections_to_print is None:
-        sections_to_print = config.sections()
-    for section in sections_to_print:
-        if config.has_section(section):
-            pr.green(f"[{section}]")
-            for key, value in config.items(section):
-                pr.green(f"{key} = {value}")
 
 
 if __name__ == "__main__":

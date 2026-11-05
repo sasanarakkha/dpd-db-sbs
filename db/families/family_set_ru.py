@@ -194,6 +194,11 @@ def compile_sf_html_ru(
     return sets_dict
 
 
+# Sets that are legitimately complete with fewer than 3 members,
+# matched by prefix. Short saṃyuttas contain only one or two vaggas.
+SMALL_SET_EXCEPTIONS: tuple[str, ...] = ("vaggas of Saṃyutta Nikāya",)
+
+
 def add_sf_to_db(db_session: Session, sets_dict: dict[str, dict]) -> list[str]:
     pr.green_tmr("updating db")
 
@@ -210,7 +215,7 @@ def add_sf_to_db(db_session: Session, sets_dict: dict[str, dict]) -> list[str]:
             sf_data.data_ru_pack(sets_dict[sf]["data_ru"])
             db_session.add(sf_data)
 
-            if count < 3:
+            if count < 3 and not sf.startswith(SMALL_SET_EXCEPTIONS):
                 errors_list.append(sf)
         else:
             pr.red(f"{sf} not found in db")

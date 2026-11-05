@@ -422,7 +422,7 @@
         </tr>
         {% endif %}
 
-        {% if d.su.tbw_legacy %}
+        {% if d.su.tbw_legacy and show_tbw %}
         <tr>
             <th>
                 TBW Legacy
@@ -466,6 +466,18 @@
             <td>
                 <a href="{{ d.su.sc_voice_link }}" target="_blank">{{
                     d.su.sc_voice_link }}</a>
+            </td>
+        </tr>
+        {% endif %}
+
+        {% if d.su.s_4nt_link %}
+        <tr>
+            <th>
+                s.4nt.org
+            </th>
+            <td>
+                <a href="{{ d.su.s_4nt_link }}" target="_blank">{{
+                    d.su.s_4nt_link }}</a>
             </td>
         </tr>
         {% endif %}
@@ -659,19 +671,16 @@
         </tr>
         {% endif %}
 
-        <!-- DV catalogue -->
+        <!-- PTS concordance -->
 
         {% if not is_vagga and not is_samyutta %}
 
-        {% if d.su.dv_exists %}
+        {% if d.su.dv_pts %}
         <tr>
             <th class="heading" colspan="2">
-                Dhamma Vinaya Tools: Sutta Catalogue
+                Pali Text Society
             </th>
         </tr>
-        {% endif %}
-
-        {% if d.su.dv_pts %}
         <tr>
             <th>
                 PTS
@@ -679,6 +688,16 @@
             <td>
                 {{ d.su.dv_pts }}
             </td>
+        </tr>
+        {% endif %}
+
+        <!-- DV catalogue -->
+
+        {% if d.su.dv_exists %}
+        <tr>
+            <th class="heading" colspan="2">
+                Dhamma Vinaya Tools: Sutta Catalogue
+            </th>
         </tr>
         {% endif %}
 

@@ -11,9 +11,11 @@ This subsystem follows a modern "Model-View-Controller (MVC)" or "Component-Base
 4.  **Separation of Concerns:** Clearly distinguishes between data handling (`storage/`), technical requirements (`specs/`), and the visual interface.
 
 ## Relationships & Data Flow
-- **Writer:** Acts as the primary modern interface for adding and correcting data in the **db/**.
+- **Writer:** Acts as the primary modern interface for adding and correcting data in the **db/**. Only user "1" writes the db. A contributor's saves go to their own JSON files (`save_router.py`), and the db shows their edits on top (`DatabaseManager.set_overlay`).
+- **Preview before save:** The Pass1Add and Pass2Add save buttons first open the unsaved word as the webapp shows it (`preview.py`, a dark page in a browser tab). A dialog then offers Save or Cancel, and the form stays filled until Save. The page is written to `gui2/assets/preview/` (gitignored).
 - **Validation:** Integrates deeply with **db_tests/** to ensure data quality at the point of entry.
 - **Support:** Relies on **tools/** for project-wide paths and Pāḷi-specific logic.
+- **Field help:** the hover tooltip on each field name in the editor form comes from `field_help.json` (one text per field, hand-edited, in the words of a Pāḷi scholar). `field_help.py` loads it, and `tests/gui2/test_field_help.py` fails if its keys and the field list differ.
 
 ## Interface
 To start the modern GUI:
@@ -39,5 +41,24 @@ Specific maintenance utilities can be run from the `utilities/` subfolder.
 | Bold Search | `bold_search_view.py` | Search bold definitions |
 | **Roots** | **`roots_tab_view.py`** | **Full CRUD editor for `dpd_roots` table** |
 
+## Contributor server tabs
+When `DPD_GUI2_ROLE=contributor-server`, the tab bar shows only the tabs a contributor may use (`contributor_tabs.py`). The tab decides what they can do:
+
+| Kind | Tabs | Rule |
+|------|------|------|
+| Base (always) | Pass1Auto, Pass1Add | Saves go to the contributor's own JSON files |
+| Safe (extra, by env) | Transl, Bold Search | Write nothing shared |
+| Read (extra, by env) | DB, √ (Roots), Infl | Read only: every save handler returns at once |
+| Hidden | everything else | Never shown, whatever the env says |
+
+- `DPD_GUI2_TABS` lists the extra tabs, comma-separated (e.g. `Bold Search,DB`).
+- `DPD_GUI2_DATA_DIR` moves the per-user files outside the repo.
+- One live session per process: the newest browser tab wins and the older tab shows "already open". Flet does not always fire its disconnect event on a reload, so the app does not wait for it.
+- A contributor process opens the db read-only (`PRAGMA query_only`).
+
 ## GUI Assets
 - **Linux Integration:** A `dpd-gui2.desktop` file is provided in `gui2/linux/` to ensure the custom icon is correctly displayed in the Linux Mint taskbar and Alt-Tab switcher.
+
+## Development Notes
+- **Lint/typecheck excludes:** `gui2/` is pyright-excluded (`[tool.pyright].exclude`) and pyrefly-excluded (`[tool.pyrefly].project-excludes`), but NOT ruff-excluded — so it commonly carries pre-existing ruff violations that surface when you touch a file, and `uv run pyright gui2/<file>` reports "0 errors" having analysed zero files. To actually type-check a gui2 file (or a `tests/` file, also excluded), run `uv run pyright --project /dev/null <file>`, or check `--outputjson`'s `filesAnalyzed`.
+- **Measuring startup headless:** use `xvfb-run -a` plus a driver that launches with `start_new_session=True` and kills the whole process group on the final stamp — never launch desktop windows for measurement (users close them mid-run), and never kill just the `uv run` PID (it orphans the venv python and the flet client). Working driver: `kamma/archive/20260918_gui2_startup_latency/artifacts/run_phase3_serial.py`.

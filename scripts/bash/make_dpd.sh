@@ -44,7 +44,6 @@ done
 uv run python exporter/goldendict/main_sbs.py
 # uv run python exporter/deconstructor/deconstructor_exporter.py
 
-uv run python exporter/tpr/tpr_exporter_ru.py
 # uv run python exporter/kindle/kindle_exporter.py
 
 uv run python scripts/build/zip_goldendict_mdict.py

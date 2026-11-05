@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 
 from db.models import DpdHeadword
+from tools.contrib_entry import entry_hash
 from tools.printer import printer as pr
 
 CorrectionsDict = dict[str, dict[str, str | int]]
@@ -46,51 +47,152 @@ class CorrectionsManager:
             try:
                 with open(self.corrections_path, encoding="utf-8") as f:
                     merged = json.load(f)
-            except (FileNotFoundError, json.JSONDecodeError):
+            except FileNotFoundError:
                 pass
+            except json.JSONDecodeError:
+                # The file is the contributor's only record. Keep the damaged
+                # copy aside so the next save does not overwrite it.
+                corrupt = self.corrections_path.with_name(
+                    self.corrections_path.name + ".corrupt"
+                )
+                self.corrections_path.replace(corrupt)
+                pr.red(
+                    f"{self.corrections_path.name} is damaged, kept as {corrupt.name}"
+                )
 
         return merged
 
     def _save_dict(self, data: CorrectionsDict) -> None:
-        with open(self.corrections_path, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
+        # Write then swap, so a crash mid-write cannot leave a half-written file.
+        tmp = self.corrections_path.with_name(self.corrections_path.name + ".tmp")
+        tmp.write_text(json.dumps(data, ensure_ascii=False, indent=4), encoding="utf-8")
+        tmp.replace(self.corrections_path)
 
     def save_corrections(self) -> None:
         self._save_dict(self.corrections_dict)
 
-    def update_corrections(self, word: DpdHeadword, comment: str) -> None:
+    def update_corrections(
+        self, word: DpdHeadword, comment: str, changed: list[str] | None = None
+    ) -> None:
         word_dict = {k: v for k, v in vars(word).items() if not k.startswith("_")}
         word_dict["comment"] = comment
-        self.corrections_dict[str(word.id)] = word_dict
-        self.save_corrections()
+        if changed is not None:
+            # Which columns differ from the db row, so the reviewer can see
+            # what the contributor touched without comparing every field.
+            word_dict["_changed"] = changed
+        # Key = "{username}_{id}": unique across contributors (username) and
+        # stable per word (id + dedup), so re-correcting the same word overwrites
+        # its one live entry (latest wins) instead of piling up duplicates the
+        # reviewer would process repeatedly. Reuse an existing entry's key even
+        # if it predates this scheme (e.g. an old uuid key).
+        key = self._key_for_id(word.id) or f"{self._username()}_{word.id}"
+        previous = self.corrections_dict.get(key)
+        self.corrections_dict[key] = word_dict
+        try:
+            self.save_corrections()
+        except OSError:
+            # The overlay reads this dict, so it must not show an unsaved edit.
+            if previous is None:
+                del self.corrections_dict[key]
+            else:
+                self.corrections_dict[key] = previous
+            raise
+
+    def _username(self) -> str:
+        """The contributor this file belongs to, from its name
+        (corrections_{username}.json). Primary user's corrections.json → '1'."""
+        stem = self.corrections_path.stem
+        prefix = "corrections_"
+        return stem[len(prefix) :] if stem.startswith(prefix) else "1"
+
+    def _key_for_id(self, id_no: int) -> str | None:
+        """Return the existing key for an entry with this db id, or None."""
+        # Compare as text: a form field holds the id as int or str, so the same
+        # word can be saved under either type.
+        for key, entry in self.corrections_dict.items():
+            if str(entry.get("id")) == str(id_no):
+                return key
+        return None
+
+    def is_not_in_corrections(self, id_no: int) -> bool:
+        return self._key_for_id(id_no) is None
+
+    def discard(self, id_no: int) -> bool:
+        """Remove this word's entry and rewrite the file. False if none."""
+        key = self._key_for_id(id_no)
+        if key is None:
+            return False
+        removed = self.corrections_dict.pop(key)
+        try:
+            self.save_corrections()
+        except OSError:
+            self.corrections_dict[key] = removed
+            raise
+        return True
 
     def get_next_correction(
         self,
-    ) -> tuple[dict[str, str | int] | None, Path | None, int]:
+    ) -> tuple[dict[str, str | int] | None, Path | None, str | None, int]:
         """Retrieves and removes the next correction from the in-memory queue.
 
-        Returns (correction, origin_path, corrections_remaining). For the
-        primary user flow, origin_path is the contributor file the item came
-        from. Correction and origin_path are None if no corrections available.
+        Returns (correction, origin_path, source_key, corrections_remaining).
+        source_key is the key as it appears in the contributor file — needed
+        because the DB may assign a different id when the correction is
+        committed. For the primary user flow, origin_path is the contributor
+        file the item came from. The first three are None if no corrections
+        are available.
         """
         if not self.corrections_dict:
-            return None, None, 0
+            return None, None, None, 0
 
         first_key = next(iter(self.corrections_dict))
         correction = self.corrections_dict.pop(first_key)
         origin = self._origin.pop(first_key, None)
-        return correction, origin, len(self.corrections_dict)
+        return correction, origin, first_key, len(self.corrections_dict)
 
     def save_processed_correction(
         self,
         word_data: dict[str, str],
         origin_path: Path | None = None,
+        source_key: str | None = None,
+        original_entry: dict | None = None,
     ) -> None:
         """Append processed correction to corrections_added.json, tagging the
         contributor, and remove that key from the origin contributor file.
+        source_key is the key as stored in the contributor file (may differ
+        from word_data["id"] which gets a new DB-assigned value on commit).
+        original_entry is the contributor's entry as it was loaded; its hash
+        and source_key go in the log so the server can tell it was processed.
         """
         contributor = _contributor_from_origin(origin_path, prefix="corrections_")
 
+        tagged = {**word_data, "_contributor": contributor}
+        if source_key is not None and original_entry is not None:
+            tagged["_source_key"] = source_key
+            tagged["_source_hash"] = entry_hash(original_entry)
+        self._append_to_log(tagged)
+
+        if origin_path is not None and source_key is not None:
+            _remove_key_from_file(origin_path, source_key)
+
+    def reject(self, origin_path: Path, source_key: str, original_entry: dict) -> None:
+        """Turn a contributor's correction down: log it as rejected, then remove it
+        from their file. The log entry stops the server from sending the same
+        entry back, as it does for an accepted one."""
+        self._append_to_log(
+            {
+                "_source_key": source_key,
+                "_source_hash": entry_hash(original_entry),
+                "_contributor": _contributor_from_origin(
+                    origin_path, prefix="corrections_"
+                ),
+                "lemma_1": original_entry.get("lemma_1", ""),
+                "_rejected": True,
+            }
+        )
+        _remove_key_from_file(origin_path, source_key)
+
+    def _append_to_log(self, entry: dict) -> None:
         existing_data: list[dict] = []
         try:
             with open(self.paths.corrections_added_path, encoding="utf-8") as f:
@@ -98,14 +200,10 @@ class CorrectionsManager:
         except (FileNotFoundError, json.JSONDecodeError):
             pass
 
-        tagged = {**word_data, "_contributor": contributor}
-        existing_data.append(tagged)
+        existing_data.append(entry)
 
         with open(self.paths.corrections_added_path, "w", encoding="utf-8") as f:
             json.dump(existing_data, f, ensure_ascii=False, indent=4)
-
-        if origin_path is not None and "id" in word_data:
-            _remove_key_from_file(origin_path, str(word_data["id"]))
 
 
 def _contributor_from_origin(origin_path: Path | None, prefix: str) -> str:

@@ -9,7 +9,7 @@ import json
 from multiprocessing import Manager, Process
 from multiprocessing.managers import ListProxy
 from subprocess import check_output
-from typing import TypedDict
+from typing import TypedDict, cast
 
 import psutil
 from aksharamukha import transliterate
@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 from db.db_helpers import get_db_session
 from db.models import Lookup
 from tools.configger import config_test, config_update
-from tools.lookup_is_another_value import is_another_value
+from tools.lookup_is_another_value import TRANSLITERATION_COLUMNS, is_another_value
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 from tools.sinhala_tools import translit_ro_to_si
@@ -33,6 +33,44 @@ class WordInflections(TypedDict):
 
 def _should_transliterate(lookup: Lookup, regenerate_all: bool) -> bool:
     return (not lookup.sinhala or regenerate_all) and is_another_value(lookup, "epd")
+
+
+def _clear_ineligible_transliterations(db_session: Session) -> tuple[int, int]:
+    """Strip the transliterations of rows ``_should_transliterate`` now rejects.
+
+    The write-back below only ever updates rows it selected, so a row that stops
+    qualifying keeps whatever it was given last time. EPD-only rows are English,
+    and transliterating them produced junk like ``un-`` -> ``උන්-`` that stayed
+    searchable forever.
+
+    Returns (cleared, deleted).
+    """
+
+    content_columns = [
+        c.name
+        for c in Lookup.__table__.columns
+        if c.name not in ("lookup_key", "epd", *TRANSLITERATION_COLUMNS)
+    ]
+    no_content = " AND ".join(f"IFNULL({c}, '') = ''" for c in content_columns)
+    has_translit = " OR ".join(
+        f"IFNULL({c}, '') != ''" for c in TRANSLITERATION_COLUMNS
+    )
+    blanks = ", ".join(f"{c} = ''" for c in TRANSLITERATION_COLUMNS)
+
+    conn = db_session.connection()
+
+    # A row with nothing left but transliterations is unreachable by every stale
+    # pass, which only ever inspects rows holding a value in its own column.
+    # Blanking it would strand it forever as a blank lookup key.
+    deleted = conn.exec_driver_sql(
+        f"DELETE FROM lookup "
+        f"WHERE ({no_content}) AND IFNULL(epd, '') = '' AND ({has_translit})"
+    )
+    cleared = conn.exec_driver_sql(
+        f"UPDATE lookup SET {blanks} WHERE ({no_content}) AND ({has_translit})"
+    )
+    db_session.commit()
+    return cleared.rowcount, deleted.rowcount
 
 
 def _parse_batch(
@@ -81,17 +119,25 @@ def _parse_batch(
 
     sinhala: str = translit_ro_to_si(lookup_to_transliterate_string)
 
-    devanagari: str = transliterate.process(
-        "IASTPali",
-        "Devanagari",
-        lookup_to_transliterate_string,
-    )  # type:ignore
+    # aksharamukha's process() is unannotated and falls through to None on an
+    # unknown script name; the script names here are constants, so it is a str.
+    devanagari: str = cast(
+        str,
+        transliterate.process(
+            "IASTPali",
+            "Devanagari",
+            lookup_to_transliterate_string,
+        ),
+    )
 
-    thai: str = transliterate.process(
-        "IASTPali",
-        "Thai",
-        lookup_to_transliterate_string,
-    )  # type:ignore
+    thai: str = cast(
+        str,
+        transliterate.process(
+            "IASTPali",
+            "Thai",
+            lookup_to_transliterate_string,
+        ),
+    )
 
     sinhala_lines: list[str] = sinhala.split("\n")
     devanagari_lines: list[str] = devanagari.split("\n")
@@ -191,9 +237,18 @@ def main() -> None:
 
     pth = ProjectPaths()
     db_session = get_db_session(pth.dpd_db_path)
-    lookup_db = db_session.query(Lookup).all()
 
     pr.yes("")
+    pr.green_tmr("clearing ineligible")
+
+    cleared, deleted = _clear_ineligible_transliterations(db_session)
+    pr.yes(cleared)
+    pr.summary("rows deleted", deleted)
+
+    pr.green_tmr("loading lookup table")
+    lookup_db = db_session.query(Lookup).all()
+    pr.yes(len(lookup_db))
+
     pr.green_tmr("regenerate all")
 
     # check config

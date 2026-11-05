@@ -13,8 +13,6 @@ class ProjectPaths:
         # root
         self.docs_dir = base_dir / "docs"
         self.dpd_db_path = base_dir / "dpd.db"
-        self.gmail_credentials_path = base_dir / "credentials.json"
-        self.gmail_token_path = base_dir / "token.json"
         self.mk_docs_yaml = base_dir / "mkdocs.yaml"
         self.pyproject_path = base_dir / "pyproject.toml"
         self.temp_dir = base_dir / "temp"
@@ -55,8 +53,12 @@ class ProjectPaths:
 
         # db/inflections
         self.inflection_templates_path = (
-            base_dir / "db/inflections/inflection_templates.xlsx"
+            base_dir / "misc/inflection_templates_legacy.xlsx"
         )
+        self.inflection_templates_index_path = (
+            base_dir / "db/inflections/templates_index.tsv"
+        )
+        self.inflection_templates_dir = base_dir / "db/inflections/templates"
 
         # db/sanskrit
         self.root_families_sanskrit_path = (
@@ -67,6 +69,7 @@ class ProjectPaths:
         self.dv_catalogue_suttas_tsv_path = (
             base_dir / "db/suttas/dv_catalogue_suttas.tsv"
         )
+        self.pts_concordance_tsv_path = base_dir / "db/suttas/pts_concordance.tsv"
 
         # db_tests
         self.internal_tests_path = base_dir / "db_tests/db_tests_columns.tsv"
@@ -75,22 +78,55 @@ class ProjectPaths:
         self.add_phonetic_variants_exceptions_path = (
             base_dir / "db_tests/single/add_phonetic_variants.json"
         )
-        self.antonym_dict_path = base_dir / "db_tests/single/test_antonyms.json"
-        self.bahubbihi_dict_path = base_dir / "db_tests/single/test_bahubbihis.json"
-        self.bold_example_path = base_dir / "db_tests/single/test_bold.json"
-        self.digu_json_path = base_dir / "db_tests/single/test_digu.json"
-        self.hyphenations_scratchpad_path = (
-            base_dir / "db_tests/single/test_hyphenations.txt"
+        self.antonym_dict_path = base_dir / "db_tests/single/fixme/test_antonyms.json"
+        self.bahubbihi_dict_path = (
+            base_dir / "db_tests/single/fixme/test_bahubbihis.json"
         )
-        self.idioms_exceptions_dict = base_dir / "db_tests/single/test_idioms.json"
-        self.maha_exceptions_list = (
-            base_dir / "db_tests/single/test_maha_exceptions.json"
+        self.bold_example_path = (
+            base_dir / "db_tests/single/test_bold_example_inflections.json"
+        )
+        self.digu_json_path = base_dir / "db_tests/single/test_digu.json"
+        self.example_dupes_config_path = (
+            base_dir / "db_tests/single/test_example_dupes.json"
+        )
+        self.family_compounds_meaning_exceptions_path = (
+            base_dir / "db_tests/single/test_family_compounds_have_meaning_1.json"
+        )
+        self.hyphenations_scratchpad_path = (
+            base_dir / "db_tests/single/fixme/test_hyphenations.txt"
+        )
+        self.idioms_exceptions_dict = (
+            base_dir / "db_tests/single/fixme/test_idioms.json"
+        )
+        self.longest_compound_parts_exceptions_path = (
+            base_dir / "db_tests/single/test_longest_compound_parts.json"
+        )
+        self.longest_compound_parts_endings_path = (
+            base_dir / "db_tests/single/test_longest_compound_parts_endings.json"
         )
         self.neg_compound_exceptions = (
             base_dir / "db_tests/single/test_neg_compound_exceptions.json"
         )
+        self.numbering_anomalies_exceptions_path = (
+            base_dir / "db_tests/single/test_numbering_anomalies.json"
+        )
+        self.pali_difference_exceptions_path = (
+            base_dir / "db_tests/single/test_pali_1_2_difference.json"
+        )
+        self.root_family_prefix_exceptions_path = (
+            base_dir / "db_tests/single/test_root_family_vs_construction_prefixes.json"
+        )
+        self.verb_grammar_sync_exceptions_path = (
+            base_dir / "db_tests/single/test_verb_grammar_sync.json"
+        )
         self.phonetic_changes_vowels_path = (
             base_dir / "db_tests/single/add_phonetic_changes_vowels.tsv"
+        )
+        self.sandhi_errors_exceptions_path = (
+            base_dir / "db_tests/single/test_sandhi_errors.json"
+        )
+        self.su_kammadharaya_exceptions_path = (
+            base_dir / "db_tests/single/test_su_kammadharaya.json"
         )
         self.sukha_dukkha_finder_path = (
             base_dir / "db_tests/single/test_sukha_dukkha_finder.json"
@@ -102,21 +138,27 @@ class ProjectPaths:
             base_dir / "db_tests/single/add_synonym_variant.json"
         )
         self.theragatha_filler_path = (
-            base_dir / "db_tests/single/test_theragatha_filler.pickle"
+            base_dir / "db_tests/single/test_theragatha_filler.json"
         )
         self.wf_exceptions_list = (
-            base_dir / "db_tests/single/add_word_family_finder.pickle"
+            base_dir / "db_tests/single/fixme/add_word_family_finder.pickle"
         )
 
-        # db_tests_gui
+        # db_tests/single
         self.add_antonyms_sync_dict = (
-            base_dir / "db_tests_gui/add_antonyms_sync_dict.json"
+            base_dir / "db_tests/single/add_antonyms_sync.json"
         )
+        self.add_hyphenations_config_path = (
+            base_dir / "db_tests/single/add_hyphenations.json"
+        )
+
+        self.citation_cff_path = base_dir / "CITATION.cff"
 
         # docs
         self.docs_abbreviations_md_path = base_dir / "docs/abbreviations.md"
         self.docs_bibliography_md_path = base_dir / "docs/bibliography.md"
         self.docs_changelog_md_path = base_dir / "docs/changelog.md"
+        self.docs_how_to_cite_md_path = base_dir / "docs/how_to_cite.md"
         self.docs_newsletters_md_path = base_dir / "docs/newsletters.md"
         self.docs_thanks_md_path = base_dir / "docs/thanks.md"
 
@@ -181,7 +223,7 @@ class ProjectPaths:
 
         # exporter/kindle
         self.epub_dir = base_dir / "exporter/kindle/epub"
-        self.kindlegen_path = base_dir / "exporter/kindle/kindlegen"
+        self.kindling_path = base_dir / "exporter/kindle/kindling-cli"
 
         # exporter/kindle/epub/OEBPS
         self.epub_content_opf_path = base_dir / "exporter/kindle/epub/OEBPS/content.opf"
@@ -273,6 +315,7 @@ class ProjectPaths:
         self.webapp_home_simple_css_path = (
             base_dir / "exporter/webapp/static/home_simple.css"
         )
+        self.webapp_cc_icons_path = base_dir / "exporter/webapp/static/cc_icons.svg"
         self.webapp_js_path = base_dir / "exporter/webapp/static/dpd.js"
         self.webapp_logo_dark_svg_path = (
             base_dir / "exporter/webapp/static/dpd-logo-dark.svg"
@@ -303,9 +346,8 @@ class ProjectPaths:
         self.dpd_logo_svg = base_dir / "identity/logo/dpd-logo.svg"
 
         # resources
-        self.deconstructor_output_dir = base_dir / "resources/deconstructor_output"
         self.other_pali_texts_dir = base_dir / "resources/other_pali_texts"
-        self.sya_dir = base_dir / "resources/syāmaraṭṭha_1927"
+        self.sya_dir = base_dir / "resources/tipitaka.rte"
         self.tipitaka_translation_db_dir = (
             base_dir / "resources/tipitaka_translation_db"
         )
@@ -316,14 +358,6 @@ class ProjectPaths:
         )
         self.tbw_dpd_ebts_js_path = base_dir / "resources/bw2/js/dpd_ebts.js"
         self.tbw_i2h_js_path = base_dir / "resources/bw2/js/dpd_i2h.js"
-
-        # resources/deconstructor_output
-        self.deconstructor_output_json = (
-            base_dir / "resources/deconstructor_output/deconstructor_output.json"
-        )
-        self.deconstructor_output_tar_path = (
-            base_dir / "resources/deconstructor_output/deconstructor_output.json.tar.gz"
-        )
 
         # resources/dpd_submodules/bjt/public
         self.bjt_dir = base_dir / "resources/dpd_submodules/bjt/public/static"
@@ -472,6 +506,12 @@ class ProjectPaths:
             / "resources/other-dictionaries/dictionaries/cone/source/cone_dict.json"
         )
 
+        # resources/other-dictionaries/dictionaries/wordnet/source
+        self.wordnet_source_path = (
+            base_dir
+            / "resources/other-dictionaries/dictionaries/wordnet/source/wordnet_dict.json"
+        )
+
         # resources/other-dictionaries/dictionaries/cpd
         self.cpd_css_path = (
             base_dir / "resources/other-dictionaries/dictionaries/cpd/cpd.css"
@@ -503,6 +543,28 @@ class ProjectPaths:
             base_dir / "resources/other-dictionaries/dictionaries/dpr/source/dpr.json"
         )
 
+        # resources/other-dictionaries/dictionaries/nyanatiloka
+        self.nyanatiloka_css_path = (
+            base_dir
+            / "resources/other-dictionaries/dictionaries/nyanatiloka/nyanatiloka.css"
+        )
+
+        # resources/other-dictionaries/dictionaries/nyanatiloka/source
+        self.nyanatiloka_source_path = (
+            base_dir
+            / "resources/other-dictionaries/dictionaries/nyanatiloka/source/nyanatiloka.json"
+        )
+
+        # resources/other-dictionaries/dictionaries/pts
+        self.pts_css_path = (
+            base_dir / "resources/other-dictionaries/dictionaries/pts/pts.css"
+        )
+
+        # resources/other-dictionaries/dictionaries/pts/source
+        self.pts_source_path = (
+            base_dir / "resources/other-dictionaries/dictionaries/pts/source/pts.json"
+        )
+
         # resources/other-dictionaries/dictionaries/mw
         self.mw_css_path = (
             base_dir / "resources/other-dictionaries/dictionaries/mw/mw.css"
@@ -526,6 +588,16 @@ class ProjectPaths:
             base_dir
             / "resources/other-dictionaries/dictionaries/peu/source/peu_dump.js"
         )
+        self.peu_source_json_path = (
+            base_dir
+            / "resources/other-dictionaries/dictionaries/peu/source/peu_dump.json"
+        )
+
+        # ePitaka app data. It lives outside the repo and is absent on the
+        # contributor server, so every reader treats it as optional.
+        self.epitaka_data_dir = Path.home() / ".local/share/com.dn.epitaka"
+        self.epitaka_db_path = self.epitaka_data_dir / "epitaka.db"
+        self.epitaka_en_db_path = self.epitaka_data_dir / "epitaka_en.db"
 
         # resources/other-dictionaries/dictionaries/sin_eng_sin/source
         self.eng_sin_source_path = (
@@ -577,6 +649,10 @@ class ProjectPaths:
             base_dir
             / "resources/tpr_downloads/download_source_files/download_list.json"
         )
+        self.tpr_download_list_2_path = (
+            base_dir
+            / "resources/tpr_downloads/download_source_files/download_list_2.json"
+        )
 
         # resources/tpr_downloads/release_zips
         self.tpr_beta_path = (
@@ -586,23 +662,12 @@ class ProjectPaths:
             base_dir / "resources/tpr_downloads/release_zips/dpd.zip"
         )
 
-        # scripts/build
-        self.newsletter_processed_json = (
-            base_dir / "scripts/build/newsletter_processed.json"
-        )
-
         # scripts/extractor
         self.extract_cone_tsv_path = base_dir / "scripts/extractor/extract_cone.tsv"
-        self.extract_cpd_tsv_path = base_dir / "scripts/extractor/extract_cpd.tsv"
 
         # scripts/find
         self.most_common_missing_words_tsv_path = (
             base_dir / "scripts/find/most_common_missing_words.tsv"
-        )
-
-        # scripts/fix
-        self.fix_synonym_entries_json_path = (
-            base_dir / "scripts/fix/fix_synonym_entries.json"
         )
 
         # scripts/suttas
@@ -614,7 +679,6 @@ class ProjectPaths:
         )
 
         # shared_data
-        self.additions_tsv_path = base_dir / "shared_data/additions.tsv"
         self.changed_headwords_path = base_dir / "shared_data/changed_headwords"
         self.corrections_tsv_path = base_dir / "shared_data/corrections.tsv"
         self.headword_stem_pattern_dict_path = (
@@ -686,6 +750,19 @@ class ProjectPaths:
         self.cst_book_translator_tsv_path = base_dir / "tools/cst_book_translator.tsv"
         self.phonetic_changes_path = base_dir / "tools/phonetic_changes.tsv"
         self.proofreader_tsv_path = base_dir / "tools/proofreader.tsv"
+        self.proofreader_checked_json_path = base_dir / "tools/proofreader_checked.json"
+        self.proofreader_meaning_lit_tsv_path = (
+            base_dir / "tools/proofreader_meaning_lit.tsv"
+        )
+        self.proofreader_meaning_lit_checked_json_path = (
+            base_dir / "tools/proofreader_meaning_lit_checked.json"
+        )
+        self.proofreader_meaning_2_tsv_path = (
+            base_dir / "tools/proofreader_meaning_2.tsv"
+        )
+        self.proofreader_meaning_2_checked_json_path = (
+            base_dir / "tools/proofreader_meaning_2_checked.json"
+        )
         self.speech_marks_path = base_dir / "tools/speech_marks.json"
         self.tpr_codes_json_path = base_dir / "tools/tpr_codes.json"
         self.uposatha_day_ini = base_dir / "tools/uposatha_day.ini"

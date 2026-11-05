@@ -5,6 +5,8 @@
 Search for missing or wrong phonetic changes according to TSV criteria.
 """
 
+from collections import defaultdict
+
 import pyperclip
 from rich import print
 from rich.prompt import Prompt
@@ -14,6 +16,7 @@ from db.models import DpdHeadword
 from tools.db_search_string import db_search_string
 from tools.pali_sort_key import pali_list_sorter
 from tools.paths import ProjectPaths
+from tools.printer import printer as pr
 from tools.phonetic_change_manager import PhoneticChangeManager, PhoneticChangeResult
 
 
@@ -25,16 +28,34 @@ def add_update_phonetic(
     Returns:
         True if user requested a rerun, False otherwise.
     """
-    for rule in manager.get_rules():
+    # Precompute cleaned construction/base for every headword once
+    cleaned: list[tuple[DpdHeadword, str, str]] = []
+    for hw in db:
+        cc, bc = manager.clean_headword_data(hw)
+        cleaned.append((hw, cc, bc))
+
+    # Build index: initial pattern -> headword indices
+    rules_list = manager.get_rules()
+    initials: set[str] = {str(r["initial"]) for r in rules_list if r["initial"] != "-"}
+    index: dict[str, list[int]] = defaultdict(list)
+    for idx, (hw, cc, bc) in enumerate(cleaned):
+        combined = cc + " " + bc
+        for init in initials:
+            if init in combined:
+                index[init].append(idx)
+
+    for rule in rules_list:
         if rule["initial"] == "-":
             break
 
         all_matches: list[tuple[DpdHeadword, PhoneticChangeResult]] = []
 
-        for headword in db:
-            result = manager.check_headword_against_rule(headword, rule)
+        rule_initial = str(rule["initial"])
+        for idx in index.get(rule_initial, []):
+            hw, cc, bc = cleaned[idx]
+            result = manager.check_headword_against_rule_fast(hw, rule, cc, bc)
             if result:
-                all_matches.append((headword, result))
+                all_matches.append((hw, result))
 
         if not all_matches:
             print(f"[dim]{rule['line']} {rule['initial']}")
@@ -45,8 +66,8 @@ def add_update_phonetic(
         for k, v in rule.items():
             if k == "line":
                 continue
-            if k in ("exceptions", "without", "wrong"):
-                v = ", ".join(v) if v else "x"
+            if k in ("exceptions", "not_in_constr", "not_in_lemma", "wrong"):
+                v = ", ".join(v) if isinstance(v, list) and v else "x"
             print(f"[green]{str(k):<15}: [white]{str(v)}")
         print()
 
@@ -75,10 +96,10 @@ def add_update_phonetic(
             print(f"\n[green]commit ({len(committable)}): [white]{committable_names}")
 
             choice = Prompt.ask(
-                "[yellow](c)ommit all, (e)xceptions, (r)erun, e(x)it, any key to pass"
+                "[yellow]c[white]ommit all, [yellow]e[white]xceptions, [yellow]r[white]erun, [yellow]q[white]uit, any key to pass"
             )
 
-            if choice == "x":
+            if choice == "q":
                 db_session.close()
                 return False
             elif choice == "r":
@@ -105,8 +126,10 @@ def add_update_phonetic(
                         hw.phonetic = str(rule["correct"])
                     elif res.status == "auto_update":
                         lines = hw.phonetic.split("\n")
+                        wrong = rule["wrong"]
+                        wrong_lines = wrong if isinstance(wrong, list) else []
                         new_lines = [
-                            str(rule["correct"]) if line in rule["wrong"] else line
+                            str(rule["correct"]) if line in wrong_lines else line
                             for line in lines
                         ]
                         hw.phonetic = "\n".join(new_lines)
@@ -122,9 +145,9 @@ def add_update_phonetic(
             print(f"\n[green]manual_check:   [white]{manual_names}")
             pyperclip.copy(manual_names)
             choice = Prompt.ask(
-                "[yellow](e)xceptions, (r)erun, e(x)it, any key to continue"
+                "[yellow]e[white]xceptions, [yellow]r[white]erun, [yellow]q[white]uit, any key to continue"
             )
-            if choice == "x":
+            if choice == "q":
                 db_session.close()
                 return False
             elif choice == "r":
@@ -176,13 +199,10 @@ def finder(db, manager: PhoneticChangeManager, string: str):
         print(None)
 
 
-def list_all_phonetic_changes(db, manager: PhoneticChangeManager):
-    """List all phonetic changes not covered by TSV rules.
-
-    Args:
-        db: List of DpdHeadword objects to process
-        manager: PhoneticChangeManager instance with loaded rules
-    """
+def list_all_phonetic_changes(
+    db: list[DpdHeadword], manager: PhoneticChangeManager
+) -> None:
+    """Write all phonetic changes not covered by TSV rules to a temp file."""
     # All phonetic changes minus all correct values from rules
     all_phonetic_set = set()
     correct = set()
@@ -205,13 +225,17 @@ def list_all_phonetic_changes(db, manager: PhoneticChangeManager):
 
 
 if __name__ == "__main__":
+    pr.tic()
+    pr.yellow_title("add phonetic changes")
     pth = ProjectPaths()
 
     while True:
         manager = PhoneticChangeManager(pth.phonetic_changes_path)
+        pr.green_tmr("loading database")
         db_session = get_db_session(pth.dpd_db_path)
         db_session.expire_on_commit = False
         db = db_session.query(DpdHeadword).filter(DpdHeadword.meaning_1 != "").all()
+        pr.yes(len(db))
 
         list_all_phonetic_changes(db, manager)
         rerun = add_update_phonetic(db_session, db, manager)
@@ -220,8 +244,7 @@ if __name__ == "__main__":
         print("\n[yellow]Rerunning with fresh data...\n")
     # finder(db, manager, "ṃs > s")
 
-# FIXME test for xyz not in pali
+    pr.toc()
+
 # FIXME test for xyz not in base
 # FIXME test for xyz not in construction
-# FIXME exceptions must be a list
-# FIXME without must be a list

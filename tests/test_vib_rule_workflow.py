@@ -3,7 +3,7 @@
 from io import StringIO
 from unittest.mock import MagicMock, patch
 
-from tools.cst_sc_text_sets import make_cst_text_list_from_file
+from scripts.export.list_of_words_from_txt import make_cst_text_list_from_file
 from scripts.change_in_db.copy_examples import update_column_for_some_criteria
 from scripts.change_in_db.vib_rule_workflow import (
     accept_pasted_text,

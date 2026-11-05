@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
+"""Check for uposatha days and rotate the new-words count stored in
+uposatha_day.ini. Used by the release workflow, the TPR exporter and
+changelog generation."""
+
 import configparser
-from datetime import date, timedelta
+from datetime import date
 
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
@@ -56,7 +60,8 @@ class UposathaManger:
         date(2026, 5, 1),
         date(2026, 5, 31),
         date(2026, 6, 29),
-        date(2026, 7, 29),
+        date(2026, 7, 28),
+        # date(2026, 7, 29), # moved one day earlier
         date(2026, 8, 28),
         date(2026, 9, 26),
         date(2026, 10, 26),
@@ -78,12 +83,6 @@ class UposathaManger:
     def uposatha_today(cls) -> bool:
         """Check if today is an uposatha day."""
         return date.today() in cls.UPOSATHA_DATES
-
-    @classmethod
-    def day_after_uposatha(cls) -> bool:
-        """Check if yesterday was an uposatha day."""
-        yesterday = date.today() - timedelta(days=1)
-        return yesterday in cls.UPOSATHA_DATES
 
     @classmethod
     def get_baseline_count(cls) -> int:

@@ -1,3 +1,6 @@
+"""Auto-detect the script of a text and transliterate it to Roman IAST Pāḷi
+using Aksharamukha. Used by db/models.py and the webapp."""
+
 from aksharamukha import transliterate
 
 from tools.pali_alphabet import english_alphabet, pali_alphabet
@@ -15,6 +18,8 @@ def auto_translit_to_roman(text: str) -> str:
         )
         or text[0].lower() in pali_alphabet  # if pure Pāḷi, even UpperCase
         or text[0].lower() in english_alphabet  # if English, even UpperCase
+        # numbers and punctuation have no script, aksharamukha only warns
+        or not any(char.isalpha() for char in text)
     ):
         return text
 

@@ -2,6 +2,7 @@ import flet as ft
 
 from gui2.pass1_auto_controller import Pass1AutoController
 from gui2.toolkit import ToolKit
+from gui2.ui_utils import field_border
 
 LABEL_WIDTH = 250
 COLUMN_WIDTH: int = 700
@@ -23,7 +24,6 @@ class Pass1AutoView(ft.Column):
             controls=[],
             spacing=5,
         )
-        self.page: ft.Page = page
         self.toolkit: ToolKit = toolkit
         self.controller = Pass1AutoController(
             self,
@@ -48,8 +48,7 @@ class Pass1AutoView(ft.Column):
             options=self.book_options,
             width=300,
             text_size=14,
-            border_color=ft.Colors.BLUE_200,
-            border_radius=20,
+            border=field_border(color=ft.Colors.BLUE_200),
         )
         self.ai_model_dropdown = ft.Dropdown(
             label="AI Model",
@@ -58,8 +57,7 @@ class Pass1AutoView(ft.Column):
             options=self._build_model_options(),
             width=300,
             text_size=14,
-            border_color=ft.Colors.BLUE_200,
-            border_radius=20,
+            border=field_border(color=ft.Colors.BLUE_200),
             menu_width=700,
         )
         self.auto_processed_count_field = ft.TextField(
@@ -68,7 +66,7 @@ class Pass1AutoView(ft.Column):
             label_style=TEXT_FIELD_LABEL_STYLE,
             width=200,
             color=HIGHLIGHT_COLOUR,
-            border_radius=20,
+            border=field_border(),
         )
         self.gd_switch = ft.Switch(
             label="GD",
@@ -81,7 +79,7 @@ class Pass1AutoView(ft.Column):
             label="Word in text",
             label_style=TEXT_FIELD_LABEL_STYLE,
             color=HIGHLIGHT_COLOUR,
-            border_radius=20,
+            border=field_border(),
         )
         self.ai_results_field = ft.TextField(
             "",
@@ -91,7 +89,7 @@ class Pass1AutoView(ft.Column):
             label="Results",
             label_style=TEXT_FIELD_LABEL_STYLE,
             color=HIGHLIGHT_COLOUR,
-            border_radius=20,
+            border=field_border(),
         )
 
         self.text_input_field = ft.TextField(
@@ -100,7 +98,7 @@ class Pass1AutoView(ft.Column):
             max_lines=20,
             label="Paste Pāḷi text here",
             label_style=TEXT_FIELD_LABEL_STYLE,
-            border_radius=20,
+            border=field_border(),
             expand=True,
         )
         self.text_dialog = ft.AlertDialog(
@@ -111,7 +109,7 @@ class Pass1AutoView(ft.Column):
             ),
             actions=[
                 ft.TextButton("Cancel", on_click=self.handle_text_cancel),
-                ft.ElevatedButton("Process", on_click=self.handle_text_submit),
+                ft.Button("Process", on_click=self.handle_text_submit),
             ],
         )
 
@@ -123,7 +121,7 @@ class Pass1AutoView(ft.Column):
                             ft.Row(
                                 controls=[
                                     self.books_dropdown,
-                                    ft.ElevatedButton(
+                                    ft.Button(
                                         "AutoProcess Book",
                                         on_click=self.handle_book_click,
                                     ),
@@ -133,15 +131,15 @@ class Pass1AutoView(ft.Column):
                                         tooltip="Reload AI models",
                                         on_click=self._on_reload_models,
                                     ),
-                                    ft.ElevatedButton(
+                                    ft.Button(
                                         "AutoProcess Text",
                                         on_click=self.handle_text_button_click,
                                     ),
-                                    ft.ElevatedButton(
+                                    ft.Button(
                                         "Stop",
                                         on_click=self.handle_stop_click,
                                     ),
-                                    ft.ElevatedButton(
+                                    ft.Button(
                                         "Clear",
                                         on_click=self.handle_clear_click,
                                     ),
@@ -186,29 +184,30 @@ class Pass1AutoView(ft.Column):
         self.ai_model_dropdown.options = self._build_model_options()
         self.ai_model_dropdown.update()
 
-    def handle_book_click(self, e):
+    async def handle_book_click(self, e):
         if self.books_dropdown.value:
-            self.controller.auto_process_book(self.books_dropdown.value)
+            await self.controller.auto_process_book(self.books_dropdown.value)
 
     def handle_text_button_click(self, e):
         self.text_input_field.value = ""
-        self.page.overlay.append(self.text_dialog)
-        self.text_dialog.open = True
+        self.page.show_dialog(self.text_dialog)
         self.page.update()
 
     def handle_text_cancel(self, e):
-        self.text_dialog.open = False
+        self.page.pop_dialog()
         self.page.update()
 
-    def handle_text_submit(self, e):
+    async def handle_text_submit(self, e):
         text = self.text_input_field.value
-        self.text_dialog.open = False
+        self.page.pop_dialog()
         self.page.update()
         if text and text.strip():
-            self.controller.auto_process_text(text.strip())
+            await self.controller.auto_process_text(text.strip())
 
     def handle_stop_click(self, e):
         self.controller.stop_flag = True
+        if self.controller._run_in_progress:
+            self.update_message("stopping...")
 
     def handle_clear_click(self, e):
         self.clear_all_fields()

@@ -11,7 +11,9 @@ from types import SimpleNamespace
 
 from exporter.anki.anki_updater import (
     deck_selector,
+    family_note_type,
     make_data_dict,
+    make_new_family_note,
     make_search_query,
     update_family_note,
     update_note_values,
@@ -204,6 +206,51 @@ def test_update_note_values_returns_bool_not_none() -> None:
     assert isinstance(is_updated, bool)
 
 
+ROOT_FIELDS = [
+    "sanskrit_root",
+    "sanskrit_root_meaning",
+    "sanskrit_root_class",
+    "root_meaning",
+    "root_in_comps",
+    "root_has_verb",
+    "root_group",
+]
+
+
+def test_update_note_values_clears_root_fields_when_root_removed() -> None:
+    """A headword that lost its root_key must not keep stale root data."""
+    col = _fake_col_for_note_update()
+    hw = _stub_headword(root_key=None)
+    note = _FakeNote(["1", "test", "n", "", "SN1.1"])
+    for field in ROOT_FIELDS:
+        note[field] = "stale root data"
+
+    _note, _is_updated = update_note_values(col, note, hw)
+
+    for field in ROOT_FIELDS:
+        assert note[field] == "", f"{field} not cleared"
+
+
+def test_update_note_values_keeps_root_fields_when_root_present() -> None:
+    col = _fake_col_for_note_update()
+    rt = SimpleNamespace(
+        sanskrit_root="√gam",
+        sanskrit_root_meaning="to go",
+        sanskrit_root_class="1",
+        root_meaning="to go",
+        root_in_comps="going",
+        root_has_verb="gam",
+        root_group="1",
+    )
+    hw = _stub_headword(root_key="√gam 1", rt=rt)
+    note = _FakeNote(["1", "test", "n", "", "SN1.1"])
+
+    update_note_values(col, note, hw)
+
+    assert note["root_meaning"] == "to go"
+    assert note["sanskrit_root"] == "√gam"
+
+
 # ---------------------------------------------------------------------------
 # update_family_note — is_updated logic
 # ---------------------------------------------------------------------------
@@ -281,3 +328,39 @@ def test_delete_branch_int_key_does_not_fire() -> None:
     # int 42 must NOT be a key — only "42" (string) should be
     assert 42 not in result
     assert "42" in result
+
+
+# ---------------------------------------------------------------------------
+# family_note_type / make_new_family_note — Root Matrix note type selection
+# ---------------------------------------------------------------------------
+
+
+def test_family_note_type_root_matrix_uses_dedicated_note_type() -> None:
+    assert family_note_type("Root Matrix") == "DPD Root Matrix"
+
+
+def test_family_note_type_other_decks_use_dpd_family() -> None:
+    assert family_note_type("Family Root") == "DPD Family"
+    assert family_note_type("Family Word") == "DPD Family"
+    assert family_note_type("Family Compound") == "DPD Family"
+
+
+def test_make_new_family_note_root_matrix_picks_dedicated_model() -> None:
+    """Regression test: Root Matrix notes must not fall back to DPD Family,
+    which lacks the table.root_matrix CSS."""
+    new_note_model_ids: list[int] = []
+    fake_col = SimpleNamespace(
+        new_note=lambda model_id: (
+            new_note_model_ids.append(model_id) or _FakeFamilyNote("", "")
+        ),
+        add_note=lambda note, deck_id: None,
+    )
+    model_dict = {"DPD Family": 1, "DPD Root Matrix": 2}
+    deck_dict = {"Root Matrix": 99}
+
+    make_new_family_note(
+        fake_col, ["Root Matrix"], model_dict, deck_dict, ("key1", "<b>html</b>")
+    )
+
+    # new_note must be called with the "DPD Root Matrix" model id (2), not "DPD Family" (1)
+    assert new_note_model_ids == [2]

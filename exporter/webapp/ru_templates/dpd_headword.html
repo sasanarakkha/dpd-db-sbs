@@ -1,3 +1,8 @@
+{% macro ru_plural(n, one, few, many) -%}
+{%- if n % 10 == 1 and n % 100 != 11 -%}{{ one }}
+{%- elif n % 10 in [2, 3, 4] and n % 100 not in [12, 13, 14] -%}{{ few }}
+{%- else -%}{{ many }}{%- endif -%}
+{%- endmacro %}
 <!-- summary -->
 
 {% set is_vagga = d.su.is_vagga if d.su else false %}
@@ -422,7 +427,7 @@
                 {% if d.su.tbw %}
                 <a href="{{ d.su.tbw }}" target="_blank">thebuddhaswords.net</a><br>
                 {% endif %}
-                {% if d.su.tbw_legacy %}
+                {% if d.su.tbw_legacy and show_tbw %}
                 <a href="{{ d.su.tbw_legacy }}" target="_blank">dhamma.gift (BW)</a><br>
                 {% endif %}
                 {% if d.su.dhamma_gift %}
@@ -433,6 +438,9 @@
                 {% endif %}
                 {% if d.su.sc_voice_link %}
                 <a href="{{ d.su.sc_voice_link }}" target="_blank">sc-voice.net</a><br>
+                {% endif %}
+                {% if d.su.s_4nt_link %}
+                <a href="{{ d.su.s_4nt_link }}" target="_blank">s.4nt.org</a><br>
                 {% endif %}
             </td>
         </tr>
@@ -638,19 +646,16 @@
         </tr>
         {% endif %}
 
-        <!-- DV catalogue -->
+        <!-- PTS concordance -->
 
         {% if not is_vagga and not is_samyutta %}
 
-        {% if d.su.dv_exists %}
+        {% if d.su.dv_pts %}
         <tr>
             <th class="heading" colspan="2">
-                Дхамма Виная: Каталог Сутт
+                Pali Text Society
             </th>
         </tr>
-        {% endif %}
-
-        {% if d.su.dv_pts %}
         <tr>
             <th>
                 PTS
@@ -658,6 +663,16 @@
             <td>
                 {{ d.su.dv_pts }}
             </td>
+        </tr>
+        {% endif %}
+
+        <!-- DV catalogue -->
+
+        {% if d.su.dv_exists %}
+        <tr>
+            <th class="heading" colspan="2">
+                Дхамма Виная: Каталог Сутт
+            </th>
         </tr>
         {% endif %}
 
@@ -1252,7 +1267,7 @@
 <div id="family_word_{{d.i.lemma_1_}}" class="dpd content hidden">
     <p class="heading underlined">
         <b>{{d.i.fw.count}}</b>
-        слов(а) относящиеся к семье
+        {{ ru_plural(d.i.fw.count, "слово, относящееся к семье", "слова, относящихся к семье", "слов, относящихся к семье") }}
         <b>{{d.i.family_word}}</b>
     </p>
     {{d.i.fw.html_ru|safe}}
@@ -1272,7 +1287,7 @@
 <div id="family_compound_{{d.i.lemma_1_}}" class="dpd content hidden">
     <p class="heading underlined">
         <b>{{d.fc[0].count}}</b>
-        составных содержащих
+        {{ ru_plural(d.fc[0].count, "составное слово, содержащее", "составных слова, содержащих", "составных слов, содержащих") }}
         <b>{{d.i.lemma_clean}}</b>
     </p>
     {{d.fc[0].html_ru|safe}}
@@ -1305,11 +1320,7 @@
     <p id="{{d.i.lemma_1_}}cf_{{f.compound_family}}" class="heading underlined overlined">
         {% endif %}
         <b>{{f.count}}</b>
-        {% if f.count == 1 %}
-        составное содержащее
-        {% else %}
-        составных содержащих
-        {% endif %}
+        {{ ru_plural(f.count, "составное слово, содержащее", "составных слова, содержащих", "составных слов, содержащих") }}
         <b>{{f.compound_family}}</b>
         <a class="jump" href="#{{d.i.lemma_1_}}cf_top"> ⤴ </a>
     </p>
@@ -1338,11 +1349,7 @@
     <p class="heading underlined overlined">
         {% endif %}
         <b>{{f.count}}</b>
-        {% if f.count == 1 %}
-        идиоматическое выражение, которое содержит
-        {% else %}
-        идиоматических выражений, которые содержат
-        {% endif %}
+        {{ ru_plural(f.count, "идиоматическое выражение, содержащее", "идиоматических выражения, содержащих", "идиоматических выражений, содержащих") }}
         <b>{{f.idiom}}</b>
     </p>
     {{f.html_ru|safe}} {% endfor %}
@@ -1461,6 +1468,9 @@
 
 <div id="feedback_{{d.i.lemma_1_}}" class="dpd content hidden">
     <p>ID <b>{{d.i.id}}</b></p>
+    <p>Постоянная ссылка <a class="dpd-link" href="{{d.permalink}}"
+            target="_blank">{{d.permalink}}</a>
+    </p>
     <p>
         Это образовательный проект и находится на стадии тестирования и редактирования.
         <br>
@@ -1502,6 +1512,14 @@
         <span>
             . Узнайте как установить и настроить словарь на разные платформы, как умело использовать весь функционал
             словаря и как обновить, чтобы иметь самую свежую версию.
+        </span>
+    </p>
+    <p>
+        <a class="dpd-link" href="https://digitalpalidictionary.github.io/how_to_cite/" target="_blank">
+            Как цитировать
+        </a>
+        <span>
+            . DPD обновляется каждый месяц, поэтому, пожалуйста, указывайте версию, которой вы пользовались.
         </span>
     </p>
     <p>

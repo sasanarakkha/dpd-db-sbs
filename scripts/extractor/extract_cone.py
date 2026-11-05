@@ -1,4 +1,17 @@
 #!/usr/bin/env python3
+"""Extract Cone dictionary entries via AI and write to TSV.
+
+Iterates through Cone headwords that haven't been processed yet, sends each
+entry's HTML to an OpenRouter AI model for extraction, maps the Cone POS to
+DPD POS values, and appends the results to `extract_cone.tsv`.
+
+Interrupt-safe: Ctrl-C saves remaining words so the run can be resumed.
+
+Usage:
+    uv run scripts/extractor/extract_cone.py
+"""
+
+from pathlib import Path
 
 import signal
 import time
@@ -11,7 +24,7 @@ from scripts.extractor._prompts import CONE_PROMPT
 from scripts.extractor._read_cone import get_cone_html_entries
 from scripts.extractor._signal_handler import signal_handler, state
 from scripts.extractor._word_list import prepare_word_list
-from tools.ai_open_router import OpenRouterManager
+from tools.ai_openai_compat import OpenAiCompatManager
 from tools.goldendict_tools import open_in_goldendict
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
@@ -84,17 +97,24 @@ CONE_POS_MAPPING = {
 }
 
 
-def connect_to_openrouter():
+def connect_to_openrouter() -> OpenAiCompatManager:
     pr.green_tmr("Connecting to OpenRouter")
-    manager = OpenRouterManager()
-    if manager.client:
+    # No fallback chain here, unlike AIManager: one transient 429/5xx would
+    # otherwise end the whole batch run, so keep the retries the OpenAI SDK gave us.
+    manager = OpenAiCompatManager("openrouter", max_retries=2)
+    if manager.api_key:
         pr.yes("ok")
     else:
         pr.red("failed")
     return manager
 
 
-def process_word(word, cone_dict, manager, output_path):
+def process_word(
+    word: str,
+    cone_dict: dict[str, str],
+    manager: OpenAiCompatManager,
+    output_path: Path,
+) -> bool | None:
     entries = get_cone_html_entries(cone_dict, word)
     if not entries:
         pr.no("no source")
@@ -141,9 +161,13 @@ def process_word(word, cone_dict, manager, output_path):
     return False
 
 
-def main():
+def main() -> None:
     pr.tic()
     pr.yellow_title("Extracting Cone entries")
+    pr.cyan("Mines Cone dictionary HTML via AI to extract POS + meaning for words")
+    pr.cyan("not yet in DPD. Results append to extract_cone.tsv.")
+    pr.cyan("Processes 25 words per batch, then prompts to continue or quit.")
+    pr.cyan("Ctrl-C is safe — progress is saved to the TSV.")
 
     pth = ProjectPaths()
     output_path = pth.extract_cone_tsv_path
@@ -165,6 +189,7 @@ def main():
 
     pr.green_title(f"Processing {state['total_words']} new words")
     processed = 0
+    batch_size = 25
     for i, word in enumerate(words_to_process, 1):
         pr.white_tmr(f"{i} / {len(words_to_process)} {word}")
         res = process_word(word, cone_dict, manager, output_path)
@@ -176,6 +201,17 @@ def main():
         state["remaining_words"].remove(word)
         if i < len(words_to_process):
             time.sleep(0.5)
+
+        # Pause every batch_size words for continue/quit
+        if i % batch_size == 0 and i < len(words_to_process):
+            remaining = len(words_to_process) - i
+            pr.green(f"batch done: {processed} extracted, {remaining} words remaining")
+            answer = input("(c)ontinue or (q)uit? ").strip().lower()
+            if answer.startswith("q"):
+                pr.green(f"quitting — {processed} extracted this session")
+                pr.green(f"total in TSV: {len(existing) + processed}")
+                pr.toc()
+                return
 
     pr.green_title(f"\ndone: {processed}")
     pr.green(f"total: {len(existing) + processed}")

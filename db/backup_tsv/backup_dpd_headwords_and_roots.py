@@ -4,13 +4,16 @@
 """Save latest DpdHeadword and DpdRoot tables to backup_tsv folder."""
 
 import csv
+import subprocess
+import sys
 from pathlib import Path
 
-from git import Repo
+from sqlalchemy import func
 from sqlalchemy.orm.session import Session
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword, DpdRoot
+from gui2.paths import Gui2Paths
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 
@@ -19,11 +22,42 @@ def backup_dpd_headwords_and_roots(pth: ProjectPaths):
     pr.tic()
     pr.yellow_title("backing headword and roots tables to tsv")
     db_session = get_db_session(pth.dpd_db_path)
+    check_no_duplicate_lemma_1(db_session)
     backup_dpd_headwords(db_session, pth)
     backup_dpd_roots(db_session, pth)
     db_session.close()
     git_commit(pth)
     pr.toc()
+
+
+def find_duplicate_lemma_1(db_session: Session) -> dict[str, list[int]]:
+    """Map each lemma_1 held by more than one headword to those ids."""
+    duplicate_names = (
+        db_session.query(DpdHeadword.lemma_1)
+        .group_by(DpdHeadword.lemma_1)
+        .having(func.count() > 1)
+    )
+    rows = (
+        db_session.query(DpdHeadword.lemma_1, DpdHeadword.id)
+        .filter(DpdHeadword.lemma_1.in_(duplicate_names))
+        .order_by(DpdHeadword.lemma_1, DpdHeadword.id)
+        .all()
+    )
+    duplicates: dict[str, list[int]] = {}
+    for lemma_1, headword_id in rows:
+        duplicates.setdefault(lemma_1, []).append(headword_id)
+    return duplicates
+
+
+def check_no_duplicate_lemma_1(db_session: Session) -> None:
+    """Stop before any file is written: the database build rejects a duplicate."""
+    duplicates = find_duplicate_lemma_1(db_session)
+    if not duplicates:
+        return
+    pr.red("duplicate lemma_1, backup stopped, nothing written or committed")
+    for lemma_1, ids in duplicates.items():
+        pr.red(f"{lemma_1}: ids {', '.join(str(i) for i in ids)}")
+    sys.exit(1)
 
 
 def split_tsv_file(file_path: Path, prefix: str, chunk_size: int = 30000):
@@ -147,23 +181,51 @@ def backup_dpd_roots(db_session: Session, pth: ProjectPaths, custom_path: str = 
 
 def git_commit(pth: ProjectPaths):
     pr.green_tmr("committing changes to GitHub")
+
+    # Add all split files for headwords and roots
+    backup_dir = pth.pali_word_path.parent
+    headword_files = list(backup_dir.glob("dpd_headwords_part_*.tsv"))
+    root_files = list(backup_dir.glob("dpd_roots_part_*.tsv"))
+
+    files_to_add = [str(f) for f in headword_files + root_files]
+
+    # The processed-entry logs and the merged-lines log must reach main in the
+    # same commit as the words they describe: the server's reconcile reads them
+    # to drop what main has already handled.
+    gui2_paths = Gui2Paths()
+    for log_path in (
+        gui2_paths.additions_added_path,
+        gui2_paths.corrections_added_path,
+        gui2_paths.contrib_lines_merged_path,
+    ):
+        if log_path.exists():
+            files_to_add.append(str(log_path))
+
+    if not files_to_add:
+        pr.no("no files to commit")
+        return
+
     try:
-        repo = Repo("./")
-        index = repo.index
-
-        # Add all split files for headwords and roots
-        backup_dir = pth.pali_word_path.parent
-        headword_files = list(backup_dir.glob("dpd_headwords_part_*.tsv"))
-        root_files = list(backup_dir.glob("dpd_roots_part_*.tsv"))
-
-        files_to_add = headword_files + root_files
-        if files_to_add:
-            index.add([str(f) for f in files_to_add])
-            index.commit("pali update")
-            pr.yes("ok")
-        else:
-            pr.no("no files to commit")
-    except Exception as e:
+        # Path-limited commit, not `index.add` + `index.commit`. The latter
+        # stages these files and then commits the *whole index*, so in a working
+        # tree shared with other sessions it would sweep up whatever they had
+        # staged and commit it as "pali update". Passing the paths after `--`
+        # commits exactly these files from the working tree and ignores the rest
+        # of the index entirely.
+        #
+        # It also leaves nothing staged when it fails — a busy index.lock or a
+        # rejected pre-commit hook used to abort between the add and the commit
+        # and leave these files sitting staged for someone else's next commit.
+        subprocess.run(
+            ["git", "commit", "-m", "pali update", "--", *files_to_add],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        pr.yes("ok")
+    except subprocess.CalledProcessError as e:
+        pr.no(e.stderr.strip())
+    except FileNotFoundError as e:
         pr.no(f"{e}")
 
 

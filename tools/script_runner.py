@@ -53,7 +53,7 @@ def run_script(title: str, commands: list[str]) -> None:
             print(f"Error: {e!s}")
             sys.exit(1)
         finally:
-            print(f"\n─── {cmd}: {time.time() - cmd_start:.1f}s wall\n")
+            print(f"\n─── {cmd} ({time.time() - cmd_start:.1f}s wall)\n")
 
     # Print elapsed time
     end_time = time.time()
@@ -78,4 +78,4 @@ def _should_use_uv(command: str) -> bool:
     """
     Determine if a command should use uv run based on its extension.
     """
-    return command.strip().endswith(".py")
+    return command.split()[0].endswith(".py")

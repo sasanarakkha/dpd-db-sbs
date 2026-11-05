@@ -5,6 +5,7 @@ from typing import Any, NamedTuple
 import pytest
 
 from tools import ai_manager as ai_manager_module
+from tools import ai_antigravity_cli as antigravity_cli_module
 from tools.ai_manager import AIManager, _load_models_from_json
 
 
@@ -41,7 +42,7 @@ class _FailingProvider:
 class _RaisingProvider:
     """Provider stub that raises to exercise AIManager exception reporting."""
 
-    def request(self, **kwargs: Any) -> _StubResponse:
+    def request(self, **_kwargs: Any) -> _StubResponse:
         raise RuntimeError("boom")
 
 
@@ -330,22 +331,13 @@ def test_rate_limit_sleep_applies_to_tried_model(
 
 
 def test_antigravity_has_per_model_timeout() -> None:
-    """antigravity_cli work models must carry 150s timeouts before DeepSeek."""
+    """If an antigravity_cli model is configured, it must carry a 150s timeout."""
     models = _load_models_from_json()
     agy_entries = [m for m in models["default"] if m[0] == "antigravity_cli"]
-    assert [m[1] for m in agy_entries] == ["Gemini 3.5 Flash (Low)"]
     assert all(len(m) == 4 for m in agy_entries), (
         "model tuple must be (provider, model, delay, timeout)"
     )
     assert all(m[3] == 150.0 for m in agy_entries)
-
-    first_deepseek_index = next(
-        i for i, m in enumerate(models["default"]) if m[0] == "deepseek"
-    )
-    last_agy_index = max(
-        i for i, m in enumerate(models["default"]) if m[0] == "antigravity_cli"
-    )
-    assert last_agy_index < first_deepseek_index
 
 
 def test_request_uses_per_model_timeout() -> None:
@@ -380,7 +372,7 @@ def test_forced_antigravity_waits_for_probe() -> None:
     manager.request(
         prompt="hi",
         provider_preference="antigravity_cli",
-        model="Gemini 3.5 Flash (Low)",
+        model="test-model",
     )
 
     assert calls == [True]
@@ -395,7 +387,7 @@ def test_forced_antigravity_skips_wait_when_already_registered() -> None:
     manager.request(
         prompt="hi",
         provider_preference="antigravity_cli",
-        model="Gemini 3.5 Flash (Low)",
+        model="test-model",
     )
 
     assert calls == []
@@ -407,7 +399,7 @@ def test_default_chain_does_not_wait_for_antigravity_probe() -> None:
     provider = _RecordingProvider()
     manager.providers = {"deepseek": provider}
     manager.DEFAULT_MODELS = [
-        ("antigravity_cli", "Gemini 3.5 Flash (Low)", 0, 150.0),
+        ("antigravity_cli", "test-model", 0, 150.0),
         ("deepseek", "deepseek-v4-flash", 0, 150.0),
     ]
 
@@ -415,3 +407,76 @@ def test_default_chain_does_not_wait_for_antigravity_probe() -> None:
 
     assert calls == []
     assert response.content == "ok"
+
+
+def test_probe_registers_antigravity_using_json_models(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The probe must test the ai_models.json entries, never a hardcoded name."""
+    probed: list[str] = []
+
+    def fake_get_working_key(model: str) -> bool:
+        probed.append(model)
+        return len(probed) == 2  # first configured model fails, second works
+
+    monkeypatch.setattr(antigravity_cli_module, "get_working_key", fake_get_working_key)
+
+    manager = object.__new__(AIManager)
+    manager.providers = {}
+    manager.DEFAULT_MODELS = [
+        ("deepseek", "deepseek-v4-pro", 0, 150.0),
+        ("antigravity_cli", "agy-one", 0, 150.0),
+        ("antigravity_cli", "agy-two", 0, 150.0),
+    ]
+    manager.GROUNDED_MODELS = []
+
+    manager._probe_antigravity_cli()
+
+    assert probed == ["agy-one", "agy-two"]
+    assert "antigravity_cli" in manager.providers
+
+
+def test_probe_skips_when_no_antigravity_models_configured(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Without configured agy models the provider stays unregistered and unprobed."""
+
+    def fail_get_working_key(_model: str) -> bool:
+        raise AssertionError("probe must not run without configured models")
+
+    monkeypatch.setattr(antigravity_cli_module, "get_working_key", fail_get_working_key)
+
+    manager = object.__new__(AIManager)
+    manager.providers = {}
+    manager.DEFAULT_MODELS = [("deepseek", "deepseek-v4-pro", 0, 150.0)]
+    manager.GROUNDED_MODELS = []
+
+    manager._probe_antigravity_cli()
+
+    assert "antigravity_cli" not in manager.providers
+
+
+def test_probe_leaves_provider_unregistered_when_all_models_fail(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Every configured agy model failing must leave the provider unregistered."""
+    probed: list[str] = []
+
+    def fake_get_working_key(model: str) -> bool:
+        probed.append(model)
+        return False
+
+    monkeypatch.setattr(antigravity_cli_module, "get_working_key", fake_get_working_key)
+
+    manager = object.__new__(AIManager)
+    manager.providers = {}
+    manager.DEFAULT_MODELS = [
+        ("antigravity_cli", "agy-one", 0, 150.0),
+        ("antigravity_cli", "agy-two", 0, 150.0),
+    ]
+    manager.GROUNDED_MODELS = []
+
+    manager._probe_antigravity_cli()
+
+    assert probed == ["agy-one", "agy-two"]
+    assert "antigravity_cli" not in manager.providers

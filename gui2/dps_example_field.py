@@ -4,9 +4,10 @@ import flet as ft
 
 from gui2.dpd_fields_examples import DpdExampleField, book_codes
 from gui2.dpd_fields_classes import DpdTextField
-from gui2.dpd_fields_functions import clean_example
+from tools.example_cleaning import clean_example
 from gui2.dps_example_stash_manager import DpsExampleStashManager
 from gui2.toolkit import ToolKit
+from gui2.ui_utils import compact_button_style, field_border, request_focus
 from tools.cst_source import (
     CstSourceSuttaExample,
 )
@@ -53,7 +54,6 @@ class DpsExampleField(DpdExampleField):
         # Initialize archive index as instance variable
         self.archived_example_index = 0
         ft.Column.__init__(self, expand=True)
-        self.page: ft.Page = ui.page
 
         self.text_field = DpdTextField(
             name=field_name,
@@ -68,6 +68,7 @@ class DpsExampleField(DpdExampleField):
         if not self.simple_mode:
             self.bold_field = ft.TextField(
                 "",
+                border=field_border(),
                 width=240,
                 label="bold",
                 label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=15),
@@ -96,9 +97,7 @@ class DpsExampleField(DpdExampleField):
                 label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=15),
                 editable=True,
                 enable_filter=True,
-                border_color=ft.Colors.GREY_800,
-                border_radius=20,
-                border_width=1,
+                border=field_border(color=ft.Colors.GREY_800),
                 on_blur=self._handle_book_blur,
             )
 
@@ -108,7 +107,7 @@ class DpsExampleField(DpdExampleField):
                 label="word to find",
                 label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=15),
                 on_submit=self._click_search_dialog_ok,
-                border_radius=20,
+                border=field_border(),
             )
 
             # Toggle Button
@@ -132,21 +131,40 @@ class DpsExampleField(DpdExampleField):
             # Action buttons row (initially hidden)
             self._actions_row = ft.Row(
                 [
-                    ft.ElevatedButton("Clean", on_click=self.click_clean_example),
-                    ft.ElevatedButton("Delete", on_click=self.click_delete_example),
-                    ft.ElevatedButton("Swap", on_click=self.click_swap_example),
-                    ft.ElevatedButton("Stash", on_click=self._click_stash_example),
-                    ft.ElevatedButton(
+                    ft.Button(
+                        "Clean",
+                        on_click=self.click_clean_example,
+                        style=compact_button_style(),
+                    ),
+                    ft.Button(
+                        "Delete",
+                        on_click=self.click_delete_example,
+                        style=compact_button_style(),
+                    ),
+                    ft.Button(
+                        "Swap",
+                        on_click=self.click_swap_example,
+                        style=compact_button_style(),
+                    ),
+                    ft.Button(
+                        "Stash",
+                        on_click=self._click_stash_example,
+                        style=compact_button_style(),
+                    ),
+                    ft.Button(
                         "Reload",
                         on_click=self._click_reload_example,
+                        style=compact_button_style(),
                     ),
-                    ft.ElevatedButton(
+                    ft.Button(
                         "Last",
                         on_click=self._click_last_example,
+                        style=compact_button_style(),
                     ),
-                    ft.ElevatedButton(
+                    ft.Button(
                         "Arch",
                         on_click=self._click_arch_example,
+                        style=compact_button_style(),
                     ),
                 ],
                 spacing=0,
@@ -327,7 +345,9 @@ class DpsExampleField(DpdExampleField):
             ]  # Remove last character - exact same logic as Pass2Add
             self.word_to_find_field.value = stem
             self.word_to_find_field.update()  # Force immediate UI update
-            self.word_to_find_field.focus()  # Focus on the field for quick editing
+            request_focus(
+                self.word_to_find_field
+            )  # Focus on the field for quick editing
 
         self._active_page.update()
 

@@ -14,18 +14,21 @@ from gui2.mixins import SandhiOK, SnackBarMixin
 from gui2.pass1_add_view import Pass1AddView
 from gui2.pass1_auto_controller import Pass1AutoController
 from gui2.paths import Gui2Paths
+from gui2.preview import preview_and_confirm
+from gui2.save_router import save_headword
 from gui2.spelling import SpellingMistakesFileManager
 from gui2.toolkit import ToolKit
 from gui2.user import UsernameManager
 from gui2.variants import VariantReadingFileManager
-from tools.fast_api_utils import request_dpd_server
 from tools.goldendict_tools import open_in_goldendict
-from tools.wordfinder_manager import WordFinderManager
 
 LABEL_WIDTH = 250
 BUTTON_WIDTH = 250
 LABEL_COLOUR = ft.Colors.GREY_500
 HIGHLIGHT_COLOUR = ft.Colors.BLUE_200
+
+# Copied from the source text by Pass1Auto, not guessed by the AI.
+SOURCE_TEXT_FIELDS = ("example_1", "translation_1", "example_2", "translation_2")
 
 
 class Pass1AddController(SandhiOK, SnackBarMixin):
@@ -38,12 +41,12 @@ class Pass1AddController(SandhiOK, SnackBarMixin):
         pass1_auto_controller: Pass1AutoController,
     ) -> None:
         self.ui: Pass1AddView = ui
+        self.toolkit: ToolKit = toolkit
         self.db: DatabaseManager = toolkit.db_manager
         self.daily_log: DailyLog = toolkit.daily_log
         self.gui2pth: Gui2Paths = toolkit.paths
         self.additions_manager: AdditionsManager = toolkit.additions_manager
         self.username_manager: UsernameManager = toolkit.username_manager
-        self.wordfinder_manager: WordFinderManager = toolkit.wordfinder_manager
         self.pass1_auto_controller = pass1_auto_controller
 
         self.pass1_books = sutta_central_books
@@ -56,10 +59,15 @@ class Pass1AddController(SandhiOK, SnackBarMixin):
         self.word_in_text: str
         self.sentence_data: dict[str, str]
 
-        self.variants = VariantReadingFileManager()
-        self.spelling_mistakes = SpellingMistakesFileManager()
+        self.variants = VariantReadingFileManager(toolkit.paths.variant_readings_path)
+        self.spelling_mistakes = SpellingMistakesFileManager(
+            toolkit.paths.spelling_mistakes_path
+        )
 
     def process_book(self, book: str):
+        # Without a fresh form, suggestions from the previous word could
+        # sit beside the new one and be copied onto it.
+        self.ui.clear_all_fields()
         self.book_to_process = book
         self.load_json()
         is_next_item = self.get_next_item()
@@ -110,17 +118,33 @@ class Pass1AddController(SandhiOK, SnackBarMixin):
 
     def load_into_gui(self):
         open_in_goldendict(self.word_in_text)
-        pyperclip.copy(self.word_in_text)
+        try:
+            pyperclip.copy(self.word_in_text)
+        except pyperclip.PyperclipException:
+            # A headless server has no clipboard. The copy is only a convenience.
+            pass
         self.ui.word_in_text.value = self.word_in_text
         self.ui.word_in_text.update()
 
+        # The AI's guesses are only offered in the _add column, so the editor
+        # can skip them. The example sentences are the real source text.
+        suggestions: dict[str, str] = {}
         for field, data in self.sentence_data.items():
-            if field in self.ui.dpd_fields.fields:
-                self.ui.dpd_fields.fields[field].value = data
+            if field in SOURCE_TEXT_FIELDS:
+                if field in self.ui.dpd_fields.fields:
+                    self.ui.dpd_fields.fields[field].value = data
+            else:
+                suggestions[field] = data
 
-        self.ui.page.update()
+        self.ui.dpd_fields.update_add_fields(suggestions)
 
     def make_dpd_headword_and_add_to_db(self):
+        if not self.db.is_db_loaded():
+            self.ui.update_message(
+                "Database still loading — please wait before saving."
+            )
+            return
+
         # Collect data from UI fields into a dictionary
         field_data: dict[str, str] = {
             field_name: field.value or ""
@@ -154,27 +178,35 @@ class Pass1AddController(SandhiOK, SnackBarMixin):
             if not self.ui.dpd_fields.validate_no_duplicates(word_id, lemma_1_value):
                 return
 
-        # Check if this is an existing word loaded from history (has an ID)
-        if already_in_db:
-            # Update existing word - keep the same ID
-            new_word.origin = "pass1"
-            committed, message = self.db.update_word_in_db(new_word)
-        else:
-            # Create new word - assign new ID
+        # An existing word (loaded from history) keeps its ID, a new one gets one
+        if not already_in_db:
             new_word.id = self.db.get_next_id()
-            new_word.origin = "pass1"
+        new_word.origin = "pass1"
 
-            # add to additions
-            if self.username_manager.is_not_primary():
-                self.additions_manager.add_additions(new_word, comment)
+        self.ui.page.run_task(self._preview_then_save, new_word, comment, already_in_db)
 
-            # add to db
-            committed, message = self.db.add_word_to_db(new_word)
+    async def _preview_then_save(
+        self, new_word: DpdHeadword, comment: str, already_in_db: bool
+    ) -> None:
+        async def save() -> None:
+            self._save_previewed_word(new_word, comment, already_in_db)
+
+        await preview_and_confirm(
+            self.ui.page,
+            self.db.db_session,
+            new_word,
+            self.username_manager.routed_username,
+            save,
+        )
+
+    def _save_previewed_word(
+        self, new_word: DpdHeadword, comment: str, already_in_db: bool
+    ) -> None:
+        committed, message = save_headword(
+            self.toolkit, new_word, comment, already_in_db
+        )
 
         if committed:
-            # open in browser
-            request_dpd_server(new_word.id)
-
             # Only increment daily log for new words, not re-edited words from history
             if not already_in_db:
                 self.daily_log.increment("pass1")
@@ -192,9 +224,7 @@ class Pass1AddController(SandhiOK, SnackBarMixin):
             is_next_item = self.get_next_item()
             if is_next_item:
                 self.load_into_gui()
-                self.ui.update_message(
-                    f"{self.ui.dpd_fields.fields['lemma_1'].value} loaded"
-                )
+                self.ui.update_message(f"{self.word_in_text} loaded")
             else:
                 self.ui.clear_all_fields()
         else:

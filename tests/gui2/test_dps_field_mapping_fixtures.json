@@ -1,9 +1,11 @@
 {
   "dps_class_anki": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14,
       "tooltip": "which class from Anki deck for Pāli Class"
@@ -12,8 +14,10 @@
   "dps_class_example": {
     "control": "gui2.dps_example_field.DpsExampleField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "min_lines": 4,
       "multiline": true,
@@ -21,19 +25,23 @@
     }
   },
   "dps_class_example_translation": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_class_extra": {
-    "control": "flet.core.dropdown.Dropdown",
+    "control": "flet.controls.material.dropdown.Dropdown",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "options": [
         [
@@ -50,28 +58,34 @@
     }
   },
   "dps_class_source": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_class_sutta": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_constriction": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
@@ -79,8 +93,10 @@
   "dps_dhp_example": {
     "control": "gui2.dps_example_field.DpsExampleField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "min_lines": 4,
       "multiline": true,
@@ -88,19 +104,23 @@
     }
   },
   "dps_dhp_source": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_dhp_sutta": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
@@ -108,8 +128,10 @@
   "dps_discourses_example": {
     "control": "gui2.dps_example_field.DpsExampleField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "min_lines": 4,
       "multiline": true,
@@ -117,19 +139,23 @@
     }
   },
   "dps_discourses_source": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_discourses_sutta": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
@@ -137,8 +163,10 @@
   "dps_example_1": {
     "control": "gui2.dps_example_field.DpsExampleField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "min_lines": 5,
       "multiline": true,
@@ -148,8 +176,10 @@
   "dps_example_2": {
     "control": "gui2.dps_example_field.DpsExampleField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "min_lines": 5,
       "multiline": true,
@@ -159,8 +189,10 @@
   "dps_extra_example": {
     "control": "gui2.dps_example_field.DpsExampleField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "min_lines": 4,
       "multiline": true,
@@ -168,28 +200,34 @@
     }
   },
   "dps_extra_source": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_extra_sutta": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_family_set": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "disabled": true,
       "expand": true,
       "text_size": 14,
@@ -197,37 +235,45 @@
     }
   },
   "dps_grammar": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_id": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_lemma_1": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_meaning": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "min_lines": 2,
       "multiline": true,
@@ -235,10 +281,12 @@
     }
   },
   "dps_meaning_1": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "disabled": true,
       "expand": true,
       "text_size": 14,
@@ -246,10 +294,12 @@
     }
   },
   "dps_meaning_lit": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "disabled": true,
       "expand": true,
       "text_size": 14,
@@ -257,10 +307,12 @@
     }
   },
   "dps_notes": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "min_lines": 3,
       "multiline": true,
@@ -268,10 +320,12 @@
     }
   },
   "dps_notes_suggestion": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "min_lines": 2,
       "multiline": true,
@@ -281,8 +335,10 @@
   "dps_pat_example": {
     "control": "gui2.dps_example_field.DpsExampleField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "min_lines": 4,
       "multiline": true,
@@ -290,28 +346,34 @@
     }
   },
   "dps_pat_source": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_pat_sutta": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_pos": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "disabled": true,
       "expand": true,
       "text_size": 14,
@@ -319,19 +381,23 @@
     }
   },
   "dps_root": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_ru_cognate": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14,
       "tooltip": "Russian word which close sounding"
@@ -340,8 +406,10 @@
   "dps_ru_meaning": {
     "control": "gui2.dps_meaning_field.DpsMeaningField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "min_lines": 2,
       "multiline": true,
@@ -352,18 +420,22 @@
   "dps_ru_meaning_lit": {
     "control": "gui2.dps_meaning_field.DpsMeaningField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14,
       "tooltip": "type Russian literal meaning"
     }
   },
   "dps_ru_notes": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "min_lines": 2,
       "multiline": true,
@@ -371,55 +443,67 @@
     }
   },
   "dps_sbs_chant_eng_1": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_sbs_chant_eng_2": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_sbs_chant_pali_1": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_sbs_chant_pali_2": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_sbs_chapter_1": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_sbs_chapter_2": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
@@ -427,8 +511,10 @@
   "dps_sbs_example_1": {
     "control": "gui2.dps_example_field.DpsExampleField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "min_lines": 4,
       "multiline": true,
@@ -438,8 +524,10 @@
   "dps_sbs_example_2": {
     "control": "gui2.dps_example_field.DpsExampleField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "min_lines": 4,
       "multiline": true,
@@ -447,10 +535,12 @@
     }
   },
   "dps_sbs_meaning": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "min_lines": 2,
       "multiline": true,
@@ -459,10 +549,12 @@
     }
   },
   "dps_sbs_notes": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "min_lines": 2,
       "multiline": true,
@@ -470,66 +562,80 @@
     }
   },
   "dps_sbs_source_1": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14,
       "tooltip": "Sutta code using DPR system"
     }
   },
   "dps_sbs_source_2": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_sbs_sutta_1": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14,
       "tooltip": "Sutta name"
     }
   },
   "dps_sbs_sutta_2": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_source_1": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_source_2": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_suffix": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "disabled": true,
       "expand": true,
       "text_size": 14,
@@ -537,10 +643,12 @@
     }
   },
   "dps_suggestion": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "min_lines": 3,
       "multiline": true,
@@ -548,37 +656,45 @@
     }
   },
   "dps_sutta_1": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_sutta_2": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_synonym_antonym": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_verb": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "disabled": true,
       "expand": true,
       "text_size": 14,
@@ -588,8 +704,10 @@
   "dps_vib_example": {
     "control": "gui2.dps_example_field.DpsExampleField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "min_lines": 4,
       "multiline": true,
@@ -597,19 +715,23 @@
     }
   },
   "dps_vib_source": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }
   },
   "dps_vib_sutta": {
-    "control": "flet.core.textfield.TextField",
+    "control": "flet.controls.material.textfield.TextField",
     "params": {
-      "border_color": "blue200",
-      "border_radius": 20,
+      "border": {
+        "border_radius": 20,
+        "color": "Colors.BLUE_200"
+      },
       "expand": true,
       "text_size": 14
     }

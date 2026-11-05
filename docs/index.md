@@ -1,6 +1,6 @@
 # Welcome to Digital Pāḷi Dictionary
 
-DPD is a feature-rich Pāḷi-English dictionary which runs <a href='https://dpdict.net' target='_blank'>on the web</a>, in GoldenDict, MDict, [DictTango](install/android_dicttango.md) and [Kindle](install/kindle.md), or any other application that supports those formats.
+DPD is a feature-rich Pāḷi-English dictionary which runs <a href='https://dpdict.net' target='_blank'>on the web</a>, in GoldenDict, MDict, [DictTango](install/android_dicttango.md), [Kindle](install/kindle.md), on e-readers via [KOReader](install/koreader.md), or any other application that supports those formats.
 
 It is a work in progress, made available for testing and feedback purposes.
 
@@ -16,15 +16,17 @@ Next, you should really [configure the hotkey](goldendict/hotkey.md) if you're o
 
 There are some powerful [advanced features for GoldenDict](goldendict/advanced.md) that might be useful to you.
 
-While you're at it, here are some [more Pāḷi and Sanskrit dictionaries](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest){target="_blank"} to install for GoldenDict, MDict or DictTango. These include the Critical Pāli Dictionary, and the Simsapa Combined Dictionary which contains PTS, DPPN and NCPED and more.
+While you're at it, here are some [more Pāḷi and Sanskrit dictionaries](https://github.com/digitalpalidictionary/other-dictionaries/releases/latest){target="_blank"} to install for GoldenDict, MDict or DictTango. These include the Critical Pāli Dictionary, the PTS Pāḷi-English Dictionary, Nyanatiloka's Buddhist Dictionary, and the Simsapa Combined Dictionary which contains PTS, DPPN and NCPED and more.
 
 If you spot a mistake in DPD, or notice something missing, here's where to [report it](https://docs.google.com/forms/d/e/1FAIpQLSf9boBe7k5tCwq7LdWgBHHGIPVc4ROO5yjVDo1X5LDAxkmGWQ/viewform?usp=pp_url&entry.1433863141=digitalpalidictionary.github.io){target="_blank"}. It generally takes less than a minute. 
 
-If you have any bright ideas to make this dictionary even better, or would like to get involved with the project, please [get in touch](contact.md).
+If you have any bright ideas to make this dictionary even better, please [get in touch](contact.md). If you would like to get involved with the project, please use the [contribution form](contributing/index.md#offer-your-help).
 
-Digital Pāḷi Dictionary is licensed under a [Creative Commons Attribution-NonCommercial 4.0 International License](http://creativecommons.org/licenses/by-nc/4.0/){target="_blank"}.
+If you are quoting DPD in academic work, please see [How to Cite DPD](how_to_cite.md) — DPD is revised every month, so citing the version you used matters.
 
-<a rel="license noopener noreferrer" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">
-  <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" />
+Digital Pāḷi Dictionary is licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/){target="_blank"}.
+
+<a rel="license noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">
+  <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" />
 </a><br />
 

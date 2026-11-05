@@ -6,8 +6,7 @@ function ru_makeFamilyWordHtml(data) {
 
     var html = `
         <p class="heading">
-            <b>${fw.count}</b> 
-            слов(а), которые принадлежат к семье 
+            <b>${fw.count}</b> ${ruPlural(fw.count, "слово, относящееся к семье", "слова, относящихся к семье", "слов, относящихся к семье")} 
             <b>${ru_superScripter(data.family_word)}</b> 
         </p>
     `;

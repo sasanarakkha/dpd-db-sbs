@@ -11,13 +11,14 @@ import pickle
 from multiprocessing import Manager, Process
 from multiprocessing.managers import ListProxy
 from subprocess import check_output
-from typing import TypedDict
+from typing import TypedDict, cast
 
 import psutil
 from aksharamukha import transliterate
 from sqlalchemy.orm import Session
 
 from db.db_helpers import get_db_session
+from db.inflections.create_inflection_templates import clear_pickle_pending_templates
 from db.models import DpdHeadword
 from tools.configger import config_test
 from tools.paths import ProjectPaths
@@ -85,17 +86,25 @@ def _parse_batch(
 
     sinhala: str = translit_ro_to_si(inflections_to_transliterate_string)
 
-    devanagari: str = transliterate.process(
-        "IASTPali",
-        "Devanagari",
-        inflections_to_transliterate_string,
-    )  # type:ignore
+    # aksharamukha's process() is unannotated and falls through to None on an
+    # unknown script name; the script names here are constants, so it is a str.
+    devanagari: str = cast(
+        str,
+        transliterate.process(
+            "IASTPali",
+            "Devanagari",
+            inflections_to_transliterate_string,
+        ),
+    )
 
-    thai: str = transliterate.process(
-        "IASTPali",
-        "Thai",
-        inflections_to_transliterate_string,
-    )  # type:ignore
+    thai: str = cast(
+        str,
+        transliterate.process(
+            "IASTPali",
+            "Thai",
+            inflections_to_transliterate_string,
+        ),
+    )
 
     sinhala_lines: list[str] = sinhala.split("\n")
     devanagari_lines: list[str] = devanagari.split("\n")
@@ -265,6 +274,9 @@ def main() -> None:
     pr.green_tmr("writing to db")
 
     translit_counter = _write_translit_to_db(db_session, dpd_db, translit_dict)
+    # remove only the names this run used, and only after the db write
+    # succeeded; names added since the pickle was loaded stay pending
+    clear_pickle_pending_templates(pth, changed_templates)
     db_session.close()
     pr.yes(translit_counter)
 

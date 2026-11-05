@@ -40,7 +40,7 @@ uv run python exporter/anki/anki_apkg_exporter.py
 uv run python db/variants/main.py
 
 go run go_modules/deconstructor/main.go
-uv run python scripts/build/tarball_deconstructor_output.py
+uv run python scripts/build/deconstructor_output_add_to_db.py
 
 uv run python scripts/build/api_ca_eva_iti_iva_hi.py
 uv run python db/inflections/transliterate_inflections.py
@@ -62,6 +62,8 @@ uv run python scripts/build/ebt_counter.py
 go run go_modules/frequency/main.go
 
 uv run python db/epd/epd_to_lookup.py
+
+uv run python scripts/build/decon_cache_update.py
 
 uv run python exporter/webapp/generate_search_index.py
 

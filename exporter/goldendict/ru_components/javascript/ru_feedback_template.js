@@ -6,6 +6,7 @@ function ru_makeFeedback(data) {
     Словарь является частичным переводом <a class="dpd-link" href="https://digitalpalidictionary.github.io/">DPD</a> — <b>Электронного Словаря Пали (от Дост. Бодхираса).</b>
     <b>Помощь.</b> Чтобы увидеть подробное описание пожалуйста кликните на любое заглавие или сокращение.
     Список литературы можно увидеть в статье <b>литература</b>.</p>
+    <p>Постоянная ссылка <a class="dpd-link" href="https://ru.dpdict.net/${data.id}" target="_blank">https://ru.dpdict.net/${data.id}</a></p>
     <p>
         <a class="dpd-link"
         href="https://docs.google.com/forms/d/e/1FAIpQLSfResxEUiRCyFITWPkzoQ2HhHEvUS5fyg68Rl28hFH6vhHlaA/viewform?usp=pp_url&entry.1433863141=${progName}+${
@@ -43,6 +44,11 @@ function ru_makeFeedback(data) {
         <a class="dpd-link"
         href="https://devamitta.github.io/dpd.rus/">
         Читать документацию</a><span>. Узнайте как установить и настроить словарь на разные платформы, как умело использовать весь функционал словаря и как обновить, чтобы иметь самую свежую версию.</span>
+    </p>
+    <p>
+        <a class="dpd-link"
+        href="https://digitalpalidictionary.github.io/how_to_cite/">
+        Как цитировать</a><span>. DPD обновляется каждый месяц, поэтому, пожалуйста, указывайте версию, которой вы пользовались.</span>
     </p>
     <p>
         <a class="dpd-link"

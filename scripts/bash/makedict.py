@@ -5,43 +5,43 @@ This script updates the database and generates DPD in all formats.
 You can finely control which parts get run in ./config.ini
 """
 
-from tools.script_runner import run_script, check_db_exists
+from tools.script_runner import check_db_exists, run_script
 
-# Check if database exists
-check_db_exists()
-
-COMMANDS = [
+COMMANDS: list[str] = [
     # Generate components first
     "scripts/bash/generate_components.py",
-
     # Export to various formats
     "exporter/goldendict/main.py",
     "exporter/grammar_dict/grammar_dict.py",
     "exporter/deconstructor/deconstructor_exporter.py",
     "exporter/variants/variants_exporter.py",
-
     # Additional exporters
-    "exporter/mobile/mobile_exporter.py",
-    "exporter/tpr/tpr_exporter.py",
+    "exporter/mobile/mobile_exporter.py --cone",
+    "exporter/epitaka/epitaka_exporter.py",
     "exporter/kindle/kindle_exporter.py",
     "exporter/tbw/tbw_exporter.py",
     "exporter/sutta_central/sutta_central_exporter.py",
     "exporter/pdf/pdf_exporter.py",
     "exporter/txt/export_txt.py",
-
     # Zip and tarball creation
     "scripts/build/zip_goldendict_mdict.py",
     "scripts/build/tarball_db.py",
-    
     # Documentation updates
     "tools/docs_update_abbreviations.py",
     "tools/docs_update_bibliography.py",
     "tools/docs_update_thanks.py",
+    "tools/docs_update_how_to_cite.py",
     "tools/docs_changelog_and_release_notes.py",
-    "scripts/build/newsletter_scraper.py",
-
     # Reset config to baseline after uposatha build
     "scripts/build/config_uposatha_reset.py",
 ]
 
-run_script("Make Dictionary", COMMANDS)
+
+def main() -> None:
+    """Exit if dpd.db is missing, then run every build step in order."""
+    check_db_exists()
+    run_script("Make Dictionary", COMMANDS)
+
+
+if __name__ == "__main__":
+    main()

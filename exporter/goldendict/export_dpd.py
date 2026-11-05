@@ -2,7 +2,7 @@
 
 from collections.abc import Iterator
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from typing import TypedDict, cast
+from typing import TypedDict
 
 import jinja2
 import psutil
@@ -58,6 +58,7 @@ class DpdHeadwordRenderDataBase(TypedDict):
     cf_set: set[str]
     idioms_set: set[str]
     show_id: bool
+    show_tbw: bool
 
 
 class DpdHeadwordRenderData(DpdHeadwordRenderDataBase):
@@ -160,13 +161,15 @@ def _worker_init(
     """Worker initializer: build the jinja env and full render data once per
     worker, reused across every batch that worker handles."""
     global _WORKER_RENDER_DATA
-    _WORKER_RENDER_DATA = cast(
-        DpdHeadwordRenderData,
-        {
-            **render_data,
-            "pth": path,
-            "jinja_env": get_jinja2_env("exporter/goldendict/templates"),
-        },
+    jinja_env = get_jinja2_env("exporter/goldendict/templates")
+    # pyrefly: ignore  # jinja2 leaves Environment.globals unannotated, so its
+    # value type infers as the union of jinja's own defaults; extending it is
+    # the documented usage.
+    jinja_env.globals["show_tbw"] = render_data["show_tbw"]
+    _WORKER_RENDER_DATA = DpdHeadwordRenderData(
+        **render_data,
+        pth=path,
+        jinja_env=jinja_env,
     )
 
 
@@ -289,6 +292,7 @@ def generate_dpd_html(
     pr.green_title("generating dpd html")
 
     show_id: bool = config_test("dictionary", "show_id", "yes")
+    show_tbw: bool = config_test("dictionary", "show_tbw", "yes")
 
     pali_words_count = db_session.query(func.count(DpdHeadword.id)).scalar()
 
@@ -310,6 +314,7 @@ def generate_dpd_html(
         "cf_set": cf_set,
         "idioms_set": idioms_set,
         "show_id": show_id,
+        "show_tbw": show_tbw,
     }
 
     # Preload the family tables once instead of 3 queries per headword.

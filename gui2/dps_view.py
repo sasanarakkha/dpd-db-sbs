@@ -14,6 +14,7 @@ from gui2.dps_example_field import DpsExampleField
 from gui2.history import HistoryManager
 from gui2.mixins import PopUpMixin
 from gui2.toolkit import ToolKit
+from gui2.ui_utils import field_border
 from tools.paths_dps import DPSPaths
 from tools.fast_api_utils_dps import request_dpd_server
 
@@ -70,9 +71,7 @@ class DpsView(ft.Column, PopUpMixin):
 
         self._message_field = ft.TextField(
             "",
-            border_color=ft.Colors.BLUE_200,
-            border_radius=20,
-            border=ft.InputBorder.OUTLINE,
+            border=field_border(color=ft.Colors.BLUE_200),
             color=ft.Colors.BLUE_200,
             expand_loose=True,
             expand=True,
@@ -86,8 +85,7 @@ class DpsView(ft.Column, PopUpMixin):
         self._enter_id_or_lemma_field = ft.TextField(
             "",
             autofocus=True,
-            border_color=ft.Colors.BLUE_200,
-            border_radius=20,
+            border=field_border(color=ft.Colors.BLUE_200),
             expand_loose=True,
             expand=True,
             hint_style=ft.TextStyle(color=LABEL_COLOUR, size=14),
@@ -104,9 +102,9 @@ class DpsView(ft.Column, PopUpMixin):
             options=[],
             expand=True,
             expand_loose=True,
-            border_radius=20,
+            border=field_border(),
             text_size=14,
-            on_change=self._handle_history_selection,
+            on_select=self._handle_history_selection,
         )
 
         # Create hint button for translation examples
@@ -115,7 +113,7 @@ class DpsView(ft.Column, PopUpMixin):
             icon_size=16,
             tooltip=self._formatted_translation_hint,
             style=ft.ButtonStyle(
-                padding=ft.padding.all(4), overlay_color=ft.Colors.TRANSPARENT
+                padding=ft.Padding.all(4), overlay_color=ft.Colors.TRANSPARENT
             ),
         )
 
@@ -134,25 +132,25 @@ class DpsView(ft.Column, PopUpMixin):
             icon_size=16,
             tooltip=types_of_comp,
             style=ft.ButtonStyle(
-                padding=ft.padding.all(4), overlay_color=ft.Colors.TRANSPARENT
+                padding=ft.Padding.all(4), overlay_color=ft.Colors.TRANSPARENT
             ),
         )
 
-        self._next_ru_button = ft.ElevatedButton(
+        self._next_ru_button = ft.Button(
             "Next Ru",
             on_click=self._click_next_ru,
             tooltip="Find next word with raw Russian meaning to be edited",
             width=150,
         )
 
-        self._next_note_button = ft.ElevatedButton(
+        self._next_note_button = ft.Button(
             "Next Note",
             on_click=self._click_next_note,
             tooltip="Find next word with Russian note to be edited",
             width=150,
         )
 
-        self._clear_button = ft.ElevatedButton(
+        self._clear_button = ft.Button(
             "Clear All",
             on_click=self._click_clear_all,
             tooltip="Clear all fields",
@@ -196,7 +194,7 @@ class DpsView(ft.Column, PopUpMixin):
                 bottom=ft.BorderSide(1, HIGHLIGHT_COLOUR),
             ),
             padding=10,
-            alignment=ft.alignment.center,
+            alignment=ft.Alignment.CENTER,
         )
 
         self._middle_section = self._build_middle_section()
@@ -209,12 +207,12 @@ class DpsView(ft.Column, PopUpMixin):
                 controls=[
                     ft.Row(
                         [
-                            ft.ElevatedButton(
+                            ft.Button(
                                 "Test",
                                 on_click=self._click_run_tests,
                                 width=BUTTON_WIDTH,
                             ),
-                            ft.ElevatedButton(
+                            ft.Button(
                                 "Update DB",
                                 on_click=self._click_update_db,
                                 width=BUTTON_WIDTH,
@@ -224,7 +222,7 @@ class DpsView(ft.Column, PopUpMixin):
                 ],
                 spacing=10,
             ),
-            padding=ft.padding.all(10),
+            padding=ft.Padding.all(10),
         )
 
         self.controls = [
@@ -504,14 +502,18 @@ class DpsView(ft.Column, PopUpMixin):
                 self._update_history_dropdown()
                 self._page.update()
 
-                self._page.set_clipboard(
-                    self.headword.lemma_1
+                self._page.run_task(
+                    self._copy_to_clipboard, self.headword.lemma_1
                 )  # Copy headword to clipboard
                 self._click_clear_all(e)  # Clear all fields after successful update
 
         except Exception as ex:
             self._db.db_session.rollback()
             self.update_message(f"Error updating DB: {str(ex)}")
+
+    async def _copy_to_clipboard(self, text: str) -> None:
+        # Flet 1.0 removed Page.set_clipboard; the Clipboard service is async.
+        await ft.Clipboard().set(text)
 
     def _update_russian_table(self, headword_id: int) -> None:
         """Update Russian table with fields starting with dps_ru_*"""

@@ -1,6 +1,6 @@
 import difflib
 import re
-from typing import List, TypedDict
+from typing import List, TypedDict, cast
 
 
 def paragraphs_are_similar_sbs(p1: str, p2: str, ratio: float) -> bool:
@@ -89,8 +89,11 @@ def default_rendered_sizes() -> RenderedSizes:
 
 
 def sum_rendered_sizes(sizes: List[RenderedSizes]) -> RenderedSizes:
-    res = default_rendered_sizes()
+    # Summed through plain dicts: a TypedDict cannot be indexed by a variable key
+    # and widens its values to object. Identical at runtime — a TypedDict is a
+    # dict and every RenderedSizes value is an int.
+    totals = cast(dict[str, int], default_rendered_sizes())
     for i in sizes:
-        for k, v in i.items():
-            res[k] += v
-    return res
+        for k, v in cast(dict[str, int], i).items():
+            totals[k] += v
+    return cast(RenderedSizes, totals)

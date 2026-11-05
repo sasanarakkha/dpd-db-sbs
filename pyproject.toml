@@ -2,7 +2,7 @@
 name = "dpd-db"
 version = "v0.2"
 description = ""
-authors = [{ name = "Bodhirasa", email = "digitalpalidictionary@gmail.com" }]
+authors = [{ name = "Bodhirasa Bhikkhu", email = "digitalpalidictionary@gmail.com" }]
 requires-python = ">=3.13,<3.14"
 readme = "README.md"
 dependencies = [
@@ -19,8 +19,15 @@ dependencies = [
     "natsort>=8.4.0",
     "requests>=2.32.3",
     "typst>=0.14.9",
+    "filelock>=3.29.1",
+    "regex>=2026.5.9",
+    "starlette>=1.2.1",
+    "anyio>=4.13.0",
+    "css-inline>=0.23.0",
+    "pillow>=12.3.0",
+    "brotli>=1.2.0,<2",
+    # fork-local: scripts/change_in_db/update_yojana_km.py (registered unique)
     "num2words>=0.5.14",
-    "pyrefly>=1.1.1",
 ]
 
 [dependency-groups]
@@ -32,6 +39,7 @@ dev = [
     "pre-commit>=4.5.1",
     # starlette TestClient backend; no fastapi/starlette extra provides httpx2 (their extras pull old httpx)
     "httpx2>=2.3.0",
+    "pyrefly>=1.1.1",
 ]
 tools = [
     "pandas>=2.2.3",
@@ -41,11 +49,9 @@ tools = [
     "minify-html>=0.16.4",
     "pyspellchecker>=0.7.1",
     "pyperclip>=1.8.2",
-    "openai>=1.54.4",
     # anki 25.7+ ships protobuf-6 gencode; pin until anki resolves upstream
     "anki>=23.10.1,<25.3",
     "pyglossary>=4.6.1",
-    "gitpython>=3.1.43",
     "numpy>=2.2.3",
     "pypdf>=5.0.0",
     "ruff>=0.9.7",
@@ -55,19 +61,16 @@ tools = [
     "mkdocs-material>=9.6.9",
     "pyyaml>=6.0.2",
     "google-genai>=1.0.0",
-    "fuzzywuzzy>=0.18.0",
     "python-levenshtein>=0.27.1",
     "miniaudio>=1.61",
     "pathspec>=0.12.1",
-    "flet[all]==0.28.3",
-    "mcp>=1.6.0",
-    "google-api-python-client>=2.167.0",
-    "google-auth-httplib2>=0.2.0",
-    "google-auth-oauthlib>=1.3.0",
-    "markdownify>=1.2.2",
+    "flet[all]==1.0.1",
     "pyicu>=2.16.2",
     "genanki>=0.13.1",
-    "prompt-toolkit>=3.0.52",
+    "thefuzz>=0.22.1",
+    # bare, not under an extra: google-genai does not provide it, but
+    # tools/ai_gemini_manager.py imports google.api_core.exceptions directly
+    "google-api-core>=2.43.0",
 ]
 
 [tool.hatch.build.targets.sdist]
@@ -85,6 +88,63 @@ pythonVersion = "3.13"
 typeCheckingMode = "basic"
 exclude = ["gui2", "tools/writemdict", "tests", "archive", "tools/cst_source", "exporter/anki"]
 
+[tool.pyrefly]
+# Repo-wide type check (`just typecheck`), complementing the per-file pyright
+# pre-commit hook. Excludes mirror [tool.pyright] plus the trees pyright never
+# sees because it is only ever invoked on staged files.
+python-version = "3.13"
+project-includes = ["**/*.py"]
+# Error counts below were measured 2026-07-27; each exclusion states what it costs
+# so the list stays a decision rather than a habit.
+project-excludes = [
+    "**/.venv/**",
+    "**/node_modules/**",
+    "**/__pycache__/**",
+    "**/archive/**",
+    "resources/**",
+    # 396 errors / 73 files, of which 326 are `NoneType has no attribute ...` from
+    # flet typing every control's `.page` and `.parent` as optional. `self.page.update()`
+    # is the idiomatic call and cannot be None in practice, so the fix would be 326
+    # asserts for no behaviour change.
+    "gui2/**",
+    # 36 errors / 16 files, all pyrefly-only — pyright reports the tree clean. They are
+    # bs4 navigation return types (`find_previous` -> NavigableString | PageElement |
+    # Tag | None) and `match` statements pyrefly cannot prove exhaustive. The 88 real
+    # findings here, `+= 1` on `str | int` counters, were fixed by making the counters
+    # str-only; see parsers/base.py `bump`/`is_counted`.
+    "tools/cst_source/**",
+    # 131 errors / 68 files. One-off corpus extraction, run by hand and not by any
+    # build recipe; nothing outside this tree imports it.
+    "scripts/suttas/**",
+    # 28 errors / 6 files. Vendored third party, not ours to retype.
+    "tools/writemdict/**",
+    # 4 errors / 3 files, all heterogeneous dict-value unions that want a TypedDict.
+    "exporter/anki/**",
+    # 18 errors / 30 files. Scratch space, deliberately throwaway.
+    "temp/**",
+    # 16 and 7 errors. Tooling scaffolding, not shipped with the dictionary.
+    "kamma/**",
+    "conductor/**",
+]
+
+# tests/** IS checked, but only for imports and name resolution — that is the class of
+# bug the pre-commit hook structurally cannot see (it only ever looks at staged files),
+# and it is what broke CI on 2026-07-27. The type-shape codes below are off because test
+# doubles (SimpleNamespace, FakeDb, _MinimalEnv) legitimately violate declared types;
+# all 104 findings here were that pattern, none were bugs.
+[[tool.pyrefly.sub-config]]
+matches = "tests/**"
+
+[tool.pyrefly.sub-config.errors]
+bad-argument-type = false
+bad-assignment = false
+bad-override = false
+bad-return = false
+missing-attribute = false
+no-matching-overload = false
+not-iterable = false
+unsupported-operation = false
+
 [tool.ruff]
 target-version = "py313"
 exclude = ["archive", "tools/writemdict/*", "tools/cst_source"]
@@ -96,6 +156,30 @@ ignore = ["E501"]
 extend-select = ["PLW1514"]
 preview = true
 explicit-preview-rules = true
+
+[tool.deptry]
+# regexes matched from the start of the path; archives also live inside audio/, conductor/, kamma/
+extend_exclude = ["resources", "(.*/)?archive/", "tools/writemdict", "temp", "scripts/suttas"]
+# deptry treats every [dependency-groups] group as dev and never checks dev packages for use
+non_dev_dependency_groups = ["tools"]
+# python-levenshtein is a shim; the `Levenshtein` module comes from its `levenshtein` dependency
+package_module_name_map = { "python-levenshtein" = "Levenshtein" }
+
+[tool.deptry.per_rule_ignores]
+DEP002 = [
+    "openpyxl",  # pandas Excel engine, loaded by name inside pd.read_excel
+    "httpx2",  # starlette TestClient backend
+    "pyicu",  # pyglossary slob writer, loaded by name
+    "typst",  # called as a CLI by the pdf exporter
+    "ruff",  # CLI
+    "pyright",  # CLI
+    "pyrefly",  # CLI
+    "pytest",  # CLI
+    "pre-commit",  # CLI
+    "deptry",  # CLI
+    "mkdocs",  # CLI
+    "mkdocs-material",  # mkdocs theme, loaded by name from mkdocs.yaml
+]
 
 [tool.pytest.ini_options]
 addopts = "--import-mode=importlib -m 'not slow'"

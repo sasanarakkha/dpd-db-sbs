@@ -2,14 +2,14 @@ from typing import Any
 
 import flet as ft
 
+from gui2.ui_utils import field_border
 from gui2.dps_example_field import DpsExampleField
 from gui2.dps_meaning_field import DpsMeaningField
 
 FieldDef = dict[str, Any]
 
 common_params: dict[str, Any] = {
-    "border_color": ft.Colors.BLUE_200,
-    "border_radius": 20,
+    "border": field_border(color=ft.Colors.BLUE_200),
     "text_size": 14,
     "expand": True,
 }

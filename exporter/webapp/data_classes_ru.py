@@ -7,6 +7,8 @@ from tools.tools_for_ru_exporter import (
 from tools.date_and_time import year_month_day_dash
 from tools.degree_of_completion_ru import degree_of_completion_ru
 
+RU_PERMALINK_BASE = "https://ru.dpdict.net"
+
 
 class HeadwordData:
     def __init__(self, i: DpdHeadword, fc, fi, fs):
@@ -28,6 +30,7 @@ class HeadwordData:
         self.su = i.su
         self.app_name = "dpdict.net"
         self.date = year_month_day_dash()
+        self.permalink = f"{RU_PERMALINK_BASE}/{i.id}"
         self.inflections_html_ru = ru_replace_abbreviations(
             i.inflections_html, "inflect"
         )

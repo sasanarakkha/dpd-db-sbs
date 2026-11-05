@@ -1,46 +1,111 @@
-from dataclasses import dataclass
+import os
 from pathlib import Path
 
 
-@dataclass
 class Gui2Paths:
-    gui2_dir: Path = Path("gui2/")
-    gui2_data_path: Path = gui2_dir / "data"  # Base data directory
+    def __init__(self, base_dir: Path | None = None) -> None:
+        if base_dir is None:
+            base_dir = Path(os.path.abspath("."))
 
-    # Static file paths
-    daily_log_path: Path = gui2_data_path / "daily_log.json"
-    pass2_auto_json_path: Path = gui2_data_path / "pass2_auto.json"
-    pass2_auto_failures_path: Path = gui2_data_path / "pass2_auto_failures.txt"
-    pass2_exceptions_path: Path = gui2_data_path / "pass2_exceptions.json"
-    pass2_new_words_path: Path = gui2_data_path / "pass2_new_words.json"
-    history_json_path: Path = gui2_data_path / "history.json"
-    example_stash_json_path: Path = gui2_data_path / "example_stash.json"
-    commentary_stash_json_path: Path = gui2_data_path / "commentary_stash.json"
-    headword_stash_json_path: Path = gui2_data_path / "headword_stash.json"
-    corrections_path: Path = gui2_data_path / "corrections.json"
-    corrections_added_path: Path = gui2_data_path / "corrections_added.json"
-    additions_path: Path = gui2_data_path / "additions.json"
-    additions_added_path: Path = gui2_data_path / "additions_added.json"
-    filter_presets_path: Path = gui2_data_path / "filter_presets.json"
-    in_commentary_exceptions_path: Path = (
-        gui2_data_path / "in_commentary_exceptions.txt"
-    )
+        self.gui2_dir: Path = base_dir / "gui2"
+        self.gui2_data_path: Path = self.gui2_dir / "data"  # Base data directory
 
-    # Other paths
-    pass2_x_manager_py_path: Path = gui2_dir / "pass2_x_manager.py"
-    find_words_dump_path: Path = gui2_dir / "data/find_words_with_examples_dump.json"
-    find_words_exceptions_path: Path = (
-        gui2_dir / "data/find_words_with_examples_no.json"
-    )
+        # Static file paths
+        self.daily_log_path: Path = self.gui2_data_path / "daily_log.json"
+        self.pass2_auto_json_path: Path = self.gui2_data_path / "pass2_auto.json"
+        self.pass2_auto_failures_path: Path = (
+            self.gui2_data_path / "pass2_auto_failures.txt"
+        )
+        self.pass2_exceptions_path: Path = self.gui2_data_path / "pass2_exceptions.json"
+        self.pass2_new_words_path: Path = self.gui2_data_path / "pass2_new_words.json"
+        self.pass2_eg_words_path: Path = self.gui2_data_path / "pass2_eg_words.json"
+        self.pass2_x_words_path: Path = self.gui2_data_path / "pass2_x_words.json"
+        self.pass2_x_words_done_path: Path = (
+            self.gui2_data_path / "pass2_x_words_done.json"
+        )
+        self.history_json_path: Path = self.gui2_data_path / "history.json"
+        self.example_stash_json_path: Path = self.gui2_data_path / "example_stash.json"
+        self.commentary_stash_json_path: Path = (
+            self.gui2_data_path / "commentary_stash.json"
+        )
+        self.headword_stash_json_path: Path = (
+            self.gui2_data_path / "headword_stash.json"
+        )
+        self.corrections_path: Path = self.gui2_data_path / "corrections.json"
+        self.corrections_added_path: Path = (
+            self.gui2_data_path / "corrections_added.json"
+        )
+        self.additions_path: Path = self.gui2_data_path / "additions.json"
+        self.additions_added_path: Path = self.gui2_data_path / "additions_added.json"
+        self.contrib_lines_merged_path: Path = (
+            self.gui2_data_path / "contrib_lines_merged.json"
+        )
+        self.filter_presets_path: Path = self.gui2_data_path / "filter_presets.json"
+        self.in_commentary_exceptions_path: Path = (
+            self.gui2_data_path / "in_commentary_exceptions.txt"
+        )
+        self.user_dictionary_path: Path = base_dir / "shared_data/user_dictionary.txt"
+        decon = base_dir / "shared_data/deconstructor"
+        self.sandhi_checked_path: Path = decon / "checked.csv"
+        self.sandhi_corrections_path: Path = decon / "manual_corrections.tsv"
+        self.variant_readings_path: Path = decon / "variant_readings.tsv"
+        self.spelling_mistakes_path: Path = decon / "spelling_mistakes.tsv"
+        self.component_words_ignore_path: Path = (
+            self.gui2_data_path / "component_words_ignore.txt"
+        )
+
+        # A contributor's own exceptions to the db tests; None for user 1,
+        # whose exceptions live in the shared test file.
+        self.db_test_exceptions_path: Path | None = None
+
+        # Other paths
+        self.find_words_dump_path: Path = (
+            self.gui2_dir / "data/find_words_with_examples_dump.json"
+        )
+        self.find_words_exceptions_path: Path = (
+            self.gui2_dir / "data/find_words_with_examples_no.json"
+        )
+        # Set for contributors only: the tracked pass1_auto files are read-only
+        # on the server, so their finished words are listed here instead.
+        self.pass1_auto_removed_path: Path | None = None
 
     @staticmethod
-    def for_user(username: str) -> "Gui2Paths":
+    def for_user(username: str, base_dir: Path | None = None) -> "Gui2Paths":
         """Create paths with username-specific data files for contributors."""
-        paths = Gui2Paths()
+        paths = Gui2Paths(base_dir)
         if username and username != "1":
-            data = paths.gui2_data_path
+            # On the server the per-user files live outside the repo, so a pull
+            # never meets a local copy of a file that main tracks.
+            data_dir = os.environ.get("DPD_GUI2_DATA_DIR")
+            data = Path(data_dir) if data_dir else paths.gui2_data_path
             paths.additions_path = data / f"additions_{username}.json"
             paths.additions_added_path = data / f"additions_added_{username}.json"
             paths.corrections_path = data / f"corrections_{username}.json"
             paths.corrections_added_path = data / f"corrections_added_{username}.json"
+            # Per-user session-state files: concurrent gui2 web instances each
+            # write these, and non-atomic JSON writes to a shared file corrupt
+            # it. Route them per-user (desktop / primary user "1" is unaffected).
+            paths.daily_log_path = data / f"daily_log_{username}.json"
+            paths.history_json_path = data / f"history_{username}.json"
+            paths.filter_presets_path = data / f"filter_presets_{username}.json"
+            # Pass2 stash slots are single-word scratch, written by _click_stash
+            # / the commentary + example stash managers. Shared across instances
+            # they'd clobber each other, so route per-user too.
+            paths.headword_stash_json_path = data / f"headword_stash_{username}.json"
+            paths.example_stash_json_path = data / f"example_stash_{username}.json"
+            paths.commentary_stash_json_path = (
+                data / f"commentary_stash_{username}.json"
+            )
+            # The spelling gate blocks saves, so contributors need "add to
+            # dictionary". The shared file is never pushed back from the server.
+            paths.user_dictionary_path = data / f"user_dictionary_{username}.txt"
+            # The Pass1Add helper buttons (Sandhi OK, Add to Sandhi / Variants /
+            # Spelling) write these. Shared, two processes race on them and the
+            # server never pushes them back.
+            paths.sandhi_checked_path = data / f"checked_{username}.csv"
+            paths.sandhi_corrections_path = data / f"manual_corrections_{username}.tsv"
+            paths.variant_readings_path = data / f"variant_readings_{username}.tsv"
+            paths.spelling_mistakes_path = data / f"spelling_mistakes_{username}.tsv"
+            paths.db_test_exceptions_path = data / f"db_test_exceptions_{username}.tsv"
+            paths.pass1_auto_removed_path = data / f"pass1_auto_removed_{username}.json"
         return paths

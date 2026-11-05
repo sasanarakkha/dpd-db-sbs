@@ -3,6 +3,7 @@ Where are all the parts of the project located?
 
 ## Tree
 .
+├── archive
 ├── db
 │   ├── backup_tsv
 │   ├── bold_definitions
@@ -15,16 +16,15 @@ Where are all the parts of the project located?
 │   ├── suttas
 │   └── variants
 ├── db_tests
+│   └── single
 ├── docs
 ├── exporter
 │   ├── apple_dictionary
-│   ├── chrome_extension
 │   ├── deconstructor
 │   ├── goldendict
 │   ├── grammar_dict
 │   ├── kindle
 │   ├── kobo
-│   ├── mcp
 │   ├── mobile
 │   ├── pdf
 │   ├── share
@@ -40,13 +40,12 @@ Where are all the parts of the project located?
 │   ├── frequency
 │   ├── tools
 ├── gui2
+├── newsletter
 ├── resources
 ├── scripts
 │   ├── add
-│   ├── archive
 │   ├── bash
 │   ├── build
-│   ├── cl
 │   ├── export
 │   ├── extractor
 │   ├── find
@@ -54,7 +53,10 @@ Where are all the parts of the project located?
 │   ├── info
 │   ├── onboarding
 │   ├── patch
-│   ├── server
+│   ├── project_management
+│   ├── repo_maintenance
+│   ├── server_contrib
+│   ├── server_dpdict
 │   ├── suttas
 │   ├── tutorial
 ├── shared_data
@@ -73,6 +75,8 @@ There are four main parts to the code:
 
 ## Folder details
 
+- **archive/** Retired code kept for reference, e.g. the MCP server (`archive/exporter/mcp/`, archived 2026-09-27).
+
 - **db/** All code related to building and populating the various tables and columns of the database.
 
     - **models.py** SQLAlchemy model of the database.
@@ -89,7 +93,7 @@ There are four main parts to the code:
 
 	- **grammar/** Grammar data and processing.
 
-	- **inflections/** Populate the `inflection_templates` table and use that to create HTML inflection tables for every word.
+	- **inflections/** Populate the `inflection_templates` table and use that to create HTML inflection tables for every word. Sources: `templates_index.tsv` (one row per template: pattern, like, group) and `templates/<pattern>.tsv` (one grid file per template).
 
 	- **lookup/** Populate the `lookup` table for instant accces to every word in the dictionary.
 
@@ -101,6 +105,8 @@ There are four main parts to the code:
 
 - **db_tests/** Tests to ensure the completeness and accuracy of the Pāḷi database.
 
+	- **single/** Individual, focused audit scripts — one script per linguistic or structural rule. The `add_*` scripts also review and approve bulk data corrections in the terminal (antonyms, family compounds, hyphenations).
+
 - **docs/** Helpful project documentation.
 
 	- **project_folder_structure.md** What you're reading right now.
@@ -111,9 +117,9 @@ There are four main parts to the code:
 
 	- **apple_dictionary/** Export DPD for Apple Dictionary.
 
-	- **chrome_extension/** Export DPD as a Chrome browser extension.
-
 	- **deconstructor/** Export DPD Deconstructor to GoldenDict and MDict
+
+	- **epitaka/** Copy the mobile DPD database into the local ePitaka app (local only).
 
 	- **goldendict/** Export DPD, EPD, Help and Abbreviations to GoldenDict and MDict
 
@@ -122,8 +128,6 @@ There are four main parts to the code:
 	- **kindle/** Export a light version of DPD for Kindle.
 
 	- **kobo/** Export a light version of DPD for Kobo eReader.
-
-	- **mcp/** Export DPD as an MCP server.
 
 	- **mobile/** Export a light version of DPD for mobile devices.
 
@@ -152,6 +156,8 @@ There are four main parts to the code:
 	- **tools/** GO packages used across the project
 
 - **gui2/** A GUI for data capture and running database tests
+
+- **newsletter/** The monthly newsletter: one folder per month (`<YYYY-MM>/newsletter.md` + `pics/`), the shared footer, and the builder behind `just newsletter-new`, `newsletter-preview` and `newsletter-publish`.
 
 - **resources/** All external resources used by the project, imported as submodules
 

@@ -1,12 +1,18 @@
-# -*- coding: utf-8 -*-
+import asyncio
 import copy
+import json
+import re
+from pathlib import Path
 
 import flet as ft
+from sqlalchemy import or_
 
-from db.models import DpdHeadword
+from db.models import DpdHeadword, Lookup
+from gui2.contributor_proposal import proposal_fields
 from gui2.dpd_fields import DpdFields
 from gui2.dpd_fields_commentary import DpdCommentaryField
 from gui2.dpd_fields_examples import DpdExampleField
+from gui2.dpd_fields_classes import get_last_focused_field, track_focus
 from gui2.dpd_fields_functions import clean_lemma_1, increment_lemma_1
 from gui2.dpd_fields_lists import (
     COMPOUND_FIELDS,
@@ -20,10 +26,23 @@ from gui2.dpd_fields_lists import (
 from gui2.mixins import PopUpMixin
 from gui2.pass2_auto_control import Pass2AutoController
 from gui2.pass2_auto_file_manager import Pass2AutoFileManager
+from gui2.pass2_eg_manager import Pass2EgManager
 from gui2.pass2_pre_new_word_manager import Pass2NewWordManager
 from gui2.pass2_x_manager import Pass2XManager
+from gui2.pass2x.in_commentary_exceptions import InCommentaryExceptions
+from gui2.preview import preview_and_confirm
+from gui2.save_router import save_headword
 from gui2.toolkit import ToolKit
-from tools.fast_api_utils_dps import request_dpd_server
+from gui2.ui_utils import (
+    field_border,
+    is_inside,
+    is_mounted,
+    page_of,
+    request_focus,
+)
+from scripts.find.missing_meanings import find_missing_meanings
+from tools.dharmamitra_client import get_contextual_gloss
+from tools.printer import printer as pr
 from tools.speech_marks import SpeechMarkManager
 
 LABEL_WIDTH = 250
@@ -46,7 +65,6 @@ class Pass2AddView(ft.Column, PopUpMixin):
         )
         from gui2.test_manager import GuiTestManager
 
-        self.page: ft.Page = page
         self.toolkit: ToolKit = toolkit
 
         self._db = self.toolkit.db_manager
@@ -61,23 +79,34 @@ class Pass2AddView(ft.Column, PopUpMixin):
         self.history_manager.register_refresh_callback(self._update_history_dropdown)
         self.corrections_manager = self.toolkit.corrections_manager
         self.additions_manager = self.toolkit.additions_manager
-        self._x_manager = Pass2XManager(self._db)
+        self._x_manager = Pass2XManager(self.toolkit)
 
         self.dpd_fields: DpdFields
         self._pass2_auto_file_manager = Pass2AutoFileManager(self.toolkit)
         self.pass2_new_word_manager: Pass2NewWordManager = (
             self.toolkit.pass2_new_word_manager
         )
+        self.pass2_eg_manager: Pass2EgManager = Pass2EgManager(self.toolkit)
+        self._component_ignore: InCommentaryExceptions = InCommentaryExceptions(
+            self.toolkit.paths.component_words_ignore_path
+        )
+        self._eg_alert: ft.AlertDialog | None = None
+        self._eg_checkboxes: dict[str, ft.Checkbox] = {}
+        self._eg_prefills: dict[str, dict[str, str]] = {}
+        self._eg_comment: str = ""
+        self._eg_section_textboxes: list[tuple[ft.TextField, dict[str, str]]] = []
         self.headword: DpdHeadword | None = None
         self.headword_original: DpdHeadword | None = None
         self.current_correction: dict | None = None
         self.current_addition: dict | None = None
+        self._current_addition_origin: Path | None = None
+        self._current_addition_key: str | None = None
+        self._current_correction_origin: Path | None = None
+        self._current_correction_key: str | None = None
 
         self._message_field = ft.TextField(
             "",
-            border_color=ft.Colors.BLUE_200,
-            border_radius=20,
-            border=ft.InputBorder.OUTLINE,
+            border=field_border(color=ft.Colors.BLUE_200),
             color=ft.Colors.BLUE_200,
             expand_loose=True,
             expand=True,
@@ -87,33 +116,52 @@ class Pass2AddView(ft.Column, PopUpMixin):
             text_size=14,
             width=700,
         )
-        self._pass2_auto_button = ft.ElevatedButton(
+        self._pass2_auto_button = ft.Button(
             "P2A",
             on_click=self._click_load_pass2_auto,
+            on_hover=self._update_count_tooltip,
             tooltip="Next Pass2Auto",
         )
-        self._new_word_button = ft.ElevatedButton(
+        self._new_word_button = ft.Button(
             "New",
             on_click=self._click_load_new_word,
+            on_hover=self._update_count_tooltip,
             tooltip="Next new word",
         )
-        self._corrections_button = ft.ElevatedButton(
-            "Cor", on_click=self._click_corrections_button, tooltip="corrections"
+        self._corrections_button = ft.Button(
+            "Cor",
+            on_click=self._click_corrections_button,
+            on_hover=self._update_count_tooltip,
+            tooltip="corrections",
         )
-        self._additions_button = ft.ElevatedButton(
-            "Add", on_click=self._click_additions_button, tooltip="additions"
+        self._additions_button = ft.Button(
+            "Add",
+            on_click=self._click_additions_button,
+            on_hover=self._update_count_tooltip,
+            tooltip="additions",
         )
-        self._x_button = ft.ElevatedButton(
-            "X", on_click=self._click_x_button, tooltip="filter queue"
+        self._x_button = ft.Button(
+            "X",
+            on_click=self._click_x_button,
+            on_hover=self._update_count_tooltip,
+            tooltip="import queue",
         )
-        self._pread_button = ft.ElevatedButton(
-            "PRead", on_click=self._click_pread_button, tooltip="proofreader"
+        self._eg_button = ft.Button(
+            "Eg",
+            on_click=self._click_eg_button,
+            on_hover=self._update_count_tooltip,
+            tooltip="eg queue",
+        )
+        self._pread_button = ft.Button(
+            "PRead",
+            on_click=self._click_pread_button,
+            on_hover=self._update_count_tooltip,
+            tooltip="proofreader",
         )
         self._enter_id_or_lemma_field = ft.TextField(
             "",
             autofocus=True,
-            border_color=ft.Colors.BLUE_200,
-            border_radius=20,
+            border=field_border(color=ft.Colors.BLUE_200),
             expand_loose=True,
             expand=True,
             hint_style=ft.TextStyle(color=LABEL_COLOUR, size=10),
@@ -123,20 +171,42 @@ class Pass2AddView(ft.Column, PopUpMixin):
             text_size=14,
             width=400,
         )
-        self._clone_headword_button = ft.ElevatedButton(
+        # Record the id field like the Dpd* editor fields do, so it can be
+        # restored as the last-used field when the tab regains focus.
+        self._enter_id_or_lemma_field.on_focus = track_focus(
+            self._enter_id_or_lemma_field, None
+        )
+        self._clone_headword_button = ft.Button(
             "Clone", on_click=self._click_clone_headword
         )
-        self._split_headword_button = ft.ElevatedButton(
+        self._split_headword_button = ft.Button(
             "Split", on_click=self._click_split_headword
         )
-        self._clear_all_button = ft.ElevatedButton(
-            "Clear All", on_click=self._click_clear_all
+        self._clear_all_button = ft.Button("Clear All", on_click=self._click_clear_all)
+        self._missing_words_switch = ft.Switch(
+            label="Missing Words",
+            value=True,
         )
-        self.update_speech_marks_button = ft.ElevatedButton(
-            "Update Speech Marks", on_click=self._click_update_sandhi
+        self._dharmamitra_gloss_switch = ft.Switch(
+            label="Dharmamitra Gloss",
+            value=False,
         )
-        self._update_with_ai_button = ft.ElevatedButton(
-            "AiAutofill", on_click=self._click_update_with_ai
+        self._action_menu_button = ft.PopupMenuButton(
+            icon=ft.Icons.ARROW_DROP_DOWN,
+            tooltip="Actions",
+            items=[
+                ft.PopupMenuItem(
+                    content=ft.Text("Update Speech Marks"),
+                    on_click=self._click_update_sandhi,
+                ),
+                ft.PopupMenuItem(
+                    content=ft.Text("AiAutofill"),
+                    on_click=self._click_update_with_ai,
+                ),
+                ft.PopupMenuItem(),  # divider
+                ft.PopupMenuItem(content=self._missing_words_switch),
+                ft.PopupMenuItem(content=self._dharmamitra_gloss_switch),
+            ],
         )
 
         self._history_dropdown = ft.Dropdown(
@@ -145,9 +215,9 @@ class Pass2AddView(ft.Column, PopUpMixin):
             options=[],
             expand=True,
             expand_loose=True,
-            border_radius=20,
+            border=field_border(),
             text_size=14,
-            on_change=self._handle_history_selection,
+            on_select=self._handle_history_selection,
         )
 
         # --- Field Filter Radio Buttons ---
@@ -167,10 +237,17 @@ class Pass2AddView(ft.Column, PopUpMixin):
         )
 
         # Define the Add to DB button as a member variable
-        self._add_to_db_button = ft.ElevatedButton(
+        self._add_to_db_button = ft.Button(
             "Add to DB",
             on_click=self._click_add_to_db,
             width=BUTTON_WIDTH,
+        )
+        # Shown only while a contributor's addition or correction is loaded.
+        self._reject_button = ft.Button(
+            "Reject",
+            on_click=self._click_reject,
+            width=BUTTON_WIDTH,
+            visible=False,
         )
         self._top_section = ft.Container(
             content=ft.Column(
@@ -182,14 +259,14 @@ class Pass2AddView(ft.Column, PopUpMixin):
                             self._split_headword_button,
                             self._pass2_auto_button,
                             self._new_word_button,
+                            self._eg_button,
                             self._corrections_button,
                             self._additions_button,
                             self._x_button,
                             self._pread_button,
                             self._clear_all_button,
-                            self.update_speech_marks_button,
-                            self._update_with_ai_button,
                             self._history_dropdown,
+                            self._action_menu_button,
                         ],
                         spacing=10,
                         alignment=ft.MainAxisAlignment.START,
@@ -202,39 +279,53 @@ class Pass2AddView(ft.Column, PopUpMixin):
                 bottom=ft.BorderSide(1, HIGHLIGHT_COLOUR),
             ),
             padding=10,
-            alignment=ft.alignment.center,
+            alignment=ft.Alignment.CENTER,
         )
 
         # Build middle section using the new method
         self._middle_section = self._build_middle_section()
 
         # Populate history dropdown initially
-        self._update_history_dropdown()
+        self._update_history_dropdown(page)
 
         self._bottom_section = ft.Container(
             content=ft.Column(
                 controls=[
                     ft.Row(
                         [
-                            ft.ElevatedButton(
+                            ft.Button(
                                 "Test",
                                 on_click=self._click_run_tests,
                                 width=BUTTON_WIDTH,
                             ),
                             self._add_to_db_button,  # Use the member variable here
-                            ft.ElevatedButton(
+                            self._reject_button,
+                            ft.Button(
                                 "Delete",
                                 on_click=self._click_delete_from_db,
                                 width=BUTTON_WIDTH,
                                 on_hover=self._on_delete_hover,
                             ),
-                            # Backup & Quit moved to Global tab
+                        ],
+                    ),
+                    ft.Row(
+                        [
+                            ft.Button(
+                                "Stash",
+                                on_click=self._click_stash,
+                                width=BUTTON_WIDTH,
+                            ),
+                            ft.Button(
+                                "Unstash",
+                                on_click=self._click_unstash,
+                                width=BUTTON_WIDTH,
+                            ),
                         ],
                     ),
                 ],
                 spacing=10,
             ),
-            padding=ft.padding.all(10),
+            padding=ft.Padding.all(10),
         )
 
         self.controls = [
@@ -243,22 +334,156 @@ class Pass2AddView(ft.Column, PopUpMixin):
             self._bottom_section,
         ]
 
-    def _require_page(self) -> ft.Page:
-        assert self.page is not None
-        return self.page
-
     def _disable_id_field_autofocus(self, e: ft.ControlEvent) -> None:
         if self._enter_id_or_lemma_field.autofocus:
             self._enter_id_or_lemma_field.autofocus = False
+
+    def on_tab_focus(self) -> None:
+        """Restore focus when the tab is activated.
+
+        A form carrying any data means a word is being edited, so the cursor
+        returns to the field last used — where the contributor left off. An
+        empty form means the next word is about to be entered, so the cursor
+        goes to the id-or-lemma field. A last-focus left in another tab, or
+        in a form since rebuilt, falls back to the id field too.
+        """
+        restore: ft.Control | None = None
+        if self._form_has_data():
+            last = get_last_focused_field()
+            if last is not None and self._owns_focus_target(last):
+                restore = last
+        if restore is None and is_mounted(self._enter_id_or_lemma_field):
+            restore = self._enter_id_or_lemma_field
+        if restore is not None:
+            request_focus(restore)
+
+    def _owns_focus_target(self, field: ft.Control) -> bool:
+        """Whether the last-focused field belongs to this view.
+
+        The tracker is app-wide, and is_mounted() is true for fields in hidden
+        tabs too — every built view stays in the TabBarView — so ownership has
+        to be checked through the control tree. Focusing another tab's field
+        would lose the cursor invisibly instead of restoring it here.
+
+        The tracked field is often the inner text box of a composite field
+        (meaning, examples, commentary), not the composite itself, so an
+        identity check against the form's field list would miss it.
+        """
+        return is_inside(field, self)
+
+    def _form_has_data(self) -> bool:
+        """Whether any editor field currently holds a value.
+
+        The id-or-lemma textbox is no signal here — it is cleared as soon as
+        a word is loaded, so an in-progress edit reads as an empty id field.
+        """
+        return any(field.value for field in self.dpd_fields.fields.values())
 
     def _on_delete_hover(self, e: ft.ControlEvent) -> None:
         e.control.bgcolor = ft.Colors.RED if e.data == "true" else None
         e.control.color = "white" if e.data == "true" else None
         e.control.update()
 
+    def _update_count_tooltip(self, e: ft.ControlEvent) -> None:
+        # flet 1.0 sends a bool for hover; earlier versions sent "true"/"false"
+        if e.data not in (True, "true"):
+            return
+        if e.control is self._pread_button:
+            field, count = self.toolkit.proofreader_manager.next_queue_status()
+            label = field or "proofreader"
+            e.control.tooltip = f"{label} — {count} remaining"
+            e.control.update()
+            return
+        counts = {
+            id(self._pass2_auto_button): (
+                "Next Pass2Auto",
+                lambda: len(self._pass2_auto_file_manager.pass2_auto_data),
+            ),
+            id(self._new_word_button): (
+                "Next new word",
+                lambda: len(self.pass2_new_word_manager.new_words_dict),
+            ),
+            id(self._corrections_button): (
+                "corrections",
+                lambda: len(self.corrections_manager.corrections_dict),
+            ),
+            id(self._additions_button): (
+                "additions",
+                lambda: len(self.additions_manager.additions_dict),
+            ),
+            id(self._x_button): (
+                "import queue",
+                lambda: self._x_manager.remaining_count(),
+            ),
+            id(self._eg_button): (
+                "eg queue",
+                lambda: self.pass2_eg_manager.count(),
+            ),
+        }
+        entry = counts.get(id(e.control))
+        if entry is None:
+            return
+        base, count_fn = entry
+        e.control.tooltip = f"{base} — {count_fn()} remaining"
+        e.control.update()
+
+    def _click_stash(self, e: ft.ControlEvent) -> None:
+        """Save all current field values to a JSON stash file."""
+        values = self.dpd_fields.get_current_values()
+        if not values.get("lemma_1"):
+            self.update_message("Nothing to stash")
+            return
+
+        stash_path = self.toolkit.paths.headword_stash_json_path
+        try:
+            stash_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(stash_path, "w", encoding="utf-8") as f:
+                json.dump(values, f, indent=4, ensure_ascii=False)
+        except (OSError, TypeError, ValueError) as ex:
+            self.update_message(f"Stash failed: {ex}")
+            return
+
+        self.update_message(f"Stashed: {values.get('lemma_1', '')}")
+
+    def _click_unstash(self, e: ft.ControlEvent) -> None:
+        """Restore field values from the JSON stash file."""
+        stash_path = self.toolkit.paths.headword_stash_json_path
+        if not stash_path.exists():
+            self.update_message("No stash found")
+            return
+
+        try:
+            with open(stash_path, "r", encoding="utf-8") as f:
+                values = json.load(f)
+        except (json.JSONDecodeError, OSError) as ex:
+            self.update_message(f"Failed to read stash: {ex}")
+            return
+
+        if not isinstance(values, dict) or not values:
+            self.update_message("Stash is empty or invalid")
+            return
+
+        self.clear_all_fields()
+        for name, value in values.items():
+            if name in self.dpd_fields.fields:
+                self.dpd_fields.fields[name].value = value
+
+        stashed_id = values.get("id", "")
+        if stashed_id:
+            try:
+                headword = self._db.get_headword_by_id(int(stashed_id))
+                if headword:
+                    self.headword = headword
+                    self.headword_original = copy.deepcopy(headword)
+            except (ValueError, TypeError):
+                pass
+
+        self.update_message(f"Unstashed: {values.get('lemma_1', '')}")
+        self.page.update()
+
     def update_message(self, message: str) -> None:
         self._message_field.value = message
-        self._require_page().update()
+        self.page.update()
 
     def add_headword_to_examples_and_commentary(self) -> None:
         # add headword to example_1 example_2 and commentary
@@ -315,10 +540,34 @@ class Pass2AddView(ft.Column, PopUpMixin):
                             str(self.headword.id)
                         )
                         self.dpd_fields.update_add_fields(to_add)
+
+                    self._apply_dharmamitra_gloss(self.headword)
             else:
                 self.update_message("headword not found")
         else:
             self.update_message("you're shooting blanks")
+
+    def _apply_dharmamitra_gloss(self, headword: DpdHeadword) -> None:
+        """Fetch a contextual word gloss from Dharmamitra into meaning_1_add, if enabled."""
+        if not self._dharmamitra_gloss_switch.value:
+            return
+
+        example_sentence = headword.example_1 or headword.example_2
+        if not example_sentence:
+            pr.amber(
+                f"dharmamitra gloss: no example for {headword.lemma_clean}, skipping"
+            )
+            return
+
+        pr.cyan_tmr(f"dharmamitra gloss: querying API for {headword.lemma_clean}")
+        gloss = get_contextual_gloss(example_sentence, headword.lemma_clean)
+        if gloss is None:
+            pr.no("failed")
+            self.update_message("dharmamitra gloss failed")
+            return
+
+        pr.yes("done")
+        self.dpd_fields.update_add_fields({"meaning_1": gloss})
 
     def _click_clone_headword(self, e: ft.ControlEvent) -> None:
         """Fetches a headword and adds its data to empty fields in the current view."""
@@ -339,18 +588,17 @@ class Pass2AddView(ft.Column, PopUpMixin):
             if (
                 hasattr(headword_to_clone, field_name)
                 and field_name not in NO_CLONE_LIST
+                and not ui_field.value
             ):
-                # Check if the UI field is empty (or None)
-                if not ui_field.value:
-                    db_value = getattr(headword_to_clone, field_name)
-                    if db_value is not None:  # Only clone non-None values
-                        ui_field.value = db_value
-                        cloned_count += 1
+                db_value = getattr(headword_to_clone, field_name)
+                if db_value is not None:  # Only clone non-None values
+                    ui_field.value = db_value
+                    cloned_count += 1
 
         self.update_message(
             f"Cloned {cloned_count} fields from {headword_to_clone.lemma_1}."
         )
-        self._require_page().update()
+        self.page.update()
 
     def _click_split_headword(self, e: ft.ControlEvent) -> None:
         """Copies current fields to a new ID, increments lemma_1, and clears specific fields."""
@@ -383,8 +631,8 @@ class Pass2AddView(ft.Column, PopUpMixin):
         self.dpd_fields.clear_fields(target="add")
 
         self.update_message(f"Split {old_lemma} into {new_lemma} id: {new_id})")
-        self._require_page().update()
-        current_lemma_1_field.focus()
+        self.page.update()
+        request_focus(current_lemma_1_field)
 
     def _click_load_new_word(self, e: ft.ControlEvent | None = None) -> None:
         """Load next new word into the view."""
@@ -441,9 +689,12 @@ class Pass2AddView(ft.Column, PopUpMixin):
     def _click_clear_all(self, e: ft.ControlEvent) -> None:
         self.clear_all_fields()
 
-    def _click_update_sandhi(self, e: ft.ControlEvent) -> None:
+    async def _click_update_sandhi(self, e: ft.ControlEvent) -> None:
         self.update_message("updating speech marks... please wait...")
-        self.speech_marks_manager.regenerate_from_db()
+        # Awaiting `to_thread` is what lets the message above reach the screen:
+        # `page.update()` only queues a patch, and the suspension here gives the
+        # loop the turn that flushes it before the regeneration begins.
+        await asyncio.to_thread(self.speech_marks_manager.regenerate_from_db)
         self.speech_marks_dict = self.speech_marks_manager.get_speech_marks()
         self.update_message("speech marks updated")
 
@@ -474,10 +725,14 @@ class Pass2AddView(ft.Column, PopUpMixin):
             visible_fields = PASS1_FIELDS
 
         self.dpd_fields.filter_fields(visible_fields)
-        self._require_page().update()
+        self.page.update()
 
-    def _update_history_dropdown(self) -> None:
-        """Populates the history dropdown with the latest history."""
+    def _update_history_dropdown(self, page: ft.Page | None = None) -> None:
+        """Populates the history dropdown with the latest history.
+
+        `page` is only passed by the constructor call, which runs before the
+        view is mounted and so cannot reach `self.page`.
+        """
         history_items = self.history_manager.get_history()
         if self._history_dropdown.options is not None:
             self._history_dropdown.options.clear()
@@ -488,7 +743,9 @@ class Pass2AddView(ft.Column, PopUpMixin):
                         text=f"{item.get('id')}: {item.get('lemma_1', 'N/A')}",
                     )
                 )
-        self._require_page().update()
+        target = page or page_of(self)
+        if target is not None:
+            target.update()
 
     def _handle_history_selection(self, e: ft.ControlEvent) -> None:
         """Loads the selected headword from history."""
@@ -516,7 +773,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
                 self.update_message("Invalid history item ID selected")
             finally:
                 self._history_dropdown.value = None  # Reset dropdown selection
-                self._require_page().update()
+                self.page.update()
 
     # Add the new builder method
     def _build_middle_section(self) -> ft.Column:
@@ -543,7 +800,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
 
         # Clear relevant top-section fields
         self._enter_id_or_lemma_field.value = ""
-        self._enter_id_or_lemma_field.error_text = None
+        self._enter_id_or_lemma_field.error = None
         self.headword = None  # Resetting the data model reference
         if self._filter_radios.value == "sutta":
             self._apply_sutta_prefill()
@@ -553,11 +810,56 @@ class Pass2AddView(ft.Column, PopUpMixin):
         self.headword_original = None  # Resetting the original data reference
         self.current_correction = None
         self.current_addition = None
+        self._current_addition_origin = None
+        self._current_addition_key = None
+        self._current_correction_origin = None
+        self._current_correction_key = None
 
+        self._reject_button.visible = False
         self.update_message("")  # Clear message field
-        self._require_page().update()
+        self.page.update()
 
-    def _click_run_tests(self, e: ft.ControlEvent) -> None:
+    def _click_reject(self, e: ft.ControlEvent) -> None:
+        """Turn down the loaded contributor addition or correction: remove it
+        from their file, log it as rejected, and clear the form."""
+        if self.dpd_fields.flags.addition:
+            manager = self.additions_manager
+            entry = self.current_addition
+            origin = self._current_addition_origin
+            key = self._current_addition_key
+        elif self.dpd_fields.flags.correction:
+            manager = self.corrections_manager
+            entry = self.current_correction
+            origin = self._current_correction_origin
+            key = self._current_correction_key
+        else:
+            return
+        if entry is None or origin is None or key is None:
+            return
+        try:
+            manager.reject(origin, key, entry)
+        except OSError as ex:
+            self.update_message(f"Reject failed: {ex}")
+            self.page.update()
+            return
+        self.clear_all_fields()
+        self.update_message(f"Rejected {entry.get('lemma_1', key)}")
+        self.page.update()
+
+    def _show_reject_if_contributor_entry(self) -> None:
+        """Show Reject only for an entry that came from a contributor's file."""
+        loaded_from_contributor = (
+            self.dpd_fields.flags.addition
+            and self._current_addition_origin is not None
+            and self._current_addition_key is not None
+        ) or (
+            self.dpd_fields.flags.correction
+            and self._current_correction_origin is not None
+            and self._current_correction_key is not None
+        )
+        self._reject_button.visible = loaded_from_contributor
+
+    def _click_run_tests(self, e: ft.ControlEvent | None) -> None:
         """Run tests on current field values"""
 
         # Get the lemma_1 field and its value first
@@ -587,56 +889,104 @@ class Pass2AddView(ft.Column, PopUpMixin):
         else:
             # No lemma_1 value, open the test file instead
             self.update_message("Opening tests TSV...")
-            self.test_manager._handle_open_test_file(e)
+            self.test_manager.open_test_file(self)
             self._add_to_db_button.color = None
-        self._require_page().update()
+        self.page.update()
 
-    def _click_add_to_db(self, e: ft.ControlEvent) -> None:
+    async def test_and_add_to_db(self) -> None:
+        """Ctrl+S: run the tests, then add to db only if they all pass."""
+        # A run that never reaches the tests would otherwise leave the last
+        # word's result in place, and save this word untested.
+        self.test_manager.passed = False
+        self._click_run_tests(None)
+        if self.test_manager.passed:
+            await self._click_add_to_db(None)
+
+    def _fills_empty_field(self, word_to_save: DpdHeadword, field_name: str) -> bool:
+        """True when this save puts content into a field that was empty before."""
+
+        original = self.headword_original
+        original_value = getattr(original, field_name, "") if original else ""
+        return bool(getattr(word_to_save, field_name, "")) and not original_value
+
+    async def _click_add_to_db(self, e: ft.ControlEvent | None) -> None:
         """Add the word to db, or update in db."""
 
+        if not self._db.is_db_loaded():
+            self.update_message("Database still loading — please wait before saving.")
+            return
+
         word_to_save = self.dpd_fields.get_current_headword()
-        item_to_history = word_to_save
+        if not word_to_save.origin:
+            word_to_save.origin = "pass2"
         comment = self.dpd_fields.get_field("comment").value
 
-        if (
+        for field_name in ("meaning_1", "meaning_lit"):
+            field = self.dpd_fields.get_field(field_name)
+            value = field.value if field else ""
+            if value:
+                misspelled = self.dpd_fields.spellchecker.check_sentence(value)
+                if misspelled:
+                    error_string = ", ".join(misspelled.keys())
+                    self.update_message(
+                        f"spelling mistakes in {field_name}: {error_string}"
+                    )
+                    return
+
+        is_existing_word = bool(
             hasattr(self, "headword")
             and self.headword
             and hasattr(self, "headword_original")
             and self.headword_original
             and word_to_save.id
             == self.headword_original.id  # Compare ID from UI state with original
-        ):
-            # it's an update if this block runs
-            committed, message = self._db.update_word_in_db(word_to_save)
-            log_key = "pass2_update"
+        )
 
-            if self.toolkit.username_manager.is_not_primary():
-                # if not in additions then add to corrections
-                if self.toolkit.additions_manager.is_not_in_additions(word_to_save.id):
-                    self.corrections_manager.update_corrections(word_to_save, comment)
-
-                # if in additions then update to additions
-                else:
-                    self.additions_manager.add_additions(word_to_save, comment)
-        else:
+        item_to_history = word_to_save
+        if not is_existing_word:
             # Check for duplicate id or lemma_1 when adding a new word
             if not self.dpd_fields.validate_no_duplicates(
                 word_to_save.id, word_to_save.lemma_1
             ):
                 return
 
-            # add to additions json
-            if self.toolkit.username_manager.is_not_primary():
-                self.additions_manager.add_additions(word_to_save, comment)
+        async def save() -> None:
+            await self._save_previewed_word(
+                word_to_save, comment, is_existing_word, item_to_history
+            )
 
-            # add to db
-            committed, message = self._db.add_word_to_db(word_to_save)
+        await preview_and_confirm(
+            self.page,
+            self._db.db_session,
+            word_to_save,
+            self.toolkit.username_manager.routed_username,
+            save,
+        )
 
-            log_key = "pass2_add"
-            item_to_history = word_to_save
+    async def _save_previewed_word(
+        self,
+        word_to_save: DpdHeadword,
+        comment: str | None,
+        is_existing_word: bool,
+        item_to_history: DpdHeadword,
+    ) -> None:
+        committed, message = save_headword(
+            self.toolkit, word_to_save, comment, is_existing_word
+        )
+
+        log_key = (
+            "pass2_update"
+            if is_existing_word
+            and not self._fills_empty_field(word_to_save, "meaning_1")
+            and not self._fills_empty_field(word_to_save, "example_1")
+            else "pass2_add"
+        )
 
         if committed:
-            request_dpd_server(str(word_to_save.id))
+            if self.toolkit.username_manager.is_not_primary():
+                # A contributor save writes no db row, so only a refresh lets
+                # the duplicate check see the new lemma.
+                self._db.get_all_lemma_1_and_lemma_clean()
             item_id = (
                 self.headword.id
                 if hasattr(self, "headword") and self.headword
@@ -648,19 +998,20 @@ class Pass2AddView(ft.Column, PopUpMixin):
                 else item_to_history.lemma_1
             )
 
-            if log_key == "pass2_add":
-                item_id = item_to_history.id
-                item_lemma = item_to_history.lemma_1
-            else:
+            if is_existing_word:
                 item_id = self.headword.id if self.headword else None
                 item_lemma = self.headword.lemma_1 if self.headword else ""
+            else:
+                item_id = item_to_history.id
+                item_lemma = item_to_history.lemma_1
 
             if item_id is not None:
                 was_new_to_history = self.history_manager.add_item(item_id, item_lemma)
             else:
                 was_new_to_history = False
 
-            if was_new_to_history:
+            # an add counts even when the word was already saved earlier today
+            if was_new_to_history or log_key == "pass2_add":
                 self._daily_log.increment(log_key)
 
             if item_id is not None:
@@ -677,7 +1028,12 @@ class Pass2AddView(ft.Column, PopUpMixin):
             ):
                 word_data = self.dpd_fields.get_current_values()
                 if word_data:
-                    self.additions_manager.save_processed_addition(word_data)
+                    self.additions_manager.save_processed_addition(
+                        word_data,
+                        self._current_addition_origin,
+                        self._current_addition_key,
+                        self.current_addition,
+                    )
 
             # Save correction if flag is set
             if self.dpd_fields.flags.correction:
@@ -688,7 +1044,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
                     # _add fields = the final modified GUI values (the user's result)
                     if hasattr(self, "current_correction") and self.current_correction:
                         current_gui_values = copy.deepcopy(word_data)
-                        for key in word_data.keys():
+                        for key in word_data:
                             if key.endswith("_add"):
                                 # Set logged _add field to the current UI BASE field value
                                 base_key = key[:-4]
@@ -700,20 +1056,28 @@ class Pass2AddView(ft.Column, PopUpMixin):
                                     word_data[key] = str(val) if val is not None else ""
                                 # Otherwise keep current UI value if not in correction (e.g. ID)
 
-                    self.corrections_manager.save_processed_correction(word_data)
+                    self.corrections_manager.save_processed_correction(
+                        word_data,
+                        self._current_correction_origin,
+                        self._current_correction_key,
+                        self.current_correction,
+                    )
 
-            self._require_page().set_clipboard(word_to_save.lemma_1)
+            await ft.Clipboard().set(word_to_save.lemma_1)
 
             self._update_history_dropdown()
-            self._require_page().update()
+            self.page.update()
+            # clear_all_fields keeps the sutta filter; a finished add should not
+            self._filter_radios.value = "all"
             self.clear_all_fields()
+            self._show_missing_words_dialog(word_to_save)
         else:
             self.update_message(f"Commit failed: {message}")
 
         self._add_to_db_button.color = ft.Colors.RED
-        self._require_page().update()
+        self.page.update()
 
-    def _click_update_with_ai(self, e: ft.ControlEvent) -> None:
+    async def _click_update_with_ai(self, e: ft.ControlEvent) -> None:
         """Handles the 'Update with AI' button click."""
         current_headword = self.dpd_fields.get_current_headword()
         if not current_headword or not current_headword.id:
@@ -724,8 +1088,9 @@ class Pass2AddView(ft.Column, PopUpMixin):
 
         # Call the controller's single-word processing method
         # Pass None for sentence_data for now
-        response_dict = self.pass2_auto_controller.process_single_headword_from_view(
-            current_headword
+        response_dict = await asyncio.to_thread(
+            self.pass2_auto_controller.process_single_headword_from_view,
+            current_headword,
         )
 
         if response_dict:
@@ -741,6 +1106,12 @@ class Pass2AddView(ft.Column, PopUpMixin):
 
         if not self.headword:
             self.headword = self.dpd_fields.get_current_headword()
+
+        if self.toolkit.username_manager.is_not_primary() and not self._has_own_edit(
+            self.headword.id
+        ):
+            self.update_message("you can only discard your own edits")
+            return
 
         self.delete_alert = ft.AlertDialog(
             modal=True,
@@ -765,21 +1136,27 @@ class Pass2AddView(ft.Column, PopUpMixin):
                 alignment=ft.MainAxisAlignment.CENTER,
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             ),
-            alignment=ft.alignment.center,
+            alignment=ft.Alignment.CENTER,
             actions=[
                 ft.TextButton("OK", on_click=self._click_delete_ok),
                 ft.TextButton("Cancel", on_click=self._click_delete_cancel),
             ],
         )
 
-        self._require_page().open(self.delete_alert)
-        self._require_page().update()
+        self.page.show_dialog(self.delete_alert)
+        self.page.update()
 
     def _click_delete_ok(self, e: ft.ControlEvent) -> None:
         self.delete_alert.open = False
-        self._require_page().update()
+        self.page.update()
 
-        if self.headword:
+        if not self._db.is_db_loaded():
+            self.update_message("Database still loading — please wait before deleting.")
+            return
+
+        if self.headword and self.toolkit.username_manager.is_not_primary():
+            self._discard_own_edit(self.headword.id, e)
+        elif self.headword:
             deleted, message = self._db.delete_word_in_db(self.headword)
             if deleted:
                 self.update_message(f"{self.headword.id} deleted from database")
@@ -789,13 +1166,30 @@ class Pass2AddView(ft.Column, PopUpMixin):
         else:
             self.update_message("No headword to delete")
 
+    def _has_own_edit(self, id_no: int) -> bool:
+        return not self.additions_manager.is_not_in_additions(
+            id_no
+        ) or not self.corrections_manager.is_not_in_corrections(id_no)
+
+    def _discard_own_edit(self, id_no: int, e: ft.ControlEvent) -> None:
+        """A contributor's delete: drop their own JSON edit, never a db word.
+        A discarded correction shows the db version again."""
+        was_addition = self.additions_manager.discard(id_no)
+        was_correction = self.corrections_manager.discard(id_no)
+        self._db.get_all_lemma_1_and_lemma_clean()
+        self.clear_all_fields()
+        if was_correction and not was_addition:
+            self._enter_id_or_lemma_field.value = str(id_no)
+            self._click_edit_headword(e)
+        self.update_message(f"{id_no}: your edit was discarded")
+
     def _click_delete_cancel(self, e: ft.ControlEvent) -> None:
         self.delete_alert.open = False
-        self._require_page().update()
+        self.page.update()
 
     def _click_corrections_button(self, e: ft.ControlEvent) -> None:
         """Loads the next correction and populates the _add fields."""
-        correction_data, _origin_path, corrections_remaining = (
+        correction_data, origin, source_key, corrections_remaining = (
             self.corrections_manager.get_next_correction()
         )
 
@@ -804,6 +1198,8 @@ class Pass2AddView(ft.Column, PopUpMixin):
             return
 
         self.current_correction = copy.deepcopy(correction_data)
+        self._current_correction_origin = origin
+        self._current_correction_key = source_key
 
         try:
             # Clear any existing add fields
@@ -824,7 +1220,9 @@ class Pass2AddView(ft.Column, PopUpMixin):
 
             # Map correction data to add fields
             processed_correction: dict[str, str] = {}
-            for field_name, value in correction_data.items():
+            for field_name, value in proposal_fields(
+                correction_data, "correction"
+            ).items():
                 processed_correction[field_name] = str(value)
                 if field_name in self.dpd_fields.fields:
                     add_field = f"{field_name}_add"
@@ -835,6 +1233,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
 
             # Set correction flag
             self.dpd_fields.flags.correction = True
+            self._show_reject_if_contributor_entry()
 
             # Update message with lemma if available
             lemma = correction_data.get("lemma_1", "unknown")
@@ -842,14 +1241,14 @@ class Pass2AddView(ft.Column, PopUpMixin):
                 f"Loaded correction for {lemma}. {corrections_remaining} corrections remaining."
             )
 
-        except Exception as ex:
-            self.update_message(f"Error loading correction: {str(ex)}")
+        except Exception as ex:  # noqa: BLE001
+            self.update_message(f"Error loading correction: {ex!s}")
 
-        self._require_page().update()
+        self.page.update()
 
     def _click_additions_button(self, e: ft.ControlEvent) -> None:
         """Loads the next addition and populates the _add fields."""
-        addition_data, _origin_path, _source_key, additions_remaining = (
+        addition_data, origin, source_key, additions_remaining = (
             self.additions_manager.get_next_addition()
         )
 
@@ -858,6 +1257,8 @@ class Pass2AddView(ft.Column, PopUpMixin):
             return
 
         self.current_addition = copy.deepcopy(addition_data)
+        self._current_addition_origin = origin
+        self._current_addition_key = source_key
 
         try:
             # Clear any existing fields
@@ -867,7 +1268,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
 
             # Map addition data to add fields
             processed_addition: dict[str, str] = {}
-            for field_name, value in addition_data.items():
+            for field_name, value in proposal_fields(addition_data, "addition").items():
                 processed_addition[field_name] = str(value)
                 if field_name in self.dpd_fields.fields:
                     add_field = f"{field_name}_add"
@@ -878,6 +1279,7 @@ class Pass2AddView(ft.Column, PopUpMixin):
 
             # Set addition flag
             self.dpd_fields.flags.addition = True
+            self._show_reject_if_contributor_entry()
 
             # Update message with lemma if available
             lemma = addition_data.get("lemma_1", "unknown")
@@ -885,64 +1287,452 @@ class Pass2AddView(ft.Column, PopUpMixin):
                 f"Loaded addition for {lemma}. {additions_remaining} additions remaining."
             )
 
-        except Exception as ex:
-            self.update_message(f"Error loading addition: {str(ex)}")
+        except Exception as ex:  # noqa: BLE001
+            self.update_message(f"Error loading addition: {ex!s}")
 
-        self._require_page().update()
+        self.page.update()
 
-    def _click_x_button(self, e: ft.ControlEvent) -> None:
-        """Loads the next headword from the X filter queue."""
-        if self._x_manager._loaded and not self._x_manager._queue:
-            # Re-read pass2_x_manager.py from disk so edits to filter_query
-            # take effect without restarting the app. Bypasses sys.modules
-            # and __pycache__ — importlib.reload was not reliably picking
-            # up changes.
-            import importlib.util
-            from pathlib import Path
+    async def _click_x_button(self, e: ft.ControlEvent) -> None:
+        """Load the next entry from the X import queue: an entry with an id
+        updates that headword, with the queued values as _add proposals;
+        an entry without one is a new word filled straight into the fields."""
 
-            path = Path(__file__).parent / "pass2_x_manager.py"
-            spec = importlib.util.spec_from_file_location(
-                f"pass2_x_manager_live_{id(self)}", path
-            )
-            assert spec is not None and spec.loader is not None
-            mod = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(mod)
-            self._x_manager = mod.Pass2XManager(self._db)
-
-        headword_id, remaining = self._x_manager.get_next()
-
-        if headword_id is None:
+        word, data = self._x_manager.get_next()
+        if word is None or data is None:
             self.update_message("No more X words")
-            self._require_page().update()
+            self.page.update()
             return
 
+        values = {k: v for k, v in data.items() if k != "comment"}
+        comment = data.get("comment", "")
+
         try:
-            headword = self._db.get_headword_by_id(headword_id)
-            if not headword:
-                self.update_message(f"Headword ID {headword_id} not found in DB")
-                self._require_page().update()
-                return
+            headword = None
+            queued_id = str(values.pop("id", "")).strip()
+            if queued_id:
+                if not queued_id.isdigit():
+                    self._x_manager.requeue(word, data)
+                    self.update_message(f"{word}: bad id {queued_id!r} — requeued")
+                    self.page.update()
+                    return
+                headword = self._db.get_headword_by_id(int(queued_id))
+                if not headword:
+                    self._x_manager.requeue(word, data)
+                    self.update_message(
+                        f"Headword ID {queued_id} not found in DB — requeued"
+                    )
+                    self.page.update()
+                    return
 
             self.clear_all_fields()
+
+            if headword:
+                self.headword = headword
+                self._enter_id_or_lemma_field.value = headword.lemma_1
+                self.headword_original = copy.deepcopy(headword)
+                self.dpd_fields.update_db_fields(headword)
+                self.add_headword_to_examples_and_commentary()
+                self.dpd_fields.update_add_fields(values)
+            else:
+                for name, value in values.items():
+                    field = self.dpd_fields.fields.get(name)
+                    if field is not None:
+                        field.value = value
+                self.add_headword_to_examples_and_commentary()
+
+            lemma_1 = headword.lemma_1 if headword else values.get("lemma_1", word)
+            await ft.Clipboard().set(lemma_1)
+
+            remaining = self._x_manager.remaining_count()
+            self.update_message(
+                f"[{remaining}] {word}: {comment} (lemma_1 copied)"
+                if comment
+                else f"[{remaining}] {word} (lemma_1 copied)"
+            )
+        except Exception as ex:  # noqa: BLE001
+            self._x_manager.requeue(word, data)
+            self.update_message(f"Error loading X word ({word} requeued): {ex!s}")
+
+        self.page.update()
+
+    @staticmethod
+    def _order_by_appearance(words: list[str], text: str) -> list[str]:
+        """Sort words by their position in the text. Existing headwords are
+        lemma_1 values whose inflected form appears in the text, so match on a
+        progressively shortened stem; unmatched words go to the end."""
+
+        def position(word: str) -> int:
+            stem = clean_lemma_1(word)
+            while len(stem) >= 4:
+                index = text.find(stem)
+                if index != -1:
+                    return index
+                stem = stem[:-1]
+            return len(text)
+
+        return sorted(words, key=position)
+
+    def _find_missing_eg_words(
+        self, word_to_save: DpdHeadword
+    ) -> list[tuple[str, dict[str, dict[str, str]]]]:
+        """Scan examples and commentary for words missing meaning or example.
+        Returns one (labelled field text, {word: prefill}) section per scanned field
+        containing missing words, words ordered by appearance in that text."""
+
+        def unbold(text: str) -> str:
+            return text.replace("<b>", "").replace("</b>", "")
+
+        field_prefills: list[tuple[str, str, dict[str, str]]] = [
+            (
+                "EG1:",
+                word_to_save.example_1,
+                {
+                    "source_1": word_to_save.source_1,
+                    "sutta_1": word_to_save.sutta_1,
+                    "example_1": unbold(word_to_save.example_1),
+                },
+            ),
+            (
+                "EG2:",
+                word_to_save.example_2,
+                {
+                    "source_1": word_to_save.source_2,
+                    "sutta_1": word_to_save.sutta_2,
+                    "example_1": unbold(word_to_save.example_2),
+                },
+            ),
+            (
+                "COMM:",
+                word_to_save.commentary,
+                {"example_1": unbold(word_to_save.commentary)},
+            ),
+        ]
+
+        sections: list[tuple[str, dict[str, dict[str, str]]]] = []
+        seen: set[str] = set()
+
+        # Parts go first and join `seen`, so the same word is not offered
+        # again from the example text below.
+        parts = self._find_missing_component_words(word_to_save)
+        if parts:
+            parts_prefill = {
+                "source_1": word_to_save.source_1,
+                "sutta_1": word_to_save.sutta_1,
+                "example_1": unbold(word_to_save.example_1),
+            }
+            if word_to_save.example_2:
+                parts_prefill |= {
+                    "source_2": word_to_save.source_2,
+                    "sutta_2": word_to_save.sutta_2,
+                    "example_2": unbold(word_to_save.example_2),
+                }
+            sections.append(
+                (
+                    f"PARTS: {word_to_save.construction}",
+                    dict.fromkeys(parts, parts_prefill),
+                )
+            )
+            seen.update(parts)
+
+        for label, text, prefill in field_prefills:
+            if not text or text == "-":
+                continue
+            found = [
+                word
+                for word in find_missing_meanings(self._db.db_session, text, level=3)
+                if word not in seen
+                and word != word_to_save.lemma_1
+                and not self._is_eg_queued(word)
+            ]
+            if not found:
+                continue
+            seen.update(found)
+            section_words = {
+                word: prefill for word in self._order_by_appearance(found, text)
+            }
+            sections.append((f"{label} {text}", section_words))
+        return sections
+
+    @staticmethod
+    def _construction_parts(construction: str) -> list[str]:
+        """Words named in a construction, in order. Sound changes ('ti > te')
+        keep only the form before the '>'. Anything that is not plain letters
+        is not a word and is dropped: roots ('√dhā'), marked endings ('*a'),
+        sandhi inserts ('[y]'), bracketed letters ('(n)a'), '??' and
+        cross-reference phrases with a space."""
+
+        parts: list[str] = []
+        for line in construction.splitlines():
+            for chunk in line.split("+"):
+                part = chunk.split(">")[0].strip()
+                if not re.fullmatch(r"[^\W\d_]+", part) or part in parts:
+                    continue
+                parts.append(part)
+        return parts
+
+    @staticmethod
+    def _has_component_parts(word_to_save: DpdHeadword) -> bool:
+        return word_to_save.pos in ("sandhi", "idiom") or bool(
+            re.search(r"\bcomp\b", word_to_save.grammar or "")
+        )
+
+    def _find_queued_component_words(self, word_to_save: DpdHeadword) -> list[str]:
+        """Parts the missing-words dialog skips because the eg queue already
+        holds them, so the dialog can say so instead of leaving a gap."""
+
+        if not self._has_component_parts(word_to_save):
+            return []
+
+        self._component_ignore.load()
+        return [
+            part
+            for part in self._construction_parts(word_to_save.construction or "")
+            if part != clean_lemma_1(word_to_save.lemma_1)
+            and part not in self._component_ignore
+            and self._is_eg_queued(part)
+        ]
+
+    def _find_missing_component_words(self, word_to_save: DpdHeadword) -> list[str]:
+        """Parts of a compound that still need a meaning or an example.
+        Every headword of a part that lacks either one is returned, homonyms
+        and the headwords behind an inflected form alike."""
+
+        if not self._has_component_parts(word_to_save):
+            return []
+
+        self._component_ignore.load()
+        missing: list[str] = []
+        for part in self._construction_parts(word_to_save.construction or ""):
+            if (
+                part == clean_lemma_1(word_to_save.lemma_1)
+                or part in self._component_ignore
+                or self._is_eg_queued(part)
+            ):
+                continue
+            entries = (
+                self._db.db_session.query(DpdHeadword)
+                .filter(
+                    or_(
+                        DpdHeadword.lemma_1 == part,
+                        DpdHeadword.lemma_1.like(f"{part} %"),
+                    )
+                )
+                .all()
+            )
+            if not entries:
+                # Not a lemma: an inflected form resolves through the lookup
+                # table to the headwords behind it.
+                form = (
+                    self._db.db_session.query(Lookup).filter_by(lookup_key=part).first()
+                )
+                ids = form.headwords_unpack if form else []
+                if not ids:
+                    missing.append(part)
+                    continue
+                entries = (
+                    self._db.db_session.query(DpdHeadword)
+                    .filter(DpdHeadword.id.in_(ids))
+                    .all()
+                )
+            # The Eg button looks the queued word up by exact lemma_1, so a
+            # part that exists only as 'kata 1' must be queued as 'kata 1'.
+            for lemma in sorted(
+                e.lemma_1 for e in entries if not (e.meaning_1 and e.example_1)
+            ):
+                if lemma not in missing:
+                    missing.append(lemma)
+        return missing
+
+    def _is_eg_queued(self, word: str) -> bool:
+        """Match on clean form so a queued 'uppāṭita' also covers 'uppāṭita 1'
+        and vice versa — the queue is one entry per word, homonyms get sorted
+        out when the word is actually worked on."""
+
+        clean = clean_lemma_1(word)
+        return any(
+            clean == clean_lemma_1(queued)
+            for queued in self.pass2_eg_manager.eg_words_dict
+        )
+
+    @staticmethod
+    def _parse_pasted_words(text: str) -> list[str]:
+        """Split on commas only, so phrases containing spaces stay intact.
+        Homonym numbers ('kata 1', 'kata 1.1') survive because they keep their
+        internal space. Empty tokens are dropped."""
+
+        return [w.strip() for w in text.split(",") if w.strip()]
+
+    def _show_missing_words_dialog(self, word_to_save: DpdHeadword) -> None:
+        """After a successful save, list missing words found in the saved word's
+        examples and commentary. Ticked words go to the eg queue; unticked words
+        are simply not added this time."""
+
+        if not self._missing_words_switch.value:
+            return
+
+        sections = self._find_missing_eg_words(word_to_save)
+        if not sections:
+            return
+
+        self._eg_prefills = {}
+        self._eg_comment = f"eg: found in {word_to_save.lemma_1}"
+        self._eg_checkboxes = {}
+        self._eg_section_textboxes = []
+
+        queued_parts = self._find_queued_component_words(word_to_save)
+
+        rows: list[ft.Control] = []
+        for text, section_words in sections:
+            rows.append(
+                ft.Text(
+                    text,
+                    color=LABEL_COLOUR,
+                    size=12,
+                    selectable=True,
+                )
+            )
+            for word, prefill in section_words.items():
+                self._eg_prefills[word] = prefill
+                checkbox = ft.Checkbox(value=False)
+                self._eg_checkboxes[word] = checkbox
+                rows.append(
+                    ft.Row(
+                        controls=[
+                            checkbox,
+                            ft.Text(word, selectable=True),
+                        ]
+                    )
+                )
+            if text.startswith("PARTS:"):
+                for queued in queued_parts:
+                    rows.append(
+                        ft.Row(
+                            controls=[
+                                ft.Checkbox(value=False, disabled=True),
+                                ft.Text(
+                                    f"{queued} (already queued)",
+                                    color=ft.Colors.GREY_600,
+                                    selectable=True,
+                                ),
+                            ]
+                        )
+                    )
+            add_field = ft.TextField(
+                border=field_border(),
+                label="words to add (comma-separated)",
+                dense=True,
+                text_size=12,
+                expand=True,
+                on_submit=self._click_eg_add,
+            )
+            section_prefill = next(iter(section_words.values()))
+            self._eg_section_textboxes.append((add_field, section_prefill))
+            rows.append(ft.Row(controls=[add_field]))
+
+        self._eg_alert = ft.AlertDialog(
+            modal=True,
+            content=ft.Column(
+                controls=[
+                    ft.Text("Missing words", color=ft.Colors.BLUE_200, size=20),
+                    ft.Text(f"found in {word_to_save.lemma_1}", color=LABEL_COLOUR),
+                    ft.Column(
+                        controls=rows,
+                        scroll=ft.ScrollMode.AUTO,
+                        expand=True,
+                    ),
+                ],
+                height=500,
+                width=500,
+            ),
+            alignment=ft.Alignment.CENTER,
+            actions=[
+                ft.TextButton("Add ticked", on_click=self._click_eg_add),
+                ft.TextButton("Close", on_click=self._click_eg_close),
+            ],
+        )
+
+        # The dialog is modal and every `words to add` box submits on Enter, so
+        # it needs no keyboard handler of its own. It used to install one on the
+        # page that delegated unhandled keys back to whatever it replaced, read
+        # from an instance attribute at call time rather than captured at
+        # install time — so a second open made the handler its own predecessor
+        # and every keypress recursed until the stack blew.
+        self.page.show_dialog(self._eg_alert)
+        self.page.update()
+
+    def _click_eg_add(self, e: ft.ControlEvent) -> None:
+        if not self._eg_alert or not self._eg_alert.open:
+            return
+        added = 0
+        for word, checkbox in self._eg_checkboxes.items():
+            if checkbox.value:
+                self.pass2_eg_manager.add_word(
+                    word, self._eg_prefills[word], self._eg_comment
+                )
+                added += 1
+        for add_field, prefill in self._eg_section_textboxes:
+            if not add_field.value:
+                continue
+            for word in self._parse_pasted_words(add_field.value):
+                if not self._is_eg_queued(word):
+                    self.pass2_eg_manager.add_word(word, prefill, self._eg_comment)
+                    added += 1
+        self._close_eg_alert()
+        self.update_message(f"eg: {added} added")
+
+    def _click_eg_close(self, e: ft.ControlEvent) -> None:
+        self._close_eg_alert()
+
+    def _close_eg_alert(self) -> None:
+        # `pop_dialog` rather than `open = False`: the latter hides the dialog
+        # but leaves it on the page's dialog stack, where flet compares entries
+        # by value, so a later popup with the same content is refused as
+        # already open.
+        if self._eg_alert and self._eg_alert.open:
+            self.page.pop_dialog()
+        self.page.update()
+        request_focus(self._enter_id_or_lemma_field)
+
+    def _click_eg_button(self, e: ft.ControlEvent) -> None:
+        """Load the next eg queue word: edit mode if it exists in the db,
+        otherwise a prefilled new word."""
+
+        word, prefill = self.pass2_eg_manager.get_next()
+        if word is None or prefill is None:
+            self.update_message("No more eg words")
+            self.page.update()
+            return
+
+        remaining = self.pass2_eg_manager.count()
+        comment = prefill.get("comment", "")
+        headword = self._db.get_headword_by_lemma(word)
+
+        self.clear_all_fields()
+        if headword:
             self.headword = headword
             self._enter_id_or_lemma_field.value = headword.lemma_1
             self.headword_original = copy.deepcopy(headword)
             self.dpd_fields.update_db_fields(headword)
             self.add_headword_to_examples_and_commentary()
+            self.dpd_fields.update_add_fields(prefill)
+        else:
+            lemma_1_field = self.dpd_fields.get_field("lemma_1")
+            if lemma_1_field:
+                lemma_1_field.value = word
+            self.dpd_fields.update_add_fields(prefill)
 
-            self.update_message(
-                f"Loaded {headword.lemma_clean}. {remaining} X remaining."
-            )
-        except Exception as ex:
-            self.update_message(f"Error loading X word: {str(ex)}")
-
-        self._require_page().update()
+        self.update_message(
+            f"[{remaining}] {word}: {comment}" if comment else f"[{remaining}] {word}"
+        )
+        self.update()
 
     def _click_pread_button(self, e: ft.ControlEvent) -> None:
         """Loads the next proofreader correction and populates the gui."""
-        correction, remaining = self.toolkit.proofreader_manager.get_next_correction()
+        correction, remaining, field = (
+            self.toolkit.proofreader_manager.get_next_correction()
+        )
 
-        if not correction:
+        if not correction or not field:
             self.update_message("No more proofreadings available")
             return
 
@@ -961,15 +1751,15 @@ class Pass2AddView(ft.Column, PopUpMixin):
             self.dpd_fields.update_db_fields(headword)
             self.add_headword_to_examples_and_commentary()
 
-            # Load correction into meaning_1_add
-            meaning_1_corrected = correction.get("meaning_1_corrected", "")
-            self.dpd_fields.update_add_fields({"meaning_1": meaning_1_corrected})
+            # Load correction into the add-field matching the proofread field
+            corrected = correction.get(f"{field}_corrected", "")
+            self.dpd_fields.update_add_fields({field: corrected})
 
             self.update_message(
-                f"Loaded proofreading for {headword.lemma_clean}. {remaining} proofreadings remaining."
+                f"Loaded {field} proofreading for {headword.lemma_clean}. {remaining} proofreadings remaining."
             )
 
-        except Exception as ex:
-            self.update_message(f"Error loading proofreading: {str(ex)}")
+        except Exception as ex:  # noqa: BLE001
+            self.update_message(f"Error loading proofreading: {ex!s}")
 
-        self._require_page().update()
+        self.page.update()

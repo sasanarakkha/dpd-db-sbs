@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"unicode"
 )
 
 var pf = fmt.Printf
@@ -126,6 +127,13 @@ func CleanMachine(text string, niggahita string, addHyphenatedWords bool, source
 		// remove pts ref and html markup
 		r := regexp.MustCompile(`<.+?>`)
 		text = r.ReplaceAllString(text, " ")
+
+		// remove structural markers of the corrected BUDSIR corpus so their
+		// literal words do not pollute the frequency map (digits already stripped)
+		r = regexp.MustCompile(`\(pts[^)]*\)`)
+		text = r.ReplaceAllString(text, " ")
+		text = strings.Replace(text, "page number", " ", -1)
+		text = strings.Replace(text, "footnote", " ", -1)
 
 		// remove words with crazy characters
 
@@ -261,6 +269,10 @@ func characterTest(text string, textSet string) {
 
 	errors := []rune{}
 	for _, ch := range text {
+		// Burmese script appears in the other texts as an exercise to translate; it is not a mistake.
+		if textSet == "other" && unicode.Is(unicode.Myanmar, ch) {
+			continue
+		}
 		if !strings.Contains(allowedCharacters, string(ch)) {
 			errors = append(errors, ch)
 		}

@@ -212,11 +212,21 @@ WHITELIST: dict[str, WhitelistEntry] = {
             "save_content_opf_xhtml",
             "save_title_page_xhtml",
             "zip_epub",
+            # 2026-11-05 sync (D6): upstream #217 form-keyed rewrite deferred to
+            # kamma/drafts/20261105_kindle_ru_217_port/ — RU keeps the old architecture.
+            "_load_lookup",
+            "_niggahita_variants",
+            "render_form_entry",
+            "_letter_files",
+            "_headword_aliases",
+            "find_pages_with_web_links",
         ],
         "imports": [
             "argparse",
             "exporter.kindle.data_classes.KindleData",
             "pathlib.Path",
+            "os",
+            "sqlalchemy.orm.Session",
         ],
     },
     "exporter/tbw/tbw_exporter_ru.py": {
@@ -225,12 +235,18 @@ WHITELIST: dict[str, WhitelistEntry] = {
     },
     "exporter/tpr/tpr_exporter_ru.py": {
         "imports": ["tools.uposatha_day.UposathaManger"],
+        # 2026-11-05 sync (D7): upstream's TPR download-index publishing is not
+        # ported — RU writes different paths and automatic RU TPR export stopped.
+        "functions": ["_update_download_list", "_tpr_download_url"],
     },
     "exporter/webapp/data_classes_ru.py": {
         "classes": ["SpellingData", "VariantData"],
         "imports": [
             "tools.configger.config_test",
             "tools.meaning_construction.make_grammar_line",
+            # 2026-11-05 sync (D-3): RU permalinks use local RU_PERMALINK_BASE
+            # (ru.dpdict.net) instead of upstream make_permalink (dpdict.net).
+            "tools.version.make_permalink",
         ],
     },
     "exporter/webapp/main_ru.py": {
@@ -282,8 +298,18 @@ WHITELIST: dict[str, WhitelistEntry] = {
             "split_tsv_file",
             "backup_dpd_headwords",
             "git_commit",
+            # 2026-11-05 sync: upstream's duplicate-lemma_1 guard is not ported —
+            # backup_dps only backs up RU/SBS tables, never dpd_headwords.
+            "find_duplicate_lemma_1",
+            "check_no_duplicate_lemma_1",
         ],
-        "imports": ["db.models.DpdHeadword", "pathlib.Path"],
+        "imports": [
+            "db.models.DpdHeadword",
+            "pathlib.Path",
+            "sqlalchemy.func",
+            "sys",
+            "gui2.paths.Gui2Paths",
+        ],
     },
     "scripts/build/db_rebuild_from_tsv_dps.py": {
         "functions": [
@@ -316,8 +342,24 @@ WHITELIST: dict[str, WhitelistEntry] = {
     "tools/paths_ru.py": {"classes": ["ProjectPaths"]},
     "tools/ru_spelling.py": {
         "classes": ["CustomSpellChecker"],
-        "functions": ["add_to_dictionary"],
-        "imports": ["tools.paths.ProjectPaths"],
+        # 2026-11-05 sync (C5): upstream's ASCII-only `_english_words` filter would
+        # drop every Cyrillic word; `has_misspellings` builds on it and has no RU caller.
+        "functions": ["add_to_dictionary", "_english_words", "has_misspellings"],
+        "imports": ["tools.paths.ProjectPaths", "pathlib.Path", "re"],
+    },
+    "tools/version_ru.py": {
+        # 2026-11-05 sync: upstream #262 citation / Zenodo metadata generators
+        # (CITATION.cff, .zenodo.json) belong to the upstream repository; RU
+        # permalinks are handled in exporter/webapp/data_classes_ru.py.
+        "functions": [
+            "release_date",
+            "make_db_metadata",
+            "make_citation_cff",
+            "make_permalink",
+            "update_citation_cff",
+            "make_citation",
+        ],
+        "imports": ["pathlib.Path", "tools.uposatha_day.UposathaManger"],
     },
     "tools/utils_sbs.py": {
         "functions": ["list_into_batches", "squash_whitespaces", "extract_body"]
@@ -333,6 +375,13 @@ WHITELIST: dict[str, WhitelistEntry] = {
             "tools.cst_source.find_cst_source_sutta_example",
             "gui2.dpd_fields_functions.remove_brackets",
             "gui2.flet_functions.highlight_word_in_sentence",
+            # 2026-11-05 sync (F-2): upstream [] / <b> buttons, CST-source finder and
+            # set_error-based highlighting are upstream UI features absent from DPS.
+            "tools.example_cleaning.remove_bold_tags",
+            "tools.example_cleaning.remove_brackets",
+            "tools.cst_source.extractor.find_cst_source_sutta_example",
+            "tools.cst_source.models.CstSourceSuttaExample",
+            "gui2.ui_utils.set_error",
         ],
         "functions": [
             "value",
@@ -355,6 +404,8 @@ WHITELIST: dict[str, WhitelistEntry] = {
             # `dict[str, ft.TextField | None]`, an LSP-incompatible signature vs.
             # the base tuple; the `_dps` suffix follows the namespace convention).
             "get_fields",
+            # 2026-11-05 sync (F-2): collapse_tools SKIP (2a) — DPS has no tools panel.
+            "collapse_tools",
         ],
         "classes": ["DpdExampleField"],
     },
@@ -371,6 +422,9 @@ WHITELIST: dict[str, WhitelistEntry] = {
             "tools.spelling.CustomSpellChecker",
             "gui2.pass1_add_view.Pass1AddView",
             "gui2.pass2_add_view.Pass2AddView",
+            # 2026-11-05 sync (F-3): upstream async/to_thread spell check not ported —
+            # DPS writes suggestions to error_text synchronously (registry local_changes).
+            "asyncio",
         ],
         "functions": [
             "_handle_on_focus",

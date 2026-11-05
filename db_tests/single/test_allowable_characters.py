@@ -14,6 +14,7 @@ from tools.pali_alphabet import (
     sanskrit_alphabet,
 )
 from tools.paths import ProjectPaths
+from tools.printer import printer as pr
 from tools.unicode_char import unicode_char
 
 
@@ -436,6 +437,7 @@ class AllowableCharacters:
         + niggahitas
         + sanskrit_capitals
         + greek_characters
+        + ["ṣ"]
         +
         # digits
         digits
@@ -458,6 +460,7 @@ class AllowableCharacters:
         + equals
         + ampersand
         + dash
+        + plus
     )
 
     non_ia_allowed = (
@@ -485,6 +488,7 @@ class AllowableCharacters:
         + dash
         + forward_slash
         + less_than
+        + question
     )
 
     root_key_allowed = pali_alphabet + digits + space + root
@@ -574,6 +578,7 @@ class AllowableCharacters:
         + digits
         + space
         + comma  #   for subsections of suttas
+        + dash
         + new_line
     )
 
@@ -674,6 +679,8 @@ class AllowableCharacters:
         + brackets
         + low_line
         + new_line
+        + question
+        + equals
     )
 
     origin_allowed = origins
@@ -723,7 +730,6 @@ class AllowableCharacters:
         ("example_2", example_allowed),
         ("antonym", ant_syn_var_allowed),
         ("synonym", ant_syn_var_allowed),
-        ("variant", ant_syn_var_allowed),
         ("var_phonetic", ant_syn_var_allowed),
         ("var_text", ant_syn_var_allowed),
         ("commentary", commentary_allowed),
@@ -736,7 +742,9 @@ class AllowableCharacters:
     ]
 
 
-def main():
+def main() -> None:
+    pr.tic()
+    print("[bright_yellow]testing allowable characters in all fields")
     pth = ProjectPaths()
     db_session = get_db_session(pth.dpd_db_path)
     if config_test("user", "username", "deva"):
@@ -746,46 +754,47 @@ def main():
 
     a = AllowableCharacters()
 
-    debug = False
-    error_list = []
+    # pre-compile regex patterns for every column
+    column_patterns: list[tuple[str, str]] = []
+    for column, allowed in a.tests_data:
+        column_patterns.append((column, join_allowed(allowed)))
 
-    for test_data in a.tests_data:
-        # setup variables
-        column, allowed = test_data
-        print(f"[green]{column:<40}", end="")
-        allowed = join_allowed(allowed)
-        if debug:
-            print()
-            print(allowed)
-        remainder = ""
+    # per-column buckets for illegal characters
+    remainders: dict[str, str] = {col: "" for col, _ in column_patterns}
+    error_lists: dict[str, list[str]] = {col: [] for col, _ in column_patterns}
 
-        for i in db:
-            # grab the text from the column
+    # single pass over all rows
+    for i in db:
+        for column, pattern in column_patterns:
+            # skip trans/example checks when no meaning_1
+            if column == "trans" and not i.meaning_1:
+                continue
+            if column in ("example_1", "example_2") and not i.meaning_1:
+                continue
+
             text = getattr(i, column)
-
-            # remove all allowable characters
-            oops = re.sub(allowed, "", text)
-
-            # compile the remaining characters
+            oops = re.sub(pattern, "", text)
             if oops:
-                if debug:
-                    print(f"{i.lemma_1} '{oops}'")
-                remainder += oops
-                error_list += [i.lemma_1]
+                remainders[column] += oops
+                error_lists[column].append(i.lemma_1)
 
-        print(f"[white]{[char for char in set(remainder)]}", end=" ")
-
-        # unicode numbers for obscure characters
-        unicode_remainder = [ord(char) for char in set(remainder)]
-        for error in unicode_remainder:
-            print("\\u{:04x}".format(error), end=" ")
+    # print results in original column order
+    debug = False
+    for column, _ in column_patterns:
+        remainder = remainders[column]
+        print(f"[green]{column:<40}", end="")
+        print(f"[white]{[c for c in set(remainder)]}", end=" ")
+        for code in sorted(set(ord(c) for c in remainder)):
+            print("\\u{:04x}".format(code), end=" ")
         print()
 
         if debug:
-            # print db serach string
-            error_search_string = db_search_string(error_list)
-            pyperclip.copy(error_search_string)
-            print("[green]db search string copied to clipboard")
+            error_list = error_lists[column]
+            if error_list:
+                pyperclip.copy(db_search_string(error_list))
+                print("[green]db search string copied to clipboard")
+
+    pr.toc()
 
 
 def test_allowable_characters_gui(values: dict[str, str]) -> dict[str, str]:
@@ -816,7 +825,8 @@ def test_allowable_characters_gui(values: dict[str, str]) -> dict[str, str]:
     return error_dict
 
 
-def check_root_db():
+def check_root_db() -> None:
+    """Test allowable characters in the DpdRoot table."""
     pth = ProjectPaths()
     db_session = get_db_session(pth.dpd_db_path)
     db = db_session.query(DpdRoot)
@@ -865,9 +875,8 @@ def check_root_db():
             print("[green]db search string copied to clipboard")
 
 
-def join_allowed(allowed: list) -> str:
-    """Turn a list into a compiled string for regex
-    find and replace."""
+def join_allowed(allowed: list[str]) -> str:
+    """Compile a list of strings into a regex alternation group."""
     return f"({'|'.join(allowed)})"
 
 

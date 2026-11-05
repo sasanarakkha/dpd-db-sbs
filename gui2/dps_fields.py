@@ -8,6 +8,7 @@ from gui2.dps_example_stash_manager import DpsExampleStashManager
 from gui2.dps_ai_service import translate_with_ai_from_gui
 from gui2.dps_meaning_field import DpsMeaningField
 from gui2.toolkit import ToolKit
+from gui2.ui_utils import set_error
 from tools.meaning_construction import make_meaning_combo
 from tools.tsv_read_write import read_tsv_dot_dict
 from tools.ru_spelling import RuSpellChecker
@@ -123,7 +124,7 @@ class DpsFields:
                         ]
 
                     if field_name in ["dps_sbs_chant_pali_1", "dps_sbs_chant_pali_2"]:
-                        params["on_change"] = self._handle_sbs_chant_change
+                        params["on_select"] = self._handle_sbs_chant_change
                     params["editable"] = True
                     params["enable_filter"] = True
 
@@ -180,7 +181,7 @@ class DpsFields:
 
             # Add AI button for Russian meaning suggestion
             if field_name == "dps_suggestion":
-                ai_button = ft.ElevatedButton(
+                ai_button = ft.Button(
                     "AI",
                     on_click=lambda e, mode="meaning": self._handle_ai_click(e, mode),
                     width=50,
@@ -188,7 +189,7 @@ class DpsFields:
                     tooltip="Generate Russian translation using AI",
                 )
                 controls.append(ai_button)
-                synonym_button = ft.ElevatedButton(
+                synonym_button = ft.Button(
                     "Syn",
                     on_click=lambda e, mode="meaning": self._handle_ai_click(
                         e, mode, True
@@ -198,7 +199,7 @@ class DpsFields:
                     tooltip="Generate list of Synonyms using AI",
                 )
                 controls.append(synonym_button)
-                copy_split_button = ft.ElevatedButton(
+                copy_split_button = ft.Button(
                     "Copy",
                     on_click=self._handle_copy_split_click,
                     width=80,
@@ -209,7 +210,7 @@ class DpsFields:
 
             # Add AI button for notes suggestion
             elif field_name == "dps_notes_suggestion":
-                ai_button = ft.ElevatedButton(
+                ai_button = ft.Button(
                     "AI",
                     on_click=lambda e, mode="note": self._handle_ai_click(e, mode),
                     width=50,
@@ -217,7 +218,7 @@ class DpsFields:
                     tooltip="Generate Russian notes translation using AI",
                 )
                 controls.append(ai_button)
-                copy_notes_button = ft.ElevatedButton(
+                copy_notes_button = ft.Button(
                     "Copy",
                     on_click=self._handle_copy_notes_click,
                     width=80,
@@ -449,7 +450,8 @@ class DpsFields:
         for field_name, field in self.fields.items():
             if isinstance(field, (ft.TextField, ft.Text)):
                 field.value = ""
-                field.error_text = None
+                if isinstance(field, ft.TextField):
+                    field.error = None
             elif isinstance(field, ft.Checkbox):
                 field.value = False
             elif isinstance(field, ft.Dropdown):
@@ -462,7 +464,7 @@ class DpsFields:
                 # Clear additional fields within DpsExampleField
                 if hasattr(field, "word_to_find_field"):
                     field.word_to_find_field.value = ""
-                    field.word_to_find_field.error_text = None
+                    set_error(field.word_to_find_field, None)
                 if hasattr(field, "book_dropdown"):
                     field.book_dropdown.value = None
                 if hasattr(field, "bold_field"):

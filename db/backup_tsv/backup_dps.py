@@ -3,8 +3,8 @@
 """Save latest Russian, Tamil, SBS, and roots tables to backup_tsv folder."""
 
 import csv
+import subprocess
 
-from git import Repo
 from sqlalchemy.orm.session import Session
 
 from db.db_helpers import get_db_session
@@ -164,17 +164,27 @@ def backup_roots_ru(db_session: Session, dpspth: DPSPaths, custom_path: str = ""
             csvwriter.writerow(row)
 
 
-def git_commit_dps():
-    repo = Repo("./")
-    index = repo.index
-    index.add(
-        [
-            "db/backup_tsv/russian.tsv",
-            "db/backup_tsv/sbs.tsv",
-            "db/backup_tsv/ru_roots.tsv",
-        ]
-    )
-    index.commit("backup russian & sbs")
+def git_commit_dps() -> None:
+    pr.green_tmr("committing changes to GitHub")
+    files_to_add = [
+        "db/backup_tsv/russian.tsv",
+        "db/backup_tsv/sbs.tsv",
+        "db/backup_tsv/ru_roots.tsv",
+    ]
+    try:
+        # Path-limited commit (upstream backup_dpd_headwords_and_roots.py): commits exactly
+        # these files and ignores whatever else other sessions have staged.
+        subprocess.run(
+            ["git", "commit", "-m", "backup russian & sbs", "--", *files_to_add],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        pr.yes("ok")
+    except subprocess.CalledProcessError as e:
+        pr.no(e.stderr.strip())
+    except FileNotFoundError as e:
+        pr.no(f"{e}")
 
 
 if __name__ == "__main__":

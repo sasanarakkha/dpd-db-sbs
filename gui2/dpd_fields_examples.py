@@ -1,17 +1,16 @@
 import flet as ft
 
 from gui2.dpd_fields_classes import DpdTextField
-from gui2.dpd_fields_functions import clean_example, remove_bold_tags, remove_brackets
+from tools.example_cleaning import clean_example, remove_bold_tags, remove_brackets
 from gui2.example_stash_manager import ExampleStashManager
 from gui2.flet_functions import (
     highlight_word_in_sentence,
 )
 from gui2.toolkit import ToolKit
+from gui2.ui_utils import compact_button_style, field_border, request_focus, set_error
 from tools.clean_sentence import split_pali_sentence_into_words
-from tools.cst_source import (
-    CstSourceSuttaExample,
-    find_cst_source_sutta_example,
-)
+from tools.cst_source.extractor import find_cst_source_sutta_example
+from tools.cst_source.models import CstSourceSuttaExample
 from tools.speech_marks import SpeechMarkManager
 
 MAX_SEARCH_RESULTS = 100
@@ -143,11 +142,10 @@ class DpdExampleField(ft.Column):
         self.speech_marks_dict = self.speech_marks_manager.get_speech_marks()
 
         self.simple_mode = simple_mode
-        self.stash_manager = ExampleStashManager(self.ui.toolkit)
+        self.stash_manager: ExampleStashManager = self.ui.toolkit.example_stash_manager
         super().__init__(
             expand=True,
         )
-        self.page: ft.Page = ui.page
 
         self.text_field = DpdTextField(
             name=field_name,
@@ -162,12 +160,19 @@ class DpdExampleField(ft.Column):
         if not self.simple_mode:
             self.bold_field = ft.TextField(
                 "",
+                border=field_border(),
                 width=240,
                 label="bold",
                 label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=10),
                 expand=True,
                 dense=True,
                 text_size=12,
+                # A single-line field unfocuses itself on Enter before on_submit
+                # reaches Python, so the next Tab restarted at the id field.
+                # shift_enter submits from a key handler that keeps focus here;
+                # max_lines keeps it looking like a one-line box.
+                shift_enter=True,
+                max_lines=1,
                 on_submit=self.click_bold_example,
                 on_blur=self._handle_last_control_blur,
             )
@@ -190,9 +195,7 @@ class DpdExampleField(ft.Column):
                 label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=10),
                 editable=True,
                 enable_filter=True,
-                border_color=ft.Colors.GREY_800,
-                border_radius=20,
-                border_width=1,
+                border=field_border(color=ft.Colors.GREY_800),
                 on_blur=self._handle_book_blur,
             )
 
@@ -202,7 +205,7 @@ class DpdExampleField(ft.Column):
                 label="word to find",
                 label_style=ft.TextStyle(color=ft.Colors.GREY_700, size=10),
                 on_submit=self._click_search_dialog_ok,
-                border_radius=20,
+                border=field_border(),
             )
 
             # Toggle Button
@@ -226,19 +229,45 @@ class DpdExampleField(ft.Column):
             # Action buttons row (initially hidden)
             self._actions_row = ft.Row(
                 [
-                    ft.ElevatedButton("Add '-", on_click=self.click_clean_example),
-                    ft.ElevatedButton("[]", on_click=self.click_remove_brackets),
-                    ft.ElevatedButton("<b>", on_click=self.click_remove_bold_tags),
-                    ft.ElevatedButton("Delete", on_click=self.click_delete_example),
-                    ft.ElevatedButton("Swap", on_click=self.click_swap_example),
-                    ft.ElevatedButton("Stash", on_click=self._click_stash_example),
-                    ft.ElevatedButton(
+                    ft.Button(
+                        "Add '-",
+                        on_click=self.click_clean_example,
+                        style=compact_button_style(),
+                    ),
+                    ft.Button(
+                        "[]",
+                        on_click=self.click_remove_brackets,
+                        style=compact_button_style(),
+                    ),
+                    ft.Button(
+                        "<b>",
+                        on_click=self.click_remove_bold_tags,
+                        style=compact_button_style(),
+                    ),
+                    ft.Button(
+                        "Delete",
+                        on_click=self.click_delete_example,
+                        style=compact_button_style(),
+                    ),
+                    ft.Button(
+                        "Swap",
+                        on_click=self.click_swap_example,
+                        style=compact_button_style(),
+                    ),
+                    ft.Button(
+                        "Stash",
+                        on_click=self._click_stash_example,
+                        style=compact_button_style(),
+                    ),
+                    ft.Button(
                         "Reload",
                         on_click=self._click_reload_example,
+                        style=compact_button_style(),
                     ),
-                    ft.ElevatedButton(
+                    ft.Button(
                         "Last",
                         on_click=self._click_last_example,
+                        style=compact_button_style(),
                     ),
                 ],
                 spacing=0,
@@ -300,7 +329,7 @@ class DpdExampleField(ft.Column):
         if are_visible:
             self._toggle_tools_button.icon = ft.Icons.VISIBILITY_OUTLINED
             self._toggle_tools_button.tooltip = "Hide Tools"
-            self.book_dropdown.focus()
+            request_focus(self.book_dropdown)
         else:
             self._toggle_tools_button.icon = ft.Icons.VISIBILITY_OFF_OUTLINED
             self._toggle_tools_button.tooltip = "Show Tools"
@@ -311,15 +340,19 @@ class DpdExampleField(ft.Column):
         self.click_book_and_word(e)
 
     def _handle_book_blur(self, e: ft.ControlEvent):
-        self.word_to_find_field.focus()
+        request_focus(self.word_to_find_field)
         self.page.update()
 
-    def _handle_last_control_blur(self, e: ft.ControlEvent):
-        """Hides the tools if they are visible when the last control loses focus.
-        Also adds apostrophes, hyphenations and saves current example"""
-
-        if self._search_row.visible:
+    def collapse_tools(self) -> None:
+        """Hides the tools if they are open. Called when another field gets focus."""
+        if not self.simple_mode and self._search_row.visible:
             self._toggle_tools_visibility(None)
+
+    def _handle_last_control_blur(self, e: ft.ControlEvent):
+        """Adds apostrophes, hyphenations and saves current example.
+
+        Does not hide the tools: hiding them here shifted the layout under the
+        click that was moving focus back to the sentence."""
 
         source, sutta, example = self.get_fields()
 
@@ -340,10 +373,11 @@ class DpdExampleField(ft.Column):
         for word in text_list:
             if "-" in word or "'" in word:
                 clean_word = word.replace("-", "").replace("'", "")
-                self.speech_marks_manager.update_variants(clean_word, word)
+                if clean_word:
+                    self.speech_marks_manager.update_variants(clean_word, word)
 
     def click_book_and_word(self, e: ft.ControlEvent):
-        self.word_to_find_field.error_text = None
+        set_error(self.word_to_find_field, None)
         if self.book_dropdown.value and self.word_to_find_field.value:
             self.cst_examples = find_cst_source_sutta_example(
                 book_codes[self.book_dropdown.value],
@@ -352,8 +386,8 @@ class DpdExampleField(ft.Column):
             if self.cst_examples:
                 self.choose_example()
             else:
-                self.word_to_find_field.error_text = "no example found"
-        self.word_to_find_field.focus()
+                set_error(self.word_to_find_field, "no example found")
+        request_focus(self.word_to_find_field)
         self.page.update()
 
     def choose_example(self):
@@ -426,15 +460,15 @@ class DpdExampleField(ft.Column):
                 expand=True,
                 scroll=ft.ScrollMode.AUTO,
             ),
-            alignment=ft.alignment.center,
-            title_padding=ft.padding.all(25),
+            alignment=ft.Alignment.CENTER,
+            title_padding=ft.Padding.all(25),
             actions=[
                 ft.TextButton("OK", on_click=self.click_choose_example_ok),
                 ft.TextButton("Cancel", on_click=self.click_choose_example_cancel),
             ],
         )
 
-        self.page.open(self.choose_example_dialog)
+        self.page.show_dialog(self.choose_example_dialog)
         self.page.update()
 
     def update_example_index(self, e):
@@ -476,7 +510,7 @@ class DpdExampleField(ft.Column):
         bold_word = e.control.value
         if self.value:
             self.value = self.value.replace(bold_word, f"<b>{bold_word}</b>")
-        self.bold_field.focus()
+        request_focus(self.bold_field)
         self.update()
 
     def click_clean_example(self, e: ft.ControlEvent):
@@ -580,12 +614,13 @@ class DpdExampleField(ft.Column):
             text_len = len(clean_text)
             self.counter_field.value = str(text_len)
 
+            # No border= here: text_field is a DpdTextField, whose
+            # before_update() derives the red border from error_text. Setting it
+            # by hand as well was dead code — the same value, recomputed.
             if text_len > max_length:
-                self.text_field.border_color = ft.Colors.RED
                 self.text_field.color = ft.Colors.RED
                 self.text_field.error_text = str(text_len - max_length)
             else:
-                self.text_field.border_color = None
                 self.text_field.color = None
                 self.text_field.error_text = None
 

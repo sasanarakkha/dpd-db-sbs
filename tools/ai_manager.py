@@ -1,3 +1,5 @@
+"""Make AI requests through a single interface with automatic fallback across providers (Antigravity CLI, Claude, Codex, OpenRouter, DeepSeek, Gemini, NVIDIA), using the model lists in tools/ai_models.json. Used by gui2, exporter/analysis and tools/proofreader.py."""
+
 import json
 import shutil
 import threading
@@ -10,6 +12,13 @@ from tools.printer import printer as pr
 
 ANTIGRAVITY_PROVIDER = "antigravity_cli"
 
+OPENAI_COMPAT_PROVIDERS: dict[str, str] = {
+    "openrouter": "OpenRouter",
+    "zai": "Z.ai",
+    "deepseek": "DeepSeek",
+    "nvidia": "NVIDIA",
+}
+
 
 def _load_models_from_json() -> dict[str, list[tuple[str, str, int, float]]]:
     """Load model lists from tools/ai_models.json."""
@@ -20,12 +29,8 @@ def _load_models_from_json() -> dict[str, list[tuple[str, str, int, float]]]:
 
     try:
         data = json.loads(pth.ai_models_json_path.read_text(encoding="utf-8"))
-        antigravity_cli_work = [
-            _entry(m) for m in data.get("antigravity_cli_work_models", [])
-        ]
         return {
-            "default": antigravity_cli_work
-            + [_entry(m) for m in data.get("default_models", [])],
+            "default": [_entry(m) for m in data.get("default_models", [])],
             "grounded": [_entry(m) for m in data.get("grounded_models", [])],
         }
     except (FileNotFoundError, json.JSONDecodeError, KeyError) as e:
@@ -58,11 +63,9 @@ class AIManager:
         self.providers: dict[str, Any] = {}
 
         from tools.ai_claude_manager import ClaudeManager
-        from tools.ai_deepseek_manager import DeepseekManager
         from tools.ai_gemini_manager import GeminiManager
         from tools.ai_gpt_manager import GptManager
-        from tools.ai_nvidia import NvidiaManager
-        from tools.ai_open_router import OpenRouterManager
+        from tools.ai_openai_compat import OpenAiCompatManager
 
         self.providers["claude"] = ClaudeManager()
         pr.green("claude initialized")
@@ -70,29 +73,18 @@ class AIManager:
         self.providers["codex"] = GptManager()
         pr.green("codex initialized")
 
-        if config_read("apis", "openrouter"):
-            self.providers["openrouter"] = OpenRouterManager()
-            pr.green("openrouter initialized")
-        else:
-            pr.amber("OpenRouter API key not found, manager not initialized.")
-
-        if config_read("apis", "deepseek"):
-            self.providers["deepseek"] = DeepseekManager()
-            pr.green("deepseek initialized")
-        else:
-            pr.amber("DeepSeek API key not found, manager not initialized.")
+        for compat_provider, label in OPENAI_COMPAT_PROVIDERS.items():
+            if config_read("apis", compat_provider):
+                self.providers[compat_provider] = OpenAiCompatManager(compat_provider)
+                pr.green(f"{compat_provider} initialized")
+            else:
+                pr.amber(f"{label} API key not found, manager not initialized.")
 
         if config_read("apis", "gemini"):
             self.providers["gemini"] = GeminiManager()
             pr.green("gemini initialized")
         else:
             pr.amber("Gemini API key not found, manager not initialized.")
-
-        if config_read("apis", "nvidia"):
-            self.providers["nvidia"] = NvidiaManager()
-            pr.green("nvidia initialized")
-        else:
-            pr.amber("NVIDIA API key not found, manager not initialized.")
 
         if shutil.which("agy"):
             self._antigravity_probe_thread = threading.Thread(
@@ -118,17 +110,38 @@ class AIManager:
     def _probe_antigravity_cli(self) -> None:
         """Probe agy off-thread so its slow auth check never blocks startup.
 
-        antigravity_cli is the first model in the default fallback list, so it
-        must stay gated: until the probe confirms agy works, the provider is
-        absent from self.providers and request() simply skips to the next model.
+        antigravity_cli is the last-resort model in the default fallback list,
+        so it must stay gated: until the probe confirms agy works, the provider
+        is absent from self.providers and request() simply skips over it.
+
+        Probe targets come from the antigravity_cli entries in
+        tools/ai_models.json — no model name is hardcoded here, so a CLI model
+        rotation is a one-line JSON edit. The provider registers if any
+        configured agy model works.
         """
         from tools.ai_antigravity_cli import AntigravityCliManager, get_working_key
 
-        if get_working_key():
-            self.providers[ANTIGRAVITY_PROVIDER] = AntigravityCliManager()
-            pr.green("antigravity_cli initialized")
-        else:
-            pr.amber("agy found but not working, antigravity_cli not initialized.")
+        agy_models = [
+            model
+            for provider, model, *_ in self.DEFAULT_MODELS
+            if provider == ANTIGRAVITY_PROVIDER
+        ]
+        if not agy_models:
+            pr.amber(
+                f"no {ANTIGRAVITY_PROVIDER} models in ai_models.json, "
+                "antigravity_cli not initialized."
+            )
+            return
+
+        for model in agy_models:
+            if get_working_key(model):
+                self.providers[ANTIGRAVITY_PROVIDER] = AntigravityCliManager()
+                pr.green(f"antigravity_cli initialized with {model}")
+                return
+            pr.amber(f"antigravity_cli model {model} not working")
+        pr.amber(
+            "agy found but no configured model works, antigravity_cli not initialized."
+        )
 
     def _ensure_antigravity_ready(self) -> None:
         """Block until the background agy probe finishes.
@@ -179,7 +192,10 @@ class AIManager:
         provider_preference and model are not specified.
         Returns an AIResponse object.
         """
-        models_to_try = []
+        # 4-tuples come from the configured model lists; an explicit
+        # provider/model preference contributes a bare pair. Only [0] and [1] are
+        # read here — delay and timeout are looked up from the canonical lists.
+        models_to_try: list[tuple[str, str] | tuple[str, str, int, float]] = []
         errors: list[str] = []
 
         # A forced antigravity_cli request must wait for the background probe,

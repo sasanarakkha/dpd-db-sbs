@@ -6,11 +6,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Digital Pāḷi Dictionary</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,700;1,8..60,400;1,8..60,700&amp;display=swap" />
     <link rel="stylesheet" type="text/css" href="/static/dpd.css" />
     <link rel="stylesheet" type="text/css" href="/static/home.css" />
     <link rel="stylesheet" type="text/css" href="/static/switch.css" />
     <link rel="stylesheet" type="text/css" href="/static/tt.css" />
-    <link rel="icon" type="image/png" href="/static/dpd-logo-dark.svg" />
+    <link rel="icon" type="image/svg+xml" href="/static/dpd-logo-dark.svg" />
     <link rel="alternate" type="application/rss+xml" title="DPD Updates" href="https://digitalpalidictionary.github.io/rss.xml" />
 
     <script>
@@ -128,7 +131,7 @@
         <div class="main-pane" id="main-pane">
             <div class="history-pane" id="history-pane">
                 <div class="pane-header">
-                    <h3 class="dpd">History<button class="clear-history-button" id="clear-history-button" title="Clear history">x</button></h3>
+                    <h3 class="dpd">History<button class="clear-history-button" id="clear-history-button" data-title="Clear history">x</button></h3>
                     <button class="collapse-toggle" id="history-collapse-toggle" aria-label="Toggle history">
                         <span class="collapse-icon">▼</span>
                     </button>
@@ -220,12 +223,20 @@
         </div>
         <div class="footer-pane">
             For more information, please
-            <a href="https://digitalpalidictionary.github.io/webapp/" target="_blank">
+            <a href="https://digitalpalidictionary.github.io/webapp/" target="_blank"
+                data-title="How to use the webapp, search syntax and features">
                 read the docs
             </a>
             &nbsp;|&nbsp;
+            <a href="https://digitalpalidictionary.github.io/how_to_cite/" target="_blank"
+                data-title="DPD is revised every month — cite the version you used">
+                how to cite
+            </a>
+            &nbsp;|&nbsp;
+            <span data-title="the release you are using">{{ dpd_release_version }}</span>
+            &nbsp;|&nbsp;
             <a href="https://github.com/digitalpalidictionary/dpd-db" target="_blank"
-                title="Report issues or suggest features on GitHub" class="footer-link github-link">
+                data-title="Report issues or suggest features on GitHub" class="footer-link github-link">
                 <svg class="footer-icon github-icon" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
                     fill="currentColor" style="height: 1em; vertical-align: middle">
                     <title>GitHub Issues</title>
@@ -369,8 +380,7 @@
         </div>
         <div class="scrolling-pane" id="tt-results"></div>
         <div class="footer-pane">
-            This page uses the database from <a href="https://tipitaka.paauksociety.org/index.php" target="_blank">Pa
-                Auk Society Tipiṭaka Translations</a>.
+            This page uses the database from <a href="https://www.opentipitaka.org/" target="_blank">OpenTipitaka</a>.
             Pāḷī texts are from
             <a href="https://github.com/VipassanaTech/tipitaka-xml" target="_blank">
                 Vipassana Research Institute

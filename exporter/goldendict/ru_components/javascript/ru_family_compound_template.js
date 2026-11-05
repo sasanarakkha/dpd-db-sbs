@@ -18,18 +18,19 @@ function ru_makeFamilyCompoundHtml(data) {
     familyCompoundList.forEach(item => {
         fc = ru_family_compound_json[item]
         itemTag = item.replace(/ /g, "_")
+        const compounds = ruPlural(fc.count, "составное слово, содержащее", "составных слова, содержащих", "составных слов, содержащих")
 
         if (familyCompoundList.length > 1) {
             html += `<p class="heading underlined overlined" `
             html += `id=${lemmaTag}_cf_${itemTag}>`;
-            html += `<b>${fc.count}</b> составных слов(а) содержат `;
+            html += `<b>${fc.count}</b> ${compounds} `;
             html += `<b>${ru_superScripter(item)}</b>`;
             html += `<a class="jump" href="#${lemmaTag}_cf_top"> ⤴</a></p>`;
         } else if (familyCompoundList.length == 1) {
             html += `<p class="heading underlined" `
             html += `id=${lemmaTag}_cf_top>`;
-            html += `<b>${fc.count}</b> составное слово содержащее `;
-            html += `<b>${ru_superScripter(item)}</b>`;
+            html += `<b>${fc.count}</b> ${compounds} `;
+            html += `<b>${ru_superScripter(item)}</b></p>`;
         };
         
         

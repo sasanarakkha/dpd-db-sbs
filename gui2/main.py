@@ -1,17 +1,28 @@
+import asyncio
 import cProfile
 import re
+import threading
 import time
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 import flet as ft
 
+from gui2.ai_search_window import launch_ai_search_window
 from gui2.compound_type_tab_view import CompoundTypeTabView
+from gui2.contributor_tabs import allowed_tabs, resolve_extra_tabs
 from gui2.dpd_fields_classes import DpdTextField
 from gui2.roots_tab_view import RootsTabView
 from gui2.sandhi_find_replace_view import SandhiFindReplaceView
 from gui2.sandhi_view import SandhiView
+from gui2.shortcuts_dialog import ShortcutGroup, build_shortcuts_dialog
+from gui2.spelling_find_replace_view import SpellingFindReplaceView
 from gui2.toolkit import ToolKit
+from gui2.ui_utils import cancel_top_dialog, is_dialog_open, show_global_snackbar
 from tools.fast_api_utils_dps import start_dpd_server
+from tools.printer import printer as pr
+from tools.server_mode import is_headless_server
 
 # DPS local: runtime font scaling — adjust _DPS_FONT_SCALE to retune
 _DPS_FONT_SCALE: float = 1.4
@@ -51,24 +62,101 @@ def _dpd_tf_init_scaled(self, *args, **kwargs):
 DpdTextField.__init__ = _dpd_tf_init_scaled
 
 
+# Tab order must match the App._view_builders index keys.
+TAB_LABELS: list[str] = [
+    "Global",
+    "Transl",
+    "Pass1Auto",
+    "Pass1Add",
+    "Pass2Pre",
+    "Pass2x",
+    "Pass2Auto",
+    "Pass2Add",
+    "'",
+    "Sp",
+    "Sandhi",
+    "DB",
+    "Tests",
+    "Bold Search",
+    "√",
+    "CT",
+    "Infl",
+    "DPS",  # DPS local: index 17, appended last so upstream indices never shift
+]
+
+
+def tab_selection() -> tuple[list[int], frozenset[int]]:
+    """The tab indices to show and the read-only ones. A contributor-server
+    session gets its allowed tabs; every other role gets all of them."""
+    if not is_headless_server():
+        return list(range(len(TAB_LABELS))), frozenset()
+    visible, read_only = allowed_tabs(TAB_LABELS, resolve_extra_tabs())
+    return visible, frozenset(read_only)
+
+
 class App:
+    # Tab-bar position -> tab index. Every index-based lookup below keeps the
+    # 17 original indices; only the tab bar and its bodies use positions. The
+    # desktop shows every tab, so this is the identity list there.
+    _visible: list[int] = list(range(len(TAB_LABELS)))
+    _read_only: frozenset[int] = frozenset()
+
+    # Most-used tabs first so they are ready soonest.
+    _WARMUP_TAB_ORDER: tuple[int, ...] = (
+        7,
+        4,
+        5,
+        6,
+        2,
+        3,
+        1,
+        13,
+        11,
+        8,
+        9,
+        10,
+        12,
+        14,
+        15,
+        17,  # DPS local
+    )
+
     def __init__(self, page: ft.Page) -> None:
-        from gui2.bold_search_view import BoldSearchView
-        from gui2.dps_view import DpsView
         from gui2.filter_tab_view import FilterTabView
         from gui2.global_tab_view import GlobalTabView
+        from gui2.inflection_templates_tab_view import InflectionTemplatesTabView
         from gui2.pass1_add_view import Pass1AddView
         from gui2.pass1_auto_view import Pass1AutoView
         from gui2.pass2_add_view import Pass2AddView
         from gui2.pass2_auto_view import Pass2AutoView
         from gui2.pass2_pre_view import Pass2PreProcessView
         from gui2.pass2x.in_commentary_view import Pass2xInCommentaryView
+        from gui2.bold_search_view import BoldSearchView
+        from gui2.dps_view import DpsView
         from gui2.tests_tab_view import TestsTabView
         from gui2.translations_view import TranslationsView
 
         self.page = page
+        self._db_init_started: bool = False
+        self._warmup_started: bool = False
+        # Guards _views/_mounted_tabs: the warm-up worker builds tabs in the
+        # background while the user may click one on the UI thread.
+        self._build_lock = threading.RLock()
+        # Constructed here rather than in build_ui so the background db load,
+        # which toggles it, cannot outrace its creation.
+        self._loading_bar = ft.ProgressBar(visible=False)
 
-        page.theme = ft.Theme(font_family="Inter")
+        page.theme = ft.Theme()
+        page.theme.font_family = "Inter"
+        # Stated rather than inherited from the system, which is what the other
+        # three Flet apps in this repo do. The editor's colours — including the
+        # field border constant in ui_utils — were all chosen against a dark
+        # ground, so following a light system theme would render them wrong.
+        page.theme_mode = ft.ThemeMode.DARK
+        # No window title by the user's choice. The taskbar name and icon do not
+        # come from here anyway — on Linux they come from the desktop entry whose
+        # `StartupWMClass` matches the Flutter client's WM_CLASS, and
+        # `window.icon` is Windows-only and wants a `.ico`.
         self.page.window.top = 0
         self.page.window.left = 0
         self.page.window.height = 1280
@@ -82,7 +170,12 @@ class App:
         appbar_actions: list[ft.Control] = [
             ft.Text(self.toolkit.daily_log.get_counts())
         ]
-        if self.toolkit.username_manager.is_not_primary():
+        # Desktop (legacy) contributors get the git-based Submit/Update buttons.
+        # Server contributors do not: sync is automated (role contributor-server).
+        if (
+            self.toolkit.username_manager.is_not_primary()
+            and not self.toolkit.username_manager.is_server_contributor()
+        ):
             appbar_actions.extend(
                 [
                     ft.VerticalDivider(),
@@ -108,31 +201,40 @@ class App:
             actions=appbar_actions,
         )
 
-        # Now create views
-        self.global_view: GlobalTabView = GlobalTabView(self.page, self.toolkit)
-        self.pass1_auto_view: Pass1AutoView = Pass1AutoView(self.page, self.toolkit)
-        self.pass1_add_view: Pass1AddView = Pass1AddView(
-            self.page,
-            self.toolkit,
-            self.pass1_auto_view.controller,
-        )
-        self.pass2_pre_view: Pass2PreProcessView = Pass2PreProcessView(
-            self.page, self.toolkit
-        )
-        self.pass2x_view: Pass2xInCommentaryView = Pass2xInCommentaryView(
-            self.page, self.toolkit
-        )
-        self.pass2_auto_view: Pass2AutoView = Pass2AutoView(self.page, self.toolkit)
-        self.pass2_add_view: Pass2AddView = Pass2AddView(self.page, self.toolkit)
-        self.tests_tab_view: TestsTabView = TestsTabView(self.page, self.toolkit)
-        self.sandhi_view = SandhiFindReplaceView(self.page, self.toolkit)
-        self.sandhi_view2 = SandhiView(self.page, self.toolkit)
-        self.filter_tab_view = FilterTabView(self.page, self.toolkit)
-        self.translations_view = TranslationsView(self.page, self.toolkit)
-        self.bold_search_view = BoldSearchView(self.page, self.toolkit)
-        self.dps_view: DpsView = DpsView(self.page, self.toolkit)
-        self.roots_view = RootsTabView(self.page, self.toolkit)
-        self.compound_type_view = CompoundTypeTabView(self.page, self.toolkit)
+        # Views are built off the UI thread by the warm-up worker (in
+        # priority order) so the window paints instantly and every tab is
+        # ready by the time it is clicked; clicking a not-yet-warmed tab
+        # builds it on demand (see _view / _on_tab_activated). Each builder
+        # is a thunk keyed by tab index; the Pass1Add view reuses the
+        # Pass1Auto view's controller, so building it transparently builds
+        # Pass1Auto first via _view(2), even where its tab is hidden.
+        self._views: dict[int, ft.Control] = {}
+        self._mounted_tabs: set[int] = set()
+        self._visible, self._read_only = tab_selection()
+        # The server opens on Pass1Add, never on a safe tab that sorts before
+        # it; the desktop opens on its first tab, Global.
+        self._start_index: int = 3 if is_headless_server() else self._visible[0]
+        self._focused_tab_index: int = self._start_index
+        self._view_builders: dict[int, Callable[[], ft.Control]] = {
+            0: lambda: GlobalTabView(self.page, self.toolkit),
+            1: lambda: TranslationsView(self.page, self.toolkit),
+            2: lambda: Pass1AutoView(self.page, self.toolkit),
+            3: lambda: Pass1AddView(self.page, self.toolkit, self._view(2).controller),
+            4: lambda: Pass2PreProcessView(self.page, self.toolkit),
+            5: lambda: Pass2xInCommentaryView(self.page, self.toolkit),
+            6: lambda: Pass2AutoView(self.page, self.toolkit),
+            7: lambda: Pass2AddView(self.page, self.toolkit),
+            8: lambda: SandhiFindReplaceView(self.page, self.toolkit),
+            9: lambda: SpellingFindReplaceView(self.page, self.toolkit),
+            10: lambda: SandhiView(self.page, self.toolkit),
+            11: lambda: FilterTabView(self.page, self.toolkit),
+            12: lambda: TestsTabView(self.page, self.toolkit),
+            13: lambda: BoldSearchView(self.page, self.toolkit),
+            14: lambda: RootsTabView(self.page, self.toolkit),
+            15: lambda: CompoundTypeTabView(self.page, self.toolkit),
+            16: lambda: InflectionTemplatesTabView(self.page, self.toolkit),
+            17: lambda: DpsView(self.page, self.toolkit),  # DPS local
+        }
 
         self.build_ui()
 
@@ -147,16 +249,16 @@ class App:
             title=ft.Text("Submit Data"),
             content=ft.Text(result.message),
             actions=[
-                ft.TextButton("OK", on_click=lambda _: self.page.close(dialog)),
+                ft.TextButton("OK", on_click=lambda _: self.page.pop_dialog()),
             ],
         )
-        self.page.open(dialog)
+        self.page.show_dialog(dialog)
 
     def _on_check_updates(self, e: ft.ControlEvent) -> None:
         """Handle Update button click with confirmation."""
 
         def _run_update(e: ft.ControlEvent) -> None:
-            self.page.close(confirm_dialog)
+            self.page.pop_dialog()
             from scripts.onboarding.contributor_update import update_environment
 
             summary = update_environment(Path.cwd())
@@ -164,12 +266,10 @@ class App:
                 title=ft.Text("Update Complete"),
                 content=ft.Text(summary),
                 actions=[
-                    ft.TextButton(
-                        "OK", on_click=lambda _: self.page.close(result_dialog)
-                    ),
+                    ft.TextButton("OK", on_click=lambda _: self.page.pop_dialog()),
                 ],
             )
-            self.page.open(result_dialog)
+            self.page.show_dialog(result_dialog)
 
         confirm_dialog = ft.AlertDialog(
             modal=True,
@@ -182,7 +282,7 @@ class App:
             actions=[
                 ft.TextButton(
                     "Cancel",
-                    on_click=lambda _: self.page.close(confirm_dialog),
+                    on_click=lambda _: self.page.pop_dialog(),
                 ),
                 ft.TextButton(
                     "Update",
@@ -191,46 +291,223 @@ class App:
             ],
             actions_alignment=ft.MainAxisAlignment.END,
         )
-        self.page.open(confirm_dialog)
+        self.page.show_dialog(confirm_dialog)
 
-    def on_keyboard(self, e: ft.KeyboardEvent) -> None:
+    # Alt+<key> jumps straight to a tab, by its index in tab_labels.
+    _TAB_JUMP_KEYS: dict[str, int] = {
+        "G": 0,  # Global
+        "T": 1,  # Transl
+        "P": 4,  # Pass2Pre
+        "E": 7,  # Pass2Add
+        "'": 8,  # '
+        "S": 9,  # Sp
+        "D": 11,  # DB
+        "B": 13,  # Bold Search
+        "R": 14,  # √ (Roots)
+        "C": 15,  # CT (Compound Type)
+        "I": 16,  # Infl
+    }
+
+    # Page scroll keys -> scroll delta in px. Numpad 9/3 are the keypad
+    # PageUp/PageDown keys reported when Num Lock is off.
+    _SCROLL_KEYS: dict[str, int] = {
+        "Page Up": -500,
+        "Page Down": 500,
+        "Numpad 9": -500,
+        "Numpad 3": 500,
+    }
+
+    # Alt+X runs the open tab's Clear / Clear All button handler, so the key
+    # and the button can never do different things. Tabs without such a
+    # button are absent and ignore the key.
+    _CLEAR_ACTIONS: dict[int, Callable[[Any], None]] = {
+        1: lambda view: view.clear_clicked(None),  # Transl
+        2: lambda view: view.handle_clear_click(None),  # Pass1Auto
+        3: lambda view: view.clear_all_fields(None),  # Pass1Add
+        6: lambda view: view.handle_clear_click(None),  # Pass2Auto
+        7: lambda view: view._click_clear_all(None),  # Pass2Add
+        8: lambda view: view.clear_search(None),  # '
+        9: lambda view: view.clear_search(None),  # Sp
+        11: lambda view: view._clear_filters_clicked(None),  # DB
+        13: lambda view: view.controller.clear_fields(None),  # Bold Search
+        14: lambda view: view._clear_all(None),  # √ (Roots)
+        15: lambda view: view._on_clear(None),  # CT (Compound Type)
+        16: lambda view: view._clear_all(None),  # Infl
+    }
+
+    # Alt+? opens the shortcuts popup. Some keyboard layouts report the key
+    # under "?" as "/", so both are accepted.
+    _SHORTCUTS_KEYS: tuple[str, ...] = ("?", "/")
+
+    async def on_keyboard(self, e: ft.KeyboardEvent) -> None:
         """Handles global keyboard events."""
         if e.key == "Q" and e.ctrl:
-            self.page.window.close()
+            await self.page.window.close()
+        elif e.key == "Escape":
+            await cancel_top_dialog(self.page)
         elif e.key == "A" and e.ctrl and e.shift:
-            self.toolkit.ai_search_popup.open_popup()
-        elif e.key == "F" and e.ctrl:
+            launch_ai_search_window()
+        elif e.key == "F" and e.ctrl and 7 in self._visible:
+            # 7 = Pass2Add: the tab the word finder is for. Without it the
+            # finder is never built and the key stays dead — on Pass1Add the
+            # lemma fill goes with it, deliberately.
             self.toolkit.wordfinder_popup.open_popup(self._get_current_lemma())
-        elif e.key == "W" and e.ctrl:
+        elif e.key == "W" and e.ctrl and 7 in self._visible:
             # Universal close key - close any open dialog
-            if self.toolkit.ai_search_popup.is_dialog_open():
-                self.toolkit.ai_search_popup.close_dialog()
-            elif self.toolkit.wordfinder_popup.is_dialog_open():
+            if self.toolkit.wordfinder_popup.is_dialog_open():
                 self.toolkit.wordfinder_popup.close_dialog()
         elif e.key == "S" and e.ctrl:
-            tab = self.tabs.tabs[self.tabs.selected_index]
-            view = tab.content
-            # Ctrl+S saves table changes in tabs that support it
+            # A popup stops the mouse reaching the tab behind it, so it stops
+            # the save and clear keys too.
+            if is_dialog_open(self.page):
+                return
+            # Sourced from _views, not from the tab control: 1.0's Tab has no
+            # content slot, and the hasattr checks below would simply miss,
+            # so a wrong lookup here stops Ctrl+S saving without any error.
+            view = self._views.get(self._current_index())
+            # Ctrl+S saves in tabs that support it.
+            # The first four targets are synchronous today. If any is ever made
+            # `async def`, these calls become discarded coroutines and Ctrl+S
+            # stops saving with no error at all — the same silent failure this
+            # path already had once. Await them if that day comes.
             if hasattr(view, "_on_save_changes"):
                 getattr(view, "_on_save_changes")(None)
             elif hasattr(view, "_save_changes_clicked"):
                 getattr(view, "_save_changes_clicked")(None)
+            elif hasattr(view, "_save_root"):
+                getattr(view, "_save_root")(None)
+            elif hasattr(view, "_save_template"):
+                getattr(view, "_save_template")(None)
+            elif hasattr(view, "commit_clicked"):
+                getattr(view, "commit_clicked")(None)
+            elif hasattr(view, "test_and_add_to_db"):
+                await getattr(view, "test_and_add_to_db")()
+            elif hasattr(view, "_click_backup_quit"):
+                await getattr(view, "_click_backup_quit")(None)
         elif e.key == "Arrow Left" and e.alt:
             if self.tabs.selected_index > 0:
                 self.tabs.selected_index -= 1
+                await self._on_tab_activated()
                 self.page.update()
         elif e.key == "Arrow Right" and e.alt:
-            if self.tabs.selected_index < len(self.tabs.tabs) - 1:
+            if self.tabs.selected_index < len(self._tab_bar.tabs) - 1:
                 self.tabs.selected_index += 1
+                await self._on_tab_activated()
                 self.page.update()
+        elif e.key == "X" and e.alt:
+            clear = self._CLEAR_ACTIONS.get(self._current_index())
+            view = self._views.get(self._current_index())
+            if clear is not None and view is not None and not is_dialog_open(self.page):
+                clear(view)
+        elif e.alt and e.key in self._SHORTCUTS_KEYS:
+            if not is_dialog_open(self.page):
+                self.page.show_dialog(
+                    build_shortcuts_dialog(
+                        self._shortcut_groups(), lambda _: self.page.pop_dialog()
+                    )
+                )
+        elif (
+            e.alt
+            and e.key in self._TAB_JUMP_KEYS
+            and self._TAB_JUMP_KEYS[e.key] in self._visible
+        ):
+            self.tabs.selected_index = self._visible.index(self._TAB_JUMP_KEYS[e.key])
+            await self._on_tab_activated()
+            self.page.update()
+        elif e.key in self._SCROLL_KEYS:
+            # Flet's global key handler intercepts these before any focused
+            # scrollable, so page scrolling has to be driven manually. Only
+            # views exposing a `_middle_section` scrollable respond (Pass2Add
+            # today); others simply ignore it. "Numpad 9"/"Numpad 3" are the
+            # keypad PageUp/PageDown keys reported when Num Lock is off.
+            view = self._views.get(self._current_index())
+            target = getattr(view, "_middle_section", None)
+            if target is not None:
+                await target.scroll_to(delta=self._SCROLL_KEYS[e.key], duration=100)
+
+    def _shortcut_groups(self) -> list[ShortcutGroup]:
+        """Every shortcut on_keyboard handles, for the Alt+? popup. The tab
+        jumps and the Alt+X tabs come from the tables the keys act on."""
+        tab_jumps = sorted(
+            (
+                (key, index)
+                for key, index in self._TAB_JUMP_KEYS.items()
+                if index in self._visible
+            ),
+            key=lambda item: item[1],
+        )
+        clear_tabs = ", ".join(
+            self._tab_label(i) for i in self._CLEAR_ACTIONS if i in self._visible
+        )
+        # The word finder is Pass2Add's tool: without the tab, its keys do
+        # nothing, so their rows are left out.
+        wordfinder_open = (
+            [
+                ("Ctrl+F", "Open the word finder (with the lemma on the add tabs)"),
+            ]
+            if 7 in self._visible
+            else []
+        )
+        wordfinder_close = (
+            [("Ctrl+W", "Close the word finder")] if 7 in self._visible else []
+        )
+        return [
+            (
+                "App",
+                [
+                    ("Alt+?", "Show this list of shortcuts"),
+                    *wordfinder_open,
+                    ("Ctrl+Shift+A", "Open the AI search window"),
+                    ("Ctrl+Q", "Quit the editor"),
+                ],
+            ),
+            (
+                "Tabs",
+                [
+                    ("Alt+←", "Go to the previous tab"),
+                    ("Alt+→", "Go to the next tab"),
+                    *(
+                        (f"Alt+{key}", f"Go to {self._tab_label(index)}")
+                        for key, index in tab_jumps
+                    ),
+                ],
+            ),
+            (
+                "Save and clear (the open tab)",
+                [
+                    (
+                        "Ctrl+S",
+                        "Pass1Add, Pass2Add: run the tests, then add to the db if all pass",
+                    ),
+                    ("Ctrl+S", "', Sp: commit"),
+                    ("Ctrl+S", "DB, CT: save changes"),
+                    ("Ctrl+S", "√: save to the db"),
+                    ("Ctrl+S", "Infl: save the template"),
+                    ("Ctrl+S", "Global: back up the db and quit"),
+                    ("Alt+X", f"Clear or Clear All on {clear_tabs}"),
+                    ("Page Up / Page Down", "Scroll Pass2Add"),
+                ],
+            ),
+            (
+                "Popups",
+                [
+                    ("Escape", "Cancel or close the top popup"),
+                    *wordfinder_close,
+                    ("", "Ctrl+S and Alt+X do nothing while a popup is open"),
+                ],
+            ),
+            (
+                "AI search window",
+                [("Ctrl+W or Escape", "Close the window")],
+            ),
+        ]
 
     def _get_current_lemma(self) -> str:
         """Return lemma_clean from the active add-view, or empty string."""
-        tab_to_view = {
-            3: self.pass1_add_view,
-            7: self.pass2_add_view,
-        }
-        view = tab_to_view.get(self.tabs.selected_index)
+        index = self._current_index()
+        if index not in (3, 7):
+            return ""
+        view = self._views.get(index)
         if view is None:
             return ""
         try:
@@ -240,90 +517,247 @@ class App:
         except Exception:
             return ""
 
-    def tab_clicked(self, e: ft.ControlEvent) -> None:
-        """Handles tab clicks."""
+    def _current_index(self) -> int:
+        """The tab index of the open tab (the selection is a tab-bar position)."""
+        return self._visible[self.tabs.selected_index]
 
-        # load pass_1 database
-        if self.toolkit.db_manager.all_lemma_1 is None:
+    def _view(self, index: int) -> ft.Control:
+        """Build (once) and return the view for a tab index."""
+        with self._build_lock:
+            if index not in self._views:
+                view = self._view_builders[index]()
+                if index in self._read_only:
+                    setattr(view, "read_only", True)
+                self._views[index] = view
+            return self._views[index]
+
+    def _ensure_tab_built(self, index: int) -> None:
+        """Swap the real view into a tab the first time it is shown."""
+        with self._build_lock:
+            if index in self._mounted_tabs:
+                return
+            self._tab_bodies.controls[self._visible.index(index)] = self._view(index)
+            self._mounted_tabs.add(index)
+        self.page.update()
+
+    def _maybe_start_db_init(self) -> None:
+        # started at launch; this remains as a retry path if that load failed
+        # Lock covers both flags' check-and-set: handlers run in a thread
+        # pool, so two near-simultaneous tab clicks could otherwise each
+        # reserve a worker.
+        with self._build_lock:
+            if self._db_init_started or self.toolkit.db_manager.all_lemma_1 is not None:
+                return
+            self._db_init_started = True
+            self.page.run_thread(self._initialize_db_in_background)
+
+    async def _on_tab_activated(self, e: ft.ControlEvent | None = None) -> None:
+        """Build the newly-active tab's content on demand and kick db init."""
+        index = self._current_index()
+        if index not in self._mounted_tabs:
+            # Hand the loop a turn so the placeholder spinner reaches the
+            # client before the build blocks, then build off the event loop.
+            # Without both halves the ring is queued and painted only after the
+            # view it was meant to cover has already appeared.
+            self.page.update()
+            await asyncio.sleep(0)
+            await asyncio.to_thread(self._ensure_tab_built, index)
+        self._maybe_start_db_init()
+
+        # Only the first call for a given tab dispatches focus. In 0.28 the
+        # duplicate came from on_click and on_change both being bound; 1.0 has
+        # only on_change, but the keyboard jumps still call this directly as
+        # well as tripping on_change. The page.update() flushes the new
+        # selected_index to the client before the view asks for focus —
+        # otherwise the target field is not built yet and the request is lost.
+        if index == self._focused_tab_index:
+            return
+        self._focused_tab_index = index
+        self.page.update()
+        on_tab_focus = getattr(self._views.get(index), "on_tab_focus", None)
+        if on_tab_focus is not None:
+            on_tab_focus()
+
+    def _set_loading(self, loading: bool) -> None:
+        """Show or hide the indeterminate bar under the app bar."""
+        self._loading_bar.visible = loading
+        self.page.update()
+
+    def _initialize_db_in_background(self) -> None:
+        # The longest operation in the app — ~11 s, measured — and until now it
+        # ran with nothing on screen to say so.
+        self._set_loading(True)
+        try:
             self.toolkit.db_manager.initialize_db()
+            show_global_snackbar(self.page, "Database loaded.", "info", 2000)
+        except Exception as ex:
+            # Same lock as the check-and-set in _maybe_start_db_init: a
+            # failing retry's reset must not race a concurrent tab click's
+            # re-reservation.
+            with self._build_lock:
+                self._db_init_started = False
+            show_global_snackbar(
+                self.page, f"Database load failed: {ex}", "error", 5000
+            )
+        finally:
+            self._set_loading(False)
+            # Serialised, not merged: the database is a prerequisite for
+            # editing anything, the warm-up is speculative prefetch, and both
+            # are CPU-bound so under the GIL they interleave rather than
+            # parallelise. Starting the warm-up here gives the load the
+            # interpreter to itself first; `finally` keeps the warm-up running
+            # even when the load failed. The lock-guarded check-and-set keeps
+            # a retry after a failed load from running the warm-up twice.
+            with self._build_lock:
+                if not self._warmup_started:
+                    self._warmup_started = True
+                    self.page.run_thread(self._warmup_in_background)
+
+    def _warmup_in_background(self) -> None:
+        """Build every tab (most-used first), then the heavy managers, so
+        nothing waits on a first click. Started after the db load finishes."""
+        # A failing builder leaves its tab unmounted (retried on click) and
+        # must not abort the warm-up of the remaining tabs and managers.
+        failed: list[str] = []
+        for index in self._WARMUP_TAB_ORDER:
+            if index not in self._visible:
+                continue
+            try:
+                self._ensure_tab_built(index)
+            except Exception:
+                failed.append(self._tab_label(index))
+        try:
+            # The word finder is Pass2Add's tool: without the tab nothing
+            # can open it, so building it would just cost its ~160 MB.
+            if 7 in self._visible:
+                self.toolkit.wordfinder_manager
+                self.toolkit.wordfinder_popup
+            self.toolkit.ai_manager
+            self.toolkit.bold_definitions_search_manager
+            # Pre-build the synonym/phonetic detector (~0.8-0.9 s corpus
+            # scan) so initialize_db can skip it and the first synonym
+            # click doesn't pay for it either.
+            self.toolkit.db_manager.get_relationship_detector()
+        except Exception as ex:
+            failed.append(str(ex))
+        if failed:
+            show_global_snackbar(
+                self.page, f"Warm-up failed for: {', '.join(failed)}", "error", 5000
+            )
+        else:
+            show_global_snackbar(self.page, "All tabs and tools ready.", "info", 2000)
+
+    def _tab_label(self, index: int) -> str:
+        """Return a tab's visible label, for messages about that tab."""
+        label = self._tab_bar.tabs[self._visible.index(index)].label
+        text = getattr(label, "value", None)
+        return text or str(index)
 
     def build_ui(self) -> None:
         """Constructs the main UI elements."""
 
-        self.tabs: ft.Tabs = ft.Tabs(
-            selected_index=0,
-            animation_duration=300,
-            on_click=self.tab_clicked,
+        # Each tab starts with a lightweight placeholder; the real view is
+        # built and mounted on first selection by _on_tab_activated.
+        tab_labels = [TAB_LABELS[index] for index in self._visible]
+        # Derived from _TAB_JUMP_KEYS so the tooltips can never drift from the
+        # keys the handler actually acts on.
+        shortcuts = {index: key for key, index in self._TAB_JUMP_KEYS.items()}
+        # In Flet 1.0 the headers and the bodies are separate controls: the
+        # labels live in TabBar.tabs and the bodies in TabBarView.controls,
+        # indexed in parallel. Tab itself no longer holds any content, so the
+        # lazy-build mount point is the TabBarView list, not the Tab.
+        self._tab_bar = ft.TabBar(
             tabs=[
                 ft.Tab(
-                    text="Global",
-                    content=self.global_view,
-                ),
-                ft.Tab(
-                    text="Transl",
-                    content=self.translations_view,
-                ),
-                ft.Tab(
-                    text="Pass1Auto",
-                    content=self.pass1_auto_view,
-                ),
-                ft.Tab(
-                    text="Pass1Add",
-                    content=self.pass1_add_view,
-                ),
-                ft.Tab(
-                    text="Pass2Pre",
-                    content=self.pass2_pre_view,
-                ),
-                ft.Tab(
-                    text="Pass2x",
-                    content=self.pass2x_view,
-                ),
-                ft.Tab(
-                    text="Pass2Auto",
-                    content=self.pass2_auto_view,
-                ),
-                ft.Tab(
-                    text="Pass2Add",
-                    content=self.pass2_add_view,
-                ),
-                ft.Tab(
-                    text="DPS",
-                    content=self.dps_view,
-                ),
-                ft.Tab(
-                    text="'",
-                    content=self.sandhi_view,
-                ),
-                ft.Tab(
-                    text="Sandhi",
-                    content=self.sandhi_view2,
-                ),
-                ft.Tab(
-                    text="DB",
-                    content=self.filter_tab_view,
-                ),
-                ft.Tab(
-                    text="Tests",
-                    content=self.tests_tab_view,
-                ),
-                ft.Tab(
-                    text="Bold Search",
-                    content=self.bold_search_view,
-                ),
-                ft.Tab(
-                    text="√",
-                    content=self.roots_view,
-                ),
-                ft.Tab(
-                    text="CT",
-                    content=self.compound_type_view,
-                ),
+                    label=ft.Text(
+                        label,
+                        tooltip=f"Alt+{shortcuts[index]}"
+                        if index in shortcuts
+                        else None,
+                    ),
+                )
+                for index, label in zip(self._visible, tab_labels)
+            ],
+        )
+        # A spinner, not an empty box: building a view takes ~1.6 s on first
+        # selection and the placeholder is what the user looks at meanwhile.
+        self._tab_bodies = ft.TabBarView(
+            controls=[
+                ft.Container(
+                    content=ft.Row(
+                        [ft.ProgressRing()],
+                        alignment=ft.MainAxisAlignment.CENTER,
+                    ),
+                    alignment=ft.Alignment.CENTER,
+                    expand=True,
+                )
+                for _ in tab_labels
             ],
             expand=True,
         )
+        self.tabs: ft.Tabs = ft.Tabs(
+            content=ft.Column(
+                [self._loading_bar, self._tab_bar, self._tab_bodies], expand=True
+            ),
+            length=len(tab_labels),
+            selected_index=self._visible.index(self._start_index),
+            animation_duration=300,
+            on_change=self._on_tab_activated,
+            expand=True,
+        )
+
+        # The first tab is visible at startup, so build it eagerly.
+        self._mounted_tabs.add(self._start_index)
+        self._tab_bodies.controls[self._visible.index(self._start_index)] = self._view(
+            self._start_index
+        )
+
         self.page.add(self.tabs)
         self.page.update()
+
+        # Window has painted — load the database in the background. The
+        # warm-up is not started here; it is chained from
+        # _initialize_db_in_background so the two do not compete.
+        self._db_init_started = True
+        self.page.run_thread(self._initialize_db_in_background)
+
+
+# One live app per process. A second browser tab would build a second copy of
+# the app (~2.5 GB) that holds the same contributor JSON in memory, and two
+# copies rewriting one file lose each other's saves. The newest page wins:
+# Flet does not always fire on_disconnect when a tab reloads (its send loop
+# raises on a closing socket and skips the disconnect step), so waiting for the
+# old page to say it left would lock a reloading contributor out.
+_session_lock = threading.Lock()
+_session_page: ft.Page | None = None
+
+ALREADY_OPEN_MESSAGE = "This app is already open in another tab or window."
+
+
+def claim_session(page: ft.Page) -> None:
+    """Take the process's one session. The page that held it, if any, is retired."""
+    global _session_page
+    with _session_lock:
+        previous = _session_page
+        _session_page = page
+    if previous is not None and previous is not page:
+        try:
+            # The old App stays alive in memory; without this its Ctrl+S would
+            # still save from a stale copy of the contributor's file.
+            previous.on_keyboard_event = None
+            previous.controls.clear()
+            previous.add(ft.Text(ALREADY_OPEN_MESSAGE))
+        except Exception as e:
+            # The old connection may already be dead; nothing is left to show.
+            pr.red(f"could not retire the old page: {e}")
+
+
+def release_session(page: ft.Page) -> None:
+    """Free the session, but only if this page is the one that holds it."""
+    global _session_page
+    with _session_lock:
+        if _session_page is page:
+            _session_page = None
 
 
 def main(page: ft.Page) -> None:
@@ -336,15 +770,25 @@ def main(page: ft.Page) -> None:
         profiler = cProfile.Profile()
         profiler.enable()
 
-    # Time FastAPI server startup
-    start_time = time.time()
-    start_dpd_server()
-    print(f"FastAPI server started in {time.time() - start_time:.2f}s")
+    # Set empty rather than left unset: an unset title is None, which the
+    # desktop client fills with its own name ("flet") instead of leaving the
+    # title bar blank.
+    page.title = ""
+
+    claim_session(page)
+    page.on_disconnect = lambda _: release_session(page)
+    page.on_close = lambda _: release_session(page)
 
     # Time App initialization
     start_time = time.time()
     App(page)
     print(f"App initialized in {time.time() - start_time:.2f}s")
+
+    # Start the FastAPI server after the UI has painted so it never delays the
+    # window appearing.
+    start_time = time.time()
+    start_dpd_server()
+    print(f"FastAPI server started in {time.time() - start_time:.2f}s")
 
     if enable_profiling and profiler is not None:
         profiler.disable()
@@ -352,4 +796,4 @@ def main(page: ft.Page) -> None:
 
 
 if __name__ == "__main__":
-    ft.app(target=main)
+    ft.run(main)

@@ -1,4 +1,5 @@
 import re
+from collections.abc import Iterable
 from typing import Any, Union
 
 import flet as ft
@@ -27,8 +28,10 @@ from gui2.dpd_fields_functions import (
 )
 from gui2.dpd_fields_meaning import DpdMeaningField
 from gui2.dpd_fields_notes import DpdNotesField
+from gui2.field_help import get_field_help
 from gui2.mixins import PopUpMixin
 from gui2.toolkit import ToolKit
+from gui2.ui_utils import is_mounted, request_focus
 from tools.compound_type_manager import CompoundTypeManager
 from tools.phonetic_change_manager import PhoneticChangeManager
 from tools.fuzzy_tools import find_closest_matches
@@ -64,9 +67,8 @@ class DpdFields(PopUpMixin):
         from gui2.pass2_add_view import Pass2AddView
 
         self.ui: Pass2AddView | Pass1AddView = ui
-        self.page = self.ui.page
         self.db: DatabaseManager = db
-        self.spellchecker = CustomSpellChecker()
+        self.spellchecker = CustomSpellChecker(toolkit.paths.user_dictionary_path)
         self.toolkit: ToolKit = toolkit
 
         self.speech_marks_manager: SpeechMarkManager = self.toolkit.speech_marks_manager
@@ -250,21 +252,16 @@ class DpdFields(PopUpMixin):
             FieldConfig(
                 "synonym",
                 on_focus=self.synonym_focus,
-                on_change=self.synonym_field_change,
+                on_change=self.clean_pali_field,
                 on_submit=self.synonym_submit,
                 on_blur=self.clean_pali_field,
-            ),
-            FieldConfig(
-                "variant",
-                on_change=self.variant_field_change,
-                on_blur=self.variant_blur,
             ),
             FieldConfig(
                 "var_phonetic",
                 on_focus=self.var_phonetic_focus,
                 on_change=self.clean_pali_field,
                 on_submit=self.var_phonetic_submit,
-                on_blur=self.clean_pali_field,
+                on_blur=self.var_phonetic_blur,
             ),
             FieldConfig(
                 "var_text",
@@ -314,8 +311,35 @@ class DpdFields(PopUpMixin):
 
         self.create_fields()
 
+    @property
+    def page(self) -> ft.Page:
+        """The owning view's page, resolved on use rather than cached.
+
+        Flet 1.0 resolves `Control.page` by walking up to the root and raises
+        while the control is unmounted. This object is built inside the view's
+        constructor, so caching the page there raised; every reader of `.page`
+        runs after mount, so resolving lazily is equivalent and safe.
+        """
+        return self.ui.page
+
+    def _collapse_example_tools_on_focus(self, on_focus):
+        """Wraps a field's on_focus so focusing it hides the example tools."""
+
+        def handler(e: ft.ControlEvent) -> None:
+            for name in ("example_1", "example_2"):
+                example_field = self.fields.get(name)
+                if isinstance(example_field, DpdExampleField):
+                    example_field.collapse_tools()
+            if on_focus:
+                on_focus(e)
+
+        return handler
+
     def create_fields(self):
         for config in self.field_configs:
+            if config.field_type != "example":
+                config.on_focus = self._collapse_example_tools_on_focus(config.on_focus)
+
             if config.field_type == "text":
                 self.fields[config.name] = DpdTextField(
                     name=config.name,
@@ -442,6 +466,13 @@ class DpdFields(PopUpMixin):
             width=150,
             selectable=True,
         )
+        help_text = get_field_help(field_name)
+        if help_text is not None:
+            label.tooltip = ft.Tooltip(
+                message=help_text,
+                wait_duration=500,
+                size_constraints=ft.BoxConstraints(max_width=360),
+            )
         main_field = self.fields[field_name]
         row_controls = [label, main_field]  # Add label first
 
@@ -653,14 +684,13 @@ class DpdFields(PopUpMixin):
 
             current = {
                 "synonym": self.get_field("synonym").value or "",
-                "variant": self.get_field("variant").value or "",
                 "var_phonetic": self.get_field("var_phonetic").value or "",
                 "var_text": self.get_field("var_text").value or "",
             }
             for lemma in split_field(add_field.value):
                 current = assign_relationship_dict(current, lemma, target_name)
-            for name, value in current.items():
-                self.get_field(name).value = value
+            for name in ("synonym", "var_phonetic", "var_text"):
+                self.get_field(name).value = current[name]
         else:
             field.value = add_field.value
 
@@ -724,7 +754,7 @@ class DpdFields(PopUpMixin):
                 self.ui.update_message(f"id {word_id} already in db")
                 return False
 
-        if lemma_1 and lemma_1 in self.db.all_lemma_1:
+        if lemma_1 and lemma_1 in (self.db.all_lemma_1 or set()):
             lemma_1_field = self.get_field("lemma_1")
             lemma_1_field.error_text = f"{lemma_1} already in db"
             self.page.update()
@@ -739,7 +769,7 @@ class DpdFields(PopUpMixin):
         """Get the next id on submit."""
         field, value = self.get_event_field_and_value(e)
         field.value = self.db.get_next_id()
-        field.focus()
+        request_focus(field)
         self.page.update()
 
     def lemma_1_change(self, e: ft.ControlEvent) -> None:
@@ -748,7 +778,7 @@ class DpdFields(PopUpMixin):
         field, value = self.get_event_field_and_value(e)
 
         if not self.flags.loaded_from_db:
-            if value in self.db.all_lemma_1:
+            if value in (self.db.all_lemma_1 or set()):
                 field.error_text = f"{value} already in db"
 
         elif not value:
@@ -785,7 +815,7 @@ class DpdFields(PopUpMixin):
 
         self.page.update()
         if e.name != "blur":  # only focus on submit, not on blur
-            field.focus()
+            request_focus(field)
 
     def meaning_1_focus(self, e: ft.ControlEvent) -> None:
         """Copy meaning_2 to meaning_1 for suttas/vaggas if meaning_1 is empty and not loaded from DB."""
@@ -829,10 +859,10 @@ class DpdFields(PopUpMixin):
     def pos_blur(self, e: ft.ControlEvent) -> None:
         pos_field, pos = self.get_event_field_and_value(e)
         grammar_field = self.get_field("grammar")
-        grammar = grammar_field.value
+        grammar = grammar_field.value or ""
 
-        # test for wrong values
-        if pos not in self.db.all_pos:
+        # test for wrong values (skipped while the corpus is still loading)
+        if self.db.all_pos is not None and pos not in self.db.all_pos:
             suggestions = find_closest_matches(
                 pos, list(self.db.all_pos or []), limit=3
             )
@@ -840,7 +870,7 @@ class DpdFields(PopUpMixin):
                 pos_field.error_text = ", ".join(suggestions)
             else:
                 pos_field.error_text = f"Unknown pattern: {pos}"
-            pos_field.focus()
+            request_focus(pos_field)
         else:
             pos_field.error_text = None
         self.page.update()
@@ -864,7 +894,7 @@ class DpdFields(PopUpMixin):
             else:
                 grammar_field.value = f"{pos}, "
             grammar_field.update()
-            grammar_field.focus()
+            request_focus(grammar_field)
             self.page.update()
 
     def grammar_blur(self, e: ft.ControlEvent) -> None:
@@ -885,7 +915,7 @@ class DpdFields(PopUpMixin):
                 derived_from_field.update()
                 self.flags.derived_from_done = True
                 self.page.update()
-                # derived_from_field.focus() # Focus might be better handled elsewhere or removed
+                # request_focus(derived_from_field) # Focus might be better handled elsewhere or removed
 
     def trans_blur(self, e: ft.ControlEvent) -> None:
         field, value = self.get_event_field_and_value(e)
@@ -893,7 +923,7 @@ class DpdFields(PopUpMixin):
             plus_case_field = self.get_field("plus_case")
             plus_case_field.value = "+acc"
             plus_case_field.update()
-            plus_case_field.focus()
+            request_focus(plus_case_field)
             self.page.update()
 
     def compound_type_blur(self, e: ft.ControlEvent):
@@ -901,7 +931,7 @@ class DpdFields(PopUpMixin):
         compound_construction: DpdCompoundConstructionField = self.get_field(
             "compound_construction"
         )
-        compound_construction.compound_construction_field.focus()
+        request_focus(compound_construction.compound_construction_field)
         self.page.update()
 
     def phonetic_focus(self, e: ft.ControlEvent) -> None:
@@ -949,7 +979,7 @@ class DpdFields(PopUpMixin):
         """Get Sanskrit and clean field."""
 
         sanskrit_field = self.get_field("sanskrit")
-        if not sanskrit_field or sanskrit_field.page is None:
+        if not sanskrit_field or not is_mounted(sanskrit_field):
             return
 
         # Auto-replace common Sanskrit text errors
@@ -967,7 +997,7 @@ class DpdFields(PopUpMixin):
     def sanskrit_focus(self, e: ft.ControlEvent) -> None:
         """Search for Sanskrit when field gets focus."""
         sanskrit_field = self.get_field("sanskrit")
-        if not sanskrit_field or sanskrit_field.page is None:
+        if not sanskrit_field or not is_mounted(sanskrit_field):
             return
         if not self.flags.sanskrit_done and not sanskrit_field.value:
             self._search_and_fill_sanskrit()
@@ -1002,7 +1032,7 @@ class DpdFields(PopUpMixin):
     def _search_and_fill_sanskrit(self) -> None:
         """Search database for Sanskrit and fill the field."""
         sanskrit_field = self.get_field("sanskrit")
-        if not sanskrit_field or sanskrit_field.page is None:
+        if not sanskrit_field or not is_mounted(sanskrit_field):
             return
 
         construction = self.get_field("construction").value
@@ -1052,7 +1082,7 @@ class DpdFields(PopUpMixin):
         sanskrit = self._clean_sanskrit_simple(sanskrit)
 
         self.flags.sanskrit_done = True
-        if sanskrit_field.page is None:
+        if not is_mounted(sanskrit_field):
             return
         sanskrit_field.value = sanskrit
         sanskrit_field.update()
@@ -1115,7 +1145,7 @@ class DpdFields(PopUpMixin):
         if root_key:
             field.value = self.db.get_next_root_sign(root_key)
             self.page.update()
-            field.focus()
+            request_focus(field)
 
     def root_sign_change(self, e: ft.ControlEvent) -> None:
         """Test root_sign."""
@@ -1140,7 +1170,7 @@ class DpdFields(PopUpMixin):
         if root_key and root_sign:
             field.value = self.db.get_next_root_base(root_key, root_sign)
             self.page.update()
-            field.focus()
+            request_focus(field)
 
     def family_root_submit(self, e: ft.ControlEvent) -> None:
         field, value = self.get_event_field_and_value(e)
@@ -1150,7 +1180,7 @@ class DpdFields(PopUpMixin):
             construction = self.get_field("construction").value or ""
             field.value = self.db.get_next_family_root(root_key, construction)
             self.page.update()
-            field.focus()
+            request_focus(field)
 
     def family_root_blur(self, e: ft.ControlEvent) -> None:
         field, value = self.get_event_field_and_value(e)
@@ -1160,10 +1190,13 @@ class DpdFields(PopUpMixin):
             root_key_clean = clean_root(self.get_field("root_key").value)
             if root_key_clean not in value:
                 field.error_text = "root_key and family_root dont's match"
-                field.focus()
+                request_focus(field)
 
-            # test root_family exists
-            elif value not in self.db.all_root_families:
+            # test root_family exists (skipped while the corpus is still loading)
+            elif (
+                self.db.all_root_families is not None
+                and value not in self.db.all_root_families
+            ):
                 field.error_text = f"{value} unknown root family"
             else:
                 field.error_text = None
@@ -1185,7 +1218,7 @@ class DpdFields(PopUpMixin):
                 suffix = re.sub(r".+ \+ ", "", suffix)
                 suffix_field.value = suffix
                 suffix_field.update()
-                suffix_field.focus()
+                request_focus(suffix_field)
                 self.page.update()
 
     def suffix_on_change(self, e: ft.ControlEvent) -> None:
@@ -1203,24 +1236,27 @@ class DpdFields(PopUpMixin):
             # Test for root and family_word
             if root_key:
                 field.error_text = "Cannot have both root_key and family_word"
-                field.focus()
+                request_focus(field)
 
             # Test for space
             elif " " in value:
                 field.error_text = "family_word contains space"
-                field.focus()
+                request_focus(field)
 
-            # Test if known value
-            elif value not in self.db.all_word_families:
+            # Test if known value (skipped while the corpus is still loading)
+            elif (
+                self.db.all_word_families is not None
+                and value not in self.db.all_word_families
+            ):
                 suggestions = find_closest_matches(
                     value, list(self.db.all_word_families or []), limit=3
                 )
                 if suggestions:
                     field.error_text = ", ".join(suggestions)
-                    field.focus()
+                    request_focus(field)
                 else:
                     field.error_text = f"Unknown: {value}"
-                    field.focus()
+                    request_focus(field)
 
             # All good
             else:
@@ -1243,15 +1279,15 @@ class DpdFields(PopUpMixin):
             ):
                 field.value = lemma_clean
                 field.update()
-                field.focus()
+                request_focus(field)
                 self.page.update()
             self.flags.family_compound_done = True
 
     def family_compound_change(self, e: ft.ControlEvent) -> None:
         field, value = self.get_event_field_and_value(e)
 
-        # test family compounds exist
-        if value:
+        # test family compounds exist (skipped while the corpus is still loading)
+        if value and self.db.all_compound_families is not None:
             error_list = [
                 c for c in value.split() if c not in self.db.all_compound_families
             ]
@@ -1279,7 +1315,7 @@ class DpdFields(PopUpMixin):
             self.page.update()
 
         # Always focus the field when it gains focus
-        field.focus()
+        request_focus(field)
 
     def clean_pali_field(self, e: ft.ControlEvent) -> None:
         """Clean field value to only allow Pali chars, comma and space."""
@@ -1295,16 +1331,6 @@ class DpdFields(PopUpMixin):
         if cleaned != field.value:
             field.value = cleaned
             field.update()
-
-    def synonym_field_change(self, e: ft.ControlEvent) -> None:
-        """Clean text and check for duplicates in variant field."""
-        self.clean_pali_field(e)
-        self.synonym_variant_check(e)
-
-    def variant_field_change(self, e: ft.ControlEvent) -> None:
-        """Clean text and check for duplicates in synonym field."""
-        self.clean_pali_field(e)
-        self.synonym_variant_check(e)
 
     def synonym_focus(self, e: ft.ControlEvent) -> None:
         """Compute synonym suggestions on focus if not already done.
@@ -1333,17 +1359,21 @@ class DpdFields(PopUpMixin):
             self.ui.update_message("POS, Meaning 1, and Lemma 1 needed for synonyms")
             return
 
+        lowered = meaning_1.strip().lower()
+        if lowered.startswith("name of") or "name of a metre" in lowered:
+            self.get_field("synonym").value = ""
+            self.get_field("synonym_add").value = ""
+            self.ui.update_message("'name of' meaning — no synonyms suggested")
+            self.flags.synonyms_done = True
+            self.check_and_color_add_fields()
+            self.page.update()
+            return
+
         values = self.get_current_values()
         values["synonym"] = ""
         current_hw = make_dpd_headword_from_dict(values)
         detector = self.db.get_relationship_detector()
         candidates = detector.find_synonyms(current_hw)
-
-        var_field = self.get_field("variant")
-        var_set = {
-            word.strip() for word in (var_field.value or "").split(",") if word.strip()
-        }
-        candidates = [c for c in candidates if c not in var_set]
 
         suggestion = ", ".join(candidates) if candidates else ""
 
@@ -1404,45 +1434,44 @@ class DpdFields(PopUpMixin):
             f"{c}: {rule_by_lemma[c]}" for c in candidates
         )
 
+        self._strip_var_phonetic_dupes(candidates)
+
         self.ui.update_message(f"{len(candidates)} phonetic variants suggested")
         self.flags.var_phonetic_done = True
         self.check_and_color_add_fields()
         self.page.update()
 
-    def synonym_variant_check(self, e: ft.ControlEvent) -> None:
-        """Ensure that the same word does not exist in both synonym and variant fields."""
+    def _strip_var_phonetic_dupes(self, lemmas: Iterable[str]) -> None:
+        """Remove `lemmas` from `synonym`/`synonym_add`/`var_text` since they
+        already belong to `var_phonetic` — enforces the same exclusivity rule
+        as `assign_relationship_dict` for words entering var_phonetic outside
+        the transfer-button flow (autofill, manual edit + blur).
+        """
+        from tools.synonym_variant import assign_relationship_dict
 
-        # Determine which field triggered the event
-        triggering_field_name = e.control.name
+        current = {
+            "synonym": self.get_field("synonym").value or "",
+            "var_phonetic": "",
+            "var_text": self.get_field("var_text").value or "",
+        }
+        for lemma in lemmas:
+            current = assign_relationship_dict(current, lemma, "var_phonetic")
+        self.get_field("synonym").value = current["synonym"]
+        self.get_field("synonym_add").value = current["synonym"]
+        self.get_field("var_text").value = current["var_text"]
 
-        syn_field = self.get_field("synonym")
-        var_field = self.get_field("variant")
-
-        syn_value = syn_field.value or ""
-        var_value = var_field.value or ""
-
-        # Split into sets of cleaned words
-        syn_set = set(word.strip() for word in syn_value.split(",") if word.strip())
-        var_set = set(word.strip() for word in var_value.split(",") if word.strip())
-
-        intersection = syn_set.intersection(var_set)
-
-        if intersection:
-            if triggering_field_name == "synonym":
-                for word in intersection:
-                    var_set.discard(word)
-                var_field.value = ", ".join(pali_list_sorter(list(var_set)))
-                var_field.update()
-            elif triggering_field_name == "variant":
-                for word in intersection:
-                    syn_set.discard(word)
-                syn_field.value = ", ".join(pali_list_sorter(list(syn_set)))
-                syn_field.update()
-
-            self.page.update()
-
-    def variant_blur(self, e: ft.ControlEvent) -> None:
+    def var_phonetic_blur(self, e: ft.ControlEvent) -> None:
+        """On losing focus, clean the field then strip any words it now
+        shares with synonym/var_text (covers manual edits, not just
+        autofill suggestions).
+        """
         self.clean_pali_field(e)
+
+        from tools.synonym_variant import split_field
+
+        lemmas = split_field(self.get_field("var_phonetic").value)
+        if lemmas:
+            self._strip_var_phonetic_dupes(lemmas)
         self.page.update()
 
     def construction_focus(self, e: ft.ControlEvent) -> None:
@@ -1464,7 +1493,7 @@ class DpdFields(PopUpMixin):
             field.value = construction
             field.update()
             self.page.update()
-            field.focus()
+            request_focus(field)
             self.flags.construction_done = True
 
         elif value:
@@ -1574,7 +1603,11 @@ class DpdFields(PopUpMixin):
             compound_type_add_field = self.get_field("compound_type_add")
             if compound_type_add_field:
                 compound_type_add_field.value = detected_type
-                compound_type_add_field.update()
+                # The `_add` field may not be attached to a page, and in 1.0
+                # update() on an unmounted control raises. The value is still
+                # set either way; only the refresh is conditional.
+                if is_mounted(compound_type_add_field):
+                    compound_type_add_field.update()
                 self.check_and_color_add_fields()
 
             self.page.update()
@@ -1658,7 +1691,7 @@ class DpdFields(PopUpMixin):
 
         self.page.update()
         if e.name == "submit":
-            field.focus()
+            request_focus(field)
 
     def pattern_change(self, e: ft.ControlEvent) -> None:
         """Validate pattern against known patterns on blur."""
@@ -1677,7 +1710,7 @@ class DpdFields(PopUpMixin):
                     field.error_text = ", ".join(suggestions)
                 else:
                     field.error_text = f"Unknown pattern: {value}"
-                field.focus()
+                request_focus(field)
             else:
                 field.error_text = None
         else:

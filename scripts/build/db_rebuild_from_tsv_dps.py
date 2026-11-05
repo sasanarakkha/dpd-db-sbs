@@ -4,7 +4,7 @@
 
 import csv
 import sys
-from typing import Iterator, List, Tuple
+from collections.abc import Iterator
 from tools.duplicates import has_duplicate_values_in_column
 from db.models import DpdHeadword
 from sqlalchemy.orm.session import Session
@@ -17,7 +17,7 @@ from pathlib import Path
 from tools.paths_dps import DPSPaths
 
 
-def main():
+def main() -> None:
     pr.tic()
     pr.yellow_title("populating ru sbs tables from tsvs")
 
@@ -25,26 +25,24 @@ def main():
     dpspth = DPSPaths()
 
     # Define TSV files and their ID columns to check for duplicates
-    tsvs_to_check = [
-        {"path": dpspth.russian_path, "id_col": "id"},
-        {"path": dpspth.sbs_path, "id_col": "id"},
-        {"path": dpspth.tamil_path, "id_col": "id"},
-        {"path": dpspth.ru_root_path, "id_col": "root"},
+    tsvs_to_check: list[tuple[Path, str]] = [
+        (dpspth.russian_path, "id"),
+        (dpspth.sbs_path, "id"),
+        (dpspth.tamil_path, "id"),
+        (dpspth.ru_root_path, "root"),
     ]
 
     # Check each TSV for duplicates before processing
-    for tsv_info in tsvs_to_check:
-        if not tsv_info["path"].exists():
-            pr.red(f"TSV backup file does not exist: {tsv_info['path']}")
+    for tsv_path, id_col in tsvs_to_check:
+        if not tsv_path.exists():
+            pr.red(f"TSV backup file does not exist: {tsv_path}")
             sys.exit(1)
 
         has_dupes, dupes_list, dupes_lines = has_duplicate_values_in_column(
-            tsv_path=tsv_info["path"], column_name=tsv_info["id_col"]
+            tsv_path=tsv_path, column_name=id_col
         )
         if has_dupes:
-            pr.red(
-                f"Duplicate values found in '{tsv_info['path']}' (column: '{tsv_info['id_col']}'):"
-            )
+            pr.red(f"Duplicate values found in '{tsv_path}' (column: '{id_col}'):")
             for val in dupes_list:
                 lines = ", ".join(map(str, dupes_lines[val]))
                 pr.red(f"  - Value: '{val}' found on lines: {lines}")
@@ -147,7 +145,7 @@ def main():
     pr.toc()
 
 
-def get_tsv_files(original_path: Path, base_filename: str) -> List[Path]:
+def get_tsv_files(original_path: Path, base_filename: str) -> list[Path]:
     """Get list of TSV files to process, handling both split and single file formats."""
 
     backup_dir = original_path.parent
@@ -167,7 +165,7 @@ def get_tsv_files(original_path: Path, base_filename: str) -> List[Path]:
     return []
 
 
-def read_tsv_files(file_paths: List[Path]) -> Iterator[Tuple[List[str], List[str]]]:
+def read_tsv_files(file_paths: list[Path]) -> Iterator[tuple[list[str], list[str]]]:
     """Read TSV files and yield (columns, row) tuples."""
     if not file_paths:
         return
@@ -184,7 +182,7 @@ def read_tsv_files(file_paths: List[Path]) -> Iterator[Tuple[List[str], List[str
                     yield columns, row
 
 
-def make_table_data_ru(dpspth: DPSPaths, db_session: Session):
+def make_table_data_ru(dpspth: DPSPaths, db_session: Session) -> None:
     """Read TSV and return Russian table data."""
     pr.green_tmr("creating Russian table data")
     counter = 0
@@ -197,7 +195,7 @@ def make_table_data_ru(dpspth: DPSPaths, db_session: Session):
     pr.yes(counter)
 
 
-def make_table_data_sbs(dpspth: DPSPaths, db_session: Session):
+def make_table_data_sbs(dpspth: DPSPaths, db_session: Session) -> None:
     """Read TSV and return SBS table data."""
     pr.green_tmr("creating SBS table data")
     counter = 0
@@ -210,7 +208,7 @@ def make_table_data_sbs(dpspth: DPSPaths, db_session: Session):
     pr.yes(counter)
 
 
-def make_table_data_ta(dpspth: DPSPaths, db_session: Session):
+def make_table_data_ta(dpspth: DPSPaths, db_session: Session) -> None:
     """Read TSV and return Tamil table data."""
     pr.green_tmr("creating Tamil table data")
     counter = 0
@@ -223,7 +221,7 @@ def make_table_data_ta(dpspth: DPSPaths, db_session: Session):
     pr.yes(counter)
 
 
-def make_root_table_data_ru(dpspth: DPSPaths, db_session: Session):
+def make_root_table_data_ru(dpspth: DPSPaths, db_session: Session) -> None:
     """Read TSV and return ru columns from DpdRoot."""
     pr.green_tmr("filling ru in DpdRoot table")
     updated_counter = 0

@@ -24,14 +24,14 @@ function ru_makeFamilySets(data) {
         if (familySetLen > 1) {
             html += `<p class="heading underlined overlined" `
             html += `id=${lemmaTag}_fs_${itemTag}>`;
-            html += `<b>${fs.count}</b> слов в группе `;
+            html += `<b>${fs.count}</b> ${ruPlural(fs.count, "слово в группе", "слова в группе", "слов в группе")} `;
             html += `<b>${item}</b>`;
             html += `<a class="jump" href="#${lemmaTag}_fs_top"> ⤴</a></p>`;
         } else if (familySetLen == 1) {
             html += `<p class="heading underlined" `
             html += `id=${lemmaTag}_fs_top>`;
-            html += `<b>${fs.count}</b> слов в группе `;
-            html += `<b>${item}</b>`;
+            html += `<b>${fs.count}</b> ${ruPlural(fs.count, "слово в группе", "слова в группе", "слов в группе")} `;
+            html += `<b>${item}</b></p>`;
         };
         
         //// table

@@ -372,7 +372,7 @@ candidate — never open a discuss item for an unregistered path.
 
 1. **⛔ USER GATE — full manual verification (the user acts, not the agent):**
    - The handoff must tell the user exactly what to run and what to check (e.g. build
-     via `dpd-makedict` / `scripts/cl/dpd-build-db`, spot-check RU + SBS output in
+     via `dpd-makedict` / `scripts/cl_dps/dpd-build-db`, spot-check RU + SBS output in
      GoldenDict/webapp, plus any sync-specific watch items named in the plan).
    - The user runs these at their own pace and reports issues; each fix round happens
      in a fresh session. This gate does NOT mean "start a new session" — it means the

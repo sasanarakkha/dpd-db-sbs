@@ -68,6 +68,7 @@ accordant
 accurses
 accusative
 acerifolium
+acidissima
 Aciravatī
 Acorus
 acquirement
@@ -132,15 +133,18 @@ Ambaṭṭha
 amberalla
 amenable
 amla
+ampeloprasum
 amra
 amūḷhapaññassa
 ana
 anacchādikata
+analyse
 analysed
 analysing
 Anamataggasaṃyuttaṃ
 Ananda
 anchorite
+Andhakavinda
 Andhra
 Andhropogon
 Andropogon
@@ -201,8 +205,10 @@ Ariyavaṃsasutta
 Ariṭṭha
 Arjuna
 arjuna
+armoured
 armspans
 arriver
+arrowmaker
 Artha
 Arthavan
 articulately
@@ -247,6 +253,7 @@ ati
 atipāteti
 Atittisutta
 atta
+attache
 attaches
 attainments
 atthi
@@ -287,6 +294,7 @@ Bael
 bael
 Bahudhātukasutta
 Bahudhītarasutta
+Bahuvedanīyasutta
 baiter
 balamattena
 Balasaṃyuttaṃ
@@ -304,6 +312,7 @@ Barleria
 Barringtonia
 barters
 basket
+basketmaking
 Bassia
 bather
 batrachus
@@ -344,6 +353,7 @@ bewails
 Beḷuva
 bh
 bha
+Bhaddaji
 Bhaddasārī
 Bhaddekarattasutta
 Bhaddiya
@@ -398,6 +408,7 @@ blamelessness
 blameworthiness
 blameworthy
 blibber-blabber
+bloodshed
 blowpipe
 blurtingly
 Blyxa
@@ -430,6 +441,7 @@ Brassica
 brayonia
 brazenness
 breadths
+breakability
 brigandage
 brinjal
 broadcasted
@@ -440,10 +452,13 @@ Buddha's
 Buddhadatta
 Buddhaghosa
 Buddhaghosa's
+buddhahood
 Buddhappiya
 Buddhas
 Budhanania
+bulubulu
 bumpiness
+Bungarus
 burmanniana
 Butea
 byāyāma
@@ -456,6 +471,7 @@ Bījaka's
 c.
 Cadamba
 caerulea
+caeruleus
 Caesalpina
 cajoler
 calamus
@@ -474,6 +490,7 @@ Carissa
 Cariyāpiṭaka
 Cartaeva
 Carthamus
+Casarca
 catechu
 Catukkanipāta
 Catunaregam
@@ -489,12 +506,14 @@ censures
 centered
 centeredness
 centre
+cepa
 ceramicist
 cerasoides
 Ceta
 Cetan
 Cetans
 Cetiyans
+Cetokhilasutta
 ch
 Chabbisodhanasutta
 Chakkanipāta
@@ -513,6 +532,7 @@ charnel
 charoli
 chebula
 chicklet
+chirurgus
 chitter-chatter
 chowry
 Chrysopogon
@@ -540,6 +560,7 @@ clyster
 co-nascence
 coaxer
 Coccolus
+Cocculus
 cochineal
 coessential
 cognised
@@ -631,6 +652,7 @@ Curcuma
 curlew
 curādigaṇa
 Cymbopogon
+Cynodon
 Cyperus
 Cyprinus
 cā
@@ -645,8 +667,10 @@ cūḷavagga
 d
 Dabba
 dacoit
+dactylon
 daddabha
 dadāti
+daemoness
 dahl
 dakkhati
 dal
@@ -682,6 +706,7 @@ dehusked
 deity
 dejection
 delicateness
+delightfulness
 delimited
 deludedly
 demeritorious
@@ -697,10 +722,12 @@ deprecated
 deprecation
 derides
 descendancy
+descendency
 desiderative
 desireless
 desirelessness
 desisted
+desmodium
 Desmostachya
 determinative
 detestation
@@ -718,6 +745,7 @@ devas
 Devatāsaṃyuttaṃ
 Devānampiyatissa
 dh
+dhal
 Dhamma
 dhamma
 dhamma-ness
@@ -742,6 +770,8 @@ dhū
 diarrhea
 dibba
 dicocum
+didn't
+didnt
 diguṇa
 dilemmatic
 diligence
@@ -761,9 +791,11 @@ disembarks
 disentangled
 disfiguration
 dishevelling
+dishonour
 disinterestedly
 disinvesting
 disjoined
+dislikable
 dismounts
 disorderliness
 disownment
@@ -835,6 +867,7 @@ Dutiyavohārapathasutta
 duvaṅgika
 dvanda
 dvedhikajātā
+Dvedhāvitakkasutta
 dwelled
 dā
 Dāmali
@@ -883,6 +916,7 @@ enclitic
 encourager
 endeavour
 endeavoured
+endeavours
 endlessness
 endurer
 ennead
@@ -963,7 +997,10 @@ finiteness
 firma
 firstness
 fisherman's
+fisherwoman
 fissured
+fistedness
+fistulosum
 flambeau
 flatterer
 flaviviridis
@@ -1036,6 +1073,7 @@ Gayā's
 gaḷagaḷa
 Gaṇakamoggallānasutta
 gelder
+genetrix
 genitive
 genitor
 genitrix
@@ -1073,6 +1111,7 @@ goldwork
 goo-gooing
 goodness
 gooseflesh
+goosegrass
 Gopaka
 gopānasī
 gossipmongering
@@ -1154,10 +1193,13 @@ Hiptage
 hispida
 hitman
 Holarrhena
+honeyball
 honour
+honourable
 honoured
 honouring
 honours
+hoofprint
 Hoplobatrachus
 Hordeum
 Horner
@@ -1173,6 +1215,8 @@ hubbed
 human-sacrificer
 humour
 husband's
+Hydrophasianus
+hypervigilant
 hā
 Hāliddikānisutta
 hāra
@@ -1272,6 +1316,8 @@ is-not-ness
 Isidatta
 Isigili
 Isigilisuttaṃ
+isn't
+isnt
 Isvara
 ITI
 Itivuttaka
@@ -1279,6 +1325,7 @@ iva
 iṃ
 iṃsu
 JA
+jacana
 jacanas
 jackstraws
 Jain
@@ -1331,6 +1378,7 @@ Kadali
 kahāpaṇa
 Kailash
 Kajaṅgalā
+Kakudha
 Kakusandha
 Kalanda's
 Kaliṅgas
@@ -1492,6 +1540,7 @@ Kālāma
 Kālāmas
 Kāmabhū
 Kāpilānī
+Kāradīpa
 Kāsi
 Kāsian
 Kāsians
@@ -1545,6 +1594,7 @@ likhā
 limbed
 limitlessly
 limitlessness
+Limonia
 linch-pin
 Lindica
 Linum
@@ -1577,6 +1627,7 @@ Macchikā's
 Macchikāsaṇḍika
 mad
 Madda
+Madhupiṇḍikasutta
 Madhura
 madhurasuttaṃ
 Madhurā
@@ -1683,6 +1734,8 @@ menses
 meritless
 Meru
 metathesized
+metre
+metres
 metrical
 Mettagū's
 Mettaya
@@ -1697,11 +1750,13 @@ Migajāla
 Migāra
 Migāra's
 Mihintale
+Milinda
 Milinda's
 Millettia
 Mimusops
 mindfully
 mis-meditates
+misbehaviour
 miscomprehension
 miserliness
 Mithil
@@ -1804,11 +1859,15 @@ Moḷiyaphagguna
 mridangam
 mucalinda
 Mucana
+Mucuna
 muddle-mindedness
 muddleheadedness
 muditā
 Muggala
+multi
+multi-coloured
 mung
+munja
 Muricantum
 Muricatus
 muricatus
@@ -1847,6 +1906,7 @@ mūla
 mūlaghaccaṃ
 na
 Nadubbhiyasuttaṃ
+Naja
 nakhā
 Nakula
 Nanda
@@ -1861,6 +1921,7 @@ nd
 Neem
 neem
 negundo
+neighbour
 neighbourhood
 neighbouring
 nellie
@@ -1868,6 +1929,7 @@ Nelumbo
 Nerañjara
 Nerium
 Neru
+Nesajjikasutta
 nescience
 nestless
 newel
@@ -1914,6 +1976,7 @@ nā
 nāga
 nāgas
 Nāgasa
+Nāgasena
 Nālaka
 Nālanda
 Nālandā
@@ -1950,6 +2013,7 @@ one's
 one-placed-ness
 one-sidedly
 onomatopoeic
+oojeinense
 oojeinensis
 optative
 optionality
@@ -1968,10 +2032,14 @@ outgrowths
 outlaid
 outshined
 outspeaking
+outspeaks
+overanalyzing
 overestimation
 overgarment
 overindulging
+overperforming
 overrating
+overreactive
 overspread
 overvaluation
 oviparous
@@ -2074,6 +2142,7 @@ Pentaptera
 perceiver
 percipient
 pericarp
+perishableness
 perpetration
 perplexity
 pers
@@ -2117,6 +2186,7 @@ Pisum
 pitbull
 piyajātikasuttaṃ
 piyal
+Piyaṅkara's
 piṭ
 Piṭaka
 Piṭakas
@@ -2139,10 +2209,12 @@ porāṇametaṃ
 post
 post-mortem
 Posāla's
+Potali
 Potaliya
 potsherd
 Poṭṭhapāda
 ppa
+praisingly
 prajuhoti
 prakṛti
 pranking
@@ -2364,6 +2436,7 @@ sagehood
 Sagāthakasutta
 saha
 Sahampati
+Sahampati's
 sahasakkha
 sakhilabhāve
 Sakka
@@ -2395,6 +2468,7 @@ samādhi
 samāpatti
 Sanaṅkumāra
 Sandaka
+sandan
 sandbank
 sandbar
 Sandhi
@@ -2402,6 +2476,7 @@ sandhi
 sannayhi
 Sanseveria
 Sansevieria
+Santalum
 Sappan
 Sappinikā
 Sappurisasuttaṃ
@@ -2427,6 +2502,7 @@ Sattakanipāta
 sattva
 saturates
 Savatth
+savour
 Sañcaya
 Sañjaya
 Sañjīva
@@ -2447,6 +2523,7 @@ Saṅkha
 scandens
 scatteredness
 schismatic
+schoenoprasum
 Scholaris
 scourer
 SCPN
@@ -2457,6 +2534,7 @@ scrutinizingly
 seasonable
 secluding
 Sedaka
+seduceable
 seizers
 Sekhasutta
 Sekhasuttaṃ
@@ -2475,9 +2553,11 @@ serrata
 sesemum
 Setabyā
 shakeable
+shatterer
 shaveling
 sheafs
-shelduck
+sheldrake
+sheldrakes
 shoos
 Shorea
 sicklessness
@@ -2492,10 +2572,12 @@ sieving
 sifter
 signless
 Sikhī
+siloka
 Silāyūpasuttaṃ
 Simsapa
 Sinapis
 Sindh
+sinensis
 Sineru
 single-halled
 Sinh
@@ -2510,6 +2592,7 @@ sirissa
 Sirivaḍḍha
 sirā
 sirīsa
+sixteenfold
 siyanti
 siṃsapāvane
 Siṅgāla
@@ -2550,6 +2633,7 @@ Soṇadaṇḍa
 Soṇadaṇḍa's
 Soṇakāyana
 spathacea
+spectre
 spellicans
 spillikins
 spinosa
@@ -2577,6 +2661,7 @@ stillbirth
 stiller
 stinginess
 stinkiness
+stipitatum
 straightforwardness
 straightness
 strategized
@@ -2633,6 +2718,7 @@ Sunidha
 Sunn
 sunned
 sunshade
+sunup
 Sunāparanta
 Sunīdha
 Supaṇṇasaṃyuttaṃ
@@ -2733,6 +2819,7 @@ tasselled
 tastable
 Tathāgata
 Tatiyadevacārikasutta
+Tatiyajanasutta
 Tatiyakaṇḍakīsutta
 Tatiyamoranivāpasutta
 Tatiyasikkhāsutta
@@ -2780,6 +2867,7 @@ tight-fistedness
 Tikanipāta
 Tikaṇṇa
 timbaru
+timeously
 tinctoria
 tinctorius
 tinduka
@@ -2821,6 +2909,7 @@ trisulphide
 Triticum
 tta
 tuber
+tuberosum
 tulsi
 tumours
 turbanned
@@ -2856,9 +2945,11 @@ Udāna
 Udāyi
 Udāyī
 Ugga
+Uggaha
 Uggata
 ugghāṭeti
 Uggo
+Ujjain
 Ujjaya
 Ujjenī
 Ujuññā
@@ -2930,7 +3021,9 @@ undependability
 underbodice
 underbrush
 underlain
+underperforming
 undersheet
+undesignated
 undiminishable
 undiscoverable
 undispersed
@@ -3045,12 +3138,15 @@ unstartled
 unstated
 unsteadiness
 unstealable
+unsticks
 unstitch
 unsubmissive
 unsuffused
+unsupportive
 unsurpassable
 unswept
 untaught
+unthatched
 unthinkingly
 untrainable
 untruthfully
@@ -3128,6 +3224,7 @@ Vallisneria
 valour
 valuator
 Valāhakasaṃyuttaṃ
+Vanapatthasutta
 Vanasaṃyuttaṃ
 vanquishable
 Vappa
@@ -3189,6 +3286,8 @@ Vesālika
 Vesālī
 Vetaric
 vetiver
+Vetāla
+Vetālas
 Veḷudvāra
 Veḷudvāreyyasutta
 Veḷuva
@@ -3203,6 +3302,7 @@ Videha
 Videhan
 Videhans
 Vigna
+vigour
 vikāra-rūpa
 vimānas
 Vimānavatthu
@@ -3248,12 +3348,14 @@ vārita
 Vāseṭṭha
 vāyo
 vījeti
+vīṇā
 wainwright
 wainwright's
 wainwrights
 warbled
 washroom
 watchfulness
+watchwoman
 waveless
 waylayer
 weeped
@@ -3267,10 +3369,14 @@ wieldy
 wifehood
 winnows
 witnesser
+Woodapple
 wooled
+woolled
+woollen
 worldliness
 woundless
 Wrightia
+wrinkliness
 wrinkly-nes
 wrinklyness
 wrt

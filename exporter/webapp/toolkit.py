@@ -2,7 +2,7 @@ import difflib
 import re
 import time
 
-from sqlalchemy import or_
+from sqlalchemy import literal_column, or_
 from sqlalchemy.exc import OperationalError
 
 from db.db_helpers import get_db_session
@@ -41,6 +41,42 @@ def get_variant_manager() -> VariantManager:
     return _variant_manager
 
 
+LICENSE_URL: str = "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+LICENSE_NAME: str = "CC BY-NC-SA 4.0"
+LICENSE_HOLDER: str = "Bodhirasa Bhikkhu"
+LICENSE_ATTRIBUTION: str = f"Digital Pāḷi Dictionary by {LICENSE_HOLDER} {LICENSE_NAME}"
+
+# Official Creative Commons press-kit marks, recoloured to inherit the surrounding
+# text colour so they read in both light and dark mode. Inlined rather than linked
+# so the notice survives offline in GoldenDict.
+_CC_ICONS: str = ProjectPaths().webapp_cc_icons_path.read_text(encoding="utf-8").strip()
+
+# Appended to the rendered entries rather than to a page footer, so the notice
+# travels with the data into GoldenDict, the JSON body and third-party embeds.
+LICENSE_HTML: str = (
+    '<div class="license-line">'
+    f'<a href="{LICENSE_URL}" target="_blank" rel="license">'
+    f'<span class="license-icons">{_CC_ICONS}</span>'
+    f"Digital Pāḷi Dictionary {LICENSE_NAME}"
+    "</a>"
+    "</div>"
+)
+
+# Attached only to routes returning DPD dictionary data, so that the licence and
+# attribution travel with the data itself. Tipitaka translations and audio are
+# licensed separately and must not carry these.
+LICENSE_LINK_HEADER: dict[str, str] = {
+    "Link": f'<{LICENSE_URL}>; rel="license"; title="{LICENSE_NAME}"'
+}
+
+LICENSE_NOTICE: dict[str, str] = {
+    "name": LICENSE_NAME,
+    "url": LICENSE_URL,
+    "attribution": LICENSE_ATTRIBUTION,
+    "note": "Non-commercial use only. Derivatives must be shared alike.",
+}
+
+
 def make_dpd_html(
     q: str,
     pth: ProjectPaths,
@@ -58,18 +94,35 @@ def make_dpd_html(
                 with db_session.no_autoflush:
                     dpd_html = ""
                     summary_html = ""
+                    # Set when the query fell through to suggestions, so the licence
+                    # is not stamped on a "no results" page.
+                    only_suggestions = False
                     q = q.replace("'", "").replace("ṁ", "ṃ").strip()
 
-                    lookup_results = (
-                        db_session.query(Lookup)
-                        .filter(
+                    lookup_query = db_session.query(Lookup)
+                    if "\x00" in q:
+                        # SQLite LIKE truncates at NUL; preserve the legacy edge
+                        # case rather than silently changing its results.
+                        q_like = (
+                            q.replace("\\", "\\\\")
+                            .replace("%", "\\%")
+                            .replace("_", "\\_")
+                        )
+                        lookup_query = lookup_query.filter(
                             or_(
-                                Lookup.lookup_key.ilike(q),
-                                Lookup.lookup_key.ilike(q + "."),
+                                Lookup.lookup_key.ilike(q_like, escape="\\"),
+                                Lookup.lookup_key.ilike(q_like + ".", escape="\\"),
                             )
                         )
-                        .all()
-                    )
+                    else:
+                        # SQLite NOCASE and lower/LIKE both fold ASCII only.
+                        lookup_query = lookup_query.filter(
+                            Lookup.lookup_key.collate("NOCASE").in_((q, q + "."))
+                        )
+                    # Preserve the old table-scan order, including case collisions.
+                    lookup_results = lookup_query.order_by(
+                        literal_column("lookup.rowid")
+                    ).all()
 
                     # Check manual variants from TSV first
                     main_form = vm.get_main(q)
@@ -83,7 +136,9 @@ def make_dpd_html(
                         ).render(d=d)
 
                     # first try the lookup table, if no results, then try other options
-                    if lookup_results:
+                    # a bare number is always a permalink to a headword id, so it
+                    # skips the lookup table, where "3" is an abbreviation
+                    if lookup_results and not q.isdecimal():
                         for lookup_result in lookup_results:
                             # headwords
                             if lookup_result.headwords:
@@ -223,12 +278,16 @@ def make_dpd_html(
                                 ).render(d=d)
 
                     # the two cases below search directly in the DpdHeadwords table
-                    elif q.isnumeric():  # eg 78654
-                        search_term = int(q)
+                    # isdecimal, not isnumeric: "½" and "²" are numeric but int() rejects them
+                    elif q.isdecimal():  # eg 78654
+                        # 18 digits always fit SQLite's integer; a longer number
+                        # is never an id, and would overflow the query
                         headword_result = (
                             db_session.query(DpdHeadword)
-                            .filter(DpdHeadword.id == search_term)
+                            .filter(DpdHeadword.id == int(q))
                             .first()
+                            if len(q) <= 18
+                            else None
                         )
                         if headword_result:
                             fc = get_family_compounds(headword_result)
@@ -244,6 +303,7 @@ def make_dpd_html(
                             dpd_html = find_closest_matches(
                                 q, headwords_clean_set, ascii_to_unicode_dict
                             )
+                            only_suggestions = True
 
                     elif re.search(r"\s\d", q):  # eg "kata 5"
                         headword_result = (
@@ -265,12 +325,17 @@ def make_dpd_html(
                             dpd_html = find_closest_matches(
                                 q, headwords_clean_set, ascii_to_unicode_dict
                             )
+                            only_suggestions = True
 
                     # or finally return closest matches
                     else:
                         dpd_html = find_closest_matches(
                             q, headwords_clean_set, ascii_to_unicode_dict
                         )
+                        only_suggestions = True
+
+                    if dpd_html and not only_suggestions:
+                        dpd_html += LICENSE_HTML
 
                     return dpd_html, summary_html
 
@@ -278,196 +343,10 @@ def make_dpd_html(
             if attempt == retries - 1:  # Last attempt
                 raise e
             time.sleep(0.1 * (attempt + 1))  # Exponential backoff
-        dpd_html = ""
-        summary_html = ""
-        q = q.replace("'", "").replace("ṁ", "ṃ").strip()
 
-        lookup_results = (
-            db_session.query(Lookup)
-            .filter(or_(Lookup.lookup_key.ilike(q), Lookup.lookup_key.ilike(q + ".")))
-            .all()
-        )
-
-        # Check manual variants from TSV first
-        main_form = vm.get_main(q)
-        if main_form:
-            d = ManualVariantData(variant=q, main=main_form)
-            summary_html += templates.get_template(
-                pth.template_manual_variant_summary
-            ).render(d=d)
-            dpd_html += templates.get_template(pth.template_manual_variant).render(d=d)
-
-        # first try the lookup table, if no results, then try other options
-
-        if lookup_results:
-            for lookup_result in lookup_results:
-                # headwords
-                if lookup_result.headwords:
-                    headwords = lookup_result.headwords_unpack
-                    headword_results = (
-                        db_session.query(DpdHeadword)
-                        .filter(DpdHeadword.id.in_(headwords))
-                        .all()
-                    )
-                    headword_results = sorted(
-                        headword_results, key=lambda x: pali_sort_key(x.lemma_1)
-                    )
-                    for i in headword_results:
-                        fc = get_family_compounds(i)
-                        fi = get_family_idioms(i)
-                        fs = get_family_set(i)
-                        d = HeadwordData(i, fc, fi, fs)
-                        summary_html += templates.get_template(
-                            pth.template_dpd_summary
-                        ).render(d=d)
-                        dpd_html += templates.get_template(
-                            pth.template_dpd_headword
-                        ).render(d=d)
-
-                # roots
-                if lookup_result.roots:
-                    roots_list = lookup_result.roots_unpack
-                    root_results = (
-                        db_session.query(DpdRoot)
-                        .filter(DpdRoot.root.in_(roots_list))
-                        .all()
-                    )
-                    for r in root_results:
-                        frs = db_session.query(FamilyRoot).filter(
-                            FamilyRoot.root_key == r.root
-                        )
-                        frs = sorted(frs, key=lambda x: pali_sort_key(x.root_family))
-                        d = RootsData(r, frs, roots_count_dict)
-                        summary_html += templates.get_template(
-                            pth.template_root_summary
-                        ).render(d=d)
-                        dpd_html += templates.get_template(pth.template_root).render(
-                            d=d
-                        )
-
-                # abbreviations
-                if lookup_result.abbrev:
-                    d = AbbreviationsData(lookup_result)
-                    summary_html += templates.get_template(
-                        pth.template_abbreviations_summary
-                    ).render(d=d)
-                    dpd_html += templates.get_template(
-                        pth.template_abbreviations
-                    ).render(d=d)
-
-                # deconstructor
-                if lookup_result.deconstructor:
-                    d = DeconstructorData(lookup_result)
-                    summary_html += templates.get_template(
-                        pth.template_deconstructor_summary
-                    ).render(d=d)
-                    dpd_html += templates.get_template(
-                        pth.template_deconstructor
-                    ).render(d=d)
-
-                # variant
-                if lookup_result.variant:
-                    d = VariantData(lookup_result)
-                    summary_html += templates.get_template(
-                        pth.template_variant_summary
-                    ).render(d=d)
-                    dpd_html += templates.get_template(pth.template_variant).render(d=d)
-
-                # spelling mistake
-                if lookup_result.spelling:
-                    d = SpellingData(lookup_result)
-                    summary_html += templates.get_template(
-                        pth.template_spelling_summary
-                    ).render(d=d)
-                    dpd_html += templates.get_template(pth.template_spelling).render(
-                        d=d
-                    )
-
-                # grammar
-                if lookup_result.grammar:
-                    d = GrammarData(lookup_result)
-                    summary_html += templates.get_template(
-                        pth.template_grammar_summary
-                    ).render(d=d)
-                    dpd_html += templates.get_template(pth.template_grammar).render(d=d)
-
-                # help
-                if lookup_result.help:
-                    d = HelpData(lookup_result)
-                    summary_html += templates.get_template(
-                        pth.template_help_summary
-                    ).render(d=d)
-                    dpd_html += templates.get_template(pth.template_help).render(d=d)
-
-                # epd
-                if lookup_result.epd:
-                    d = EpdData(lookup_result)
-                    summary_html += templates.get_template(
-                        pth.template_epd_summary
-                    ).render(d=d)
-                    dpd_html += templates.get_template(pth.template_epd).render(d=d)
-
-                # abbreviations other
-                if lookup_result.abbrev_other:
-                    d = AbbreviationsOtherData(lookup_result)
-                    summary_html += templates.get_template(
-                        pth.template_abbreviations_other_summary
-                    ).render(d=d)
-                    dpd_html += templates.get_template(
-                        pth.template_abbreviations_other
-                    ).render(d=d)
-
-        # the two cases below search directly in the DpdHeadwords table
-
-        elif q.isnumeric():  # eg 78654
-            search_term = int(q)
-            headword_result = (
-                db_session.query(DpdHeadword)
-                .filter(DpdHeadword.id == search_term)
-                .first()
-            )
-            if headword_result:
-                fc = get_family_compounds(headword_result)
-                fi = get_family_idioms(headword_result)
-                fs = get_family_set(headword_result)
-                d = HeadwordData(headword_result, fc, fi, fs)
-                dpd_html += templates.get_template(pth.template_dpd_headword).render(
-                    d=d
-                )
-
-            # return closest matches
-            else:
-                dpd_html = find_closest_matches(
-                    q, headwords_clean_set, ascii_to_unicode_dict
-                )
-
-        elif re.search(r"\s\d", q):  # eg "kata 5"
-            headword_result = (
-                db_session.query(DpdHeadword).filter(DpdHeadword.lemma_1 == q).first()
-            )
-            if headword_result:
-                fc = get_family_compounds(headword_result)
-                fi = get_family_idioms(headword_result)
-                fs = get_family_set(headword_result)
-                d = HeadwordData(headword_result, fc, fi, fs)
-                dpd_html += templates.get_template(pth.template_dpd_headword).render(
-                    d=d
-                )
-
-            # return closest matches
-            else:
-                dpd_html = find_closest_matches(
-                    q, headwords_clean_set, ascii_to_unicode_dict
-                )
-
-        # or finally return closest matches
-
-        else:
-            dpd_html = find_closest_matches(
-                q, headwords_clean_set, ascii_to_unicode_dict
-            )
-
-    return dpd_html, summary_html
+    # Unreachable: the body returns on success and the handler re-raises on the
+    # final attempt. Explicit rather than returning names bound in the `with`.
+    raise RuntimeError(f"make_dpd_html exhausted {retries} retries for {q!r}")
 
 
 def find_closest_matches(
@@ -475,7 +354,8 @@ def find_closest_matches(
     headwords_clean_set,
     ascii_to_unicode_dict,
 ) -> str:
-    ascii_matches = ascii_to_unicode_dict[q]
+    # .get, not [q]: indexing a defaultdict would store an entry per distinct miss
+    ascii_matches = ascii_to_unicode_dict.get(q, [])
     closest_headword_matches = difflib.get_close_matches(
         q, headwords_clean_set, n=10, cutoff=0.7
     )

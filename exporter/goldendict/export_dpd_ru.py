@@ -2,7 +2,7 @@
 
 from collections.abc import Iterator
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from typing import TypedDict, cast
+from typing import TypedDict
 
 import jinja2
 import psutil
@@ -63,6 +63,7 @@ class DpdHeadwordRenderDataBase(TypedDict):
     cf_set: set[str]
     idioms_set: set[str]
     show_id: bool
+    show_tbw: bool
     set_ru_dict: dict[str, str]
 
 
@@ -175,17 +176,15 @@ def _worker_init(
     """Worker initializer: build the jinja env and full render data once per
     worker, reused across every batch that worker handles."""
     global _WORKER_RENDER_DATA
-    # cast: the spread literal has every DpdHeadwordRenderData key (base keys via
-    # **render_data, plus pth/jinja_env), but pyrefly widens a {**TypedDict, ...}
-    # spread to dict[str, ...] and cannot re-narrow it. Runtime no-op; mirrors the
-    # identical construct in upstream export_dpd.py (Batch D cast precedent).
-    _WORKER_RENDER_DATA = cast(
-        DpdHeadwordRenderData,
-        {
-            **render_data,
-            "pth": path,
-            "jinja_env": get_jinja2_env("exporter/goldendict/ru_components/templates"),
-        },
+    jinja_env = get_jinja2_env("exporter/goldendict/ru_components/templates")
+    # pyrefly: ignore  # jinja2 leaves Environment.globals unannotated, so its
+    # value type infers as the union of jinja's own defaults; extending it is
+    # the documented usage.
+    jinja_env.globals["show_tbw"] = render_data["show_tbw"]
+    _WORKER_RENDER_DATA = DpdHeadwordRenderData(
+        **render_data,
+        pth=path,
+        jinja_env=jinja_env,
     )
 
 
@@ -314,6 +313,7 @@ def generate_dpd_html(
     pr.green_title("generating dpd html")
 
     show_id: bool = config_test("dictionary", "show_id", "yes")
+    show_tbw: bool = config_test("dictionary", "show_tbw", "yes")
 
     pali_words_count = (
         db_session.query(func.count(DpdHeadword.id))
@@ -340,6 +340,7 @@ def generate_dpd_html(
         "cf_set": cf_set,
         "idioms_set": idioms_set,
         "show_id": show_id,
+        "show_tbw": show_tbw,
         "set_ru_dict": read_set_ru_from_tsv(),
     }
 

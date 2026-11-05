@@ -186,7 +186,7 @@ port"); verified RU non-Darwin `make_mobi` (`kindle_exporter_ru.py:362-370`) run
 `ru_release.yml`, `ru_release_test.yml`, `ru_release_kindle.yml`. PORT trivial:
 `<body>` → `<body epub:type="dictionary">` in `ru_components/templates/ebook_ru_letter.jinja` and
 `ebook_ru_rpd_letter.jinja` (2c verifies `xmlns:epub` is declared). Option (b) deferred to DRAFT
-thread `kamma/threads/20261105_kindle_ru_217_port/handoff.md` (created 2026-11-05).
+thread `kamma/drafts/20261105_kindle_ru_217_port/handoff.md` (created 2026-11-05).
 
 ### D7. TPR monthly export stopped upstream (#279)
 Upstream workflows/docs stop monthly TPR export ("keep code until year end"). Local `make_dpd.sh`,

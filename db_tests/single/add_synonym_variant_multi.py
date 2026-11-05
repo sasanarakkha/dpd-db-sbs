@@ -55,11 +55,13 @@ class GlobalVars:
 
 
 def _pair_key(pos: str, hw_a: DpdHeadword, hw_b: DpdHeadword, sig: str) -> str:
+    """Build the per-pair exception key used to skip already-decided pairs."""
     lemmas = sorted([hw_a.lemma_clean, hw_b.lemma_clean])
     return f"{pos}:{lemmas[0]}|{lemmas[1]}:{sig}"
 
 
 def _general_key(pos: str, meanings: list[str]) -> str:
+    """Build the exception key that blanket-skips every pair sharing this meaning set."""
     return f"[{pos}] {'; '.join(sorted(meanings))}"
 
 
@@ -175,6 +177,9 @@ def find_identical_meaning_clusters(
         # skip if every pair is already related (syn/var_phon/var_text)
         if _all_pairs_related(members):
             continue
+        # skip if every pair has a textual variant link
+        if _all_pairs_textual(members):
+            continue
         clusters.append((pcls, sig, meanings, members))
 
     clusters.sort(key=lambda c: -len(c[3]))
@@ -192,6 +197,19 @@ def _all_pairs_related(members: list[DpdHeadword]) -> bool:
             if a.lemma_clean == b.lemma_clean:
                 continue
             if not pair_consistently_related(a, b):
+                return False
+    return True
+
+
+def _all_pairs_textual(members: list[DpdHeadword]) -> bool:
+    """True if every pair has a textual variant link in at least one direction."""
+    for i, a in enumerate(members):
+        a_text = split_field(a.var_text)
+        for b in members[i + 1 :]:
+            if a.lemma_clean == b.lemma_clean:
+                continue
+            b_text = split_field(b.var_text)
+            if b.lemma_clean not in a_text and a.lemma_clean not in b_text:
                 return False
     return True
 
@@ -225,10 +243,49 @@ def prompt_clusters(
         pyperclip.copy(gui_string)
         print(f"\n[white]{gui_string}")
         choice = Prompt.ask(
-            "[white](s)ynonym all pairwise, (p)honetic all pairwise, (g)eneral exception, (pass), (r)estart, (q)uit"
+            "[white](s)ynonym all pairwise, (p)honetic all pairwise, (t)extual all pairwise, (g)eneral exception, (pass), (r)estart, (q)uit"
         )
 
-        if choice == "s":
+        if choice == "t":
+            written = 0
+            moved_phon = 0
+            skipped_syn = 0
+            for i, a in enumerate(members):
+                a_text = set(split_field(a.var_text))
+                a_syn = set(a.synonym_list)
+                a_phon = split_field(a.var_phonetic)
+                for b in members[i + 1 :]:
+                    if a.lemma_clean == b.lemma_clean:
+                        continue
+                    b_syn = set(b.synonym_list)
+                    b_phon = split_field(b.var_phonetic)
+                    b_text = set(split_field(b.var_text))
+                    if b.lemma_clean in a_syn or a.lemma_clean in b_syn:
+                        skipped_syn += 1
+                        print(f"  [yellow]kept as synonym: {a.lemma_1} ↔ {b.lemma_1}")
+                        continue
+                    if b.lemma_clean in a_phon or a.lemma_clean in b_phon:
+                        assign_relationship(a, b.lemma_clean, "var_text")
+                        assign_relationship(b, a.lemma_clean, "var_text")
+                        moved_phon += 1
+                        print(
+                            f"  [cyan]moved phonetic → textual: {a.lemma_1} ↔ {b.lemma_1}"
+                        )
+                        continue
+                    if b.lemma_clean in a_text and a.lemma_clean in b_text:
+                        continue
+                    assign_relationship(a, b.lemma_clean, "var_text")
+                    assign_relationship(b, a.lemma_clean, "var_text")
+                    written += 1
+            g.db_session.commit()
+            print(
+                f"  [green]wrote {written} new var_text, moved {moved_phon} from phonetic"
+                f"  [yellow]({skipped_syn} preserved as synonyms)"
+            )
+            for m in members:
+                _show_result(m)
+
+        elif choice == "s":
             written = 0
             skipped_phon = 0
             for i, a in enumerate(members):
@@ -308,6 +365,7 @@ def prompt_clusters(
 
 
 def _entry_label(hw: DpdHeadword) -> str:
+    """Format a headword's one-line summary for the interactive prompt."""
     family_root = f" [magenta]{hw.family_root}" if hw.family_root else ""
     family_word = f" [magenta]{hw.family_word}" if hw.family_word else ""
     return (
@@ -318,6 +376,7 @@ def _entry_label(hw: DpdHeadword) -> str:
 
 
 def _format_fields(hw: DpdHeadword) -> str:
+    """Format a headword's syn/variant/var_text/var_phonetic fields for display."""
     syn = hw.synonym.split(", ") if hw.synonym else []
     var = hw.variant.split(", ") if hw.variant else []
     var_text = hw.var_text.split(", ") if hw.var_text else []
@@ -326,6 +385,7 @@ def _format_fields(hw: DpdHeadword) -> str:
 
 
 def _show_result(hw: DpdHeadword) -> None:
+    """Print a headword's updated fields after a relationship write."""
     print()
     print(f"[green]{hw.lemma_1}:")
     print(f"[green]{_format_fields(hw)}")
@@ -404,6 +464,7 @@ def prompt_pairs(g: GlobalVars) -> bool:
 
 
 def main() -> None:
+    """Loop cluster-approval then pairwise-approval passes until no restart is requested."""
     pr.tic()
     print("[bright_yellow]synonym multi — finding and adding multi-meaning synonyms")
     while True:

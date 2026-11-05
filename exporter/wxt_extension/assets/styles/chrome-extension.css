@@ -3,7 +3,6 @@
   --dpd-text: inherit;
   --dpd-primary: hsl(198, 100%, 50%);
   --dpd-border: hsla(0, 0%, 50%, 0.25);
-  --dpd-panel-width: 33.33vw;
   --dpd-logo-hue-rotate: 0deg;
   --dpd-logo-saturate: 1;
   --dpd-logo-brightness: 1;
@@ -20,6 +19,21 @@ html.dpd-active body {
   padding-right: var(--dpd-panel-width) !important;
   width: 100vw !important;
   box-sizing: border-box !important;
+}
+
+/* Reclaim the panel's reserved space while the dictionary is popped out. */
+html.dpd-active.dpd-popped-out body {
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* Keep the panel readable when resized. Scoped to wide viewports so on narrow
+   screens (where the 33.33vw default is already below 340px) it never overflows
+   the reserved padding into page content. */
+@media (min-width: 1020px) {
+  #dict-panel-25445:not(.dpd-minimized) {
+    min-width: 340px;
+  }
 }
 
 /* Panel Styling */
@@ -373,29 +387,16 @@ html.dpd-active body.dpd-panel-left-active {
 }
 
 /* Button styling */
-#dict-panel-25445 .button {
-  padding: 2px 6px;
-  background: var(--dpd-border);
-  border: none;
-  cursor: pointer;
-  color: var(--dpd-button-text, #fff);
-  font-size: 0.85em;
-  border-radius: 3px;
-}
-
-#dict-panel-25445 .button.active {
-  background: var(--dpd-primary);
-  color: var(--dpd-button-text, #fff) !important;
-}
-
 #dict-panel-25445 a.dpd-button,
 #dict-panel-25445 a.dpd-button.active,
 #dict-panel-25445 a.dpd-button:hover {
   color: var(--dpd-button-text) !important;
+  /* Pin line-height so a host site's body line-height (e.g. s.4nt.org's
+     body{line-height:1.55}) can't leak in and inflate the button height. */
+  line-height: normal;
 }
 
 /* Ensure SVG icons inside buttons also get the proper contrast color */
-#dict-panel-25445 .button svg,
 #dict-panel-25445 .dpd-button svg {
   fill: currentColor !important;
   stroke: currentColor !important;
@@ -447,7 +448,7 @@ html.dpd-active body.dpd-panel-left-active {
   border-color: transparent transparent var(--dpd-primary) transparent;
 }
 
-.dpd-tooltip:hover .dpd-tooltip-text {
+#dict-panel-25445 .dpd-tooltip:hover .dpd-tooltip-text {
   visibility: visible;
   opacity: 1;
 }

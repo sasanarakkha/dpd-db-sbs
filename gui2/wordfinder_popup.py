@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import flet as ft
+from gui2.ui_utils import field_border, request_focus
 
 from tools.printer import printer as pr
 
@@ -19,18 +20,17 @@ class WordFinderPopup:
             label_style=ft.TextStyle(color=ft.Colors.WHITE, size=10),
             width=500,
             on_submit=self._handle_search,
-            border_radius=20,
-            border=None,
+            border=field_border(),
             bgcolor=ft.Colors.GREY_900,  # Darker field background
         )
 
-        self.search_button = ft.ElevatedButton(
-            text="Search",
+        self.search_button = ft.Button(
+            content="Search",
             on_click=self._handle_search,
         )
 
-        self.clear_button = ft.ElevatedButton(
-            text="Clear",
+        self.clear_button = ft.Button(
+            content="Clear",
             on_click=self._handle_clear,
         )
 
@@ -45,7 +45,7 @@ class WordFinderPopup:
             label="Search Type",
             label_style=ft.TextStyle(color=ft.Colors.WHITE, size=10),
             width=300,
-            border_radius=20,
+            border=field_border(),
         )
 
         self.results_container = ft.Container(
@@ -160,7 +160,7 @@ class WordFinderPopup:
                 )
 
                 data_table = ft.DataTable(
-                    border=ft.border.all(1, ft.Colors.BLUE_200),
+                    border=ft.Border.all(1, ft.Colors.BLUE_200),
                     border_radius=10,
                     data_row_color={ft.ControlState.HOVERED: ft.Colors.GREY_700},
                     column_spacing=10,
@@ -211,14 +211,25 @@ class WordFinderPopup:
         self.dialog.update()
 
     def open_popup(self, lemma: str = "") -> None:
+        # show_dialog raises on any dialog still on Flet's stack, and a closed
+        # dialog stays there until Flutter reports the dismiss, which did not
+        # arrive for this popup in testing. A second Ctrl+F while open
+        # just refocuses; after a close the stale entry is dropped first.
+        dialogs = self.page._dialogs.controls
+        if self.dialog in dialogs:
+            if self.dialog.open:
+                request_focus(self.search_field)
+                return
+            dialogs.remove(self.dialog)
         self.search_field.value = lemma
         self.results_container.visible = False
         self.results_container.content = ft.Column(
             [],
             scroll=ft.ScrollMode.AUTO,
         )
-        self.page.open(self.dialog)
+        self.page.show_dialog(self.dialog)
         self.page.update()
+        request_focus(self.search_field)
 
     def is_dialog_open(self) -> bool:
         return self.dialog.open

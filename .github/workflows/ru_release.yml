@@ -53,13 +53,6 @@ jobs:
         rm -rf ${{ github.workspace }}/resources/bjt/dev/*
         rm -rf ${{ github.workspace }}/resources/sc-data/html_text/*
 
-    - name: Unzip deconstructor_output
-      run: |
-        cd ${{ github.workspace }}/resources/deconstructor_output
-        tar -xzvf deconstructor_output.json.tar.gz
-        ls -la
-        cd ${{ github.workspace }}/
-    
     - name: Install dictzip
       run: sudo apt-get update && sudo apt-get install -y dictzip
 
@@ -158,6 +151,9 @@ jobs:
     - name: Extract Variants
       run: uv run python db/variants/main.py
 
+    - name: Generate Deconstructor
+      run: go run go_modules/deconstructor/main.go
+
     - name: Run Deconstructor
       run: uv run python scripts/build/deconstructor_output_add_to_db.py
 
@@ -223,6 +219,8 @@ jobs:
 
     - name: Download Audio Index
       run: uv run python audio/index_release_download.py
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     # ----------------------------------------
     # Exporter
@@ -303,14 +301,10 @@ jobs:
     
     - name: Sync all submodules with Upstream
       run: |
-        for submodule in resources/fdg_dpd resources/tpr_downloads; do
+        for submodule in resources/fdg_dpd; do
           echo "Syncing $submodule..."
           cd "$submodule"
-          if [ "$submodule" = "resources/tpr_downloads" ]; then
-            branch="master"
-          else 
-            branch="main"
-          fi
+          branch="main"
           git fetch origin $branch
           git checkout $branch
           git reset --hard origin/$branch
@@ -332,9 +326,6 @@ jobs:
     - name: Config for DPD + RUS
       run: uv run python scripts/rus_exporter/set_config.py --profile release_rus
 
-    - name: Run TPR Exporter
-      run: uv run python exporter/tpr/tpr_exporter_ru.py
-
     # ----------------------------------------
     # Update Submodules
     # ----------------------------------------
@@ -344,7 +335,6 @@ jobs:
       run: |
         declare -A submodules=(
           ["resources/fdg_dpd"]="fdg https://github.com/dhammagift/dictPlugin.git"
-          ["resources/tpr_downloads"]="tpr https://github.com/bksubhuti/tpr_downloads"
         )
 
         for path in "${!submodules[@]}"; do
@@ -357,11 +347,7 @@ jobs:
           echo "Recent commits:"
           git log -1 --oneline
           
-          if [ "$path" = "resources/tpr_downloads" ]; then
-            branch="master"
-          else
-            branch="main"
-          fi
+          branch="main"
           git checkout $branch
           git pull origin $branch
           

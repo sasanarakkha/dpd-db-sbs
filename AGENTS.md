@@ -19,6 +19,7 @@ Digital Pali Dictionary.
 
 ## Flet
 - When answering questions about Flet refer to the /resources/flet-docs folder.
+- gui2 runs **Flet 1.0.1**. Closing a dialog with `dialog.open = False` leaves the instance on `page._dialogs`; a later `page.show_dialog` of the same instance raises "Dialog is already opened" — guard reopen paths. Escape on modal dialogs is handled once, globally, by `cancel_top_dialog` in `gui2/ui_utils.py`; new popups only need a "Cancel" or "Close" button.
 
 ## Context7
 Use Context7 MCP (`mcp__plugin_context7_context7__resolve-library-id` + `query-docs`) for up-to-date docs on project libraries:
@@ -83,6 +84,16 @@ Use `from tools.printer import printer as pr` for colored terminal output and ti
 
 ## Performance Work
 - Never `INSERT OR REPLACE` on `lookup` (blanks the other 16 columns); use `ON CONFLICT ... DO UPDATE SET <col> = excluded.<col>` (see the `_raw_sql_sync` pattern in `tools/lookup_sync.py`).
+## Git Safety (shared working tree)
+- NEVER run `git stash`, `git checkout -- <path>`, `git restore`, or `git reset --hard` — they operate on the whole tree and destroy other sessions' uncommitted work. Stage by explicit file list.
+
+## Repo Gotchas
+- `.gitignore` ignores ALL `__init__.py` files, so a package `__init__.py` re-export can never be committed. Import new symbols from their concrete module.
+- `dpd.db` runs in WAL mode: writes land in `dpd.db-wal` and the main file's mtime does not move. Never use the timestamp to decide whether the database changed — read the data.
+- `DpdHeadword.inflections_list_all` yields `""` entries when either inflections column is empty — filter empty strings before using inflections as dict keys or set members.
+- `uv add` / `uv remove` sync only the default groups and uninstall the `tools` group. Always pass `--no-sync`, then run `uv sync --all-groups`.
+- For files under `gui2/`, `tests/` or `tools/cst_source/`, plain `uv run pyright <file>` analyses nothing (all are in `[tool.pyright].exclude`) yet prints "0 errors". Use `uv run pyright --project /dev/null <file>`. Lint `tools/cst_source` with `uv run ruff check --no-force-exclude <file>` (same flag for `ruff format`).
+- Never `ruff format` `.json` fixtures — it adds trailing commas that break parsing.
 
 # Localized Rules (local fork)
 

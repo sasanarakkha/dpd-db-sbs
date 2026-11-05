@@ -1,4 +1,62 @@
+import inspect
+from typing import Any, Callable
+
 import flet as ft
+
+from gui2.ui_utils import field_border, is_mounted, request_focus
+
+# The last control that received keyboard focus anywhere in the app. Tab views
+# read this through get_last_focused_field() when they regain focus, to put the
+# cursor back where the contributor left off. Only DpdTextField and DpdDropdown
+# record themselves — that covers every main editor field, including those
+# inside the composite field classes, which all build on these two.
+_last_focused_field: "DpdTextField | DpdDropdown | None" = None
+
+
+def get_last_focused_field() -> "DpdTextField | DpdDropdown | None":
+    """The most recently focused editor field, or None if none is restorable.
+
+    A field left focused in a form that was since rebuilt (clear_all_fields
+    constructs a fresh DpdFields) is unmounted and unrestorable, so it reads
+    as None — and stops pinning the abandoned field tree in memory.
+    """
+    global _last_focused_field
+    if _last_focused_field is not None and not is_mounted(_last_focused_field):
+        _last_focused_field = None
+    return _last_focused_field
+
+
+def track_focus(
+    field: "DpdTextField | DpdDropdown",
+    original: Callable[[ft.ControlEvent], Any] | None,
+) -> Callable[[ft.Event[Any]], Any]:
+    """Wrap a field's on_focus so focusing it also records it for restoration.
+
+    The original handler — a composite field's internal handler, or one of the
+    per-field focus callbacks — still runs, unchanged, after the recording.
+    """
+
+    def record() -> None:
+        global _last_focused_field
+        _last_focused_field = field
+
+    # Flet awaits a handler only if the handler itself is a coroutine
+    # function, so an async original needs an async wrapper — a sync one would
+    # call it, get a coroutine back, and drop it unrun.
+    if inspect.iscoroutinefunction(original):
+
+        async def async_handler(e: ft.Event[Any]) -> None:
+            record()
+            await original(e)
+
+        return async_handler
+
+    def handler(e: ft.Event[Any]) -> None:
+        record()
+        if original is not None:
+            original(e)
+
+    return handler
 
 
 class FieldConfig:
@@ -36,15 +94,50 @@ class DpdTextField(ft.TextField):
         super().__init__(
             expand=True,
             multiline=multiline,
-            on_focus=on_focus,
+            on_focus=track_focus(self, on_focus),
             on_change=on_change,
             on_submit=on_submit,
             on_blur=on_blur,
             min_lines=1,
             width=700,
-            border_radius=20,
+            border=field_border(),
         )
         self.name = name
+
+    # clear_fields and update_db_fields write None (a cleared field, an empty
+    # db column), and Flet 1.0 keeps it. Every handler that reads the value as
+    # text then crashes, so None is stored as the empty text it means.
+    def __setattr__(self, name: str, value: Any) -> None:
+        if name == "value" and value is None:
+            value = ""
+        super().__setattr__(name, value)
+
+    # Flet 1.0 renamed TextField.error_text to `error` but left
+    # Dropdown.error_text alone, so the two control types now spell it
+    # differently. Assigning the old name on a 1.0 TextField is silently
+    # accepted — it writes a dead instance attribute that never reaches the UI —
+    # which killed every validation message in the editor at once. Forwarding
+    # here keeps the ~60 call sites, and the composite wrappers that delegate to
+    # them, spelling it the one way that works on both.
+    @property
+    def error_text(self) -> str | None:
+        value = self.error
+        return value if isinstance(value, str) or value is None else None
+
+    @error_text.setter
+    def error_text(self, value: str | None) -> None:
+        self.error = value
+
+    # 0.28 recoloured the border by itself whenever an error was set. 1.0
+    # resolves the error state against the theme, which an explicit `border=`
+    # overrides — and every field now carries one (BR-22). Deriving it here
+    # rather than at the ~60 assignment sites means no call site has to
+    # remember, and clearing the error clears the red with it.
+    def before_update(self) -> None:
+        super().before_update()
+        self.border = (
+            field_border(color=ft.Colors.RED) if self.error else field_border()
+        )
 
 
 class DpdDropdown(ft.Dropdown):
@@ -59,21 +152,61 @@ class DpdDropdown(ft.Dropdown):
         if options is None:  # Check specifically for None, allow empty list
             raise ValueError("Options must be provided for DpdDropdown")
 
+        # Set before super().__init__ so _handle_select can never observe it
+        # missing, whatever the base class does during construction.
+        self._on_change: Callable[[ft.Event[ft.Dropdown]], None] | None = on_change
+
         super().__init__(
+            # Same `expand` + `width` pair as DpdTextField, deliberately. 1.0
+            # resolves the contradiction in favour of `expand`, so both control
+            # types settle at the same rendered width and their right edges line
+            # up down the form. A fixed `width` here with no `expand` made the
+            # dropdowns ~65px wider than the text fields beside them.
             expand=True,
             options=[ft.dropdown.Option(o) for o in options],
-            on_focus=on_focus,
-            on_change=on_change,
+            on_focus=track_focus(self, on_focus),
+            # Flet 1.0 split 0.28's on_change into on_select (an item was
+            # picked) and on_text_change (the user typed). on_select is the
+            # one that preserves 0.28 behaviour. The parameter keeps its name
+            # because it is shared with FieldConfig.on_change across all 48
+            # field definitions.
+            on_select=self._handle_select,
             on_blur=on_blur,
             editable=True,
             enable_filter=True,
             width=700,
             menu_width=200,
-            border_color=ft.Colors.GREY_800,
-            border_radius=20,
-            border_width=1,
+            border=field_border(color=ft.Colors.GREY_800),
         )
         self.name = name
+
+    # 1.0's editable Dropdown is a Flutter dropdown-menu: the options live in an
+    # overlay route, so the control holding focus when an option is chosen is
+    # destroyed with the overlay and focus falls back to the page root. The next
+    # Tab then restarts traversal at the top tab bar instead of moving to the
+    # next field. Reclaiming focus here restores 0.28's behaviour.
+    #
+    # The reclaim runs before the configured handler so that a handler moving
+    # focus onward still wins — derivative_change jumping to suffix is the one
+    # that does. Focus requests are dispatched in call order, so the later one
+    # settles last. Handlers relocating focus from on_blur instead (trans,
+    # compound_type) are a separate event and unaffected by this ordering.
+    #
+    # The handler is called directly rather than through flet's dispatcher, so
+    # it must be synchronous and take the event as its single argument.
+    def _handle_select(self, e: ft.Event[ft.Dropdown]) -> None:
+        request_focus(self)
+        if self._on_change is not None:
+            self._on_change(e)
+
+    # Dropdown kept 0.28's `error_text` spelling where TextField renamed it to
+    # `error`, so no forwarding property is needed here — only the border, for
+    # the same reason as DpdTextField.before_update.
+    def before_update(self) -> None:
+        super().before_update()
+        self.border = field_border(
+            color=ft.Colors.RED if self.error_text else ft.Colors.GREY_800
+        )
 
 
 class DpdText(ft.TextField):
@@ -86,7 +219,25 @@ class DpdText(ft.TextField):
             text_size=16,
             width=500,
             read_only=True,
-            border=ft.InputBorder.NONE,
+            border=ft.NoInputBorder(),
             dense=True,
             multiline=True,
         )
+
+    # Same as DpdTextField, so a cleared main field and its cleared _add field
+    # still compare equal in check_and_color_add_fields.
+    def __setattr__(self, name: str, value: Any) -> None:
+        if name == "value" and value is None:
+            value = ""
+        super().__setattr__(name, value)
+
+    # Same 1.0 rename as DpdTextField. No border toggle: this field is a
+    # read-only display and deliberately carries no outline at all.
+    @property
+    def error_text(self) -> str | None:
+        value = self.error
+        return value if isinstance(value, str) or value is None else None
+
+    @error_text.setter
+    def error_text(self, value: str | None) -> None:
+        self.error = value

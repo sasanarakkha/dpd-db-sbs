@@ -1,0 +1,178 @@
+"""Apply the unambiguous grammar redirects found by `verb_finder.py`.
+
+The rule: a derived form's `grammar` names the present-tense verb it comes from
+when that verb exists in the dictionary, and the prefixes + root when it does
+not. `verb_finder.py` buckets every derived form against that rule; this script
+writes back only the two buckets where the correction is unambiguous:
+
+- `would_change_to_root` — grammar names a verb absent from the dictionary and
+  no pr verb exists at that (family_root, root_key), so it becomes the root.
+- `would_change_to_verb` — grammar names a root (or an absent verb) and exactly
+  one pr verb exists at that (family_root, root_key), so it becomes that verb.
+
+Causative, passive, intensive and desiderative forms land in the same two
+buckets, matched on kind and stem; a root form gets its kind written in
+("aor of caus of pa √dhaṃs").
+
+The ambiguous, rootless, malformed and mismatched buckets are left alone — they
+need a human.
+
+Proposals are recomputed live from the database on every run, so there is no
+stale-TSV hazard. Nothing is written without `--apply`.
+
+CLOSE gui2 BEFORE RUNNING WITH --apply — it writes to the same database.
+
+Usage:
+    uv run scripts/fix/verb_grammar_fixer.py            # dry run, writes the diff file
+    uv run scripts/fix/verb_grammar_fixer.py --apply    # writes to the database
+"""
+
+import argparse
+from pathlib import Path
+
+from sqlalchemy.orm import Session
+
+from db.db_helpers import get_db_session
+from db.models import DpdHeadword
+from scripts.fix.verb_finder import (
+    build_pr_verb_index,
+    load_all_lemmas,
+    load_cst_word_freq,
+    merge_present_buckets,
+    scan_derived_forms,
+    scan_present_verbs,
+    write_tsv,
+)
+from tools.paths import ProjectPaths
+from tools.printer import printer as pr
+
+APPLY_BUCKETS = (
+    "would_change_to_root",
+    "would_change_to_verb",
+    "present_verb_to_root",
+)
+SAMPLE_SIZE = 25
+DIFF_FILES = {
+    "would_change_to_root": "changes_to_root.tsv",
+    "would_change_to_verb": "changes_to_verb.tsv",
+    "present_verb_to_root": "changes_present_verb_to_root.tsv",
+}
+
+
+def collect_changes(db: Session, pth: ProjectPaths) -> list[dict]:
+    """Recompute the two unambiguous buckets and flatten them into one change list.
+
+    Every argument the scan accepts must be passed: without the CST frequencies
+    and the all-headword set it computes a looser set of changes than
+    `verb_finder` reports, and the two drift apart silently.
+    """
+    pr_index, pr_lemma_map = build_pr_verb_index(db)
+    cst_freq = load_cst_word_freq(pth)
+    buckets = scan_derived_forms(
+        db, pr_index, pr_lemma_map, cst_freq, load_all_lemmas(db)
+    )
+    # A causative or passive names a verb too, and the same rule governs it.
+    merge_present_buckets(
+        buckets, scan_present_verbs(db, pr_index, pr_lemma_map, cst_freq)
+    )
+
+    changes: list[dict] = []
+    for bucket in APPLY_BUCKETS:
+        for row in buckets[bucket]:
+            proposed = row["grammar_proposed"]
+            # A blank or unchanged proposal is not a correction — never write one.
+            if not proposed or proposed == row["grammar_current"]:
+                continue
+            changes.append(
+                {
+                    "id": row["id"],
+                    "lemma_1": row["lemma_1"],
+                    "pos": row["pos"],
+                    "family_root": row["family_root"],
+                    "grammar_current": row["grammar_current"],
+                    "grammar_proposed": proposed,
+                    "bucket": bucket,
+                }
+            )
+    changes.sort(key=lambda r: r["id"])
+    return changes
+
+
+def apply_changes(db: Session, changes: list[dict]) -> int:
+    """Write the new `grammar` values, skipping any row that has moved underneath us."""
+    by_id = {c["id"]: c for c in changes}
+    headwords = (
+        db.query(DpdHeadword).filter(DpdHeadword.id.in_(list(by_id.keys()))).all()
+    )
+
+    for missing_id in sorted(set(by_id) - {hw.id for hw in headwords}):
+        pr.red(f"skipped {by_id[missing_id]['lemma_1']} — the entry is gone")
+
+    written = 0
+    for hw in headwords:
+        change = by_id[hw.id]
+        if hw.grammar != change["grammar_current"]:
+            pr.red(f"skipped {hw.lemma_1} — grammar changed since the scan")
+            continue
+        hw.grammar = change["grammar_proposed"]
+        written += 1
+
+    db.commit()
+    return written
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--apply",
+        action="store_true",
+        help="write the changes to the database (default is a dry run)",
+    )
+    parser.add_argument(
+        "--only",
+        choices=sorted(DIFF_FILES),
+        help="restrict to one bucket; the root redirects are mechanical, "
+        "the verb redirects rest on picking a single candidate",
+    )
+    args = parser.parse_args()
+
+    pr.yellow_title("verb grammar fixer")
+    pr.tic()
+
+    pth = ProjectPaths()
+    db = get_db_session(pth.dpd_db_path)
+    output_dir: Path = pth.temp_dir / "verb_finder"
+
+    changes = collect_changes(db, pth)
+    for bucket, filename in DIFF_FILES.items():
+        write_tsv([c for c in changes if c["bucket"] == bucket], output_dir / filename)
+
+    if args.only:
+        changes = [c for c in changes if c["bucket"] == args.only]
+
+    for bucket, filename in DIFF_FILES.items():
+        count = sum(1 for c in changes if c["bucket"] == bucket)
+        pr.summary(bucket, str(count))
+    pr.summary("total changes", str(len(changes)))
+
+    pr.green_title(f"sample (first {SAMPLE_SIZE})")
+    for change in changes[:SAMPLE_SIZE]:
+        pr.white(
+            f"  {change['lemma_1']:<24} {change['grammar_current']:<34}"
+            f" ->  {change['grammar_proposed']}"
+        )
+
+    if args.apply:
+        written = apply_changes(db, changes)
+        pr.summary("rows written", str(written))
+        pr.green("database updated — run `just backup` next")
+    else:
+        pr.amber("dry run — nothing written")
+        for filename in DIFF_FILES.values():
+            pr.white(f"  {output_dir / filename}")
+
+    pr.toc()
+
+
+if __name__ == "__main__":
+    main()

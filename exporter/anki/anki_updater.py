@@ -341,6 +341,14 @@ def update_note_values(col, note, i):
         note["root_in_comps"] = str(i.rt.root_in_comps)
         note["root_has_verb"] = str(i.rt.root_has_verb)
         note["root_group"] = str(i.rt.root_group)
+    else:
+        note["sanskrit_root"] = ""
+        note["sanskrit_root_meaning"] = ""
+        note["sanskrit_root_class"] = ""
+        note["root_meaning"] = ""
+        note["root_in_comps"] = ""
+        note["root_has_verb"] = ""
+        note["root_group"] = ""
     note["family_root"] = str(i.family_root)
     note["family_word"] = str(i.family_word)
     note["family_compound"] = str(i.family_compound)
@@ -431,12 +439,26 @@ def make_new_note(
     col.add_note(note, deck_id)
 
 
+FAMILY_DECK_NOTE_TYPES = {
+    "Root Matrix": "DPD Root Matrix",
+}
+
+
+def family_note_type(deck_name: str) -> str:
+    """Select the note type for a family deck.
+
+    Root Matrix has its own note type carrying the root_matrix table CSS;
+    other family decks share the generic "DPD Family" note type.
+    """
+    return FAMILY_DECK_NOTE_TYPES.get(deck_name, "DPD Family")
+
+
 def make_new_family_note(
     col, deck: list[str], model_dict: dict, deck_dict: dict, i: tuple[str, str]
 ) -> None:
     """Make a new note for family decks."""
     deck_name = deck[0]
-    model_id = model_dict["DPD Family"]
+    model_id = model_dict[family_note_type(deck_name)]
     deck_id = deck_dict[deck_name]
     note = col.new_note(model_id)
     note, is_updated = update_family_note(note, i)

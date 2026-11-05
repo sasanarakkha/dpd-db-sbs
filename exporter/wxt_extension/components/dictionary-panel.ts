@@ -2,6 +2,7 @@ import { Settings } from '../types/extension';
 import { browser } from 'wxt/browser';
 import { getAudioUrl } from '../utils/api';
 import { replaceFeedbackSource } from '../utils/utils';
+import { normalizeHostname, isDefaultOnDomain } from '../utils/domains';
 
 // Define helper functions first
 export function wrapApostrophesInHTML(html: string): string {
@@ -87,6 +88,13 @@ export class DictionaryPanel {
   forwardBtn!: HTMLButtonElement;
   isResizing: boolean = false;
   savedWidth: string = "";
+  // When true, this panel never enters the minimized "sliver" state regardless of
+  // the saved setting. The detached popout window sets this: it is a real OS window
+  // sized by its frame, so minimizing would hide its content and search box.
+  private neverMinimize: boolean;
+  // Aborts the document/window-level resize listeners when the panel is destroyed, so
+  // repeated destroy→init cycles don't accumulate orphaned listeners (memory leak).
+  private resizeAbort: AbortController = new AbortController();
 
   history: { html: string; query: string }[] = [];
   historyIndex: number = -1;
@@ -106,7 +114,9 @@ export class DictionaryPanel {
     panelSide: "right",
   };
 
-  constructor() {
+  constructor(opts: { neverMinimize?: boolean } = {}) {
+    this.neverMinimize = opts.neverMinimize ?? false;
+
     const panelEl = document.createElement("div");
     panelEl.id = "dict-panel-25445";
 
@@ -149,6 +159,7 @@ export class DictionaryPanel {
       "settingsSandhi",
       "settingsOneButton",
       "settingsAudio",
+      "settingsGoldenDict",
       "settingsMinimized",
       "settingsPanelSide",
       "settingsPanelWidth",
@@ -172,6 +183,8 @@ export class DictionaryPanel {
         this.settings.niggahita = false; // Default OFF for VRI (ṃ)
       } else if (domain.includes("open.tipitaka.lk")) {
         this.settings.niggahita = false; // Default OFF for Tipitaka.lk (ṃ)
+      } else if (domain.includes("s.4nt.org")) {
+        this.settings.niggahita = true; // Default ON for s.4nt.org (ṁ), matches theme
       }
     }
 
@@ -193,8 +206,12 @@ export class DictionaryPanel {
       this.settings.minimized = result.settingsMinimized as boolean;
     if (result.settingsPanelSide !== undefined)
       this.settings.panelSide = result.settingsPanelSide as "left" | "right";
-    if (result.settingsPanelWidth !== undefined)
+    if (result.settingsPanelWidth !== undefined) {
       document.documentElement.style.setProperty("--dpd-panel-width", result.settingsPanelWidth as string);
+      // Prime savedWidth so _applySettings re-applies the stored width instead of
+      // removing it (otherwise the width resets to the default on every reload).
+      this.savedWidth = result.settingsPanelWidth as string;
+    }
 
     this._applySettings();
   }
@@ -205,14 +222,17 @@ export class DictionaryPanel {
 
     panelEl.style.fontSize = this.settings.fontSize + "px";
 
+    // The popout is a real OS window, so it never minimizes regardless of the setting.
+    const minimized = this.neverMinimize ? false : this.settings.minimized;
+
     // DETERMINISTIC CSS TOGGLES via Class
     panelEl.classList.toggle("dpd-hide-summary", !this.settings.summary);
     panelEl.classList.toggle("dpd-hide-sandhi", !this.settings.sandhi);
-    panelEl.classList.toggle("dpd-minimized", this.settings.minimized);
+    panelEl.classList.toggle("dpd-minimized", minimized);
 
     // Handle width for minimized state
     const docStyle = document.documentElement.style;
-    if (this.settings.minimized) {
+    if (minimized) {
         const current = docStyle.getPropertyValue("--dpd-panel-width");
         if (current && current !== "30px") this.savedWidth = current;
         docStyle.setProperty("--dpd-panel-width", "30px");
@@ -228,7 +248,7 @@ export class DictionaryPanel {
     panelEl.classList.toggle("dpd-panel-left", isLeft);
     document.body.classList.toggle("dpd-panel-left-active", isLeft);
 
-    if (!this.settings.minimized) {
+    if (!minimized) {
       if (isLeft) {
         panelEl.style.right = "auto";
         panelEl.style.left = "0";
@@ -383,34 +403,64 @@ export class DictionaryPanel {
   }
 
   _setupResize(handle: HTMLDivElement) {
+    const OVERLAY_ID = "dpd-resize-overlay";
+
+    const stopResize = () => {
+      if (!this.isResizing) return;
+      this.isResizing = false;
+      document.body.style.userSelect = "";
+      document.body.style.cursor = "";
+      document.getElementById(OVERLAY_ID)?.remove();
+      const currentWidth = document.documentElement.style.getPropertyValue("--dpd-panel-width");
+      if (currentWidth) {
+        // Keep the in-memory field in sync so a later _applySettings (e.g. minimize
+        // toggle) re-applies this width rather than removing it.
+        this.savedWidth = currentWidth;
+        browser.storage.local.set({ settingsPanelWidth: currentWidth });
+      }
+    };
+
     handle.addEventListener("mousedown", (e) => {
+      e.preventDefault();
       this.isResizing = true;
       document.body.style.userSelect = "none";
       document.body.style.cursor = "col-resize";
+      // A transparent full-viewport overlay keeps mousemove firing even over
+      // iframes, and lets us catch a release that lands outside the document.
+      if (!document.getElementById(OVERLAY_ID)) {
+        const overlay = document.createElement("div");
+        overlay.id = OVERLAY_ID;
+        overlay.style.cssText =
+          "position:fixed;inset:0;z-index:2147483647;cursor:col-resize;";
+        document.body.appendChild(overlay);
+      }
     });
+
+    const signal = this.resizeAbort.signal;
     document.addEventListener("mousemove", (e) => {
       if (!this.isResizing) return;
+      // Self-heal: if the button was released while we weren't looking (over an
+      // iframe, outside the window, during alt-tab), stop instead of resizing forever.
+      if (e.buttons === 0) {
+        stopResize();
+        return;
+      }
       const width = this.settings.panelSide === "left"
         ? e.clientX
         : window.innerWidth - e.clientX;
-      if (width > 200 && width < window.innerWidth * 0.8) {
+      if (width > 340 && width < window.innerWidth * 0.8) {
         document.documentElement.style.setProperty(
           "--dpd-panel-width",
           width + "px",
         );
       }
-    });
-    document.addEventListener("mouseup", () => {
-      if (this.isResizing) {
-        const currentWidth = document.documentElement.style.getPropertyValue("--dpd-panel-width");
-        if (currentWidth) {
-          browser.storage.local.set({ settingsPanelWidth: currentWidth });
-        }
-      }
-      this.isResizing = false;
-      document.body.style.userSelect = "";
-      document.body.style.cursor = "";
-    });
+    }, { signal });
+
+    document.addEventListener("mouseup", stopResize, { signal });
+    window.addEventListener("blur", stopResize, { signal });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") stopResize();
+    }, { signal });
   }
 
   _setupEvents() {
@@ -853,6 +903,13 @@ export class DictionaryPanel {
           • <b>Highlight / Drag</b> any word or phrase on the webpage to search.
         </p>
 
+        <p style="margin-bottom: 12px !important;">
+          <b>Pop-out Window:</b><br>
+          ${isFirefox
+            ? "Detaching the dictionary into its own window is currently available in Chrome / Edge only."
+            : "Click the pop-out icon in the header to detach the dictionary into its own window."}
+        </p>
+
         </div>
     `;
     this.setContent(html);
@@ -888,6 +945,9 @@ export class DictionaryPanel {
       { key: "tbw_dark", name: "The Buddha's Words Dark" },
       { key: "vri", name: "VRI (tipitaka.org)" },
       { key: "tipitakalk", name: "Tipitaka.lk" },
+      { key: "paauksociety", name: "PAUK Society" },
+      { key: "s4nt_light", name: "s.4nt.org" },
+      { key: "s4nt_dark", name: "s.4nt.org Dark" },
     ];
 
     options.forEach((opt) => {
@@ -978,23 +1038,38 @@ export class DictionaryPanel {
             <span style="font-size: 0.8rem;">Audio Male / Female</span>
             <label class="dpd-switch"><input type="checkbox" id="settings-audio-toggle" ${this.settings.audio ? "checked" : ""}><span class="dpd-slider dpd-round"></span></label>
           </div>
+          ${this.neverMinimize ? "" : `
           <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 0;">
             <span style="font-size: 0.8rem;">Use GoldenDict</span>
             <label class="dpd-switch"><input type="checkbox" id="settings-goldendict-toggle" ${this.settings.goldenDict ? "checked" : ""}><span class="dpd-slider dpd-round"></span></label>
-          </div>
+          </div>`}
+          ${this.neverMinimize ? "" : `
           <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 0;">
             <span style="font-size: 0.8rem;">Minimize Panel</span>
             <label class="dpd-switch"><input type="checkbox" id="settings-minimize-toggle" ${this.settings.minimized ? "checked" : ""}><span class="dpd-slider dpd-round"></span></label>
-          </div>
+          </div>`}
+          ${this.neverMinimize ? "" : `
           <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 0;">
             <span style="font-size: 0.8rem;">Panel Left / Right</span>
             <label class="dpd-switch"><input type="checkbox" id="settings-panelside-toggle" ${this.settings.panelSide === "right" ? "checked" : ""}><span class="dpd-slider dpd-round"></span></label>
+          </div>`}
+          <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--dpd-border);">
+            <div style="font-size: 0.8rem; margin-bottom: 6px;">Enabled Sites</div>
+            <div id="settings-sites-list"></div>
+            <div style="display: flex; gap: 4px; margin-top: 6px;">
+              <input type="text" id="settings-sites-input" placeholder="e.g. localhost"
+                style="flex: 1; min-width: 0; font-size: 0.75rem; padding: 3px 5px; background: var(--dpd-bg); color: inherit; border: 1px solid var(--dpd-border); border-radius: 3px;">
+              <button id="settings-sites-add" style="padding: 3px 8px; font-size: 0.75rem; background: var(--dpd-border); border: none; border-radius: 3px; cursor: pointer; color: inherit;">Add</button>
+            </div>
+            <div id="settings-sites-msg" style="font-size: 0.7rem; margin-top: 4px; color: var(--dpd-primary); display: none;"></div>
           </div>
         </div>
+        <div id="settings-scroll-hint" style="position: sticky; bottom: 0; text-align: center; font-size: 0.7rem; line-height: 1; padding: 3px 0 5px; pointer-events: none; opacity: 0.75; background: linear-gradient(to top, var(--dpd-bg) 55%, transparent);">▾</div>
       `;
 
     document.getElementById("dict-panel-25445")?.appendChild(dropdown);
     this._setupSettingsEventListeners();
+    this._setupSettingsScrollHint(dropdown);
     var closeDropdown = (e: MouseEvent) => {
       if (dropdown && !dropdown.contains(e.target as Node)) {
         dropdown.remove();
@@ -1069,6 +1144,130 @@ export class DictionaryPanel {
         this._saveSetting("panelSide" as keyof Settings, side);
       };
     }
+
+    const sitesAdd = document.getElementById("settings-sites-add");
+    if (sitesAdd) sitesAdd.onclick = () => this._addEnabledSite();
+
+    const sitesInput = document.getElementById("settings-sites-input") as HTMLInputElement | null;
+    if (sitesInput) {
+      sitesInput.onkeydown = (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          this._addEnabledSite();
+        }
+      };
+    }
+
+    this._renderEnabledSites();
+  }
+
+  // The settings list is taller than the dropdown's 400px cap, so the lower rows
+  // are reachable only by scrolling inside it — with no visible cue that they
+  // exist. This shows a chevron until the user reaches the bottom.
+  _setupSettingsScrollHint(dropdown: HTMLElement) {
+    const hint = dropdown.querySelector("#settings-scroll-hint") as HTMLElement | null;
+    if (!hint) return;
+
+    const update = () => {
+      const atBottom =
+        dropdown.scrollTop + dropdown.clientHeight >= dropdown.scrollHeight - 2;
+      const scrollable = dropdown.scrollHeight > dropdown.clientHeight + 2;
+      hint.style.display = scrollable && !atBottom ? "block" : "none";
+    };
+
+    dropdown.addEventListener("scroll", update);
+    // The sites list is painted asynchronously, so the scrollable height is not
+    // final on this tick.
+    update();
+    setTimeout(update, 50);
+  }
+
+  // Read from storage on every render rather than caching: the toolbar icon can
+  // flip a site's state from outside the panel, so a cached copy would go stale.
+  async _renderEnabledSites() {
+    const list = document.getElementById("settings-sites-list");
+    if (!list) return;
+
+    const all = await browser.storage.local.get(null) as Record<string, unknown>;
+    // Built-in sites never appear here whatever their stored state — they are the
+    // toolbar icon's business, and an × on one would look like it did something
+    // while leaving the site running on its default.
+    const hosts = Object.keys(all)
+      .filter((k) => k.startsWith("state_") && all[k] === "ON")
+      .map((k) => k.slice("state_".length))
+      .filter((host) => !isDefaultOnDomain(host))
+      .sort();
+
+    list.textContent = "";
+
+    if (!hosts.length) {
+      const empty = document.createElement("div");
+      empty.textContent = "No sites added yet.";
+      empty.style.fontSize = "0.75rem";
+      empty.style.opacity = "0.7";
+      list.appendChild(empty);
+      return;
+    }
+
+    hosts.forEach((host) => {
+      const row = document.createElement("div");
+      row.style.cssText =
+        "display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 2px 0;";
+
+      const name = document.createElement("span");
+      name.textContent = host;
+      name.title = host;
+      name.style.cssText =
+        "font-size: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;";
+
+      const remove = document.createElement("button");
+      remove.textContent = "×";
+      remove.title = `Remove ${host}`;
+      remove.style.cssText =
+        "flex: none; padding: 0 5px; font-size: 0.9rem; line-height: 1.2; background: none; border: none; cursor: pointer; color: inherit; opacity: 0.7;";
+      remove.onmouseover = () => (remove.style.opacity = "1");
+      remove.onmouseout = () => (remove.style.opacity = "0.7");
+      // Removing the current site tears the panel down via the storage.onChanged
+      // listener in the content script — deliberately not duplicated here.
+      remove.onclick = async () => {
+        await browser.storage.local.remove(`state_${host}`);
+        this._renderEnabledSites();
+      };
+
+      row.append(name, remove);
+      list.appendChild(row);
+    });
+  }
+
+  async _addEnabledSite() {
+    const input = document.getElementById("settings-sites-input") as HTMLInputElement | null;
+    const msg = document.getElementById("settings-sites-msg");
+    if (!input) return;
+
+    const showMsg = (text: string) => {
+      if (!msg) return;
+      msg.textContent = text;
+      msg.style.display = text ? "block" : "none";
+    };
+
+    const host = normalizeHostname(input.value);
+    if (!host) {
+      showMsg("Enter a valid site name.");
+      return;
+    }
+
+    const key = `state_${host}`;
+    const existing = await browser.storage.local.get(key);
+    if (existing[key] === "ON") {
+      showMsg(`${host} is already enabled.`);
+      input.value = "";
+      return;
+    }
+
+    await browser.storage.local.set({ [key]: "ON" });
+    input.value = "";
+    showMsg("");
+    this._renderEnabledSites();
   }
 
   async _setTheme(themeKey: string) {
@@ -1080,6 +1279,7 @@ export class DictionaryPanel {
   }
 
   destroy() {
+    this.resizeAbort.abort();
     document.getElementById("dict-panel-25445")?.remove();
   }
 };

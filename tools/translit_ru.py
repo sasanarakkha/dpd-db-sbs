@@ -30,6 +30,8 @@ def auto_translit_to_roman(text: str) -> str:
         or text[0].lower() in pali_alphabet  # if pure Pāḷi, even UpperCase
         or text[0].lower() in english_alphabet  # if English, even UpperCase
         or is_cyrillic(text)  # if Cyrillic
+        # numbers and punctuation have no script, aksharamukha only warns
+        or not any(char.isalpha() for char in text)
     ):
         return text
 
@@ -103,6 +105,7 @@ def main() -> None:  # Added return type hint
                 counter, total_words, f"Original: '{word}', Transliterated: '{roman}'"
             )
             counter += 1
+
 
 if __name__ == "__main__":
     main()

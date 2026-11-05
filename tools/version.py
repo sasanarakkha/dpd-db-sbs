@@ -1,16 +1,69 @@
 #!/usr/bin/env python3
 
+"""Generate the DPD release version string (v{major}.{minor}.{yymmdd}) and
+write it to config.ini and the db_info table. Run directly by the justfile
+and the GitHub release workflows."""
+
+from pathlib import Path
+
 from db.db_helpers import get_db_session
 from db.models import DbInfo
 from tools.configger import config_update
 from tools.date_and_time import year_month_day
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
+from tools.uposatha_day import UposathaManger
 
 major = 0
 minor = 4
 
 # 0.3 > 0.4 added abbreviations_other to lookup table
+
+AUTHOR = "Bodhirasa Bhikkhu"
+EMAIL = "digitalpalidictionary@gmail.com"
+WEBSITE = "https://www.dpdict.net/"
+DOCS = "https://digitalpalidictionary.github.io/"
+GITHUB = "https://github.com/digitalpalidictionary/dpd-db"
+LATEST_RELEASE = "https://github.com/digitalpalidictionary/dpd-db/releases"
+LICENSE = "CC BY-NC-SA 4.0"
+# Short form of the website, used for permalinks so that a cited link stays
+# short enough to print in a footnote.
+SHORT_WEBSITE = "https://dpdict.net"
+# Zenodo's concept DOI always resolves to the newest archived release, so it
+# never changes month to month. A new one is minted only if the repo is
+# disconnected and reconnected on Zenodo.
+DOI = "10.5281/zenodo.22979413"
+
+# The worked example used in every citation surface. gacchati 1 is a stable,
+# common entry; ids are never reused, so this link cannot rot onto another word.
+EXAMPLE_LEMMA = "gacchati 1"
+EXAMPLE_ID = 24043
+KEYWORDS = ["Pāḷi", "Pali", "dictionary", "lexicography", "Buddhism", "Theravāda"]
+ABSTRACT = (
+    "A feature-rich Pāḷi-English dictionary with full declension and conjugation "
+    "tables, compound deconstruction, examples from the Pāḷi canon, word frequency, "
+    "root families and grammatical analysis. Runs on the web, in GoldenDict, MDict, "
+    "DictTango and on Kindle."
+)
+
+
+def make_permalink(headword_id: int) -> str:
+    """The permanent link to one dictionary entry.
+
+    Ids are never reused, so the link can never rot onto another word."""
+
+    return f"{SHORT_WEBSITE}/{headword_id}"
+
+
+def make_citation(version: str, doi: str | None = None) -> str:
+    """The recommended citation for this release.
+
+    DPD is revised continuously, so the version is the part that makes a quoted
+    reading findable again. Built here because this is where the version is
+    generated — anywhere else would be a second copy that goes stale."""
+
+    location = f"https://doi.org/{doi}" if doi else WEBSITE
+    return f"{AUTHOR}. Digital Pāḷi Dictionary. Version {version}. {location}"
 
 
 def make_version() -> tuple[str, str]:
@@ -25,50 +78,104 @@ def make_version() -> tuple[str, str]:
     return version, version_light
 
 
-def update_db_version(pth: ProjectPaths, version: str) -> None:
-    db_session = get_db_session(pth.dpd_db_path)
-    db_info = db_session.query(DbInfo).filter_by(key="dpd_release_version").first()
+def make_db_metadata(version: str, doi: str | None = None) -> dict[str, str]:
+    """The project metadata block carried inside dpd.db, for downstream apps."""
 
-    # update the dpd_release_version if it exists
-    if db_info:
-        db_info.value = version
+    metadata = {
+        "dpd_release_version": version,
+        "author": AUTHOR,
+        "email": EMAIL,
+        "website": WEBSITE,
+        "docs": DOCS,
+        "github": GITHUB,
+        "latest_release": LATEST_RELEASE,
+        "license": LICENSE,
+        "citation": make_citation(version, doi),
+        "___": "___",
+    }
+    if doi:
+        metadata["doi"] = doi
+    return metadata
 
-    # add the dpd_release_version and author info if it doesn't exist
-    else:
-        dpd_release_version = DbInfo(key="dpd_release_version", value=version)
-        db_session.add(dpd_release_version)
 
-        author = DbInfo(key="author", value="Bodhirasa")
-        db_session.add(author)
+def update_db_version(db_path: Path, version: str, doi: str | None = None) -> None:
+    db_session = get_db_session(db_path)
 
-        email_address = DbInfo(key="email", value="digitalpalidictionary@gmail.com")
-        db_session.add(email_address)
+    metadata = make_db_metadata(version, doi)
 
-        website = DbInfo(key="website", value="https://www.dpdict.net/")
-        db_session.add(website)
+    # Upserted rather than written once at creation, so that a key added later
+    # (or a corrected value) also reaches databases that already exist.
+    existing: dict[str, DbInfo] = {
+        row.key: row
+        for row in db_session.query(DbInfo).filter(DbInfo.key.in_(metadata)).all()
+    }
 
-        docs = DbInfo(key="docs", value="https://digitalpalidictionary.github.io/")
-        db_session.add(docs)
-
-        github = DbInfo(
-            key="github", value="https://github.com/digitalpalidictionary/dpd-db"
-        )
-        db_session.add(github)
-
-        latest_release = DbInfo(
-            key="latest_release",
-            value="https://github.com/digitalpalidictionary/dpd-db/releases",
-        )
-        db_session.add(latest_release)
-
-        license = DbInfo(key="license", value="CC BY-NC-SA 4.0")
-        db_session.add(license)
-
-        ___ = DbInfo(key="___", value="___")
-        db_session.add(___)
+    for key, value in metadata.items():
+        if key in existing:
+            existing[key].value = value
+        else:
+            db_session.add(DbInfo(key=key, value=value))
 
     db_session.commit()
     pr.summary("dpd.db", "ok")
+
+
+def release_date(version: str) -> str:
+    """ISO date from the version's yyyymmdd patch, for CITATION.cff."""
+
+    patch = version.rsplit(".", 1)[-1]
+    return f"{patch[:4]}-{patch[4:6]}-{patch[6:]}"
+
+
+def make_citation_cff(version: str, doi: str | None = None) -> str:
+    """The repo's CITATION.cff, which GitHub and Zenodo both read.
+
+    Generated rather than hand-kept so that the version it advertises is always
+    the version that was actually released."""
+
+    lines = [
+        "# Generated by tools/version.py — do not edit by hand.",
+        "cff-version: 1.2.0",
+        "title: Digital Pāḷi Dictionary",
+        "message: >-",
+        "  Digital Pāḷi Dictionary is a work in progress and is revised",
+        "  continuously. Please cite the version you consulted, so that the",
+        "  reading you quote can be found again. When citing a single entry,",
+        "  give its headword and permalink as well as the version.",
+        "type: dataset",
+        "authors:",
+        "  - family-names: Bodhirasa",
+        "    name-suffix: Bhikkhu",
+        f"    email: {EMAIL}",
+        f"version: {version}",
+        f"date-released: '{release_date(version)}'",
+        f"url: {WEBSITE}",
+        f"repository-code: {GITHUB}",
+        f"repository-artifact: {LATEST_RELEASE}/tag/{version}",
+        "license: CC-BY-NC-SA-4.0",
+    ]
+    if doi:
+        lines.append(f"doi: {doi}")
+    lines.append("abstract: >-")
+    lines.append(f"  {ABSTRACT}")
+    lines.append("keywords:")
+    lines.extend(f"  - {keyword}" for keyword in KEYWORDS)
+    return "\n".join(lines) + "\n"
+
+
+def update_citation_cff(cff_path: Path, version: str, doi: str | None = None) -> None:
+    """Rewritten on uposatha days only.
+
+    It is a tracked file that advertises the released version, so regenerating
+    it on an ordinary dev build would churn the diff with a version that was
+    never released."""
+
+    if not UposathaManger.uposatha_today():
+        pr.summary("CITATION.cff", "not uposatha")
+        return
+
+    cff_path.write_text(make_citation_cff(version, doi), encoding="utf-8")
+    pr.summary("CITATION.cff", "ok")
 
 
 def main() -> None:
@@ -80,7 +187,8 @@ def main() -> None:
     config_update("version", "version", version, silent=True)
     pr.summary("config.ini", "ok")
 
-    update_db_version(pth, version)
+    update_db_version(pth.dpd_db_path, version, DOI)
+    update_citation_cff(pth.citation_cff_path, version, DOI)
 
     pr.toc()
 

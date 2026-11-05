@@ -10,6 +10,7 @@ import re
 from sqlalchemy.orm.session import Session
 
 from db.db_helpers import get_db_session
+from db.inflections.create_inflection_templates import clear_db_pending_templates
 from db.models import DbInfo, DpdHeadword, InflectionTemplates
 from tools.all_tipitaka_words import make_all_tipitaka_word_set
 from tools.configger import config_test, config_update
@@ -267,6 +268,9 @@ class InflectionsManager:
         self.process_all_inflections()
 
         pr.green_tmr("committing to db")
+        # clear the pending list in the same commit as the regenerated
+        # words — a rollback keeps it
+        clear_db_pending_templates(self.db_session, self.changed_templates)
         try:
             self.db_session.commit()
             pr.yes(self.updated_counter)
@@ -287,8 +291,6 @@ class InflectionsManager:
         if config_test("regenerate", "inflections", "yes"):
             config_update("regenerate", "inflections", "no")
 
-        pr.toc()
-
 
 def main() -> None:
     """Initialize and run the inflection generation process."""
@@ -298,6 +300,10 @@ def main() -> None:
     manager = InflectionsManager()
     pr.yes(len(manager.dpd_db))
     manager.run()
+    # The clock belongs to whoever starts it. `run()` used to stop it, so the
+    # GUI's Update Inflections button — which calls `run()` directly — always
+    # ended with "Error: tic() not called before toc()".
+    pr.toc()
 
 
 if __name__ == "__main__":

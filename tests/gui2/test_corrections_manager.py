@@ -1,0 +1,309 @@
+import copy
+import json
+import uuid
+from pathlib import Path
+from types import SimpleNamespace
+from typing import TYPE_CHECKING, cast
+
+import pytest
+
+from gui2.corrections_manager import (
+    CorrectionsManager,
+    _contributor_from_origin,
+    _remove_key_from_file,
+)
+from gui2.paths import Gui2Paths
+from tools.contrib_entry import entry_hash
+
+if TYPE_CHECKING:
+    from db.models import DpdHeadword
+    from gui2.toolkit import ToolKit
+
+
+class _FakeWord:
+    def __init__(self, id: int, lemma_1: str) -> None:
+        self.id = id
+        self.lemma_1 = lemma_1
+
+
+def _fake_toolkit(paths: Gui2Paths) -> "ToolKit":
+    return cast("ToolKit", SimpleNamespace(paths=paths))
+
+
+def _fake_word(id: int, lemma_1: str) -> "DpdHeadword":
+    return cast("DpdHeadword", _FakeWord(id, lemma_1))
+
+
+def _manager(tmp_path: Path, username: str) -> CorrectionsManager:
+    paths = Gui2Paths.for_user(username, base_dir=tmp_path)
+    paths.gui2_data_path.mkdir(parents=True, exist_ok=True)
+    return CorrectionsManager(_fake_toolkit(paths))
+
+
+class TestContributorFromOrigin:
+    def test_none_origin_is_primary(self):
+        assert _contributor_from_origin(None, prefix="corrections_") == "primary"
+
+    def test_prefixed_stem_strips_prefix(self):
+        origin = Path("corrections_bob.json")
+        assert _contributor_from_origin(origin, prefix="corrections_") == "bob"
+
+    def test_non_prefixed_stem_returned_as_is(self):
+        origin = Path("weird_name.json")
+        assert _contributor_from_origin(origin, prefix="corrections_") == "weird_name"
+
+
+class TestRemoveKeyFromFile:
+    def test_removes_key_and_keeps_remaining_data(self, tmp_path: Path):
+        path = tmp_path / "f.json"
+        path.write_text(json.dumps({"1": {"a": 1}, "2": {"b": 2}}), encoding="utf-8")
+        _remove_key_from_file(path, "1")
+        assert json.loads(path.read_text(encoding="utf-8")) == {"2": {"b": 2}}
+
+    def test_removing_last_key_writes_empty_object(self, tmp_path: Path):
+        path = tmp_path / "f.json"
+        path.write_text(json.dumps({"1": {"a": 1}}), encoding="utf-8")
+        _remove_key_from_file(path, "1")
+        assert path.read_text(encoding="utf-8") == "{}"
+
+    def test_missing_key_leaves_file_unchanged(self, tmp_path: Path):
+        path = tmp_path / "f.json"
+        path.write_text(json.dumps({"1": {"a": 1}}), encoding="utf-8")
+        _remove_key_from_file(path, "not_present")
+        assert json.loads(path.read_text(encoding="utf-8")) == {"1": {"a": 1}}
+
+    def test_missing_file_does_not_raise(self, tmp_path: Path):
+        path = tmp_path / "missing.json"
+        _remove_key_from_file(path, "1")
+        assert not path.exists()
+
+
+class TestUpdateCorrectionsKey:
+    def test_update_uses_username_id_key_with_id_inside_entry(self, tmp_path: Path):
+        mgr = _manager(tmp_path, "bob")
+        mgr.update_corrections(_fake_word(42, "gacchati"), "a note")
+        (key,) = mgr.corrections_dict.keys()
+        assert key == "bob_42"
+        entry = mgr.corrections_dict[key]
+        assert entry["id"] == 42
+        assert entry["comment"] == "a note"
+
+    def test_changed_columns_are_stored_in_the_entry(self, tmp_path: Path):
+        mgr = _manager(tmp_path, "bob")
+        mgr.update_corrections(_fake_word(42, "gacchati"), "n", ["meaning_1"])
+        assert mgr.corrections_dict["bob_42"]["_changed"] == ["meaning_1"]
+        saved = json.loads(mgr.corrections_path.read_text(encoding="utf-8"))
+        assert saved["bob_42"]["_changed"] == ["meaning_1"]
+
+    def test_no_changed_argument_stores_no_changed_key(self, tmp_path: Path):
+        mgr = _manager(tmp_path, "bob")
+        mgr.update_corrections(_fake_word(42, "gacchati"), "n")
+        assert "_changed" not in mgr.corrections_dict["bob_42"]
+
+    def test_recorrecting_same_id_updates_in_place_latest_wins(self, tmp_path: Path):
+        mgr = _manager(tmp_path, "bob")
+        mgr.update_corrections(_fake_word(42, "testa"), "first")
+        (key_after_first,) = mgr.corrections_dict.keys()
+        mgr.update_corrections(_fake_word(42, "testa"), "second")
+        assert list(mgr.corrections_dict.keys()) == [key_after_first]
+        assert mgr.corrections_dict[key_after_first]["comment"] == "second"
+
+    def test_different_ids_get_separate_entries(self, tmp_path: Path):
+        mgr = _manager(tmp_path, "bob")
+        mgr.update_corrections(_fake_word(42, "testa"), "a")
+        mgr.update_corrections(_fake_word(43, "testa 2"), "b")
+        assert len(mgr.corrections_dict) == 2
+
+
+class TestPrimaryQueueMixedKeys:
+    def test_mixed_old_and_new_key_file_processes_and_removes_both(
+        self, tmp_path: Path
+    ):
+        data_dir = tmp_path / "gui2" / "data"
+        data_dir.mkdir(parents=True)
+        contrib = data_dir / "corrections_bob.json"
+        new_key = str(uuid.uuid4())
+        contrib.write_text(
+            json.dumps(
+                {
+                    "123": {"id": 123, "lemma_1": "legacy"},
+                    new_key: {"id": 456, "lemma_1": "modern"},
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        paths = Gui2Paths(base_dir=tmp_path)  # primary user (corrections.json)
+        mgr = CorrectionsManager(_fake_toolkit(paths))
+        assert len(mgr.corrections_dict) == 2
+
+        seen_keys: list[str] = []
+        for _ in range(2):
+            correction, origin, source_key, _ = mgr.get_next_correction()
+            assert correction is not None and source_key is not None
+            seen_keys.append(source_key)
+            # NOTE: word_data["id"] deliberately differs from the uuid source_key
+            # to prove removal keys off source_key, not the entry id.
+            mgr.save_processed_correction(
+                {"id": str(correction["id"])}, origin, source_key
+            )
+
+        assert set(seen_keys) == {"123", new_key}
+        assert json.loads(contrib.read_text(encoding="utf-8")) == {}
+
+
+class TestDiscard:
+    def test_discard_removes_only_that_entry_and_rewrites_file(self, tmp_path: Path):
+        manager = _manager(tmp_path, "alice")
+        manager.update_corrections(_fake_word(1, "one"), "c")
+        manager.update_corrections(_fake_word(2, "two"), "c")
+
+        assert manager.discard(1) is True
+
+        on_disk = json.loads(manager.corrections_path.read_text(encoding="utf-8"))
+        assert [e["id"] for e in on_disk.values()] == [2]
+        assert [e["id"] for e in manager.corrections_dict.values()] == [2]
+
+    def test_discard_unknown_id_changes_nothing(self, tmp_path: Path):
+        manager = _manager(tmp_path, "alice")
+        manager.update_corrections(_fake_word(1, "one"), "c")
+
+        assert manager.discard(7) is False
+        assert len(manager.corrections_dict) == 1
+
+    def test_discard_matches_id_saved_as_text(self, tmp_path: Path):
+        manager = _manager(tmp_path, "alice")
+        text_id_word = cast("DpdHeadword", SimpleNamespace(id="5", lemma_1="five"))
+        manager.update_corrections(text_id_word, "c")
+
+        assert manager.discard(5) is True
+        assert manager.corrections_dict == {}
+
+
+class TestSafeWrites:
+    def test_save_leaves_no_temp_file(self, tmp_path: Path):
+        manager = _manager(tmp_path, "alice")
+        manager.update_corrections(_fake_word(1, "one"), "c")
+        assert not list(tmp_path.rglob("*.tmp"))
+
+    def test_failed_write_does_not_leave_the_edit_in_memory(
+        self, tmp_path: Path, monkeypatch
+    ):
+        manager = _manager(tmp_path, "alice")
+
+        def fail(data: dict) -> None:
+            raise OSError("disk full")
+
+        monkeypatch.setattr(manager, "_save_dict", fail)
+        with pytest.raises(OSError):
+            manager.update_corrections(_fake_word(1, "one"), "c")
+        assert manager.corrections_dict == {}
+
+    def test_failed_rewrite_restores_the_earlier_entry(
+        self, tmp_path: Path, monkeypatch
+    ):
+        manager = _manager(tmp_path, "alice")
+        manager.update_corrections(_fake_word(1, "one"), "first")
+
+        def fail(data: dict) -> None:
+            raise OSError("disk full")
+
+        monkeypatch.setattr(manager, "_save_dict", fail)
+        with pytest.raises(OSError):
+            manager.update_corrections(_fake_word(1, "one"), "second")
+        assert [e["comment"] for e in manager.corrections_dict.values()] == ["first"]
+
+    def test_failed_discard_keeps_the_entry(self, tmp_path: Path, monkeypatch):
+        manager = _manager(tmp_path, "alice")
+        manager.update_corrections(_fake_word(1, "one"), "c")
+
+        def fail(data: dict) -> None:
+            raise OSError("disk full")
+
+        monkeypatch.setattr(manager, "_save_dict", fail)
+        with pytest.raises(OSError):
+            manager.discard(1)
+        assert len(manager.corrections_dict) == 1
+
+    def test_damaged_contributor_file_is_kept_aside_not_overwritten(
+        self, tmp_path: Path
+    ):
+        manager = _manager(tmp_path, "alice")
+        path = manager.corrections_path
+        path.write_text("{broken", encoding="utf-8")
+
+        reloaded = _manager(tmp_path, "alice")
+
+        assert reloaded.corrections_dict == {}
+        assert (
+            path.with_name(path.name + ".corrupt").read_text(encoding="utf-8")
+            == "{broken"
+        )
+
+
+class TestSourceLogAndReject:
+    def _primary_with_two_entries(
+        self, tmp_path: Path
+    ) -> tuple[CorrectionsManager, Path]:
+        data_dir = tmp_path / "gui2" / "data"
+        data_dir.mkdir(parents=True)
+        contrib = data_dir / "corrections_alice.json"
+        contrib.write_text(
+            json.dumps(
+                {
+                    "alice_1": {"id": 1, "lemma_1": "one", "meaning_1": "proposal"},
+                    "alice_2": {"id": 2, "lemma_1": "two"},
+                }
+            ),
+            encoding="utf-8",
+        )
+        mgr = CorrectionsManager(_fake_toolkit(Gui2Paths(base_dir=tmp_path)))
+        return mgr, contrib
+
+    def _log(self, mgr: CorrectionsManager) -> list[dict]:
+        return json.loads(mgr.paths.corrections_added_path.read_text(encoding="utf-8"))
+
+    def test_processed_entry_logs_source_key_and_hash_of_the_original(
+        self, tmp_path: Path
+    ):
+        mgr, _ = self._primary_with_two_entries(tmp_path)
+        entry, origin, key, _ = mgr.get_next_correction()
+        assert entry is not None and key is not None
+        edited = {"id": "77", "lemma_1": "one", "meaning_1": "edited by maintainer"}
+
+        mgr.save_processed_correction(edited, origin, key, copy.deepcopy(entry))
+
+        (logged,) = self._log(mgr)
+        assert logged["_source_key"] == key
+        assert logged["_source_hash"] == entry_hash(entry)
+        assert logged["_source_hash"] != entry_hash(edited)
+        assert logged["meaning_1"] == "edited by maintainer"
+
+    def test_without_the_original_entry_no_source_fields_are_logged(
+        self, tmp_path: Path
+    ):
+        mgr, _ = self._primary_with_two_entries(tmp_path)
+        entry, origin, key, _ = mgr.get_next_correction()
+        assert entry is not None
+
+        mgr.save_processed_correction({"id": "77"}, origin, key)
+
+        (logged,) = self._log(mgr)
+        assert "_source_key" not in logged and "_source_hash" not in logged
+
+    def test_reject_logs_and_removes_only_that_key(self, tmp_path: Path):
+        mgr, contrib = self._primary_with_two_entries(tmp_path)
+        entry, origin, key, _ = mgr.get_next_correction()
+        assert entry is not None and origin is not None and key is not None
+
+        mgr.reject(origin, key, entry)
+
+        (logged,) = self._log(mgr)
+        assert logged == {
+            "_source_key": "alice_1",
+            "_source_hash": entry_hash(entry),
+            "_contributor": "alice",
+            "lemma_1": "one",
+            "_rejected": True,
+        }
+        assert list(json.loads(contrib.read_text(encoding="utf-8"))) == ["alice_2"]
