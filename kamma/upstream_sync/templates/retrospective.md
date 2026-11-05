@@ -14,7 +14,7 @@ running `finalize_accepted_sync.py`. A missing `retrospective.md` is a hard gate
 
 
 ## Promote
-*Patterns worth turning into guide rules, validators, or archive entries. Do it NOW.*
+*Patterns worth turning into guide rules, validators, or archive entries. Do it NOW: an item is done only when its change is applied, or it is in `archive_improvements.md` AND a follow-up thread exists in `kamma/drafts/` named under "Open after finalize".*
 
 <!-- Example:
 - Add a Stage 3 gotcha: SBS files may need explicit `from tools.utils import …`.

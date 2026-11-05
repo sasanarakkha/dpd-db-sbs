@@ -14,6 +14,7 @@ from kamma.upstream_sync.scripts.sync_triage import is_localized_noop
 from tools.printer import printer as pr
 
 GUIDE_PATH = Path(__file__).resolve().parent.parent / "guide.md"
+ACCEPTED_SYNC_PATH = Path(__file__).resolve().parent.parent / "accepted_sync.json"
 
 HEADING_PATTERN = re.compile(r"^(#{1,6})\s")
 
@@ -36,8 +37,25 @@ class StageDescriptor:
     guide_anchor: str
 
 
-def derive_stage(thread_dir: Path) -> StageDescriptor:
+def _sync_is_accepted(manifest_path: Path, accepted_sync_path: Path) -> bool:
+    """Return True when accepted_sync.json already points at the manifest's target SHA."""
+    if not manifest_path.exists() or not accepted_sync_path.exists():
+        return False
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    accepted = json.loads(accepted_sync_path.read_text(encoding="utf-8"))
+    to_sha = manifest.get("to_upstream_sha")
+    return bool(to_sha) and accepted.get("last_accepted_upstream_sha") == to_sha
+
+
+def derive_stage(
+    thread_dir: Path, accepted_sync_path: Path = ACCEPTED_SYNC_PATH
+) -> StageDescriptor:
     """Derive the current stage descriptor for a sync thread.
+
+    `dynamic_plan.md` without `execute_sync_done.json` is still Stage 2 (2a-2d);
+    `execute_sync.py` runs in Stage 3 on the non-fast path. With
+    `retrospective.md` present, the thread is "Closed" once `accepted_sync_path`
+    already records the manifest's `to_upstream_sha`; otherwise it awaits finalize.
 
     Known limitation: on the non-fast-path, the Stage 3 -> Stage 4 verification
     gate (all `dynamic_plan.md` items marked `[x]`) is not distinguished from
@@ -50,6 +68,19 @@ def derive_stage(thread_dir: Path) -> StageDescriptor:
     dynamic_plan_path = thread_dir / "dynamic_plan.md"
 
     if retrospective_path.exists():
+        if _sync_is_accepted(manifest_path, accepted_sync_path):
+            return StageDescriptor(
+                stage="Stage 4: Closed (sync accepted)",
+                next_command="none — sync closed; start a new sync thread with /update-upstream",
+                owner="ADVANCED",
+                dispatch="self",
+                gate_before=None,
+                gate_after=None,
+                reads=["accepted_sync.json"],
+                produces=[],
+                stop_condition="n/a",
+                guide_anchor="### Stage 4: Verification & After-sync (ADVANCED Acceptance)",
+            )
         return StageDescriptor(
             stage="Stage 4: Verification & After-sync (finalize)",
             next_command=f"uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py {thread_dir}",
@@ -78,6 +109,23 @@ def derive_stage(thread_dir: Path) -> StageDescriptor:
         )
 
     manifest: dict[str, object] = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+    if (
+        dynamic_plan_path.exists()
+        and not (thread_dir / "execute_sync_done.json").exists()
+    ):
+        return StageDescriptor(
+            stage="Stage 2: Analysis (2a-2d; execute_sync.py runs in Stage 3)",
+            next_command="Continue Stage 2 sub-stages 2a-2d, then run execute_sync.py (Stage 3 A3).",
+            owner="ADVANCED",
+            dispatch="self",
+            gate_before=None,
+            gate_after="Stage 2 approval (dynamic_plan.md presented to user)",
+            reads=["prep_manifest.json", "prep_report.md", "dynamic_plan.md"],
+            produces=["dynamic_plan.md"],
+            stop_condition="dynamic_plan.md written and approved by user",
+            guide_anchor="### Stage 2: Analysis (ADVANCED Strategic Planning)",
+        )
 
     if dynamic_plan_path.exists():
         return StageDescriptor(

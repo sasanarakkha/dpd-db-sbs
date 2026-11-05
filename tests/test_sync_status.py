@@ -144,9 +144,33 @@ def test_shadow_touching_manifest_with_acknowledged_blockers_is_automated_pull(
     assert "execute_sync.py" in descriptor.next_command
 
 
+def _write_done_marker(thread_dir: Path) -> None:
+    (thread_dir / "execute_sync_done.json").write_text(
+        json.dumps(
+            {"to_upstream_sha": "1" * 40, "executed_at": "2026-07-02T00:00:00+00:00"}
+        ),
+        encoding="utf-8",
+    )
+
+
+def _write_accepted_sync(path: Path, sha: str) -> None:
+    path.write_text(
+        json.dumps(
+            {
+                "last_accepted_upstream_sha": sha,
+                "last_accepted_upstream_date": "2026-11-04T19:34:13+05:30",
+                "last_accepted_upstream_ref": "upstream/main",
+                "notes": "test",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
 def test_dynamic_plan_present_is_stage_3(tmp_path: Path) -> None:
     _write_manifest(tmp_path, localized=False)
     (tmp_path / "dynamic_plan.md").write_text("plan", encoding="utf-8")
+    _write_done_marker(tmp_path)
     descriptor = derive_stage(tmp_path)
     assert descriptor.stage == "Stage 3: Execution & Verification"
 
@@ -156,6 +180,7 @@ def test_docs_paths_with_dynamic_plan_is_stage_3_not_docs_analysis(
 ) -> None:
     _write_manifest(tmp_path, localized=False, docs=True)
     (tmp_path / "dynamic_plan.md").write_text("plan", encoding="utf-8")
+    _write_done_marker(tmp_path)
     descriptor = derive_stage(tmp_path)
     assert descriptor.stage == "Stage 3: Execution & Verification"
 
@@ -166,17 +191,50 @@ def test_docs_translation_plan_presence_has_no_effect_on_routing(
     _write_manifest(tmp_path, localized=False, docs=True)
     (tmp_path / "dynamic_plan.md").write_text("plan", encoding="utf-8")
     (tmp_path / "docs_translation_plan.md").write_text("plan", encoding="utf-8")
+    _write_done_marker(tmp_path)
     descriptor = derive_stage(tmp_path)
     assert descriptor.stage == "Stage 3: Execution & Verification"
+
+
+def test_dynamic_plan_without_done_marker_is_stage_2(tmp_path: Path) -> None:
+    _write_manifest(tmp_path, localized=False)
+    (tmp_path / "dynamic_plan.md").write_text("plan", encoding="utf-8")
+    descriptor = derive_stage(tmp_path)
+    assert descriptor.stage.startswith("Stage 2")
 
 
 def test_retrospective_present_is_stage_4_finalize(tmp_path: Path) -> None:
     _write_manifest(tmp_path, localized=False)
     (tmp_path / "dynamic_plan.md").write_text("plan", encoding="utf-8")
     (tmp_path / "retrospective.md").write_text("retro", encoding="utf-8")
-    descriptor = derive_stage(tmp_path)
+    descriptor = derive_stage(
+        tmp_path, accepted_sync_path=tmp_path / "missing_accepted_sync.json"
+    )
     assert descriptor.stage.startswith("Stage 4")
     assert "finalize_accepted_sync.py" in descriptor.next_command
+
+
+def test_retrospective_with_non_matching_accepted_sync_is_stage_4_finalize(
+    tmp_path: Path,
+) -> None:
+    _write_manifest(tmp_path, localized=False)
+    (tmp_path / "retrospective.md").write_text("retro", encoding="utf-8")
+    accepted = tmp_path / "accepted_sync.json"
+    _write_accepted_sync(accepted, "2" * 40)
+    descriptor = derive_stage(tmp_path, accepted_sync_path=accepted)
+    assert "Closed" not in descriptor.stage
+    assert "finalize_accepted_sync.py" in descriptor.next_command
+
+
+def test_retrospective_with_matching_accepted_sync_is_closed(tmp_path: Path) -> None:
+    _write_manifest(tmp_path, localized=False)
+    (tmp_path / "retrospective.md").write_text("retro", encoding="utf-8")
+    accepted = tmp_path / "accepted_sync.json"
+    _write_accepted_sync(accepted, "1" * 40)
+    descriptor = derive_stage(tmp_path, accepted_sync_path=accepted)
+    assert descriptor.stage.startswith("Stage 4")
+    assert "Closed" in descriptor.stage
+    assert descriptor.next_command.startswith("none")
 
 
 def _all_descriptors(tmp_path: Path) -> list[StageDescriptor]:
@@ -209,8 +267,21 @@ def _all_descriptors(tmp_path: Path) -> list[StageDescriptor]:
     (tmp_path / "dynamic_plan.md").write_text("plan", encoding="utf-8")
     descriptors.append(derive_stage(tmp_path))  # Stage 3
 
+    (tmp_path / "execute_sync_done.json").unlink()
+    descriptors.append(derive_stage(tmp_path))  # Stage 2 (dynamic plan, no done marker)
+    _write_done_marker(tmp_path)
+
     (tmp_path / "retrospective.md").write_text("retro", encoding="utf-8")
-    descriptors.append(derive_stage(tmp_path))  # Stage 4 (finalize)
+    missing = tmp_path / "missing_accepted_sync.json"
+    descriptors.append(
+        derive_stage(tmp_path, accepted_sync_path=missing)
+    )  # Stage 4 (finalize)
+
+    accepted = tmp_path / "accepted_sync.json"
+    _write_accepted_sync(accepted, "1" * 40)
+    descriptors.append(
+        derive_stage(tmp_path, accepted_sync_path=accepted)
+    )  # Stage 4 (closed)
 
     return descriptors
 

@@ -202,6 +202,42 @@ class TestExecuteSync(unittest.TestCase):
         self.assertEqual(result, 1)
         context.restore_original_state.assert_not_called()
 
+    @patch(
+        "kamma.upstream_sync.scripts.execute_sync.get_run_specific_exclusions",
+        return_value=[],
+    )
+    @patch(
+        "kamma.upstream_sync.scripts.execute_sync.get_permanent_exclusions",
+        return_value=[],
+    )
+    @patch("kamma.upstream_sync.scripts.execute_sync.verify_manifest", return_value=0)
+    @patch("kamma.upstream_sync.scripts.execute_sync.load_accepted_sync_state")
+    @patch("kamma.upstream_sync.scripts.execute_sync.run_git")
+    @patch("kamma.upstream_sync.scripts.execute_sync.GitContext")
+    def test_dry_run_allowed_on_dirty_working_tree(
+        self,
+        mock_context_class,
+        mock_run_git,
+        mock_load_state,
+        mock_verify_manifest,
+        mock_permanent,
+        mock_run_specific,
+    ):
+        context = MagicMock()
+        context.is_dirty = True
+        context.original_branch = "sbs-ru"
+        mock_context_class.return_value = context
+        mock_load_state.return_value = _ACCEPTED_STATE
+        mock_run_git.side_effect = [
+            MagicMock(stdout=""),  # git fetch upstream
+            MagicMock(stdout="newsha456\n"),  # rev-parse upstream/main
+        ]
+
+        result = execute_sync(str(self.thread_dir), dry_run=True)
+
+        self.assertEqual(result, 0)
+        mock_verify_manifest.assert_called_once()
+
     @patch("kamma.upstream_sync.scripts.execute_sync.verify_manifest", return_value=1)
     @patch("kamma.upstream_sync.scripts.execute_sync.load_accepted_sync_state")
     @patch("kamma.upstream_sync.scripts.execute_sync.run_git")

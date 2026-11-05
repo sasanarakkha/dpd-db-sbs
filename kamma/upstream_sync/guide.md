@@ -105,6 +105,8 @@ Hard stop procedure: save artifacts -> append this session's friction/improvemen
 **Pre-Authorized Commands:**
 All commands listed in this guide (`uv run`, `rg`, `git diff`, `git log`, `ruff`, `pytest`, `python temp/`) are pre-authorized for the entire sync session. Use `rg` for repo searches. Write all ad-hoc logic to `temp/<name>.py` and run via `uv run python temp/<name>.py`. Never use inline `python -c "..."`. Delete temp files when done.
 
+**Shell and thread hygiene:** in zsh write `${SHA}:path`, never `$SHA:path` (modifier expansion). Park draft threads in `kamma/drafts/`, never `kamma/threads/` (the spec-gate hook blocks all edits otherwise).
+
 **Pre-commit hooks are inviolable.** Never use `--no-verify`; never suggest skipping,
 whitelisting, or ignoring a pre-commit hook error. Every reported error gets a real,
 behaviour-preserving fix (see CLAUDE.md "Pre-commit gate"). If the fix requires
@@ -241,7 +243,7 @@ reference when a step fails or when running a step by hand outside the chain.
    - Generate `prep_report.md` and `prep_manifest.json` from the explicit upstream range in `accepted_sync.json`.
    - Identify all modified, added, and deleted upstream files relative to the registry.
    - If `prep_manifest.json.discuss_paths` is non-empty, STOP before `execute_sync.py`.
-   - If `prep_manifest.json.needs_classification_paths` is non-empty, those upstream additions have no local collision; register them in `registry.json` during Stage 2. They do NOT block `execute_sync.py`.
+   - If `prep_manifest.json.needs_classification_paths` is non-empty, those upstream additions have no local collision and are mirrored verbatim. Register one in `registry.json` only if Stage 2 decides it needs a local divergence. They do NOT block `execute_sync.py`.
    - `prep_analyzer.py` also performs a full local-tree audit (independent of the commit-range diff) by comparing every git-tracked local file against the upstream tree and full upstream history at the target SHA:
      - If `prep_manifest.json.unregistered_local_paths` is non-empty, those local files have no upstream counterpart (current or historical) and are not covered by any registry category; register them in `registry.json` during Stage 2 (typically `unique_paths`, or a shadow/inspired category). They do NOT block `execute_sync.py`.
      - If `prep_manifest.json.upstream_deleted_orphans` is non-empty, those local files match a path upstream once had but has since deleted; decide during Stage 2 whether to keep them as an intentional fork divergence (register the decision) or delete them locally to match upstream. They do NOT block `execute_sync.py`.
@@ -265,9 +267,9 @@ reference when a step fails or when running a step by hand outside the chain.
 **ADVANCED must stop and request FAST if** files need to be copied, generated, formatted, tested, translated in bulk, or mechanically edited.
 
 **Stage 2 sub-stage splitting (context safety):** Stage 2 routinely exceeds one session's context. Split it into restartable sub-stages, updating `handoff.md` at each boundary so a fresh session can resume from files alone:
-- **2a — Impact assessment:** read `prep_report.md` + `prep_manifest.json`; classify every changed path (port / mirror / preserve / discuss / inspired / skip / docs) in `dynamic_plan.md`, then hard stop (🔄 SESSION BOUNDARY). For every changed path with a registered shadow/`inspired_by_upstream` mapping, read the actual upstream diff at this stage (not later) and note whether it contains structural refactoring — see the "Structural refactor check" field required in 2c. Also classify every path in `unregistered_local_paths` (register in the appropriate registry category) and `upstream_deleted_orphans` (keep-as-divergence or delete-to-match-upstream).
+- **2a — Impact assessment:** read `prep_report.md` + `prep_manifest.json`; classify every changed path (port / mirror / preserve / discuss / inspired / skip / docs) in `dynamic_plan.md`, then hard stop (🔄 SESSION BOUNDARY). For every changed path with a registered shadow/`inspired_by_upstream` mapping, read the actual upstream diff at this stage (not later) and note whether it contains structural refactoring — see the "Structural refactor check" field required in 2c. Also classify every path in `unregistered_local_paths` (register in the appropriate registry category) and `upstream_deleted_orphans` (keep-as-divergence or delete-to-match-upstream). Run `git diff --name-status <from>..<to> -- tests/` and check local `tests/` for imports of upstream symbols changed in range; record upstream-test watch items in the owning source file's registry `watch_for` (`tests/` is skip_sync and cannot hold registry entries). For framework major-version migrations, AST-scan the framework's attribute/call usage in local files and probe doubtful APIs with `uv run --no-project --with <pkg>==<ver> python -c ...`.
 - **2b — Discuss resolution:** resolve each `discuss: true` item with the user one at a time; record each as RESOLVED in `dynamic_plan.md`, then hard stop (⛔ USER GATE per item, then 🔄 SESSION BOUNDARY).
-- **2c — Literal plan authoring:** write self-contained per-file instructions (anchors, literal edits, verify commands); split again after each major domain if context grows, then hard stop (🔄 SESSION BOUNDARY).
+- **2c — Literal plan authoring:** write self-contained per-file instructions (anchors, literal edits, verify commands); split again after each major domain if context grows, then hard stop (🔄 SESSION BOUNDARY). Re-verify every 2a/2b factual claim against the files before writing a recipe on it; run every recipe `Verify` command once when writing it.
 - **2d — Approval gate:** present `dynamic_plan.md` for approval (⛔ USER GATE — released by the user approving dynamic_plan.md).
 A session must be restartable at any sub-stage boundary from files alone — never rely on chat history.
 
@@ -389,7 +391,7 @@ candidate — never open a discuss item for an unregistered path.
    - Copy `kamma/upstream_sync/templates/retrospective.md` to `<thread_dir>/retrospective.md`.
    - Fill the three buckets: **landed** (fixed in code this sync), **promote** (becomes a guide rule / validator / archive entry — do it now), **drop** (genuine one-off, with reason).
    - Harvest `## Friction notes` from `handoff.md` first — every note lands in one of the three buckets. This section exists so improvements are captured per-session, not reconstructed from memory at the end.
-   - Promote any `promote` items to `archive_improvements.md` before running finalize.
+   - A `promote` item is done only when its rule/code change is applied now, or when it is recorded in `archive_improvements.md` AND a follow-up thread exists in `kamma/drafts/`, named under the retrospective's "Open after finalize". Archive entries alone are not done.
    - `finalize_accepted_sync.py` will refuse to run if `retrospective.md` is absent (hard code gate).
 3. **After sync**
    - If accepted, write exact FAST handoff instructions to run `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>`.

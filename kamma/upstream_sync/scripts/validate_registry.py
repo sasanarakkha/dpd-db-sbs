@@ -3,6 +3,7 @@
 """Validate registry.json schema integrity and data quality."""
 
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -125,6 +126,46 @@ def validate_no_duplicates_in_list(label: str, items: list[str]) -> list[str]:
     return errors
 
 
+DEFAULT_UPSTREAM_REF = "upstream/main"
+
+
+def _upstream_ref(repo_root: Path) -> str:
+    """Return `last_accepted_upstream_ref` from accepted_sync.json, or the default ref."""
+    accepted_path = repo_root / "kamma" / "upstream_sync" / "accepted_sync.json"
+    try:
+        data = json.loads(accepted_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return DEFAULT_UPSTREAM_REF
+    ref = data.get("last_accepted_upstream_ref") if isinstance(data, dict) else None
+    return ref if isinstance(ref, str) and ref.strip() else DEFAULT_UPSTREAM_REF
+
+
+def _exists_in_upstream_ref(repo_root: Path, path: str, ref: str | None = None) -> bool:
+    """Return True if `path` exists in the already-fetched upstream ref (no network).
+
+    `ref` defaults to `last_accepted_upstream_ref` from accepted_sync.json (else
+    `upstream/main`). Before the pull, an upstream path repointed this sync exists only
+    in that ref, not in the working tree. Returns False if git or the ref is unavailable.
+    """
+    ref = ref or _upstream_ref(repo_root)
+    try:
+        result = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(repo_root),
+                "cat-file",
+                "-e",
+                f"{ref}:{path.rstrip('/')}",
+            ],
+            capture_output=True,
+            check=False,
+        )
+    except OSError:
+        return False
+    return result.returncode == 0
+
+
 def validate_shadow_mapping(
     label: str, data: dict[str, object], repo_root: Path | None = None
 ) -> list[str]:
@@ -168,11 +209,15 @@ def validate_shadow_mapping(
                     )
             if "*" not in upstream:
                 if upstream.endswith("/"):
-                    if not upstream_path.is_dir():
+                    if not upstream_path.is_dir() and not _exists_in_upstream_ref(
+                        repo_root, upstream
+                    ):
                         errors.append(
                             f"{label}: upstream source '{upstream}' does not exist"
                         )
-                elif not upstream_path.exists():
+                elif not upstream_path.exists() and not _exists_in_upstream_ref(
+                    repo_root, upstream
+                ):
                     errors.append(
                         f"{label}: upstream source '{upstream}' does not exist"
                     )
@@ -263,7 +308,11 @@ def validate_inspired_by_upstream(
         upstream = entry.get("upstream")
         if not upstream or not isinstance(upstream, str):
             errors.append(f"{label}: missing or invalid 'upstream' path")
-        elif repo_root and not (repo_root / upstream).exists():
+        elif (
+            repo_root
+            and not (repo_root / upstream).exists()
+            and not _exists_in_upstream_ref(repo_root, upstream)
+        ):
             errors.append(f"{label}: upstream path '{upstream}' does not exist")
 
         reason = entry.get("divergence_reason")

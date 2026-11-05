@@ -565,7 +565,7 @@ class PrepAnalyzer:
         lines.append("## Needs Classification (Stage 2)")
         if needs_classification:
             lines.append(
-                "These upstream additions have no local collision. Register them in `registry.json` during Stage 2."
+                "These upstream additions have no local collision and are mirrored verbatim. Register one in `registry.json` only if Stage 2 decides it needs a local divergence."
             )
             for path in needs_classification:
                 lines.append(f"- {path}")

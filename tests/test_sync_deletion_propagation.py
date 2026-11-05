@@ -243,3 +243,69 @@ def test_missing_base_sha_aborts(sync_repo: tuple[Path, str, str]) -> None:
     # Nothing should have been removed
     assert (repo / "tools" / "foo.py").exists(), "no files removed when base SHA is bad"
     assert (repo / "tools" / "bar.py").exists(), "no files removed when base SHA is bad"
+
+
+def _make_repo_non_ascii_and_gitlink(tmp_path: Path) -> tuple[Path, str, str]:
+    """Two upstream commits: A adds a non-ASCII file and a gitlink; B removes both."""
+    repo = tmp_path / "repo2"
+    repo.mkdir()
+    _git(["git", "init"], cwd=repo)
+    _git(["git", "config", "user.email", "test@test.com"], cwd=repo)
+    _git(["git", "config", "user.name", "Test"], cwd=repo)
+
+    (repo / "base.txt").write_text("base\n")
+    _git(["git", "add", "base.txt"], cwd=repo)
+    _git(["git", "commit", "-m", "base"], cwd=repo)
+    base_sha = _git(["git", "rev-parse", "HEAD"], cwd=repo).stdout.strip()
+
+    (repo / "kathāsallāpasikkhā.txt").write_text("pali\n")
+    _git(["git", "add", "kathāsallāpasikkhā.txt"], cwd=repo)
+    _git(
+        ["git", "update-index", "--add", "--cacheinfo", f"160000,{base_sha},sub"],
+        cwd=repo,
+    )
+    _git(["git", "commit", "-m", "commit A"], cwd=repo)
+    sha_a = _git(["git", "rev-parse", "HEAD"], cwd=repo).stdout.strip()
+
+    _git(["git", "rm", "--cached", "kathāsallāpasikkhā.txt"], cwd=repo)
+    _git(["git", "update-index", "--force-remove", "sub"], cwd=repo)
+    _git(["git", "commit", "-m", "commit B"], cwd=repo)
+    sha_b = _git(["git", "rev-parse", "HEAD"], cwd=repo).stdout.strip()
+
+    (repo / "kathāsallāpasikkhā.txt").write_text("pali\n")
+    (repo / "sub").mkdir()
+    (repo / "sub" / "keep.txt").write_text("uncommitted user work\n")
+    return repo, sha_a, sha_b
+
+
+def test_non_ascii_deletion_removed(tmp_path: Path) -> None:
+    """A deleted non-ASCII path (C-quoted without -z) is removed from the worktree."""
+    repo, sha_a, sha_b = _make_repo_non_ascii_and_gitlink(tmp_path)
+
+    propagate_upstream_deletions(
+        last_accepted_sha=sha_a,
+        target_sha=sha_b,
+        protected=set(),
+        repo_root=repo,
+    )
+
+    assert not (repo / "kathāsallāpasikkhā.txt").exists()
+
+
+def test_gitlink_deletion_skipped_with_warning(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """A deleted submodule (gitlink) is skipped: no crash, contents survive, warning printed."""
+    repo, sha_a, sha_b = _make_repo_non_ascii_and_gitlink(tmp_path)
+
+    propagate_upstream_deletions(
+        last_accepted_sha=sha_a,
+        target_sha=sha_b,
+        protected=set(),
+        repo_root=repo,
+    )
+
+    assert (repo / "sub" / "keep.txt").exists()
+    out = " ".join(capsys.readouterr().out.split())  # printer wraps long lines
+    assert "skipped submodule: sub" in out
+    assert "1 submodule(s) skipped" in out

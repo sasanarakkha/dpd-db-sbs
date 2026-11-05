@@ -13,7 +13,9 @@ REGISTRY_PATH = Path("kamma/upstream_sync/registry.json")
 
 
 def run_git(args: list[str]) -> list[str]:
-    result = subprocess.run(["git"] + args, capture_output=True, text=True)
+    result = subprocess.run(
+        ["git", "-c", "core.quotepath=false"] + args, capture_output=True, text=True
+    )
     if result.returncode != 0:
         return []
     return result.stdout.splitlines()
@@ -69,6 +71,51 @@ def load_codebase_contents(skip_paths: set[str]) -> dict[str, str]:
     return contents
 
 
+def find_orphans(
+    current_files: list[str],
+    upstream_files: set[str],
+    registry: dict[str, object],
+) -> list[str]:
+    """Return current files that are unregistered originals missing from upstream.
+
+    A file is skipped when it matches no_sync_files, unique_paths or skip_sync_patterns
+    (exact, `/` prefix or glob), is a registered shadow or inspired_by_upstream key
+    (exact, or a key ending in `/` as a prefix), or carries a localized name marker.
+    """
+    exclusions: list[str] = []
+    for section in ("no_sync_files", "unique_paths", "skip_sync_patterns"):
+        value = registry.get(section, [])
+        if isinstance(value, list):
+            exclusions.extend(str(item) for item in value)
+
+    shadow_keys: set[str] = set()
+    for section in (
+        "russian_copies",
+        "sbs_copies",
+        "dps_copies",
+        "tamil_copies",
+        "inspired_by_upstream",
+    ):
+        value = registry.get(section, {})
+        if isinstance(value, dict):
+            shadow_keys.update(str(key) for key in value)
+    shadow_dirs = [k for k in shadow_keys if k.endswith("/")]
+
+    orphans: list[str] = []
+    for f in current_files:
+        if is_excluded(f, exclusions):
+            continue
+        if f in shadow_keys:
+            continue
+        if any(f.startswith(d) for d in shadow_dirs):
+            continue
+        if is_localized(f):
+            continue
+        if f not in upstream_files:
+            orphans.append(f)
+    return orphans
+
+
 def main() -> None:
     pr.tic()
     pr.green_title("test_shadow_cleanup.py")
@@ -102,14 +149,16 @@ def main() -> None:
 
     registry: dict[str, object] = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
 
-    no_sync: list[str] = registry.get("no_sync_files", []) + registry.get(
-        "unique_paths", []
-    )  # type: ignore[operator]
     russian_copies: dict[str, str] = registry.get("russian_copies", {})  # type: ignore[assignment]
     sbs_copies: dict[str, str] = registry.get("sbs_copies", {})  # type: ignore[assignment]
     dps_copies: dict[str, str] = registry.get("dps_copies", {})  # type: ignore[assignment]
     tamil_copies: dict[str, str] = registry.get("tamil_copies", {})  # type: ignore[assignment]
-    all_shadows_map: dict[str, str] = {**russian_copies, **sbs_copies, **dps_copies, **tamil_copies}
+    all_shadows_map: dict[str, str] = {
+        **russian_copies,
+        **sbs_copies,
+        **dps_copies,
+        **tamil_copies,
+    }
 
     scan_folder = args.folder
     if not scan_folder:
@@ -122,24 +171,9 @@ def main() -> None:
     upstream_files: set[str] = set(
         run_git(["ls-tree", "-r", "as_upstream", "--name-only"])
     )
-    current_files: list[str] = run_git(
-        ["ls-tree", "-r", "HEAD", "--name-only", scan_folder]
-    )
+    current_files: list[str] = run_git(["ls-files", "--", scan_folder])
 
-    shadow_dirs: list[str] = [k for k in all_shadows_map if k.endswith("/")]
-
-    orphans: list[str] = []
-    for f in current_files:
-        if is_excluded(f, no_sync):
-            continue
-        if f in all_shadows_map:
-            continue
-        if any(f.startswith(d) for d in shadow_dirs):
-            continue
-        if is_localized(f):
-            continue
-        if f not in upstream_files:
-            orphans.append(f)
+    orphans = find_orphans(current_files, upstream_files, registry)
 
     pr.green("orphaned original files")
     pr.yes(str(len(orphans))) if not orphans else pr.no(str(len(orphans)))

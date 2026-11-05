@@ -1,5 +1,9 @@
 """Verify upstream sync registry schema and cross-section integrity."""
 
+import shutil
+import subprocess
+from pathlib import Path
+
 import pytest
 
 from kamma.upstream_sync.scripts.validate_registry import (
@@ -306,3 +310,129 @@ def test_rubric_allows_single_local_change(base_data, capsys):
     validate_registry_core(base_data)
 
     assert "local-change(s)" not in capsys.readouterr().out
+
+
+def _git_repo_with_upstream_only_paths(repo: Path) -> None:
+    """Commit a.py and d/b.py, point refs/remotes/upstream/main at it, then delete them."""
+    env_args = ["-c", "user.email=t@t.com", "-c", "user.name=T"]
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    (repo / "a.py").write_text("# a\n")
+    (repo / "d").mkdir()
+    (repo / "d" / "b.py").write_text("# b\n")
+    subprocess.run(["git", "add", "."], cwd=repo, check=True)
+    subprocess.run(["git", *env_args, "commit", "-qm", "c"], cwd=repo, check=True)
+    subprocess.run(
+        ["git", "update-ref", "refs/remotes/upstream/main", "HEAD"],
+        cwd=repo,
+        check=True,
+    )
+    (repo / "a.py").unlink()
+    shutil.rmtree(repo / "d")
+
+
+def test_upstream_path_found_in_upstream_ref_only(base_data, tmp_path):
+    _git_repo_with_upstream_only_paths(tmp_path)
+    (tmp_path / "x_ru.py").touch()
+    base_data["russian_copies"] = {
+        "x_ru.py": {
+            "upstream": "a.py",
+            "sync_rule": "MIRROR_EXACTLY",
+            "local_changes": [],
+            "watch_for": [],
+        }
+    }
+    errors = validate_registry_core(base_data, tmp_path)
+    assert not [e for e in errors if "does not exist" in e], errors
+
+
+def test_upstream_dir_found_in_upstream_ref_only(base_data, tmp_path):
+    _git_repo_with_upstream_only_paths(tmp_path)
+    (tmp_path / "x_ru").mkdir()
+    base_data["russian_copies"] = {
+        "x_ru/": {
+            "upstream": "d/",
+            "sync_rule": "MIRROR_EXACTLY",
+            "local_changes": [],
+            "watch_for": [],
+        }
+    }
+    errors = validate_registry_core(base_data, tmp_path)
+    assert not [e for e in errors if "does not exist" in e], errors
+
+
+def test_inspired_upstream_path_found_in_upstream_ref_only(base_data, tmp_path):
+    _git_repo_with_upstream_only_paths(tmp_path)
+    (tmp_path / "local.py").touch()
+    base_data["inspired_by_upstream"] = {
+        "local.py": {
+            "upstream": "a.py",
+            "divergence_reason": "Reason",
+            "sync_rule": "MIRROR_EXACTLY",
+        }
+    }
+    errors = validate_inspired_by_upstream(base_data, tmp_path)
+    assert not errors, errors
+
+
+def test_upstream_path_absent_everywhere_still_errors(base_data, tmp_path):
+    _git_repo_with_upstream_only_paths(tmp_path)
+    (tmp_path / "x_ru.py").touch()
+    base_data["russian_copies"] = {
+        "x_ru.py": {
+            "upstream": "nope.py",
+            "sync_rule": "MIRROR_EXACTLY",
+            "local_changes": [],
+            "watch_for": [],
+        }
+    }
+    errors = validate_registry_core(base_data, tmp_path)
+    assert any("upstream source 'nope.py' does not exist" in e for e in errors)
+
+
+def test_upstream_ref_read_from_accepted_sync_json(base_data, tmp_path):
+    """The fallback ref comes from accepted_sync.json, not a hardcoded upstream/main."""
+    _git_repo_with_upstream_only_paths(tmp_path)
+    subprocess.run(
+        ["git", "update-ref", "refs/remotes/other/trunk", "refs/remotes/upstream/main"],
+        cwd=tmp_path,
+        check=True,
+    )
+    subprocess.run(
+        ["git", "update-ref", "-d", "refs/remotes/upstream/main"],
+        cwd=tmp_path,
+        check=True,
+    )
+    sync_dir = tmp_path / "kamma" / "upstream_sync"
+    sync_dir.mkdir(parents=True)
+    (sync_dir / "accepted_sync.json").write_text(
+        '{"last_accepted_upstream_ref": "other/trunk"}', encoding="utf-8"
+    )
+    (tmp_path / "x_ru.py").touch()
+    base_data["russian_copies"] = {
+        "x_ru.py": {
+            "upstream": "a.py",
+            "sync_rule": "MIRROR_EXACTLY",
+            "local_changes": [],
+            "watch_for": [],
+        }
+    }
+    errors = validate_registry_core(base_data, tmp_path)
+    assert not [e for e in errors if "does not exist" in e], errors
+
+
+def test_malformed_accepted_sync_json_falls_back_to_default_ref(base_data, tmp_path):
+    _git_repo_with_upstream_only_paths(tmp_path)
+    sync_dir = tmp_path / "kamma" / "upstream_sync"
+    sync_dir.mkdir(parents=True)
+    (sync_dir / "accepted_sync.json").write_text("{not json", encoding="utf-8")
+    (tmp_path / "x_ru.py").touch()
+    base_data["russian_copies"] = {
+        "x_ru.py": {
+            "upstream": "a.py",
+            "sync_rule": "MIRROR_EXACTLY",
+            "local_changes": [],
+            "watch_for": [],
+        }
+    }
+    errors = validate_registry_core(base_data, tmp_path)
+    assert not [e for e in errors if "does not exist" in e], errors

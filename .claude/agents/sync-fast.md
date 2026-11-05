@@ -22,6 +22,7 @@ Follow the Iron Rule as defined in `kamma/upstream_sync/guide.md`. When a shadow
 - Generate factual reports from script output.
 - Apply literal edits from an approved plan — exact anchors, exact replacements.
 - Run formatting and tests; record exact output.
+- Lint/format commands use literal file paths only — no shell variables, no `&&`-chained assignments; never run `ruff check --fix` or `ruff format` without an explicit path.
 - Update `handoff.md` at the end of each dispatch with: stage completed, commands run, files changed, exact failures, next action.
 
 ## Stop Conditions (hand off to ADVANCED immediately)

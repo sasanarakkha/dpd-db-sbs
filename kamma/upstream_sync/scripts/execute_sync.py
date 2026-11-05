@@ -115,8 +115,11 @@ def propagate_upstream_deletions(
 ) -> None:
     """Remove worktree files that upstream deleted or renamed away since last_accepted_sha.
 
-    Candidates come from git diff --no-renames --diff-filter=D, which decomposes renames into
-    add+delete so renamed-away paths appear as deleted. Protected files are never removed.
+    Candidates come from git diff -z --raw --no-renames --diff-filter=D, which decomposes
+    renames into add+delete so renamed-away paths appear as deleted. The -z output keeps
+    non-ASCII paths unquoted and reports the old mode. Protected files are never removed.
+    Deleted submodules (gitlinks, old mode 160000) are never removed: a warning is printed
+    so the user can `git rm` them after reviewing any uncommitted work inside.
     Removals are worktree-only (Path.unlink); the index is never touched.
 
     Raises SystemExit(1) if last_accepted_sha does not resolve in the object store.
@@ -141,8 +144,9 @@ def propagate_upstream_deletions(
         [
             "git",
             "diff",
+            "-z",
+            "--raw",
             "--no-renames",
-            "--name-only",
             "--diff-filter=D",
             f"{last_accepted_sha}..{target_sha}",
         ],
@@ -155,10 +159,24 @@ def propagate_upstream_deletions(
         pr.red(f"P0 deletion diff failed: {result.stderr.strip()}")
         raise SystemExit(1)
 
-    candidates = [p for p in result.stdout.splitlines() if p.strip()]
+    # -z --raw records: ":<oldmode> <newmode> <oldsha> <newsha> D" NUL path NUL
+    fields = [f for f in result.stdout.split("\0") if f]
+    candidates: list[tuple[str, str]] = []
+    for meta, path in zip(fields[0::2], fields[1::2]):
+        old_mode = meta.lstrip(":").split(" ", 1)[0]
+        candidates.append((old_mode, path))
+
     removed = 0
-    for candidate in candidates:
+    skipped_submodules = 0
+    for old_mode, candidate in candidates:
         if _is_protected(candidate, protected):
+            continue
+        if old_mode == "160000":
+            pr.amber(
+                f"  P0 skipped submodule: {candidate} — upstream removed it; "
+                "remove manually (git rm) after reviewing its uncommitted work"
+            )
+            skipped_submodules += 1
             continue
         target = (repo_root / candidate) if repo_root else Path(candidate)
         if target.exists():
@@ -167,7 +185,8 @@ def propagate_upstream_deletions(
             removed += 1
 
     pr.yes(
-        f"P0 deletion pass: {removed} upstream-deleted file(s) removed from worktree"
+        f"P0 deletion pass: {removed} upstream-deleted file(s) removed from worktree, "
+        f"{skipped_submodules} submodule(s) skipped"
     )
 
 
@@ -246,7 +265,7 @@ def execute_sync(
         return 1
 
     context = GitContext()
-    if context.is_dirty:
+    if context.is_dirty and not dry_run:
         pr.red("Working tree is dirty. Commit or stash changes before sync.")
         return 1
 
