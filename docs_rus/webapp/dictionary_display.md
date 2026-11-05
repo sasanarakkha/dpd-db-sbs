@@ -34,4 +34,4 @@
 
 ![epd](../pics/dpdict.net/dpdict_rpd.png)
 
-ДАЛЕЕ: [Настройки](dpdict_settings.md)
+ДАЛЕЕ: [Настройки](settings.md)

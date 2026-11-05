@@ -4,7 +4,7 @@
 
 ## Управление проектом
 
-Вот [управление проектом DPD Codebase](https://GitHub.com/orgs/digitalpalidictionary/projects/1/views/2){target="_blank"} и [управление проектом DPD - SBS / Russian](https://github.com/orgs/sasanarakkha/projects/1/views/1){target="_blank"} на GitHub со всеми открытыми и текущими задачами. Просто прокомментируйте любую задачу, чтобы узнать больше, или [свяжитесь с нами по электронной почте](mailto:devamitta@sasanarakkha.org).
+Вот [управление проектом DPD Codebase](https://GitHub.com/orgs/digitalpalidictionary/projects/1/views/2){target="_blank"} и [управление проектом DPD - SBS / Russian](https://github.com/orgs/sasanarakkha/projects/1/views/1){target="_blank"} на GitHub со всеми открытыми и текущими задачами. Просто прокомментируйте любую задачу, чтобы узнать больше, или предложите свою помощь через [форму для участия](index.md#offer-your-help).
 
 ## Репозиторий проекта DPD
 

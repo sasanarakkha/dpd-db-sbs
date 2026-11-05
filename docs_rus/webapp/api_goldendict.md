@@ -36,4 +36,4 @@ Address: https://ru.dpdict.net/gd?search=%GDWORD%
 
 Вот и всё, настройка завершена!
 
-ДАЛЕЕ: [Настройка API в DictTango](dpdict_api_dt.md)
+ДАЛЕЕ: [Настройка API в DictTango](api_dicttango.md)

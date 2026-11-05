@@ -10,4 +10,4 @@
 
 ![hide summary](../pics/dpdict.net/dpdict_settings_summary_hide.png)
 
-ДАЛЕЕ: [Настройки](dpdict_settings.md)
+ДАЛЕЕ: [Настройки](settings.md)

@@ -1,17 +1,18 @@
-# Digital Source Files for Pāḷi Tipiṭaka
+# Цифровые источники Pāḷi Tipiṭaka
 
-These are the digital sources DPD uses for Pāḷi texts.
+Это цифровые источники, которые DPD использует для текстов на пали.
 
-### CST: Chaṭṭha Saṅgāyana Tipiṭaka (Myanmar)
+### CST: Chaṭṭha Saṅgāyana Tipiṭaka (Мьянма)
 [https://github.com/vipassanatech/tipitaka-xml](https://github.com/vipassanatech/tipitaka-xml){target="_blank"}
 
-### BJT: Buddha Jayanti Tipiṭaka (Sri Lanka)
+### BJT: Buddha Jayanti Tipiṭaka (Шри-Ланка)
 [https://github.com/pathnirvana/tipitaka.lk](https://github.com/pathnirvana/tipitaka.lk){target="_blank"}
 
-### SYA: Syāmaraṭṭha_1927 Royal Thai Edition (Thailand)
+### SYA: Syāmaraṭṭha Royal Thai Edition (Таиланд)
 
-Do you know of a better source? These text files are in bad shape.
-[https://github.com/sasanarakkha/dpd-db-sbs/tree/main/resources/sy%C4%81mara%E1%B9%AD%E1%B9%ADha_1927](https://github.com/sasanarakkha/dpd-db-sbs/tree/main/resources/sy%C4%81mara%E1%B9%AD%E1%B9%ADha_1927){target="_blank"}
+Издание Syāmaraṭṭha (Королевское сиамское), оцифрованное BUDSIR и исправленное
+воспроизводимым конвейером с доказанной гарантией сохранности текста на пали.
+[https://github.com/jorgecaa/tipitaka.rte](https://github.com/jorgecaa/tipitaka.rte){target="_blank"}
 
 
 ### MST: Mahāsaṅgīti Tipiṭaka (Sutta Central)

@@ -67,5 +67,5 @@
 СКРЫТО: akaṅkhī vatamhi avicikicchī niṭṭhaṅgato saddhammeti.\
 ПОКАЗАНО: akaṅkhī vat'amhi avicikicchī niṭṭhaṅ'gato saddhamme'ti.
 
-ДАЛЕЕ: [Настройка API в GoldenDict](dpdict_api_gd.md)
+ДАЛЕЕ: [Настройка API в GoldenDict](api_goldendict.md)
 

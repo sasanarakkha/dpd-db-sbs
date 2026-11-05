@@ -1,80 +1,121 @@
-# API Endpoints
+# Эндпоинты API
 
-Here are the API endpoints available in the DPD Web App (`exporter/webapp`). The application is built using FastAPI.
+Здесь перечислены эндпоинты API, доступные в веб-приложении DPD (`exporter/webapp`). Приложение построено на FastAPI.
 
-The website is online here [https://www.dpdict.net/](https://www.dpdict.net/)
+Сайт доступен по адресу [https://www.dpdict.net/](https://www.dpdict.net/)
 
-All API endpoints can be tested here [https://www.dpdict.net/docs](https://www.dpdict.net/docs)
+Все эндпоинты API можно протестировать здесь [https://www.dpdict.net/docs](https://www.dpdict.net/docs)
 
-## Web Pages
+## Лицензирование
 
-### Home Page
+Данные словаря DPD распространяются по лицензии [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) — требуется указание авторства, только некоммерческое использование, производные работы распространяются на тех же условиях.
+
+Каждый эндпоинт, возвращающий данные словаря (`/search_json`, `/search_html`, `/gd`), отправляет лицензию в заголовке `Link` по RFC 8288:
+
+```
+Link: <https://creativecommons.org/licenses/by-nc-sa/4.0/>; rel="license"; title="CC BY-NC-SA 4.0"
+```
+
+Ответ `/search_json` дополнительно завершается объектом `license`.
+
+Сами словарные статьи завершаются небольшим видимым уведомлением — четыре знака Creative Commons (встроенный SVG, поэтому они сохраняются офлайн в GoldenDict), а затем `Digital Pāḷi Dictionary CC BY-NC-SA 4.0` со ссылкой на текст лицензии. Оно добавляется к HTML результатов, а не к нижнему колонтитулу страницы, поэтому передаётся вместе с данными в GoldenDict, в поле `dpd_html` ответа JSON и в любые сторонние встраивания фрагмента. Страница «ничего не найдено» уведомления не содержит.
+
+### Занятый сервер
+
+`/search_json`, `/search_html` и `/gd` обслуживаются по очереди: одновременно выполняются два запроса, ещё до 20 ожидают своей очереди до 20 секунд. Все остальные, а также ждавшие дольше 20 секунд, получают HTTP `503` с заголовком `Retry-After: 10`, теми же межсайтовыми заголовками и заголовком лицензии `Link`, что и обычный ответ, и текстом «The server is busy. Try again in a moment.» `/search_json` сохраняет обычную структуру (`summary_html` пуст, текст находится в `dpd_html`, плюс `license`), поэтому веб-страница показывает это сообщение. У `/bd_search` и `/tt_search` своя очередность, она описана в их разделах. В очередь встают только запросы `GET`: предварительный межсайтовый запрос браузера (`OPTIONS`) обрабатывается сразу. Другие маршруты, такие как `/status` и `/audio/{headword}`, никогда не задерживаются.
+
+Переводы Типитаки (`/tt_search`), выделенные определения (`/bd_search`) и аудио (`/audio/{headword}`) лицензируются отдельно и ничего из вышеперечисленного не содержат.
+
+## Веб-страницы
+
+### Главная страница
 - **URL:** `/`
-- **Method:** `GET`
-- **Description:** Renders the main home page of the dictionary.
-- **Parameters:** None
-- **Response:** HTML (`home.html`)
+- **Метод:** `GET`
+- **Описание:** Отображает главную страницу словаря.
+- **Параметры:** нет
+- **Ответ:** HTML (`home.html`)
 
-### Bold Definitions Page
+### Страница выделенных определений
 - **URL:** `/bd`
-- **Method:** `GET`
-- **Description:** Renders the landing page for Bold Definitions search.
-- **Parameters:** None
-- **Response:** HTML (`home.html`)
+- **Метод:** `GET`
+- **Описание:** Отображает стартовую страницу поиска по выделенным определениям.
+- **Параметры:** нет
+- **Ответ:** HTML (`home.html`)
 
-## Search Endpoints
+### Постоянная ссылка для цитирования
+- **URL:** `/{headword_id}`
+- **Метод:** `GET`
+- **Описание:** Постоянная ссылка на одну словарную статью, например `/24043`, используется в цитатах. Перенаправляет на страницу поиска этой статьи. Путь соответствует только цифрам, поэтому ни один именованный маршрут не может в него попасть.
+- **Параметры:**
+    - `headword_id` (параметр пути): Идентификатор заглавного слова. Идентификаторы никогда не используются повторно.
+- **Ответ:** `308 Permanent Redirect` на `/?q={headword_id}`
 
-### HTML Search
+## Эндпоинты поиска
+
+### HTML-поиск
 - **URL:** `/search_html`
-- **Method:** `GET`
-- **Description:** Performs a dictionary search and returns the results rendered within the home page template. Used for direct page loads with search results.
-- **Parameters:**
-    - `q` (str): The search query (Pali word or English term).
-- **Response:** HTML (`home.html` populated with results)
+- **Метод:** `GET`
+- **Описание:** Выполняет поиск по словарю и возвращает результаты, отрисованные в шаблоне главной страницы. Используется для прямой загрузки страницы с результатами поиска.
+- **Параметры:**
+    - `q` (str): Поисковый запрос (слово на пали или английский термин).
+- **Ответ:** HTML (`home.html` с результатами)
 
-### JSON Search
+### JSON-поиск
 - **URL:** `/search_json`
-- **Method:** `GET`
-- **Description:** Main search route for the website's dynamic search functionality. Returns the rendered HTML fragments for the results and summary.
-- **Parameters:**
-    - `q` (str): The search query.
-- **Response:** JSON
+- **Метод:** `GET`
+- **Описание:** Основной маршрут поиска для динамического поиска на сайте. Возвращает готовые HTML-фрагменты для результатов и сводки.
+- **Параметры:**
+    - `q` (str): Поисковый запрос.
+- **Ответ:** JSON
     ```json
     {
         "summary_html": "...",
-        "dpd_html": "..."
+        "dpd_html": "...",
+        "license": {
+            "name": "CC BY-NC-SA 4.0",
+            "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+            "attribution": "Digital Pāḷi Dictionary by Bodhirasa Bhikkhu CC BY-NC-SA 4.0",
+            "note": "Non-commercial use only. Derivatives must be shared alike."
+        }
     }
     ```
 
-### GoldenDict / MDict Search
+### Поиск для GoldenDict / MDict
 - **URL:** `/gd`
-- **Method:** `GET`
-- **Description:** Returns a simplified HTML version of the search results, optimized for external dictionary applications like GoldenDict and MDict.
-- **Parameters:**
-    - `search` (str): The search query.
-- **Response:** HTML (`home_simple.html`)
+- **Метод:** `GET`
+- **Описание:** Возвращает упрощённую HTML-версию результатов поиска, оптимизированную для внешних словарных приложений, таких как GoldenDict и MDict.
+- **Параметры:**
+    - `search` (str): Поисковый запрос.
+- **Ответ:** HTML (`home_simple.html`)
 
-Check out this guide for setting up the API in [GoldenDict](https://digitalpalidictionary.github.io/webapp/api_goldendict/) or [DictTango on Android](https://digitalpalidictionary.github.io/webapp/api_dicttango/)
+Руководство по настройке API в [GoldenDict](https://digitalpalidictionary.github.io/webapp/api_goldendict/) или [DictTango на Android](https://digitalpalidictionary.github.io/webapp/api_dicttango/)
 
-### Bold Definitions Search
+### Поиск по выделенным определениям
 - **URL:** `/bd_search`
-- **Method:** `GET`
-- **Description:** Search route specifically for "Bold Definitions" (commentarial definitions).
-- **Parameters:**
-    - `q1` (str): Primary search query.
-    - `q2` (str): Secondary search query (context or additional filter).
-    - `option` (str): Search option/mode.
-- **Response:** HTML (`bold_definitions.html` with results)
+- **Метод:** `GET`
+- **Описание:** Маршрут поиска, предназначенный именно для «выделенных определений» (определения из комментариев).
+- **Параметры:**
+    - `q1` (str): Основной поисковый запрос.
+    - `q2` (str): Дополнительный поисковый запрос (контекст или дополнительный фильтр).
+    - `option` (str): Параметр (режим) поиска.
+- **Ограничения:** Показывается не более 100 результатов. Если их больше, страница сообщает «100+ results found». Поиск по регулярным выражениям имеет тот же лимит времени, те же правила для шаблонов и ту же очередность, что и `/tt_search`. Если поиск остановлен, страница показывает то же сообщение вместо количества результатов.
+- **Ответ:** HTML (`bold_definitions.html` с результатами)
 
-### Tipiṭaka Translations Search
+### Поиск по переводам Типитаки
 - **URL:** `/tt_search`
-- **Method:** `GET`
-- **Description:** Searches through Tipiṭaka translations.
-- **Parameters:**
-    - `q` (str): Search query.
-    - `book` (str): Specific book to search in, or "all".
-    - `lang` (str): Language/Column to search ("Pāḷi" or others).
-- **Response:** JSON
+- **Метод:** `GET`
+- **Описание:** Выполняет поиск по переводам Типитаки.
+- **Параметры:**
+    - `q` (str): Поисковый запрос.
+    - `book` (str): Конкретная книга для поиска или "all".
+    - `lang` (str): Язык/столбец для поиска ("Pāḷi" или другие).
+- **Ограничения:**
+    - `q` очищается от пробелов по краям. Пустой `q` возвращает `{"total": 0, "results": []}` без поиска.
+    - Повторяющиеся книги в `book` ищутся один раз.
+    - Возвращается не более 100 результатов. Сервер прекращает чтение на 101-м совпадении, поэтому `total` — это число найденных совпадений до 101: значение `101` означает «больше 100», а не точное количество.
+    - На каждый запрос отводится бюджет в 4 секунды собственного процессорного времени поиска для регулярного выражения (ожидание очереди его не расходует), плюс страховочный лимит в 20 секунд по настенным часам.
+    - `q` — регулярное выражение, чувствительное к регистру. Шаблон длиннее 2000 символов, с очень большими числами повторений, например `(?:a{3000}){3000}`, или с рекурсией (`(?R)`, `(?1)`) отклоняется как слишком сложный. Недопустимый шаблон отклоняется как некорректный. Поиск по регулярным выражениям идёт по очереди: выполняется один запрос, ещё до трёх ждут своей очереди до 10 секунд, а всем остальным сообщается, что сервер занят.
+- **Ответ:** JSON
     ```json
     {
         "total": 100,
@@ -89,19 +130,27 @@ Check out this guide for setting up the API in [GoldenDict](https://digitalpalid
         ]
     }
     ```
+    Если поиск остановлен, `results` пуст и добавляется текст `error`. Текст — один из: «The search took too long. Use a more specific search.», «That search pattern is not valid.», «That search pattern is too complex. Use a simpler pattern.», «The server is busy. Try again in a moment.»
+    ```json
+    {
+        "total": 0,
+        "results": [],
+        "error": "The search took too long. Use a more specific search."
+    }
+    ```
 
-## Resources
+## Ресурсы
 
-### Audio
+### Аудио
 - **URL:** `/audio/{headword}`
-- **Method:** `GET`
-- **Description:** Serves the audio file for a specific headword with byte-range support.
-- **Parameters:**
-    - `headword` (path parameter): The headword to retrieve audio for.
-    - `gender` (query parameter, optional): Preferred voice gender ("male" or "female"). Defaults to "male".
-- **Response:** Audio file (`audio/mpeg`). Returns `200 OK` for full file, `206 Partial Content` for range requests, or `404 Not Found` if the headword does not exist.
+- **Метод:** `GET`
+- **Описание:** Отдаёт аудиофайл для конкретного заглавного слова с поддержкой запросов диапазона байтов.
+- **Параметры:**
+    - `headword` (параметр пути): Заглавное слово, для которого нужно получить аудио.
+    - `gender` (параметр запроса, необязательный): Предпочитаемый пол голоса ("male" или "female"). По умолчанию "male".
+- **Ответ:** Аудиофайл (`audio/mpeg`). Возвращает `200 OK` для полного файла, `206 Partial Content` для запросов диапазона или `404 Not Found`, если заглавного слова не существует.
 
-**Examples:**
+**Примеры:**
 - `GET /audio/buddha?gender=male`
 - `GET /audio/buddha?gender=female`
 - `GET /audio/dhamma?gender=male`

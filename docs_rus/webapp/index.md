@@ -8,6 +8,6 @@ DPD теперь доступен как веб-сайт [www.ru.dpdict.net](htt
 
 Веб-сайт немного медленнее, чем использование таких приложений, как GoldenDict, MDict или DictTango, но зато всегда имеет доступ к последним изменениям в базе данных. Обновления не требуются.
 
-Вы также можете использовать [www.ru.dpdict.net](https://www.ru.dpdict.net) как API для получения актуальной информации из DPD в [GoldenDict](dpdict_api_gd.md) и [DictTango](dpdict_api_dt.md).
+Вы также можете использовать [www.ru.dpdict.net](https://www.ru.dpdict.net) как API для получения актуальной информации из DPD в [GoldenDict](api_goldendict.md) и [DictTango](api_dicttango.md).
 
-ДАЛЕЕ: [Поиск](dpdict_search.md)
+ДАЛЕЕ: [Поиск](search.md)

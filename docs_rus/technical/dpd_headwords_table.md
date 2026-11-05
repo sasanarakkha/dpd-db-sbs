@@ -1,248 +1,250 @@
-# DPD Headwords table - columns and properties
+# Таблица DPD Headwords — столбцы и свойства
 
-Most of the database functionality comes from the 
+Основная функциональность базы данных реализована через
 
 ``` python
 class DpdHeadword(Base):
     __tablename__ = "dpd_headwords"
 ```
 
-This can be found here in [db/models.py](https://github.com/sasanarakkha/dpd-db-sbs/blob/c0ff5b0591627fff7818b717d6c5f8e8ffdd63ec/db/models.py#L535){target="_blank"}.
+Это можно найти в [db/models.py](https://github.com/sasanarakkha/dpd-db-sbs/blob/c0ff5b0591627fff7818b717d6c5f8e8ffdd63ec/db/models.py#L535){target="_blank"}.
 
-- **`columns`** in the table are in bold,     
-- *`derived properties`* are in italics, 
-- `[data type]` is in square brackets, 
-- a brief description of the column or property follows
+- **`columns`** (столбцы) таблицы выделены жирным,     
+- *`derived properties`* (производные свойства) выделены курсивом, 
+- `[data type]` (тип данных) указан в квадратных скобках, 
+- далее следует краткое описание столбца или свойства
 
-Here is a quick overview:
+Краткий обзор:
 
-- **`id`** `[int]` unique numerical identifier for each word  
+- **`id`** `[int]` уникальный числовой идентификатор каждого слова  
 
-- **`lemma_1`** `[str]` unique headword and number
+- **`lemma_1`** `[str]` уникальное заглавное слово и номер
 
-- *`lemma_clean`* `[str]` lemma_1 without any trailing digits
+- *`lemma_clean`* `[str]` lemma_1 без завершающих цифр
 
-- *`lemma_1_`* `[str]` lemma_1 with underscores instead of spaces for use in code
+- *`lemma_1_`* `[str]` lemma_1 с подчёркиваниями вместо пробелов для использования в коде
 
-- *`lemma_link`* `[str]` lemma_1 with %20 instead of spaces for website links
+- *`lemma_link`* `[str]` lemma_1 с %20 вместо пробелов для ссылок на сайты
 
-- *`lemma_ipa`* `[str]` lemma_clean in International Phonetic Alphabet
+- *`lemma_ipa`* `[str]` lemma_clean в Международном фонетическом алфавите
 
-- *`lemma_tts`* `[str]` lemma_clean in International Phonetic Alphabet suitable for Text-to-Speech engines
+- *`lemma_tts`* `[str]` lemma_clean в Международном фонетическом алфавите, пригодном для движков синтеза речи (Text-to-Speech)
 
-- *`lemma_trad`* `[str]` form of the lemma found in traditional Pāḷi grammars
+- *`lemma_trad`* `[str]` форма леммы, встречающаяся в традиционных грамматиках пали
 
-- *`lemma_si`* `[str]` form of the lemma found in traditional Pāḷi grammars, in Sinhala script
+- *`lemma_si`* `[str]` форма леммы, встречающаяся в традиционных грамматиках пали, сингальским письмом
 
-- **`lemma_2`** `[str]` masculine nominative singular of the headword for nouns
+- **`lemma_2`** `[str]` именительный падеж единственного числа мужского рода заглавного слова для имён существительных
 
-- **`pos`** `[str]` part of speech 
+- **`pos`** `[str]` часть речи 
 
-- *`pos_list`* `[list]` list of all the parts of speech in the database
+- *`pos_list`* `[list]` список всех частей речи в базе данных
 
-- *`pos_si`* `[str]` part of speech translated into Sinhala 
+- *`pos_si`* `[str]` часть речи, переведённая на сингальский 
 
-- *`pos_si_full`* `[str]` part of speech translated into Sinhala, unabbreviated
+- *`pos_si_full`* `[str]` часть речи, переведённая на сингальский, без сокращений
 
-- **`grammar`** `[str]` grammatical information
+- **`grammar`** `[str]` грамматическая информация
 
-- **`derived_from`** `[str]` etymological parent from which the headword is derived 
+- **`derived_from`** `[str]` этимологический родитель, от которого образовано заглавное слово 
 
-- **`neg`** `[str]` is the headword a negative or double negative? 
+- **`neg`** `[str]` является ли заглавное слово отрицанием или двойным отрицанием? 
 
-- **`verb`** `[str]` is the verb causative, passive or denominative?
+- **`verb`** `[str]` является ли глагол каузативным, пассивным или отыменным?
 
-- **`trans`** `[str]` is the verb transitive, intransitive, or ditransitive?
+- **`trans`** `[str]` является ли глагол переходным, непереходным или двойным переходным?
 
-- **`plus_case`** `[str]` what syntactical case does the word trigger?
+- **`plus_case`** `[str]` какой синтаксический падеж требует слово?
 
-- *`plus_case_si`* `[str]` what syntactical case does the word trigger, translated into Sinhala?
+- *`plus_case_si`* `[str]` какой синтаксический падеж требует слово, в переводе на сингальский?
 
-- **`meaning_1`** `[str]` what is the contextual meaning in English?
+- **`meaning_1`** `[str]` каково контекстное значение на английском?
 
-- **`meaning_lit`** `[str]` what is the literal meaning in English?
+- **`meaning_lit`** `[str]` каково буквальное значение на английском?
 
-- **`meaning_2`** `[str]` what meaning does Buddhadatta give?
+- **`meaning_2`** `[str]` какое значение даёт Буддадатта?
 
-- *`meaning_combo`* `[str]` composite of meaning_1, meaning_lit and meaning_2
+- *`meaning_combo`* `[str]` объединение meaning_1, meaning_lit и meaning_2
 
-- *`meaning_combo_html`* `[str]` composite of meaning_1, meaning_lit and meaning_2 with meaning_1 in HTML <b\> tags
+- *`meaning_combo_html`* `[str]` объединение meaning_1, meaning_lit и meaning_2, где meaning_1 заключено в HTML-теги <b\>
 
-- *`meaning_si`* `[str]` meaning_1 translated into Sinhala
+- *`meaning_si`* `[str]` meaning_1, переведённое на сингальский
 
-- **`non_ia`** `[str]` what non Indo-Aryan word is the headword derived from?
+- **`non_ia`** `[str]` от какого неиндоарийского слова происходит заглавное слово?
 
 - **`sanskrit`** `[str]` ближайшее санскритское соответствие в словаре Монье-Вильямса (MW) или Эджертона. Префикс и корень, найденные в MW, указаны в квадратных скобках [kṛ].
 
-- *`sanskrit_clean`* `[str]` what is the Sanskrit stripped of all content in `[square brackets]`?
+- *`sanskrit_clean`* `[str]` санскритская форма, очищенная от всего содержимого в `[квадратных скобках]`
 
-- **`root_key`** `[str]` what is the unique root key in `dpd_roots` table?
+- **`root_key`** `[str]` каков уникальный ключ корня в таблице `dpd_roots`?
 
-- *`root_clean`* `[str]` what is the root_key without any trailing digits?
+- *`root_clean`* `[str]` каков root_key без завершающих цифр?
 
-- *`root_count`* `[int]` how many times does the root_key occur in the database?
+- *`root_count`* `[int]` сколько раз root_key встречается в базе данных?
 
-- **`root_sign`** `[str]` what is the conjugational sign of the root?
+- **`root_sign`** `[str]` каков знак спряжения корня?
 
-- **`root_base`** `[str]` what is the root and conjugational sign combined?
+- **`root_base`** `[str]` каково сочетание корня и знака спряжения?
 
-- *`root_base_clean`* `[str]` what is the root_base stripped of all phonetic changes?
+- *`root_base_clean`* `[str]` каков root_base без всех фонетических изменений?
 
-- **`family_root`** `[str]` what are the prefixes and root family?
+- **`family_root`** `[str]` каковы префиксы и семейство корня?
 
-- *`root_family_key`* `[str]` what is the root key and family root, space separated?
+- *`root_family_key`* `[str]` каковы ключ корня и семейство корня, через пробел?
 
-- **`family_word`** `[str]` if not a root, what is the word family? 
+- **`family_word`** `[str]` если это не корень, то каково семейство слова? 
 
-- **`family_compound`** `[str]` if a compound, what are the component words, space separated?
+- **`family_compound`** `[str]` если это составное слово, то каковы его компоненты, через пробел?
 
-- *`family_compound_list`* `[list]` list of the family_compound values
+- *`family_compound_list`* `[list]` список значений family_compound
 
-- **`family_idioms`** `[str]` if an idiom, what are the component words, space separated?
+- **`family_idioms`** `[str]` если это идиома, то каковы её компоненты, через пробел?
 
-- *`family_idioms_list`* `[list]` list of the family_idioms values
+- *`family_idioms_list`* `[list]` список значений family_idioms
 
-- **`family_set`** `[str]` what set does the word belong to?
+- **`family_set`** `[str]` к какому набору относится слово?
 
-- *`family_set_list`* `[list]` list of the family_set values
+- *`family_set_list`* `[list]` список значений family_set
 
-- **`construction`** `[str]` how is the word constructed?
+- **`construction`** `[str]` как образовано слово?
 
-- *`construction_clean`* `[str]` construction stripped of all phonetic changes
+- *`construction_clean`* `[str]` construction без всех фонетических изменений
 
-- *`construction_summary`* `[str]` summary of the construction in one line
+- *`construction_summary`* `[str]` краткое описание образования слова в одной строке
 
-- *`construction_summary_si`* `[str]` summary of the construction in one line, transliterated into Sinhala
+- *`construction_summary_si`* `[str]` краткое описание образования слова в одной строке, транслитерированное на сингальский
 
-- *`construction_line1`* `[str]` first line of the construction 
+- *`construction_line1`* `[str]` первая строка construction 
 
-- **`derivative`** `[str]` is the word a kita, kicca or taddhita derivative?
+- **`derivative`** `[str]` является ли слово производным типа кита, кичча или таддхита?
 
-- **`suffix`** `[str]` what is the kita, kicca or final taddhita suffix?
+- **`suffix`** `[str]` какой суффикс — кита, кичча или конечный таддхита?
 
-- **`phonetic`** `[str]` what phonetic changes occur?
+- **`phonetic`** `[str]` какие происходят фонетические изменения?
 
-- **`compound_type`** `[str]` if a compound, what type of compound is the headword?
+- **`compound_type`** `[str]` если это составное слово, то к какому типу оно относится?
 
-- **`compound_construction`** `[str]` if a compound, how is the compound constructed? 
+- **`compound_construction`** `[str]` если это составное слово, то как оно образовано? 
 
-- **`non_root_in_comps`** `[str]` (mostly unused)
+- **`non_root_in_comps`** `[str]` (в основном не используется)
 
-- **`source_1`** `[str]` what is the source of the first example ?
+- **`source_1`** `[str]` каков источник первого примера ?
 
-- *`source_link_1`* `[str]` source of the first example with an embedded HTML link
+- *`source_link_1`* `[str]` источник первого примера со встроенной HTML-ссылкой
 
-- **`sutta_1`** `[str]` from which sutta does the first example come?
+- **`sutta_1`** `[str]` из какой сутты взят первый пример?
 
-- **`example_1`** `[str]` what is a good contextual example of the headword?
+- **`example_1`** `[str]` какой пример хорошо показывает употребление заглавного слова в контексте?
 
-- **`source_2`** `[str]` what is the source of the second example?
+- **`source_2`** `[str]` каков источник второго примера?
 
-- *`source_link_1`* `[str]` source of the second example with an embedded HTML link
+- *`source_link_1`* `[str]` источник второго примера со встроенной HTML-ссылкой
 
-- *`source_link_sutta`* `[str]` sutta code from example with an embedded HTML link
+- *`source_link_sutta`* `[str]` код сутты из примера со встроенной HTML-ссылкой
 
-- **`sutta_2`** `[str]` from which sutta does the second example come?
+- **`sutta_2`** `[str]` из какой сутты взят второй пример?
 
-- **`example_2`** `[str]` what is a good second example of the headword in context?
+- **`example_2`** `[str]` какой второй пример хорошо показывает употребление заглавного слова в контексте?
 
-- *`degree_of_completion`* `[str]` how complete is a word's data?
+- *`degree_of_completion`* `[str]` насколько полны данные слова?
 
-- *`degree_of_completion_html`* `[str]` how complete is a word's data, embedded in html tags?
+- *`degree_of_completion_html`* `[str]` насколько полны данные слова, встроенные в html-теги?
 
-- **`antonym`** `[str]` what is the antonym of the headword, comma space separated?
+- **`antonym`** `[str]` каков антоним заглавного слова, через запятую с пробелом?
 
-- *`antonym_list`* `[list]` list of all the antonyms
+- *`antonym_list`* `[list]` список всех антонимов
 
-- **`synonym`** `[str]` what are synonyms of the headword, comma space separated?
+- **`synonym`** `[str]` каковы синонимы заглавного слова, через запятую с пробелом?
 
-- *`synonym_list`* `[list]` list of all the synonyms
+- *`synonym_list`* `[list]` список всех синонимов
 
-- **`variant`** `[str]` what are the variant readings of the headword found in other Pāḷi texts, comma space separated?
+- **`variant`** `[str]` **УСТАРЕЛО — всегда пусто.** Заменено на `var_text`; данные перенесены 2026-07-25, а столбец будет удалён при следующем изменении модели базы данных.
 
-- *`variant_list`* `[list]` list of all the variants
+- *`variant_list`* `[list]` **УСТАРЕЛО — всегда пусто.** Список всех вариантов.
 
-- **`var_phonetic`** `[str]` (currently unused) what are other phonetic variants of the headword found in Pāḷi texts, comma space separated?
+- **`var_phonetic`** `[str]` каковы другие фонетические варианты заглавного слова, встречающиеся в палийских текстах, через запятую с пробелом?
 
-- **`var_text`** `[str]` (currently unused) what are the variant readings of the headword found in other Pāḷi texts, comma space separated?
+- **`var_text`** `[str]` каковы варианты чтения заглавного слова, встречающиеся в других палийских текстах, через запятую с пробелом?
 
-- **`commentary`** `[str]` how does the commentary define the headword, new line separated?
+- **`commentary`** `[str]` как комментарий определяет заглавное слово, через перевод строки?
 
-- **`notes`** `[str]` what further information should be mentioned about the headword?
+- **`notes`** `[str]` какую дополнительную информацию о заглавном слове следует указать?
 
-- **`cognate`** `[str]` what English cognates does the headword have?
+- **`cognate`** `[str]` какие английские родственные слова есть у заглавного слова?
 
-- **`link`** `[str]` for plants, animals and historical characters what is the wikipedia link?
+- **`link`** `[str]` для растений, животных и исторических личностей — какова ссылка на Википедию?
 
-- **`origin`** `[str]` what is the origin of the headword's data?
+- *`link_list`* `list[str]` список ссылок, разделённый символом новой строки `\n`.
 
-- **`stem`** `[str]` what is the stem upon which the inflection pattern is built?
+- **`origin`** `[str]` каково происхождение данных заглавного слова?
 
-- **`pattern`** `[str]` what is the inflection pattern found in the `inflection_patterns` table?
+- **`stem`** `[str]` какая основа лежит в основе парадигмы словоизменения?
 
-- **`created_at`** `[datetime]` when was the headword created?
+- **`pattern`** `[str]` какая парадигма словоизменения указана в таблице `inflection_patterns`?
 
-- **`updated_at`** `[datetime]` when was the headword updated?
+- **`created_at`** `[datetime]` когда было создано заглавное слово?
 
-- **`inflections`** `[str]` what inflected forms does the headword take, comma separated?
+- **`updated_at`** `[datetime]` когда было обновлено заглавное слово?
 
-- *`inflections_list`* `[list]` list of inflections
+- **`inflections`** `[str]` какие словоизменённые формы принимает заглавное слово, через запятую?
 
-- **`inflections_api_ca_eva_iti`** `[str]` what inflected forms can be found in sandhi compounds with api, ca, eva and iti, comma separated?
+- *`inflections_list`* `[list]` список словоизменённых форм
 
-- *`inflections_list_api_ca_eva_iti`* `[list]` list of inflections found in sandhi compounds with api, ca, eva and iti
+- **`inflections_api_ca_eva_iti`** `[str]` какие словоизменённые формы встречаются в сандхи-композитах с api, ca, eva и iti, через запятую?
 
-- *`inflections_list_all`* `[list]` list of all inflections, including those with api, ca, eva and iti
+- *`inflections_list_api_ca_eva_iti`* `[list]` список словоизменённых форм, встречающихся в сандхи-композитах с api, ca, eva и iti
 
-- **`inflections_sinhala`** `[str]` what are the inflected forms in Sinhala script, comma separated?
+- *`inflections_list_all`* `[list]` список всех словоизменённых форм, включая формы с api, ca, eva и iti
 
-- *`inflections_sinhala_list`* `[list]` list if all inflections in Sinhala script
+- **`inflections_sinhala`** `[str]` каковы словоизменённые формы сингальским письмом, через запятую?
 
-- **`inflections_devanagari`** `[str]` what are the inflected forms in Devanagari script, comma separated?
+- *`inflections_sinhala_list`* `[list]` список всех словоизменённых форм сингальским письмом
 
-- *`inflections_devanagari_list`* `[list]` list of all inflections in Devanagari script
+- **`inflections_devanagari`** `[str]` каковы словоизменённые формы письмом деванагари, через запятую?
 
-- **`inflections_thai`** `[str]` what are the inflected forms in Thai script, comma separated?
+- *`inflections_devanagari_list`* `[list]` список всех словоизменённых форм письмом деванагари
 
-- *`inflections_thai_list`* `[list]` list of all inflections in Thai script
+- **`inflections_thai`** `[str]` каковы словоизменённые формы тайским письмом, через запятую?
 
-- **`inflections_html`** `[str]` inflection table of the headwords as HTML table
+- *`inflections_thai_list`* `[list]` список всех словоизменённых форм тайским письмом
 
-- **`freq_html`** `[str]` frequency map of the word in CST corpus as HTML table
+- **`inflections_html`** `[str]` таблица словоизменения заглавных слов в виде HTML-таблицы
 
-- **`ebt_count`** `[str]` how many times does the word occur in early Buddhist texts?
+- **`freq_html`** `[str]` карта частотности слова в корпусе CST в виде HTML-таблицы
 
-- *`needs_grammar_button`* `[bool]` does the headword need a grammar button?
+- **`ebt_count`** `[str]` сколько раз слово встречается в ранних буддийских текстах?
 
-- *`needs_example_button`* `[bool]` does the headword needs an example button?
+- *`needs_grammar_button`* `[bool]` нужна ли заглавному слову кнопка грамматики?
 
-- *`needs_examples_button`* `[bool]` does the headword needs an examples button?
+- *`needs_example_button`* `[bool]` нужна ли заглавному слову кнопка примера?
 
-- *`needs_conjugation_button`* `[bool]` does the headword need a conjugations button?
+- *`needs_examples_button`* `[bool]` нужна ли заглавному слову кнопка примеров?
 
-- *`needs_declension_button`* `[bool]` does the headword need a declensions button?
+- *`needs_conjugation_button`* `[bool]` нужна ли заглавному слову кнопка спряжения?
 
-- *`needs_root_family_button`* `[bool]` does the headword need a root family button?
+- *`needs_declension_button`* `[bool]` нужна ли заглавному слову кнопка склонения?
 
-- *`needs_word_family_button`* `[bool]` does the headword need a word family button?
+- *`needs_root_family_button`* `[bool]` нужна ли заглавному слову кнопка семейства корня?
 
-- *`needs_compound_family_button`* `[bool]` does the headword need a compound family button?
+- *`needs_word_family_button`* `[bool]` нужна ли заглавному слову кнопка семейства слова?
 
-- *`needs_compound_families_button`* `[bool]` does the headword need a compound families button?
+- *`needs_compound_family_button`* `[bool]` нужна ли заглавному слову кнопка семейства составных слов?
 
-- *`needs_idioms_button`* `[bool]` does the headword need an idioms button?
+- *`needs_compound_families_button`* `[bool]` нужна ли заглавному слову кнопка семейств составных слов?
 
-- *`needs_set_button`* `[bool]` does the headword need a set button?
+- *`needs_idioms_button`* `[bool]` нужна ли заглавному слову кнопка идиом?
 
-- *`needs_sets_button`* `[bool]` does the headword need a sets button?
+- *`needs_set_button`* `[bool]` нужна ли заглавному слову кнопка набора?
 
-- *`needs_frequency_button`* `[bool]` does the headword need a frequency button?
+- *`needs_sets_button`* `[bool]` нужна ли заглавному слову кнопка наборов?
 
-- *`cf_set`* `[set]` set of all compound families in the database
+- *`needs_frequency_button`* `[bool]` нужна ли заглавному слову кнопка частотности?
 
-- *`idioms_set`* `[set]` set of all the idioms in the database
+- *`cf_set`* `[set]` набор всех семейств составных слов в базе данных
 
-- *`__repr__`* `[str]` quick overview of headword data
+- *`idioms_set`* `[set]` набор всех идиом в базе данных
+
+- *`__repr__`* `[str]` краткий обзор данных заглавного слова
 
 ## Особые символы
 
@@ -250,20 +252,19 @@ Here is a quick overview:
 
 - `sanskrit`: `[квадратные скобки]` содержат префикс и корень, найденные в словаре Монье-Вильямса, например, `[anukṛ]`.
 - `source_1`: `-` означает, что реальный пример не найден. Часто используется для названий сутт и других структурных элементов палийских текстов. Запись считается полной даже без примера.
-- `stem`: `!` означает отсутствие фактической основы. Слово полностью выводится из колонки `pattern`.
-- `stem`: `*` означает, что не следует генерировать полный список флексий для колонки `inflection`. Слово часто является неправильной формой, и необходимо распознавать только точное написание `lemma_clean`.
+- `stem`: `!` означает отсутствие фактической основы. Слово полностью выводится из столбца `pattern`.
+- `stem`: `*` означает, что не следует генерировать полный список словоизменённых форм для столбца `inflection`. Слово часто является неправильной формой, и необходимо распознавать только точное написание `lemma_clean`.
 
+## Связи в базе данных
 
-## Database Relationships
+Класс `DpdHeadword` имеет прямой доступ к другим таблицам базы данных через связи.
 
-The `DpdHeadword` class has direct access to other tables in the database through relationships.
-
-- `.rt` connects to the `dpd_roots` table
-- `.fr` connects to the `family_roots` table
-- `.fw` connects to the `family_words` table
-- `.sbs` connects to the `SBS` table
-- `.ru` connects to the `russian` table
-- `.si` connects to the `sinhala` table
-- `.it` connects to the `inflection_templates` table
+- `.rt` связывает с таблицей `dpd_roots`
+- `.fr` связывает с таблицей `family_roots`
+- `.fw` связывает с таблицей `family_words`
+- `.sbs` связывает с таблицей `SBS`
+- `.ru` связывает с таблицей `russian`
+- `.si` связывает с таблицей `sinhala`
+- `.it` связывает с таблицей `inflection_templates`
 
 

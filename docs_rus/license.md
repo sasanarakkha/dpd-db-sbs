@@ -9,6 +9,8 @@
 
 Полные условия лицензии можно посмотреть на [сайте Creative Commons](http://creativecommons.org/licenses/by-nc/4.0/deed.ru){target="_blank"}.
 
+Указываете DPD в научной работе? См. [Как цитировать DPD](how_to_cite.md).
+
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />
 
 
