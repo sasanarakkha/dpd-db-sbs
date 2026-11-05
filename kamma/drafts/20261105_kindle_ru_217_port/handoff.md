@@ -1,7 +1,7 @@
 # handoff.md — DRAFT: Port upstream Kindle #217 to the RU Kindle exporter
 
 Status: **DRAFT — not planned.** Start with `/kamma:1-plan` when picked up.
-Origin: upstream sync `kamma/threads/20261105_upstream_sync/` (dynamic_plan.md D6, option b deferred).
+Origin: upstream sync `kamma/archive/20261105_upstream_sync/` (dynamic_plan.md D6, option b deferred).
 
 ## Why
 
@@ -35,7 +35,7 @@ Kindle entries by form. `exporter/kindle/kindle_exporter_ru.py` still forks the 
 
 ## Evidence
 
-- Detailed hunk analysis: `kamma/threads/20261105_upstream_sync/stage2a_findings/kindle.md`.
+- Detailed hunk analysis: `kamma/archive/20261105_upstream_sync/stage2a_findings/kindle.md`.
 - Upstream diff: `git diff be49bffe2c2c c54f942ee3f6 -- exporter/kindle/`.
 
 ## Verification needed
