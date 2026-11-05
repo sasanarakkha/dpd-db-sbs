@@ -23,6 +23,7 @@ EXPECTED_LOCAL_ONLY: set[str] = {
     "dpd_rus.md",
     "contributing/rus_collaboration.md",
     "technical/dpd_headwords_table_ru.md",
+    "technical/generate_pli2ru_json.md",
 }
 
 # docs/ files that are mirrored via redirect — no translation needed, skip staleness checks

@@ -25,6 +25,7 @@ nav:
     - Linux: "install/linux.md"
     - Kindle: "install/kindle.md"
     - Kobo: "install/kobo.md"
+    - KOReader: "install/koreader.md"
     - Anki: "install/anki.md"
     - ChromeBook: "install/chromebook.md"
     - Расширение для Chrome и Firefox: "install/browser_extension.md"
@@ -46,11 +47,14 @@ nav:
   - Программные Интеграции:
     - integrations/index.md
     - Dhamma.gift: "integrations/dhamma_gift.md"
+    - ePitaka: "integrations/epitaka.md"
     - Simsapa Dhamma Reader: "integrations/simsapa.md"
+    - Sutamaya: "integrations/sutamaya.md"
     - Sutta Central: "integrations/sutta_central.md"
     - The Buddha's Words: "integrations/tbw.md"
     - Tipitaka Pali Reader: "integrations/tpr.md"
     - Tipitakapali.org: "integrations/tipitakapali.md"
+    - Добавьте своё приложение: "integrations/add_your_app.md"
   - Обратная связь:
     - "feedback/index.md"
     - Исправить ошибку: "feedback/correct_mistake.md"
@@ -60,6 +64,7 @@ nav:
     - "contributing/index.md"
     - Пали: "contributing/pali.md"
     - Код: "contributing/code.md"
+    - Помощь ресурсами: "contributing/resources.md"
     - Помощь с переводом: "contributing/rus_collaboration.md"
   - Совмещенный словарь: "dpd_rus.md"
   - Другие словари: "other_dicts.md"
@@ -68,6 +73,7 @@ nav:
   - Литература: "bibliography.md"
   - Благодарности: "thanks.md"
   - Контакты: "contact.md"
+  - Как цитировать: "how_to_cite.md"
   - Changelog: "changelog.md"
   - Новостные рассылки: "newsletters.md"
   - Лицензия: "license.md"  

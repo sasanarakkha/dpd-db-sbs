@@ -17,35 +17,35 @@ no-translate redirect). Items are checked off as translations land.
 - [ ] docs/contributing/code.md
 - [ ] docs/contributing/index.md
 - [ ] docs/contributing/pali.md
-- [ ] docs/contributing/resources.md
+- [x] docs/contributing/resources.md
 - [ ] docs/features/sutta_info.md
-- [ ] docs/how_to_cite.md
+- [x] docs/how_to_cite.md
 - [ ] docs/index.md
-- [ ] docs/install/koreader.md
-- [ ] docs/integrations/add_your_app.md
+- [x] docs/install/koreader.md
+- [x] docs/integrations/add_your_app.md
 - [ ] docs/integrations/dhamma_gift.md
-- [ ] docs/integrations/epitaka.md
-- [ ] docs/integrations/sutamaya.md
+- [x] docs/integrations/epitaka.md
+- [x] docs/integrations/sutamaya.md
 - [ ] docs/integrations/tpr.md
 - [ ] docs/license.md
 - [ ] docs/newsletters.md
 - [ ] docs/other_dicts.md
-- [ ] docs/pics/dpdict.net/dpdict_feedback_permalink_dark.png
-- [ ] docs/pics/dpdict.net/dpdict_feedback_permalink_light.png
-- [ ] docs/pics/epitaka/lookup-phone-dark.png
-- [ ] docs/pics/epitaka/lookup-phone-light.png
-- [ ] docs/pics/epitaka/main-view-dark.png
-- [ ] docs/pics/epitaka/main-view-light.png
-- [ ] docs/pics/koreader/database_status_dark.png
-- [ ] docs/pics/koreader/database_status_light.png
-- [ ] docs/pics/koreader/database_status_menu_dark.png
-- [ ] docs/pics/koreader/database_status_menu_light.png
-- [ ] docs/pics/koreader/hero_dark.png
-- [ ] docs/pics/koreader/hero_light.png
-- [ ] docs/pics/koreader/lookup_dark.png
-- [ ] docs/pics/koreader/lookup_light.png
-- [ ] docs/pics/koreader/main_dark.png
-- [ ] docs/pics/koreader/main_light.png
+- [x] docs/pics/dpdict.net/dpdict_feedback_permalink_dark.png
+- [x] docs/pics/dpdict.net/dpdict_feedback_permalink_light.png
+- [x] docs/pics/epitaka/lookup-phone-dark.png
+- [x] docs/pics/epitaka/lookup-phone-light.png
+- [x] docs/pics/epitaka/main-view-dark.png
+- [x] docs/pics/epitaka/main-view-light.png
+- [x] docs/pics/koreader/database_status_dark.png
+- [x] docs/pics/koreader/database_status_light.png
+- [x] docs/pics/koreader/database_status_menu_dark.png
+- [x] docs/pics/koreader/database_status_menu_light.png
+- [x] docs/pics/koreader/hero_dark.png
+- [x] docs/pics/koreader/hero_light.png
+- [x] docs/pics/koreader/lookup_dark.png
+- [x] docs/pics/koreader/lookup_light.png
+- [x] docs/pics/koreader/main_dark.png
+- [x] docs/pics/koreader/main_light.png
 - [ ] docs/pics/newsletters/055d6c99f31c.jpg
 - [ ] docs/pics/newsletters/2026-10/epitaka-android.png
 - [ ] docs/pics/newsletters/2026-10/epitaka-app.jpg
@@ -56,12 +56,12 @@ no-translate redirect). Items are checked off as translations land.
 - [ ] docs/pics/newsletters/cfc409b522d4.jpg
 - [ ] docs/pics/newsletters/d9fdfd5353b9.jpg
 - [ ] docs/pics/newsletters/e0a09c53d3e5.jpg
-- [ ] docs/pics/sutamaya/library-phone-dark.png
-- [ ] docs/pics/sutamaya/library-phone-light.png
-- [ ] docs/pics/sutamaya/lookup-phone-dark.png
-- [ ] docs/pics/sutamaya/lookup-phone-light.png
-- [ ] docs/pics/sutamaya/settings-dark.png
-- [ ] docs/pics/sutamaya/settings-light.png
+- [x] docs/pics/sutamaya/library-phone-dark.png
+- [x] docs/pics/sutamaya/library-phone-light.png
+- [x] docs/pics/sutamaya/lookup-phone-dark.png
+- [x] docs/pics/sutamaya/lookup-phone-light.png
+- [x] docs/pics/sutamaya/settings-dark.png
+- [x] docs/pics/sutamaya/settings-light.png
 - [ ] docs/technical/api_endpoints.md
 - [ ] docs/technical/project_folder_structure.md
 - [ ] docs/technical/style_guide_for_dpd_entries.md
