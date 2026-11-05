@@ -469,6 +469,14 @@ Recurring pitfalls captured from past sync runs. Check these before declaring a 
   sync. Run `uv run pytest tests/test_whitelist_liveness.py` afterward to confirm the entry is
   in the correct FQ form.
 
+- **Every `.gitmodules` path needs a gitlink in `HEAD` (archive §30).** A sync can merge
+  `.gitmodules` but drop the submodule pointer, so CI's `submodules: recursive` checkout
+  silently skips it. Before closing Stage 3, run
+  `git ls-tree -r upstream/main | grep ^160000` and `git ls-tree -r HEAD | grep ^160000`
+  and confirm every upstream path exists in ours (commit lag is fine, absence is not). Fix a
+  missing one with `git update-index --add --cacheinfo 160000,<sha>,<path>` and commit the
+  pointer alone.
+
 ---
 
 ## Registry Categories

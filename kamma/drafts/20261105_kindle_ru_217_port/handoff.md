@@ -10,7 +10,7 @@ Kindle entries by form. `exporter/kindle/kindle_exporter_ru.py` still forks the 
 
 - Entries keyed by `lemma_clean` → homonyms collapse; upstream measured ~8% of entries unreachable
   (15,124 in DPD). RU has the same bug.
-- RU CI (`ru_release.yml`, `ru_release_test.yml`, `ru_release_kindle.yml`) converts with the
+- RU CI (`ru_release.yml`, `ru_release_kindle.yml`) converts with the
   kindlegen binary `exporter/kindle/kindlegen`, which upstream deleted. The sync keeps it alive via
   registry `unique_paths` as a stopgap; this thread retires it.
 

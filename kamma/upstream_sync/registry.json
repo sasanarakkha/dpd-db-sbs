@@ -179,19 +179,6 @@
         "The TPD step must remain after RPD and before dealbreakers."
       ]
     },
-    ".github/workflows/ru_release_test.yml": {
-      "upstream": ".github/workflows/draft_release.yml",
-      "divergence_reason": "Different pipeline logic for RU release testing.",
-      "sync_rule": "inspired_only",
-      "local_changes": [
-        "Test/dry-run variant of `ru_release.yml` — validates RU release build without publishing.",
-        "Adapted from `draft_release.yml` with test-mode flags.",
-        "\"Add TPD to Lookup Table\" step added after the RPD step — mirrors `ru_release.yml`."
-      ],
-      "watch_for": [
-        "Keep in sync with `ru_release.yml` — divergence causes test/prod environment drift."
-      ]
-    },
     ".github/workflows/ru_release_kindle.yml": {
       "upstream": ".github/workflows/draft_release.yml",
       "divergence_reason": "RU Kindle/ePub release variant — builds the Russian Kindle & ePub outputs, not the goldendict/mdict draft release.",
