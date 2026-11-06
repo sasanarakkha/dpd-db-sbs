@@ -42,6 +42,8 @@ see **[guide.md](../guide.md)**.
 
 Each gate requires explicit user approval before manual commit execution.
 
+Every commit message must end with the footer `Refs sasanarakkha/dpd-db-sbs#51` (see guide.md, "Commit issue reference").
+
 ## Key References
 
 | File | Purpose |

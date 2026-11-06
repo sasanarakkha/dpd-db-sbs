@@ -103,5 +103,6 @@ section instead of re-reading the whole guide.
 - [ ] Write `retrospective.md` (required before finalize); promote accepted items to `archive_improvements.md`.
 - [ ] If accepted, ADVANCED may run `uv run python3 kamma/upstream_sync/scripts/finalize_accepted_sync.py <thread_dir>` directly (pre-authorized scripted command, same carve-out as Stage 1), or write exact FAST handoff instructions to run it.
 - [ ] Prepare final commit message only after acceptance.
+- [ ] Every prepared commit message (all gates) ends with the footer `Refs sasanarakkha/dpd-db-sbs#51`.
 
 **Final hard stop**: update `handoff.md` with final state, verification evidence, files changed, and any remaining risks, then stop.

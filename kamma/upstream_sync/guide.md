@@ -14,6 +14,18 @@ creates the Kamma thread through `kamma/upstream_sync/scripts/init_sync_thread.p
 
 Git commit/push policy is inherited from the global rules.
 
+**Commit issue reference (MANDATORY).** The regular upstream sync is tracked in
+https://github.com/sasanarakkha/dpd-db-sbs/issues/51. Every commit made as part of the sync task
+(`backup dps data`, Commit 1/2/3, Docs Commit, and any fix/cleanup commit during the sync) MUST end
+its message body with this footer line, separated from the subject by a blank line:
+
+```
+Refs sasanarakkha/dpd-db-sbs#51
+```
+
+Use `Refs`, never `Closes`/`Fixes` — the issue is a standing task and must stay open. When
+preparing a commit message for the user, always include the footer.
+
 After that wrapper finishes, all sync work must use the Python scripts in
 `kamma/upstream_sync/scripts/` and the 4-stage workflow below. Do not use legacy shell sync wrappers.
 Docs translation runs separately as the async Docs Translation Track (see below) — it is never a
