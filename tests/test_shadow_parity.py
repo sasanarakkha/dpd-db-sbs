@@ -207,26 +207,16 @@ WHITELIST: dict[str, WhitelistEntry] = {
             "render_epd_xhtml",
             "render_abbreviation_entry",
             "render_ebook_entry",
+            "render_form_entry",  # RU name: render_form_entry_ru
             "render_ebook_letter_templ",
             "save_abbreviations_xhtml_page",
             "save_content_opf_xhtml",
             "save_title_page_xhtml",
             "zip_epub",
-            # 2026-11-05 sync (D6): upstream #217 form-keyed rewrite deferred to
-            # kamma/drafts/20261105_kindle_ru_217_port/ — RU keeps the old architecture.
-            "_load_lookup",
-            "_niggahita_variants",
-            "render_form_entry",
-            "_letter_files",
-            "_headword_aliases",
-            "find_pages_with_web_links",
         ],
         "imports": [
             "argparse",
-            "exporter.kindle.data_classes.KindleData",
             "pathlib.Path",
-            "os",
-            "sqlalchemy.orm.Session",
         ],
     },
     "exporter/tbw/tbw_exporter_ru.py": {

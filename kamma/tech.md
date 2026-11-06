@@ -13,6 +13,7 @@
 - **ty** — type checker
 - **Pytest** — testing framework
 - **Typst** — PDF generation
+- **kindling** (`exporter/kindle/kindling-cli`, pinned v0.45.6) — compiles the Kindle MOBI for both the upstream and the Russian exporters, replacing the old Amazon converter binary and the macOS Calibre fallback (both removed). The binary is gitignored: CI downloads it with a sha256 check; locally download the `kindling-cli-mac-apple-silicon` (or `-mac-intel`) release asset to that path and `chmod +x` it.
 - **antigravity-cli (agy)** — AI model transport provider for the analysis pipeline (uses stdin transport).
 
 ## Who This Is For

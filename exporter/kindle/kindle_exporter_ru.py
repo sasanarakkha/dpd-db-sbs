@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """Create an EPUB and MOBI version of DPD.
+
 The word set is limited to
 - CST EBTS
 - Sutta Central EBTS
-- words in deconstructed compounds."""
+- words in deconstructed compounds.
 
+Entries are keyed so that every form reaches every sense it has: a single
+index term resolves to a single entry on Kindle, so a form shared by several
+headwords gets an entry of its own listing them all."""
+
+import os
 import subprocess
-import platform
-import shutil
 
 from datetime import datetime
 from jinja2 import Environment
@@ -25,7 +29,6 @@ from tools.first_letter import find_first_letter
 from tools.meaning_construction import make_meaning_combo_html
 from tools.meaning_construction import summarize_construction
 from tools.degree_of_completion_ru import degree_of_completion_ru
-from tools.niggahitas import add_niggahitas
 from tools.pali_alphabet import pali_alphabet
 from tools.pali_sort_key import pali_list_sorter, pali_sort_key
 from tools.paths import ProjectPaths
@@ -33,7 +36,7 @@ from tools.deconstructed_words import make_words_in_deconstructions
 from tools.printer import printer as pr
 from tools.tsv_read_write import read_tsv_dict
 
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import Session, joinedload
 
 from tools.paths_ru import RuPaths
 from tools.tools_for_ru_exporter import (
@@ -42,132 +45,246 @@ from tools.tools_for_ru_exporter import (
     ru_make_grammar_line,
 )
 from exporter.jinja2_env import get_jinja2_env
-from exporter.kindle.data_classes import _make_friendly, html_friendly
+from exporter.kindle.data_classes import KindleData, html_friendly
+
+# the dictionary is limited to the early texts
+EBT_BOOKS = [
+    "vin1",
+    "vin2",
+    "vin3",
+    "vin4",
+    "dn1",
+    "dn2",
+    "dn3",
+    "mn1",
+    "mn2",
+    "mn3",
+    "sn1",
+    "sn2",
+    "sn3",
+    "sn4",
+    "sn5",
+    "an1",
+    "an2",
+    "an3",
+    "an4",
+    "an5",
+    "an6",
+    "an7",
+    "an8",
+    "an9",
+    "an10",
+    "an11",
+    "kn1",
+    "kn2",
+    "kn3",
+    "kn4",
+    "kn5",
+    "kn8",
+    "kn9",
+]
+
+
+class KindleDataRu(KindleData):
+    """Russian body of one headword: summary, grammar table and examples in
+    Russian, on top of upstream's KindleData."""
+
+    def _generate_summary(self) -> str:
+        i = self.i
+        summary = f"{i.pos}. "
+        if i.plus_case:
+            summary += f"({i.plus_case}) "
+        summary = ru_replace_abbreviations(summary)
+        summary += make_ru_meaning_for_ebook(i, i.ru)
+        construction = summarize_construction(i)
+        if construction:
+            summary += f" [{construction}]"
+        summary += f" {degree_of_completion_ru(i)}"
+        if "&" in summary:
+            summary = summary.replace(" & ", " и ")
+        return summary
+
+    def _render_grammar_table(self) -> str:
+        """html table of grammatical information"""
+        i = self.i
+        if i.meaning_1:
+            # a copy: ru_notes is added without touching the shared dict
+            friendly = dict(self.friendly)
+            if i.ru and i.ru.ru_notes:
+                friendly["ru_notes"] = html_friendly(i.ru.ru_notes)
+            grammar = ru_make_grammar_line(i)
+            meaning = f"{make_meaning_combo_html(i)}"
+            template = self.jinja_env.get_template("ebook_ru_grammar.jinja")
+            html = template.render(
+                i=i, friendly=friendly, grammar=grammar, meaning=meaning
+            )
+            if "&" in html:
+                html = html.replace(" & ", " и ")
+            return html
+        return ""
+
+    def _render_examples(self) -> str:
+        """render sutta examples html"""
+        if self.i.meaning_1 and self.i.example_1:
+            template = self.jinja_env.get_template("ebook_ru_example.jinja")
+            return template.render(i=self.i, friendly=self.friendly)
+        return ""
+
+
+def _niggahita_variants(forms: set[str]) -> set[str]:
+    """SuttaCentral spells the niggahita ṁ while the lookup table keys it ṃ, so
+    a reader tapping a ṁ form finds nothing unless both spellings are indexed."""
+    return {f.replace("ṃ", "ṁ") for f in forms if "ṃ" in f}
+
+
+def _letter_files() -> dict[str, str]:
+    """Letter -> output filename, matching the static manifest in content.opf."""
+    return {
+        letter: f"{i}_{diacritics_cleaner(letter)}.xhtml"
+        for i, letter in enumerate(pali_alphabet)
+    }
+
+
+def _load_lookup(
+    db_session: Session, words: set[str]
+) -> tuple[dict[str, list[int]], dict[str, list[str]], dict[str, str]]:
+    """One pass over Lookup for the text-set forms: which headwords each form
+    belongs to, its spellings in the other scripts, and any deconstruction."""
+    form_headwords: dict[str, list[int]] = {}
+    scripts: dict[str, list[str]] = {}
+    deconstructions: dict[str, str] = {}
+    word_list = list(words)
+    chunk_size = 900
+    for start in range(0, len(word_list), chunk_size):
+        chunk = word_list[start : start + chunk_size]
+        for row in db_session.query(Lookup).filter(Lookup.lookup_key.in_(chunk)).all():
+            if row.headwords:
+                form_headwords[row.lookup_key] = row.headwords_unpack
+            spellings = {
+                s
+                for s in row.devanagari_unpack + row.sinhala_unpack + row.thai_unpack
+                if s and s.strip()
+            }
+            if spellings:
+                scripts[row.lookup_key] = sorted(spellings, key=pali_sort_key)
+            if row.deconstructor:
+                unpacked = row.deconstructor_unpack
+                if unpacked:
+                    deconstructions[row.lookup_key] = "<br/>".join(unpacked)
+    return form_headwords, scripts, deconstructions
 
 
 def render_dpd_xhtml_ru(pth: ProjectPaths, rupth: RuPaths) -> int:
+    """Render the dictionary, keyed so that every form reaches every sense it
+    has. A single index term resolves to a single entry, so a form shared by
+    several headwords needs an entry of its own that lists them all."""
+    jinja_env = get_jinja2_env("exporter/kindle/ru_components/templates")
     pr.green_tmr("querying dpd db")
     db_session = get_db_session(pth.dpd_db_path)
-    dpd_db = db_session.query(DpdHeadword).options(joinedload(DpdHeadword.ru)).all()
-    dpd_db = sorted(dpd_db, key=lambda x: pali_sort_key(x.lemma_1))
-    pr.yes(len(dpd_db))
+    db_session.autoflush = False
+    headwords = sorted(
+        db_session.query(DpdHeadword).options(joinedload(DpdHeadword.ru)).all(),
+        key=lambda h: pali_sort_key(h.lemma_1),
+    )
+    pr.yes(len(headwords))
 
-    # limit the extent of the dictionary to an ebt text set
-    ebt_books = [
-        "vin1",
-        "vin2",
-        "vin3",
-        "vin4",
-        "dn1",
-        "dn2",
-        "dn3",
-        "mn1",
-        "mn2",
-        "mn3",
-        "sn1",
-        "sn2",
-        "sn3",
-        "sn4",
-        "sn5",
-        "an1",
-        "an2",
-        "an3",
-        "an4",
-        "an5",
-        "an6",
-        "an7",
-        "an8",
-        "an9",
-        "an10",
-        "an11",
-        "kn1",
-        "kn2",
-        "kn3",
-        "kn4",
-        "kn5",
-        "kn8",
-        "kn9",
-    ]
-
-    # all words in cst and sc texts
-    cst_text_set = make_cst_text_set(pth, ebt_books)
-    sc_text_set = make_sc_text_set(pth, ebt_books)
-    combined_text_set = cst_text_set | sc_text_set
-
-    # words in deconstructor in cst_text_set & sc_text_set
-    pr.green_tmr("querying lookup for deconstructor")
-    chunk_size = 900
-    deconstructor_db = []
-
-    combined_text_list = list(combined_text_set)
-    for i in range(0, len(combined_text_list), chunk_size):
-        chunk = combined_text_list[i : i + chunk_size]
-        chunk_result = (
-            db_session.query(Lookup)
-            .filter(Lookup.deconstructor != "", Lookup.lookup_key.in_(chunk))
-            .all()
-        )
-        deconstructor_db.extend(chunk_result)
-    words_in_deconstructor_set = make_words_in_deconstructions(db_session)
-    pr.yes(len(words_in_deconstructor_set))
-
-    # all_words_set = cst_text_set + sc_text_set + words in deconstructor compounds
+    # the text-set helpers print their own timed lines, so they must run
+    # before this line opens
+    cst_words = make_cst_text_set(pth, EBT_BOOKS)
+    sc_words = make_sc_text_set(pth, EBT_BOOKS)
     pr.green_tmr("making all words set")
-    all_words_set = combined_text_set | words_in_deconstructor_set
-    pr.yes(len(all_words_set))
+    words = cst_words | sc_words
+    words |= make_words_in_deconstructions(db_session)
+    words = {w for w in words if w and w.strip()}
+    pr.yes(len(words))
 
-    pr.green_tmr("creating inflections dict")
-    inflections_dict: dict[int, list[str]] = {}
-    inflections_counter = 0
-    for i in dpd_db:
-        inflections_set: set[str] = set(i.inflections_list_all) & all_words_set
-        inflections_set = set(add_niggahitas(list(inflections_set), all=False))
-        inflections_sorted: list[str] = pali_list_sorter(list(inflections_set))
-        inflections_filtered: list[str] = [
-            inf for inf in inflections_sorted if inf and inf.strip()
-        ]
-        inflections_dict[i.id] = inflections_filtered
-        inflections_counter += len(inflections_filtered)
-    pr.yes(inflections_counter)
+    pr.green_tmr("querying lookup")
+    form_headwords, scripts, deconstructions = _load_lookup(db_session, words)
+    pr.yes(len(form_headwords))
 
-    # Jinja env
-    jinja_env = get_jinja2_env("exporter/kindle/ru_components/templates")
+    pr.green_title("rendering headword bodies")
+    bodies: dict[int, KindleDataRu] = {}
+    for counter, headword in enumerate(headwords):
+        bodies[headword.id] = KindleDataRu(headword, jinja_env, headword.id, [])
+        if counter % 20000 == 0:
+            pr.counter(counter, len(headwords), headword.lemma_1)
+    pr.counter(len(bodies), len(headwords), "")
+
+    pr.green_tmr("routing ambiguous forms")
+    lemma_labels = {h.lemma_1: h.id for h in headwords}
+    sole_owner: dict[int, list[str]] = {}
+    ambiguous: set[str] = set()
+    for form, ids in form_headwords.items():
+        if len(ids) == 1 and form not in deconstructions:
+            sole_owner.setdefault(ids[0], []).append(form)
+        else:
+            ambiguous.add(form)
+    ambiguous.update(f for f in deconstructions if f not in form_headwords)
+    pr.yes(len(ambiguous))
+
+    pr.green_tmr("finding contested headwords")
+    # a label reaches one entry, so where a form entry and a headword entry want
+    # the same string the headword is folded into the form entry
+    contested = ambiguous & set(lemma_labels)
+    pr.yes(len(contested))
 
     pr.green_title("creating letter dict entries")
-    letter_dict: dict[str, list[str]] = {}
-    for letter in pali_alphabet:
-        letter_dict[letter] = []
-
-    # add all words
+    letter_dict: dict[str, list[str]] = {letter: [] for letter in pali_alphabet}
+    letter_files = _letter_files()
     id_counter = 1
-    for counter, i in enumerate(dpd_db):
-        inflection_list: list[str] = inflections_dict[i.id]
-        first_letter = find_first_letter(i.lemma_1)
-        entry = render_ebook_entry_ru(jinja_env, id_counter, i, inflection_list)
-        letter_dict[first_letter].append(entry)
-        id_counter += 1
-        if counter % 5000 == 0:
-            pr.counter(counter, len(dpd_db), i.lemma_1)
 
-    # add deconstructor words
-    pr.green_title("add deconstructor words")
-    for counter, i in enumerate(deconstructor_db):
-        first_letter = find_first_letter(i.lookup_key)
-        entry = render_deconstructor_entry_ru(jinja_env, id_counter, i)
-        letter_dict[first_letter].append(entry)
+    for counter, headword in enumerate(headwords):
+        if headword.lemma_1 in contested:
+            continue
+        aliases = _headword_aliases(headword, sole_owner, scripts)
+        entry = render_ebook_entry_ru(
+            jinja_env,
+            bodies[headword.id],
+            aliases,
+            deconstructions.get(headword.lemma_1, ""),
+        )
+        letter_dict[find_first_letter(headword.lemma_1)].append(entry)
         id_counter += 1
-        if counter % 5000 == 0:
-            pr.counter(counter, len(deconstructor_db), i.lookup_key)
+        if counter % 20000 == 0:
+            pr.counter(counter, len(headwords), headword.lemma_1)
+    pr.counter(len(headwords), len(headwords), "")
 
-    # save to xhtml
+    pr.green_title("adding form entries")
+    sorted_forms = pali_list_sorter(list(ambiguous))
+    for counter, form in enumerate(sorted_forms):
+        merged_id = lemma_labels.get(form) if form in contested else None
+        aliases = set(scripts.get(form, []))
+        own_forms = {form}
+        if merged_id is not None:
+            for owned in sole_owner.get(merged_id, []):
+                if owned != form:
+                    aliases.add(owned)
+                aliases.update(scripts.get(owned, []))
+                own_forms.add(owned)
+        aliases |= _niggahita_variants(own_forms)
+        aliases.discard(form)
+        entry = render_form_entry_ru(
+            jinja_env,
+            id_counter,
+            form,
+            [bodies[i] for i in form_headwords.get(form, []) if i in bodies],
+            pali_list_sorter(list(aliases)),
+            bodies.get(merged_id) if merged_id is not None else None,
+            deconstructions.get(form, ""),
+            letter_files,
+        )
+        letter_dict[find_first_letter(form)].append(entry)
+        id_counter += 1
+        if counter % 20000 == 0:
+            pr.counter(counter, len(sorted_forms), form)
+    pr.counter(len(sorted_forms), len(sorted_forms), "")
+
     pr.green_tmr("saving entries xhtml")
     total = 0
-    for counter, (letter, entries) in enumerate(letter_dict.items()):
-        ascii_letter = diacritics_cleaner(letter)
+    for letter, entries in letter_dict.items():
         total += len(entries)
-        entries_str = "".join(entries)
-        xhtml = render_ebook_letter_templ_ru(jinja_env, letter, entries_str)
-        output_path = rupth.epub_text_dir.joinpath(f"{counter}_{ascii_letter}.xhtml")
+        xhtml = render_ebook_letter_templ_ru(jinja_env, letter, "".join(entries))
+        output_path = rupth.epub_text_dir.joinpath(letter_files[letter])
         with output_path.open("w", encoding="utf-8") as f:
             f.write(xhtml)
     pr.yes(total)
@@ -176,78 +293,63 @@ def render_dpd_xhtml_ru(pth: ProjectPaths, rupth: RuPaths) -> int:
     return id_counter + 1
 
 
+def _headword_aliases(
+    headword: DpdHeadword,
+    sole_owner: dict[int, list[str]],
+    scripts: dict[str, list[str]],
+) -> list[str]:
+    """Forms only this headword owns, plus their other-script spellings."""
+    owned = sole_owner.get(headword.id, [])
+    aliases = {f for f in owned if f != headword.lemma_1}
+    for form in [*owned, headword.lemma_1]:
+        aliases.update(scripts.get(form, []))
+    aliases |= _niggahita_variants(set(owned) | {headword.lemma_1})
+    aliases.discard(headword.lemma_1)
+    return pali_list_sorter(list(aliases))
+
+
 def render_ebook_entry_ru(
     jinja_env: Environment,
-    counter: int,
-    i: DpdHeadword,
-    inflections: list[str],
+    data: KindleDataRu,
+    aliases: list[str],
+    deconstruction: str,
 ) -> str:
-    """Render single word entry."""
-    summary = f"{i.pos}. "
-    if i.plus_case:
-        summary += f"({i.plus_case}) "
-    summary = ru_replace_abbreviations(summary)
-    summary += make_ru_meaning_for_ebook(i, i.ru)
-    construction = summarize_construction(i)
-    if construction:
-        summary += f" [{construction}]"
-    summary += f" {degree_of_completion_ru(i)}"
-    if "&" in summary:
-        summary = summary.replace(" & ", " и ")
-
-    # precompute html-friendly text without mutating the ORM-tracked headword
-    friendly = _make_friendly(i)
-    if i.ru and i.ru.ru_notes:
-        friendly["ru_notes"] = html_friendly(i.ru.ru_notes)
-
-    grammar_table = render_grammar_templ_ru(jinja_env, i, friendly)
-    if "&" in grammar_table:
-        grammar_table = grammar_table.replace(" & ", " и ")
-    examples = render_example_templ_ru(jinja_env, i, friendly)
-
+    """Render one headword's full entry."""
     template = jinja_env.get_template("ebook_ru_entry.jinja")
+    return template.render(data=data, aliases=aliases, deconstruction=deconstruction)
+
+
+def render_form_entry_ru(
+    jinja_env: Environment,
+    counter: int,
+    form: str,
+    senses: list[KindleDataRu],
+    aliases: list[str],
+    merged: KindleDataRu | None,
+    deconstruction: str,
+    letter_files: dict[str, str],
+) -> str:
+    """Render one ambiguous form, listing every sense it has with a link."""
+    template = jinja_env.get_template("ebook_ru_form_entry.jinja")
+    # a merged headword is rendered in full at the foot of the entry, so it must
+    # not also appear above as a one-line sense linking to itself
+    merged_id = merged.i.id if merged is not None else None
+    linked = [
+        {
+            "lemma_1": html_friendly(data.i.lemma_1),
+            "summary": data.summary,
+            "href": f"{letter_files[find_first_letter(data.i.lemma_1)]}#hw{data.i.id}",
+        }
+        for data in senses
+        if data.i.id != merged_id
+    ]
     return template.render(
         counter=counter,
-        lemma_1=i.lemma_1,
-        lemma_clean=i.lemma_clean,
-        inflections=inflections,
-        summary=summary,
-        grammar_table=grammar_table,
-        examples=examples,
-    )
-
-
-def render_grammar_templ_ru(
-    jinja_env: Environment, i: DpdHeadword, friendly: dict[str, str]
-) -> str:
-    """html table of grammatical information"""
-    if i.meaning_1:
-        grammar = ru_make_grammar_line(i)
-        meaning = f"{make_meaning_combo_html(i)}"
-        template = jinja_env.get_template("ebook_ru_grammar.jinja")
-        return template.render(i=i, friendly=friendly, grammar=grammar, meaning=meaning)
-    return ""
-
-
-def render_example_templ_ru(
-    jinja_env: Environment, i: DpdHeadword, friendly: dict[str, str]
-) -> str:
-    """render sutta examples html"""
-    if i.meaning_1 and i.example_1:
-        template = jinja_env.get_template("ebook_ru_example.jinja")
-        return template.render(i=i, friendly=friendly)
-    return ""
-
-
-def render_deconstructor_entry_ru(
-    jinja_env: Environment, counter: int, i: Lookup
-) -> str:
-    """Render deconstructor word entry."""
-    construction = i.lookup_key
-    deconstruction = "<br/>".join(i.deconstructor_unpack)
-    template = jinja_env.get_template("ebook_ru_deconstructor_entry.jinja")
-    return template.render(
-        counter=counter, construction=construction, deconstruction=deconstruction
+        form=form,
+        senses=linked,
+        aliases=aliases,
+        merged=merged,
+        deconstruction=deconstruction,
     )
 
 
@@ -308,13 +410,35 @@ def save_title_page_xhtml(rupth: RuPaths) -> None:
     save_content_opf_xhtml(rupth, current_datetime)
 
 
+def find_pages_with_web_links(pth: RuPaths) -> set[str]:
+    """Return the names of text pages that contain an http(s) src or href.
+
+    kindling's OPF_014 check treats a plain hyperlink as a remote resource and
+    wants the page declared as one. It also warns when a page is declared but
+    has no such URL, so the list has to match the pages exactly.
+    """
+    needles = tuple(
+        f'{attr}="{scheme}://'
+        for attr in ("src", "href")
+        for scheme in ("http", "https")
+    )
+    return {
+        page.name
+        for page in pth.epub_text_dir.glob("*.xhtml")
+        if any(needle in page.read_text(encoding="utf-8") for needle in needles)
+    }
+
+
 def save_content_opf_xhtml(rupth: RuPaths, current_datetime: datetime) -> None:
     """Save date and time in content.opf."""
     pr.green_tmr("saving content.opf")
     jinja_env = get_jinja2_env("exporter/kindle/ru_components/templates")
     date_time_zulu = current_datetime.strftime("%Y-%m-%dT%H:%M:%SZ")
     template = jinja_env.get_template("ebook_ru_content_opf.jinja")
-    content = template.render(date_time_zulu=date_time_zulu)
+    content = template.render(
+        date_time_zulu=date_time_zulu,
+        remote_pages=find_pages_with_web_links(rupth),
+    )
     with rupth.epub_content_opf_path.open("w", encoding="utf-8") as f:
         f.write(content)
     pr.yes("OK")
@@ -332,42 +456,42 @@ def zip_epub(pth: RuPaths) -> None:
 
 
 def make_mobi(pth: RuPaths) -> None:
-    """Convert epub to mobi using available tool."""
+    """Compile the rendered epub into a Kindle dictionary with kindling.
+
+    The OPF is passed rather than the zipped epub: kindling embeds an epub
+    input as a SRCS record, and DPD's epub is over the 16 MB PalmDB record
+    limit that Kindle firmware refuses to open.
+    """
     pr.green_title("converting epub to mobi")
-    system = platform.system()
-    epub_path = str(pth.dpd_epub_path)
-    mobi_path = epub_path.replace(".epub", ".mobi")
-    if system == "Darwin":
-        if shutil.which("ebook-convert"):
-            process = subprocess.Popen(
-                ["ebook-convert", epub_path, mobi_path],
-                stdout=subprocess.PIPE,
-                text=True,
-            )
-            if process.stdout:
-                for line in process.stdout:
-                    pr.white(escape(line.rstrip()))
-            process.wait()
-            pr.amber(
-                "NOTE (macOS local build only): Calibre cannot compile Kindle "
-                "dictionary markup (idx:entry), so this local .mobi is a broken "
-                "~256 KB stub with all entries dropped — do NOT distribute it. "
-                "The valid full mobi is built by kindlegen on GitHub CI "
-                "(ru_release.yml)."
-            )
-            return
-        else:
-            pr.red("No compatible MOBI converter found on macOS.")
-            return
-    else:
-        process = subprocess.Popen(
-            [str(pth.kindlegen_path), epub_path], stdout=subprocess.PIPE, text=True
-        )
-        if process.stdout:
-            for line in process.stdout:
-                pr.white(escape(line.rstrip()))
-        process.wait()
-        pr.yes("Converted with kindlegen")
+
+    # os.access, not .exists(): a downloaded release asset lands mode 0644 and
+    # would otherwise pass the check and die inside Popen.
+    if not os.access(pth.kindling_path, os.X_OK):
+        pr.red(f"no executable kindling binary at {pth.kindling_path}")
+        raise FileNotFoundError(pth.kindling_path)
+
+    command = [
+        str(pth.kindling_path),
+        "build",
+        str(pth.epub_content_opf_path),
+        "-o",
+        str(pth.dpd_mobi_path),
+    ]
+    process = subprocess.Popen(
+        command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+    )
+    if process.stdout is not None:
+        for line in process.stdout:
+            pr.white(escape(line.rstrip()))
+    returncode = process.wait()
+
+    # kindling exits non-zero when its own readback check finds a MOBI that
+    # would fail to open on device, and then declines to ship the file.
+    if returncode != 0:
+        pr.red(f"kindling failed with exit code {returncode}")
+        raise RuntimeError(f"kindling failed with exit code {returncode}")
+
+    pr.yes("Converted with kindling")
 
 
 def render_rpd_xhtml_ru(pth: ProjectPaths, rupth: RuPaths, id_counter: int) -> int:
@@ -439,7 +563,7 @@ def render_rpd_xhtml_ru(pth: ProjectPaths, rupth: RuPaths, id_counter: int) -> i
         total += len(entries_list)
         entries_str = "".join(entries_list)
         xhtml = render_rpd_letter_templ_ru(jinja_env, letter, entries_str)
-        output_path = rupth.epub_text_dir.joinpath(f"rpd_{counter}_{letter}.xhtml")
+        output_path = rupth.epub_text_dir.joinpath(f"rpd_{counter}.xhtml")
         with output_path.open("w", encoding="utf-8") as f:
             f.write(xhtml)
     pr.yes(total)

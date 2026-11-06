@@ -38,7 +38,7 @@ class RuPaths:
 
         # exporter/kindle/
         self.epub_dir = base_dir / "exporter/kindle/ru_components/epub/"
-        self.kindlegen_path = base_dir / "exporter/kindle/kindlegen"
+        self.kindling_path = base_dir / "exporter/kindle/kindling-cli"
 
         # exporter/kindle/ru_epub
         self.epub_abbreviations_path = (
@@ -61,10 +61,6 @@ class RuPaths:
         self.ebook_content_opf_templ_path = (
             base_dir
             / "exporter/kindle/ru_components/templates/ebook_ru_content_opf.html"
-        )
-        self.ebook_deconstructor_templ_path = (
-            base_dir
-            / "exporter/kindle/ru_components/templates/ebook_ru_deconstructor_entry.html"
         )
         self.ebook_entry_templ_path = (
             base_dir / "exporter/kindle/ru_components/templates/ebook_ru_entry.html"

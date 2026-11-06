@@ -172,11 +172,13 @@
       "local_changes": [
         "Adapted from `draft_release.yml` to build and release Russian dictionary artifacts.",
         "Release targets RU goldendict/mdict outputs; upload destinations are RU-specific GitHub release.",
-        "\"Add TPD to Lookup Table\" step added after the RPD step (`uv run python db/tpd/tpd_to_lookup.py`)."
+        "\"Add TPD to Lookup Table\" step added after the RPD step (`uv run python db/tpd/tpd_to_lookup.py`).",
+        "\"Install kindling\" step (pinned v0.45.6, sha256-checked, linux asset) runs before the Kindle export step, copied from `draft_release.yml`; kindling replaces the retired kindlegen."
       ],
       "watch_for": [
         "Upstream changes to release workflow steps (artifact names, upload actions) need mirroring here.",
-        "The TPD step must remain after RPD and before dealbreakers."
+        "The TPD step must remain after RPD and before dealbreakers.",
+        "Keep the kindling version/sha256 in step with `draft_release.yml`."
       ]
     },
     ".github/workflows/ru_release_kindle.yml": {
@@ -185,11 +187,13 @@
       "sync_rule": "inspired_only",
       "local_changes": [
         "Adapted from `draft_release.yml` to build and release the Russian Kindle & ePub artifacts via `uv run python exporter/kindle/kindle_exporter_ru.py`.",
-        "Lookup-table build steps (Suttas, EPD, RPD) run before the Kindle export step."
+        "Lookup-table build steps (Suttas, EPD, RPD) run before the Kindle export step.",
+        "\"Install kindling\" step (pinned v0.45.6, sha256-checked, linux asset) runs before the Kindle export step, copied from `draft_release.yml`; kindling replaces the retired kindlegen."
       ],
       "watch_for": [
         "Upstream changes to release workflow steps (artifact names, upload actions, lookup-build order) need mirroring here.",
-        "Keep the Kindle export step consuming the RU exporter output; do not adopt the draft_release goldendict/mdict upload targets."
+        "Keep the Kindle export step consuming the RU exporter output; do not adopt the draft_release goldendict/mdict upload targets.",
+        "Keep the kindling version/sha256 in step with `draft_release.yml`."
       ]
     },
     ".github/workflows/ru_static.yml": {
@@ -676,8 +680,7 @@
     "shared_data/changed_templates",
     ".metadata_never_index",
     "dpd-db.code-workspace",
-    "tools/cst_source/__init__.py",
-    "exporter/kindle/kindlegen"
+    "tools/cst_source/__init__.py"
   ],
   "russian_copies": {
     "db/families/family_compound_ru.py": {
@@ -846,16 +849,18 @@
       "upstream": "exporter/kindle/kindle_exporter.py",
       "sync_rule": "PORT",
       "local_changes": [
-        "`render_dpd_xhtml` signature changed to accept `pth` and `rupth`; `script_attr` logic removed (Russian fork uses Roman script only).",
-        "Loads templates from `ru_components/templates/`.",
-        "`render_ebook_entry` builds a Russian summary using `make_ru_meaning_for_ebook`, `ru_replace_abbreviations`, and `ru_degree_of_completion`.",
-        "`render_grammar_templ` and `render_example_templ` use `_ru.jinja` templates.",
-        "`render_rpd_xhtml` (replacing upstream's `render_epd_xhtml`) uses the Russian alphabet and `Lookup.rpd`.",
+        "Port of upstream #217: entries are keyed per headword (`lemma_1`), sole-owner forms become aliases, ambiguous/deconstructed forms get `f{n}` form entries, contested labels fold into the form entry. Helpers (`EBT_BOOKS`, `_niggahita_variants`, `_letter_files`, `_load_lookup`, `_headword_aliases`, `find_pages_with_web_links`) are verbatim copies of upstream.",
+        "`render_dpd_xhtml_ru(pth, rupth)` is upstream `render_dpd_xhtml` with `joinedload(DpdHeadword.ru)`, `KindleDataRu`, the RU template env and `rupth.epub_text_dir`.",
+        "`KindleDataRu(KindleData)` overrides `_generate_summary` (`ru_replace_abbreviations`, `make_ru_meaning_for_ebook`, `degree_of_completion_ru`, `\" & \"`→`\" и \"`), `_render_grammar_table` (`ebook_ru_grammar.jinja`, `ru_notes`, `ru_make_grammar_line`) and `_render_examples` (`ebook_ru_example.jinja`); shared `data_classes.py` is not modified.",
+        "`render_ebook_entry_ru` / `render_form_entry_ru` mirror upstream signatures with `ebook_ru_*` templates; the separate deconstructor entry renderer is gone (deconstruction rides on the entry).",
+        "`render_rpd_xhtml_ru` (replacing upstream's `render_epd_xhtml`) uses the Russian alphabet and `Lookup.rpd`.",
+        "`make_mobi` is upstream's kindling build (`rupth.kindling_path`, OPF input); kindlegen and the Calibre macOS branch are removed.",
         "Output paths resolve via `rupth` (e.g., `ru-dpd-kindle.epub`)."
       ],
       "watch_for": [
-        "Upstream `KindleData` class is not used; instead, fields are passed directly to templates.",
-        "The entire EBTS text set logic is preserved but applied to Russian outputs."
+        "Keep the copied helpers and `render_dpd_xhtml_ru` structure in step with upstream `kindle_exporter.py`; only the RU layer (`KindleDataRu`, `_ru` names, `rupth`, templates) may differ.",
+        "If upstream `KindleData` changes its constructor or the three render hooks, re-check `KindleDataRu`.",
+        "The EBTS text set logic is preserved but applied to Russian outputs."
       ]
     },
     "exporter/kindle/ru_components/cover/": {
@@ -873,12 +878,14 @@
       "upstream": "exporter/kindle/epub/",
       "sync_rule": "PORT",
       "local_changes": [
-        "Russian-language EPUB structural files (OEBPS/content.opf, titlepage.xhtml).",
-        "Metadata (title, creator, language=\"ru\") set to Russian fork values.",
+        "Russian-language EPUB structural files (OEBPS/content.opf, toc.ncx, titlepage.xhtml, Text/nav.xhtml).",
+        "Metadata (title, creator, language=\"ru\") set to Russian fork values; `x-metadata` declares DictionaryInLanguage=pi, DictionaryOutLanguage=ru, DefaultLookupIndex=Pali (matches `idx:entry name=\"Pali\"`).",
+        "`toc.ncx` is the Russian NCX (Сокращения, Пали-Русский a..ṃ, Русский-Пали а..я with `rpd_N.xhtml`, RU BookId).",
+        "`nav.xhtml` has the `titlepage.xhtml` entry dropped (upstream a0459b697 dead-link cleanup).",
         "`titlepage.xhtml` update date/time is generated locally for the Russian Kindle build; upstream date/time-only changes are intentionally not ported."
       ],
       "watch_for": [
-        "Navigation entries in `content.opf` must match the generated letter files.",
+        "Navigation entries in `content.opf` and `toc.ncx` must match the generated letter files.",
         "Do not sync upstream `titlepage.xhtml` update date/time into the Russian shadow; only port structural or metadata changes."
       ]
     },
@@ -886,11 +893,14 @@
       "upstream": "exporter/kindle/templates/",
       "sync_rule": "PORT",
       "local_changes": [
-        "Full set of Russian XHTML templates for ebook export: `ebook_ru_entry.jinja`, `ebook_ru_grammar.jinja`, `ebook_ru_example.jinja`, `ebook_ru_rpd_letter.jinja`, etc.",
-        "Binds Russian localized context variables replacing upstream english variables."
+        "Full set of Russian XHTML templates for ebook export: `ebook_ru_entry.jinja`, `ebook_ru_form_entry.jinja`, `ebook_ru_grammar.jinja`, `ebook_ru_example.jinja`, `ebook_ru_rpd_letter.jinja`, etc.",
+        "`ebook_ru_entry.jinja` / `ebook_ru_form_entry.jinja` mirror upstream `ebook_entry.jinja` / `ebook_form_entry.jinja` (`data.*` shape, `lemma_1` orth, `hw{id}` anchors).",
+        "`ebook_ru_content_opf.jinja` carries `dc:type`, `x-metadata`, the `ncx` manifest item, `<spine toc=\"ncx\">`, the `<guide>` index reference (`Text/0_a.xhtml`) and per-page `remote-resources`.",
+        "`ebook_ru_deconstructor_entry.jinja` was removed (upstream retired its separate deconstructor entries)."
       ],
       "watch_for": [
-        "Template variables must match the direct dictionary passing in `kindle_exporter_ru.py`."
+        "Template variables must match `KindleDataRu` and the render calls in `kindle_exporter_ru.py`.",
+        "Entry/form-entry templates must stay in step with upstream `ebook_entry.jinja` / `ebook_form_entry.jinja`."
       ]
     },
     "exporter/tbw/tbw_exporter_ru.py": {

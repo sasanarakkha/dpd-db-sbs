@@ -206,6 +206,18 @@ jobs:
     # ----------------------------------------
 
 
+    # kindling replaces the retired kindlegen (same pinned binary as draft_release.yml).
+    - name: Install kindling
+      env:
+        KINDLING_VERSION: "0.45.6"
+        KINDLING_SHA256: "417ad6dad4b1072fabb20610f320ba44ca8f4afcbe2f47948dcefc3955bd6439"
+      run: |
+        curl -sSfL -o exporter/kindle/kindling-cli \
+          "https://github.com/ciscoriordan/kindling/releases/download/v${KINDLING_VERSION}/kindling-cli-linux"
+        echo "${KINDLING_SHA256}  exporter/kindle/kindling-cli" | sha256sum -c -
+        chmod +x exporter/kindle/kindling-cli
+        exporter/kindle/kindling-cli --version
+
     - name: Export Kindle & ePub
       run: |
         uv run python exporter/kindle/kindle_exporter_ru.py
