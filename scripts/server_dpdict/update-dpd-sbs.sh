@@ -24,7 +24,6 @@ fi
 
 echo "=== 3. Updating Dependencies with uv ==="
 uv sync
-uv cache prune
 
 echo "=== 4. Updating Data (Audio & Translations) ==="
 uv run python audio/db_release_download.py
