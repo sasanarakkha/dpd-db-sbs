@@ -4,7 +4,7 @@ import pandas as pd
 
 # --- Configuration ---
 # Define the paths to your files
-base_path = "shared_data/discourses/"
+base_path = "temp/discourses/"
 source = "sn22"
 original_vocab_path = os.path.join(base_path, f"vocab/vocab_{source}.csv")
 output_path = os.path.join(base_path, f"output/{source}_output.csv")

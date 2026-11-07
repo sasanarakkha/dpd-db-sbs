@@ -28,7 +28,7 @@ def main() -> None:
     pr.green_title("Extracting grammar csvs...")
     dpspth = DPSPaths()
     pth = ProjectPaths()
-    sheets = load_grammar_sheets(dpspth.pali_class_output_dir / "grammar")
+    sheets = load_grammar_sheets(dpspth.pali_class_grammar_data_dir)
     make_grammar_csvs(sheets, dpspth, pth)
     check_duplicate_ids(sheets)
     pr.toc()

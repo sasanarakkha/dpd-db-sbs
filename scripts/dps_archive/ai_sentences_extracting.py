@@ -439,20 +439,20 @@ if __name__ == "__main__":
 
     # --- Default paths for "batch_class_inference" ---
     class_num = "29"
-    vocab_csv_for_batch = f"shared_data/pali_class/vocab/vocab_class_{class_num}.csv"
+    vocab_csv_for_batch = f"temp/pali_class/vocab/vocab_class_{class_num}.csv"
     exercise_file_for_batch = (
-        f"shared_data/pali_class/exercises/exercises_class_{class_num}.txt"
+        f"temp/pali_class/exercises/exercises_class_{class_num}.txt"
     )
     output_csv_for_batch = (
-        f"shared_data/pali_class/output/class_{class_num}_output2.csv"
+        f"temp/pali_class/output/class_{class_num}_output2.csv"
     )
 
     # --- Default paths for "batch_discourse_inference" ---
     sutta_code = "sn56"
-    discourse_vocab_csv_path = "shared_data/discourses/vocab/vocab_rest.csv"
-    sutta_text_file_for_discourse = f"shared_data/discourses/suttas/{sutta_code}.txt"
+    discourse_vocab_csv_path = "temp/discourses/vocab/vocab_rest.csv"
+    sutta_text_file_for_discourse = f"temp/discourses/suttas/{sutta_code}.txt"
     output_csv_for_discourse = (
-        f"shared_data/discourses/output/rest_{sutta_code}_output.csv"
+        f"temp/discourses/output/rest_{sutta_code}_output.csv"
     )
     # --- End Configuration ---
 

@@ -118,11 +118,11 @@ if __name__ == "__main__":
     # category = "rest2"
     
     if mode == "class":
-        base_path = dpspth.pali_class_output_dir
+        base_path = os.path.join(dpspth.temp_dir, "pali_class")
         csv_path = os.path.join(base_path, "done", f"class_{class_number}_output done.csv")
     elif mode == "suttas":
         print("something here to add")
-        # base_path = dpspth.discourses_output_dir
+        # base_path = os.path.join(dpspth.temp_dir, "discourses")
         # csv_path = os.path.join(base_path, "done", f"{category} done.csv")
 
     if not csv_path:

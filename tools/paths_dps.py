@@ -153,15 +153,9 @@ class DPSPaths:
             Path("shared_data/rus/ru_total_comps.tsv")
         )
 
-        self.pali_class_vocab_dir = base_dir.joinpath(
-            Path("shared_data/pali_class/vocab/")
+        self.pali_class_grammar_data_dir = base_dir.joinpath(
+            Path("shared_data/pali_class/grammar/")
         )
-        self.pali_class_output_dir = base_dir.joinpath(Path("shared_data/pali_class/"))
-
-        self.discourses_vocab_dir = base_dir.joinpath(
-            Path("shared_data/discourses/vocab/")
-        )
-        self.discourses_output_dir = base_dir.joinpath(Path("shared_data/discourses/"))
 
         self.internal_tests_path = base_dir.joinpath(
             Path("db_tests/dps_internal_tests.tsv")

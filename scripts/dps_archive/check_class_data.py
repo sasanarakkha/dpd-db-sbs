@@ -66,11 +66,11 @@ def find_mismatched_examples(mode: str, source: str, dpspth: DPSPaths):
         source: The class number or sutta name to process.
     """
     if mode == "pali_class":
-        base_path = dpspth.pali_class_output_dir
+        base_path = os.path.join(dpspth.temp_dir, "pali_class")
         csv_path = os.path.join(base_path, "done", f"class_{source}_output done.csv")
         txt_path = os.path.join(base_path, "exercises", f"exercises_class_{source}.txt")
     elif mode == "discourses":
-        base_path = dpspth.discourses_output_dir
+        base_path = os.path.join(dpspth.temp_dir, "discourses")
         csv_path = os.path.join(base_path, "done", f"{source} done.csv")
         txt_path = os.path.join(base_path, "suttas", "combined.txt")
     else:
