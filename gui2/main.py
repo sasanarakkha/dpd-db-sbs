@@ -150,13 +150,11 @@ class App:
         # which toggles it, cannot outrace its creation.
         self._loading_bar = ft.ProgressBar(visible=False)
 
-        page.theme = ft.Theme()
-        page.theme.font_family = "Inter"
-        # Stated rather than inherited from the system, which is what the other
-        # three Flet apps in this repo do. The editor's colours — including the
-        # field border constant in ui_utils — were all chosen against a dark
-        # ground, so following a light system theme would render them wrong.
-        page.theme_mode = ft.ThemeMode.DARK
+        # DPS local: follow the OS light/dark setting. `theme` styles light mode
+        # and `dark_theme` styles dark mode, so the font goes on both.
+        page.theme = ft.Theme(font_family="Inter")
+        page.dark_theme = ft.Theme(font_family="Inter")
+        page.theme_mode = ft.ThemeMode.SYSTEM
         # No window title by the user's choice. The taskbar name and icon do not
         # come from here anyway — on Linux they come from the desktop entry whose
         # `StartupWMClass` matches the Flutter client's WM_CLASS, and
