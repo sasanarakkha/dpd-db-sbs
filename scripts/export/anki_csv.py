@@ -17,6 +17,7 @@ import csv
 import datetime
 import os
 import re
+from difflib import SequenceMatcher
 
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
@@ -43,6 +44,113 @@ def get_common_root_examples(root_example: str, main_verb: str) -> str:
     examples = [example.strip() for example in root_example.split(",")]
     examples = [example for example in examples if example and example != main_verb]
     return ", ".join(examples)
+
+
+_FOLD_TABLE = str.maketrans("āīūṭḍṇḷṃñṅ", "aiutdnlmnn")
+
+
+NOUN_POS = ("masc", "fem", "nt")
+# nouns, plus adjectives and participles that work as nouns/adjectives;
+# actual verbs (pr, aor, fut, perf, imperf, ...) are never used
+EXAMPLE_POS = (*NOUN_POS, "adj", "pp", "ptp")
+# verbal forms, only used as a fallback when a root has no other examples
+FALLBACK_POS = (*EXAMPLE_POS, "abs", "ger", "prp")
+EXAMPLE_MIN_EBT_COUNT = 5
+FALLBACK_MIN_EBT_COUNT = 1
+
+
+def _lemmas_are_similar(a: str, b: str, min_shared: int = 4) -> bool:
+    """True if two lemmas look like variants of one word, ignoring vowel length
+    and diacritics (pāda ~ pada, sugata ~ sugati). Similar when:
+    - one is a prefix of the other (vega ~ vegena, vāda ~ vādī)
+    - they share min_shared letters in a row
+    - they share 3 letters in a row and start with the same 3 letters"""
+    a = a.translate(_FOLD_TABLE)
+    b = b.translate(_FOLD_TABLE)
+    if a.startswith(b) or b.startswith(a):
+        return True
+    shortest = min(len(a), len(b))
+    longest = SequenceMatcher(None, a, b).find_longest_match(0, len(a), 0, len(b))
+    if longest.size >= min(min_shared, shortest):
+        return True
+    return longest.size >= 3 and a[:3] == b[:3]
+
+
+def pick_distinct_lemmas(
+    lemmas: list[str], picked: list[str] | None = None, limit: int = 3
+) -> list[str]:
+    """Add lemmas in the given order to `picked` (up to `limit` in total),
+    skipping any lemma similar to one already picked."""
+    picked = list(picked) if picked else []
+    for lemma in lemmas:
+        if len(picked) >= limit:
+            break
+        if any(_lemmas_are_similar(lemma, p) for p in picked):
+            continue
+        picked.append(lemma)
+    return picked
+
+
+def _example_tier(i: DpdHeadword) -> int:
+    """Preference tier, lower is better:
+    0 noun, no prefix / 1 noun, prefixed / 2 adj, pp, ptp, no prefix / 3 same, prefixed."""
+    return (0 if i.pos in NOUN_POS else 2) + (1 if " " in i.family_root else 0)
+
+
+def _pick_by_example_stages(ranked: list[DpdHeadword]) -> list[str]:
+    """Pick up to 3 distinct lemmas from `ranked`, in stages:
+    1. words with example_1 and example_2
+    2. if 1 or fewer picked: words with example_1 or example_2
+    3. if none picked: words without examples
+    """
+    both = [x.lemma_clean for x in ranked if x.example_1 and x.example_2]
+    picked = pick_distinct_lemmas(both)
+    if len(picked) <= 1:
+        one = [x.lemma_clean for x in ranked if x.example_1 or x.example_2]
+        picked = pick_distinct_lemmas(one, picked)
+    if not picked:
+        picked = pick_distinct_lemmas([x.lemma_clean for x in ranked])
+    return picked
+
+
+def pick_root_examples(candidates: list[DpdHeadword], main_verb: str) -> list[str]:
+    """Pick up to 3 distinct example lemmas for a root, never the main_verb,
+    a pos "root" entry or a "(gram)" meaning.
+
+    `candidates` must be ordered by ebt_count desc. Each round ranks words by
+    _example_tier, then ebt_count, and runs _pick_by_example_stages. Later
+    rounds only run if every earlier round found nothing:
+    1. EXAMPLE_POS, ebt_count >= 5, no passive/causative
+    2. EXAMPLE_POS, ebt_count >= 1, no passive/causative
+    3. FALLBACK_POS (adds abs, ger, prp), ebt_count >= 5, no passive/causative
+    4. FALLBACK_POS, ebt_count >= 5, passive/causative allowed
+    5. any part of speech (actual verbs too), ebt_count >= 5, passive/causative allowed
+    """
+    rounds: tuple[tuple[tuple[str, ...] | None, int, bool], ...] = (
+        (EXAMPLE_POS, EXAMPLE_MIN_EBT_COUNT, False),
+        (EXAMPLE_POS, FALLBACK_MIN_EBT_COUNT, False),
+        (FALLBACK_POS, EXAMPLE_MIN_EBT_COUNT, False),
+        (FALLBACK_POS, EXAMPLE_MIN_EBT_COUNT, True),
+        (None, EXAMPLE_MIN_EBT_COUNT, True),
+    )
+    for pos_list, min_ebt, allow_pass_caus in rounds:
+        pool = [
+            x
+            for x in candidates
+            if x.lemma_clean != main_verb
+            and x.pos != "root"
+            and "(gram)" not in x.meaning_1
+            and (pos_list is None or x.pos in pos_list)
+            and x.ebt_count >= min_ebt
+            and (
+                allow_pass_caus or ("pass" not in x.grammar and "caus" not in x.grammar)
+            )
+        ]
+        ranked = sorted(pool, key=_example_tier)  # stable: keeps ebt_count order
+        picked = _pick_by_example_stages(ranked)
+        if picked:
+            return picked
+    return []
 
 
 def common_roots(db_session, dpspth):
@@ -109,7 +217,15 @@ def common_roots(db_session, dpspth):
         # if not main_verb:
         #     print(f"for {root} no main verb")
 
-        examples = get_common_root_examples(root_obj.root_example, main_verb)
+        examples_objs = (
+            db_session.query(DpdHeadword)
+            .filter(DpdHeadword.root_key == root)
+            .filter(~DpdHeadword.stem.contains("!"))
+            .filter(DpdHeadword.meaning_1 != "")
+            .order_by(DpdHeadword.ebt_count.desc())
+            .all()
+        )
+        examples = ", ".join(pick_root_examples(examples_objs, main_verb))
 
         root_clean = re.sub(r" \d*$", "", str(root))
         feedback = f"""{sbs_ped_link}={root_clean}&entry.1433863141=common-roots-{current_date_year}">Fix it here.</a>"""
