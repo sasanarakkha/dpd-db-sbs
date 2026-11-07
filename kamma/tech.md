@@ -47,6 +47,29 @@ GUI onboarding workflow.
   `sheet_order.txt` for row order). The data is agent-maintained; the Google
   Sheet downloader is retired to `scripts/dps_archive/download_grammar.sh`.
 
+## Git Hygiene — `resources/` submodules never show as dirty
+The 11 `resources/*` submodules collect generated or accidental edits inside their own
+working trees (release zips, `.DS_Store`, downloaded JSON, patched vendored scripts).
+They are not our work and must never appear in `git status`, a diff, or a commit.
+The suppression is **local git config, not a tracked file** — nothing to commit:
+
+```bash
+for p in $(git config -f .gitmodules --get-regexp '^submodule\..*\.path$' | awk '{print $2}'); do
+  git config --local "submodule.$p.ignore" dirty
+done
+```
+
+- It writes `.git/config` (`submodule.<path>.ignore = dirty` ×11) and nothing else — no
+tracked file changes, `.gitmodules` and the registry stay at upstream content.
+- **It is not cloned**: run the one-liner once in every fresh clone. If `git status` shows
+`resources/*` entries, this is the fix.
+- `dirty`, never `all`: hides working-tree noise while still surfacing a real submodule
+commit-pointer bump, so submodule updates can never be silently lost.
+- Only status reporting changes: the files inside the submodules stay on disk untouched.
+- VS Code ignores this and lists each submodule as its own repo — use
+`"git.detectSubmodules": false` there. Zed needs nothing: it just shells out to
+`git status --porcelain=v1 --untracked-files=all`, so the config covers it.
+
 ## Resources
 - Upstream repo: github.com/digitalpalidictionary/dpd-db
 - Fork repo: github.com/sasanarakkha/dpd-db-sbs
