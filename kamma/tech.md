@@ -42,6 +42,10 @@ GUI onboarding workflow.
 - **Atomic Rename Protocol**: Renames/moves are atomic. All imports, paths, scripts, registries, and docs MUST be updated and staged in the same commit as the `git mv`.
 - **Mandatory UI Tooling**: All Python scripts MUST use `tools.printer` (`pr`) for console output (UI, status, timing) instead of standard `print()`. Use `pr.tic()` / `pr.toc()` for script-level timing and `pr.bip()` / `pr.yes()` etc. for step-level timing. Standard `print()` is only allowed for outputting structured data intended for piping or when explicitly marked as debug (e.g., using `icecream`).
 - Releases are time-boxed to Uposatha days (~monthly).
+- **Pali Class grammar data**: the deck source lives in tracked TSVs at
+  `shared_data/pali_class/grammar/` (one per former Google Sheet, plus
+  `sheet_order.txt` for row order). The data is agent-maintained; the Google
+  Sheet downloader is retired to `scripts/dps_archive/download_grammar.sh`.
 
 ## Resources
 - Upstream repo: github.com/digitalpalidictionary/dpd-db
