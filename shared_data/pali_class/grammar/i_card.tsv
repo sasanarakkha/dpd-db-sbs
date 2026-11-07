@@ -1,0 +1,17 @@
+id	pali	gramma	of	eng	related	decl-con	pattern	native
+43043	koṭiṃ	fem acc sg	koṭi	ten million		declension	i2-card	десять миллионов
+4302	koṭīnaṃ	fem dat pl<br>fem gen pl	koṭi	for ten million<br>of ten million		declension	i2-card	за десять миллионов<br>из десяти миллионов
+4303	koṭīhi	fem instr pl<br>fem abl pl	koṭi	with ten million<br>from ten million		declension	i2-card	с десятью миллионами<br>из десяти миллионов
+4306	koṭiyā	fem instr sg<br>fem dat sg<br>fem abl sg<br>fem gen sg<br>fem loc sg	koṭi	with ten million<br>for ten million<br>from ten million<br>of ten million<br>in ten million		declension	i2-card	с десятью миллионами<br>для десяти миллионов<br>из десяти миллионов<br>из десяти миллионов<br>в десяти миллионах
+4307	koṭīsu	fem loc pl	koṭi	amongst ten million		declension	i2-card	среди десяти миллионов
+4309	koṭiyaṃ	fem loc sg	koṭi	in ten million	koṭiyā	declension	i2-card	в десяти миллионах
+43430	koṭī	fem nom pl<br>fem acc pl	koṭi	ten million	koṭiyo	declension	i2-card	десять миллионов
+434343	koṭiyo	fem nom pl<br>fem acc pl	koṭi	ten million	koṭī	declension	i2-card	десять миллионов
+43434	koṭi	fem nom sg	koṭi	ten million		declension	i2-card	десять миллионов
+4305	vīsāya	fem instr sg<br>fem dat sg<br>fem abl sg<br>fem gen sg<br>fem loc sg	vīsā	with twenty<br>for twenty<br>from twenty<br>of twenty<br>in twenty		declension	ā card	с двадцатью<br>за двадцать<br>из двадцати<br>в двадцать
+43432	vīsā	fem nom sg	vīsā	twenty	vīsaṃ	declension	ā card	двадцать
+43435	vīsaṃ	fem nom sg<br>fem acc sg	vīsā	twenty		declension	ā card	двадцать
+4300	vīsatiṃ	fem acc sg	vīsati	twenty		declension	ā card	двадцать
+4304	vīsatiyā	fem instr sg<br>fem dat sg<br>fem abl sg<br>fem gen sg<br>fem loc sg	vīsati	with twenty<br>for twenty<br>from twenty<br>of twenty<br>in twenty		declension	ā card	с двадцатью<br>за двадцать<br>из двадцати<br>в двадцать
+4308	vīsatiyaṃ	fem loc sg	vīsati	in twenty	vīsatiyā	declension	ā card	в двадцати
+43433	vīsati	fem nom sg	vīsati	twenty		declension	ā card	двадцать

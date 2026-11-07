@@ -31,11 +31,8 @@ if [[ $response == "y" ]]; then
     cd "$PROJECT_DIR"
 fi
 
-# grammar.xlsx - https://docs.google.com/spreadsheets/d/1KV5LmebIQpNyNKl03Pmo_Ti-LNW3IYWB6uc7OfGRGPU/
-
 response=$(uv run python "$PROJECT_DIR/tools/ask.py" "need to make updated grammar.csv?") || exit 1
 if [[ $response == "y" ]]; then
-    uv run bash scripts/bash/download_grammar.sh
     uv run python scripts/work_with_csv/anki_class_grammar.py
 fi
 

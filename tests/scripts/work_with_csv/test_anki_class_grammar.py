@@ -1,7 +1,5 @@
 """Golden-master tests for anki_class_grammar duplicate-id detection."""
 
-from pathlib import Path
-
 import pandas as pd
 
 from scripts.work_with_csv.anki_class_grammar import (
@@ -10,21 +8,15 @@ from scripts.work_with_csv.anki_class_grammar import (
 )
 
 
-def _write_fixture_xlsx(path: Path) -> None:
-    with pd.ExcelWriter(path) as writer:
-        pd.DataFrame({"id": [1, 2, 2, 3], "word": ["a", "b", "c", "d"]}).to_excel(
-            writer, sheet_name="with_dupes", index=False
-        )
-        pd.DataFrame({"word": ["x"], "id": [1]}).to_excel(
-            writer, sheet_name="bad_column_order", index=False
-        )
+def _fixture_sheets() -> dict[str, pd.DataFrame]:
+    return {
+        "with_dupes": pd.DataFrame({"id": [1, 2, 2, 3], "word": ["a", "b", "c", "d"]}),
+        "bad_column_order": pd.DataFrame({"word": ["x"], "id": [1]}),
+    }
 
 
-def test_check_duplicate_ids_flags_repeated_id(tmp_path: Path, capsys) -> None:
-    fixture_path = tmp_path / "grammar.xlsx"
-    _write_fixture_xlsx(fixture_path)
-
-    check_duplicate_ids(fixture_path)
+def test_check_duplicate_ids_flags_repeated_id(capsys) -> None:
+    check_duplicate_ids(_fixture_sheets())
 
     out = capsys.readouterr().out
     assert "2" in out

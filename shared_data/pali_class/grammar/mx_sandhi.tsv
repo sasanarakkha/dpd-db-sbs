@@ -1,0 +1,23 @@
+id	example	sandhi	details	result	meeting	pattern
+5000	yadi evaṃ	yajjevaṃ		di > dy > jj	di + e	mixed-sandhi
+5001	sa √div > dyu > jju	sajju		di > dy > jj	a + di	mixed-sandhi
+510050	bodhi aṅga	bojjhaṅga		dhi > dhy > jjh	dhi + a	mixed-sandhi
+50052	adhi a √bhās i	ajjhabhāsi		dhi > dhy > jjh	dhi + a	mixed-sandhi
+50051	adhi āvasati	ajjhāvasati		dhi > dhy > jjh	dhi + ā	mixed-sandhi
+5002	abhi uggacchati	abbhuggacchati		bhi > bhy > bbh	bhi + u	mixed-sandhi
+50020	abhi ācikkhati	abbhācikkhati		bhi > bhy > bbh	bhi + ā	mixed-sandhi
+50021	abhi a √ñā si	abbhaññāsi		bhi > bhy > bbh	bhi + a	mixed-sandhi
+5003	api ekacce	appekacce		pi > py > pp	pi + e	mixed-sandhi
+50030	api ekadā	appekadā		pi > py > pp	pi + e	mixed-sandhi
+5004	pari aṅka	pallaṅka		ri > li > ly > ll	ri + a	mixed-sandhi
+50105	vi pari √as	vipallāsa		ri > li > ly > ll	ri + a	mixed-sandhi
+5006	ati eti	acceti		ti > ty > cc	ti + e	mixed-sandhi
+5007	ati uṇha	accuṇha		ti > ty > cc	ti + u	mixed-sandhi
+5008	ati a √yā si	accayāsi		ti > ty > cc	ti + a	mixed-sandhi
+5009	pati a lattha a	paccalattha		ti > ty > cc	ti + a	mixed-sandhi
+5010	pati a √ñā si	paccaññāsi		ti > ty > cc	ti + a	mixed-sandhi
+5011	adhi a bhava i	addhabhavi		adhi > adhy > addh	dhi + a	mixed-sandhi
+5012	ā a √pad i	āpādi		ā	ā + a	vowel-sandhi
+5013	pātu a kā si	pātvākāsi		vā	u + a	vowel-sandhi
+5014	ud a √vadh i	udabbadhi		v > bb	a + v	consonant-sandhi
+5015	ud a √vah i	udabbahi		v > bb	a + v	consonant-sandhi

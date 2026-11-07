@@ -1,0 +1,15 @@
+id	pali	gramma	of	eng	related	decl-con	pattern	native
+2200	api	ind, interr adv		have?; did?; was?; perhaps?		grammar	ind	имел(а)?; делал(а)?; был(а)?; возможно?
+22022	kathaṃ	ind, interr adv	ka + thaṃ	how?		grammar	ind	как?
+2202	nu	ind, interr adv		(adds a question mark) surely?; didn’t?; wouldn't?; which?		grammar	ind	(добавляет вопросительный знак) Конечно?; не так ли?; не стал бы?; какой?
+2203	nūna	ind, interr adv	nūnam	could it be?; what if?; shall?; let’s?; perhaps?		grammar	ind	Неужели это возможно? А что, если? Стоит ли? Давайте? Может быть?
+2204	api nu	ind, interr adv	api + nu	is?; did?; are?; who?; what?; how?; would?		grammar	ind	есть?; сделал?; есть?; кто?; что?; как?; бы?
+2205	kittāvatā	ind, interr adv	kittāva + tā	in what way?; to what extent?; in what respect?		grammar	ind	Каким образом?; в какой степени?; в каком отношении?
+2206	kinti	ind, interr adv	kiṃ + iti	how then?; what then?; in what way?		grammar	ind	Как же тогда? Что же тогда? Каким образом?
+2207	kasmā	ind, interr adv<br>abl sg	ka	why?		grammar	ind	почему?
+2208	kudā	ind, interr adv	ka + dā	when; at what time?		grammar	ind	Когда; в какое время?
+2209	kahaṃ	ind, interr adv	ka + haṃ	where?	kuhiṃ<br>kva<br>kuvaṃ	grammar	ind	где?
+22220	kuhiṃ	ind, interr adv	ka + hiṃ	where?	kahaṃ<br>kva<br>kuvaṃ	grammar	ind	где?
+222222	kva	ind, interr adv	kuva	where?	kuhiṃ<br>kahaṃ<br>kuvaṃ	grammar	ind	где?
+22222	kīva	ind, interr adv	ka + iva	how far?; how much?		grammar	ind	Как далеко?; Сколько?
+22223	kuvaṃ	ind, interr adv	ka + vaṃ	where?	kuhiṃ<br>kahaṃ<br>kva	grammar	ind	где?

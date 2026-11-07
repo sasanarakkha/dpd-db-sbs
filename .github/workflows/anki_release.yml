@@ -203,9 +203,6 @@ jobs:
     - name: Export Anki CSVs
       run: uv run python scripts/export/anki_csv.py
 
-    - name: Download Grammar XLSX
-      run: uv run bash scripts/bash/download_grammar.sh
-
     - name: Generate Grammar CSVs
       run: uv run python scripts/work_with_csv/anki_class_grammar.py
 

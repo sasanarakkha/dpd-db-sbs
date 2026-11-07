@@ -654,7 +654,6 @@
     "scripts/bash/download_dpd.sh",
     "scripts/bash/update_decks.sh",
     "scripts/bash/manual_update_mac_dict.sh",
-    "scripts/bash/download_grammar.sh",
     "scripts/bash/push_dpd.sh",
     "scripts/bash/stage_study_tools.sh",
     "scripts/bash/move_class.sh",

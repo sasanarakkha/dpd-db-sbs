@@ -1,0 +1,13 @@
+id	pali	gramma	of	eng	related	decl-con	pattern	native
+5900	abhavissa	cond 3rd sg<br>cond 2nd sg	bhavati	(if) he would be<br>(if) you would be	bhavissa	conjugation	cond	
+59059	abhavissaṃsu	cond 3rd pl	bhavati	(if) they would be	bhavissaṃsu	conjugation	cond	
+5902	abhavissā	cond 3rd sg	bhavati	(if) he would be	abhavissa<br>bhavissa<br>bhavissā	conjugation	cond	
+5903	bhavissaṃ	cond 1st sg<br>reflx fut 1st sg	bhavati	(if) I would be<br>I myself will be		conjugation	fut-cond	
+5904	bhavissatha	cond 2nd pl<br>reflx cond 3rd sg<br>fut 2nd pl	bhavati	(if) you all would be<br>(if) he himself would be<br>you all will be		conjugation	fut-cond	
+5906	bhavissate	reflx fut 3rd sg	bhavati	he himself will be		conjugation	fut	
+5905	gamissase	reflx fut 2nd sg	gacchati	you yourself will go		conjugation	fut	
+5908	agamissā	cond 3rd sg	gacchati	he would have fallen into	agamissa<br>agacchissā	conjugation	cond	
+5909	agamissa	cond 3rd sg<br>cond 2nd sg	gacchati	he would have fallen into<br>you would have fallen into	agacchissa	conjugation	cond	
+59590	agacchissā	cond 3rd sg	gacchati	he would have gone	agamissa<br>agamissā	conjugation	cond	
+595959	agamissase	reflx cond 2nd sg	gacchati	you yourself would have fallen into		conjugation	cond	
+5907	pabbajissaṃ	cond 1st sg<br>reflx fut 1st sg	pabbajati	I would have renounced the household life<br>I myself will renounce the household life		conjugation	fut-cond	

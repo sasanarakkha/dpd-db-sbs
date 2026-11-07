@@ -1,0 +1,168 @@
+id	example	sandhi	details	result	meeting	pattern
+46440	acira upasampanna	acirūpasampanna	a elided, u lengthened	ū	a + u	vowel-sandhi
+46060	aja eḷakā	ajeḷakā	a elided, e remained	e	a + e	vowel-sandhi
+4673	ajja agge	ajjatagge	insertion of consonant t	t	vowel + vowel	vowel-sandhi
+46009	ajja uposatho	ajjuposatho	a elided, u remained	u	a + u	vowel-sandhi
+46340	ākāse iva	ākāseva	e remained, i elided	e	e + i	vowel-sandhi
+463469	akataññū asi	akataññūsi	ū remained, a elided	ū	ū + a	vowel-sandhi
+46069	amata ogadha	amatogadha	a elided, o remained	o	a + o	vowel-sandhi
+46547	aññassa iva	aññasseva	change of vowel	e	a + i	vowel-sandhi
+4664	anu addhamāsaṃ	anvaddhamāsaṃ	u > v	va	u + a	vowel-sandhi
+46670	anu eti	anveti	u > v	ve	u + e	vowel-sandhi
+46380	api ahaṃ	apāhaṃ	i elided, a lengthened	ā	i + a	vowel-sandhi
+4640	appassuto ayaṃ	appassutāyaṃ	o elided, a lengthened	ā	o + a	vowel-sandhi
+46381	asati asampajañña	asatāsampajañña	i elided, a lengthened	ā	i + a	vowel-sandhi
+46261	attā iti	attāti	ā remained, i elided	ā	ā + i	vowel-sandhi
+460469	aṭṭha aṅgika	aṭṭhaṅgika	a elided, a remained	a	a + a	vowel-sandhi
+46079	avijjā āsava	avijjāsava	ā elided, ā remained	ā	ā + ā	vowel-sandhi
+46661	bahu ābādho	bahvābādho	u > v	vā	u + ā	vowel-sandhi
+4646	bahu upakāra	bahūpakāra	u elided, u lengthened	ū	u + u	vowel-sandhi
+460470	bhatta agga	bhattagga	a elided, a remained	a	a + a	vowel-sandhi
+460041	bhāvita indriya	bhāvitindriya	a elided, i remained	i	a + i	vowel-sandhi
+464629	bhikkhunī upassaya	bhikkhunupassaya	ī elided, u remained	u	ī + u	vowel-sandhi
+46371	ca api	cāpi	a elided, a lengthened	ā	a + a	vowel-sandhi
+46700	ca avajānāti	camavajānāti	insertion of consonant m	m	vowel + vowel	vowel-sandhi
+46059	ca eva	ceva	a elided, e remained	e	a + e	vowel-sandhi
+46541	ca uggate	coggate	change of vowel	o	a + u	vowel-sandhi
+464650	cakkhu āyatana	cakkhāyatana	u elided, ā remained	ā	u + ā	vowel-sandhi
+46299	cakkhu indriya	cakkhundriya	u remained, i elided	u	u + i	vowel-sandhi
+4635	cattāro ime	cattārome	o remained, i elided	o	o + i	vowel-sandhi
+46740	catu aṅgī	caturaṅgī	insertion of consonant r	r	vowel + vowel	vowel-sandhi
+464691	ce eva	ceva	e elided, e remained	e	e + e	vowel-sandhi
+46750	cha abhiñña	chaḷabhiñña	insertion of consonant ḷ	ḷ	cha + vowel	vowel-sandhi
+4675	cha āyatanā	saḷāyatanā	cha > sa; insertion of consonant ḷ	ḷ	cha + vowel	vowel-sandhi
+46260	chāyā iva	chāyāva	ā remained, i elided	ā	ā + i	vowel-sandhi
+4658	dāsī ahaṃ	dāsyāhaṃ	ī > y and a lengthened	yā	ī + a	vowel-sandhi
+46080	dayā āpanna	dayāpanna	ā elided, ā remained	ā	ā + ā	vowel-sandhi
+460471	dosa antara	dosantara	a elided, a remained	a	a + a	vowel-sandhi
+4648	dukkhassa iti	dukkhassāti	a lengthened, i elided	ā	a + i	vowel-sandhi
+46339	dve ime	dveme	e remained, i elided	e	e + i	vowel-sandhi
+46490	dvi aha	dvīha	i lengthened, a elided	ī	i + a	vowel-sandhi
+4636	eko eva	ekova	o elided, e remained	o	o + e	vowel-sandhi
+46349	eso ahaṃ asmi	esohamasmi	a elided, o remained	o	o + a	vowel-sandhi
+4646469	hiri ottappa	hirottappa	i elided, o remained	o	i + o	vowel-sandhi
+4610012	icchāmi ahaṃ	icchāmahaṃ	i elided, a remained	a	i + a	vowel-sandhi
+4638	idāni ahaṃ	idānāhaṃ	i elided, a lengthened	ā	i + a	vowel-sandhi
+464610	idāni eva	idāneva	i elided, e remained	e	i + e	vowel-sandhi
+4670	idha āhu	idhamāhu	insertion of consonant m	m	vowel + vowel	vowel-sandhi
+46050	imassa uppādā	imassuppādā	a elided, u remained	u	a + u	vowel-sandhi
+46279	iti api	itipi	i remained, a elided	i	i + a	vowel-sandhi
+46280	iti assa	itissa	i remained, a elided	i	i + a	vowel-sandhi
+46240	iti’ssa ime	itissame	a remained, i elided	a	a + i	vowel-sandhi
+4672	ito āyati	itonāyati	insertion of consonant n	n	vowel + vowel	vowel-sandhi
+46480	itthattāya iti	itthattāyāti	a lengthened, i elided	ā	a + i	vowel-sandhi
+4652	jina īrita	jinerita	change of vowel	e	a + ī	vowel-sandhi
+46691	kālasseva uṭṭhahanto	kālassevavuṭṭhahanto	insertion of consonant v	v	vowel + vowel	vowel-sandhi
+46441	kata upāsana	katūpāsana	a elided, u lengthened	ū	a + u	vowel-sandhi
+46590	ke assa	kyassa	e > y	ya	e + a	vowel-sandhi
+46029	khīṇa āsava	khīṇāsava	a elided, ā remained	ā	a + ā	vowel-sandhi
+4643	kikī iva	kikīva	ī elided, i lengthened	ī	ī + i	vowel-sandhi
+4650	kiṃsu idha	kiṃsūdha	u lengthened, i elided	ū	u + i	vowel-sandhi
+46748	kiñci eva	kiñcideva	insertion of consonant d	d	vowel + vowel	vowel-sandhi
+4662	ko assa	kvāssa	oa > vā	vā	o + a	vowel-sandhi
+46620	ko attho	kvattho	o > v	va	o + a	vowel-sandhi
+462469	kuto ettha	kutettha	o elided, e remained	e	o + e	vowel-sandhi
+464661	lahu uṭṭhāna	lahuṭṭhāna	u elided, u remained	u	u + u	vowel-sandhi
+4647	lokassa iti	lokassāti	a lengthened, i elided	ā	a + i	vowel-sandhi
+46660	madhu āsava	madhvāsava	u > v	vā	u + ā	vowel-sandhi
+46081	mahā ānisaṃsa	mahānisaṃsa	ā elided, ā remained	ā	ā + ā	vowel-sandhi
+46090	mahā iccha	mahiccha	ā elided, i remained	i	ā + i	vowel-sandhi
+4160091	mahā iddhika	mahiddhika	ā elided, i remained	i	ā + i	vowel-sandhi
+4653	mahā īsī	mahesī	change of vowel	e	ā + ī	vowel-sandhi
+46251	manasā anupekkhita	manasānupekkhita	ā remained, a elided	ā	ā + a	vowel-sandhi
+46600	me ahaṃ	myāhaṃ	e > y and a lengthened	yā	e + a	vowel-sandhi
+464679	me āsi	māsi	e elided, ā remained	ā	e + ā	vowel-sandhi
+464670	me atthi	matthi	e elided, a remained	a	e + a	vowel-sandhi
+46680	na imassa	nayimassa	insertion of consonant y	y	vowel + vowel	vowel-sandhi
+4654	na upeti	nopeti	change of vowel	o	a + u	vowel-sandhi
+46681	nava ime	navayime	insertion of consonant y	y	vowel + vowel	vowel-sandhi
+464639	nu ajja	najja	u elided, a remained	a	u + a	vowel-sandhi
+46640	nu ajja	nvajja	u > v	va	u + a	vowel-sandhi
+46289	nu asi	nusi	u remained, a elided	u	u + a	vowel-sandhi
+46309	nu ettha	nuttha	u remained, e elided	u	u + e	vowel-sandhi
+4669	pa uccati	pavuccati	insertion of consonant v	v	vowel + vowel	vowel-sandhi
+46540	pāda udaka	pādodaka	change of vowel	o	a + u	vowel-sandhi
+46561	pamutti atthi	pamutyatthi	i > y	ya	i + a	vowel-sandhi
+46040	pañca ime	pañcime	a elided, i remained	i	a + i	vowel-sandhi
+464660	pañcasu upādānakkhandhesu	pañcasupādānakkhandhesu	u elided, u remained	u	u + u	vowel-sandhi
+46089	paññā indriya	paññindriya	ā elided, i remained	i	ā + i	vowel-sandhi
+4668	pari esati	pariyesati	insertion of consonant y	y	vowel + vowel	vowel-sandhi
+464609	paṭi eka	pacceka	i elided, e remained	e	i + e	vowel-sandhi
+46360	pāto eva	pātova	o elided, e remained	o	o + e	vowel-sandhi
+4674	pātu ahosi	pāturahosi	insertion of consonant r	r	vowel + vowel	vowel-sandhi
+464689	pubbe eva	pubbeva	e elided, e remained	e	e + e	vowel-sandhi
+46741	puna eti	punareti	insertion of consonant r	r	vowel + vowel	vowel-sandhi
+46049	purisa uttama	purisuttama	a elided, u remained	u	a + u	vowel-sandhi
+4644	ratta uparata	rattūparata	a elided, u lengthened	ū	a + u	vowel-sandhi
+46520	sa √īr ī	serī	change of vowel	e	a + ī	vowel-sandhi
+46250	sā assa	sāssa	ā remained, a elided	ā	ā + a	vowel-sandhi
+46721	sa diṭṭhi	sandiṭṭhi	insertion of consonant n	n	vowel + vowel	vowel-sandhi
+46270	sā eva	sāva	ā remained, e elided	ā	ā + e	vowel-sandhi
+464690	sabbe eva	sabbeva	e elided, e remained	e	e + e	vowel-sandhi
+46329	sace api	sacepi	e remained, a elided	e	e + a	vowel-sandhi
+464669	sace assa	sacassa	e elided, a remained	a	e + a	vowel-sandhi
+46390	sace ayaṃ	sacāyaṃ	e elided, a lengthened	ā	e + a	vowel-sandhi
+46446	saddhā idha	saddhīdha	ā elided, i lengthened	ī	ā + i	vowel-sandhi
+464651	sādhu āvuso	sādhāvuso	u elided, ā remained	ā	u + ā	vowel-sandhi
+46500	sādhu iti	sādhūti	u lengthened, i elided	ū	u + i	vowel-sandhi
+46098	samādhi indriya	samādhindriya	i elided, i remained	i	i + i	vowel-sandhi
+464649	sametu āyasmā	sametāyasmā	u elided, ā remained	ā	u + ā	vowel-sandhi
+46259	saññā iti	saññāti	ā remained, i elided	ā	ā + i	vowel-sandhi
+46701	saññī eva	saññīmeva	insertion of consonant m	m	vowel + vowel	vowel-sandhi
+464611	santi ettha	santettha	i elided, e remained	e	i + e	vowel-sandhi
+46100	sati indriya	satindriya	i elided, i remained	i	i + i	vowel-sandhi
+46210	satto upalabbhati	sattupalabbhati	o elided, u remained	u	o + u	vowel-sandhi
+460031	sena āsana	senāsana	a elided, ā remained	ā	a + ā	vowel-sandhi
+46671	sīlesu eva	sīlesveva	u > v	ve	u + e	vowel-sandhi
+46400	so ahaṃ	sāhaṃ	o elided, a lengthened	ā	o + a	vowel-sandhi
+46646	so ahaṃ	svāhaṃ	o > v and a lengthened	vā	o + a	vowel-sandhi
+46621	so ahaṃ	svahaṃ	o > v	va	o + a	vowel-sandhi
+46350	so api	sopi	a elided, o remained	o	o + a	vowel-sandhi
+46630	so assa	svāssa	o > v and a lengthened	vā	o + a	vowel-sandhi
+4666	su āgata	svāgata	u > v	vā	u + ā	vowel-sandhi
+4665	su akkhāto	svākkhāto	u > v and a lengthened	vā	u + a	vowel-sandhi
+46690	su atthi	suvatthi	insertion of consonant v	v	vowel + vowel	vowel-sandhi
+46300	su idaṃ	sudaṃ	u remained, i elided	u	u + i	vowel-sandhi
+46760	su ujū	suhujū	insertion of consonant h	h	vowel + vowel	vowel-sandhi
+4676	su uṭṭhitaṃ	suhuṭṭhitaṃ	insertion of consonant h	h	vowel + vowel	vowel-sandhi
+4637	suñña agāra	suññāgāra	a elided, a lengthened	ā	a + a	vowel-sandhi
+464659	tadahu uposathe	tadahuposathe	u elided, u remained	u	u + u	vowel-sandhi
+46269	tamhā eva	tamhāva	ā remained, e elided	ā	ā + e	vowel-sandhi
+46730	tasmā iha	tasmātiha	insertion of consonant t	t	vowel + vowel	vowel-sandhi
+4645	tathā upamaṃ	tathūpamaṃ	ā elided, u lengthened	ū	ā + u	vowel-sandhi
+46209	tato uddhaṃ	tatuddhaṃ	o elided, u remained	u	o + u	vowel-sandhi
+46211	tato uṭṭhāya	tatuṭṭhāya	o elided, u remained	u	o + u	vowel-sandhi
+46370	tatra ayaṃ	tatrāyaṃ	a elided, a lengthened	ā	a + a	vowel-sandhi
+4116061	tatra eva	tatreva	a elided, e remained	e	a + e	vowel-sandhi
+46747	tāva eva	tāvadeva	insertion of consonant d	d	vowel + vowel	vowel-sandhi
+4660	te ahaṃ	tyāhaṃ	e > y and a lengthened	yā	e + a	vowel-sandhi
+46330	te api	tepi	e remained, a elided	e	e + a	vowel-sandhi
+4659	te assu	tyassu	e > y	ya	e + a	vowel-sandhi
+46601	te ayaṃ	tyāyaṃ	e > y and a lengthened	yā	e + a	vowel-sandhi
+46070	tena obhāsena	tenobhāsena	a elided, o remained	o	a + o	vowel-sandhi
+46650	tesu ahaṃ	tesvāhaṃ	u > v and a lengthened	vā	u + a	vowel-sandhi
+46491	ti aha	tīha	i lengthened, a elided	ī	i + a	vowel-sandhi
+46099	tīṇi imāni	tīṇimāni	i elided, i remained	i	i + i	vowel-sandhi
+4667	tu eva	tveva	u > v	ve	u + e	vowel-sandhi
+464699	ubho anta	ubhanta	o elided, a remained	a	o + a	vowel-sandhi
+46071	udaka orohaka	udakorohaka	a elided, o remained	o	a + o	vowel-sandhi
+46542	udaka ūmi	udakomi	change of vowel	o	a + ū	vowel-sandhi
+46546	upa ikkhati	upekkhati	change of vowel	e	a + i	vowel-sandhi
+46290	utu akkhāna	utukkhāna	u remained, a elided	u	u + a	vowel-sandhi
+46501	vāyodhātu iti	vāyodhātūti	u lengthened, i elided	ū	u + i	vowel-sandhi
+4639	ve api	vāpi	e elided, a lengthened	ā	e + a	vowel-sandhi
+4657	vi ākaraṇa	vyākaraṇa	i > y	yā	i + ā	vowel-sandhi
+46560	vi anta	vyanta (byanta)	i > y	ya	i + a	vowel-sandhi
+4656	vi appanā	vyappanā	i > y	ya	i + a	vowel-sandhi
+4649	vi atināmeti	vītināmeti	i lengthened, a elided	ī	i + a	vowel-sandhi
+4655	vi udakaṃ	vodakaṃ	change of vowel	o	i + u	vowel-sandhi
+46039	vīriya indriya	vīriyindriya	a elided, i remained	i	a + i	vowel-sandhi
+46720	vutta atthā eva	vutt’atthāneva	insertion of consonant n	n	vowel + vowel	vowel-sandhi
+4642	yāni idha	yānīdha	i elided, i lengthened	ī	i + i	vowel-sandhi
+46239	yassa idāni	yassadāni	a remained, i elided	a	a + i	vowel-sandhi
+46249	yathā api	yathāpi	ā remained, a elided	ā	ā + a	vowel-sandhi
+4677	yathā eva	yathariva	ā is shortened and e > ri	ari	ā + e	vowel-sandhi
+46746	yāva eva	yāvadeva	insertion of consonant d	d	vowel + vowel	vowel-sandhi
+460030	yena āyasmā	yenāyasmā	a elided, ā remained	ā	a + ā	vowel-sandhi
+4663	yo ayaṃ	yvāyaṃ	o > v and a lengthened	vā	o + a	vowel-sandhi
+46351	yo idha	yodha	o remained, i elided	o	o + i	vowel-sandhi

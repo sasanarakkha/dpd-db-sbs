@@ -1,0 +1,20 @@
+id	abbrev	meaning	pali	example	explanation	type
+4800	Vowels	a ā i ī u ū e o	sara		8 letters	alphabet
+48048	Consonants	"k kh g gh ṅ<br>
+c ch j jh ñ<br>
+ṭ ṭh ḍ ḍh ṇ<br>
+t th d dh n<br>
+p ph b bh m<br>"	vyañjana		25 letters	alphabet
+4802	Semi-Vowels	y r l v s h ḷ ṃ	antaṭṭha		8 letters	alphabet
+4803	Guttural	k kh g gh ṅ	kaṇṭhaja		kavagga	alphabet
+4804	Palatal	c ch j jh ñ	tāluja		cavagga	alphabet
+4805	Cerebral or Retroflex	ṭ ṭh ḍ ḍh ṇ	muddhaja		ṭavagga	alphabet
+4806	Dental	t th d dh n	dantaja		tavagga	alphabet
+4807	Labial	p ph b bh m	oṭṭhaja		pavagga	alphabet
+4808	pali order	"a ā i ī u ū e o<br>
+k kh g gh ṅ<br>
+c ch j jh ñ<br>
+ṭ ṭh ḍ ḍh ṇ<br>
+t th d dh n<br>
+p ph b bh m<br>
+y r l v s h ḷ ṃ"			41 letters	alphabet

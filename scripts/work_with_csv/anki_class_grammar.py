@@ -28,10 +28,29 @@ def main() -> None:
     pr.green_title("Extracting grammar csvs...")
     dpspth = DPSPaths()
     pth = ProjectPaths()
-    excel_file_dir = pth.temp_dir / "grammar.xlsx"
-    make_grammar_csvs(excel_file_dir, dpspth, pth)
-    check_duplicate_ids(excel_file_dir)
+    sheets = load_grammar_sheets(dpspth.pali_class_output_dir / "grammar")
+    make_grammar_csvs(sheets, dpspth, pth)
+    check_duplicate_ids(sheets)
     pr.toc()
+
+
+def load_grammar_sheets(grammar_dir: Path) -> dict[str, pd.DataFrame]:
+    """Read the grammar TSVs listed in sheet_order.txt, in manifest order."""
+    manifest = (grammar_dir / "sheet_order.txt").read_text(encoding="utf-8")
+    sheet_names = [line for line in manifest.splitlines() if line]
+
+    for tsv_path in sorted(grammar_dir.glob("*.tsv")):
+        if tsv_path.stem not in sheet_names:
+            pr.amber(f"{tsv_path.name} is not listed in sheet_order.txt, skipping.")
+
+    sheets: dict[str, pd.DataFrame] = {}
+    for sheet_name in sheet_names:
+        tsv_path = grammar_dir / f"{sheet_name}.tsv"
+        if not tsv_path.exists():
+            pr.amber(f"{sheet_name} is listed in sheet_order.txt but has no TSV file.")
+            continue
+        sheets[sheet_name] = pd.read_csv(tsv_path, sep="\t")
+    return sheets
 
 
 def _warn_invalid_sheet(sheet_name: str | int, df: pd.DataFrame) -> None:
@@ -40,74 +59,58 @@ def _warn_invalid_sheet(sheet_name: str | int, df: pd.DataFrame) -> None:
     pr.amber(f"Sheet {sheet_name} does not have an 'id' column as the first column.")
 
 
-def check_duplicate_ids(excel_file_dir: Path) -> None:
-    with pd.ExcelFile(excel_file_dir) as excel_file:
-        seen_ids: set[object] = set()
+def check_duplicate_ids(sheets: dict[str, pd.DataFrame]) -> None:
+    seen_ids: set[object] = set()
 
-        for sheet_name in excel_file.sheet_names:
-            df = excel_file.parse(sheet_name)
+    for sheet_name, df in sheets.items():
+        if df.columns[0] != "id":
+            _warn_invalid_sheet(sheet_name, df)
+            continue
 
-            if not isinstance(df, pd.DataFrame):
-                pr.amber(
-                    f"Sheet {sheet_name} did not load as a DataFrame. It is a {type(df)}."
-                )
-                continue
-
-            if df.columns[0] != "id":
-                _warn_invalid_sheet(sheet_name, df)
-                continue
-
-            for id_value in df[df.columns[0]]:
-                if id_value in seen_ids:
-                    pr.red(f"{id_value}")
-                else:
-                    seen_ids.add(id_value)
+        for id_value in df[df.columns[0]]:
+            if id_value in seen_ids:
+                pr.red(f"{id_value}")
+            else:
+                seen_ids.add(id_value)
 
 
 def make_grammar_csvs(
-    excel_file_dir: Path, dpspth: DPSPaths, pth: ProjectPaths
+    sheets: dict[str, pd.DataFrame], dpspth: DPSPaths, pth: ProjectPaths
 ) -> None:
     now = datetime.now().astimezone()
     current_date = now.strftime("%m-%d")
     current_date_year = now.strftime("%y-%m-%d")
 
     # Create a dictionary to store the DataFrames
-    dfs: dict[str | int, pd.DataFrame] = {}
+    dfs: dict[str, pd.DataFrame] = {}
 
-    with pd.ExcelFile(excel_file_dir) as excel_file:
-        sheet_names = excel_file.sheet_names
+    sheet_names = list(sheets)
 
-        for sheet_name in sheet_names:
-            df = excel_file.parse(sheet_name)
+    for sheet_name, sheet_df in sheets.items():
+        df = sheet_df.copy()
 
-            if not isinstance(df, pd.DataFrame):
-                pr.amber(
-                    f"Sheet {sheet_name} did not load as a DataFrame. It is a {type(df)}."
-                )
-                continue
+        # Convert the 'id' column to integers
+        if "id" in df.columns:
+            df["id"] = df["id"].fillna(0).astype(int)
+            # remove rows where id is 0 or empty
+            df = df[df["id"] != 0]
 
-            # Convert the 'id' column to integers
-            if "id" in df.columns:
-                df["id"] = df["id"].fillna(0).astype(int)
-                # remove rows where id is 0 or empty
-                df = df[df["id"] != 0]
+        # Convert the values in the '2nd column' to strings
+        df.iloc[:, 1] = df.iloc[:, 1].astype(str)
 
-            # Convert the values in the '2nd column' to strings
-            df.iloc[:, 1] = df.iloc[:, 1].astype(str)
+        second_column_name = df.columns[1]
+        df["feedback"] = df.apply(
+            lambda row, scn=second_column_name: make_feedback_link(
+                row[scn], current_date_year
+            ),
+            axis=1,
+        )
 
-            second_column_name = df.columns[1]
-            df["feedback"] = df.apply(
-                lambda row, scn=second_column_name: make_feedback_link(
-                    row[scn], current_date_year
-                ),
-                axis=1,
-            )
+        df.reset_index(drop=True, inplace=True)
+        df["test"] = current_date
 
-            df.reset_index(drop=True, inplace=True)
-            df["test"] = current_date
-
-            assert isinstance(df, pd.DataFrame)
-            dfs[sheet_name] = df
+        assert isinstance(df, pd.DataFrame)
+        dfs[sheet_name] = df
 
     pr.green("extracting df_sum_abbr for class.")
 

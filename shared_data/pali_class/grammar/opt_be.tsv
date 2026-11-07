@@ -1,0 +1,10 @@
+id	pali	gramma	of	eng	related	decl-con	pattern	native
+2500	assāma	opt 1st pl	atthi	we could be		conjugation	ssa-opt	мы могли бы быть
+25025	assaṃ	opt 1st sg	atthi	I could be	siyaṃ	conjugation	ssa-opt	Я мог бы быть
+2502	siyaṃ	opt 1st sg	atthi	I could be	assaṃ	conjugation	siyā-opt	Я мог бы быть
+2503	assa 1	opt 2nd & 3rd sg	atthi	you & he could be	siyā	conjugation	ssa-opt	Вы и он могли бы быть
+2504	siyā	opt 2nd & 3rd sg	atthi	you & he could be	assa	conjugation	siyā-opt	Вы и он могли бы быть
+2505	assatha	opt 2nd pl	atthi	you all could be		conjugation	ssa-opt	вы все могли бы быть
+2506	assu	opt 3rd pl	atthi	they could be	siyaṃsu<br>siyuṃ	conjugation	ssa-opt	они могли бы быть
+2507	siyuṃ	opt 3rd pl	atthi	they could be	siyaṃsu<br>assu	conjugation	siyā-opt	они могли бы быть
+2508	siyaṃsu	"opt 3rd pl	"	atthi	they could be	assu<br>siyuṃ	conjugation	siyā-opt	они могли бы быть

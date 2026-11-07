@@ -1,0 +1,29 @@
+id	pali	gramma	of	eng	related	decl-con	pattern	native
+1100	ajātasattussa	dat sg<br>gen sg	ajātasattu	for unborn enemy<br>of unborn enemy (name of the king of Magadha; son of Bimbisāra)	ajātasattuno	declension	u-masc	для нерожденного врага<br>нерожденного врага (имя царя Магадхи; сын Бимбисары)
+11011	bhikkhuṃ	acc sg	bhikkhu	monk		declension	u-masc	монах
+1102	bhikkhūnaṃ	dat pl<br>gen pl	bhikkhu	for monks<br>of monks		declension	u-masc	для монахов<br>монахов
+1103	bhikkhuno	dat sg<br>gen sg	bhikkhu	for monk<br>of monk	bhikkhussa	declension	u-masc	для монаха<br>из монаха
+1104	bhikkhussa	dat sg<br>gen sg	bhikkhu	for monk<br>of monk	bhikkhuno	declension	u-masc	для монаха<br>из монаха
+1105	bhikkhūhi	instr pl<br>abl pl	bhikkhu	with monks<br>from monks		declension	u-masc	с монахами<br>от монахов
+1106	bhikkhunā	instr sg<br>abl sg	bhikkhu	with monk<br>from monk		declension	u-masc	с монахом<br>от монаха
+1107	bhikkhūsu	loc pl	bhikkhu	amongst monks		declension	u-masc	среди монахов
+1108	bhikkhusmiṃ	loc sg	bhikkhu	in monk	bhikkhumhi	declension	u-masc	в монахе
+1109	bhikkhavo	nom pl<br>acc pl<br>voc pl	bhikkhu	monks<br>o monks!	bhikkhū	declension	u-masc	монахи<br>о монахи!
+11110	bhikkhū	nom pl<br>acc pl<br>voc pl	bhikkhu	monks<br>o monks!	bhikkhavo	declension	u-masc	монахи<br>о монахи!
+111111	bhikkhu	nom sg<br>voc sg	bhikkhu	monk<br>o monk!		declension	u-masc	монах<br>о монах!
+11112	bhikkhave	voc pl	bhikkhu	o monks!	bhikkhū<br>bhikkhavo	declension	u-masc	О монахи!
+11113	garuṃ	acc sg	garu	guru		declension	u-masc	гуру
+11114	garūnaṃ	dat pl<br>gen pl	garu	for gurus<br>of gurus		declension	u-masc	для гуру<br>гуру
+11115	garuno	dat sg<br>gen sg	garu	for guru<br>of guru	garussa	declension	u-masc	для гуру<br>гуру
+11116	garu	nom sg<br>voc sg	garu	guru<br>o guru!		declension	u-masc	гуру<br>о гуру!
+11117	hetunā	instr sg<br>abl sg	hetu	with reason<br>from reason		declension	u-masc	по причине<br>из причины
+11118	hetumhi	loc sg	hetu	in reason	hetusmiṃ	declension	u-masc	в разумных пределах
+11119	hetū	nom pl<br>acc pl<br>voc pl	hetu	reasons<br>o reasons!	hetavo	declension	u-masc	причины<br>о причины!
+1120	hetu	nom sg<br>voc sg	hetu	reason<br>o reason!		declension	u-masc	причина<br>о причина!
+11211	kurūnaṃ	dat pl<br>gen pl	kuru	for Kurus<br>of Kurus (name of a country)		declension	u-masc	для Куруса<br>из Куруса (название страны)
+1122	kurūsu	loc pl	kuru	amongst Kurus (name of a country)		declension	u-masc	среди Куру (название страны)
+1123	maccuno	dat sg<br>gen sg	maccu	for death<br>of death	maccussa	declension	u-masc	смерть<br>смерти
+1124	maccussa	dat sg<br>gen sg	maccu	for death<br>of death	maccuno	declension	u-masc	смерть<br>смерти
+1125	maccunā	instr sg<br>abl sg	maccu	with death<br>from death		declension	u-masc	со смертью<br>от смерти
+1126	pasū	nom pl<br>acc pl<br>voc pl	pasu	domestic animals<br>o domestic animals!	pasavo	declension	u-masc	домашние животные<br>о домашние животные!
+1127	ucchumhā	abl sg	ucchu	from sugar cane	ucchunā<br>ucchusmā	declension	u-masc	из сахарного тростника

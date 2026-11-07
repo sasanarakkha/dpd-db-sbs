@@ -1,0 +1,38 @@
+id	example	sandhi	details	result	meeting	pattern
+7701	√dhar + *e + ti	dhāreti	a > ā	ā	a	guṇa_vuddhi
+7711	i + a + ti	eti	i > e	e	i	guṇa_vuddhi
+7721	√vid + *e + ti	vedeti	i > e	e	i	guṇa_vuddhi
+7731	√sī + a + ti	seti	ī > e	e	ī	guṇa_vuddhi
+7741	√bhī + a + ti	bhāyati	ī > āy	āy	ī	guṇa_vuddhi
+7751	√cud + *e + ti	codeti	u > o	o	u	guṇa_vuddhi
+7761	ā + √ruc + *e + ti	āroceti	u > o	o	u	guṇa_vuddhi
+7771	√bhū + *a	bhāva	ū > av > āv	āv	ū	guṇa_vuddhi
+7781	√bhū + *a	bhava	ū > av	av	ū	guṇa_vuddhi
+7791	√su + *aka	sāvaka	u > av > āv	āv	u	guṇa_vuddhi
+7801	√su + *ana	savana	u > av	av	u	guṇa_vuddhi
+7811	saṃ + √sṛ + *a	saṃsāra	ṛ > ar > ār	ār	ṛ	guṇa_vuddhi
+7821	√kṛ + o + ti	karoti	ṛ > ar	ar	ṛ	guṇa_vuddhi
+7831	nī + √vid + ṃa + ti	nibbindati	√vid + ṃa > viṃda > vinda > binda	binda	vid ṃa	metathesis
+7841	√bhuj + ṃa + ti	bhuñjati	√bhuj + ṃa > bhuṃja > bhuñja	bhuñja	bhuj ṃa	metathesis
+7851	√his + ṃa + ti	hiṃsati	√his + ṃa > hisṃa > hiṃsa	hiṃsa	his ṃa	metathesis
+7861	√yuj + ṃa + ti	yuñjati	√yuj + ṃa > yuṃja > yuñja	yuñja	yuj ṃa	metathesis
+7871	√muc + ya + ti	muccati	c + y > cc	cc	cy	basic_assimilation
+7881	vi + √raj + ya + ti	virajjati	j + y > jj	jj	jy	basic_assimilation
+7891	√saj + ya + ti	sajjati	j + y > jj	jj	jy	basic_assimilation
+7901	√bhid + ya + ti	bhijjati	d + y > jj	jj	dy	basic_assimilation
+7911	√khād + ya + ti	khajjati	d + y > jj	jj	dy	basic_assimilation
+7921	√chid + ya + ti	chijjati	d + y > jj	jj	dy	basic_assimilation
+7931	√budh + ya + ti	bujjhati	dh + y > jjh	jjh	dhy	basic_assimilation
+7941	√gidh + ya + ti	gijjhati	dh + y > jjh	jjh	dhy	basic_assimilation
+7951	√idh + ya + ti	ijjhati	dh + y > jjh	jjh	dhy	basic_assimilation
+7961	√han + ya + ti	haññati	n + y > ññ	ññ	ny	basic_assimilation
+7971	√man + ya + ti	maññati	n + y > ññ	ññ	ny	basic_assimilation
+7981	√dīp + ya + ti	dippati	p + y > pp	pp	py	basic_assimilation
+7991	√kup + ya + ti	kuppati	p + y > pp	pp	py	basic_assimilation
+8001	√rup + ya + ti	ruppati	p + y > pp	pp	py	basic_assimilation
+8011	√lubh + ya + ti	lubbhati	bh + y > bbh	bbh	bhy	basic_assimilation
+8021	√sam + ya + ti	sammati	m + y > mm	mm	my	basic_assimilation
+8031	√siv + ya + ti	sibbati	v + y > vv > bb	bb	vy	basic_assimilation
+8041	√div + ya + ti	dibbati	v + y > vv > bb	bb	vy	basic_assimilation
+8051	√dus + ya + ti	dussati	s + y > ss	ss	sy	basic_assimilation
+8061	√kilis + ya + ti	kilissati	s + y > ss	ss	sy	basic_assimilation

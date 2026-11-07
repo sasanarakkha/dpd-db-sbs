@@ -1,0 +1,24 @@
+id	pali	gramma	of	eng	related	decl-con	pattern	native
+1000	assasissāmi	fut 1st sg	assasati	I will breathe in		conjugation	issati-fut	Я сделаю вдох
+10010	bhāsissati	fut 3rd sg	bhāsati	he will say		conjugation	issati-fut	он скажет
+1002	bhavissāma	fut 1st pl	bhavati	we could be (will be)		conjugation	issati-fut	мы могли бы быть (будем)
+1003	bhavissanti	fut 3rd pl	bhavati	they will be		conjugation	issati-fut	они будут
+1004	bhavissati	fut 3rd sg	bhavati	he could be (will be)		conjugation	issati-fut	он мог бы быть (будет)
+1005	bhuñjissatha	fut 2nd pl	bhuñjati	you all will eat		conjugation	issati-fut	вы все поедите
+1006	byākarissāmi	fut 1st sg	byākaroti	I will answer		conjugation	issati-fut	Я отвечу
+1007	dhāressāma	fut 1st pl	dhāreti	we will hold up		conjugation	ssati-fut	мы будем держаться
+1008	dhāressatha	fut 2nd pl	dhāreti	you all will hold up		conjugation	ssati-fut	вы все выдержите
+1009	dhāressanti	fut 3rd pl	dhāreti	they will hold up		conjugation	ssati-fut	они выдержат
+10100	gamissanti	fut 3rd pl	gacchati	they will go	gacchissanti	conjugation	issati-fut	они уйдут
+101010	gaṇhissāmi	fut 1st sg	gaṇhāti	I will take	gahessāmi	conjugation	ssati-fut	Я возьму
+10102	gahessasi	fut 2nd sg	gaṇhāti	you will take	gaṇhissasi	conjugation	ssati-fut	вы возьмете
+10103	gahessati	fut 3rd sg	gaṇhāti	he will take	gaṇhissati	conjugation	ssati-fut	он возьмет
+10104	jānissāma	fut 1st pl	jānāti	we will know		conjugation	issati-fut	мы узнаем
+10105	karissasi	fut 2nd sg	karoti	you will do		conjugation	issati-fut	вы сделаете
+10106	karissati	fut 3rd sg	karoti	he will do		conjugation	issati-fut	он это сделает
+10107	sakkhissasi	fut 2nd sg	sakkoti	you will be able (to)		conjugation	issati-fut	вы сможете (сделать это)
+10108	sarissasi	fut 2nd sg	sarati	you will remember		conjugation	issati-fut	вы запомните
+10109	upādiyissāmi	fut 1st sg	upādiyati	I will grasp		conjugation	issati-fut	Я пойму
+1020	viharissāma	fut 1st pl	viharati	we will dwell		conjugation	issati-fut	мы будем останавливаться
+10210	viharissatha	fut 2nd pl	viharati	you all will dwell		conjugation	issati-fut	вы все будете жить
+1022	viharissanti	fut 3rd pl	viharati	they will dwell		conjugation	issati-fut	они будут жить

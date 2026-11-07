@@ -1,0 +1,30 @@
+id	pali	gramma	of	eng	related	decl-con	pattern	native
+3100	cakkhusmā	abl sg	cakkhu	from eye	cakkhunā<br>cakkhumhā	declension	u-nt	из глаза
+31031	vatthusmā	abl sg	vatthu	from site	vatthunā<br>vatthumhā	declension	u-nt	с сайта
+3102	dārūnaṃ	dat pl<br>gen pl	dāru	for timbers<br>of timbers		declension	u-nt	для древесины<br>из древесины
+3103	vatthūnaṃ	dat pl<br>gen pl	vatthu	for sites<br>of sites		declension	u-nt	для участков<br>участков
+3104	āyuno	dat sg<br>gen sg	āyu	for life force<br>of life force	āyussa	declension	u-nt	для жизненной силы<br>жизненной силы
+3105	cakkhuno	dat sg<br>gen sg	cakkhu	for eye<br>of eye	cakkhussa	declension	u-nt	для глаза<br>глаза
+3106	cakkhussa	dat sg<br>gen sg	cakkhu	for eye<br>of eye	cakkhuno	declension	u-nt	для глаза<br>глаза
+3107	vatthussa	dat sg<br>gen sg	vatthu	for site<br>of site	vatthuno	declension	u-nt	для сайта<br>сайта
+3108	cakkhūhi	instr pl<br>abl pl	cakkhu	with eyes<br>from eyes		declension	u-nt	глазами<br>из глаз
+3109	vatthūhi	instr pl<br>abl pl	vatthu	with sites<br>from sites		declension	u-nt	с сайтами<br>из сайтов
+31310	āyunā	instr sg<br>abl sg	āyu	with life force<br>from life force		declension	u-nt	с жизненной силой<br>из жизненной силы
+313131	cakkhunā	instr sg<br>abl sg	cakkhu	with eye<br>from eye		declension	u-nt	глазом<br>от глаза
+31312	pheggunā	instr sg<br>abl sg	pheggu	with sapwood<br>from sapwood		declension	u-nt	с заболонью<br>из заболони
+31313	āyusmiṃ	loc sg	āyu	in life force	āyumhi	declension	u-nt	в жизненной силе
+31314	cakkhusmiṃ	loc sg	cakkhu	in eye	cakkhumhi	declension	u-nt	в глаз
+31315	utumhi	loc sg	utu	in weather	utusmiṃ	declension	u-nt	в погоде
+31316	vatthusmiṃ	loc sg	vatthu	in site	vatthumhi	declension	u-nt	на сайте
+31317	cakkhūni	nom pl<br>acc pl<br>voc pl	cakkhu	eyes<br>o eyes!	cakkhū	declension	u-nt	глаза<br>о глаза!
+31318	dārūni	nom pl<br>acc pl<br>voc pl	dāru	timbers<br>o timbers!	dārū	declension	u-nt	древесина<br>о древесина!
+31319	massū	nom pl<br>acc pl<br>voc pl	massu	beards<br>o beards!	massūni	declension	u-nt	бороды<br>о бороды!
+3120	tadahū	nom pl<br>acc pl<br>voc pl	tadahu	same day (pl)<br>o same day (pl)!	tadahūni	declension	u-nt	в тот же день (мн. ч.)<br>o в тот же день (мн. ч.)!
+31231	vatthū	nom pl<br>acc pl<br>voc pl	vatthu	sites<br>o sites!	vatthūni	declension	u-nt	сайты<br>o сайты!
+3122	vatthūni	nom pl<br>acc pl<br>voc pl	vatthu	sites<br>o sites!	vatthū	declension	u-nt	сайты<br>o сайты!
+3123	āyuṃ	nom sg<br>acc sg	āyu	life force		declension	u-nt	жизненная сила
+3124	cakkhuṃ	nom sg<br>acc sg	cakkhu	eye		declension	u-nt	глаз
+3125	kesamassuṃ	nom sg<br>acc sg	kesamassu	hair and beard		declension	u-nt	волосы и борода
+3126	āyu	nom sg<br>voc sg	āyu	life force<br>o life forces!		declension	u-nt	жизненная сила<br>о жизненные силы!
+3127	cakkhu	nom sg<br>voc sg	cakkhu	eye<br>o eye!		declension	u-nt	глаз<br>о глаз!
+3128	vatthu	nom sg<br>voc sg	vatthu	site<br>o site!		declension	u-nt	сайт<br>o сайт!

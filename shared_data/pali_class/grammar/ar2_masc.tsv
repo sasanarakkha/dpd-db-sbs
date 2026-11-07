@@ -1,0 +1,14 @@
+id	pali	gramma	of	eng	related	decl-con	pattern	native
+1300	bhātare	acc pl	bhātar	brothers	bhātaro	declension	ar2-masc	братья
+13013	bhātaraṃ	acc sg	bhātar	brother		declension	ar2-masc	брат
+1302	bhātūnaṃ	dat pl<br>gen pl	bhātar	for brothers<br>of brothers		declension	ar2-masc	для братьев братьев
+1303	bhātu	dat sg<br>gen sg	bhātar	for brother<br>of brother	bhātuno<br>bhātussa	declension	ar2-masc	для брата<br>брата
+1304	bhātuno	dat sg<br>gen sg	bhātar	for brother<br>of brother	bhātu<br>bhātussa	declension	ar2-masc	для брата<br>брата
+1305	bhātussa	dat sg<br>gen sg	bhātar	for brother<br>of brother	bhātuno<br>bhātu	declension	ar2-masc	для брата<br>брата
+1306	bhātunā	instr sg	bhātar	with brother	bhātarā	declension	ar2-masc	с братом
+1307	bhātarā	instr sg<br>abl sg	bhātar	with brother<br>from brother		declension	ar2-masc	с братом<br>от брата
+1308	bhātaresu	loc pl	bhātar	amongst brothers	bhātūsu	declension	ar2-masc	среди братьев
+1309	bhātari	loc sg	bhātar	in brother		declension	ar2-masc	брат
+13130	bhātaro	nom pl<br>acc pl<br>voc pl	bhātar	brothers<br>o brothers!		declension	ar2-masc	братья<br>о братья!
+131313	bhātā	nom sg<br>voc sg	bhātar	brother<br>o brother!		declension	ar2-masc	брат<br>о брат!
+13132	bhāta	voc sg	bhātar	o brother!	bhātā	declension	ar2-masc	О, брат!

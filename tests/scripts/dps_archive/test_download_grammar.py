@@ -7,7 +7,7 @@ import stat
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent
-SCRIPT = REPO_ROOT / "scripts" / "bash" / "download_grammar.sh"
+SCRIPT = REPO_ROOT / "scripts" / "dps_archive" / "download_grammar.sh"
 
 
 def test_script_exists_and_is_executable() -> None:

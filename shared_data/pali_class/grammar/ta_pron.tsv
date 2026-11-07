@@ -1,0 +1,28 @@
+id	pali	gramma	of	eng	related	decl-con	pattern	native
+32320	tāsaṃ	fem dat pl<br>fem gen pl	ta	for those<br>of those	tasānaṃ	declension	ta-pron	для тех<br>из тех
+323232	tasānaṃ	fem dat pl<br>fem gen pl	ta	for those<br>of those	tāsaṃ	declension	ta-pron	для тех<br>из тех
+32325	tassā	fem dat sg<br>fem gen sg	ta	for her<br>hers		declension	ta-pron	для нее<br>ее
+3205	tāhi	fem instr pl<br>fem abl pl	ta	with those<br>from those		declension	ta-pron	с теми<br>из тех
+32328	tāya	fem instr sg<br>fem abl sg	ta	with her<br>from her		declension	ta-pron	с ней<br>от нее
+32327	tāsu	fem loc pl	ta	among those		declension	ta-pron	среди тех
+32326	tassaṃ	fem loc sg	ta	in that	tāyaṃ<br>tissaṃ	declension	ta-pron	в том
+32329	tāyaṃ	fem loc sg	ta	in that	tassaṃ<br>tissaṃ	declension	ta-pron	в том
+3226	tissaṃ	fem loc sg	ta	in that	tassaṃ<br>tāyaṃ	declension	ta-pron	в том
+3203	tā	fem nom pl<br>fem acc pl	ta	those	tāyo	declension	ta-pron	те
+3220	tāyo	fem nom pl<br>fem acc pl	ta	those	tā	declension	ta-pron	те
+32032	sā	fem nom sg	ta	she		declension	ta-pron	она
+3207	tamhā	masc & nt abl sg	ta	from that	tasmā	declension	ta-pron	из этого
+32322	tasmā	masc & nt abl sg	ta	from that	tamhā	declension	ta-pron	из этого
+3224	tesaṃ	masc & nt dat pl<br>masc & nt gen pl	ta	for them<br>their	tesānaṃ	declension	ta-pron	для них<br>их
+32324	tassa	masc & nt dat sg<br>masc & nt gen sg	ta	for him<br>for that<br>his<br>of that		declension	ta-pron	для него<br>для этого<br>его<br>из этого
+3222	tehi	masc & nt instr pl<br>masc & nt abl pl	ta	with those<br>from those		declension	ta-pron	с теми<br>из тех
+3223	tena	masc & nt instr sg	ta	with him<br>with that		declension	ta-pron	с ним<br>с этим
+3225	tesu	masc & nt loc pl	ta	among those		declension	ta-pron	среди тех
+3208	tamhi	masc & nt loc sg	ta	in that	tasmiṃ	declension	ta-pron	в том
+32323	tasmiṃ	masc & nt loc sg	ta	in that	tamhi	declension	ta-pron	в том
+32232	te 2	masc & nt nom pl<br>masc & nt acc pl	ta	those		declension	ta-pron	те
+3200	sa	masc nom sg	ta	he	so	declension	ta-pron	он
+3202	so	masc nom sg	ta	he	sa	declension	ta-pron	он
+3209	tāni	nt nom pl<br>nt acc pl	ta	those	te	declension	ta-pron	те
+3206	taṃ 1.2	nt nom sg <br> masc & fem & nt acc sg 	ta	that<br>him<br>her<br>that		declension	ta-pron	что<br>ему<br>ей<br>что
+3204	tad	nt nom sg<br>nt acc sg	ta	that	taṃ	declension	ta-pron	что

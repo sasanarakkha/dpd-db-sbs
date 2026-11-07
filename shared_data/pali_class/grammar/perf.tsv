@@ -1,0 +1,16 @@
+id	pali	gramma	of	eng	related	decl-con	pattern	native
+5800	āha	perf 3rd sg	√ah	he said		conjugation	perf	он сказал
+58058	āhu	perf 3rd pl	√ah	they said	āhaṃsu	conjugation	perf	они сказали
+5802	āhaṃsu	perf 3rd pl	√ah	they said	āhu	conjugation	perf	они сказали
+5803	pāvaṃ	perf 1st sg	vadati	I said		conjugation	perf	Я сказал
+5804	accagamā	imperf 3rd sg	atigacchati	he overcame		conjugation	imperf	он преодолел
+5805	ajjhagā	imperf 3rd sg	adhigacchati	he achieved		conjugation	imperf	он добился
+5806	anvagū	imperf 3rd pl	anugacchati	they followed		conjugation	imperf	они последовали
+5807	upaccaguṃ	imperf 3rd pl	upātigacchati	they transcended	upaccagu<br>upaccagū	conjugation	imperf	они превзошли
+5808	agacchaṃ	imperf 1st sg<br>reflx aor 1st sg	gacchati	I reached<br>I myself went		conjugation	imperf-aor	Я достиг<br>Я сам пошел
+5809	agacchā	imperf 3rd sg<br>reflx aor 3rd sg	gacchati	he went<br>he himself went		conjugation	imperf-aor	он ушел<br>он сам ушел
+58580	agamā	imperf 3rd sg<br>reflx aor 3rd sg	gacchati	he went<br>he himself went		conjugation	imperf-aor	он ушел<br>он сам ушел
+585858	agamū	imperf 3rd pl<br>reflx aor 3rd pl	gacchati	they went<br>they themselves went		conjugation	imperf-aor	они пошли<br>они сами пошли
+58582	agamaṃ	imperf 1st sg<br>reflx aor 1st sg	gacchati	I went<br>I myself went		conjugation	imperf-aor	Я пошёл<br>Я сам пошёл
+58583	maññittho	reflx aor 2nd sg	maññati	you yourself imagined		conjugation	imperf-aor	вы сами это себе представили
+58584	ḍayhittho	reflx aor 2nd sg	ḍayhati	you yourself were burned		conjugation	imperf-aor	ты сам сгорел

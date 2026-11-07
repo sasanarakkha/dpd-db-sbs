@@ -1,0 +1,41 @@
+id	pali	gramma	of	eng	related	decl-con	pattern	native
+600	abbhaññāsiṃ	aor 1st sg	abbhaññāsi	I directly knew		conjugation	āsi-aor	Я знал наверняка
+601	abbhaññaṃsu	aor 3rd pl	abbhaññāsi	they directly knew		conjugation	āsi-aor	они знали напрямую
+602	abbhaññāsi	aor 3rd sg<br>aor 2nd sg	abbhaññāsi	he directly knew<br>you directly knew		conjugation	āsi-aor	он знал напрямую,<br>ты знал напрямую
+603	abhinandimha	aor 1st pl	abhinandi	we delighted (in)	abhinandimhā	conjugation	i-aor	мы были в восторге (от)
+604	abhinandiṃsu	aor 3rd pl	abhinandi	they delighted (in)	abhinanduṃ	conjugation	i-aor	они были в восторге (от)
+605	abhinanduṃ	aor 3rd pl	abhinandi	they delighted (in)	abhinandiṃsu	conjugation	i-aor	они были в восторге (от)
+6006	adaṃsu	aor 3rd pl	adāsi	they gave		conjugation	āsi-aor	они дали
+607	agamamhā	aor 1st pl	agamāsi	we went		conjugation	āsi-aor	мы пошли
+608	agamaṃsu	aor 3rd pl	agamāsi	they went		conjugation	āsi-aor	они ушли
+609	agamāsi	aor 3rd sg<br>aor 2nd sg	agamāsi	he went<br>you went		conjugation	āsi-aor	он ушел<br>ты ушел
+660	aggahesuṃ	aor 3rd pl	aggahesi	they seized		conjugation	esi-aor	они захватили
+666	āmantesi	aor 3rd sg<br>aor 2nd sg	āmantesi	he addressed<br>you addressed		conjugation	esi-aor	он обратился к вам, обратившись к вам.
+662	aṭṭhaṃsu	aor 3rd pl	aṭṭhāsi	they stood		conjugation	āsi-aor	они стояли
+663	aṭṭhāsi	aor 3rd sg<br>aor 2nd sg	aṭṭhāsi	he stood<br>you stood		conjugation	āsi-aor	он стоял<br>ты стоял
+664	codesuṃ	aor 3rd pl	codesi	they reproved		conjugation	esi-aor	они упрекнули
+665	nisīdimha	aor 1st pl	nisīdi	we sat	nisīdimhā	conjugation	i-aor	мы сидели
+6066	nisīdiṃ	aor 1st sg	nisīdi	I sat		conjugation	i-aor	Я сидел
+667	nisīdiṃsu	aor 3rd pl	nisīdi	they sat	nisīdisuṃ	conjugation	i-aor	они сидели
+668	nisīdi	aor 3rd sg<br>aor 2nd sg	nisīdi	he sat<br>you sat		conjugation	i-aor	он сел<br>ты сел
+669	paccassosuṃ	aor 3rd pl	paccassosi	they agreed		conjugation	i-aor	они согласились
+620	paccassosi	aor 3rd sg<br>aor 2nd sg	paccassosi	he agreed<br>you agreed		conjugation	i-aor	он согласился<br>вы согласились
+626	pakkāmuṃ	aor 3rd pl	pakkāmi	they left	pakkamiṃsu	conjugation	i-aor	они ушли
+622	pakkāmi	aor 3rd sg<br>aor 2nd sg	pakkāmi	he left<br>you left		conjugation	i-aor	он ушел<br>ты ушел
+623	paṭiggahesiṃ	aor 1st sg	paṭiggahesi	I received		conjugation	esi-aor	Я получил
+624	paṭiggahesuṃ	aor 3rd pl	paṭiggahesi	they received		conjugation	esi-aor	они получили
+625	pāvisi	aor 3rd sg<br>aor 2nd sg	pāvisi	he entered<br>you entered		conjugation	i-aor	он вошел<br>ты вошел
+6026	samāpajjiṃ	aor 1st sg	samāpajji	I attained		conjugation	i-aor	Я достиг
+627	sammodimha	aor 1st pl	sammodi	we greeted	sammodimhā	conjugation	i-aor	мы поприветствовали
+628	sammodiṃsu	aor 3rd pl	sammodi	they greeted		conjugation	i-aor	они поприветствовали
+629	sammodi	aor 3rd sg<br>aor 2nd sg	sammodi	he greeted<br>you greeted		conjugation	i-aor	он поприветствовал<br>вы поприветствовали
+630	samuttejesiṃ	aor 1st sg	samuttejesi	I fired up		conjugation	esi-aor	Я загорелся
+636	santappesuṃ	aor 3rd pl	santappesi	they pleased		conjugation	esi-aor	они были довольны
+632	udapādiṃ	aor 1st sg	udapādi	I was re-born		conjugation	i-aor	Я переродился
+633	udapādi	aor 3rd sg<br>aor 2nd sg	udapādi	he was re-born<br>you were re-born		conjugation	i-aor	Он возродился<br>Ты возродился
+634	viharimhā	aor 1st pl	vihari	we removed	viharimha	conjugation	i-aor	мы удалили
+635	viharittha	aor 2nd pl	vihari	you all removed		conjugation	āsi-aor	вы все удалены
+6036	vihariṃsu	aor 3rd pl	vihari	they removed	vihāsuṃ	conjugation	i-aor	они удалили
+637	vihāsiṃ	aor 1st sg	vihāsi	I lived		conjugation	i-aor	Я жил
+638	vihāsuṃ	aor 3rd pl	vihāsi	they removed	vihariṃsu	conjugation	i-aor	они удалили
+639	vimuccittha	aor 2nd pl	vimucci	you all were liberated		conjugation	āsi-aor	Вы все были освобождены

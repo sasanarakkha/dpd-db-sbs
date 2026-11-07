@@ -1,0 +1,62 @@
+id	example	sandhi	details	result	meeting	pattern
+47281	ekaṃ idaṃ ahaṃ	ekamidāhaṃ	ṃ elided, a lengthened	ā	ṃ + vowel	niggahīta-sandhi
+4728	evaṃ ahaṃ	evāhaṃ	ṃ elided, a lengthened	ā	ṃ + vowel	niggahīta-sandhi
+47280	imaṃ ahaṃ	imāhaṃ	ṃ elided, a lengthened	ā	ṃ + vowel	niggahīta-sandhi
+4727	etaṃ avoca	etadavoca	ṃ become d	d	ṃ + vowel	niggahīta-sandhi
+47270	etaṃ eva	etadeva	ṃ become d	d	ṃ + vowel	niggahīta-sandhi
+47271	yaṃ yaṃ eva	yaññadeva	ṃ become d	d	ṃ + vowel	niggahīta-sandhi
+47221	paṭi + saṃ līna	paṭisallīna	ṃ become l	ll	ṃ + l	niggahīta-sandhi
+47220	saṃ lahuka	sallahuka	ṃ become l	ll	ṃ + l	niggahīta-sandhi
+4722	saṃ lekha	sallekha	ṃ become l	ll	ṃ + l	niggahīta-sandhi
+47479	abhi saṃ buddha	abhisambuddha	ṃ become nasal of the labial group	m	ṃ + b (labial)	niggahīta-sandhi
+47300	dutiyaṃ api	dutiyampi	ṃ become nasal of the dental group, a elided	m	ṃ + vowel	niggahīta-sandhi
+47260	etaṃ ahaṃ	etamahaṃ	ṃ become m	m	ṃ + vowel	niggahīta-sandhi
+47261	kiṃ assa	kimassa	ṃ become m	m	ṃ + vowel	niggahīta-sandhi
+4720	paṭi saṃ bhidā	paṭisambhidā	ṃ become nasal of the labial group	m	ṃ + bh (labial)	niggahīta-sandhi
+47247	saṃ majjana	sammajjana	ṃ become nasal of the labial group	m	ṃ + m (labial)	niggahīta-sandhi
+472470	saṃ majjati	sammajjati	ṃ become nasal of the labial group	m	ṃ + m (labial)	niggahīta-sandhi
+47478	saṃ phassa	samphassa	ṃ become nasal of the labial group	m	ṃ + ph (labial)	niggahīta-sandhi
+4726	taṃ ahaṃ	tamahaṃ	ṃ become m	m	ṃ + vowel	niggahīta-sandhi
+47477	upa saṃ padā	upasampadā	ṃ become nasal of the labial group	m	ṃ + p (labial)	niggahīta-sandhi
+47348	ava siro	avaṃsiro	ṃ insertion	ṃ	vovel + consonant (guttural)	niggahīta-sandhi
+47001	evaṃ diṭṭhī	evaṃdiṭṭhī	no change	ṃ	ṃ + consonant	niggahīta-sandhi
+4700	evaṃ vutte	evaṃ vutte	no change	ṃ	ṃ + consonant	niggahīta-sandhi
+47301	kaṃ asi	kaṃsi	ṃ become nasal of the dental group, a elided	ṃ	ṃ + vowel	niggahīta-sandhi
+47002	saṃ khitta	saṃkhitta	no change	ṃ	ṃ + consonant	niggahīta-sandhi
+47000	saṃ sandati	saṃsandati	no change	ṃ	ṃ + consonant	niggahīta-sandhi
+4730	abhinanduṃ iti	abhinandunti	ṃ become nasal of the dental group, i elided	n	ṃ + vowel	niggahīta-sandhi
+47474	saṃ dassana	sandassana	ṃ become nasal of the dental group	n	ṃ + d (dental)	niggahīta-sandhi
+474740	saṃ dasseti	sandasseti	ṃ become nasal of the dental group	n	ṃ + d (dental)	niggahīta-sandhi
+47475	saṃ dhāvita	sandhāvita	ṃ become nasal of the dental group	n	ṃ + dh (dental)	niggahīta-sandhi
+47476	saṃ nicaya	sannicaya	ṃ become nasal of the dental group	n	ṃ + n (dental)	niggahīta-sandhi
+47472	saṃ tajjeti	santajjeti	ṃ become nasal of the dental group	n	ṃ + t (dental)	niggahīta-sandhi
+474720	saṃ tāpeti	santāpeti	ṃ become nasal of the dental group	n	ṃ + t (dental)	niggahīta-sandhi
+47473	saṃ thata	santhata	ṃ become nasal of the dental group	n	ṃ + th (dental)	niggahīta-sandhi
+47240	ayaṃ hi	ayañhi	ṃ become ñ	ñ	ṃ + h	niggahīta-sandhi
+4705	dhammaṃ ca	dhammañca	ṃ become nasal of the guttural group	ñ	ṃ + c (palatal)	niggahīta-sandhi
+47241	evaṃ hi	evañhi	ṃ become ñ	ñ	ṃ + h	niggahīta-sandhi
+4724	kiṃ hi	kiñhi	ṃ become ñ	ñ	ṃ + h	niggahīta-sandhi
+47060	saṃ chavi	sañchavī	ṃ become nasal of the palatal group	ñ	ṃ + ch (palatal)	niggahīta-sandhi
+4706	saṃ chinditvā	sañchinditvā	ṃ become nasal of the palatal group	ñ	ṃ + ch (palatal)	niggahīta-sandhi
+4707	saṃ jāti	sañjāti	ṃ become nasal of the palatal group	ñ	ṃ + j (palatal)	niggahīta-sandhi
+4708	saṃ jhā	sañjhā	ṃ become nasal of the palatal group	ñ	ṃ + jh (palatal)	niggahīta-sandhi
+4709	saṃ ñā	saññā	ṃ become nasal of the palatal group	ñ	ṃ + ñ (palatal)	niggahīta-sandhi
+47349	yāva ca idha	yāvañc’idha	ṃ insertion, ṃ become nasal of the palatal group	ñ	vovel + consonant (guttural)	niggahīta-sandhi
+47048	ahaṃ kāra	ahaṅkāra	ṃ become nasal of the guttural group	ṅ	ṃ + k (guttural)	niggahīta-sandhi
+4703	atthaṃ gata	atthaṅgata	ṃ become nasal of the guttural group	ṅ	ṃ + g (guttural)	niggahīta-sandhi
+47047	kālaṃ kata	kālaṅkata	ṃ become nasal of the guttural group	ṅ	ṃ + k (guttural)	niggahīta-sandhi
+47347	pubba gama	pubbaṅgama	ṃ insertion, ṃ become nasal of the guttural group	ṅ	vovel + consonant (guttural)	niggahīta-sandhi
+4704	saṃ + √ghaṭ + a	saṅgha	ṃ become nasal of the guttural group	ṅ	ṃ + gh (guttural)	niggahīta-sandhi
+4702	saṃ khāra	saṅkhāra	ṃ become nasal of the guttural group	ṅ	ṃ + kh (guttural)	niggahīta-sandhi
+474747	saṃ √ḍaṃs > ḍās + *a	saṇḍāsa	ṃ become nasal of the retroflex group	ṇ	ṃ + ḍ (retroflex)	niggahīta-sandhi
+474700	saṃ ṭhahati	saṇṭhahati	ṃ become nasal of the retroflex group	ṇ	ṃ + ṭh (retroflex)	niggahīta-sandhi
+47470	saṃ ṭhāna	saṇṭhāna	ṃ become nasal of the retroflex group	ṇ	ṃ + ṭh (retroflex)	niggahīta-sandhi
+47230	ahaṃ eva	ahaññeva	ṃ become ññ	ññ	ṃ + e	niggahīta-sandhi
+47231	paccattaṃ eva	paccattaññeva	ṃ become ññ	ññ	ṃ + e	niggahīta-sandhi
+47251	saṃ yata	saññata	ṃ and y assimilated	ññ	ṃ + y	niggahīta-sandhi
+4725	saṃ yoga	saññoga	ṃ and y assimilated	ññ	ṃ + y	niggahīta-sandhi
+4723	taṃ eva	taññeva	ṃ become ññ	ññ	ṃ + e	niggahīta-sandhi
+47250	yaṃ yaṃ eva	yaññadeva	ṃ and y assimilated	ññ	ṃ + y	niggahīta-sandhi
+47290	ariyasaccānaṃ dassanaṃ	ariyasaccānadassanaṃ	ṃ elided		ṃ + consonant	niggahīta-sandhi
+4729	buddhānaṃ sāsanaṃ	buddhānasāsanaṃ	ṃ elided		ṃ + consonant	niggahīta-sandhi
+47291	vanasmiṃ vānaro	vanasmi vānaro	ṃ elided		ṃ + consonant	niggahīta-sandhi

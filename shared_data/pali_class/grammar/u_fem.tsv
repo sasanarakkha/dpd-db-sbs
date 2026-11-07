@@ -1,0 +1,13 @@
+id	pali	gramma	of	eng	related	decl-con	pattern	native
+2700	dhātu	nom sg<br>voc sg	dhātu	element<br>o element!		declension	u-fem	элемент<br>о элемент!
+27027	dhātuyo	nom pl<br>acc pl<br>voc pl	dhātu	elements<br>o elements!	dhātū	declension	u-fem	элементы<br>o элементы!
+2702	dhātuṃ	acc sg	dhātu	element		declension	u-fem	элемент
+2703	dhātū	nom pl<br>acc pl<br>voc pl	dhātu	elements<br>o elements!	dhātuyo	declension	u-fem	элементы<br>o элементы!
+2704	dhātuyā	instr sg<br>dat sg<br>abl sg<br>gen sg<br>loc sg	dhātu	with element<br>for element<br>from element<br>of element<br>in element		declension	u-fem	с элементом<br>для элемента<br>из элемента<br>элемента<br>в элементе
+2705	dhātūhi	instr pl<br>abl pl	dhātu	with elements<br>from elements		declension	u-fem	с элементами<br>из элементов
+2706	dhātūnaṃ	dat pl<br>gen pl	dhātu	for elements<br>of elements		declension	u-fem	для элементов<br>элементов
+2707	dhātūsu	loc pl	dhātu	amongst elements	dhātusu	declension	u-fem	среди элементов
+2708	rajju	nom sg<br>voc sg	rajju	rope<br>o rope!		declension	u-fem	веревка<br>о веревка!
+2709	rajjuyā	instr sg<br>dat sg<br>abl sg<br>gen sg<br>loc sg	rajju	with rope<br>for rope<br>from rope<br>of rope<br>in rope		declension	u-fem	с веревкой<br>для веревки<br>из веревки<br>из веревки<br>в веревке
+27270	rajjūhi	instr pl<br>abl pl	rajju	with ropes<br>from ropes		declension	u-fem	с веревками<br>из веревок
+272727	yāguṃ	acc sg	yāgu	congee		declension	u-fem	рисовая каша

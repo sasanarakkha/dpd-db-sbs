@@ -1,0 +1,39 @@
+id	pali	gramma	of	eng	related	decl-con	pattern	native
+2900	āsanaṃ	nom sg<br>acc sg	āsana	chair		declension	a-nt	стул
+29029	āsanā	nom pl<br>abl sg<br>voc sg	āsana	chairs<br>from chair<br>o chair!		declension	a-nt	стулья<br>из стула<br>о стул!
+2902	āsanāni	nom pl<br>acc pl<br>voc pl	āsana	chairs<br>o chairs!		declension	a-nt	стулья<br>о стулья!
+2903	āsane	acc pl<br>loc sg	āsana	chairs<br>in chair!		declension	a-nt	стулья<br>в стуле!
+2904	āsanena	instr sg	āsana	with chair		declension	a-nt	со стулом
+2905	āsanesu	loc pl	āsana	amongst chairs		declension	a-nt	среди стульев
+2906	cittaṃ	nom sg<br>acc sg	citta	mind		declension	a-nt	разум
+2907	cittāni	nom pl<br>acc pl<br>voc pl	citta	minds<br>o minds!		declension	a-nt	умы<br>о умы!
+2908	citte	acc pl<br>loc sg	citta	minds<br>in mind		declension	a-nt	умы<br>в уме
+2909	cittena	instr sg	citta	with mind		declension	a-nt	с умом
+29290	cittassa	dat sg<br>gen sg	citta	for mind<br>of mind		declension	a-nt	для разума<br>разума
+292929	cittamhi	loc sg	citta	in mind	citte<br>cittasmiṃ	declension	a-nt	с учетом
+29292	cittasmiṃ	loc sg	citta	in mind	cittamhi<br>citte	declension	a-nt	с учетом
+29293	cīvarānaṃ	dat pl<br>gen pl	cīvara	for robes<br>of robes		declension	a-nt	для одеяний<br>одеяний
+29294	maraṇā	nom pl<br>abl sg<br>voc sg	maraṇa	deaths<br>from death<br>o death!		declension	a-nt	смерти<br>от смерти<br>до смерти!
+29295	maraṇena	instr sg	maraṇa	with death		declension	a-nt	со смертью
+29296	maraṇāya	dat sg	maraṇa	for death	maraṇassa	declension	a-nt	смерть
+29297	maraṇassa	dat sg<br>gen sg	maraṇa	for death<br>of death		declension	a-nt	смерть<br>смерти
+29298	pahānāya	dat sg	pahāna	for abandoning	pahānassa	declension	a-nt	за отказ
+29299	rūpā	nom pl<br>abl sg<br>voc sg	rūpa	forms<br>from form<br>o form!		declension	a-nt	формы<br>из формы<br>o форма!
+2920	rūpāni	nom pl<br>acc pl<br>voc pl	rūpa	forms<br>o forms!		declension	a-nt	формы<br>o формы!
+29229	rūpehi	instr pl<br>abl pl	rūpa	with forms<br>from forms		declension	a-nt	с формами<br>из форм
+2922	rūpassa	dat sg<br>gen sg	rūpa	for form<br>of form		declension	a-nt	для формы<br>формы
+2923	rūpānaṃ	dat pl<br>gen pl	rūpa	for forms<br>of forms		declension	a-nt	для форм<br>форм
+2924	rūpamhā	abl sg	rūpa	from form	rūpasmā<br>rūpā	declension	a-nt	из формы
+2925	rūpasmā	abl sg	rūpa	from form	rūpamhā<br>rūpā	declension	a-nt	из формы
+2926	rūpasmiṃ	loc sg	rūpa	in form	rūpe<br>rūpamhi	declension	a-nt	в форме
+2927	rūpesu	loc pl	rūpa	amongst forms		declension	a-nt	среди форм
+2928	sikkhāpadesu	loc pl	sikkhāpada	amongst precepts		declension	a-nt	среди заповедей
+2929	sīlehi	instr pl<br>abl pl	sīla	with virtues<br>from virtues		declension	a-nt	с добродетелями<br>из добродетелей
+2930	sīlānaṃ	dat pl<br>gen pl	sīla	for virtues<br>of virtues		declension	a-nt	за добродетели<br>добродетелей
+29329	ṭhānehi	instr pl<br>abl pl	ṭhāna	with place<br>from place		declension	a-nt	с местом<br>из места
+2932	ṭhānesu	loc pl	ṭhāna	amongst places		declension	a-nt	среди мест
+2933	viññāṇaṃ	nom sg<br>acc sg	viññāṇa	consciousness		declension	a-nt	сознание
+2934	viññāṇe	acc pl<br>loc sg	viññāṇa	consciousnesses<br>in consciousness		declension	a-nt	сознание<br>в сознании
+2935	viññāṇamhā	abl sg	viññāṇa	from consciousness	viññāṇasmā<br>viññāṇā	declension	a-nt	из сознания
+2936	viññāṇasmā	abl sg	viññāṇa	from consciousness	viññāṇamhā<br>viññāṇā	declension	a-nt	из сознания
+2937	viññāṇasmiṃ	loc sg	viññāṇa	in consciousness	viññāṇe<br>viññāṇamhi	declension	a-nt	в сознании
