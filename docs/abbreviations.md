@@ -63,7 +63,7 @@ There are two types of abbreviations: Grammatical and Textual.
 |imp|imperative mood|Mood that expresses an intention to influence the listener's behavior or expresses wish. (e.g. begone! may there be! may it be!)|
 |imperf|imperfect past tense|Past tense which is used for events which happened before yesterday, but were seen by the speaker.|
 |impers|impersonal|Not relating to or responsive to individual persons (e.g. it occurs (to); it is suitable (for))|
-|in comps|in compounds, word is only found as an element within compounds|Usually acts as part of a compoun|
+|in comps|in compounds, word is only found as an element within compounds|Usually acts as part of a compound|
 |ind|indeclinable|It does not have declensions or conjugations.|
 |inf|infinitive verb|The uninflected form of the verb. It most commonly expresses a purpose.|
 |instr|instrumental case|shows the object or person with or by whom something is performed. (by, with or through)<br/>(e.g. by me, with me)|
