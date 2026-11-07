@@ -5,7 +5,7 @@ import threading
 import time
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import flet as ft
 
@@ -89,7 +89,11 @@ def tab_selection() -> tuple[list[int], frozenset[int]]:
     """The tab indices to show and the read-only ones. A contributor-server
     session gets its allowed tabs; every other role gets all of them."""
     if not is_headless_server():
-        return list(range(len(TAB_LABELS))), frozenset()
+        # DPS local: the DPS tab (index 17) sits right after Pass2Add (index 7)
+        # in the tab bar; its index stays 17 so upstream indices never shift.
+        order = [i for i in range(len(TAB_LABELS)) if i != 17]
+        order.insert(order.index(7) + 1, 17)
+        return order, frozenset()
     visible, read_only = allowed_tabs(TAB_LABELS, resolve_extra_tabs())
     return visible, frozenset(read_only)
 
@@ -219,7 +223,11 @@ class App:
             0: lambda: GlobalTabView(self.page, self.toolkit),
             1: lambda: TranslationsView(self.page, self.toolkit),
             2: lambda: Pass1AutoView(self.page, self.toolkit),
-            3: lambda: Pass1AddView(self.page, self.toolkit, self._view(2).controller),
+            3: lambda: Pass1AddView(
+                self.page,
+                self.toolkit,
+                cast(Pass1AutoView, self._view(2)).controller,
+            ),
             4: lambda: Pass2PreProcessView(self.page, self.toolkit),
             5: lambda: Pass2xInCommentaryView(self.page, self.toolkit),
             6: lambda: Pass2AutoView(self.page, self.toolkit),
@@ -240,7 +248,7 @@ class App:
 
         self.toolkit.username_manager.get_username()
 
-    def _on_submit_data(self, e: ft.ControlEvent) -> None:
+    def _on_submit_data(self, e: ft.Event[ft.TextButton]) -> None:
         """Handle Submit Data button click."""
         from scripts.onboarding.data_submission import submit_data
 
@@ -254,10 +262,10 @@ class App:
         )
         self.page.show_dialog(dialog)
 
-    def _on_check_updates(self, e: ft.ControlEvent) -> None:
+    def _on_check_updates(self, e: ft.Event[ft.TextButton]) -> None:
         """Handle Update button click with confirmation."""
 
-        def _run_update(e: ft.ControlEvent) -> None:
+        def _run_update(e: ft.Event[ft.TextButton]) -> None:
             self.page.pop_dialog()
             from scripts.onboarding.contributor_update import update_environment
 
@@ -279,16 +287,19 @@ class App:
                 "local dpd.db with the latest release.\n\n"
                 "A backup will be created automatically, but are you sure?"
             ),
-            actions=[
-                ft.TextButton(
-                    "Cancel",
-                    on_click=lambda _: self.page.pop_dialog(),
-                ),
-                ft.TextButton(
-                    "Update",
-                    on_click=_run_update,
-                ),
-            ],
+            actions=cast(
+                list[ft.Control],
+                [
+                    ft.TextButton(
+                        "Cancel",
+                        on_click=lambda _: self.page.pop_dialog(),
+                    ),
+                    ft.TextButton(
+                        "Update",
+                        on_click=_run_update,
+                    ),
+                ],
+            ),
             actions_alignment=ft.MainAxisAlignment.END,
         )
         self.page.show_dialog(confirm_dialog)
@@ -403,7 +414,7 @@ class App:
             if not is_dialog_open(self.page):
                 self.page.show_dialog(
                     build_shortcuts_dialog(
-                        self._shortcut_groups(), lambda _: self.page.pop_dialog()
+                        self._shortcut_groups(), self._close_shortcuts_dialog
                     )
                 )
         elif (
@@ -424,6 +435,9 @@ class App:
             target = getattr(view, "_middle_section", None)
             if target is not None:
                 await target.scroll_to(delta=self._SCROLL_KEYS[e.key], duration=100)
+
+    def _close_shortcuts_dialog(self, _: Any) -> None:
+        self.page.pop_dialog()
 
     def _shortcut_groups(self) -> list[ShortcutGroup]:
         """Every shortcut on_keyboard handles, for the Alt+? popup. The tab
@@ -511,7 +525,7 @@ class App:
         if view is None:
             return ""
         try:
-            field = view.dpd_fields.get_field("lemma_1")
+            field = cast(Any, view).dpd_fields.get_field("lemma_1")
             lemma_1 = (field.value or "").strip() if field else ""
             return re.sub(r" \d.*$", "", lemma_1)
         except Exception:
@@ -649,7 +663,7 @@ class App:
 
     def _tab_label(self, index: int) -> str:
         """Return a tab's visible label, for messages about that tab."""
-        label = self._tab_bar.tabs[self._visible.index(index)].label
+        label = cast(ft.Tab, self._tab_bar.tabs[self._visible.index(index)]).label
         text = getattr(label, "value", None)
         return text or str(index)
 

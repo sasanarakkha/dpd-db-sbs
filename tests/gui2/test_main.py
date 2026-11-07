@@ -327,7 +327,10 @@ def test_tab_selection_is_every_tab_off_the_server(
     monkeypatch.setenv("DPD_GUI2_TABS", "DB")
     monkeypatch.setattr("tools.server_mode.config_read", lambda *_: None)
     visible, read_only = tab_selection()
-    assert visible == list(range(len(TAB_LABELS)))
+    # DPS local: index 17 (DPS) is shown right after Pass2Add (index 7).
+    expected = [i for i in range(len(TAB_LABELS)) if i != 17]
+    expected.insert(expected.index(7) + 1, 17)
+    assert visible == expected
     assert read_only == frozenset()
 
 
