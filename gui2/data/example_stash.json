@@ -5,13 +5,13 @@
         "example": "yo hi koci, mārisa, amanusso ... nāgo vā nāgī vā nāgapotako vā nāgapotikā vā nāgamah'āmatto vā nāgapārisajjo vā nāgapacāro vā paduṭṭhacitto bhikkhuṃ vā bhikkhuniṃ vā upāsakaṃ vā upāsikaṃ vā gacchantaṃ vā anugaccheyya, ṭhitaṃ vā upatiṭṭheyya, nisinnaṃ vā upanisīdeyya, nipannaṃ vā upanipajjeyya."
     },
     "last": {
-        "source": "TH61",
-        "sutta": "vappattheragāthā",
-        "example": "passati passo passantaṃ,\napassantañca passati,\napassanto apassantaṃ,\npassantañca na passatī'ti."
+        "source": "AN4.61",
+        "sutta": "pattakammavaggo, pattakammasuttaṃ",
+        "example": "idha, gahapati, ariyasāvako vigatamalamaccherena cetasā agāraṃ ajjhāvasati muttacāgo payatapāṇi vossaggarato yācayogo dānasaṃvibhāgarato. ayaṃ vuccati, gahapati, cāgasampadā."
     },
     "stash": {
-        "source": "DHP142",
-        "sutta": "daṇḍavaggo",
-        "example": "alaṅ'kato ce'pi samaṃ careyya, santo danto niyato brahmacārī,\nsabbesu bhūtesu nidhāya daṇḍaṃ, so brāhmaṇo so samaṇo sa bhikkhu."
+        "source": "DHP338",
+        "sutta": "taṇhāvaggo",
+        "example": "yathā'pi mūle anupaddave daḷhe,\nchinno'pi rukkho punareva rūhati, \nevam'pi taṇh'ānusaye anūhate,\nnibbattatī dukkham'idaṃ punappunaṃ."
     }
 }
