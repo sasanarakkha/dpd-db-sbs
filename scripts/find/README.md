@@ -19,3 +19,4 @@ Scripts in this folder follow a "Gap Analysis and Discovery" pattern:
 Each script is a standalone discovery tool:
 - **Find missing words:** `uv run python scripts/find/most_common_missing_word_1_finder.py`
 - **Analyze coverage of the finder's output:** `uv run python scripts/find/most_common_missing_word_2_analysis.py`
+- **Check root_example data:** `uv run python scripts/find/root_example_checker.py` (read-only report of `dpd_roots.root_example` words that are NOT_FOUND or belong to a different root)
