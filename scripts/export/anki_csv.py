@@ -195,36 +195,40 @@ def common_roots(db_session, dpspth):
         "feedback",
     ]
 
+    # One query for all rooted headwords (no index on root_key, so a query per
+    # root would scan the whole table each time), grouped by root, ebt_count desc
+    headwords_by_root: dict[str, list[DpdHeadword]] = {}
+    for headword in (
+        db_session.query(DpdHeadword)
+        .filter(DpdHeadword.root_key != "")
+        .filter(~DpdHeadword.stem.contains("!"))
+        .order_by(DpdHeadword.ebt_count.desc())
+        .all()
+    ):
+        headwords_by_root.setdefault(headword.root_key, []).append(headword)
+
     rows = []
     ru_rows = []
     for root_obj, _ in roots_db:
         root = root_obj.root
 
+        root_headwords = headwords_by_root.get(root, [])
+
         # --- Find main_verb ---
-        main_verb_obj = (
-            db_session.query(DpdHeadword)
-            .filter(DpdHeadword.root_key == root)
-            .filter(~DpdHeadword.stem.contains("!"))
-            .filter(DpdHeadword.pos == "pr")
-            .filter(~DpdHeadword.grammar.contains("pass"))
-            .filter(~DpdHeadword.grammar.contains("caus"))
-            .filter(~DpdHeadword.family_root.contains(" "))
-            .order_by(DpdHeadword.ebt_count.desc())
-            .first()
+        main_verb_obj = next(
+            (
+                x
+                for x in root_headwords
+                if x.pos == "pr"
+                and "pass" not in x.grammar
+                and "caus" not in x.grammar
+                and " " not in x.family_root
+            ),
+            None,
         )
         main_verb = main_verb_obj.lemma_clean if main_verb_obj else ""
-        # # debug
-        # if not main_verb:
-        #     print(f"for {root} no main verb")
 
-        examples_objs = (
-            db_session.query(DpdHeadword)
-            .filter(DpdHeadword.root_key == root)
-            .filter(~DpdHeadword.stem.contains("!"))
-            .filter(DpdHeadword.meaning_1 != "")
-            .order_by(DpdHeadword.ebt_count.desc())
-            .all()
-        )
+        examples_objs = [x for x in root_headwords if x.meaning_1 != ""]
         examples = ", ".join(pick_root_examples(examples_objs, main_verb))
 
         root_clean = re.sub(r" \d*$", "", str(root))
