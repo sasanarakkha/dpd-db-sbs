@@ -6,14 +6,14 @@ id	pali	gramma	of	eng	related	decl-con	pattern	native
 2404	kareyyāmi	opt 1st sg	"karoti
 "	I could do		conjugation	eyya-opt	Я мог бы сделать
 2405	tiṭṭheyyāmi	opt 1st sg	tiṭṭhati	I could stand		conjugation	eyya-opt	Я мог стоять
-2406	dhāreyyātha	opt 2nd pl	dhāreti	you all could hold up		conjugation	eyya-opt	вы все могли бы подождать
+2406	dhāreyyātha	opt 2nd pl	dhāreti	you all could hold up		conjugation	eyya-opt	вы все могли бы поднять
 2407	jāneyyātha	opt 2nd pl	jānāti	you all could know		conjugation	eyya-opt	вы все могли знать
 2408	vijāneyyātha	opt 2nd pl	vijānati	you all could comprehend		conjugation	eyya-opt	вы все могли это понять
-2409	bhāvetha	opt 2nd pl<br>pr 2nd pl<br>imp 2nd pl	bhāveti	you all could cultivate<br>you all cultivate<br>you all must cultivate		conjugation	eyya-opt	вы все можете заниматься земледелием<br>вы все должны заниматься земледелием
-24240	bhāveyyāsi	opt 2nd sg	bhāveti	you could cultivate		conjugation	eyya-opt	вы могли бы выращивать
-242424	jāneyyāsi	opt 2nd sg	jānāti	you could know		conjugation	eyya-opt	вы могли бы знать
-24242	passeyyāsi	opt 2nd sg	passati	you could see		conjugation	eyya-opt	вы могли видеть
-24243	bhuñje	opt 3rd & 2nd & 1st sg	bhuñjati	he & you & I could eat		conjugation	eyya-opt	мы с ним могли бы поесть
+2409	bhāvetha	opt 2nd pl<br>pr 2nd pl<br>imp 2nd pl	bhāveti	you all could cultivate<br>you all cultivate<br>you all must cultivate		conjugation	eyya-opt	вы все могли бы культивировать<br>вы все культивируете<br>вы все должны культивировать
+24240	bhāveyyāsi	opt 2nd sg	bhāveti	you could cultivate		conjugation	eyya-opt	ты мог бы выращивать
+242424	jāneyyāsi	opt 2nd sg	jānāti	you could know		conjugation	eyya-opt	ты мог бы знать
+24242	passeyyāsi	opt 2nd sg	passati	you could see		conjugation	eyya-opt	ты мог бы видеть
+24243	bhuñje	opt 3rd & 2nd & 1st sg	bhuñjati	he & you & I could eat		conjugation	eyya-opt	он, ты и я могли бы поесть
 24244	icche	opt 3rd & 2nd & 1st sg	icchati	he & you & I could wish		conjugation	eyya-opt	Он, ты и я могли бы пожелать
 24245	jappe	opt 3rd & 2nd & 1st sg	jappati	he & you & I could desire		conjugation	eyya-opt	он, ты и я могли бы желать
 24246	gaccheyyuṃ	"opt 3rd pl	"	gacchati	they could go		conjugation	eyya-opt	они могли бы пойти
@@ -21,4 +21,4 @@ id	pali	gramma	of	eng	related	decl-con	pattern	native
 24248	vihareyyuṃ	"opt 3rd pl	"	viharati	they could dwell		conjugation	eyya-opt	они могли бы жить
 24249	āgaccheyya	opt 3rd sg	āgacchati	he could come		conjugation	eyya-opt	он мог бы прийти
 2420	vadeyya	opt 3rd sg	vadati	he could say		conjugation	eyya-opt	он мог бы сказать
-24224	vihareyya	opt 3rd sg	viharati	he could dwell		conjugation	eyya-opt	он мог бы остановиться
+24224	vihareyya	opt 3rd sg	viharati	he could dwell		conjugation	eyya-opt	он мог бы жить

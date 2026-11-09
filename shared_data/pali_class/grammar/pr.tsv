@@ -25,7 +25,7 @@ id	pali	gramma	of	eng	related	decl-con	pattern	native
 423	deseti	pr 3rd sg	deseti	he teaches		conjugation	eti-pr	он преподает
 424	pajānāti	pr 3rd sg	pajānāti	he understands		conjugation	āti-pr	он понимает
 425	karomi	pr 1st sg<br>imp 1st sg	karoti	I (must) do		conjugation	oti-pr	Я (должен) сделать
-426	viharāmi	pr 1st sg<br>imp 1st sg	viharati	I (must) dwell		conjugation	ati-pr	Я (должен) остановиться
+426	viharāmi	pr 1st sg<br>imp 1st sg	viharati	I (must) dwell		conjugation	ati-pr	Я (должен) жить
 427	gacchāmi	pr 1st sg<br>imp 1st sg	gacchati	I (must) go		conjugation	ati-pr	Я должен идти
 428	suṇomi	pr 1st sg<br>imp 1st sg	suṇoti	I (must) hear		conjugation	oti-pr	Я (должен) услышать
 429	vadāmi	pr 1st sg<br>imp 1st sg	vadati	I (must) say		conjugation	ati-pr	Я (должен) сказать
@@ -43,7 +43,7 @@ id	pali	gramma	of	eng	related	decl-con	pattern	native
 4043	passantu	imp 3rd pl	passati	they must see		conjugation	ati-pr	они должны увидеть
 442	tiṭṭhantu	imp 3rd pl	tiṭṭhati	they must stand		conjugation	ati-pr	они должны стоять
 443	vadanti	pr 3rd pl	vadati	they say		conjugation	ati-pr	они говорят
-44904	vipācenti	pr 3rd pl	vipāceti	they spread about		conjugation	eti-pr	они распространились
+44904	vipācenti	pr 3rd pl	vipāceti	they spread about		conjugation	eti-pr	они распространяют
 4045	karoma	pr 1st pl<br>imp 1st pl	karoti	we (must) do		conjugation	oti-pr	мы (должны) сделать
 4046	viharāma	pr 1st pl<br>imp 1st pl	viharati	we (must) dwell (in)		conjugation	ati-pr	мы (должны) жить (в)
 4047	gacchāma	pr 1st pl<br>imp 1st pl	gacchati	we (must) go		conjugation	ati-pr	мы (должны) идти
@@ -56,24 +56,24 @@ id	pali	gramma	of	eng	related	decl-con	pattern	native
 454	viharatha	pr 2nd pl<br>imp 2nd pl	viharati	you all (must) dwell		conjugation	ati-pr	вы все (должны) жить
 455	gacchatha	pr 2nd pl<br>imp 2nd pl	gacchati	you all (must) go		conjugation	ati-pr	вы все (должны) идти
 456	suṇātha	pr 2nd pl<br>imp 2nd pl	suṇāti	you all (must) hear		conjugation	āti-pr	вы все (должны) услышать
-457	dhāretha	pr 2nd pl<br>imp 2nd pl	dhāreti	you all (must) hold up		conjugation	ati-pr	вы все (должны) подождать
+457	dhāretha	pr 2nd pl<br>imp 2nd pl	dhāreti	you all (must) hold up		conjugation	ati-pr	вы все (должны) поднять
 458	maññatha	pr 2nd pl<br>imp 2nd pl	maññati	you all (must) imagine		conjugation	ati-pr	вы все (должны) представить
 459	jānātha	pr 2nd pl<br>imp 2nd pl	jānāti	you all (must) know		conjugation	āti-pr	вы все (должны) знать
-460	sakkosi	pr 2nd sg	sakkoti	you are able (to)		conjugation	oti-pr	вы способны (на)
-4064	pucchasi	pr 2nd sg	pucchati	you ask		conjugation	ati-pr	вы спрашиваете
-462	vijānāsi	pr 2nd sg	vijānāti	you comprehend		conjugation	āti-pr	вы понимаете
-463	karosi	pr 2nd sg	karoti	you do		conjugation	oti-pr	вы делаете
-464	suṇāsi	pr 2nd sg	suṇāti	you hear		conjugation	āti-pr	вы слышите
+460	sakkosi	pr 2nd sg	sakkoti	you are able (to)		conjugation	oti-pr	ты способен (на)
+4064	pucchasi	pr 2nd sg	pucchati	you ask		conjugation	ati-pr	ты спрашиваешь
+462	vijānāsi	pr 2nd sg	vijānāti	you comprehend		conjugation	āti-pr	ты понимаешь
+463	karosi	pr 2nd sg	karoti	you do		conjugation	oti-pr	ты делаешь
+464	suṇāsi	pr 2nd sg	suṇāti	you hear		conjugation	āti-pr	ты слышишь
 465	maññasi	pr 2nd sg	maññati	you imagine		conjugation	ati-pr	ты представляешь
 466	jānāsi	pr 2nd sg	jānāti	you know		conjugation	āti-pr	ты знаешь
-467	karohi	imp 2nd sg	karoti	you must do		conjugation	oti-pr	вы должны сделать
-468	viharāhi	imp 2nd sg	viharati	you must dwell (in)	vihara	conjugation	ati-pr	вы должны жить (в)
-469	bhuñja	imp 2nd sg	bhuñjati	you must eat	bhuñjāhi	conjugation	ati-pr	вы должны есть
+467	karohi	imp 2nd sg	karoti	you must do		conjugation	oti-pr	ты должен сделать
+468	viharāhi	imp 2nd sg	viharati	you must dwell (in)	vihara	conjugation	ati-pr	ты должен жить (в)
+469	bhuñja	imp 2nd sg	bhuñjati	you must eat	bhuñjāhi	conjugation	ati-pr	ты должен есть
 470	gaccha	imp 2nd sg	gacchati	you must go	gacchāhi	conjugation	ati-pr	ты должен идти
 4074	gacchāhi	imp 2nd sg	gacchati	you must go	gaccha	conjugation	ati-pr	ты должен идти
-472	suṇohi	imp 2nd sg	suṇoti	you must hear	suṇa	conjugation	oti-pr	вы должны услышать
-474	vandāhi	imp 2nd sg	vandati	you must pay respect	vanda	conjugation	ati-pr	вы должны проявлять уважение
-475	vadehi	imp 2nd sg	vadeti	you must say	vada	conjugation	eti-pr	вы должны сказать
-476	passa	imp 2nd sg	passati	you must see	passāhi	conjugation	ati-pr	вы должны это увидеть
-477	vadesi	pr 2nd sg	vadeti	you say		conjugation	eti-pr	вы говорите
+472	suṇohi	imp 2nd sg	suṇoti	you must hear	suṇa	conjugation	oti-pr	ты должен услышать
+474	vandāhi	imp 2nd sg	vandati	you must pay respect	vanda	conjugation	ati-pr	ты должен проявлять уважение
+475	vadehi	imp 2nd sg	vadeti	you must say	vada	conjugation	eti-pr	ты должен сказать
+476	passa	imp 2nd sg	passati	you must see	passāhi	conjugation	ati-pr	ты должен это увидеть
+477	vadesi	pr 2nd sg	vadeti	you say		conjugation	eti-pr	ты говоришь
 478	bhāsasi	pr 2nd sg	bhāsati	you shine		conjugation	ati-pr	ты сияешь

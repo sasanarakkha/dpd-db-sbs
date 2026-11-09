@@ -1,27 +1,27 @@
 id	pali	gramma	of	eng	related	decl-con	pattern	native
 900	amhākaṃ	1st acc & dat & gen pl	ahaṃ	us<br>for us<br>our	no	declension	ahaṃ-pron	нас<br>для нас<br>наш
 901	no 2	1st acc & instr & dat & gen pl	ahaṃ	us<br>with us<br>for us<br>our		declension	ahaṃ-pron	нас<br>с нами<br>для нас<br>наш
-902	maṃ	1st acc sg	ahaṃ	me	mamaṃ<br>me	declension	ahaṃ-pron	мне
+902	maṃ	1st acc sg	ahaṃ	me	mamaṃ<br>me	declension	ahaṃ-pron	меня
 903	mamaṃ	1st acc & dat & gen sg	ahaṃ	me<br>for me<br>mine	me	declension	ahaṃ-pron	меня<br>для меня<br>мой
-904	me	1st acc & instr & dat & gen sg	ahaṃ	me<br>with me<br>for me<br>mine		declension	ahaṃ-pron	я<br>со мной<br>для меня<br>мой
-905	mama 	1st dat & gen sg	ahaṃ	for me<br>mine	me<br>mayhaṃ<br>mamaṃ	declension	ahaṃ-pron	для меня<br>мой
+904	me	1st acc & instr & dat & gen sg	ahaṃ	me<br>with me<br>for me<br>mine		declension	ahaṃ-pron	меня<br>со мной<br>для меня<br>мой
+905	mama	1st dat & gen sg	ahaṃ	for me<br>mine	me<br>mayhaṃ<br>mamaṃ	declension	ahaṃ-pron	для меня<br>мой
 906	mayhaṃ	1st dat & gen sg	ahaṃ	for me<br>mine	mama<br>me<br>mamaṃ	declension	ahaṃ-pron	для меня<br>мой
 907	amhaṃ	1st dat & gen pl	ahaṃ	for us<br>our	amhākaṃ<br>no	declension	ahaṃ-pron	для нас<br>наш
 908	amhehi	1st instr & abl pl	ahaṃ	with us<br>from us		declension	ahaṃ-pron	с нами<br>от нас
-909	mayā	1st instr & abl sg	ahaṃ	with me<br>for me		declension	ahaṃ-pron	со мной<br>для меня
+909	mayā	1st instr & abl sg	ahaṃ	with me<br>from me		declension	ahaṃ-pron	со мной<br>от меня
 990	amhesu	1st loc pl	ahaṃ	amongst us		declension	ahaṃ-pron	среди нас
 9099	mayi	1st loc sg	ahaṃ	in me		declension	ahaṃ-pron	во мне
 992	mayaṃ	1st nom pl	ahaṃ	we	amhe	declension	ahaṃ-pron	мы
-993	amhe	1st nom & acc pl	ahaṃ	we<br>us		declension	ahaṃ-pron	мы<br>мы
+993	amhe	1st nom & acc pl	ahaṃ	we<br>us		declension	ahaṃ-pron	мы<br>нас
 994	ahaṃ	1st nom sg	ahaṃ	I		declension	ahaṃ-pron	я
-995	tumhākaṃ	2nd acc & dat & gen pl	tvaṃ	you all<br>for you all<br>your	vo	declension	tvaṃ-pron	всем вам<br>для всех вас<br>ваши
-996	vo	2nd acc & instr & dat & gen pl	tvaṃ	you all<br>with you all<br>for you all<br>your		declension	tvaṃ-pron	вы все<br>с вами всеми<br>для вас всех<br>ваш
-997	taṃ 2	2nd acc sg	tvaṃ	you	tuvaṃ<br>tavaṃ<br>te	declension	ahaṃ-pron	ты
-998	tavaṃ	2nd acc sg	tvaṃ	you	taṃ<br>tuvaṃ<br>te	declension	tvaṃ-pron	ты
-999	te	2nd acc & instr & dat & gen sg	tvaṃ	you<br>with you<br>for you<br>your		declension	tvaṃ-pron	ты<br>с тобой<br>для тебя<br>твой
+995	tumhākaṃ	2nd acc & dat & gen pl	tvaṃ	you all<br>for you all<br>your	vo	declension	tvaṃ-pron	всех вас<br>для всех вас<br>ваш
+996	vo	2nd acc & instr & dat & gen pl	tvaṃ	you all<br>with you all<br>for you all<br>your		declension	tvaṃ-pron	вас всех<br>с вами всеми<br>для вас всех<br>ваш
+997	taṃ 2	2nd acc sg	tvaṃ	you	tuvaṃ<br>tavaṃ<br>te	declension	ahaṃ-pron	тебя
+998	tavaṃ	2nd acc sg	tvaṃ	you	taṃ<br>tuvaṃ<br>te	declension	tvaṃ-pron	тебя
+999	te	2nd acc & instr & dat & gen sg	tvaṃ	you<br>with you<br>for you<br>your		declension	tvaṃ-pron	тебя<br>с тобой<br>для тебя<br>твой
 920	tumhaṃ	2nd dat & gen pl	tvaṃ	for you all<br>your	tumhākaṃ<br>vo	declension	tvaṃ-pron	для вас всех<br>ваш
-929	tuyhaṃ	2nd dat & gen sg	tvaṃ	for you<br>your	tava<br>te	declension	tvaṃ-pron	для вас<br>ваш
-922	tava	2nd dat & gen sg	tvaṃ	for you<br>your	tuyhaṃ<br>te	declension	tvaṃ-pron	для вас<br>ваш
+929	tuyhaṃ	2nd dat & gen sg	tvaṃ	for you<br>your	tava<br>te	declension	tvaṃ-pron	для тебя<br>твой
+922	tava	2nd dat & gen sg	tvaṃ	for you<br>your	tuyhaṃ<br>te	declension	tvaṃ-pron	для тебя<br>твой
 923	tumhehi	2nd instr & abl pl	tvaṃ	with you all<br>from you all		declension	tvaṃ-pron	с вами всеми<br>от вас всех
 924	tayā	2nd instr & abl sg	tvaṃ	with you<br>from you		declension	tvaṃ-pron	с тобой<br>от тебя
 925	tumhesu	2nd loc pl	tvaṃ	amongst you all		declension	tvaṃ-pron	среди вас всех

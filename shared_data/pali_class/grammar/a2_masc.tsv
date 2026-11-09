@@ -1,12 +1,12 @@
 id	pali	gramma	of	eng	related	decl-con	pattern	native
 5302	attaṃ	acc sg	atta	self	attānaṃ	declension	a2-masc	себя
-5304	attānaṃ 	acc sg<br>dat pl<br>gen pl	atta	self<br>for selves<br>of selves		declension	a2-masc	само<br>для себя<br>самости
+5304	attānaṃ	acc sg<br>dat pl<br>gen pl	atta	self<br>for selves<br>of selves		declension	a2-masc	себя<br>для самих себя<br>самих себя
 5308	attano	dat sg<br>gen sg	atta	for self<br>of self		declension	a2-masc	для себя<br>самого себя
 5305	attanehi	instr pl<br>abl pl	atta	with selves<br>from selves		declension	a2-masc	с самими собой<br>из самих себя
 53530	attena	instr sg	atta	with self	attanā	declension	a2-masc	с собой
 5303	attanā	instr sg<br>abl sg	atta	with self<br>from self		declension	a2-masc	с собой<br>из себя
 5306	attanesu	loc pl	atta	in selves		declension	a2-masc	в самих себе
 5307	attani	loc sg	atta	in self		declension	a2-masc	в себе
-5309	attāno	nom pl<br>acc pl<br>voc pl	atta	selves<br>o selves!		declension	a2-masc	сами<br>o сами!
-53053	attā	nom sg<br>voc sg	atta	self<br>o self!		declension	a2-masc	самолюбие!
-5300	atta	voc sg	atta	o self!	attā	declension	a2-masc	о себя!
+5309	attāno	nom pl<br>acc pl<br>voc pl	atta	selves<br>o selves!		declension	a2-masc	сами<br>о сами!
+53053	attā	nom sg<br>voc sg	atta	self<br>o self!		declension	a2-masc	самость<br>о самость!
+5300	atta	voc sg	atta	o self!	attā	declension	a2-masc	о самость!

@@ -1,24 +1,24 @@
 id	pali	gramma	of	eng	related	decl-con	pattern	native
 40407	abhijjhāluṃ	masc & fem & nt acc sg	abhijjhālu	covetous (one)		declension	u-adj	алчный (один)
-40409	abhijjhālūhi	masc & fem & nt instr pl<br>masc & fem & nt abl pl	abhijjhālu	with covetous (ones)<br>from covetous (ones)		declension	u-adj	с алчными (теми)<br>от алчных (теми)
-40406	abhijjhālū	masc & fem & nt nom pl<br>masc & fem & nt acc pl<br>masc & fem & nt voc pl	abhijjhālu	covetous (ones)<br>o covetous (ones)!		declension	u-adj	алчные (те)<br>o алчные (те)!
+40409	abhijjhālūhi	masc & fem & nt instr pl<br>masc & fem & nt abl pl	abhijjhālu	with covetous (ones)<br>from covetous (ones)		declension	u-adj	с алчными (теми)<br>от алчных (тех)
+40406	abhijjhālū	masc & fem & nt nom pl<br>masc & fem & nt acc pl<br>masc & fem & nt voc pl	abhijjhālu	covetous (ones)<br>o covetous (ones)!		declension	u-adj	алчные (те)<br>о алчные (те)!
 40404	abhijjhālu	masc & fem & nt nom sg<br>masc & fem & nt voc sg	abhijjhālu	covetous (one)<br>o covetous (one)!		declension	u-adj	алчный (один)<br>о алчный (один)!
-40405	abhijjhālussa	masc & nt dat sg<br>masc & nt gen sg	abhijjhālu	for covetous (one)<br>of covetous (one)	abhijjhāluno	declension	u-adj	алчный (один)<br>из алчного (один)
-40408	abhijjhāluno	masc & nt dat sg<br>masc & nt gen sg	abhijjhālu	for covetous (one)<br>of covetous (one)	abhijjhālussa	declension	u-adj	алчный (один)<br>из алчного (один)
-400940	bahuṃ	masc & fem & nt acc sg	bahu	large (thing)		declension	u-adj	большой (вещь)
+40405	abhijjhālussa	masc & nt dat sg<br>masc & nt gen sg	abhijjhālu	for covetous (one)<br>of covetous (one)	abhijjhāluno	declension	u-adj	для алчного (одного)<br>алчного (одного)
+40408	abhijjhāluno	masc & nt dat sg<br>masc & nt gen sg	abhijjhālu	for covetous (one)<br>of covetous (one)	abhijjhālussa	declension	u-adj	для алчного (одного)<br>алчного (одного)
+400940	bahuṃ	masc & fem & nt acc sg	bahu	large (thing)		declension	u-adj	большую (вещь)
 4005	bahūnaṃ	masc & fem & nt dat pl<br>masc & fem & nt gen pl	bahu	for large (things)<br>of large (things)		declension	u-adj	для больших (вещей)<br>больших (вещей)
 4009	bahūhi	masc & fem & nt instr pl<br>masc & fem & nt abl pl	bahu	with large (things)<br>from large (things)		declension	u-adj	с большими (вещами)<br>из больших (вещей)
 4003	bahūsu	masc & fem & nt loc pl	bahu	among large (things)		declension	u-adj	среди крупных (вещей)
 4000	bahū	masc & fem & nt nom pl<br>masc & fem & nt acc pl<br>masc & fem & nt voc pl	bahu	large (things)<br>o large (things)!		declension	u-adj	большие (вещи)<br>о большие (вещи)!
 4004	bahu	masc & fem & nt nom sg<br>masc & fem & nt voc sg	bahu	large (thing)<br>o large (thing)!		declension	u-adj	большая (вещь)<br>о большая (вещь)!
-40403	bahumhā	masc & nt abl sg	bahu	from large (thing)	bahusmā<br>bahunā	declension	u-adj	от большого (вещи)
-4002	bahuno	masc & nt dat sg<br>masc & nt gen sg	bahu	for large (thing)<br>of large (thing)	bahussa	declension	u-adj	для большого (вещи)<br>большой (вещи)
-404040	bahussa	masc & nt dat sg<br>masc & nt gen sg	bahu	for large (thing)<br>of large (thing)	bahuno	declension	u-adj	для большого (вещи)<br>большой (вещи)
-40400	bahunā	masc & nt instr sg<br>masc & nt abl sg	bahu	with large (thing)<br>from large (thing)		declension	u-adj	с большим (вещью)<br>из большого (вещи)
-40402	bahumhi	masc & nt loc sg	bahu	in large (thing)	bahusmiṃ	declension	u-adj	в большом (вещи)
-4007	bahunnaṃ	masc dat pl	bahu	for large (things)	bahūnaṃ	declension	u-adj	для больших (вещей)
-4008	bahavo	masc nom pl<br>masc acc pl<br>masc voc pl	bahu	large (things)<br>o large (things)!	bahū	declension	u-adj	большие (вещи)<br>о большие (вещи)!
-4006	bahūni	nt nom pl<br>nt acc pl<br>nt voc pl	bahu	large (things)<br>o large (things)!	bahū	declension	u-adj	большие (вещи)<br>о большие (вещи)!
-40240	dummaṅkuyaṃ	fem loc sg	dummaṅku	in obstinate (one)	dummaṅkuyā	declension	u-adj	упрямый (один)
+40403	bahumhā	masc & nt abl sg	bahu	from large (thing)	bahusmā<br>bahunā	declension	u-adj	от большого (предмета)
+4002	bahuno	masc & nt dat sg<br>masc & nt gen sg	bahu	for large (thing)<br>of large (thing)	bahussa	declension	u-adj	для большого (предмета)<br>большого (предмета)
+404040	bahussa	masc & nt dat sg<br>masc & nt gen sg	bahu	for large (thing)<br>of large (thing)	bahuno	declension	u-adj	для большого (предмета)<br>большого (предмета)
+40400	bahunā	masc & nt instr sg<br>masc & nt abl sg	bahu	with large (thing)<br>from large (thing)		declension	u-adj	с большим (предметом)<br>из большого (предмета)
+40402	bahumhi	masc & nt loc sg	bahu	in large (thing)	bahusmiṃ	declension	u-adj	в большом (предмете)
+4007	bahunnaṃ	masc dat pl	bahu	for large (things)	bahūnaṃ	declension	u-adj	для больших (предметов)
+4008	bahavo	masc nom pl<br>masc acc pl<br>masc voc pl	bahu	large (things)<br>o large (things)!	bahū	declension	u-adj	большие (предметы)<br>о большие (предметы)!
+4006	bahūni	nt nom pl<br>nt acc pl<br>nt voc pl	bahu	large (things)<br>o large (things)!	bahū	declension	u-adj	большие (предметы)<br>о большие (предметы)!
+40240	dummaṅkuyaṃ	fem loc sg	dummaṅku	in obstinate (one)	dummaṅkuyā	declension	u-adj	в упрямой (одной)
 4020	vagguyā	fem instr sg<br>fem dat sg<br>fem abl sg<br>fem gen sg<br>fem loc sg	vaggu	with beautiful (one)<br>for beautiful (one)<br>from beautiful (one)<br>of beautiful (one)<br>in beautiful (one)		declension	u-adj	с прекрасным (одним)<br>для прекрасного (одного)<br>из прекрасного (одного)<br>прекрасного (одного)<br>в прекрасном (одном)
 4022	vaggusu	fem loc pl	vaggu	amongst beautiful (ones)	vaggūsu	declension	u-adj	среди прекрасных (тех)

@@ -4,21 +4,21 @@ id	pali	gramma	of	eng	related	decl-con	pattern	native
 302	kāyasmā	abl sg	kāya	from body	kāyā<br>kayamhā	declension	a-masc	из тела
 303	lokamhā	abl sg	loka	from world	lokasmā<br>lokā	declension	a-masc	из мира
 304	saṅghamhā	abl sg	saṅgha	from community	saṅghasmā<br>saṅghā	declension	a-masc	из сообщества
-343	dhamme	acc pl<br>loc sg	dhamma	in teaching<br>teachings		declension	a-masc	в преподавании<br>преподавание
-342	kāye	acc pl<br>loc sg	kāya	in body<br>bodies		declension	a-masc	в теле<br>телах
-39943	loke	acc pl<br>loc sg	loka	in world<br>worlds		declension	a-masc	в мировых мирах
+343	dhamme	acc pl<br>loc sg	dhamma	teachings<br>in teaching		declension	a-masc	преподавания<br>в преподавании
+342	kāye	acc pl<br>loc sg	kāya	bodies<br>in body		declension	a-masc	тела<br>в теле
+39943	loke	acc pl<br>loc sg	loka	worlds<br>in world		declension	a-masc	миры<br>в мире
 39300	brāhmaṇaṃ	acc sg	brāhmaṇa	Brahman		declension	a-masc	Брахман
 3933	dhammaṃ	acc sg	dhamma	teaching		declension	a-masc	преподавание
 332	kāyaṃ	acc sg	kāya	body		declension	a-masc	тело
 3033	lokaṃ	acc sg	loka	world		declension	a-masc	мир
 334	purisaṃ	acc sg	purisa	man		declension	a-masc	мужчина
 3305	brāhmaṇānaṃ	dat pl<br>gen pl	brāhmaṇa	for Brahmans<br>of Brahmans		declension	a-masc	для брахманов<br>брахманов
-3306	dhammānaṃ	dat pl<br>gen pl	dhamma	for teachings<br>of teachings		declension	a-masc	для обучения<br>обучения
+3306	dhammānaṃ	dat pl<br>gen pl	dhamma	for teachings<br>of teachings		declension	a-masc	для учений<br>учений
 337	ariyāya	dat sg	ariya	for awakened being	ariyassa	declension	a-masc	для пробужденного существа
 3308	atthāya	dat sg	attha	for meaning	atthassa	declension	a-masc	для смысла
 3309	bhedāya	dat sg	bheda	for breakup	bhedassa	declension	a-masc	для расставания
-320	khayāya	dat sg	khaya	for exhaustion	khayassa	declension	a-masc	истощение
-323	nirodhāya	dat sg	nirodha	for cessation	nirodhassa	declension	a-masc	прекращение
+320	khayāya	dat sg	khaya	for exhaustion	khayassa	declension	a-masc	для истощения
+323	nirodhāya	dat sg	nirodha	for cessation	nirodhassa	declension	a-masc	для прекращения
 322	brāhmaṇassa	dat sg<br>gen sg	brāhmaṇa	for Brahman<br>of Brahman		declension	a-masc	для Брахмана<br>Брахмана
 3023	dhammassa	dat sg<br>gen sg	dhamma	for teaching<br>of teaching		declension	a-masc	для обучения<br>обучения
 324	kāyassa	dat sg<br>gen sg	kāya	for body<br>of body		declension	a-masc	для тела<br>тела
@@ -30,7 +30,7 @@ id	pali	gramma	of	eng	related	decl-con	pattern	native
 330	dhammehi	instr pl<br>abl pl	dhamma	with teachings<br>from teachings		declension	a-masc	с учениями<br>из учений
 30033	manussehi	instr pl<br>abl pl	manussa	with human beings<br>from human beings		declension	a-masc	с людьми<br>от людей
 333	samaṇehi	instr pl<br>abl pl	samaṇa	with renunciants<br>from renunciants		declension	a-masc	с отрекшимися<br>от отрекшихся
-3304	saṅkhārehi	instr pl<br>abl pl	saṅkhāra	with volitional formations<br>from volitional formations 		declension	a-masc	с волевыми построениями<br>из волевых построений
+3304	saṅkhārehi	instr pl<br>abl pl	saṅkhāra	with volitional formations<br>from volitional formations		declension	a-masc	с волевыми построениями<br>из волевых построений
 335	dhammena	instr sg	dhamma	with teaching		declension	a-masc	с обучением
 336	kāyena	instr sg	kāya	with body		declension	a-masc	с телом
 3307	dhammesu	loc pl	dhamma	amongst teachings		declension	a-masc	среди учений
@@ -38,9 +38,9 @@ id	pali	gramma	of	eng	related	decl-con	pattern	native
 339	kāyasmiṃ	loc sg	kāya	in body	kāye<br>kāyamhi	declension	a-masc	в теле
 340	lokasmiṃ	loc sg	loka	in world	loke<br>lokamhi	declension	a-masc	в мире
 305	brāhmaṇā	nom pl<br>abl sg<br>voc sg & pl	brāhmaṇa	Brahman<br>from Brahman<br>o Brahman(s)!		declension	a-masc	Брахман<br>от Брахмана<br>о Брахман(ы)!
-306	dhammā	nom pl<br>abl sg<br>voc sg & pl	dhamma	teaching<br>from teaching<br>o teaching(s)!		declension	a-masc	преподавание<br>от преподавания<br>к преподаванию(ям)!
-307	kāyā	nom pl<br>abl sg<br>voc sg & pl	kāya	bodies<br>from body<br>o body(s)!		declension	a-masc	тела<br>из тела<br>в тело(а)!
-308	lokā	nom pl<br>abl sg<br>voc sg & pl	loka	worlds<br>from world<br>o world(s)!		declension	a-masc	миры<br>из мира<br>в мир(ы)!
+306	dhammā	nom pl<br>abl sg<br>voc sg & pl	dhamma	teaching<br>from teaching<br>o teaching(s)!		declension	a-masc	преподавание<br>от преподавания<br>о преподавание(я)!
+307	kāyā	nom pl<br>abl sg<br>voc sg & pl	kāya	bodies<br>from body<br>o body(s)!		declension	a-masc	тела<br>из тела<br>о тело(а)!
+308	lokā	nom pl<br>abl sg<br>voc sg & pl	loka	worlds<br>from world<br>o world(s)!		declension	a-masc	миры<br>из мира<br>о мир(ы)!
 309	purisā	nom pl<br>abl sg<br>voc sg & pl	purisa	men<br>from man<br>o man/men!		declension	a-masc	мужчины<br>из мужчины<br>о мужчина/мужчины!
 344	brāhmaṇo	nom sg	brāhmaṇa	Brahman		declension	a-masc	Брахман
 345	dhammo	nom sg	dhamma	teaching		declension	a-masc	преподавание
@@ -48,4 +48,4 @@ id	pali	gramma	of	eng	related	decl-con	pattern	native
 347	loko	nom sg	loka	world		declension	a-masc	мир
 348	puriso	nom sg	purisa	man		declension	a-masc	мужчина
 349	brāhmaṇa	voc sg	brāhmaṇa	o Brahman!	brāhmaṇā	declension	a-masc	О Брахман!
-350	purisa	voc sg	purisa	o man!	purisā	declension	a-masc	О, боже!
+350	purisa	voc sg	purisa	o man!	purisā	declension	a-masc	О мужчина!

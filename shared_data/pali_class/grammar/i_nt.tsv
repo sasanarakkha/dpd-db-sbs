@@ -6,17 +6,17 @@ id	pali	gramma	of	eng	related	decl-con	pattern	native
 3004	akkhī	nom pl<br>acc pl<br>voc pl	akkhi	eyes<br>o eyes!	akkhīni	declension	i-nt	глаза<br>о глаза!
 3005	akkhīni	nom pl<br>acc pl<br>voc pl	akkhi	eyes<br>o eyes!	akkhī	declension	i-nt	глаза<br>о глаза!
 3006	akkhi	nom sg<br>voc sg	akkhi	eye<br>o eye!		declension	i-nt	глаз<br>о глаз!
-3007	aṭṭhīnaṃ	dat pl<br>gen pl	aṭṭhi	for bones<br>of bones		declension	i-nt	кости<br>костей
+3007	aṭṭhīnaṃ	dat pl<br>gen pl	aṭṭhi	for bones<br>of bones		declension	i-nt	для костей<br>костей
 3008	dadhimhā	abl sg	dadhi	from curd	dadhinā<br>dadhismā	declension	i-nt	из творога
 3009	dadhiṃ	acc sg	dadhi	curd		declension	i-nt	творог
 30300	dadhinā	instr sg<br>abl sg	dadhi	with curd<br>from curd		declension	i-nt	с творогом<br>из творога
 303030	dadhī	nom pl<br>acc pl<br>voc pl	dadhi	curds<br>o curds!	dadhīni	declension	i-nt	творог<br>о творог!
-30302	dadhi	nom sg<br>voc sg	dadhi	curd<br>o curd!		declension	i-nt	творог!
+30302	dadhi	nom sg<br>voc sg	dadhi	curd<br>o curd!		declension	i-nt	творог<br>о творог!
 30303	sappimhā	abl sg	sappi	from ghee	sappinā<br>sappismā	declension	i-nt	из топленого масла
 30304	sappiṃ	acc sg	sappi	ghee		declension	i-nt	топленое масло
-30305	sappissa	dat sg<br>gen sg	sappi	for ghee<br>of ghee	sappino	declension	i-nt	для топленого масла<br>из топленого масла
+30305	sappissa	dat sg<br>gen sg	sappi	for ghee<br>of ghee	sappino	declension	i-nt	для топленого масла<br>топленого масла
 30306	sappinā	instr sg<br>abl sg	sappi	with ghee<br>from ghee		declension	i-nt	с топленым маслом<br>из топленого масла
-30307	sappī	nom pl<br>acc pl<br>voc pl	sappi	ghees<br>o ghees!	sappīni	declension	i-nt	геес<br>о геес!
-30308	sappi	nom sg<br>voc sg	sappi	ghree<br>o ghee!		declension	i-nt	ghree<br>o ghee!
+30307	sappī	nom pl<br>acc pl<br>voc pl	sappi	ghees<br>o ghees!	sappīni	declension	i-nt	топленые масла<br>о топленые масла!
+30308	sappi	nom sg<br>voc sg	sappi	ghee<br>o ghee!		declension	i-nt	топленое масло<br>о топленое масло!
 30309	sucimhi	loc sg	suci	in purity	sucismiṃ<br>sucini	declension	i-nt	в чистоте
 3020	vārismiṃ	loc sg	vāri	in water	vārimhi<br>vārini	declension	i-nt	в воде

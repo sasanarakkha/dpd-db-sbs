@@ -9,10 +9,10 @@ id	pali	gramma	of	eng	related	decl-con	pattern	native
 51514	manena	instr sg	manas	with mind	manasā	declension	as-masc	с умом
 5106	manasā	instr sg<br>abl sg	manas	with mind<br>from mind		declension	as-masc	разумом<br>из разума
 51515	manesu	loc pl	manas	in minds		declension	as-masc	в умах
-5104	manamhi	loc sg	manas	in mind	manasi<br>manasmiṃ<br>mane	declension	as-masc	с учетом
-5107	manasi	loc sg	manas	in mind	manamhi<br>manasmiṃ<br>mane	declension	as-masc	с учетом
-5109	manasmiṃ	loc sg	manas	in mind	manamhi<br>manasi<br>mane	declension	as-masc	с учетом
-51512	mane	acc pl<br>loc sg	manas	in mind<br>minds		declension	as-masc	в умах<br>умы
-51051	manā	nom pl<br>abl sg<br>voc sg & pl	manas	minds<br>from mind<br>o mind(s)!		declension	as-masc	разум<br>от разума<br>к разуму(ам)!
+5104	manamhi	loc sg	manas	in mind	manasi<br>manasmiṃ<br>mane	declension	as-masc	в уме
+5107	manasi	loc sg	manas	in mind	manamhi<br>manasmiṃ<br>mane	declension	as-masc	в уме
+5109	manasmiṃ	loc sg	manas	in mind	manamhi<br>manasi<br>mane	declension	as-masc	в уме
+51512	mane	acc pl<br>loc sg	manas	minds<br>in mind		declension	as-masc	умы<br>в уме
+51051	manā	nom pl<br>abl sg<br>voc sg & pl	manas	minds<br>from mind<br>o mind(s)!		declension	as-masc	умы<br>от разума<br>о разум(ы)!
 51516	mano	nom sg<br>acc sg	manas	mind		declension	as-masc	разум
-5100	mana	voc sg	manas	o mind!	manā	declension	as-masc	О, помни!
+5100	mana	voc sg	manas	o mind!	manā	declension	as-masc	О разум!

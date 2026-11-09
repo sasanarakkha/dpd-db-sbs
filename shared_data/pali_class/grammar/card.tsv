@@ -1,31 +1,31 @@
 id	pali	gramma	of	eng	related	decl-con	pattern	native
-4100	catassannaṃ	fem dat pl<br>fem gen pl	catu	for four<br>of four		declension	catu-card	для четырех из четырех
+4100	catassannaṃ	fem dat pl<br>fem gen pl	catu	for four<br>of four		declension	catu-card	для четырех<br>четырех
 41041	catasso	fem nom pl<br>fem acc pl	catu	four		declension	catu-card	четыре
 4104	catūhi	masc & fem & nt instr pl<br>masc & fem & nt abl pl	catu	with four<br>from four		declension	catu-card	с четырьмя<br>из четырех
 4107	catusu	masc & fem & nt loc pl	catu	amongst four	catūsu	declension	catu-card	среди четырех
-4105	catunnaṃ	masc & nt dat pl<br>masc & nt gen pl	catu	for four<br>of four		declension	catu-card	для четырех из четырех
+4105	catunnaṃ	masc & nt dat pl<br>masc & nt gen pl	catu	for four<br>of four		declension	catu-card	для четырех<br>четырех
 4103	cattāro	masc nom pl<br>masc acc pl	catu	four	caturo	declension	catu-card	четыре
 4106	caturo	masc nom pl<br>masc acc pl	catu	four	cattāro	declension	catu-card	четыре
 4102	cattāri	nt nom pl<br>nt acc pl	catu	four		declension	catu-card	четыре
-414141	dvinnaṃ	x dat pl<br>x gen pl	dvi	for two<br>of two		declension	dvi-card	для двух из двух
+414141	dvinnaṃ	x dat pl<br>x gen pl	dvi	for two<br>of two		declension	dvi-card	для двух<br>двух
 41410	dvīhi	x instr pl<br>x abl pl	dvi	with two<br>from two		declension	dvi-card	с двумя<br>из двух
 41412	dvīsu	x loc pl	dvi	amongst two		declension	dvi-card	среди двух
 4108	duve	x nom pl<br>x acc pl	dvi	two	dve	declension	dvi-card	два
 4109	dve	x nom pl<br>x acc pl	dvi	two	duve	declension	dvi-card	два
-4122	ekissā	fem dat sg<br>fem gen sg	eka	for one<br>of one	ekāya	declension	eka-card	для одного из одного
-4120	ekāya	fem instr sg<br>fem dat sg<br>fem abl sg<br>fem gen sg<br>fem loc sg	eka	with one<br>for one<br>from one<br>of one<br>in one		declension	eka-card	один<br>за один<br>из одного<br>из одного<br>в одном
-41413	ekā	fem nom sg	eka	one		declension	eka-card	один
+4122	ekissā	fem dat sg<br>fem gen sg	eka	for one<br>of one	ekāya	declension	eka-card	для одной<br>одной
+4120	ekāya	fem instr sg<br>fem dat sg<br>fem abl sg<br>fem gen sg<br>fem loc sg	eka	with one<br>for one<br>from one<br>of one<br>in one		declension	eka-card	с одной<br>для одной<br>из одной<br>одной<br>в одной
+41413	ekā	fem nom sg	eka	one		declension	eka-card	одна
 41415	ekamhā	masc & nt abl sg	eka	from one	ekasmā	declension	eka-card	из одного
 41417	ekasmā	masc & nt abl sg	eka	from one	ekamhā	declension	eka-card	из одного
-41419	ekassa	masc & nt dat sg<br>masc & nt gen sg	eka	for one<br>of one		declension	eka-card	для одного из одного
+41419	ekassa	masc & nt dat sg<br>masc & nt gen sg	eka	for one<br>of one		declension	eka-card	для одного<br>одного
 41241	ekena	masc & nt instr sg	eka	with one		declension	eka-card	с одним
 41416	ekamhi	masc & nt loc sg	eka	in one	ekasmiṃ	declension	eka-card	в одном
 41418	ekasmiṃ	masc & nt loc sg	eka	in one	ekamhi	declension	eka-card	в одном
 4123	eko	masc nom sg	eka	one		declension	eka-card	один
 41414	ekaṃ	nt nom sg<br>masc & fem & nt acc sg	eka	one		declension	eka-card	один
-4127	tissannaṃ	fem dat pl<br>fem gen pl	ti	for three<br>of three		declension	ti-card	для трех из трех
+4127	tissannaṃ	fem dat pl<br>fem gen pl	ti	for three<br>of three		declension	ti-card	для трех<br>трех
 4128	tisso	fem nom pl<br>fem acc pl	ti	three		declension	ti-card	три
-4125	tīhi	masc & fem & nt instr pl<br>masc & fem & nt abl pl	ti	with three<br>from three		declension	ti-card	с тремя из трех
+4125	tīhi	masc & fem & nt instr pl<br>masc & fem & nt abl pl	ti	with three<br>from three		declension	ti-card	с тремя<br>из трех
 4129	tīsu	masc & fem & nt loc pl	ti	amongst three		declension	ti-card	среди трех
-4126	tiṇṇaṃ	masc & nt dat pl<br>masc & nt gen pl	ti	for three<br>of three	tiṇṇannaṃ	declension	ti-card	для трех из трех
+4126	tiṇṇaṃ	masc & nt dat pl<br>masc & nt gen pl	ti	for three<br>of three	tiṇṇannaṃ	declension	ti-card	для трех<br>трех
 4124	tayo	masc nom pl<br>masc acc pl	ti	three		declension	ti-card	три

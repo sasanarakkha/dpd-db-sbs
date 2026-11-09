@@ -1,12 +1,12 @@
 id	pali	gramma	of	eng	related	decl-con	pattern	native
 1200	āgantunā	instr sg	āgantar	with guest	āgantarā	declension	ar-masc	с гостем
-12012	aññātāro	nom pl<br>acc pl<br>voc pl	aññātar	those who understands<br>o those who understands!		declension	ar-masc	те, кто понимает<br>к тем, кто понимает!
+12012	aññātāro	nom pl<br>acc pl<br>voc pl	aññātar	those who understand<br>o those who understand!		declension	ar-masc	те, кто понимает<br>о те, кто понимает!
 1202	anuppadātā	nom sg<br>voc sg	anuppadātar	provider<br>o provider!		declension	ar-masc	провайдер<br>о провайдер!
 1203	bhattāraṃ	acc sg	bhattar	employer		declension	ar-masc	работодатель
 1204	bhattunā	instr sg	bhattar	with employer	bhattārā	declension	ar-masc	с работодателем
 1205	bhattu	dat sg<br>gen sg	bhattar	for employer<br>of employer	bhattuno<br>bhattussa	declension	ar-masc	для работодателя<br>работодателя
 1206	bhattuno	dat sg<br>gen sg	bhattar	for employer<br>of employer	bhattu<br>bhattussa	declension	ar-masc	для работодателя<br>работодателя
-1207	brūhetānaṃ	dat pl<br>gen pl	brūhetar	for those who develops<br>of those who develops	brūhetārānaṃ	declension	ar-masc	для тех, кто развивается<br>из тех, кто развивается
+1207	brūhetānaṃ	dat pl<br>gen pl	brūhetar	for those who develop<br>of those who develop	brūhetārānaṃ	declension	ar-masc	для тех, кто развивается<br>тех, кто развивается
 1208	dātā	nom sg<br>voc sg	dātar	donor<br>o donor!		declension	ar-masc	донор<br>о донор!
 1209	dātāraṃ	acc sg	dātar	donor		declension	ar-masc	донор
 12120	gantā	nom sg<br>voc sg	gantar	visitor<br>o visitor!		declension	ar-masc	посетитель<br>о посетитель!
@@ -19,5 +19,5 @@ id	pali	gramma	of	eng	related	decl-con	pattern	native
 12127	satthuno	dat sg<br>gen sg	satthar	for teacher<br>of teacher	satthu<br>satthussa	declension	ar-masc	для учителя<br>учителя
 12128	satthussa	dat sg<br>gen sg	satthar	for teacher<br>of teacher	satthuno<br>satthu	declension	ar-masc	для учителя<br>учителя
 12129	satthārānaṃ	dat pl<br>gen pl	satthar	for teachers<br>of teachers	satthānaṃ	declension	ar-masc	для учителей<br>учителей
-1220	satthari	loc sg	satthar	in teacher		declension	ar-masc	в учитель
-12212	vattāro	nom pl<br>acc pl<br>voc pl	vattar	speakers<br>o speakers!		declension	ar-masc	динамики<br>o динамики!
+1220	satthari	loc sg	satthar	in teacher		declension	ar-masc	в учителе
+12212	vattāro	nom pl<br>acc pl<br>voc pl	vattar	speakers<br>o speakers!		declension	ar-masc	ораторы<br>о ораторы!

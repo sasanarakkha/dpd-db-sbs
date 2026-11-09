@@ -2,17 +2,17 @@ id	pali	gramma	of	eng	related	decl-con	pattern	native
 5403	rājamhā	abl sg	rāja	from king	rājasmā<br>raññā	declension	rāja-masc	от короля
 5407	rājasmā	abl sg	rāja	from king	rājamhā<br>raññā	declension	rāja-masc	от короля
 5402	rājaṃ	acc sg	rāja	king	rājānaṃ	declension	rāja-masc	король
-5405	rājānaṃ	acc sg<br>dat pl<br>gen pl	rāja	king<br>for kings<br>of kings		declension	rāja-masc	король<br>для царей<br>царей
-54545	rājūnaṃ	dat pl<br>gen pl	rāja	for kings<br>of kings	raññaṃ<br>rājānaṃ	declension	rāja-masc	для царей<br>царей
-54548	raññaṃ	dat pl<br>gen pl	rāja	for kings<br>of kings	rājūnaṃ<br>rājānaṃ	declension	rāja-masc	для царей<br>царей
+5405	rājānaṃ	acc sg<br>dat pl<br>gen pl	rāja	king<br>for kings<br>of kings		declension	rāja-masc	король<br>для королей<br>королей
+54545	rājūnaṃ	dat pl<br>gen pl	rāja	for kings<br>of kings	raññaṃ<br>rājānaṃ	declension	rāja-masc	для королей<br>королей
+54548	raññaṃ	dat pl<br>gen pl	rāja	for kings<br>of kings	rājūnaṃ<br>rājānaṃ	declension	rāja-masc	для королей<br>королей
 54543	rājino	dat sg<br>gen sg	rāja	for king<br>of king	rañño	declension	rāja-masc	для короля<br>короля
 5420	rañño	dat sg<br>gen sg	rāja	for king<br>of king	rājino	declension	rāja-masc	для короля<br>короля
 5409	rājehi	instr pl<br>abl pl	rāja	with kings<br>from kings	rājūhi	declension	rāja-masc	с королями<br>от королей
 54544	rājūhi	instr pl<br>abl pl	rāja	with kings<br>from kings	rājehi	declension	rāja-masc	с королями<br>от королей
 54540	rājena	instr sg	rāja	with king	raññā	declension	rāja-masc	с королем
 54547	raññā	instr sg<br>abl sg	rāja	with king<br>from king		declension	rāja-masc	с королем<br>от короля
-545454	rājesu	loc pl	rāja	in kings	rājūsu	declension	rāja-masc	у королей
-54546	rājūsu	loc pl	rāja	in kings	rājesu	declension	rāja-masc	у королей
+545454	rājesu	loc pl	rāja	in kings	rājūsu	declension	rāja-masc	в королях
+54546	rājūsu	loc pl	rāja	in kings	rājesu	declension	rāja-masc	в королях
 5404	rājamhi	loc sg	rāja	in king	raññe<br>rājasmiṃ<br>rājini	declension	rāja-masc	в короле
 5408	rājasmiṃ	loc sg	rāja	in king	raññe<br>rājini<br>rājamhi	declension	rāja-masc	в короле
 54542	rājini	loc sg	rāja	in king	raññe<br>rājasmiṃ<br>rājamhi	declension	rāja-masc	в короле

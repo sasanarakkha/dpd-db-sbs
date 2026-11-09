@@ -1,12 +1,12 @@
 id	pali	gramma	of	eng	related	decl-con	pattern	native
-6300	bhuttāvī	masc & fem nom sg<br>masc & nt nom pl<br>masc & nt acc pl<br>masc voc sg<br>nt voc pl	bhuttāvī	(one) who has eaten<br>(those) who have eaten<br>o (one) who has eaten!<br>o (those) who have eaten!		declension	app	(тот), кто ел<br>(те), кто ел<br>o (тот), кто ел!<br>o (те), кто ел!
-63063	bhuttāviṃ	nt nom sg<br>masc & nt acc sg<br>nt voc sg	bhuttāvī	(one) who has eaten<br>o (one) who has eaten!		declension	app	(тот), кто поел<br>o (тот), кто поел!
+6300	bhuttāvī	masc & fem nom sg<br>masc & nt nom pl<br>masc & nt acc pl<br>masc voc sg<br>nt voc pl	bhuttāvī	(one) who has eaten<br>(those) who have eaten<br>o (one) who has eaten!<br>o (those) who have eaten!		declension	app	(тот), кто ел<br>(те), кто ел<br>о (тот), кто ел!<br>о (те), кто ел!
+63063	bhuttāviṃ	nt nom sg<br>masc & nt acc sg<br>nt voc sg	bhuttāvī	(one) who has eaten<br>o (one) who has eaten!		declension	app	(тот), кто поел<br>о (тот), кто поел!
 6302	bhuttāvinā	masc & nt instr sg<br>masc & nt abl sg	bhuttāvī	with (one) who has eaten<br>from (one) who has eaten		declension	app	с (тем), кто поел<br>от (того), кто поел
-6303	bhuttāvino	masc nom pl<br>masc acc pl<br>masc & nt dat sg<br>masc & nt gen sg<br>masc voc pl	bhuttāvī	(those) who have eaten<br>for (one) who has eaten<br>of (one) who has eaten<br>o (those) who have eaten!		declension	app	(те), кто ел<br>для (одного), кто ел<br>из (одного), кто ел<br>o (те), кто ел!
-6304	bhuttāvīnaṃ	masc & nt dat pl<br>masc & nt gen pl	bhuttāvī	for (those) who have eaten<br>of (those) who have eaten	bhuttāvinaṃ	declension	app	для тех, кто ел<br>из тех, кто ел
-6305	bhuttāvinī	fem nom sg<br>fem nom pl<br>fem acc pl<br>fem voc sg	bhuttāvī	(one) who has eaten<br>(those) who have eaten<br>o (one) who has eaten!		declension	app	(тот), кто ел<br>(те), кто ел<br>o (тот), кто ел!
-6306	bhuttāviniyo	fem nom pl<br>fem acc pl<br>fem voc pl	bhuttāvī	(those) who have eaten<br>o (those) who have eaten!		declension	app	(те), кто поел<br>o (те), кто поел!
-6307	bhuttāvissa	nt gen sg	bhuttāvī	for (one) who has eaten	bhuttāvino	declension	app	для (того), кто поел
+6303	bhuttāvino	masc nom pl<br>masc acc pl<br>masc & nt dat sg<br>masc & nt gen sg<br>masc voc pl	bhuttāvī	(those) who have eaten<br>for (one) who has eaten<br>of (one) who has eaten<br>o (those) who have eaten!		declension	app	(те), кто ел<br>для (одного), кто ел<br>(одного), кто ел<br>о (те), кто ел!
+6304	bhuttāvīnaṃ	masc & nt dat pl<br>masc & nt gen pl	bhuttāvī	for (those) who have eaten<br>of (those) who have eaten	bhuttāvinaṃ	declension	app	для тех, кто ел<br>тех, кто ел
+6305	bhuttāvinī	fem nom sg<br>fem nom pl<br>fem acc pl<br>fem voc sg	bhuttāvī	(one) who has eaten<br>(those) who have eaten<br>o (one) who has eaten!		declension	app	(тот), кто ел<br>(те), кто ел<br>о (тот), кто ел!
+6306	bhuttāviniyo	fem nom pl<br>fem acc pl<br>fem voc pl	bhuttāvī	(those) who have eaten<br>o (those) who have eaten!		declension	app	(те), кто поел<br>о (те), кто поел!
+6307	bhuttāvissa	masc & nt dat sg<br>masc & nt gen sg	bhuttāvī	for (one) who has eaten<br>of (one) who has eaten	bhuttāvino	declension	app	для (того), кто поел<br>(того), кто поел
 6308	dassāvine	masc loc sg	dassāvī	in (one) who has seen	dassāvini<br>dassāvismiṃ<br>dassāvimhi	declension	app	у (того), кто видел
 6309	aññātāvīsu	masc & nt loc pl	aññātāvī	among (those) who have awakened	aññātāvisu	declension	app	среди тех, кто пробудился
-63630	vijitāvinaṃ	masc acc sg<br>masc & nt dat pl<br>masc & nt gen pl	vijitāvī	(one) who has conquered<br>for (those) who has conquered<br>of (those) who has conquered		declension	app	(тот), кто победил<br>для (тех), кто победил<br>из (тех), кто победил
+63630	vijitāvinaṃ	masc acc sg<br>masc & nt dat pl<br>masc & nt gen pl	vijitāvī	(one) who has conquered<br>for (those) who have conquered<br>of (those) who have conquered		declension	app	(тот), кто победил<br>для (тех), кто победил<br>(тех), кто победил

@@ -3,14 +3,14 @@ id	pali	gramma	of	eng	related	decl-con	pattern	native
 5202	gavamhā	abl sg	go	from cow	gavā<br>gavasmā<br>gāvā<br>gāvamhā<br>gāvasmā	declension	go-masc	от коровы
 5204	gāvasmā	abl sg	go	from cow	gavā<br>gavamhā<br>gavasmā<br>gāvā<br>gāvamhā	declension	go-masc	от коровы
 52522	gāvuṃ	acc sg	go	cow	gavaṃ	declension	go-masc	корова
-52052	gavaṃ 	acc sg<br>dat pl<br>gen pl	go	cow<pr>for cows<br>of cows		declension	go-masc	корова<pr>для коров<br>коров
+52052	gavaṃ	acc sg<br>dat pl<br>gen pl	go	cow<br>for cows<br>of cows		declension	go-masc	корова<br>для коров<br>коров
 52527	gunnaṃ	dat pl<br>gen pl	go	for cows<br>of cows	gavaṃ 	declension	go-masc	для коров<br>коров
 5206	gavassa	dat sg<br>gen sg	go	for cow<br>of cow	gāvassa	declension	go-masc	для коровы<br>коровы
 52524	gobhi	instr pl<br>abl pl	go	with cows<br>from cows	gohi	declension	go-masc	с коровами<br>от коров
 52525	gohi	instr pl<br>abl pl	go	with cows<br>from cows	gobhi	declension	go-masc	с коровами<br>от коров
 5208	gavena	instr sg	go	with cow	gāvena	declension	go-masc	с коровой
-5209	gavesu	loc pl	go	in cows	gāvesu<br>gosu	declension	go-masc	у коров
-52526	gosu	loc pl	go	in cows	gāvesu<br>gavesu	declension	go-masc	у коров
+5209	gavesu	loc pl	go	in cows	gāvesu<br>gosu	declension	go-masc	в коровах
+52526	gosu	loc pl	go	in cows	gāvesu<br>gavesu	declension	go-masc	в коровах
 5203	gavamhi	loc sg	go	in cow	gave<br>gavasmiṃ<br>gāve<br>gāvamhi<br>gāvasmiṃ	declension	go-masc	в корове
 5205	gavasmiṃ	loc sg	go	in cow	gave<br>gavamhi<br>gāve<br>gāvamhi<br>gāvasmiṃ	declension	go-masc	в корове
 5207	gave	loc sg	go	in cow	gavamhi<br>gavasmiṃ<br>gāve<br>gāvamhi<br>gāvasmiṃ	declension	go-masc	в корове

@@ -1,6 +1,6 @@
 id	pali	gramma	of	eng	related	decl-con	pattern	native
 2100	yathā	ind, adv	ya + thā	because; since		grammar	ind	потому что; поскольку
-21021	tathā	ind, adv	ta + thā	so; thus; in such a way; likewise; similarly		grammar	ind	так; таким образом; подобным образом; аналогично; аналогично
+21021	tathā	ind, adv	ta + thā	so; thus; in such a way; likewise; similarly		grammar	ind	так; таким образом; подобным образом; также; аналогично
 2102	dutiyaṃ	ind, adv<br>acc sg	dutiya	second time		grammar	ind	второй раз
 2103	vata	ind, adv<br>emph	vata, bata	certainly; surely; indeed		grammar	ind	безусловно; несомненно; действительно
 2104	saccaṃ	ind, adv<br>acc sg	sacca	truly; really		grammar	ind	по-настоящему; действительно
@@ -24,7 +24,7 @@ saya + aṃ"	by one’s own; oneself; one’s own		grammar	ind	по своему
 21221	niccaṃ	ind, adv<br>acc sg	nicca	continuously; always; permanently; perpetually		grammar	ind	непрерывно; всегда; постоянно; бессрочно
 2122	sādhukaṃ	ind, adv	√sādh + u + ka + aṃ	well; carefully; thoroughly; fully; completely		grammar	ind	хорошо; тщательно; основательно; полностью; всецело
 2123	yoniso	ind, adv<br>abl sg	yoni	properly; prudently; thoroughly; carefully; intelligently ; lit. to the source		grammar	ind	правильно; осмотрительно; тщательно; внимательно; разумно; буквально: к источнику
-2124	accayena	ind, adv<br>instr sg	accaya	after the passing (of); after the lapse (of); lit. with passing		grammar	ind	после смерти (чего-либо); после прекращения (чего-либо); букв. со словом «с смертью»
+2124	accayena	ind, adv<br>instr sg	accaya	after the passing (of); after the lapse (of); lit. with passing		grammar	ind	после смерти (чего-либо); после прекращения (чего-либо); букв. с прохождением
 2125	pare	ind, adv<br>loc sg	para	day before yesterday; previous day; lit. on another		grammar	ind	позавчера; предыдущий день; букв. в другой день
 2126	addhā	ind, adv<br>emph		certainly; surely		grammar	ind	безусловно; несомненно
 2127	sakkā	ind, adv<br>interr	sakkoti	it is possible (to); one is able (to)		grammar	ind	это возможно (сделать); кто-то способен (сделать)

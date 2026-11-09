@@ -2,9 +2,9 @@ id	pali	gramma	of	eng	related	decl-con	pattern	native
 4202	satamhā	nt abl sg	sata	from one hundred	satasmā<br>satā	declension	a2-card	из ста
 4206	satasmā	nt abl sg	sata	from one hundred	satamhā<br>satā	declension	a2-card	из ста
 42420	sate	nt acc pl<br>nt loc sg	sata	one hundred<br>in one hundred		declension	a2-card	сто<br>в ста
-4204	satānaṃ	nt dat pl<br>nt gen pl	sata	for one hundred<br>of one hundred		declension	a2-card	сто<br>из ста
-4209	satāya	nt dat sg	sata	for one hundred	satassa	declension	a2-card	сто
-4208	satassa	nt dat sg<br>nt gen sg	sata	for one hundred<br>of one hundred		declension	a2-card	сто<br>из ста
+4204	satānaṃ	nt dat pl<br>nt gen pl	sata	for one hundred<br>of one hundred		declension	a2-card	для ста<br>ста
+4209	satāya	nt dat sg	sata	for one hundred	satassa	declension	a2-card	для ста
+4208	satassa	nt dat sg<br>nt gen sg	sata	for one hundred<br>of one hundred		declension	a2-card	для ста<br>ста
 424242	satehi	nt instr pl<br>nt abl pl	sata	with one hundred<br>from one hundred		declension	a2-card	со ста<br>из ста
 42422	satena	nt instr sg	sata	with one hundred		declension	a2-card	со ста
 42423	satesu	nt loc pl	sata	amongst one hundred		declension	a2-card	среди ста
@@ -13,7 +13,7 @@ id	pali	gramma	of	eng	related	decl-con	pattern	native
 4200	satā	nt nom pl<br>nt abl sg	sata	one hundred		declension	a2-card	сто
 4205	satāni	nt nom pl<br>nt acc pl	sata	one hundred		declension	a2-card	сто
 42042	sataṃ	nt nom sg<br>nt acc sg	sata	one hundred		declension	a2-card	сто
-42426	pañcannaṃ	x dat pl<br>x gen pl	pañca	for five<br>of five		declension	a1-card	за пять<br>из пяти
+42426	pañcannaṃ	x dat pl<br>x gen pl	pañca	for five<br>of five		declension	a1-card	для пяти<br>пяти
 42425	pañcahi	x instr pl<br>x abl pl	pañca	with five<br>from five		declension	a1-card	с пятью<br>из пяти
-42427	pañcasu	x loc pl	pañca	amonst five		declension	a1-card	среди пяти
+42427	pañcasu	x loc pl	pañca	amongst five		declension	a1-card	среди пяти
 42424	pañca	x nom pl<br>x acc pl	pañca	five		declension	a1-card	пять

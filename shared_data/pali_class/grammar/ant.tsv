@@ -4,15 +4,15 @@ id	pali	gramma	of	eng	related	decl-con	pattern	native
 1502	sīlavantaṃ	acc sg	sīlavant	virtuous one		declension	ant-masc-ant-adj	добродетельный
 1503	āyasmantānaṃ	dat pl<br>gen pl	āyasmant	for venerables<br>of venerables	āyasmataṃ	declension	ant-masc-ant-adj	для почтенных<br>почтенных
 1504	balavataṃ	dat pl<br>gen pl	balavant	for powerful ones<br>of powerful ones	balavantānaṃ	declension	ant-masc-ant-adj	для могущественных<br>могущественных
-1505	bhagavantānaṃ	dat pl<br>gen pl	bhagavant	for Blessed Ones<br>of Blessed Ones	bhagavataṃ	declension	ant-masc-ant-adj	для благословенных<br>из благословенных
-1506	sabbāvataṃ	dat pl<br>gen pl	sabbāvant	for those who have everything<br>of those who have everything	sabbāvantānaṃ	declension	ant-masc-ant-adj	для тех, у кого есть всё<br>для тех, у кого есть всё
+1505	bhagavantānaṃ	dat pl<br>gen pl	bhagavant	for Blessed Ones<br>of Blessed Ones	bhagavataṃ	declension	ant-masc-ant-adj	для благословенных<br>благословенных
+1506	sabbāvataṃ	dat pl<br>gen pl	sabbāvant	for those who have everything<br>of those who have everything	sabbāvantānaṃ	declension	ant-masc-ant-adj	для тех, у кого есть всё<br>тех, у кого есть всё
 1507	sīlavantānaṃ	dat pl<br>gen pl	sīlavant	for virtuous ones<br>of virtuous ones	sīlavataṃ	declension	ant-masc-ant-adj	для добродетельных<br>добродетельных
-1508	vusitavataṃ	dat pl<br>gen pl	vusitavant	for those who have lived (the holy life)<br>of those who have lived (the holy life)	vusitavantānaṃ	declension	ant-masc-ant-adj	для тех, кто жил (святой жизнью)<br>из тех, кто жил (святой жизнью)
+1508	vusitavataṃ	dat pl<br>gen pl	vusitavant	for those who have lived (the holy life)<br>of those who have lived (the holy life)	vusitavantānaṃ	declension	ant-masc-ant-adj	для тех, кто жил (святой жизнью)<br>тех, кто жил (святой жизнью)
 1509	bhagavato	dat sg<br>gen sg	bhagavant	for Blessed One<br>of Blessed One	bhagavantassa	declension	ant-masc-ant-adj	для Благословенного<br>Благословенного
 15150	cakkhumantassa	dat sg<br>gen sg	cakkhumant	for person with sight<br>of person with sight	cakkhumato	declension	ant-masc-ant-adj	для человека, имеющего зрение<br>человека, имеющего зрение
-151515	paññavantassa	dat sg<br>gen sg	paññavant	for wise one<br>of wise one	paññavato	declension	ant-masc-ant-adj	мудрый<br>из мудрых
-15152	sīlavato	dat sg<br>gen sg	sīlavant	for virtuous one<br>of virtuous one	sīlavantassa	declension	ant-masc-ant-adj	добродетельный<br>из добродетельных
-15153	sīlavantassa	dat sg<br>gen sg	sīlavant	for virtuous one<br>of virtuous one	sīlavato	declension	ant-masc-ant-adj	добродетельный<br>из добродетельных
+151515	paññavantassa	dat sg<br>gen sg	paññavant	for wise one<br>of wise one	paññavato	declension	ant-masc-ant-adj	для мудрого<br>мудрого
+15152	sīlavato	dat sg<br>gen sg	sīlavant	for virtuous one<br>of virtuous one	sīlavantassa	declension	ant-masc-ant-adj	для добродетельного<br>добродетельного
+15153	sīlavantassa	dat sg<br>gen sg	sīlavant	for virtuous one<br>of virtuous one	sīlavato	declension	ant-masc-ant-adj	для добродетельного<br>добродетельного
 15154	sutavato	dat sg<br>gen sg	sutavant	for educated one<br>of educated one	sutavantassa	declension	ant-masc-ant-adj	для образованного человека<br>образованного человека
 15155	balavantehi	instr pl<br>abl pl	balavant	with powerful ones<br>from powerful ones		declension	ant-masc-ant-adj	с могущественными<br>от могущественных
 15156	paññavantehi	instr pl<br>abl pl	paññavant	with wise ones<br>from wise ones		declension	ant-masc-ant-adj	с мудрецами<br>от мудрецов
@@ -28,12 +28,12 @@ id	pali	gramma	of	eng	related	decl-con	pattern	native
 1526	sīlavante	acc pl<br>loc sg	sīlavant	virtuous ones<br>in virtuous one		declension	ant-masc-ant-adj	добродетельные<br>в добродетельном
 1527	āyasmantā	nom pl<br>voc pl	āyasmant	venerables<br>o venerables!	āyasmanto	declension	ant-masc-ant-adj	почтенные<br>о почтенные!
 1528	sīlavantā	nom pl<br>voc pl	sīlavant	virtuous ones<br>o virtuous ones!	sīlavanto	declension	ant-masc-ant-adj	добродетельные<br>о добродетельные!
-1529	āyasmanto	nom sg & pl<br>voc pl	āyasmant	venerable<br>venerables<br>o venerables!		declension	ant-masc-ant-adj	почтенные<br>почтенные<br>о почтенные!
+1529	āyasmanto	nom sg & pl<br>voc pl	āyasmant	venerable<br>venerables<br>o venerables!		declension	ant-masc-ant-adj	почтенный<br>почтенные<br>о почтенные!
 1530	bhagavanto	nom sg & pl<br>voc pl	bhagavant	Blessed One<br>Blessed Ones<br>O Blessed Ones!		declension	ant-masc-ant-adj	Благословенный<br>Благословенные<br>О Благословенные!
 15315	sīlavanto	nom sg & pl<br>voc pl	sīlavant	virtuous one<br>virtuous ones<br>o virtuous ones!		declension	ant-masc-ant-adj	добродетельный<br>добродетельные<br>о добродетельные!
-1532	bhagavā	nom sg<br>voc sg	bhagavant	Blessed One<br>O Blessed One!		declension	ant-masc-ant-adj	Благословенный! О, Благословенный!
-1533	satimā	nom sg<br>voc sg	satimant	mindful one<br>o mindful one!		declension	ant-masc-ant-adj	Внимательный человек<br>Внимательный человек!
+1532	bhagavā	nom sg<br>voc sg	bhagavant	Blessed One<br>O Blessed One!		declension	ant-masc-ant-adj	Благословенный<br>О Благословенный!
+1533	satimā	nom sg<br>voc sg	satimant	mindful one<br>o mindful one!		declension	ant-masc-ant-adj	Внимательный человек<br>о внимательный человек!
 1534	sīlavā	nom sg<br>voc sg	sīlavant	virtuous one<br>o virtuous one!		declension	ant-masc-ant-adj	добродетельный<br>о добродетельный!
 1535	cakkhuma	voc sg	cakkhumant	o person with sight!	cakkhumaṃ<br>cakkhumā	declension	ant-masc-ant-adj	О человек со зрением!
-1536	pāpima	voc sg	pāpimant	o evil one!	pāpimā<br>pāpimaṃ	declension	ant-masc-ant-adj	О, злой дух!
+1536	pāpima	voc sg	pāpimant	o evil one!	pāpimā<br>pāpimaṃ	declension	ant-masc-ant-adj	О злой!
 1537	bhagava	voc sg	bhagavant	o Blessed One!	bhagavā<br>bhagavaṃ	declension	ant-masc-ant-adj	О, благословенный!

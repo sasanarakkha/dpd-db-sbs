@@ -1,0 +1,542 @@
+[
+ {
+  "file": "a_adj",
+  "line": 13,
+  "id": "38384",
+  "old": "в непревзойденном (вещи)",
+  "new": "в непревзойденной (вещи)",
+  "label": "fem loc sg",
+  "conf": 10,
+  "note": "adjective masc, noun fem"
+ },
+ {
+  "file": "i_adj",
+  "line": 5,
+  "id": "3905",
+  "old": "страстный (вещь)",
+  "new": "страстная (вещь)",
+  "label": "fem nom sg",
+  "conf": 10,
+  "note": "adjective masc, noun fem"
+ },
+ {
+  "file": "i_adj",
+  "line": 5,
+  "id": "3905",
+  "old": "о страстный (вещь)!",
+  "new": "о страстная (вещь)!",
+  "label": "fem voc sg",
+  "conf": 10,
+  "note": "adjective masc, noun fem"
+ },
+ {
+  "file": "a_adj",
+  "line": 11,
+  "id": "3802",
+  "old": "непостоянный (вещь)",
+  "new": "непостоянный (предмет)",
+  "label": "nt nom sg & acc sg",
+  "conf": 8,
+  "note": "nt placeholder = предмет"
+ },
+ {
+  "file": "a_adj",
+  "line": 20,
+  "id": "383838",
+  "old": "непревзойденная (вещь)",
+  "new": "непревзойденный (предмет)",
+  "label": "nt nom sg & acc sg",
+  "conf": 9,
+  "note": "adjective fem, noun fem -> nt"
+ },
+ {
+  "file": "a_adj",
+  "line": 32,
+  "id": "3822",
+  "old": "полезный (вещь)",
+  "new": "полезный (предмет)",
+  "label": "nt nom sg & acc sg",
+  "conf": 8,
+  "note": "nt placeholder = предмет"
+ },
+ {
+  "file": "a_adj",
+  "line": 8,
+  "id": "3800",
+  "old": "о непостоянная (вещь)!",
+  "new": "о непостоянный (предмет)!",
+  "label": "masc & nt voc sg",
+  "conf": 9,
+  "note": "adjective fem, noun fem -> masc/nt"
+ },
+ {
+  "file": "i_adj",
+  "line": 22,
+  "id": "3902",
+  "old": "страстный (вещь)",
+  "new": "страстный (предмет)",
+  "label": "nt nom sg & masc&nt acc sg",
+  "conf": 8,
+  "note": "nt placeholder"
+ },
+ {
+  "file": "i_adj",
+  "line": 22,
+  "id": "3902",
+  "old": "о страстный (вещь)!",
+  "new": "о страстный (предмет)!",
+  "label": "nt voc sg",
+  "conf": 9,
+  "note": "nt placeholder"
+ },
+ {
+  "file": "i_adj",
+  "line": 25,
+  "id": "3900",
+  "old": "страстный (вещь)",
+  "new": "страстный (предмет)",
+  "label": "nt nom sg & acc sg",
+  "conf": 8,
+  "note": "nt placeholder"
+ },
+ {
+  "file": "i_adj",
+  "line": 25,
+  "id": "3900",
+  "old": "о страстный (вещь)!",
+  "new": "о страстный (предмет)!",
+  "label": "nt voc sg",
+  "conf": 9,
+  "note": "nt placeholder"
+ },
+ {
+  "file": "i_adj",
+  "line": 7,
+  "id": "39039",
+  "old": "страстный (вещь)",
+  "new": "страстная (вещь)",
+  "label": "masc & fem nom sg",
+  "conf": 6,
+  "note": "mixed; fem form = convention for mixed rows (cf. u_adj:13 'большая (вещь)')"
+ },
+ {
+  "file": "u_adj",
+  "line": 8,
+  "id": "400940",
+  "old": "большой (вещь)",
+  "new": "большую (вещь)",
+  "label": "masc & fem & nt acc sg",
+  "conf": 7,
+  "note": "mixed acc sg; fem convention"
+ },
+ {
+  "file": "i_adj",
+  "line": 18,
+  "id": "3907",
+  "old": "для страстной (вещи)",
+  "new": "для страстного (предмета)",
+  "label": "masc & nt dat sg",
+  "conf": 10,
+  "note": "adjective fem, noun fem"
+ },
+ {
+  "file": "i_adj",
+  "line": 18,
+  "id": "3907",
+  "old": "страстной (вещи)",
+  "new": "страстного (предмета)",
+  "label": "masc & nt gen sg",
+  "conf": 10,
+  "note": "adjective fem, noun fem"
+ },
+ {
+  "file": "a_adj",
+  "line": 4,
+  "id": "3806",
+  "old": "непостоянные (вещи)",
+  "new": "непостоянные (предметы)",
+  "label": "masc & nt acc pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "a_adj",
+  "line": 5,
+  "id": "3807",
+  "old": "с непостоянными (вещами)",
+  "new": "с непостоянными (предметами)",
+  "label": "masc & nt instr pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "a_adj",
+  "line": 5,
+  "id": "3807",
+  "old": "из непостоянных (вещей)",
+  "new": "из непостоянных (предметов)",
+  "label": "masc & nt abl pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "a_adj",
+  "line": 10,
+  "id": "3804",
+  "old": "непостоянные (вещи)",
+  "new": "непостоянные (предметы)",
+  "label": "nt nom pl & acc pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "a_adj",
+  "line": 10,
+  "id": "3804",
+  "old": "о непостоянные (вещи)!",
+  "new": "о непостоянные (предметы)!",
+  "label": "nt voc pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "a_adj",
+  "line": 15,
+  "id": "38385",
+  "old": "непревзойденные (вещи)",
+  "new": "непревзойденные (предметы)",
+  "label": "masc & nt acc pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "a_adj",
+  "line": 18,
+  "id": "38387",
+  "old": "среди непревзойденных (вещей)",
+  "new": "среди непревзойденных (предметов)",
+  "label": "masc & nt loc pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "a_adj",
+  "line": 25,
+  "id": "3826",
+  "old": "полезные (вещи)",
+  "new": "полезные (предметы)",
+  "label": "masc & nt acc pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "a_adj",
+  "line": 27,
+  "id": "3827",
+  "old": "с полезными (вещами)",
+  "new": "с полезными (предметами)",
+  "label": "masc & nt instr pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "a_adj",
+  "line": 27,
+  "id": "3827",
+  "old": "из полезных (вещей)",
+  "new": "из полезных (предметов)",
+  "label": "masc & nt abl pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "a_adj",
+  "line": 29,
+  "id": "3829",
+  "old": "среди полезных (вещей)",
+  "new": "среди полезных (предметов)",
+  "label": "masc & nt loc pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "a_adj",
+  "line": 31,
+  "id": "3824",
+  "old": "полезные (вещи)",
+  "new": "полезные (предметы)",
+  "label": "nt nom pl & acc pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "a_adj",
+  "line": 31,
+  "id": "3824",
+  "old": "о полезные (вещи)!",
+  "new": "о полезные (предметы)!",
+  "label": "nt voc pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "u_adj",
+  "line": 19,
+  "id": "4007",
+  "old": "для больших (вещей)",
+  "new": "для больших (предметов)",
+  "label": "masc dat pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "u_adj",
+  "line": 20,
+  "id": "4008",
+  "old": "большие (вещи)",
+  "new": "большие (предметы)",
+  "label": "masc nom pl & acc pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "u_adj",
+  "line": 20,
+  "id": "4008",
+  "old": "о большие (вещи)!",
+  "new": "о большие (предметы)!",
+  "label": "masc voc pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "u_adj",
+  "line": 21,
+  "id": "4006",
+  "old": "большие (вещи)",
+  "new": "большие (предметы)",
+  "label": "nt nom pl & acc pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "u_adj",
+  "line": 21,
+  "id": "4006",
+  "old": "о большие (вещи)!",
+  "new": "о большие (предметы)!",
+  "label": "nt voc pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "i_adj",
+  "line": 11,
+  "id": "3904",
+  "old": "для пылких (вещей)",
+  "new": "для пылких (предметов)",
+  "label": "masc & nt dat pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "i_adj",
+  "line": 11,
+  "id": "3904",
+  "old": "пылких (вещей)",
+  "new": "пылких (предметов)",
+  "label": "masc & nt gen pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "i_adj",
+  "line": 18,
+  "id": "3907",
+  "old": "страстные (вещи)",
+  "new": "страстные (предметы)",
+  "label": "masc nom pl & acc pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "i_adj",
+  "line": 18,
+  "id": "3907",
+  "old": "о страстные (вещи)!",
+  "new": "о страстные (предметы)!",
+  "label": "masc voc pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "a_ptp",
+  "line": 5,
+  "id": "4503",
+  "old": "допустимые (вещи)",
+  "new": "допустимые (предметы)",
+  "label": "masc & nt acc pl",
+  "conf": 9,
+  "note": "pl noun"
+ },
+ {
+  "file": "a_ptp",
+  "line": 7,
+  "id": "4508",
+  "old": "(вещи, которые) следует делать",
+  "new": "(предметы, которые) следует делать",
+  "label": "masc & nt acc pl",
+  "conf": 8,
+  "note": "pl noun + relative"
+ },
+ {
+  "file": "a_ptp",
+  "line": 7,
+  "id": "4508",
+  "old": "в (вещи, которую) следует делать",
+  "new": "в (предмете, который) следует делать",
+  "label": "masc & nt loc sg",
+  "conf": 8,
+  "note": "noun + relative pronoun agree"
+ },
+ {
+  "file": "a_ptp",
+  "line": 11,
+  "id": "4507",
+  "old": "(вещи, которые) следует сделать",
+  "new": "(предметы, которые) следует сделать",
+  "label": "nt nom pl & acc pl",
+  "conf": 8,
+  "note": "pl noun + relative"
+ },
+ {
+  "file": "a_ptp",
+  "line": 11,
+  "id": "4507",
+  "old": "о (вещи, которые) следует сделать!",
+  "new": "о (предметы, которые) следует сделать!",
+  "label": "nt voc pl",
+  "conf": 8,
+  "note": "pl noun + relative"
+ },
+ {
+  "file": "a_ptp",
+  "line": 15,
+  "id": "45454",
+  "old": "для (вещи, которую) следует оставить",
+  "new": "для (предмета, который) следует оставить",
+  "label": "masc & nt dat sg",
+  "conf": 8,
+  "note": "noun + relative pronoun agree"
+ },
+ {
+  "file": "a_ptp",
+  "line": 15,
+  "id": "45454",
+  "old": "(вещи, которую) следует оставить",
+  "new": "(предмета, который) следует оставить",
+  "label": "masc & nt gen sg",
+  "conf": 8,
+  "note": "noun + relative pronoun agree"
+ },
+ {
+  "file": "a_ptp",
+  "line": 18,
+  "id": "45456",
+  "old": "для (вещи), реализуемой самостоятельно",
+  "new": "для (предмета), реализуемого самостоятельно",
+  "label": "masc & nt dat sg",
+  "conf": 8,
+  "note": "noun + participle agree"
+ },
+ {
+  "file": "a_ptp",
+  "line": 18,
+  "id": "45456",
+  "old": "(вещи), реализуемой самостоятельно",
+  "new": "(предмета), реализуемого самостоятельно",
+  "label": "masc & nt gen sg",
+  "conf": 8,
+  "note": "noun + participle agree"
+ },
+ {
+  "file": "a_ptp",
+  "line": 20,
+  "id": "4520",
+  "old": "(вещи, которые) следует практиковать",
+  "new": "(предметы, которые) следует практиковать",
+  "label": "masc & nt acc pl",
+  "conf": 8,
+  "note": "pl noun + relative"
+ },
+ {
+  "file": "a_ptp",
+  "line": 20,
+  "id": "4520",
+  "old": "в (вещи, которую) следует практиковать",
+  "new": "в (предмете, который) следует практиковать",
+  "label": "masc & nt loc sg",
+  "conf": 8,
+  "note": "noun + relative pronoun agree"
+ },
+ {
+  "file": "a_ptp",
+  "line": 24,
+  "id": "4523",
+  "old": "(вещи, которые) следует осваивать",
+  "new": "(предметы, которые) следует осваивать",
+  "label": "nt nom pl & acc pl",
+  "conf": 8,
+  "note": "pl noun + relative"
+ },
+ {
+  "file": "a_ptp",
+  "line": 24,
+  "id": "4523",
+  "old": "о (вещи, которые) следует осваивать!",
+  "new": "о (предметы, которые) следует осваивать!",
+  "label": "nt voc pl",
+  "conf": 8,
+  "note": "pl noun + relative"
+ },
+ {
+  "file": "a_ptp",
+  "line": 30,
+  "id": "4530",
+  "old": "(вещи, которые) можно познать",
+  "new": "(предметы, которые) можно познать",
+  "label": "masc & nt acc pl",
+  "conf": 8,
+  "note": "pl noun + relative"
+ },
+ {
+  "file": "a_ptp",
+  "line": 30,
+  "id": "4530",
+  "old": "в (вещи, которую) можно познать",
+  "new": "в (предмете, который) можно познать",
+  "label": "masc & nt loc sg",
+  "conf": 8,
+  "note": "noun + relative pronoun agree"
+ },
+ {
+  "file": "a_ptp",
+  "line": 33,
+  "id": "4529",
+  "old": "(вещи, которые) можно узнать",
+  "new": "(предметы, которые) можно узнать",
+  "label": "nt nom pl & acc pl",
+  "conf": 8,
+  "note": "pl noun + relative"
+ },
+ {
+  "file": "a_ptp",
+  "line": 33,
+  "id": "4529",
+  "old": "о (вещи, которые) можно узнать!",
+  "new": "о (предметы, которые) можно узнать!",
+  "label": "nt voc pl",
+  "conf": 8,
+  "note": "pl noun + relative"
+ }
+]

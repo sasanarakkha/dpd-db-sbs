@@ -14,16 +14,16 @@ id	pali	gramma	of	eng	related	decl-con	pattern	native
 552	asma	pr 1st pl<br>imp 1st pl	atthi	we are<br>we must be	amha<br>amhā	conjugation	atthi-pr	мы есть<br>мы должны быть
 553	amhi	pr 1st sg<br>imp 1st sg	atthi	I am<br>I must be	asmi	conjugation	atthi-pr	Я есть<br>Я должен быть
 554	asmi	pr 1st sg<br>imp 1st sg	atthi	I am<br>I must be	amhi	conjugation	atthi-pr	Я есть<br>Я должен быть
-5055	attha	pr 2nd pl<br>imp 2nd pl	atthi	you all are<br>you all must be		conjugation	atthi-pr	вы все такие<br>вы все должны быть
-556	asi	pr 2nd sg	atthi	you are		conjugation	atthi-pr	ты
+5055	attha	pr 2nd pl<br>imp 2nd pl	atthi	you all are<br>you all must be		conjugation	atthi-pr	вы все есть<br>вы все должны быть
+556	asi	pr 2nd sg	atthi	you are		conjugation	atthi-pr	ты есть
 557	santi	pr 3rd pl	atthi	they are		conjugation	atthi-pr	они есть
 558	atthu	imp 3rd sg	atthi	may it be!		conjugation	atthi-pr	Да будет так!
 559	atthi	pr 3rd sg	atthi	he is		conjugation	atthi-pr	он есть
 520	homa	pr 1st pl<br>imp 1st pl	hoti	we are<br>we must be		conjugation	hoti-pr	мы есть<br>мы должны быть
 525	homi	pr 1st sg<br>imp 1st sg	hoti	I am<br>I must be		conjugation	hoti-pr	Я есть<br>Я должен быть
-522	hotha	pr 2nd pl<br>imp 2nd pl	hoti	you all are<br>you all must be		conjugation	hoti-pr	вы все такие<br>вы все должны быть
-523	hosi	pr 2nd sg	hoti	you are		conjugation	hoti-pr	ты
-524	hohi	imp 2nd sg	hoti	you must be		conjugation	hoti-pr	вы должны быть
+522	hotha	pr 2nd pl<br>imp 2nd pl	hoti	you all are<br>you all must be		conjugation	hoti-pr	вы все есть<br>вы все должны быть
+523	hosi	pr 2nd sg	hoti	you are		conjugation	hoti-pr	ты есть
+524	hohi	imp 2nd sg	hoti	you must be		conjugation	hoti-pr	ты должен быть
 5025	hontu	imp 3rd pl	hoti	they must be		conjugation	hoti-pr	они должны быть
 526	honti	pr 3rd pl	hoti	they are		conjugation	hoti-pr	они есть
 527	hotu	imp 3rd sg	hoti	may it be!		conjugation	hoti-pr	Да будет так!

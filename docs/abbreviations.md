@@ -68,7 +68,7 @@ There are two types of abbreviations: Grammatical and Textual.
 |inf|infinitive verb|The uninflected form of the verb. It most commonly expresses a purpose.|
 |instr|instrumental case|shows the object or person with or by whom something is performed. (by, with or through)<br/>(e.g. by me, with me)|
 |intens|intensive verb|Also called Frequentative Verbs, express the frequent repetition or the intensification of the action denoted by the simple root.|
-|interr|interrogative pronoun|Has the nature of asking a question. (who? how? perhaps? how many?)|
+|interr|interrogative pronoun|Has the nature of asking a question. (e.g. who? what? which? how many?)|
 |intrans|intransitive verb|A verb (or verb construction) that does not take an object in the accusative case. sometimes they take what appears to be an object in another case. (e.g. there is; is conducive to)|
 |irreg|irregular conjugation or declension|Differs from the usual, generally accepted patterns of conjugation or declension.|
 |lit|literal meaning|Limited to the explicit meaning of a word or parts from which the word has been constructed.|

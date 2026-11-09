@@ -1,19 +1,19 @@
 id	pali	gramma	of	eng	related	decl-con	pattern	native
-333333	imāsaṃ	fem dat pl<br>fem gen pl	ima	to these<br>of these		declension	ima-pron	к этим<br>из этих
+333333	imāsaṃ	fem dat pl<br>fem gen pl	ima	to these<br>of these		declension	ima-pron	к этим<br>этих
 33902	assā	fem dat sg<br>fem gen sg	ima	for her<br>hers	imissā<br>imāya	declension	ima-pron	для нее<br>ее
-3323	imissā	fem dat sg<br>fem gen sg	ima	for this<br>of this	imāya<br>assā	declension	ima-pron	для этого<br>из этого
+3323	imissā	fem dat sg<br>fem gen sg	ima	for this<br>of this	imāya<br>assā	declension	ima-pron	для этой<br>этой
 33906	imāhi	fem instr pl<br>fem abl pl	ima	with these<br>from these		declension	ima-pron	с этими<br>из этих
-33336	imāya	fem instr sg<br>fem dat sg<br>fem abl sg<br>fem gen sg	ima	with this<br>to this<br>from this<br>of this		declension	ima-pron	с этим<br>к этому<br>от этого<br>из этого
+33336	imāya	fem instr sg<br>fem dat sg<br>fem abl sg<br>fem gen sg	ima	with this<br>to this<br>from this<br>of this		declension	ima-pron	с этой<br>к этой<br>от этой<br>этой
 33335	imāsu	fem loc pl	ima	among these		declension	ima-pron	среди них
-3324	imissaṃ	fem loc sg	ima	in this	imāyaṃ	declension	ima-pron	в этом
+3324	imissaṃ	fem loc sg	ima	in this	imāyaṃ	declension	ima-pron	в этой
 33905	imā	fem nom pl<br>fem acc pl	ima	these	imāyo	declension	ima-pron	эти
 33337	imāyo	fem nom pl<br>fem acc pl	ima	these	imā	declension	ima-pron	эти
 33903	ayaṃ	masc & fem nom sg	ima	this		declension	ima-pron	этот
 33908	imamhā	masc & nt abl sg	ima	from this	imasmā<br>asmā	declension	ima-pron	из этого
 33332	imasmā	masc & nt abl sg	ima	from this	asmā<br>imamhā	declension	ima-pron	из этого
-3320	imesaṃ	masc & nt dat pl<br>masc & nt gen pl	ima	for these<br>of these		declension	ima-pron	для этих<br>из этих
-33033	assa 2	masc & nt dat sg<br>masc & nt gen sg	ima	for him<br>for this<br>his<br>of this	imassa	declension	ima-pron	для него<br>для этого<br>его<br>из этого
-33334	imassa	masc & nt dat sg<br>masc & nt gen sg	ima	for him<br>for this<br>his<br>of this	assa	declension	ima-pron	для него<br>для этого<br>его<br>из этого
+3320	imesaṃ	masc & nt dat pl<br>masc & nt gen pl	ima	for these<br>of these		declension	ima-pron	для этих<br>этих
+33033	assa 2	masc & nt dat sg<br>masc & nt gen sg	ima	for him<br>for this<br>his<br>of this	imassa	declension	ima-pron	для него<br>для этого<br>его<br>этого
+33334	imassa	masc & nt dat sg<br>masc & nt gen sg	ima	for him<br>for this<br>his<br>of this	assa	declension	ima-pron	для него<br>для этого<br>его<br>этого
 33339	imehi	masc & nt instr pl<br>masc & nt abl pl	ima	with these<br>from these		declension	ima-pron	с этими<br>из этих
 3322	iminā	masc & nt instr sg	ima	with this		declension	ima-pron	с этим
 33233	imesu	masc & nt loc pl	ima	among these		declension	ima-pron	среди них
