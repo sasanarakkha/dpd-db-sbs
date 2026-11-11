@@ -276,6 +276,9 @@ class DPSPaths:
         self.sbs_anki_templates_dir = base_dir.joinpath(
             Path("../sasanarakkha/study-tools/docs/5-anki/templates/")
         )
+        self.pat_source_path = base_dir.joinpath(
+            Path("../sasanarakkha/study-tools/data/patimokkha_word_by_word.tsv")
+        )
         self.pali_class_vocab_html_dir = base_dir.joinpath(
             Path("../sasanarakkha/study-tools/pali-class/vocab/")
         )

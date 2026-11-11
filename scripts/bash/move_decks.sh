@@ -78,7 +78,7 @@ cd "$ANKI_DECKS_DIR" || { uv run "$ASK_PY" -p -c red "Error: Could not cd to $AN
 
 safe_copy_file "pali_patimokkha_word_by_word.apkg" "$FILESRV_DEST_BASE_DIR/Pātimokkha Word By Word/patimokkha-word-by-word.apkg" || true
 safe_copy_file "pali_patimokkha_word_by_word.apkg" "$TEMP_PUSH_DEST_DIR/patimokkha-word-by-word.apkg" || true
-safe_copy_file "/Users/deva/Documents/sasanarakkha/study-tools/temp/patimokkha.xlsx" "$FILESRV_PAT_DIR/Pātimokkha Word by Word.xlsx" || true
+safe_copy_file "$HOME/Documents/sasanarakkha/study-tools/data/patimokkha_word_by_word.tsv" "$FILESRV_PAT_DIR/Pātimokkha Word by Word.tsv" || true
 safe_copy_file "pali_slovar.apkg" "$FILESRV_DEST_BASE_DIR/Пали Словарь Анки/ru-pali-vocab.apkg" || true
 safe_copy_file "pali_slovar.apkg" "$TEMP_PUSH_DEST_DIR/ru-pali-vocab.apkg" || true
 safe_copy_file "sbs_pali_english_vocab.apkg" "$FILESRV_DEST_BASE_DIR/SBS Pāli-English Vocab/sbs-pali-english-vocab.apkg" || true

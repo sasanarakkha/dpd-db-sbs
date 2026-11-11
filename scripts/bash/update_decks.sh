@@ -37,14 +37,10 @@ if [[ $response == "y" ]]; then
 fi
 
 
-# Pātimokkha.xlsx - https://docs.google.com/spreadsheets/d/1rS-IlX4DvKmnBO58KON37eVnOZqwfkG-ot-zIjCuzH4/
+# Pātimokkha source: study-tools/data/patimokkha_word_by_word.tsv (edited locally)
 
 response=$(uv run python "$PROJECT_DIR/tools/ask.py" "need to generate patimokkha.csv?") || exit 1
 if [[ $response == "y" ]]; then
-    cd "$HOME/Documents/sasanarakkha/study-tools/"
-    env -u VIRTUAL_ENV uv run bash scripts/download_patimokkha.sh
-    cd "$HOME/Documents/dpd-db/"
-    uv run python scripts/work_with_csv/xlsx2csv.py "$HOME/Documents/sasanarakkha/study-tools/temp/patimokkha.xlsx" "temp/patimokkha_word_by_word.csv" "analysis"
     uv run python scripts/work_with_csv/pat_for_anki.py
 fi
 

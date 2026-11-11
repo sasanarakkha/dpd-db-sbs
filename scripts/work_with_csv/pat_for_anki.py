@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
 
 """
-Processes a specific CSV file (patimokkha_word_by_word.csv from temp_dir)
-for Anki, filters rows, selects columns, adds new computed columns,
-and saves the result to patimokkha_anki.csv in anki_csvs_dir.
+Processes the local Patimokkha word-by-word TSV (dpspth.pat_source_path, in the
+study-tools repo) for Anki: keeps the first occurrence of each word, selects
+columns, adds new computed columns, and saves the result to
+anki_patimokkha.csv in anki_csvs_dir.
 """
 
 import csv  # For csv.QUOTE_MINIMAL
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Any, cast
 
 import pandas as pd
 
-from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
 from tools.printer import printer as pr
 
-pth = ProjectPaths()
 dpspth = DPSPaths()
 
 COLUMNS_TO_KEEP: list[str] = [
@@ -48,22 +48,31 @@ _FEEDBACK_FORM_URL = (
 )
 
 
-def _filter_input_rows(df: pd.DataFrame, input_csv_path: Path) -> pd.DataFrame:
-    """Keep rows where the first column is "1" and (if present) meaning is non-empty."""
-    condition = df.iloc[:, 0] == "1"
+_BOLD_TAG = re.compile(r"</?b>")
 
+
+def _filter_input_rows(df: pd.DataFrame, input_path: Path) -> pd.DataFrame:
+    """Keep first occurrences of each word (rows with a pos) that have a meaning.
+
+    The key is the pali cell without <b> tags and surrounding whitespace.
+    """
+    has_pos = df["pos"].str.strip() != ""
+    key = df["pali"].map(lambda v: _BOLD_TAG.sub("", v).strip())
+    first_idx = key.loc[has_pos].drop_duplicates().index
+    condition = df.index.isin(first_idx)
     if "meaning" in df.columns:
-        condition &= df["meaning"].str.strip() != ""
+        condition &= (df["meaning"].str.strip() != "").to_numpy()
     else:
         pr.amber(
-            f"'meaning' column not found in '{input_csv_path}'. Filtering only on the first column."
+            f"'meaning' column not found in '{input_path}'. Not filtering on meaning."
         )
 
     df_filtered = df.loc[condition].copy()
     if df_filtered.empty:
         pr.amber(
-            f"No rows found in '{input_csv_path}' matching the filter criteria "
-            "(first column is '1' AND 'meaning' is not empty). Output will be an empty file with headers."
+            f"No rows found in '{input_path}' matching the filter criteria "
+            "(first occurrence of a word with a pos AND 'meaning' is not empty). "
+            "Output will be an empty file with headers."
         )
     return df_filtered
 
@@ -146,30 +155,25 @@ def _write_field_list(df_processed: pd.DataFrame, sbs_anki_style_dir: Path) -> N
 def process_patimokkha_csv() -> None:
     """
     Main processing function.
-    Reads the input CSV, applies transformations, and writes the output CSV.
+    Reads the source TSV, applies transformations, and writes the output CSV.
     """
-    input_csv_path = pth.temp_dir / "patimokkha_word_by_word.csv"
+    input_csv_path = dpspth.pat_source_path
     output_csv_path = dpspth.anki_csvs_dir / "anki_patimokkha.csv"
     sources_links_path = dpspth.pat_links_path  # formerly sources_links.tsv
 
     try:
-        # Read with tab separator if the intermediate CSV is tab-separated
-        # If xlsx2csv.py produces comma-separated, use sep=','
-        # dtype=str + keep_default_na=False: the first column is a numeric-looking
-        # flag ("1" or blank) that must compare equal to the literal string "1" -
-        # letting pandas infer int64/float64 here turns "1" into "1.0" and blanks
-        # into NaN, breaking the filter and crashing on later in-place writes.
+        # dtype=str + keep_default_na=False: every cell stays a string ("" when blank).
         df = pd.read_csv(input_csv_path, sep="\t", dtype=str, keep_default_na=False)
     except FileNotFoundError:
-        pr.red(f"Input CSV file not found at '{input_csv_path}'")
+        pr.red(f"Input TSV file not found at '{input_csv_path}'")
         return
     except (pd.errors.ParserError, OSError, UnicodeDecodeError) as e:
-        pr.red(f"Error reading CSV '{input_csv_path}': {e}")
+        pr.red(f"Error reading TSV '{input_csv_path}': {e}")
         return
 
     if df.empty:
         pr.amber(
-            f"Input CSV '{input_csv_path}' is empty. Output will be an empty file with headers."
+            f"Input TSV '{input_csv_path}' is empty. Output will be an empty file with headers."
         )
         df_filtered = pd.DataFrame()
     else:

@@ -148,8 +148,8 @@ def test_pipeline_regenerates_all_csvs():
     for csv_path in db_csvs:
         assert csv_path.exists(), f"DB CSV not found: {csv_path}"
 
-    # Verify Patimokkha CSV (requires temp/patimokkha_word_by_word.csv)
-    if Path("temp/patimokkha_word_by_word.csv").exists():
+    # Verify Patimokkha CSV (requires the study-tools source TSV)
+    if dpspth.pat_source_path.exists():
         assert pat_csv.exists(), f"Patimokkha CSV not found: {pat_csv}"
 
 

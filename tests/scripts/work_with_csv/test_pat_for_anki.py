@@ -1,4 +1,4 @@
-"""Golden-master tests for pat_for_anki.process_patimokkha_csv()."""
+"""Golden-master and filter tests for pat_for_anki.process_patimokkha_csv()."""
 
 import json
 from datetime import datetime
@@ -19,7 +19,6 @@ REAL_PAT_LINKS = Path("shared_data/sbs_csvs/pat_links.tsv").resolve()
 
 NORMAL_ROWS = [
     {
-        "col0": "1",
         "pali": "buddho",
         "pos": "noun",
         "grammar": "nom sg masc",
@@ -27,7 +26,6 @@ NORMAL_ROWS = [
         "source": "nidānuddeso",
     },
     {
-        "col0": "1",
         "pali": "dhammo",
         "pos": "noun",
         "grammar": "nom sg masc",
@@ -35,15 +33,13 @@ NORMAL_ROWS = [
         "source": "nidānuddeso",
     },
     {
-        "col0": "x",
         "pali": "saṅgho",
-        "pos": "noun",
+        "pos": "",
         "grammar": "nom sg masc",
         "meaning": "the community",
         "source": "nidānuddeso",
     },
     {
-        "col0": "1",
         "pali": "vinayo",
         "pos": "noun",
         "grammar": "nom sg masc",
@@ -56,9 +52,9 @@ NORMAL_ROWS = [
 def _write_input_csv(
     path: Path, rows: list[dict], *, include_meaning_col: bool = True
 ) -> None:
-    cols = ["col0", "pali", "pos", "grammar", "source"]
+    cols = ["pali", "pos", "grammar", "source"]
     if include_meaning_col:
-        cols.insert(4, "meaning")
+        cols.insert(3, "meaning")
     lines = ["\t".join(cols)]
     for row in rows:
         lines.append("\t".join(str(row.get(c, "")) for c in cols))
@@ -73,12 +69,10 @@ def _run(
     links_path: str | None = "real",
     sbs_dir_exists: bool = True,
 ) -> dict[str, str | None]:
-    temp_dir = tmp_path / "temp"
     anki_csvs_dir = tmp_path / "anki_csvs"
     sbs_style_dir = tmp_path / "sbs_style"
-    temp_dir.mkdir()
 
-    input_csv_path = temp_dir / "patimokkha_word_by_word.csv"
+    input_csv_path = tmp_path / "patimokkha_word_by_word.tsv"
     _write_input_csv(input_csv_path, rows, include_meaning_col=include_meaning_col)
 
     if links_path == "real":
@@ -95,19 +89,18 @@ def _run(
     if sbs_dir_exists:
         sbs_style_dir.mkdir()
 
-    fake_pth = type("FakePth", (), {"temp_dir": temp_dir})()
     fake_dpspth = type(
         "FakeDpspth",
         (),
         {
             "anki_csvs_dir": anki_csvs_dir,
             "pat_links_path": pat_links_path,
+            "pat_source_path": input_csv_path,
             "sbs_anki_style_dir": sbs_style_dir,
         },
     )()
 
     with (
-        patch.object(pat_for_anki, "pth", fake_pth),
         patch.object(pat_for_anki, "dpspth", fake_dpspth),
         patch("scripts.work_with_csv.pat_for_anki.datetime") as mock_dt,
     ):
@@ -168,7 +161,6 @@ def test_no_matching_rows_does_not_crash(tmp_path: Path) -> None:
     by a non-empty input where every row fails the filter."""
     rows = [
         {
-            "col0": "1",
             "pali": "x",
             "pos": "p",
             "grammar": "g",
@@ -176,9 +168,8 @@ def test_no_matching_rows_does_not_crash(tmp_path: Path) -> None:
             "source": "s",
         },
         {
-            "col0": "no",
             "pali": "y",
-            "pos": "p",
+            "pos": "",
             "grammar": "g",
             "meaning": "m",
             "source": "s",
@@ -191,39 +182,54 @@ def test_no_matching_rows_does_not_crash(tmp_path: Path) -> None:
     assert "pali" in lines[0]
 
 
-def test_numeric_first_column_does_not_crash(tmp_path: Path) -> None:
-    """Old code raised TypeError/LossySetitemError here on pandas 3.0 when the
-    first column was inferred as int64/float64 (e.g. all values are "1" or
-    blank, the realistic shape of this flag column). Fixed as part of this pass."""
-    rows = [
-        {
-            "col0": "1",
-            "pali": "buddho",
-            "pos": "noun",
-            "grammar": "g",
-            "meaning": "m1",
-            "source": "s",
-        },
-        {
-            "col0": "",
-            "pali": "dhammo",
-            "pos": "noun",
-            "grammar": "g",
-            "meaning": "m2",
-            "source": "s",
-        },
-        {
-            "col0": "1",
-            "pali": "vinayo",
-            "pos": "noun",
-            "grammar": "g",
-            "meaning": "m3",
-            "source": "s",
-        },
+def _rows(*specs: tuple[str, str, str]) -> list[dict]:
+    return [
+        {"pali": p, "pos": pos, "grammar": "g", "meaning": m, "source": "s"}
+        for p, pos, m in specs
     ]
-    result = _run(tmp_path, rows, links_path="missing")
+
+
+def _output_palis(result: dict[str, str | None]) -> list[str]:
     assert result["output_csv"] is not None
     lines = result["output_csv"].strip().splitlines()
-    assert len(lines) == 3
-    assert "buddho" in lines[1]
-    assert "vinayo" in lines[2]
+    return [line.split("\t")[0] for line in lines[1:]]
+
+
+def test_second_occurrence_of_a_word_is_dropped(tmp_path: Path) -> None:
+    rows = _rows(("buddho", "noun", "first"), ("buddho", "noun", "second"))
+    result = _run(tmp_path, rows, links_path="missing")
+    assert _output_palis(result) == ["buddho"]
+    assert "first" in str(result["output_csv"])
+    assert "second" not in str(result["output_csv"])
+
+
+def test_bold_wrapped_word_is_the_same_key(tmp_path: Path) -> None:
+    rows = _rows(
+        ("<b>buddho</b>", "noun", "bold first"),
+        (" buddho ", "noun", "plain second"),
+        ("dhammo", "noun", "other"),
+    )
+    result = _run(tmp_path, rows, links_path="missing")
+    assert _output_palis(result) == ["<b>buddho</b>", "dhammo"]
+
+
+def test_bold_tags_survive_in_output(tmp_path: Path) -> None:
+    rows = _rows(("<b>namo</b> tassa", "ind", "homage"))
+    result = _run(tmp_path, rows, links_path="missing")
+    assert _output_palis(result) == ["<b>namo</b> tassa"]
+
+
+def test_first_occurrence_ignores_rows_without_pos(tmp_path: Path) -> None:
+    """A word's earlier row with a blank pos (e.g. a sentence line) must not
+    use up its first occurrence."""
+    rows = _rows(("buddho", "", "sentence line"), ("buddho", "noun", "the Buddha"))
+    result = _run(tmp_path, rows, links_path="missing")
+    assert _output_palis(result) == ["buddho"]
+    assert "the Buddha" in str(result["output_csv"])
+
+
+def test_first_occurrence_without_meaning_drops_the_word(tmp_path: Path) -> None:
+    """The first pos-row decides: its empty meaning is not backfilled from a later row."""
+    rows = _rows(("buddho", "noun", ""), ("buddho", "noun", "later meaning"))
+    result = _run(tmp_path, rows, links_path="missing")
+    assert _output_palis(result) == []

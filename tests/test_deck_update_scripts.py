@@ -23,7 +23,9 @@ def test_update_decks_uses_pali_course_push_helper() -> None:
     )
 
 
-def test_patimokkha_download_clears_inherited_virtual_env() -> None:
-    """Cross-project uv runs should not warn about the dpd-db virtualenv."""
+def test_patimokkha_deck_reads_local_source_without_download() -> None:
+    """The Pātimokkha deck is built from the local TSV: no Sheet download, no xlsx2csv."""
     script = UPDATE_DECKS.read_text()
-    assert "env -u VIRTUAL_ENV uv run bash scripts/download_patimokkha.sh" in script
+    assert "scripts/work_with_csv/pat_for_anki.py" in script
+    assert "download_patimokkha" not in script
+    assert "xlsx2csv" not in script
