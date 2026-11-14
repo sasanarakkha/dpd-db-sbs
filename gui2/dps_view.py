@@ -626,8 +626,9 @@ class DpsView(ft.Column, PopUpMixin):
         for field_name, field_control in self.dps_fields.fields.items():
             # Preserve None values for dropdowns, convert empty strings to None for text fields
             if isinstance(field_control, ft.Dropdown):
-                # For dropdowns, preserve None values to allow clearing
-                values[field_name] = field_control.value
+                # The empty option's key is " "; strip so blank never reaches the DB
+                dropdown_value = (field_control.value or "").strip()
+                values[field_name] = dropdown_value or None
             else:
                 # For other fields, convert empty strings to None
                 values[field_name] = (
