@@ -5,7 +5,7 @@ Cycles 0001-0005 done and validated; ALL UNCOMMITTED. Backlog empty. Thread stay
 
 ## Uncommitted work
 - shared_data/pali_class/grammar/*.tsv (cycles 0001-0005; `samasa.tsv` was dirty BEFORE this thread — do not touch)
-- kamma/threads/20261109_grammar_tsv_fixes/ (records, learnings, handoff)
+- kamma/threads/loop_grammar_tsv_fixes/ (records, learnings, handoff)
 Draft commit messages are at the end of each `cycles/000N_*.md`. Stage by explicit file list; never stage `resources/` submodules.
 
 ## Closed decisions (no action)

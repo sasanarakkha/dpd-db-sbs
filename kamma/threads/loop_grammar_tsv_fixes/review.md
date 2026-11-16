@@ -11,7 +11,7 @@ re-run read-only and the two grammar test files executed.
 | Thread cycles 0001–0004 | 47 grammar TSVs (`shared_data/pali_class/grammar/`) | 443 changed cells |
 | Pre-thread, orphan | `grammar/samasa.tsv` | 1 cell (`kitaka` example `ceta` → `cetas`) — handoff says it was dirty before the thread, no cycle record |
 | Unrelated task | `docs/abbreviations.md`, `shared_data/reference/abbreviations.tsv`, `shared_data/reference_ru/abbreviations.tsv`, `tests/tools/test_docs_update_abbreviations_fixtures.json` | 1 row (`interr` explanation) |
-| New, untracked | `kamma/threads/20261109_grammar_tsv_fixes/` | thread docs + 4 cycles (~200 KB incl. audit report/proposals) |
+| New, untracked | `kamma/threads/loop_grammar_tsv_fixes/` | thread docs + 4 cycles (~200 KB incl. audit report/proposals) |
 
 ## Verified clean (grammar TSVs)
 
@@ -86,7 +86,7 @@ field-list `.md` files in the external `../sasanarakkha/study-tools` repo. Given
 
 ## Suggested commit split (nothing staged or committed)
 
-1. Grammar TSVs for cycles 0001–0004 + `kamma/threads/20261109_grammar_tsv_fixes/`
+1. Grammar TSVs for cycles 0001–0004 + `kamma/threads/loop_grammar_tsv_fixes/`
    (per-cycle draft messages are at the end of each `cycles/000N_*.md`).
 2. Abbreviations `interr` fix together with a regenerated
    `test_docs_update_abbreviations_fixtures.json`.
