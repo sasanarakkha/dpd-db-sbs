@@ -51,11 +51,21 @@ class ComparisonResult:
 class BatchProcessor:
     """Handles batch processing of AI meaning comparisons"""
 
-    def __init__(self, provider: str | None = None, model: str | None = None) -> None:
+    # When True, a non-JSON reply yields no verdict (word not checked, not cleared)
+    # instead of the keyword-based fallback guess. Used by modes that clear fields.
+    strict_parse: bool = False
+
+    def __init__(
+        self,
+        provider: str | None = None,
+        model: str | None = None,
+        strict_parse: bool = False,
+    ) -> None:
         self.ai_manager: AIManager = AIManager()
         self.json_parser: JSONParser = JSONParser()
         self.provider = provider
         self.model = model
+        self.strict_parse = strict_parse
 
     def extract_headword_id(self, result_dict: dict[str, Any]) -> int | None:
         """Safely extract headword_id from result dictionary"""
@@ -464,6 +474,10 @@ ONLY flag as MISMATCH if:
             return results
 
         except (json.JSONDecodeError, KeyError, ValueError):
+            if self.strict_parse:
+                pr.amber("AI response not in JSON format — no verdict (strict mode)")
+                return []
+
             # If JSON parsing fails, try to extract information manually
             pr.amber("AI response not in JSON format, trying manual parsing...")
 

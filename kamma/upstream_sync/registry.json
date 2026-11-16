@@ -158,13 +158,13 @@
       "discuss": false,
       "sync_rule": "PRESERVE",
       "local_changes": [
-        "`grounded_models` and work-model lists point at `antigravity_cli`/`deepseek` — the live quota-grounded config the kamma/translate pipeline depends on; upstream's list points at openrouter/gemini models.",
-        "Top-level keys (`antigravity_cli_work_models`, `default_models`, `grounded_models`) share upstream's schema, but the model values are fork-local and always take precedence over upstream's."
+        "`default_models` = translate-skill chain (DeepSeek Flash direct → OpenRouter fallback); `grounded_models` points at `deepseek` pro (+ OpenRouter) — the live config the kamma/translate pipeline depends on; upstream's list points at openrouter/gemini models.",
+        "Top-level keys (`default_models`, `grounded_models`) share upstream's schema, but the model values are fork-local and always take precedence over upstream's. The local-only `antigravity_cli_work_models` key was removed (2026-11-16, translate-skill overhaul)."
       ],
       "watch_for": [
         "Never overwrite with upstream's model list — it would break the translate pipeline's quota-grounded model selection. This file always stays local.",
         "Upstream `ai_manager.py` reads it via `ProjectPaths().ai_models_json_path`; if that path or the top-level key names change upstream, mirror only the structural/key change into the local file while keeping the local model values.",
-        "2026-11-05 sync: upstream dropped the `antigravity_cli_work_models` key; upstream `ai_manager.py` no longer reads it. Local key kept (read only by local tooling); `batch_runner.py` reads only `default_models`."
+        "2026-11-05 sync: upstream dropped the `antigravity_cli_work_models` key; the local copy of the key has since been removed too. `default_models` is the single translate-skill model chain."
       ],
       "why_discuss": "PRESERVE (discuss=false): active translate-pipeline config that must always stay local; never gates a sync."
     }

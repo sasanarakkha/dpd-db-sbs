@@ -1,4 +1,4 @@
-"""Run AI translation and checking operations in resumable chunks, defaulting to the DeepSeek-first provider chain from tools/ai_models.json."""
+"""Run AI translation and checking operations in resumable chunks, walking the default_models chain from tools/ai_models.json."""
 
 import argparse
 import json
@@ -9,12 +9,13 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from kamma.translate.scripts.offpeak import require_offpeak
+from kamma.translate.scripts.session_log import append_log_line, format_session_line
 from tools.printer import printer as pr
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 STATE_PATH = PROJECT_ROOT / "kamma" / "translate" / "state.json"
 LOG_PATH = PROJECT_ROOT / "kamma" / "translate" / "log.md"
-AI_MODELS_PATH = PROJECT_ROOT / "tools" / "ai_models.json"
 GENERATE_SCRIPT = (
     PROJECT_ROOT / "kamma" / "translate" / "scripts" / "ai_generate_translation.py"
 )
@@ -35,12 +36,12 @@ STATUS_GENERATE_PROBES: list[tuple[str, str]] = [
 
 _ROWS_FILTERED_RE = re.compile(r"Rows filtered for the process: (\d+) / (\d+)")
 _WORDS_TO_ANALYZE_RE = re.compile(r"Found (\d+) words to analyze")
+_CHECKED_RE = re.compile(r"^checked (\d+)\s*$", re.MULTILINE)
 
 
 def default_state() -> dict[str, Any]:
     """Return the default persisted-state shape."""
     return {
-        "window_start": None,
         "last_op": None,
         "totals": {"generated": 0, "checked": 0},
     }
@@ -50,32 +51,15 @@ def load_state(path: Path) -> dict[str, Any]:
     """Load persisted state, falling back to the default shape if the file is missing."""
     if not path.exists():
         return default_state()
-    return json.loads(path.read_text(encoding="utf-8"))
+    state = json.loads(path.read_text(encoding="utf-8"))
+    state.pop("window_start", None)  # retired key
+    return state
 
 
 def save_state(path: Path, state: dict[str, Any]) -> None:
     """Persist state as JSON."""
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(state, indent=2, ensure_ascii=False), encoding="utf-8")
-
-
-def load_default_provider_model() -> tuple[str, str]:
-    """Return the (provider, model) pair from ai_models.json's default_models[0].
-
-    Deliberately reads only "default_models" (never "antigravity_cli_work_models")
-    so an unset --provider/--model never routes through antigravity_cli.
-    """
-    data = json.loads(AI_MODELS_PATH.read_text(encoding="utf-8"))
-    first = data["default_models"][0]
-    return first["provider"], first["model"]
-
-
-def _resolve_provider_model(provider: str | None, model: str | None) -> tuple[str, str]:
-    """Return (provider, model), substituting the ai_models.json default pair when both are unset."""
-    if provider is None and model is None:
-        return load_default_provider_model()
-    assert provider is not None and model is not None
-    return provider, model
 
 
 def parse_generate_counts(output: str) -> tuple[int, int] | None:
@@ -92,6 +76,20 @@ def parse_check_attempted(output: str) -> int | None:
     if match is None:
         return None
     return int(match.group(1))
+
+
+def parse_check_ok(output: str) -> int:
+    """Parse the checker's "checked N" line (words with a parsed verdict); 0 when missing."""
+    match = _CHECKED_RE.search(output)
+    return int(match.group(1)) if match else 0
+
+
+def check_chunk_result(output: str, returncode: int) -> tuple[int, int]:
+    """Return (attempted, ok) for one check chunk from the checker's stdout and exit code."""
+    attempted_val = parse_check_attempted(output)
+    attempted = attempted_val if attempted_val is not None else 0
+    ok = parse_check_ok(output) if returncode == 0 else 0
+    return attempted, ok
 
 
 def read_generated_ids(path: Path, since: datetime) -> list[int]:
@@ -133,12 +131,10 @@ def build_generate_command(
 ) -> list[str]:
     """Build the subprocess command for a real (non-dry-run) generate chunk.
 
-    Falls back to load_default_provider_model() when neither is given, so the
-    call always passes both flags together and never drops into the workhorse
-    script's own antigravity-first default chain.
+    Provider flags are passed only when an explicit pair is given; otherwise the
+    workhorse walks the default_models chain.
     """
-    provider, model = _resolve_provider_model(provider, model)
-    return [
+    cmd = [
         "uv",
         "run",
         "python3",
@@ -149,11 +145,10 @@ def build_generate_command(
         lang,
         "-limit",
         str(chunk),
-        "-provider",
-        provider,
-        "-model",
-        model,
     ]
+    if provider and model:
+        cmd += ["-provider", provider, "-model", model]
+    return cmd
 
 
 def build_status_probe_command(mode: str, lang: str) -> list[str]:
@@ -178,12 +173,10 @@ def build_check_command(
 ) -> list[str]:
     """Build the subprocess command for a check chunk.
 
-    Falls back to load_default_provider_model() when neither is given, so the
-    call always passes both flags together and never drops into the workhorse
-    script's own antigravity-first default chain.
+    Provider flags are passed only when an explicit pair is given; otherwise the
+    workhorse walks the default_models chain.
     """
-    provider, model = _resolve_provider_model(provider, model)
-    return [
+    cmd = [
         "uv",
         "run",
         "python3",
@@ -192,11 +185,10 @@ def build_check_command(
         mode,
         "--limit",
         str(chunk),
-        "--provider",
-        provider,
-        "--model",
-        model,
     ]
+    if provider and model:
+        cmd += ["--provider", provider, "--model", model]
+    return cmd
 
 
 def run_subprocess_capture(cmd: list[str]) -> tuple[str, int]:
@@ -213,16 +205,9 @@ def run_subprocess_capture(cmd: list[str]) -> tuple[str, int]:
     return "".join(lines), process.returncode
 
 
-def append_log(path: Path, line: str) -> None:
-    """Append a single line to the append-only run log."""
-    with path.open("a", encoding="utf-8") as f:
-        f.write(line + "\n")
-
-
 def print_status() -> None:
     """Print persisted state, generate-pool pending counts, and checker snapshot sizes."""
     state = load_state(STATE_PATH)
-    pr.white(f"window_start: {state['window_start']}")
     pr.white(f"last_op: {state['last_op']}")
     pr.white(f"totals: {state['totals']}")
 
@@ -272,6 +257,77 @@ def print_status() -> None:
         pr.white(f"  {mode}: {n} already checked")
 
 
+def _peak_gate(chunks_run: int, allow_peak: bool) -> bool:
+    """Return True to start the next chunk. The first chunk may exit 1 via the guard;
+    a later chunk hitting peak (or an unrecorded holiday year) stops the session cleanly."""
+    if chunks_run == 0:
+        require_offpeak(allow_peak)
+        return True
+    try:
+        require_offpeak(allow_peak)
+    except SystemExit:
+        pr.amber("peak hours started — stopping")
+        return False
+    return True
+
+
+def _run_chunks(
+    args: argparse.Namespace, state: dict[str, Any], totals: dict[str, int]
+) -> int:
+    """Run chunks until done/failure/cap; return the process exit code."""
+    while True:
+        if args.max_chunks and totals["chunks"] >= args.max_chunks:
+            pr.green(f"Reached --max-chunks ({args.max_chunks}) — stopping.")
+            return 0
+
+        if not _peak_gate(totals["chunks"], args.allow_peak):
+            return 0
+
+        chunk_start = datetime.now().astimezone()
+        if args.op == "generate":
+            cmd = build_generate_command(
+                args.mode, args.lang, args.chunk, args.provider, args.model
+            )
+        else:
+            cmd = build_check_command(args.mode, args.chunk, args.provider, args.model)
+
+        pr.cyan(f"Running: {' '.join(cmd)}")
+        output, returncode = run_subprocess_capture(cmd)
+        totals["chunks"] += 1
+
+        if args.op == "generate":
+            counts = parse_generate_counts(output)
+            attempted = counts[0] if counts else 0
+            new_ids = read_generated_ids(LAST_TRANSLATED_PATH, chunk_start)
+            ok = len(new_ids)
+            if new_ids:
+                merged = merge_processed_ids(PROCESSED_IDS_PATH, new_ids)
+                PROCESSED_IDS_PATH.parent.mkdir(parents=True, exist_ok=True)
+                PROCESSED_IDS_PATH.write_text(json.dumps(merged), encoding="utf-8")
+        else:
+            attempted, ok = check_chunk_result(output, returncode)
+
+        totals["attempted"] += attempted
+        totals["ok"] += ok
+
+        state["totals"]["generated" if args.op == "generate" else "checked"] += ok
+        state["last_op"] = args.op
+        save_state(STATE_PATH, state)
+
+        if attempted == 0:
+            pr.green("pool empty — done")
+            return 0
+
+        if ok == 0 and attempted > 0:
+            pr.red("All providers failing — stopping (will not loop forever).")
+            rerun_cmd = (
+                f"uv run python3 kamma/translate/scripts/batch_runner.py "
+                f"--op {args.op} --mode {args.mode} --lang {args.lang} --chunk {args.chunk}"
+            )
+            pr.white(f"Re-run with: {rerun_cmd}")
+            return 2
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Run AI translation/checking operations in resumable chunks."
@@ -307,12 +363,17 @@ def main() -> None:
     )
     parser.add_argument(
         "--provider",
-        help="explicit provider preference to pass to workhorse script "
-        "(must be given together with --model; default: ai_models.json default_models[0])",
+        help="explicit provider to pin (must be given together with --model; "
+        "default: the workhorse walks the default_models chain)",
     )
     parser.add_argument(
         "--model",
-        help="explicit model to pass to workhorse script (must be given together with --provider)",
+        help="explicit model to pin (must be given together with --provider)",
+    )
+    parser.add_argument(
+        "--allow-peak",
+        action="store_true",
+        help="run during DeepSeek peak hours (full price)",
     )
     args = parser.parse_args()
 
@@ -326,69 +387,37 @@ def main() -> None:
     if bool(args.provider) != bool(args.model):
         parser.error(
             "--provider and --model must be given together (or neither) — a lone "
-            "--provider falls through to the workhorse script's antigravity-first "
-            "default chain."
+            "--provider would be ignored and the default_models chain used."
         )
 
     state = load_state(STATE_PATH)
-
-    chunks_run = 0
-    while True:
-        if args.max_chunks and chunks_run >= args.max_chunks:
-            pr.green(f"Reached --max-chunks ({args.max_chunks}) — stopping.")
-            sys.exit(0)
-
-        chunk_start = datetime.now().astimezone()
-        if args.op == "generate":
-            cmd = build_generate_command(
-                args.mode, args.lang, args.chunk, args.provider, args.model
-            )
-        else:
-            cmd = build_check_command(args.mode, args.chunk, args.provider, args.model)
-
-        pr.cyan(f"Running: {' '.join(cmd)}")
-        output, returncode = run_subprocess_capture(cmd)
-        chunks_run += 1
-
-        if args.op == "generate":
-            counts = parse_generate_counts(output)
-            attempted = counts[0] if counts else 0
-            new_ids = read_generated_ids(LAST_TRANSLATED_PATH, chunk_start)
-            ok = len(new_ids)
-            if new_ids:
-                merged = merge_processed_ids(PROCESSED_IDS_PATH, new_ids)
-                PROCESSED_IDS_PATH.parent.mkdir(parents=True, exist_ok=True)
-                PROCESSED_IDS_PATH.write_text(json.dumps(merged), encoding="utf-8")
-        else:
-            attempted_val = parse_check_attempted(output)
-            attempted = attempted_val if attempted_val is not None else 0
-            ok = attempted if returncode == 0 else 0
-
-        now_iso = datetime.now().astimezone().isoformat()
-        append_log(
+    totals = {"chunks": 0, "attempted": 0, "ok": 0}
+    start = datetime.now().astimezone().isoformat()
+    exit_code = 1
+    try:
+        exit_code = _run_chunks(args, state, totals)
+    except SystemExit as exc:
+        exit_code = exc.code if isinstance(exc.code, int) else 1
+        raise
+    finally:
+        end = datetime.now().astimezone().isoformat()
+        append_log_line(
             LOG_PATH,
-            f"- {now_iso} | op={args.op} mode={args.mode} lang={args.lang if args.op == 'generate' else '-'} "
-            f"chunk={args.chunk} attempted={attempted} ok={ok}",
+            format_session_line(
+                start,
+                end,
+                {
+                    "op": args.op,
+                    "mode": args.mode,
+                    "lang": args.lang if args.op == "generate" else "-",
+                    "chunks": totals["chunks"],
+                    "attempted": totals["attempted"],
+                    "ok": totals["ok"],
+                },
+                exit_code,
+            ),
         )
-
-        state["totals"]["generated" if args.op == "generate" else "checked"] += ok
-        state["last_op"] = args.op
-        if ok > 0 and state.get("window_start") is None:
-            state["window_start"] = now_iso
-        save_state(STATE_PATH, state)
-
-        if attempted == 0:
-            pr.green("pool empty — done")
-            sys.exit(0)
-
-        if ok == 0 and attempted > 0:
-            pr.red("All providers failing — stopping (will not loop forever).")
-            rerun_cmd = (
-                f"uv run python3 kamma/translate/scripts/batch_runner.py "
-                f"--op {args.op} --mode {args.mode} --lang {args.lang} --chunk {args.chunk}"
-            )
-            pr.white(f"Re-run with: {rerun_cmd}")
-            sys.exit(2)
+    sys.exit(exit_code)
 
 
 if __name__ == "__main__":

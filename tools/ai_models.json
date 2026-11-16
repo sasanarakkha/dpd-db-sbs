@@ -1,16 +1,8 @@
 {
-  "antigravity_cli_work_models": [
-    {
-      "provider": "antigravity_cli",
-      "model": "Gemini 3.8 Flash (Low)",
-      "delay": 0,
-      "timeout": 150
-    }
-  ],
   "default_models": [
     {
       "provider": "deepseek",
-      "model": "deepseek-v4-flash",
+      "model": "deepseek-flash",
       "delay": 0
     },
     {

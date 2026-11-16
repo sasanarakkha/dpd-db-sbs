@@ -1,6 +1,6 @@
 # Translate pipeline log
 
-Append-only. One line per chunk/run: `YYYY-MM-DD HH:MM | op mode lang | ok/attempted | note`
+Append-only. One line per session: `- <start ISO> → <end ISO> | op=… mode=… lang=… chunks=N attempted=A ok=O exit=<code>` (audit runs: `op=4 … field=…`). Lines dated before 2026-11-16 use the older per-chunk format.
 
 ---
 - 2026-07-06T20:43:33.526002+08:00 | op=check mode=meaning lang=- chunk=1 attempted=1 ok=1

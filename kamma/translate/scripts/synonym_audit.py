@@ -17,6 +17,12 @@ from sqlalchemy.orm import Session
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword, Russian, Tamil
+from kamma.translate.scripts.offpeak import require_offpeak
+from kamma.translate.scripts.session_log import (
+    append_log_line,
+    format_session_line,
+    update_state,
+)
 from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 
@@ -26,6 +32,8 @@ if TYPE_CHECKING:
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 REPORT_DIR = PROJECT_ROOT / "temp" / "synonym_audit"
 CACHE_PATH = REPORT_DIR / "judgments.jsonl"
+LOG_PATH = PROJECT_ROOT / "kamma" / "translate" / "log.md"
+STATE_PATH = PROJECT_ROOT / "kamma" / "translate" / "state.json"
 
 FIELD_MODEL: dict[str, type[Russian] | type[Tamil]] = {
     "ru_meaning": Russian,
@@ -35,6 +43,7 @@ FIELD_MODEL: dict[str, type[Russian] | type[Tamil]] = {
 
 _BRACKETS_RE = re.compile(r"\([^)]*\)")
 _WHITESPACE_RE = re.compile(r"\s+")
+_FENCE_RE = re.compile(r"^```[a-zA-Z]*\s*(.*?)\s*```$", re.DOTALL)
 
 JUDGE_SYSTEM_PROMPT = """You are a Russian lexicographer editing a Pāli–Russian dictionary. For each
 entry you receive the Pāli headword, its English glosses, and a numbered list
@@ -62,8 +71,22 @@ MAX_CONSECUTIVE_FAILURES = 5
 
 
 def split_meanings(field: str) -> list[str]:
-    """Split a `;`-joined meaning field into stripped, non-empty parts."""
-    return [part.strip() for part in field.split(";") if part.strip()]
+    """Split a `;`-joined meaning field into stripped, non-empty parts, ignoring `;` inside brackets."""
+    parts: list[str] = []
+    current: list[str] = []
+    depth = 0
+    for char in field:
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth = max(0, depth - 1)
+        if char == ";" and depth == 0:
+            parts.append("".join(current))
+            current = []
+        else:
+            current.append(char)
+    parts.append("".join(current))
+    return [part.strip() for part in parts if part.strip()]
 
 
 def normalize(part: str) -> str:
@@ -74,12 +97,19 @@ def normalize(part: str) -> str:
     return text.rstrip(".").strip()
 
 
+def strict_key(part: str) -> str:
+    """Key for strict duplicates: case, ё and trailing dot ignored, brackets kept."""
+    text = part.lower().replace("ё", "е")
+    text = _WHITESPACE_RE.sub(" ", text).strip()
+    return text.rstrip(".").strip()
+
+
 def find_exact_dups(parts: list[str]) -> list[int]:
-    """Return indexes of parts whose normalized form already appeared earlier."""
+    """Return indexes of parts whose strict key already appeared earlier."""
     seen: set[str] = set()
     dup_indexes: list[int] = []
     for i, part in enumerate(parts):
-        norm = normalize(part)
+        norm = strict_key(part)
         if norm in seen:
             dup_indexes.append(i)
         else:
@@ -147,6 +177,13 @@ def _is_literal_gloss(part: str) -> bool:
     return part.strip().lower().startswith("досл.")
 
 
+def _strip_fences(content: str) -> str:
+    """Remove a surrounding markdown code fence (``` or ```json) from a reply."""
+    text = content.strip()
+    match = _FENCE_RE.match(text)
+    return match.group(1).strip() if match else text
+
+
 def parse_judge_response(
     content: str | None, entries: list[JudgeEntry]
 ) -> dict[int, set[int] | None] | None:
@@ -170,7 +207,7 @@ def parse_judge_response(
     if content is None:
         return None
     try:
-        parsed = json.loads(content)
+        parsed = json.loads(_strip_fences(content))
     except json.JSONDecodeError:
         return None
     if not isinstance(parsed, dict):
@@ -265,17 +302,73 @@ def append_judgment(path: Path, record: CacheRecord) -> None:
         f.write(json.dumps(asdict(record), ensure_ascii=False) + "\n")
 
 
+def find_cached_judgment(
+    cache: dict[tuple[int, str, str, str], CacheRecord],
+    entry_id: int,
+    field: str,
+    vhash: str,
+) -> CacheRecord | None:
+    """Return the latest non-failed judgment for an entry from any model, else None."""
+    best: CacheRecord | None = None
+    for (rec_id, rec_field, rec_hash, _model), record in cache.items():
+        if (rec_id, rec_field, rec_hash) != (entry_id, field, vhash):
+            continue
+        if record.verdict == "failed":
+            continue
+        if best is None or record.timestamp > best.timestamp:
+            best = record
+    return best
+
+
+def update_failure_streak(streak: int, request_failures: int, any_success: bool) -> int:
+    """Consecutive failed AI requests; any successful request resets it."""
+    if any_success:
+        return 0
+    return streak + request_failures
+
+
+@dataclass
+class JudgeResult:
+    """Outcome of judging one batch with one model or a model chain."""
+
+    verdicts: dict[int, set[int] | None]
+    request_failures: int
+    any_success: bool
+    model: str
+    transport_failed: bool = False
+
+
+def resolve_chain(
+    ai_manager: "AIManager", provider: str | None, model: str | None
+) -> list[tuple[str, str]]:
+    """Explicit pair -> only that pair; otherwise the initialised DEFAULT_MODELS pairs in order."""
+    if provider and model:
+        return [(provider, model)]
+    return [
+        (prov, mod)
+        for prov, mod, *_ in ai_manager.DEFAULT_MODELS
+        if prov in ai_manager.providers
+    ]
+
+
+# Request outcome states.
+_OK = "ok"
+_UNPARSEABLE = "unparseable"
+_TRANSPORT = "transport"
+
+
 def _judge_request(
     ai_manager: "AIManager",
     entries: list[JudgeEntry],
     provider: str | None,
     model: str | None,
-) -> tuple[dict[int, set[int] | None] | None, bool]:
-    """Make one judge request for a batch. Returns (parsed, request_ok).
+) -> tuple[dict[int, set[int] | None] | None, str]:
+    """Make one judge request for a batch. Returns (parsed, state).
 
-    request_ok is False when the response cannot be parsed as the required
-    batch JSON object. Per-entry validation failures inside a parsed batch do
-    not mark the whole request failed.
+    state is `transport` when the provider raised or returned no content,
+    `unparseable` when content could not be parsed as the batch JSON object,
+    else `ok`. Per-entry validation failures inside a parsed batch do not mark
+    the whole request failed.
     """
     prompt = build_judge_prompt(entries)
     try:
@@ -287,9 +380,11 @@ def _judge_request(
         )
     except Exception as exc:  # noqa: BLE001 - provider/client failures should enter retry flow.
         pr.red(f"AI judge request failed: {exc}")
-        return None, False
+        return None, _TRANSPORT
+    if response.content is None:
+        return None, _TRANSPORT
     parsed = parse_judge_response(response.content, entries)
-    return parsed, parsed is not None
+    return parsed, (_OK if parsed is not None else _UNPARSEABLE)
 
 
 def judge_entries(
@@ -297,37 +392,81 @@ def judge_entries(
     entries: list[JudgeEntry],
     provider: str | None,
     model: str | None,
-) -> tuple[dict[int, set[int] | None], int]:
-    """Judge a batch of entries: one retry on batch failure, then per-entry fallback.
+) -> JudgeResult:
+    """Judge a batch with one pair: one retry on batch failure, then per-entry fallback.
 
-    Returns (verdict by entry id, count of failed AI requests encountered).
+    `transport_failed` is set when a request pair failed twice at transport
+    level (no content / exception); the caller may then try the next pair.
+    """
+    model_label = model or "default"
+    request_failures = 0
+    any_success = False
+
+    def attempt(
+        batch: list[JudgeEntry],
+    ) -> tuple[dict[int, set[int] | None] | None, bool]:
+        """Request twice; return (parsed, transport_failed_both_times)."""
+        nonlocal request_failures, any_success
+        states: list[str] = []
+        for n in range(2):
+            parsed, state = _judge_request(ai_manager, batch, provider, model)
+            if state == _OK:
+                any_success = True
+                return parsed, False
+            request_failures += 1
+            states.append(state)
+            if n == 0:
+                time.sleep(RETRY_SLEEP_SECONDS)
+        return None, all(state == _TRANSPORT for state in states)
+
+    parsed, both_transport = attempt(entries)
+    if parsed is not None:
+        return JudgeResult(parsed, request_failures, any_success, model_label)
+    if both_transport:
+        return JudgeResult(
+            {entry.id: None for entry in entries},
+            request_failures,
+            any_success,
+            model_label,
+            transport_failed=True,
+        )
+
+    # Batch judging failed twice (unparseable) — judge entries individually.
+    results: dict[int, set[int] | None] = {}
+    transport_failed = False
+    for entry in entries:
+        single, single_transport = attempt([entry])
+        transport_failed = transport_failed or single_transport
+        results[entry.id] = single[entry.id] if single is not None else None
+    return JudgeResult(
+        results, request_failures, any_success, model_label, transport_failed
+    )
+
+
+def judge_with_chain(
+    ai_manager: "AIManager",
+    entries: list[JudgeEntry],
+    chain: list[tuple[str, str]],
+) -> JudgeResult:
+    """Judge a batch walking `chain`; advance only on transport failure.
+
+    The returned result's `model` is the pair that answered (or the last pair
+    tried when every pair failed at transport level).
     """
     request_failures = 0
-    parsed, ok = _judge_request(ai_manager, entries, provider, model)
-    if not ok:
-        request_failures += 1
-    if parsed is None:
-        time.sleep(RETRY_SLEEP_SECONDS)
-        parsed, ok = _judge_request(ai_manager, entries, provider, model)
-        if not ok:
-            request_failures += 1
-
-    if parsed is not None:
-        return parsed, request_failures
-
-    # Batch judging failed twice — fall back to judging entries individually.
-    results: dict[int, set[int] | None] = {}
-    for entry in entries:
-        single, ok = _judge_request(ai_manager, [entry], provider, model)
-        if not ok:
-            request_failures += 1
-        if single is None:
-            time.sleep(RETRY_SLEEP_SECONDS)
-            single, ok = _judge_request(ai_manager, [entry], provider, model)
-            if not ok:
-                request_failures += 1
-        results[entry.id] = single[entry.id] if single is not None else None
-    return results, request_failures
+    any_success = False
+    last: JudgeResult | None = None
+    for provider, model in chain:
+        last = judge_entries(ai_manager, entries, provider, model)
+        request_failures += last.request_failures
+        any_success = any_success or last.any_success
+        if not last.transport_failed:
+            break
+    if last is None:
+        return JudgeResult({entry.id: None for entry in entries}, 0, False, "none")
+    return JudgeResult(
+        last.verdicts, request_failures, any_success, last.model, last.transport_failed
+    )
 
 
 def _tsv_safe(value: str) -> str:
@@ -335,9 +474,164 @@ def _tsv_safe(value: str) -> str:
     return value.replace("\t", " ").replace("\n", " ").replace("\r", " ")
 
 
-def main() -> None:
+TSV_HEADER: list[str] = [
+    "id",
+    "field",
+    "lemma",
+    "english",
+    "current_value",
+    "proposed_value",
+    "dropped",
+    "max_ratio",
+    "verdict",
+    "judge_model",
+    "decision",
+]
+
+_REJECT_DECISIONS = {"n", "no", "skip"}
+
+
+def build_tsv_row(
+    *,
+    entry_id: int,
+    field: str,
+    lemma: str,
+    english: str,
+    current_value: str,
+    proposed_value: str,
+    parts: list[str],
+    drop: set[int],
+    max_ratio: float,
+    verdict: str,
+    judge_model: str,
+) -> list[str]:
+    """Build one review-TSV row in TSV_HEADER order; `decision` is left empty for the reviewer."""
+    dropped = " | ".join(parts[i] for i in sorted(drop))
+    return [
+        str(entry_id),
+        field,
+        _tsv_safe(lemma),
+        _tsv_safe(english),
+        _tsv_safe(current_value),
+        _tsv_safe(proposed_value),
+        _tsv_safe(dropped),
+        f"{max_ratio:.4f}",
+        verdict,
+        judge_model,
+        "",
+    ]
+
+
+class TsvFieldMismatchError(ValueError):
+    """A review TSV row targets a different field than the one being applied."""
+
+
+def apply_review_tsv(
+    session: Session,
+    model_cls: type[Russian] | type[Tamil],
+    field: str,
+    tsv_path: Path,
+    applied_path: Path,
+) -> dict[str, int]:
+    """Apply a reviewed TSV: write approved rows, committing and logging each one.
+
+    A row is rejected (`decision` n/no/skip), unchanged (empty or identical
+    `proposed_value`), stale (DB value differs from `current_value`), or
+    applied. Any row with a different `field` aborts before any write.
+    """
+    with tsv_path.open(encoding="utf-8", newline="") as f:
+        rows = list(csv.DictReader(f, delimiter="\t"))
+
+    wrong = [row for row in rows if row.get("field") != field]
+    if wrong:
+        raise TsvFieldMismatchError(
+            f"{len(wrong)} row(s) in {tsv_path.name} have a field other than {field!r} "
+            f"(first: id {wrong[0].get('id')}, field {wrong[0].get('field')!r}); nothing applied."
+        )
+
+    totals = {"applied": 0, "rejected": 0, "unchanged": 0, "stale": 0}
+    applied_path.parent.mkdir(parents=True, exist_ok=True)
+    new_file = not applied_path.exists()
+    with applied_path.open("a", encoding="utf-8", newline="") as out:
+        writer = csv.writer(out, delimiter="\t")
+        if new_file:
+            writer.writerow(["id", "field", "old", "new"])
+        for row in rows:
+            decision = (row.get("decision") or "").strip().lower()
+            current = row.get("current_value") or ""
+            proposed = row.get("proposed_value") or ""
+            if decision in _REJECT_DECISIONS:
+                totals["rejected"] += 1
+                continue
+            if not proposed or proposed == current:
+                totals["unchanged"] += 1
+                continue
+            record = session.get(model_cls, int(row["id"]))
+            if record is None:
+                totals["stale"] += 1
+                continue
+            db_value = str(getattr(record, field) or "")
+            if db_value != current:
+                totals["stale"] += 1
+                continue
+            setattr(record, field, proposed)
+            session.commit()
+            writer.writerow(
+                [row["id"], field, _tsv_safe(db_value), _tsv_safe(proposed)]
+            )
+            out.flush()
+            totals["applied"] += 1
+    return totals
+
+
+def append_audit_log(
+    log_path: Path,
+    *,
+    start: str,
+    end: str,
+    mode: str,
+    field: str,
+    flagged: int,
+    changed: int,
+    exit_code: int,
+) -> None:
+    """Append one session line for an audit run, in the same format as batch_runner."""
+    line = format_session_line(
+        start,
+        end,
+        {
+            "op": 4,
+            "mode": mode,
+            "lang": "ru",
+            "chunks": 0,
+            "attempted": flagged,
+            "ok": changed,
+            "field": field,
+        },
+        exit_code,
+    )
+    append_log_line(log_path, line)
+
+
+def record_last_audit(
+    state_path: Path, *, field: str, mode: str, flagged: int, ts: str
+) -> None:
+    """Set state.json `last_audit`, preserving all other keys."""
+    update_state(
+        state_path,
+        {"last_audit": {"field": field, "mode": mode, "flagged": flagged, "ts": ts}},
+    )
+
+
+def _now_iso() -> str:
+    return datetime.datetime.now().astimezone().isoformat()
+
+
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Audit and optionally trim duplicate/near-identical synonyms in a meaning field."
+        description="Audit duplicate/near-identical synonyms in a meaning field. "
+        "Default: report only. --ai judges (no writes). --fix removes strict "
+        "duplicates. --apply-tsv applies a reviewed TSV."
     )
     parser.add_argument(
         "--field",
@@ -351,17 +645,24 @@ def main() -> None:
     parser.add_argument(
         "--fix",
         action="store_true",
-        help="apply safe fixes to the DB (exact normalized duplicates only)",
+        help="apply safe fixes to the DB (strict duplicates only; brackets are kept)",
     )
     parser.add_argument(
         "--ai",
         action="store_true",
-        help="additionally judge flagged entries with AIManager (judge only, no DB writes)",
+        help="judge flagged entries with the model chain (judge only, no DB writes)",
     )
     parser.add_argument(
-        "--fix-ai",
+        "--apply-tsv",
+        type=Path,
+        default=None,
+        metavar="PATH",
+        help="apply a reviewed review.tsv to the DB (no AI, no cache)",
+    )
+    parser.add_argument(
+        "--allow-peak",
         action="store_true",
-        help="judge uncached flagged entries, then trim cached AI-confirmed duplicates (implies --ai)",
+        help="run --ai during DeepSeek peak hours (full price)",
     )
     parser.add_argument(
         "--threshold",
@@ -371,8 +672,8 @@ def main() -> None:
     )
     parser.add_argument(
         "--provider",
-        help="explicit AI provider preference (must be given together with --model; "
-        "default: AIManager's default fallback chain)",
+        help="explicit AI provider (must be given together with --model; "
+        "default: the default_models chain)",
     )
     parser.add_argument(
         "--model",
@@ -390,8 +691,11 @@ def main() -> None:
         default=0,
         help="stop after N new AI judgments this run (default: 0 = unlimited)",
     )
-    args = parser.parse_args()
+    return parser
 
+
+def validate_args(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
+    """Reject invalid flag combinations via parser.error (exit code 2)."""
     if bool(args.provider) != bool(args.model):
         parser.error(
             "--provider and --model must be given together (or neither) — a lone "
@@ -402,11 +706,42 @@ def main() -> None:
         parser.error("--batch-size must be at least 1")
     if args.max_judgments < 0:
         parser.error("--max-judgments must be 0 or greater")
+    if args.apply_tsv is not None and (args.ai or args.fix or args.limit is not None):
+        parser.error("--apply-tsv cannot be combined with --ai, --fix or --limit")
+    if args.ai and args.field == "ta_meaning":
+        parser.error("Tamil judge not supported")
 
-    use_ai = args.ai or args.fix_ai
-    model_key = args.model or "default"
 
+def run_apply_tsv(args: argparse.Namespace) -> tuple[int, int]:
+    """Apply a reviewed TSV. Returns (rows read, rows applied)."""
+    model_cls = FIELD_MODEL[args.field]
+    pth = ProjectPaths(base_dir=PROJECT_ROOT)
+    db_session: Session = get_db_session(pth.dpd_db_path)
+    timestamp = datetime.datetime.now().astimezone().strftime("%Y-%m-%d_%H-%M-%S")
+    applied_path = REPORT_DIR / f"{timestamp}_applied.tsv"
+    try:
+        totals = apply_review_tsv(
+            db_session, model_cls, args.field, args.apply_tsv, applied_path
+        )
+    except TsvFieldMismatchError as exc:
+        db_session.close()
+        pr.red(str(exc))
+        sys.exit(1)
+    db_session.close()
+    pr.white(
+        f"Applied: {totals['applied']}, rejected: {totals['rejected']}, "
+        f"unchanged: {totals['unchanged']}, stale: {totals['stale']}"
+    )
+    if totals["applied"]:
+        pr.white(f"Undo record: {applied_path}")
+    return sum(totals.values()), totals["applied"]
+
+
+def run_audit(args: argparse.Namespace) -> tuple[int, int]:
+    """Report / judge / strict-fix run. Returns (rows flagged, rows fixed)."""
+    use_ai = args.ai
     ai_manager: "AIManager | None" = None  # noqa: UP037 (local import below shadows the name)
+    chain: list[tuple[str, str]] = []
     if use_ai:
         from tools.ai_manager import AIManager
 
@@ -416,6 +751,10 @@ def main() -> None:
                 f"--provider {args.provider!r} is not initialized in AIManager.providers "
                 f"({sorted(ai_manager.providers)}); check API keys/config before re-running."
             )
+            sys.exit(1)
+        chain = resolve_chain(ai_manager, args.provider, args.model)
+        if not chain:
+            pr.red("No initialised provider in default_models; check API keys/config.")
             sys.exit(1)
 
     model_cls = FIELD_MODEL[args.field]
@@ -427,6 +766,7 @@ def main() -> None:
         db_session.query(DpdHeadword, model_cls)
         .join(model_cls, DpdHeadword.id == model_cls.id)
         .filter(field_column.isnot(None), field_column != "")
+        .order_by(DpdHeadword.id)
     )
     if args.limit:
         query = query.limit(args.limit)
@@ -481,14 +821,12 @@ def main() -> None:
                 parts=item["parts"],
             )
             item["judge_entry"] = entry
-            cache_key = (entry.id, entry.field, variants_hash(entry.parts), model_key)
-            cached = cache.get(cache_key)
+            cached = find_cached_judgment(
+                cache, entry.id, entry.field, variants_hash(entry.parts)
+            )
             if cached is not None:
-                item["verdict"] = (
-                    None
-                    if cached.verdict == "failed"
-                    else set(cached.drop_indexes or [])
-                )
+                item["verdict"] = set(cached.drop_indexes or [])
+                item["judge_model"] = cached.model
                 n_ai_cached += 1
                 continue
             to_judge.append(entry)
@@ -507,24 +845,23 @@ def main() -> None:
             item["judge_entry"].id: item for item in flagged if "judge_entry" in item
         }
 
-        consecutive_failures = 0
+        failure_streak = 0
         for batch_index, batch in enumerate(batches):
-            verdicts, _request_failures = judge_entries(
-                ai_manager, batch, args.provider, args.model
-            )
-            failed_entries = sum(1 for entry in batch if verdicts.get(entry.id) is None)
-            consecutive_failures = (
-                consecutive_failures + failed_entries if failed_entries else 0
+            result = judge_with_chain(ai_manager, batch, chain)
+            failure_streak = update_failure_streak(
+                failure_streak, result.request_failures, result.any_success
             )
             for entry in batch:
-                drop = verdicts.get(entry.id)
+                drop = result.verdicts.get(entry.id)
                 entry_by_id[entry.id]["verdict"] = drop
-                record = make_cache_record(entry, drop, model_key)
-                append_judgment(CACHE_PATH, record)
+                entry_by_id[entry.id]["judge_model"] = result.model
+                append_judgment(
+                    CACHE_PATH, make_cache_record(entry, drop, result.model)
+                )
 
-            if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
+            if failure_streak >= MAX_CONSECUTIVE_FAILURES:
                 pr.red(
-                    f"{consecutive_failures} consecutive AI request failures — "
+                    f"{failure_streak} consecutive AI request failures — "
                     "aborting AI judging for this run (provider may be down or "
                     "quota exhausted). Already-judged entries are cached; re-run "
                     "to resume."
@@ -562,10 +899,6 @@ def main() -> None:
         proposed_drop = set(exact_dups) | ai_drop
         proposed_value = rebuild_field(parts, proposed_drop)
 
-        apply_drop = set(exact_dups)
-        if args.fix_ai and isinstance(verdict, set):
-            apply_drop |= verdict
-
         row_reasons = [f"exact duplicate: '{parts[i]}'" for i in exact_dups]
         for i, j, ratio in near_dups:
             row_reasons.append(
@@ -595,8 +928,8 @@ def main() -> None:
         else:
             verdict_label = "not_ai_judged"
 
-        if (args.fix or args.fix_ai) and apply_drop:
-            new_value = rebuild_field(parts, apply_drop)
+        if args.fix and exact_dups:
+            new_value = rebuild_field(parts, set(exact_dups))
             setattr(record, args.field, new_value)
             db_session.commit()
             n_fixed += 1
@@ -612,20 +945,25 @@ def main() -> None:
 
         max_ratio = max((ratio for _, _, ratio in near_dups), default=0.0)
         tsv_rows.append(
-            [
-                str(headword.id),
-                _tsv_safe(headword.lemma_1),
-                _tsv_safe(headword.meaning_1 or headword.meaning_2 or ""),
-                _tsv_safe(field_value),
-                _tsv_safe(proposed_value),
-                f"{max_ratio:.4f}",
-                verdict_label,
-            ]
+            build_tsv_row(
+                entry_id=headword.id,
+                field=args.field,
+                lemma=headword.lemma_1,
+                english=headword.meaning_1 or headword.meaning_2 or "",
+                current_value=field_value,
+                proposed_value=proposed_value,
+                parts=parts,
+                drop=proposed_drop,
+                max_ratio=max_ratio,
+                verdict=verdict_label,
+                judge_model=str(item.get("judge_model", "")),
+            )
         )
 
     db_session.close()
 
-    tsv_rows.sort(key=lambda r: float(r[5]), reverse=True)
+    ratio_col = TSV_HEADER.index("max_ratio")
+    tsv_rows.sort(key=lambda r: float(r[ratio_col]), reverse=True)
 
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.datetime.now().astimezone().strftime("%Y-%m-%d_%H-%M-%S")
@@ -655,17 +993,7 @@ def main() -> None:
 
     with tsv_path.open("w", encoding="utf-8", newline="") as f:
         writer = csv.writer(f, delimiter="\t")
-        writer.writerow(
-            [
-                "id",
-                "lemma",
-                "english",
-                "current_value",
-                "proposed_value",
-                "max_ratio",
-                "verdict",
-            ]
-        )
+        writer.writerow(TSV_HEADER)
         writer.writerows(tsv_rows)
 
     pr.white(f"Report saved to {report_path}")
@@ -678,6 +1006,56 @@ def main() -> None:
             f"cached: {n_ai_cached}, skipped: {n_ai_skipped}"
         )
     pr.white(f"Rows fixed: {n_fixed}")
+    return n_rows_flagged, n_fixed
+
+
+def main() -> None:
+    parser = build_parser()
+    args = parser.parse_args()
+    validate_args(parser, args)
+
+    if args.ai:
+        require_offpeak(args.allow_peak)
+
+    if args.apply_tsv is not None:
+        mode = "apply-tsv"
+    elif args.ai:
+        mode = "ai-fix" if args.fix else "ai"
+    elif args.fix:
+        mode = "fix"
+    else:
+        mode = "report"
+
+    start = _now_iso()
+    exit_code = 0
+    flagged = 0
+    changed = 0
+    try:
+        if args.apply_tsv is not None:
+            flagged, changed = run_apply_tsv(args)
+        else:
+            flagged, changed = run_audit(args)
+    except SystemExit as exc:
+        exit_code = exc.code if isinstance(exc.code, int) else 1
+        raise
+    except Exception:
+        exit_code = 1
+        raise
+    finally:
+        end = _now_iso()
+        append_audit_log(
+            LOG_PATH,
+            start=start,
+            end=end,
+            mode=mode,
+            field=args.field,
+            flagged=flagged,
+            changed=changed,
+            exit_code=exit_code,
+        )
+        record_last_audit(
+            STATE_PATH, field=args.field, mode=mode, flagged=flagged, ts=end
+        )
 
 
 if __name__ == "__main__":

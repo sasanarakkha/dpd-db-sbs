@@ -16,6 +16,7 @@ import json
 from pathlib import Path
 
 from sqlalchemy import and_
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from db.db_helpers import get_db_session
@@ -33,6 +34,9 @@ from tools.paths_dps import DPSPaths
 from tools.printer import printer as pr
 
 SQLITE_MAX_VARIABLES = 900
+
+# Modes that clear a DB field on MISMATCH: an unparseable reply must not decide them.
+STRICT_PARSE_MODES = {"meaning_raw", "meaning_raw_list", "notes_raw"}
 
 
 def _count_excluding(db_session, base_query, column, ids: set[int]) -> int:
@@ -131,7 +135,9 @@ class RussianMeaningChecker:
         """Lazy load BatchProcessor to avoid heavy AI initialization."""
         if self._batch_processor is None:
             self._batch_processor = BatchProcessor(
-                provider=self.provider, model=self.model
+                provider=self.provider,
+                model=self.model,
+                strict_parse=self.mode in STRICT_PARSE_MODES,
             )
         return self._batch_processor
 
@@ -513,15 +519,10 @@ class RussianMeaningChecker:
     def _clean_field_for_mismatches(
         self, results: list[ComparisonResult], field_name: str
     ) -> None:
-        """Clear the given Russian field for mismatched entries"""
+        """Clear the given Russian field for MISMATCH entries only (never PARTIAL_MATCH)."""
         from db.models import Russian
 
-        if self.mode in ["meaning_raw", "meaning_raw_list"]:
-            mismatches = [
-                r for r in results if r.match_status in ["MISMATCH", "PARTIAL_MATCH"]
-            ]
-        else:
-            mismatches = [r for r in results if r.match_status == "MISMATCH"]
+        mismatches = [r for r in results if r.match_status == "MISMATCH"]
         if not mismatches:
             return
 
@@ -530,26 +531,34 @@ class RussianMeaningChecker:
         pth = ProjectPaths()
         clean_session = get_db_session(pth.dpd_db_path)
         try:
+            cleared: list[int] = []
             for result in mismatches:
-                try:
-                    russian_record = (
-                        clean_session.query(Russian)
-                        .filter(Russian.id == result.headword_id)
-                        .first()
-                    )
-                    if russian_record:
-                        setattr(russian_record, field_name, "")
-                        clean_session.commit()
-                        pr.green(f"Cleared {field_name} for ID {result.headword_id}")
-                except OSError as e:
-                    pr.amber(
-                        f"Failed to clear {field_name} for ID {result.headword_id}: {e}"
-                    )
-                    clean_session.rollback()
-
+                russian_record = (
+                    clean_session.query(Russian)
+                    .filter(Russian.id == result.headword_id)
+                    .first()
+                )
+                if russian_record:
+                    setattr(russian_record, field_name, "")
+                    cleared.append(result.headword_id)
+            try:
+                clean_session.commit()
+            except (OSError, SQLAlchemyError) as e:
+                pr.amber(f"Failed to clear {field_name} for this chunk: {e}")
+                clean_session.rollback()
+                return
+            for headword_id in cleared:
+                pr.green(f"Cleared {field_name} for ID {headword_id}")
             pr.green(f"Completed cleaning {field_name} for mismatched entries")
         finally:
             clean_session.close()
+
+    def _clear_for_mode(self, results: list[ComparisonResult]) -> None:
+        """Clear the mode's draft field on MISMATCH; modes that only report do nothing."""
+        if self.mode in ["meaning_raw", "meaning_raw_list"]:
+            self._clean_field_for_mismatches(results, "ru_meaning_raw")
+        elif self.mode == "notes_raw":
+            self._clean_field_for_mismatches(results, "ru_notes")
 
     def generate_report(
         self,
@@ -570,17 +579,13 @@ class RussianMeaningChecker:
             "=" * 50 + "\n\n",
         ]
 
-        # Filter for problematic entries - treat PARTIAL_MATCH as mismatch in raw modes
-        if self.mode in ["meaning_raw", "meaning_raw_list"]:
-            mismatches = [
-                r for r in results if r.match_status in ["MISMATCH", "PARTIAL_MATCH"]
-            ]
-        else:
-            mismatches = [r for r in results if r.match_status == "MISMATCH"]
+        mismatches = [r for r in results if r.match_status == "MISMATCH"]
+        partials = [r for r in results if r.match_status == "PARTIAL_MATCH"]
         matches = [r for r in results if r.match_status == "MATCH"]
 
         lines.append(f"Total entries analyzed: {len(results)}\n")
         lines.append(f"Complete mismatches: {len(mismatches)}\n")
+        lines.append(f"Partial matches (not cleared): {len(partials)}\n")
         lines.append(f"Correct matches: {len(matches)}\n\n")
 
         if mismatches:
@@ -599,19 +604,26 @@ class RussianMeaningChecker:
                 "No complete mismatches found! All translations appear accurate.\n"
             )
 
+        if partials:
+            lines.append("PARTIAL MATCHES (kept as-is, review only):\n")
+            lines.append("-" * 50 + "\n\n")
+            for result in partials:
+                lines.append(f"ID: {result.headword_id}\n")
+                lines.append(f"Lemma: {result.lemma_1}\n")
+                lines.append(f"Confidence: {result.confidence:.2f}\n")
+                lines.append(f"Reasoning: {result.reasoning}\n")
+                if result.suggested_fix:
+                    lines.append(f"Suggested fix: {result.suggested_fix}\n")
+                lines.append("\n" + "-" * 40 + "\n\n")
+
         output_file.write_text("".join(lines), encoding="utf-8")
 
         pr.white(f"Report saved to {output_file}")
         pr.white(f"Total entries analyzed: {len(results)}")
         pr.white(f"Total problematic entries requiring review: {len(mismatches)}")
 
-        # Special handling for raw mode - only clean database fields for raw modes
-        if self.mode in ["meaning_raw", "meaning_raw_list"] and mismatches:
-            self._clean_field_for_mismatches(results, "ru_meaning_raw")
-        elif self.mode == "notes_raw" and mismatches:
-            self._clean_field_for_mismatches(results, "ru_notes")
-        # Note: meaning_lit and meaning_lit_list modes don't clean database fields, only report
-        # Note: russian_grammar_meaning_raw mode also doesn't clean database fields - keeps Russian meanings for review
+        # Clearing happens in run_analysis (per chunk / once after batch), never here.
+        # meaning_lit(_list) and russian_grammar_meaning_raw only report.
 
         # Save checked IDs after analysis
         self.save_checked_ids()
@@ -622,8 +634,8 @@ class RussianMeaningChecker:
         use_batch: bool = True,
         limit: int | None = None,
         auto_invalidate: bool = True,
-    ) -> None:
-        """Run the complete analysis"""
+    ) -> int:
+        """Run the complete analysis; return the number of words with a parsed verdict."""
         pr.white("Starting Russian meaning mismatch analysis...")
 
         if auto_invalidate:
@@ -644,7 +656,7 @@ class RussianMeaningChecker:
 
         if not comparisons:
             pr.white("No words found with both English and Russian meanings")
-            return
+            return 0
 
         # Run comparison
         if use_batch:
@@ -663,6 +675,7 @@ class RussianMeaningChecker:
                 self.save_checked_ids()
                 pr.green(f"Batch {batch_num} done — checked IDs saved to disk")
             results = all_results
+            self._clear_for_mode(results)
         else:
             pr.white("Using individual processing (saving progress every 50 words)...")
             results = []
@@ -674,10 +687,7 @@ class RussianMeaningChecker:
                 self.save_checked_ids()
 
                 # Clean database mismatches incrementally for this chunk
-                if self.mode in ["meaning_raw", "meaning_raw_list"]:
-                    self._clean_field_for_mismatches(chunk_results, "ru_meaning_raw")
-                elif self.mode == "notes_raw":
-                    self._clean_field_for_mismatches(chunk_results, "ru_notes")
+                self._clear_for_mode(chunk_results)
 
                 pr.green(
                     f"Checked {len(results)}/{len(comparisons)} words — progress saved and database updated"
@@ -688,6 +698,7 @@ class RussianMeaningChecker:
 
         n_mismatches = len([r for r in results if r.match_status == "MISMATCH"])
         pr.white(f"Analysis complete. Found {n_mismatches} problematic entries.")
+        return len(results)
 
 
 if __name__ == "__main__":

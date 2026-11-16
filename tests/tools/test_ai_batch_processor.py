@@ -158,3 +158,39 @@ def test_parse_ai_response_invalid_json_falls_back_to_manual() -> None:
 def test_parse_ai_response_invalid_json_no_word_comparison() -> None:
     results = _processor().parse_ai_response("not json at all")
     assert results == []
+
+
+def _word() -> WordComparison:
+    return WordComparison(
+        headword_id=5,
+        lemma_1="dhamma",
+        english_meaning="law",
+        russian_meaning="закон",
+    )
+
+
+def test_parse_ai_response_strict_non_json_yields_no_verdict() -> None:
+    processor = _processor()
+    processor.strict_parse = True
+    assert processor.parse_ai_response("No mismatch found, all good.", _word()) == []
+
+
+def test_parse_ai_response_non_strict_keeps_keyword_fallback() -> None:
+    processor = _processor()
+    results = processor.parse_ai_response("No mismatch found, all good.", _word())
+    assert [r.match_status for r in results] == ["MISMATCH"]
+
+
+def test_parse_ai_response_strict_still_parses_valid_json() -> None:
+    processor = _processor()
+    processor.strict_parse = True
+    content = (
+        '{"comparisons": [{"id": 5, "lemma": "dhamma", "match_status": "MATCH",'
+        ' "confidence": 0.9, "reasoning": "ok"}]}'
+    )
+    results = processor.parse_ai_response(content, _word())
+    assert [r.match_status for r in results] == ["MATCH"]
+
+
+def test_strict_parse_defaults_to_false() -> None:
+    assert BatchProcessor.strict_parse is False

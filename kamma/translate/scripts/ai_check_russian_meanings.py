@@ -107,13 +107,15 @@ def main() -> None:
     try:
         # Run the analysis
         pr.green_tmr("running analysis")
-        checker.run_analysis(
+        n_checked = checker.run_analysis(
             db_session=db_session,
             use_batch=use_batch,
             limit=args.limit,
             auto_invalidate=False,
         )
         pr.yes("ok")
+        # Machine-read by batch_runner.py: words that received a parsed verdict.
+        pr.white(f"checked {n_checked}")
 
         pr.green_title("ANALYSIS COMPLETE!")
 
