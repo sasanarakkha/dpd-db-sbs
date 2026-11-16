@@ -8,10 +8,13 @@ import sys
 from pathlib import Path
 
 from sqlalchemy import or_
+from sqlalchemy.orm import Session
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword, Russian, Tamil
+from kamma.translate.scripts.ids_file import read_ids_file
 from tools.paths import ProjectPaths
+from tools.printer import printer as pr
 
 # List of common Pali/Sanskrit/Buddhist words that might exist in the English dictionary
 PALI_STOPWORDS: set[str] = {
@@ -227,13 +230,28 @@ def load_english_dictionary() -> set[str]:
     return FALLBACK_ENGLISH_WORDS
 
 
+LAST_TRANSLATED_PATH = (
+    Path(__file__).resolve().parents[3] / "temp" / "last_translated.json"
+)
+HANGUL_PATTERN = re.compile(r"[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF]")
+
+
 def check_translations(
-    lang: str, specific_ids: list[int] | None = None, auto_delete: bool = False
-) -> None:
-    """Query translation entries, check for potential errors, and optionally delete flagged ones."""
+    lang: str,
+    specific_ids: list[int] | None = None,
+    auto_delete: bool = False,
+    ids_file: Path | None = None,
+    db_session: Session | None = None,
+) -> list[int]:
+    """Query translation entries, check for potential errors, and optionally delete flagged ones.
+
+    Returns the flagged ids. `ids_file` (new `{lang, mode, ids}` shape or a bare list)
+    restricts the scan to its ids, combined with `specific_ids`.
+    """
     project_root = Path(__file__).resolve().parents[3]
-    pth = ProjectPaths(base_dir=project_root)
-    db_session = get_db_session(pth.dpd_db_path)
+    if db_session is None:
+        pth = ProjectPaths(base_dir=project_root)
+        db_session = get_db_session(pth.dpd_db_path)
 
     if lang == "ta":
         model_cls = Tamil
@@ -251,20 +269,25 @@ def check_translations(
     # Determine which IDs to check
     ids_to_check: list[int] | None = specific_ids
 
+    if ids_file is not None:
+        ids_to_check = sorted(set(specific_ids or []) | set(read_ids_file(ids_file)))
+        if not ids_to_check:
+            pr.amber(f"No ids found in {ids_file}. Nothing to check.")
+            return []
+
     # If no specific IDs are provided, try to load from last run's JSON file
     if not ids_to_check:
-        last_translated_path = project_root / "temp" / "last_translated.json"
-        if last_translated_path.exists():
+        if LAST_TRANSLATED_PATH.exists():
             try:
-                with open(last_translated_path, "r", encoding="utf-8") as f:
+                with open(LAST_TRANSLATED_PATH, "r", encoding="utf-8") as f:
                     data = json.load(f)
                     if data.get("lang") == lang:
                         ids_to_check = data.get("ids") or []
-                        print(
+                        pr.white(
                             f"Loaded {len(ids_to_check or [])} IDs from the last translation run."
                         )
             except (OSError, json.JSONDecodeError) as e:
-                print(f"Warning: Failed to load last translated IDs: {e}")
+                pr.amber(f"Warning: Failed to load last translated IDs: {e}")
 
     if ids_to_check:
         results: list[DpdHeadword] = (
@@ -273,7 +296,9 @@ def check_translations(
             .filter(DpdHeadword.id.in_(ids_to_check))
             .all()
         )
-        print(f"Checking {len(results)} specified {lang.upper()} translation entries:")
+        pr.white(
+            f"Checking {len(results)} specified {lang.upper()} translation entries:"
+        )
     else:
         # Fallback to checking all translation data for this language
         results: list[DpdHeadword] = (
@@ -283,18 +308,21 @@ def check_translations(
             .order_by(DpdHeadword.id.desc())
             .all()
         )
-        print(
+        pr.white(
             f"Checking all {len(results)} {lang.upper()} translation entries in database:"
         )
 
     if not results:
-        print(f"No matching translated {lang.upper()} entries found in the database.")
-        return
+        pr.amber(
+            f"No matching translated {lang.upper()} entries found in the database."
+        )
+        return []
 
-    print("-" * 60)
+    pr.white("-" * 60)
 
     english_words = load_english_dictionary()
     flagged_ids: list[int] = []
+    flagged_columns: dict[int, list[str]] = {}
 
     # Common citation cleaning regex pattern (includes TH/THI)
     citation_pattern = r"\b(DN|MN|SN|AN|Snp|Dhp|Ud|Iti|Vv|Pv|Thag|Thig|Ap|Bv|Cp|Ja|Kh|Vin|Pāc|Pār|Mv|Cv|Pari|Vibh|Dhs|Pug|Kvu|Yam|Patth|Vism|TH|THI)\s?\d*(?:\.\d+)*(?:-\d+)?\b"
@@ -307,6 +335,9 @@ def check_translations(
         field_flags = []
         if not text:
             return field_flags
+
+        if HANGUL_PATTERN.search(text):
+            field_flags.append(f"Hangul in {field_label}")
 
         if is_sutta_entry:
             # Sutta entries (family_set starting with "suttas of") are citation references,
@@ -358,27 +389,28 @@ def check_translations(
             ru_info = row.ru
             # Check ru_meaning_raw only (raw AI translation output)
             if ru_info.ru_meaning_raw:
-                flags.extend(
-                    audit_field(
-                        ru_info.ru_meaning_raw,
-                        "ru_meaning_raw",
-                        eng_len,
-                        is_sutta_entry,
-                    )
+                raw_flags = audit_field(
+                    ru_info.ru_meaning_raw,
+                    "ru_meaning_raw",
+                    eng_len,
+                    is_sutta_entry,
                 )
+                if raw_flags:
+                    flagged_columns.setdefault(row.id, []).append("ru_meaning_raw")
+                flags.extend(raw_flags)
                 meaning_lines.append(f"ru_meaning_raw : {ru_info.ru_meaning_raw}")
 
         if flags:
             status = f"FLAGGED ({', '.join(flags)})"
             flagged_ids.append(row.id)
-            print(f"ID: {row.id} | Lemma: {row.lemma_1} | Status: {status}")
-            print(f"   English Meaning: {eng_meaning}")
+            pr.white(f"ID: {row.id} | Lemma: {row.lemma_1} | Status: {status}")
+            pr.white(f"   English Meaning: {eng_meaning}")
             for line in meaning_lines:
-                print(f"   {line}")
-            print()
+                pr.white(f"   {line}")
+            pr.white("")
 
-    print("-" * 60)
-    print(
+    pr.white("-" * 60)
+    pr.white(
         f"Validation complete: {len(flagged_ids)} flagged out of {len(results)} entries."
     )
 
@@ -396,7 +428,7 @@ def check_translations(
                 if choice in ("y", "yes"):
                     do_delete = True
             except KeyboardInterrupt:
-                print("\nOperation cancelled.")
+                pr.amber("Operation cancelled.")
 
         if do_delete:
             deleted_count = 0
@@ -409,15 +441,19 @@ def check_translations(
                         db_session.query(Russian).filter(Russian.id == row_id).first()
                     )
                     if ru_row:
-                        ru_row.ru_meaning_raw = ""
+                        for column in flagged_columns.get(row_id, []):
+                            setattr(ru_row, column, "")
                         deleted_count += 1
             db_session.commit()
-            print(
+            pr.green(
                 f"Successfully deleted/cleaned {deleted_count} entries from the database."
             )
 
+    return flagged_ids
 
-if __name__ == "__main__":
+
+def build_parser() -> argparse.ArgumentParser:
+    """Build the command-line parser (default language: ru)."""
     parser = argparse.ArgumentParser(
         description="Verify Tamil or Russian translation database entries."
     )
@@ -425,8 +461,8 @@ if __name__ == "__main__":
         "-lang",
         "--lang",
         choices=["ta", "ru"],
-        default="ta",
-        help="Language to check: 'ta' for Tamil, 'ru' for Russian (default: ta).",
+        default="ru",
+        help="Language to check: 'ta' for Tamil, 'ru' for Russian (default: ru).",
     )
     parser.add_argument(
         "-ids",
@@ -436,10 +472,25 @@ if __name__ == "__main__":
         help="Specific entry IDs to check (ignores JSON state file).",
     )
     parser.add_argument(
+        "--ids-file",
+        type=Path,
+        help="JSON file of ids to check: {lang, mode, ids} or a bare list "
+        "(e.g. temp/ai_from_batch_api/processed_ids.json).",
+    )
+    parser.add_argument(
         "-delete",
         "--delete",
         action="store_true",
         help="Automatically delete the flagged entries from the database without prompting.",
     )
-    args = parser.parse_args()
-    check_translations(lang=args.lang, specific_ids=args.ids, auto_delete=args.delete)
+    return parser
+
+
+if __name__ == "__main__":
+    args = build_parser().parse_args()
+    check_translations(
+        lang=args.lang,
+        specific_ids=args.ids,
+        auto_delete=args.delete,
+        ids_file=args.ids_file,
+    )

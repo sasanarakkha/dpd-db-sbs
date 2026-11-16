@@ -158,7 +158,7 @@
       "discuss": false,
       "sync_rule": "PRESERVE",
       "local_changes": [
-        "`default_models` = translate-skill chain (DeepSeek Flash direct → OpenRouter fallback); `grounded_models` points at `deepseek` pro (+ OpenRouter) — the live config the kamma/translate pipeline depends on; upstream's list points at openrouter/gemini models.",
+        "`default_models` = translate-skill chain (DeepSeek Flash direct → OpenRouter `qwen/qwen3.7-flash` fallback, chosen by the 2026-11-16 benchmark); `grounded_models` = `deepseek` pro direct only (OpenRouter pro entry removed by the user, 2026-11-16) — the live config the kamma/translate pipeline depends on; upstream's list points at openrouter/gemini models.",
         "Top-level keys (`default_models`, `grounded_models`) share upstream's schema, but the model values are fork-local and always take precedence over upstream's. The local-only `antigravity_cli_work_models` key was removed (2026-11-16, translate-skill overhaul)."
       ],
       "watch_for": [

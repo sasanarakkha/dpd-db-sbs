@@ -35,3 +35,6 @@
 - 2026-11-07 [CONFUSION] Normalising only the lookup keys and not the probe value produced 2 false NOT_FOUND rows (`nissanda 1`, `vatthu 2`); the same normalisation must be applied on both sides.
 - 2026-11-07 [BEHAVIOR] A test whose body duplicates another test's (`test_numbered_lemma_keys_are_caller_stripped`) passed while covering nothing, which is how the numbering bug slipped through the first pass.
 - 2026-11-07 [WORKFLOW] The stale-reference grep for a retired script also matched `dpd_operations.log` and another thread's `temp/` scratch file; add `--exclude=*.log --exclude-dir=temp` so the rename check only judges live tracked files.
+- 2026-11-16 [WORKFLOW] Documenting "re-run the same command" after a partial stop exposed that a session-scoped id file was silently reset per run; any resume instruction in docs needs a test that the state it relies on survives the re-run.
+- 2026-11-16 [BEHAVIOR] New `# noqa` crept into a test and a script despite the "never `# noqa`" rule; review caught it, so grep the diff for `noqa` before reporting lint clean.
+- 2026-11-16 [POSITIVE] Recording a "Not Verified" list (live judge path, in-memory-only apply/clear paths) in review.md let the issue comment state honestly what was and was not proven.

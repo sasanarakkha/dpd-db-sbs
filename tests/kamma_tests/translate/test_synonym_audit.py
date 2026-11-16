@@ -9,7 +9,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from db.models import Base, Russian
+from db.models import Base, DpdHeadword, Russian
 
 from kamma.translate.scripts.synonym_audit import (
     TSV_HEADER,
@@ -18,6 +18,7 @@ from kamma.translate.scripts.synonym_audit import (
     append_audit_log,
     apply_review_tsv,
     build_tsv_row,
+    build_parser,
     main,
     record_last_audit,
     append_judgment,
@@ -33,6 +34,7 @@ from kamma.translate.scripts.synonym_audit import (
     parse_judge_response,
     rebuild_field,
     resolve_chain,
+    run_audit,
     split_meanings,
     update_failure_streak,
     variants_hash,
@@ -827,3 +829,29 @@ def test_audit_log_appends_one_line_and_last_audit_preserves_state(tmp_path: Pat
         "ts": "T",
     }
     assert saved["last_op"] == "check" and saved["totals"] == {"checked": 3}
+
+
+# --- review fix: --fix records the post-fix value as current_value ---
+
+
+def test_fix_writes_post_fix_value_as_tsv_current_value(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, ru_session: Session
+):
+    """With --fix (alone or with --ai), the TSV's current_value must match the DB
+    after the fix, or every fixed row would be stale at --apply-tsv."""
+    import kamma.translate.scripts.synonym_audit as audit
+
+    ru_session.add(DpdHeadword(id=1, lemma_1="w1", meaning_1="state"))
+    ru_session.add(Russian(id=1, ru_meaning_raw="идти; идти; бежать"))
+    ru_session.commit()
+    monkeypatch.setattr(audit, "get_db_session", lambda _path: ru_session)
+    monkeypatch.setattr(audit, "REPORT_DIR", tmp_path)
+
+    args = build_parser().parse_args(["--field", "ru_meaning_raw", "--fix"])
+    run_audit(args)
+
+    assert _raw(ru_session, 1) == "идти; бежать"
+    tsv = next(tmp_path.glob("*.tsv"))
+    with tsv.open(encoding="utf-8", newline="") as f:
+        row = next(csv.DictReader(f, delimiter="\t"))
+    assert row["current_value"] == "идти; бежать"

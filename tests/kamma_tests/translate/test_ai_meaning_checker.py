@@ -131,7 +131,7 @@ def _strict_flag_for(mode: str, monkeypatch) -> bool:
             seen["strict_parse"] = strict_parse
 
     monkeypatch.setattr(ai_meaning_checker, "BatchProcessor", _Recorder)
-    RussianMeaningChecker(mode=mode).batch_processor  # noqa: B018 - property builds it
+    assert RussianMeaningChecker(mode=mode).batch_processor is not None
     return seen["strict_parse"]
 
 
@@ -182,13 +182,14 @@ def _memory_session():
     return session
 
 
-def test_clean_clears_mismatch_only_not_partial_match(monkeypatch):
+def test_clean_clears_mismatch_only_not_partial_match(monkeypatch, tmp_path):
     from db.models import Russian
     from kamma.translate.scripts import ai_meaning_checker
 
     session = _memory_session()
     monkeypatch.setattr(ai_meaning_checker, "get_db_session", lambda _p: session)
     checker = RussianMeaningChecker(mode="meaning_raw")
+    checker.rejects_path = tmp_path / "rejects.json"
     checker._clean_field_for_mismatches(
         [_result(1, "MISMATCH"), _result(2, "PARTIAL_MATCH"), _result(3, "MATCH")],
         "ru_meaning_raw",
@@ -202,7 +203,7 @@ def test_clean_clears_mismatch_only_not_partial_match(monkeypatch):
     assert values == {1: "", 2: "x", 3: "x"}
 
 
-def test_clean_commits_once_per_call(monkeypatch):
+def test_clean_commits_once_per_call(monkeypatch, tmp_path):
     from kamma.translate.scripts import ai_meaning_checker
 
     session = _memory_session()
@@ -213,6 +214,7 @@ def test_clean_commits_once_per_call(monkeypatch):
     )
     monkeypatch.setattr(ai_meaning_checker, "get_db_session", lambda _p: session)
     checker = RussianMeaningChecker(mode="meaning_raw")
+    checker.rejects_path = tmp_path / "rejects.json"
     checker._clean_field_for_mismatches(
         [_result(1, "MISMATCH"), _result(2, "MISMATCH")], "ru_meaning_raw"
     )
@@ -234,7 +236,7 @@ def _stub_checker(monkeypatch, tmp_path, mode, results):
         for r in results
     ]
     monkeypatch.setattr(
-        checker, "get_words_for_comparison_with_session", lambda _s: comps
+        checker, "get_words_for_comparison_with_session", lambda _s, limit=None: comps
     )
     monkeypatch.setattr(checker, "compare_meanings_individual", lambda _c: results)
     monkeypatch.setattr(

@@ -9,10 +9,12 @@ import json
 import re
 import sys
 import time
+from collections.abc import Sequence
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from sqlalchemy import Row
 from sqlalchemy.orm import Session
 
 from db.db_helpers import get_db_session
@@ -584,6 +586,54 @@ def apply_review_tsv(
     return totals
 
 
+DEFAULT_THRESHOLD = 0.85
+
+
+def scan_lexical(
+    rows: Sequence[Row[tuple[DpdHeadword, Russian | Tamil]]],
+    field: str,
+    threshold: float,
+) -> list[dict]:
+    """Lexical scan: rows whose `field` holds exact or near duplicate meanings."""
+    flagged: list[dict] = []
+    for headword, record in rows:
+        field_value = getattr(record, field)
+        parts = split_meanings(field_value)
+        if len(parts) < 2:
+            continue
+        exact_dups = find_exact_dups(parts)
+        near_dups = find_near_dups(parts, threshold)
+        if not exact_dups and not near_dups:
+            continue
+        flagged.append(
+            {
+                "headword": headword,
+                "record": record,
+                "field_value": field_value,
+                "parts": parts,
+                "exact_dups": exact_dups,
+                "near_dups": near_dups,
+            }
+        )
+    return flagged
+
+
+def count_lexical_flagged(
+    db_session: Session, field: str, threshold: float = DEFAULT_THRESHOLD
+) -> int:
+    """Number of rows the report-only audit would flag for `field` (read-only, no AI)."""
+    model_cls = FIELD_MODEL[field]
+    column = getattr(model_cls, field)
+    rows = (
+        db_session.query(DpdHeadword, model_cls)
+        .join(model_cls, DpdHeadword.id == model_cls.id)
+        .filter(column.isnot(None), column != "")
+        .order_by(DpdHeadword.id)
+        .all()
+    )
+    return len(scan_lexical(rows, field, threshold))
+
+
 def append_audit_log(
     log_path: Path,
     *,
@@ -667,7 +717,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--threshold",
         type=float,
-        default=0.85,
+        default=DEFAULT_THRESHOLD,
         help="difflib.SequenceMatcher ratio for the lexical near-dup flag (default: 0.85)",
     )
     parser.add_argument(
@@ -775,26 +825,7 @@ def run_audit(args: argparse.Namespace) -> tuple[int, int]:
     cache = load_judgment_cache(CACHE_PATH) if use_ai else {}
 
     # --- Phase A: lexical scan ---
-    flagged: list[dict] = []
-    for headword, record in rows:
-        field_value = getattr(record, args.field)
-        parts = split_meanings(field_value)
-        if len(parts) < 2:
-            continue
-        exact_dups = find_exact_dups(parts)
-        near_dups = find_near_dups(parts, args.threshold)
-        if not exact_dups and not near_dups:
-            continue
-        flagged.append(
-            {
-                "headword": headword,
-                "record": record,
-                "field_value": field_value,
-                "parts": parts,
-                "exact_dups": exact_dups,
-                "near_dups": near_dups,
-            }
-        )
+    flagged = scan_lexical(rows, args.field, args.threshold)
 
     n_rows_flagged = len(flagged)
     n_exact = sum(len(item["exact_dups"]) for item in flagged)
@@ -928,8 +959,12 @@ def run_audit(args: argparse.Namespace) -> tuple[int, int]:
         else:
             verdict_label = "not_ai_judged"
 
+        # The TSV's current_value must equal the DB value after this run, or
+        # --apply-tsv would treat every row fixed here as stale.
+        tsv_current_value = field_value
         if args.fix and exact_dups:
             new_value = rebuild_field(parts, set(exact_dups))
+            tsv_current_value = new_value
             setattr(record, args.field, new_value)
             db_session.commit()
             n_fixed += 1
@@ -950,7 +985,7 @@ def run_audit(args: argparse.Namespace) -> tuple[int, int]:
                 field=args.field,
                 lemma=headword.lemma_1,
                 english=headword.meaning_1 or headword.meaning_2 or "",
-                current_value=field_value,
+                current_value=tsv_current_value,
                 proposed_value=proposed_value,
                 parts=parts,
                 drop=proposed_drop,

@@ -194,3 +194,35 @@ def test_parse_ai_response_strict_still_parses_valid_json() -> None:
 
 def test_strict_parse_defaults_to_false() -> None:
     assert BatchProcessor.strict_parse is False
+
+
+_FENCE_CONTENT = (
+    '{"comparisons": [{"id": 5, "lemma": "dhamma", "match_status": "MISMATCH",'
+    ' "confidence": 0.9, "reasoning": "wrong, the Russian is incorrect"}]}'
+)
+
+
+def test_parse_ai_response_strict_accepts_json_fence() -> None:
+    processor = _processor()
+    processor.strict_parse = True
+    results = processor.parse_ai_response(f"```json\n{_FENCE_CONTENT}\n```", _word())
+    assert [r.match_status for r in results] == ["MISMATCH"]
+    assert results[0].reasoning == "wrong, the Russian is incorrect"
+
+
+def test_parse_ai_response_non_strict_fence_uses_json_not_keywords() -> None:
+    content = _FENCE_CONTENT.replace("MISMATCH", "MATCH").replace(
+        "wrong, the Russian is incorrect", "all correct"
+    )
+    results = _processor().parse_ai_response(f"```\n{content}\n```", _word())
+    assert [r.match_status for r in results] == ["MATCH"]
+    assert results[0].reasoning == "all correct"
+
+
+def test_parse_ai_response_fence_with_surrounding_whitespace() -> None:
+    processor = _processor()
+    processor.strict_parse = True
+    results = processor.parse_ai_response(
+        f"  \n```JSON\n{_FENCE_CONTENT}\n```\n ", _word()
+    )
+    assert len(results) == 1

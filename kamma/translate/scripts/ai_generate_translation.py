@@ -10,11 +10,14 @@ from pathlib import Path
 from typing import Any, TypedDict
 
 from sqlalchemy import and_, case, null, or_
+from sqlalchemy.orm import Query
+from sqlalchemy.orm.query import RowReturningQuery
 
 from db.db_helpers import get_db_session
 from db.models import DpdHeadword, DpdRoot, Russian, Tamil
+from kamma.translate.scripts.rejects import REJECTS_PATH, parked_ids, reject_reason
 from tools.ai_manager import AIManager
-from tools.ai_manager import load_models_from_json as load_ai_models_by_kind
+from tools.ai_manager import _load_models_from_json as load_ai_models_by_kind
 from tools.ai_related import (
     generate_messages_for_meaning,
     generate_messages_for_meaning_lit,
@@ -105,30 +108,34 @@ SNAPSHOTS_BY_MODE: dict[str, list[Path]] = {
 }
 
 
+def irrelevant_ru_query() -> Query[DpdHeadword]:
+    """Headwords whose Russian row has every RU column empty or NULL."""
+    return (
+        db_session.query(DpdHeadword)
+        .join(Russian)
+        .filter(
+            and_(
+                *[
+                    or_(column.is_(None), column == "")
+                    for column in (
+                        Russian.ru_meaning,
+                        Russian.ru_meaning_raw,
+                        Russian.ru_meaning_lit,
+                        Russian.ru_notes,
+                        Russian.ru_cognate,
+                    )
+                ]
+            )
+        )
+    )
+
+
 def remove_irrelevant(
     limit: int | None, lang: str = "ru", dry_run: bool = False
 ) -> None:
     # Query the database to fetch words based on language
     if lang == "ru":
-        db = (
-            db_session.query(DpdHeadword)
-            .join(Russian)
-            .filter(
-                or_(
-                    and_(
-                        Russian.id != "",
-                        Russian.ru_meaning_raw == "",
-                        Russian.ru_meaning == "",
-                    ),
-                    and_(
-                        Russian.id != "",
-                        Russian.ru_meaning == "",
-                        Russian.ru_meaning_raw == "",
-                    ),
-                )
-            )
-            .all()
-        )
+        db = irrelevant_ru_query().all()
     elif lang == "ta":
         db = (
             db_session.query(DpdHeadword)
@@ -163,10 +170,8 @@ def remove_irrelevant(
     db_session.commit()
 
 
-def filter_words_for_translation(
-    mode: str, limit: int | None, lang: str = "ru"
-) -> list[DpdHeadword]:
-    """Filter words that need translation for specified language."""
+def build_pool_query(mode: str, lang: str = "ru") -> tuple[Query[DpdHeadword], str]:
+    """Query for the words that need translation, plus a human-readable filter description."""
 
     # Get language-specific configuration
     if lang not in LANG_CONFIG:
@@ -180,7 +185,7 @@ def filter_words_for_translation(
                 f"mode: {mode} | lang: {lang} | "
                 "filter: (meaning_1 != '' OR meaning_2 != '') AND (Tamil entry is missing OR ta_meaning is empty/null)"
             )
-            db = (
+            query = (
                 db_session.query(DpdHeadword)
                 .outerjoin(Tamil, DpdHeadword.id == Tamil.id)
                 .filter(
@@ -213,18 +218,20 @@ def filter_words_for_translation(
                     ),
                     DpdHeadword.ebt_count.desc(),
                 )
-                .all()
             )
         elif lang == "ru":
+            parked = parked_ids(REJECTS_PATH)
             filter_desc = (
                 f"mode: {mode} | lang: {lang} | "
                 "filter: (meaning_1 != '' OR meaning_2 != '') AND (Russian entry is missing OR both ru_meaning_raw and ru_meaning are empty/null)"
+                f" | parked (rejected 2+ times, see rejects.json): {len(parked)} excluded"
             )
-            db = (
+            query = (
                 db_session.query(DpdHeadword)
                 .outerjoin(Russian, DpdHeadword.id == Russian.id)
                 .filter(
                     and_(
+                        DpdHeadword.id.notin_(parked),
                         or_(DpdHeadword.meaning_1 != "", DpdHeadword.meaning_2 != ""),
                         or_(
                             Russian.id.is_(null()),
@@ -261,7 +268,6 @@ def filter_words_for_translation(
                     ),
                     DpdHeadword.ebt_count.desc(),
                 )
-                .all()
             )
         else:
             raise ValueError(f"Unsupported language: {lang}")
@@ -271,7 +277,7 @@ def filter_words_for_translation(
             f"mode: {mode} | lang: {lang} | "
             "filter: (meaning_1 != '' OR meaning_2 != '') AND meaning_lit != '' AND Russian entry exists AND ru_meaning != '' AND ru_meaning_lit is empty/null"
         )
-        db = (
+        query = (
             db_session.query(DpdHeadword)
             .join(Russian, DpdHeadword.id == Russian.id)
             .filter(
@@ -305,7 +311,6 @@ def filter_words_for_translation(
                 ),
                 DpdHeadword.ebt_count.desc(),
             )
-            .all()
         )
 
     elif mode == "note":
@@ -313,7 +318,7 @@ def filter_words_for_translation(
             f"mode: {mode} | lang: {lang} | "
             "filter: (meaning_1 != '' OR meaning_2 != '') AND notes != '' AND (Russian entry is missing OR ru_notes is empty/null)"
         )
-        db = (
+        query = (
             db_session.query(DpdHeadword)
             .outerjoin(Russian, DpdHeadword.id == Russian.id)
             .filter(
@@ -347,13 +352,28 @@ def filter_words_for_translation(
                 ),
                 DpdHeadword.ebt_count.desc(),
             )
-            .all()
         )
     else:
         raise ValueError(f"Invalid mode: {mode}")
 
-    total_row_count = len(db)
-    db = db[:limit]
+    return query, filter_desc
+
+
+def count_pool(mode: str, lang: str = "ru") -> int:
+    """Number of words waiting in the generate pool (read-only)."""
+    query, _filter_desc = build_pool_query(mode, lang)
+    return query.count()
+
+
+def filter_words_for_translation(
+    mode: str, limit: int | None, lang: str = "ru"
+) -> list[DpdHeadword]:
+    """Filter words that need translation for specified language."""
+    query, filter_desc = build_pool_query(mode, lang)
+    total_row_count = query.count()
+    if limit is not None:
+        query = query.limit(limit)
+    db = query.all()
 
     pr.white(f"Current filter: {filter_desc}")
     pr.white(f"Rows filtered for the process: {len(db)} / {total_row_count}")
@@ -373,18 +393,17 @@ def get_verified_root_keys() -> set[str]:
     return {root_key for (root_key,) in rows}
 
 
-def select_reset_grounded_rows(
-    limit: int | None,
-) -> list[tuple[DpdHeadword, Russian]]:
+def reset_grounded_query() -> RowReturningQuery[tuple[DpdHeadword, Russian]] | None:
     """Rooted ru_meaning_raw drafts whose root has verified same-root examples.
 
     A pending draft has ru_meaning empty, so it can never be its own
-    verified example — no self-exclusion is needed here.
+    verified example — no self-exclusion is needed here. None when no root
+    has a verified headword.
     """
     verified_roots = get_verified_root_keys()
     if not verified_roots:
-        return []
-    query = (
+        return None
+    return (
         db_session.query(DpdHeadword, Russian)
         .join(Russian, DpdHeadword.id == Russian.id)
         .filter(
@@ -395,6 +414,21 @@ def select_reset_grounded_rows(
         )
         .order_by(DpdHeadword.ebt_count.desc())
     )
+
+
+def count_reset_grounded() -> int:
+    """Number of drafts `-reset-grounded` would clear (read-only)."""
+    query = reset_grounded_query()
+    return 0 if query is None else query.count()
+
+
+def select_reset_grounded_rows(
+    limit: int | None,
+) -> list[tuple[DpdHeadword, Russian]]:
+    """Rooted ru_meaning_raw drafts that `-reset-grounded` would clear."""
+    query = reset_grounded_query()
+    if query is None:
+        return []
     if limit is not None:
         query = query.limit(limit)
     return [(word, russian) for word, russian in query.all()]
@@ -555,6 +589,12 @@ def create_translation_prompt(
             translation_example,
             **extra_kwargs,
         )
+        if lang == "ru":
+            reason = reject_reason(REJECTS_PATH, word.id)
+            if reason:
+                messages[1]["content"] += (
+                    f"\n\nA previous draft was rejected because: {reason}"
+                )
     elif mode == "lit":
         construction = (word.construction or "").split("\n")[0]
         lit_examples = get_same_root_lit_examples(word) if word.root_key else []

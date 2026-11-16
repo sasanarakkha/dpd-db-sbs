@@ -1070,3 +1070,4 @@ Append-only. One line per session: `- <start ISO> → <end ISO> | op=… mode=�
 - 2026-07-08T22:38:24.501838+08:00 | op=check mode=meaning_raw_list lang=- chunk=50 attempted=50 ok=50
 - 2026-07-08T22:39:08.755732+08:00 | op=check mode=meaning_raw_list lang=- chunk=50 attempted=24 ok=24
 - 2026-07-08T22:39:11.711041+08:00 | op=check mode=meaning_raw_list lang=- chunk=50 attempted=0 ok=0
+- 2026-11-16T18:55:25.226313+08:00 → 2026-11-16T18:55:26.092153+08:00 | op=4 mode=ai lang=ru chunks=0 attempted=1 ok=0 field=ru_meaning_raw exit=0

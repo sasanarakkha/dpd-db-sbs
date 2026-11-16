@@ -9,8 +9,18 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from sqlalchemy.orm import Session
+
+from db.db_helpers import get_db_session
+from kamma.translate.scripts.ids_file import (
+    read_ids_file,
+    read_ids_scope,
+    write_ids_file,
+)
 from kamma.translate.scripts.offpeak import require_offpeak
+from kamma.translate.scripts.rejects import REJECTS_PATH, parked_ids
 from kamma.translate.scripts.session_log import append_log_line, format_session_line
+from tools.paths import ProjectPaths
 from tools.printer import printer as pr
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
@@ -27,12 +37,23 @@ PROCESSED_IDS_PATH = PROJECT_ROOT / "temp" / "ai_from_batch_api" / "processed_id
 
 DEFAULT_CHUNK = 50
 
-STATUS_GENERATE_PROBES: list[tuple[str, str]] = [
+STATUS_POOLS: list[tuple[str, str]] = [
     ("meaning", "ru"),
     ("lit", "ru"),
     ("note", "ru"),
     ("meaning", "ta"),
 ]
+STATUS_CHECK_MODES: list[str] = [
+    "meaning",
+    "meaning_raw",
+    "russian_grammar_meaning_raw",
+    "meaning_raw_list",
+    "meaning_lit",
+    "meaning_lit_list",
+    "notes",
+    "notes_raw",
+]
+STATUS_LEXICAL_FIELDS: list[str] = ["ru_meaning_raw", "ru_meaning"]
 
 _ROWS_FILTERED_RE = re.compile(r"Rows filtered for the process: (\d+) / (\d+)")
 _WORDS_TO_ANALYZE_RE = re.compile(r"Found (\d+) words to analyze")
@@ -111,15 +132,7 @@ def read_generated_ids(path: Path, since: datetime) -> list[int]:
 
 def merge_processed_ids(path: Path, new_ids: list[int]) -> list[int]:
     """Union existing processed ids (tolerating a missing/malformed file) with new_ids, sorted."""
-    existing: list[int] = []
-    if path.exists():
-        try:
-            loaded = json.loads(path.read_text(encoding="utf-8"))
-            if isinstance(loaded, list):
-                existing = [int(i) for i in loaded]
-        except json.JSONDecodeError:
-            existing = []
-    return sorted(set(existing) | set(new_ids))
+    return sorted(set(read_ids_file(path)) | set(new_ids))
 
 
 def build_generate_command(
@@ -149,23 +162,6 @@ def build_generate_command(
     if provider and model:
         cmd += ["-provider", provider, "-model", model]
     return cmd
-
-
-def build_status_probe_command(mode: str, lang: str) -> list[str]:
-    """Build the subprocess command for a --status dry-run pool-size probe."""
-    return [
-        "uv",
-        "run",
-        "python3",
-        str(GENERATE_SCRIPT),
-        "-mode",
-        mode,
-        "-lang",
-        lang,
-        "--dry-run",
-        "-limit",
-        "1",
-    ]
 
 
 def build_check_command(
@@ -205,45 +201,74 @@ def run_subprocess_capture(cmd: list[str]) -> tuple[str, int]:
     return "".join(lines), process.returncode
 
 
-def print_status() -> None:
-    """Print persisted state, generate-pool pending counts, and checker snapshot sizes."""
-    state = load_state(STATE_PATH)
-    pr.white(f"last_op: {state['last_op']}")
-    pr.white(f"totals: {state['totals']}")
-
-    pr.white("")
-    pr.white("Pending work (generate pool sizes):")
-    for mode, lang in STATUS_GENERATE_PROBES:
-        cmd = build_status_probe_command(mode, lang)
-        result = subprocess.run(cmd, capture_output=True, text=True, check=False)
-        counts = parse_generate_counts(result.stdout)
-        total = counts[1] if counts else "?"
-        pr.white(f"  {mode}/{lang}: {total} pending")
-
-    pr.white("")
-    pr.white("Pending work (checker pending counts):")
-    from db.db_helpers import get_db_session
+def collect_status(db_session: Session) -> dict[str, Any]:
+    """Gather every pending-work count with read-only, in-process queries."""
+    from kamma.translate.scripts import ai_generate_translation as gen
     from kamma.translate.scripts.ai_meaning_checker import RussianMeaningChecker
-    from tools.paths import ProjectPaths
+    from kamma.translate.scripts.synonym_audit import count_lexical_flagged
 
+    state = load_state(STATE_PATH)
+    return {
+        "state": state,
+        "generate": {
+            f"{mode}/{lang}": gen.count_pool(mode, lang) for mode, lang in STATUS_POOLS
+        },
+        "checker": {
+            mode: RussianMeaningChecker(mode=mode).get_total_count_with_session(
+                db_session
+            )
+            for mode in STATUS_CHECK_MODES
+        },
+        "op4": {
+            field: count_lexical_flagged(db_session, field)
+            for field in STATUS_LEXICAL_FIELDS
+        },
+        "op5": gen.irrelevant_ru_query().count(),
+        "op6": gen.count_reset_grounded(),
+        "parked": len(parked_ids(REJECTS_PATH)),
+        "last_audit": state.get("last_audit"),
+    }
+
+
+def print_status() -> None:
+    """Print persisted state, pending counts for every operation, and checker snapshot sizes."""
     pth = ProjectPaths()
     db_session = get_db_session(pth.dpd_db_path)
     try:
-        for mode in [
-            "meaning",
-            "meaning_raw",
-            "russian_grammar_meaning_raw",
-            "meaning_raw_list",
-            "meaning_lit",
-            "meaning_lit_list",
-            "notes",
-            "notes_raw",
-        ]:
-            checker = RussianMeaningChecker(mode=mode)
-            n_pending = checker.get_total_count_with_session(db_session)
-            pr.white(f"  {mode}: {n_pending} pending")
+        status = collect_status(db_session)
     finally:
         db_session.close()
+
+    pr.white(f"last_op: {status['state']['last_op']}")
+    pr.white(f"totals: {status['state']['totals']}")
+
+    pr.white("")
+    pr.white("Op 1 — generate pool (pending):")
+    for name, count in status["generate"].items():
+        pr.white(f"  {name}: {count} pending")
+
+    pr.white("")
+    pr.white("Op 2 — checker (pending):")
+    for mode, count in status["checker"].items():
+        pr.white(f"  {mode}: {count} pending")
+
+    pr.white("")
+    pr.white("Op 4 — synonym audit (lexical flagged rows):")
+    for field, count in status["op4"].items():
+        pr.white(f"  {field}: {count} flagged")
+    last_audit = status["last_audit"]
+    if last_audit:
+        pr.white(
+            f"  last audit: {last_audit.get('field')} / {last_audit.get('mode')} "
+            f"flagged {last_audit.get('flagged')} at {last_audit.get('ts')}"
+        )
+    else:
+        pr.white("  last audit: none recorded")
+
+    pr.white("")
+    pr.white(f"Op 5 — remove_irrelevant (ru): {status['op5']} rows would be removed")
+    pr.white(f"Op 6 — re-ground drafts (ru): {status['op6']} rows would be cleared")
+    pr.white(f"Parked rejects (rejected 2+ times): {status['parked']}")
 
     pr.white("")
     pr.white("Checker snapshot sizes:")
@@ -283,6 +308,15 @@ def _run_chunks(
         if not _peak_gate(totals["chunks"], args.allow_peak):
             return 0
 
+        # A re-run with the same lang/mode (after exit 2 or a peak stop) keeps the
+        # ids Op 2 has not checked yet; a new lang/mode starts a fresh file.
+        if (
+            args.op == "generate"
+            and totals["chunks"] == 0
+            and read_ids_scope(PROCESSED_IDS_PATH) != (args.lang, args.mode)
+        ):
+            write_ids_file(PROCESSED_IDS_PATH, args.lang, args.mode, [])
+
         chunk_start = datetime.now().astimezone()
         if args.op == "generate":
             cmd = build_generate_command(
@@ -302,8 +336,7 @@ def _run_chunks(
             ok = len(new_ids)
             if new_ids:
                 merged = merge_processed_ids(PROCESSED_IDS_PATH, new_ids)
-                PROCESSED_IDS_PATH.parent.mkdir(parents=True, exist_ok=True)
-                PROCESSED_IDS_PATH.write_text(json.dumps(merged), encoding="utf-8")
+                write_ids_file(PROCESSED_IDS_PATH, args.lang, args.mode, merged)
         else:
             attempted, ok = check_chunk_result(output, returncode)
 

@@ -304,3 +304,112 @@ def test_runner_source_has_no_antigravity_mention():
         "antigravity"
         not in Path(batch_runner.__file__).read_text(encoding="utf-8").lower()
     )
+
+
+# --- processed_ids.json: reset at generate-session start, merge chunk ids ---
+
+
+def test_generate_session_resets_stale_ids_then_merges_chunk_ids(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+):
+    ids_path = tmp_path / "ids.json"
+    ids_path.write_text(json.dumps([99, 98]), encoding="utf-8")  # stale bare list
+    _setup_runner(
+        monkeypatch,
+        tmp_path,
+        ["--op", "generate", "--mode", "meaning", "--lang", "ru", "--max-chunks", "1"],
+        [("", 0)],
+    )
+    monkeypatch.setattr(batch_runner, "require_offpeak", lambda _allow: None)
+
+    def fake_generate(cmd: list[str]) -> tuple[str, int]:
+        (tmp_path / "last.json").write_text(
+            json.dumps({"ids": [5, 3]}), encoding="utf-8"
+        )
+        return "Rows filtered for the process: 2 / 10\n", 0
+
+    monkeypatch.setattr(batch_runner, "run_subprocess_capture", fake_generate)
+    with pytest.raises(SystemExit) as exc:
+        batch_runner.main()
+    assert exc.value.code == 0
+    assert json.loads(ids_path.read_text(encoding="utf-8")) == {
+        "lang": "ru",
+        "mode": "meaning",
+        "ids": [3, 5],
+    }
+
+
+def test_generate_rerun_same_scope_keeps_unverified_ids(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+):
+    """A re-run after exit 2 / peak stop must not drop ids Op 2 has not checked yet."""
+    ids_path = tmp_path / "ids.json"
+    ids_path.write_text(
+        json.dumps({"lang": "ru", "mode": "meaning", "ids": [7, 8]}), encoding="utf-8"
+    )
+    _setup_runner(
+        monkeypatch,
+        tmp_path,
+        ["--op", "generate", "--mode", "meaning", "--lang", "ru", "--max-chunks", "1"],
+        [("", 0)],
+    )
+    monkeypatch.setattr(batch_runner, "require_offpeak", lambda _allow: None)
+
+    def fake_generate(cmd: list[str]) -> tuple[str, int]:
+        (tmp_path / "last.json").write_text(json.dumps({"ids": [5]}), encoding="utf-8")
+        return "Rows filtered for the process: 1 / 10\n", 0
+
+    monkeypatch.setattr(batch_runner, "run_subprocess_capture", fake_generate)
+    with pytest.raises(SystemExit):
+        batch_runner.main()
+    assert json.loads(ids_path.read_text(encoding="utf-8"))["ids"] == [5, 7, 8]
+
+
+def test_generate_new_scope_resets_ids_file(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+):
+    ids_path = tmp_path / "ids.json"
+    ids_path.write_text(
+        json.dumps({"lang": "ru", "mode": "lit", "ids": [7, 8]}), encoding="utf-8"
+    )
+    _setup_runner(
+        monkeypatch,
+        tmp_path,
+        ["--op", "generate", "--mode", "meaning", "--lang", "ru", "--max-chunks", "1"],
+        [("", 0)],
+    )
+    monkeypatch.setattr(batch_runner, "require_offpeak", lambda _allow: None)
+
+    def fake_generate(cmd: list[str]) -> tuple[str, int]:
+        (tmp_path / "last.json").write_text(json.dumps({"ids": [5]}), encoding="utf-8")
+        return "Rows filtered for the process: 1 / 10\n", 0
+
+    monkeypatch.setattr(batch_runner, "run_subprocess_capture", fake_generate)
+    with pytest.raises(SystemExit):
+        batch_runner.main()
+    assert json.loads(ids_path.read_text(encoding="utf-8")) == {
+        "lang": "ru",
+        "mode": "meaning",
+        "ids": [5],
+    }
+
+
+def test_generate_refused_in_peak_does_not_reset_ids_file(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+):
+    ids_path = tmp_path / "ids.json"
+    ids_path.write_text(json.dumps([1, 2]), encoding="utf-8")
+    _setup_runner(
+        monkeypatch,
+        tmp_path,
+        ["--op", "generate", "--mode", "meaning"],
+        [("", 0)],
+    )
+
+    def blocked(_allow: bool) -> None:
+        raise SystemExit(1)
+
+    monkeypatch.setattr(batch_runner, "require_offpeak", blocked)
+    with pytest.raises(SystemExit):
+        batch_runner.main()
+    assert json.loads(ids_path.read_text(encoding="utf-8")) == [1, 2]

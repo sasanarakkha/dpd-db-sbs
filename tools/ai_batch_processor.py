@@ -22,6 +22,9 @@ from tools.ai_manager import AIManager
 from tools.printer import printer as pr
 
 
+_CODE_FENCE_RE = re.compile(r"^```[a-zA-Z]*\s*(.*?)\s*```$", re.DOTALL)
+
+
 @dataclass
 class WordComparison:
     """Represents a word entry for AI comparison"""
@@ -455,8 +458,11 @@ ONLY flag as MISMATCH if:
         self, response_content: str, word_comparison: WordComparison | None = None
     ) -> list[ComparisonResult]:
         """Parse AI response into ComparisonResult objects"""
-        # Clean up the response content
+        # Clean up the response content (models often wrap JSON in a ```json fence)
         response_content = response_content.strip()
+        fence = _CODE_FENCE_RE.match(response_content)
+        if fence:
+            response_content = fence.group(1).strip()
 
         try:
             # Try to parse as JSON first

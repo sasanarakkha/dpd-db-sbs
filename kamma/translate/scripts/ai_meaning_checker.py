@@ -12,14 +12,16 @@ The checker uses AI models to identify mismatches and generates detailed reports
 """
 
 import datetime
-import json
+from collections.abc import Sequence
 from pathlib import Path
+from typing import Any
 
 from sqlalchemy import and_
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Query, Session
 
 from db.db_helpers import get_db_session
+from db.models import DpdHeadword, Russian
 from tools.ai_batch_processor import BatchProcessor, ComparisonResult, WordComparison
 from tools.ai_related import replace_abbreviations
 from tools.meaning_snapshot_ru import (
@@ -31,12 +33,24 @@ from tools.meaning_snapshot_ru import (
 )
 from tools.paths import ProjectPaths
 from tools.paths_dps import DPSPaths
+from kamma.translate.scripts.ids_file import read_ids_file
+from kamma.translate.scripts.rejects import REJECTS_PATH, record_reject
 from tools.printer import printer as pr
 
 SQLITE_MAX_VARIABLES = 900
+LIST_ID_CHUNK = 500
+POOL_PAGE_SIZE = 1000
 
 # Modes that clear a DB field on MISMATCH: an unparseable reply must not decide them.
 STRICT_PARSE_MODES = {"meaning_raw", "meaning_raw_list", "notes_raw"}
+
+
+def _id_chunks(ids: set[int]) -> list[list[int]]:
+    """Split ids into sorted chunks of LIST_ID_CHUNK for IN clauses."""
+    ordered = sorted(ids)
+    return [
+        ordered[i : i + LIST_ID_CHUNK] for i in range(0, len(ordered), LIST_ID_CHUNK)
+    ]
 
 
 def _count_excluding(db_session, base_query, column, ids: set[int]) -> int:
@@ -128,6 +142,8 @@ class RussianMeaningChecker:
 
         self.snapshot: dict[int, str] = {}
         self.english_by_id: dict[int, str] = {}
+        self.russian_by_id: dict[int, str] = {}
+        self.rejects_path: Path = REJECTS_PATH
         self.checked_ids = self.load_checked_ids()
 
     @property
@@ -175,22 +191,48 @@ class RussianMeaningChecker:
 
     def load_list_ids(self) -> set[int]:
         """Load IDs from the ai_processed_ids_json file for meaning_raw_list mode"""
-        if self.list_ids_file is None or not self.list_ids_file.exists():
+        if self.list_ids_file is None:
             return set()
-        try:
-            return set(json.loads(self.list_ids_file.read_text(encoding="utf-8")))
-        except json.JSONDecodeError:
-            return set()
+        return set(read_ids_file(self.list_ids_file))
+
+    def _collect_unchecked(
+        self, queries: Sequence[Query[Any]], limit: int | None
+    ) -> list[tuple[DpdHeadword, Russian]]:
+        """Page each query in id order, skip checked ids, stop at `limit`.
+
+        Checked ids are excluded in Python (not an IN list) so the SQLite
+        parameter limit never applies."""
+        results: list[tuple[DpdHeadword, Russian]] = []
+        for query in queries:
+            offset = 0
+            while True:
+                page = (
+                    query.order_by(DpdHeadword.id)
+                    .offset(offset)
+                    .limit(POOL_PAGE_SIZE)
+                    .all()
+                )
+                for headword, russian in page:
+                    if headword.id in self.checked_ids:
+                        continue
+                    results.append((headword, russian))
+                    if limit is not None and len(results) >= limit:
+                        return results
+                if len(page) < POOL_PAGE_SIZE:
+                    break
+                offset += POOL_PAGE_SIZE
+        return results
 
     def get_words_for_comparison_with_session(
-        self, db_session: Session
+        self, db_session: Session, limit: int | None = None
     ) -> list[WordComparison]:
-        """Get all words that have both English and Russian meanings using provided session"""
-        from db.models import DpdHeadword, Russian
+        """Words that have both English and Russian meanings, not yet checked.
 
+        With `limit`, stops after that many unchecked words (paged SQL reads,
+        id order) instead of loading the whole pool."""
         if self.mode == "meaning":
             # Original mode: check ru_meaning
-            results = (
+            queries = [
                 db_session.query(DpdHeadword, Russian)
                 .join(Russian, DpdHeadword.id == Russian.id)
                 .filter(
@@ -201,13 +243,12 @@ class RussianMeaningChecker:
                         Russian.ru_meaning != "",
                     )
                 )
-                .all()
-            )
+            ]
             russian_field = "ru_meaning"
 
         elif self.mode == "meaning_raw" or self.mode == "russian_grammar_meaning_raw":
             # Raw modes: check ru_meaning_raw
-            results = (
+            queries = [
                 db_session.query(DpdHeadword, Russian)
                 .join(Russian, DpdHeadword.id == Russian.id)
                 .filter(
@@ -219,8 +260,7 @@ class RussianMeaningChecker:
                         Russian.ru_meaning_raw != "",
                     )
                 )
-                .all()
-            )
+            ]
             russian_field = "ru_meaning_raw"
 
         elif self.mode == "meaning_raw_list":
@@ -230,28 +270,27 @@ class RussianMeaningChecker:
                 pr.amber("No IDs found in ai_processed_ids_json file. Exiting.")
                 return []
 
-            results = (
-                db_session.query(DpdHeadword, Russian)
-                .join(Russian, DpdHeadword.id == Russian.id)
-                .filter(
-                    and_(
-                        DpdHeadword.meaning_1.isnot(None),
-                        DpdHeadword.meaning_1 != "",
-                        Russian.ru_meaning == "",
-                        Russian.ru_meaning_raw.isnot(None),
-                        Russian.ru_meaning_raw != "",
-                        DpdHeadword.id.in_(
-                            list(list_ids)
-                        ),  # Only IDs from the list file
+            queries = []
+            for id_chunk in _id_chunks(list_ids):
+                queries.append(
+                    db_session.query(DpdHeadword, Russian)
+                    .join(Russian, DpdHeadword.id == Russian.id)
+                    .filter(
+                        and_(
+                            DpdHeadword.meaning_1.isnot(None),
+                            DpdHeadword.meaning_1 != "",
+                            Russian.ru_meaning == "",
+                            Russian.ru_meaning_raw.isnot(None),
+                            Russian.ru_meaning_raw != "",
+                            DpdHeadword.id.in_(id_chunk),
+                        )
                     )
                 )
-                .all()
-            )
             russian_field = "ru_meaning_raw"
 
         elif self.mode == "notes":
             # Notes mode: check ru_notes (excluding AI translations)
-            results = (
+            queries = [
                 db_session.query(DpdHeadword, Russian)
                 .join(Russian, DpdHeadword.id == Russian.id)
                 .filter(
@@ -267,12 +306,11 @@ class RussianMeaningChecker:
                         ),  # Exclude AI translations
                     )
                 )
-                .all()
-            )
+            ]
             russian_field = "ru_notes"
         elif self.mode == "notes_raw":
             # Notes raw mode: check ru_notes (AI translations only)
-            results = (
+            queries = [
                 db_session.query(DpdHeadword, Russian)
                 .join(Russian, DpdHeadword.id == Russian.id)
                 .filter(
@@ -286,12 +324,11 @@ class RussianMeaningChecker:
                         Russian.ru_notes.contains("[пер. ИИ]"),  # Only AI translations
                     )
                 )
-                .all()
-            )
+            ]
             russian_field = "ru_notes"
         elif self.mode == "meaning_lit":
             # Literal meaning mode: check ru_meaning_lit
-            results = (
+            queries = [
                 db_session.query(DpdHeadword, Russian)
                 .join(Russian, DpdHeadword.id == Russian.id)
                 .filter(
@@ -304,8 +341,7 @@ class RussianMeaningChecker:
                         Russian.ru_meaning_lit != "",
                     )
                 )
-                .all()
-            )
+            ]
             russian_field = "ru_meaning_lit"
 
         elif self.mode == "meaning_lit_list":
@@ -315,32 +351,28 @@ class RussianMeaningChecker:
                 pr.amber("No IDs found in ai_processed_ids_json file. Exiting.")
                 return []
 
-            results = (
-                db_session.query(DpdHeadword, Russian)
-                .join(Russian, DpdHeadword.id == Russian.id)
-                .filter(
-                    and_(
-                        DpdHeadword.meaning_lit.isnot(None),
-                        DpdHeadword.meaning_lit != "",
-                        Russian.ru_meaning.isnot(None),
-                        Russian.ru_meaning != "",
-                        Russian.ru_meaning_lit.isnot(None),
-                        Russian.ru_meaning_lit != "",
-                        DpdHeadword.id.in_(
-                            list(list_ids)
-                        ),  # Only IDs from the list file
+            queries = []
+            for id_chunk in _id_chunks(list_ids):
+                queries.append(
+                    db_session.query(DpdHeadword, Russian)
+                    .join(Russian, DpdHeadword.id == Russian.id)
+                    .filter(
+                        and_(
+                            DpdHeadword.meaning_lit.isnot(None),
+                            DpdHeadword.meaning_lit != "",
+                            Russian.ru_meaning.isnot(None),
+                            Russian.ru_meaning != "",
+                            Russian.ru_meaning_lit.isnot(None),
+                            Russian.ru_meaning_lit != "",
+                            DpdHeadword.id.in_(id_chunk),
+                        )
                     )
                 )
-                .all()
-            )
             russian_field = "ru_meaning_lit"
         else:
             raise ValueError(f"Unknown mode: {self.mode}")
 
-        if self.checked_ids:
-            results = [
-                (hw, rus) for hw, rus in results if hw.id not in self.checked_ids
-            ]
+        results = self._collect_unchecked(queries, limit)
 
         comparisons = []
         for headword, russian in results:
@@ -380,8 +412,6 @@ class RussianMeaningChecker:
 
     def get_total_count_with_session(self, db_session: Session) -> int:
         """Get total count of words that need comparison using provided session"""
-        from db.models import DpdHeadword, Russian
-
         if self.mode == "meaning":
             base_query = (
                 db_session.query(DpdHeadword.id)
@@ -413,19 +443,28 @@ class RussianMeaningChecker:
             list_ids = self.load_list_ids()
             if not list_ids:
                 return 0
-            base_query = (
-                db_session.query(DpdHeadword.id)
-                .join(Russian, DpdHeadword.id == Russian.id)
-                .filter(
-                    and_(
-                        DpdHeadword.meaning_1.isnot(None),
-                        DpdHeadword.meaning_1 != "",
-                        Russian.ru_meaning == "",
-                        Russian.ru_meaning_raw.isnot(None),
-                        Russian.ru_meaning_raw != "",
-                        DpdHeadword.id.in_(list(list_ids)),
+
+            def _build(id_chunk: list[int]):
+                return (
+                    db_session.query(DpdHeadword.id)
+                    .join(Russian, DpdHeadword.id == Russian.id)
+                    .filter(
+                        and_(
+                            DpdHeadword.meaning_1.isnot(None),
+                            DpdHeadword.meaning_1 != "",
+                            Russian.ru_meaning == "",
+                            Russian.ru_meaning_raw.isnot(None),
+                            Russian.ru_meaning_raw != "",
+                            DpdHeadword.id.in_(id_chunk),
+                        )
                     )
                 )
+
+            return sum(
+                _count_excluding(
+                    db_session, _build(c), DpdHeadword.id, self.checked_ids
+                )
+                for c in _id_chunks(list_ids)
             )
         elif self.mode == "notes":
             base_query = (
@@ -478,20 +517,29 @@ class RussianMeaningChecker:
             list_ids = self.load_list_ids()
             if not list_ids:
                 return 0
-            base_query = (
-                db_session.query(DpdHeadword.id)
-                .join(Russian, DpdHeadword.id == Russian.id)
-                .filter(
-                    and_(
-                        DpdHeadword.meaning_lit.isnot(None),
-                        DpdHeadword.meaning_lit != "",
-                        Russian.ru_meaning.isnot(None),
-                        Russian.ru_meaning != "",
-                        Russian.ru_meaning_lit.isnot(None),
-                        Russian.ru_meaning_lit != "",
-                        DpdHeadword.id.in_(list(list_ids)),
+
+            def _build(id_chunk: list[int]):
+                return (
+                    db_session.query(DpdHeadword.id)
+                    .join(Russian, DpdHeadword.id == Russian.id)
+                    .filter(
+                        and_(
+                            DpdHeadword.meaning_lit.isnot(None),
+                            DpdHeadword.meaning_lit != "",
+                            Russian.ru_meaning.isnot(None),
+                            Russian.ru_meaning != "",
+                            Russian.ru_meaning_lit.isnot(None),
+                            Russian.ru_meaning_lit != "",
+                            DpdHeadword.id.in_(id_chunk),
+                        )
                     )
                 )
+
+            return sum(
+                _count_excluding(
+                    db_session, _build(c), DpdHeadword.id, self.checked_ids
+                )
+                for c in _id_chunks(list_ids)
             )
         else:
             raise ValueError(f"Unknown mode: {self.mode}")
@@ -547,6 +595,10 @@ class RussianMeaningChecker:
                 pr.amber(f"Failed to clear {field_name} for this chunk: {e}")
                 clean_session.rollback()
                 return
+            if field_name == "ru_meaning_raw":
+                reasons = {r.headword_id: r.reasoning for r in mismatches}
+                for headword_id in cleared:
+                    record_reject(self.rejects_path, headword_id, reasons[headword_id])
             for headword_id in cleared:
                 pr.green(f"Cleared {field_name} for ID {headword_id}")
             pr.green(f"Completed cleaning {field_name} for mismatched entries")
@@ -594,6 +646,12 @@ class RussianMeaningChecker:
             for result in mismatches:
                 lines.append(f"ID: {result.headword_id}\n")
                 lines.append(f"Lemma: {result.lemma_1}\n")
+                lines.append(
+                    f"English: {self.english_by_id.get(result.headword_id, '')}\n"
+                )
+                lines.append(
+                    f"Rejected Russian: {self.russian_by_id.get(result.headword_id, '')}\n"
+                )
                 lines.append(f"Confidence: {result.confidence:.2f}\n")
                 lines.append(f"Reasoning: {result.reasoning}\n")
                 if result.suggested_fix:
@@ -646,11 +704,11 @@ class RussianMeaningChecker:
             )
 
         # Get words for comparison
-        comparisons = self.get_words_for_comparison_with_session(db_session)
+        comparisons = self.get_words_for_comparison_with_session(
+            db_session, limit=limit or None
+        )
         self.english_by_id = {c.headword_id: c.english_meaning for c in comparisons}
-
-        if limit:
-            comparisons = comparisons[:limit]
+        self.russian_by_id = {c.headword_id: c.russian_meaning for c in comparisons}
 
         pr.white(f"Found {len(comparisons)} words to analyze")
 

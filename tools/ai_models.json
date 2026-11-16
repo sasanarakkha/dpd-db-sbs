@@ -7,17 +7,7 @@
     },
     {
       "provider": "openrouter",
-      "model": "deepseek/deepseek-v4-flash",
-      "delay": 0
-    },
-    {
-      "provider": "openrouter",
-      "model": "meta-llama/llama-4-scout",
-      "delay": 0
-    },
-    {
-      "provider": "openrouter",
-      "model": "openai/gpt-4.1-nano",
+      "model": "qwen/qwen3.7-flash",
       "delay": 0
     }
   ],
@@ -25,11 +15,6 @@
     {
       "provider": "deepseek",
       "model": "deepseek-v4-pro",
-      "delay": 0
-    },
-    {
-      "provider": "openrouter",
-      "model": "deepseek/deepseek-v4-pro",
       "delay": 0
     }
   ]
