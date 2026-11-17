@@ -40,8 +40,8 @@ COLUMNS: list[str] = [
     "status",
     "verifier_verdict",
     "verifier_note",
-    "ru_final",
     "ru_flagged",
+    "ru_final",
     "decision",
 ]
 

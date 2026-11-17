@@ -212,7 +212,7 @@ per unit is copied to its headwords. Stages, all in this thread:
 ## Ledger
 `shared_data/ru_cognate/ledger.tsv` (tracked), one row per unit, never deleted. Columns, in order:
 `unit_type, unit_key, pali_meaning, sanskrit, headword_count, en_cognate, pie_root, pie_id, ru_candidates,
-source, method, confidence, status, verifier_verdict, verifier_note, ru_final, ru_flagged, decision`.
+source, method, confidence, status, verifier_verdict, verifier_note, ru_flagged, ru_final, decision` (amended 2026-11-18, user: the two review columns `ru_final` and `decision` come last so only those are edited; `ru_flagged` sits just before them for reference).
 - `pie_id` is kept for column stability but stays empty (no `id` in the dumps).
 - `method`: `join|agent|manual`.
 - `status`: `pending → proposed → verified|disputed → written`, or `none`.

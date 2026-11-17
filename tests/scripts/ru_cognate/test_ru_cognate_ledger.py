@@ -137,8 +137,8 @@ def test_ledger_round_trip(tmp_path: Path) -> None:
     assert not list(tmp_path.glob("*.tmp"))
 
 
-def test_ru_flagged_column_follows_ru_final_and_starts_empty() -> None:
-    assert led.COLUMNS.index("ru_flagged") == led.COLUMNS.index("ru_final") + 1
+def test_review_columns_are_last_and_ru_flagged_starts_empty() -> None:
+    assert led.COLUMNS[-3:] == ["ru_flagged", "ru_final", "decision"]
     units = led.build_units([root_row("√budh", "√budh", "wake")], [])
     assert units[0].row["ru_flagged"] == ""
 

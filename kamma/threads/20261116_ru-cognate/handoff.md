@@ -17,6 +17,7 @@
   `misc/pat-bi/` is NOT this thread's — report only).
 
 ### What the user does
+(Column order changed 2026-11-18: the last three columns are now `ru_flagged`, `ru_final`, `decision` — the user edits only `ru_final` and `decision`; `COLUMNS` in `ru_cognate_ledger.py` and spec 11 updated, ledger rewritten with identical data. Uncommitted.)
 For each verified/disputed row: delete `y` or `n` from `decision`; edit `ru_final` where needed; move any accepted
 `ru_flagged` word into `ru_final` (flagged words are never written unless moved). Every `y` row needs a non-empty
 `ru_final` that passes the Cyrillic-only check.
