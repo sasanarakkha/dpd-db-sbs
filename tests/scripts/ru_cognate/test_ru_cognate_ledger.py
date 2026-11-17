@@ -281,3 +281,26 @@ def test_read_ledger_rejects_wrong_columns(tmp_path: Path) -> None:
     path.write_text("a\tb\n1\t2\n", encoding="utf-8")
     with pytest.raises(ValueError):
         led.read_ledger(path)
+
+
+# ---------- review sentinel ----------
+
+
+@pytest.mark.parametrize("value", ["", "non", " non ", "NON"])
+def test_final_words_treats_empty_and_sentinel_as_no_words(value: str) -> None:
+    assert led.NO_VALUE == "non"
+    assert led.final_words({"ru_final": value}) == []
+
+
+def test_final_words_splits_and_strips_real_words() -> None:
+    assert led.final_words({"ru_final": "бдеть, бодрый,будить"}) == [
+        "бдеть",
+        "бодрый",
+        "будить",
+    ]
+
+
+def test_final_words_keeps_non_cyrillic_text_so_the_cyrillic_check_can_reject_it() -> (
+    None
+):
+    assert led.final_words({"ru_final": "door"}) == ["door"]

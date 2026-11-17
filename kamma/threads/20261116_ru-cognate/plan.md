@@ -720,8 +720,12 @@ Off-peak only (no `--allow-peak`).
 - [ ] 7.1 **STOP: ask the user to review `shared_data/ru_cognate/ledger.tsv`** — set `decision` `y`/`n` on
   `verified` and `disputed` rows, edit `ru_final` where needed; move any `ru_flagged` word the user accepts
   into `ru_final` (flagged words are never written unless moved). Wait for confirmation.
-  → verify: no `verified`/`disputed` row has an empty `decision`; every `y` row has a non-empty `ru_final`
-  that passes the Cyrillic-only check.
+  **Amended 2026-11-18 (spec 10, review sentinel):** ledger pre-filled — every verified/disputed row has
+  `decision = y`, rows without a kept word have `ru_final = non` (= no word; `final_words()` in
+  `ru_cognate_ledger.py`). The user changes `y` → `n` to reject and edits `ru_final` to correct.
+  → verify: every verified/disputed row has `decision` `y` or `n`; every row with words (`final_words`) passes the
+  Cyrillic-only check; `ru_final` is either `non`/empty or all-Cyrillic words (anything else is reported, not
+  fixed); `y` on a no-word row is only reported as a warning.
 
 ## Phase 8 — Write to the DB (`scripts/ru_cognate/ru_cognate_write.py`)
 - [ ] 8.1 Tests first, then code per spec 11 (in-memory SQLite with `DpdHeadword` / `Russian` rows).

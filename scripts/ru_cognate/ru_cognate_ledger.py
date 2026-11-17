@@ -70,6 +70,17 @@ CLOSED_CLASS_RU: frozenset[str] = frozenset(
 
 Row = dict[str, str]
 
+# Review sentinel: a `ru_final` of "non" means "no Russian word", the same as empty.
+NO_VALUE = "non"
+
+
+def final_words(row: Row) -> list[str]:
+    """Return the words in a row's ru_final; empty or the NO_VALUE sentinel gives []."""
+    value = row["ru_final"].strip()
+    if value.lower() in ("", NO_VALUE):
+        return []
+    return [w.strip() for w in value.split(",") if w.strip()]
+
 
 @dataclass
 class Unit:

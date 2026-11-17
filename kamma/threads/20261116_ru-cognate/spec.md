@@ -192,6 +192,13 @@ per unit is copied to its headwords. Stages, all in this thread:
    "peak hours started — stopping", exit 0; `--allow-peak` bypasses peak, never a missing `CN_HOLIDAYS` year.
 10. **Review.** The user sets `decision` = `y`/`n` on `verified` and `disputed` rows; `ru_final` may be
     hand-edited; `ru_flagged` words are moved into `ru_final` only by the user. Only `decision = y` rows are written.
+    Amended 2026-11-18 (user): **review sentinel.** `ru_final` = `non` (case-insensitive, or empty) means "no Russian
+    word"; `NO_VALUE` and `final_words(row)` in `ru_cognate_ledger.py` are the single definition. The ledger is
+    pre-filled: every verified/disputed row has `decision = y` (the user changes it to `n` to reject), and a row
+    with no kept word has `ru_final = non`. Rules: a row with no words is never written, whatever `decision` says
+    (`y` on it is a warning, not an error); a row with words is written only with `decision = y`; any `ru_final`
+    that is neither the sentinel nor all Cyrillic words is an error (the review check and the writer both fail).
+    `non` is Latin, so it can never pass as a Russian word.
 11. **Write** `scripts/ru_cognate/ru_cognate_write.py` — dry-run by default, `--apply` to write:
     - Targets: `root` unit → headwords with that `root_key`; `family` unit → headwords with empty
       `root_key` and that `family_word`.
